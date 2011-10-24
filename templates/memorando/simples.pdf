@@ -1,0 +1,64 @@
+{% load proto_tags %}
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style>
+@import url('/var/www/media/css/memorando.css');
+@page {
+  size: a4 portrait;
+  background-image: url('/var/www/media/img/papel_timbrado.jpg');
+  top: 3cm;
+  left: 3cm;
+  right: 3cm;
+  bottom: 2cm;
+  @frame footer {
+                -pdf-frame-content: footerContent;
+                bottom: 0.5cm;
+                margin-right: 1cm;
+                height: 1cm;
+		left: -2.3cm;
+                } 
+}
+</style> 
+</head>
+<body>
+<p style="text-align:left;">NARA {{ m.data.year }}/{{ m.numero|stringformat:"03d" }}</p>
+<br />
+<p style="text-align:right;">São Paulo, {{ m.data|date:"j \de F \de Y"|lower }}</p>
+<br />
+<br />
+<br />
+<p>{{ m.destinatario|linebreaks }}</p>
+<br />
+<br />
+<p style="text-align:center;"><b>Assunto:</b> {{ m.assunto }}</p>
+<p style="text-align:justify;">
+{{ m.corpo|safe }}
+</p>
+{% if m.equipamento %}
+<p style="text-align:justify;font-weight:bold;">
+Informamos para os devidos fins que a FAPESP (Fundação de Amparo à Pesquisa do
+Estado de São Paulo), por ser uma instituição Pública Estadual, está isenta da emissão de
+nota fiscal, conforme Decreto 48.034 de 19/08/2003.
+</p>
+{% endif %}
+<p style="text-align:left;">Atenciosamente,</p>
+<br />
+<br />
+<p style="text-align:left;">{{ m.assinatura.nome }}<br />{{ m.assinatura.cargo_atual }} – ANSP</p>
+<br />
+<p style="text-align:justify;font-size:10px;color: #0000ff;">
+A Rede ANSP é um projeto de apoio |  pesquisa científica e tecnológica no Estado de São Paulo, financiado pela Fundação de Amparo | 
+Pesquisa do Estado de São Paulo por meio do processo no 2010/52277-8. O coordenador científico é o Prof. Dr. Luis Fernandez Lopez,
+docente da Faculdade de Medicina da Universidade de São Paulo, e o coordenador técnico, Jorge Futoshi Yamamoto, PhD.
+</p>
+<br />
+{% if m.envio %}
+<p style="text-align:left;line-height:180%">
+Recebido e conferido em __/__/_____
+<br />Nome: _________________________________________________
+<br />RG: ____________________________
+</p>
+{% endif %}
+</body>
+</html>

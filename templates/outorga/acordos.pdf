@@ -1,0 +1,37 @@
+{% load proto_tags %}
+<html xmlns="http://www.w3.org/1999/xhtml" lang="pt-br" xml:lang="pt-br" >
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style>
+@import url('/var/www/django/media/css/pdf.css');
+@page {
+  size: a4 landscape;
+  background-image: url('/var/www/django/media/img/papel_timbrado.jpg');
+  top: 3cm;
+  left: 1.5cm;
+  right: 1.5cm;
+  bottom: 2cm;
+  @frame footer {
+                -pdf-frame-content: footerContent;
+                bottom: 0.5cm;
+                margin-right: 1cm;
+                height: 1cm;
+		left: -2.3cm;
+                } 
+} 
+</style> 
+</head>
+<body>
+<h1 repeat="1">Acumulado por acordo</h1>
+
+    <table border="1" repeat="1" cellpadding="5">
+    {% for a in acordos %}<tr>
+       {% for d in a %}<td>{{ d|moeda }}</td>{% endfor %}
+    </tr>{% endfor %}
+    </table>
+
+  <div id="footerContent">
+      pág <pdf:pagenumber example="00" />
+  </div> 
+</body>
+</html>

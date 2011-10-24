@@ -1,0 +1,25 @@
+{% extends "admin/base_site.html" %}
+{% load proto_tags %}
+{% block content %}
+<h1 repeat="1">Relatório de acordos da outorga {{ termo }}</h1>
+
+    <form action="{% url financeiro.views.relatorio_acordos 1 %}" method="GET">
+        <input type="hidden" value="{{ termo.id }}" name="termo" />
+        <input type="submit" value="Versão para impressão" />
+    </form>
+
+    <table border="0" cellpadding="5">
+    {% for ac in acordos %}
+	<tr><td colspan="7">{{ ac.desc }} ({{ ac.total|moeda }})</td></tr>
+	{% for it in ac.itens %}
+	  <tr><td width="5%"><a name="origem_{{ it.id }}"></a></td><td colspan="6">{{ it.desc }} ({{ it.total|moeda }})</td></tr>
+	  {% for pg in it.pg %}
+	      <tr class="{% cycle 'z1' 'z2' %}"><td width="5%"></td><td width="5%"></td><td width="5%">{{ pg.p.conta_corrente.cod_oper }}</td><td width="5%">{{ pg.p.conta_corrente.data_oper|date:"d/m" }}</td><td>{{ pg.p.protocolo.descricao2.descricao }}</td><td>{{ pg.p.protocolo.referente }}</td><td width="10%">{{ pg.p.valor_fapesp|moeda }}</td><td>[{{ pg.p.protocolo.tipo_documento.nome }} - {{ pg.p.protocolo.num_documento }}]</td></tr>
+              {% for a in pg.docs %}
+                 <tr><td colspan="5"></td><td>{{ a.tipo.nome }}</td><td>parc. {{ a.parcial }}/pag. {{ a.pagina }}</td><td>{% if a.arquivo %}<a href="{{ a.arquivo.url }}">arquivo</a>{% endif %}</td></tr> 
+	      {% endfor %}
+          {% endfor %}
+	{% endfor %}
+    {% endfor %}
+    </table>
+{% endblock %}

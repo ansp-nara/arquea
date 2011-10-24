@@ -1,0 +1,48 @@
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style>
+@import url('/var/www/django/media/css/pdf.css');
+@page {
+  background-image: url('/var/www/django/media/img/papel_timbrado.jpg');
+  top: 3cm;
+  left: 1.5cm;
+  right: 1.5cm;
+  bottom: 2cm;
+  @frame footer {
+                -pdf-frame-content: footerContent;
+                bottom: 0.5cm;
+                margin-right: 1cm;
+                height: 1cm;
+		left: -2.3cm;
+                } 
+} 
+</style> 
+</head>
+<body>
+<h1 repeat="1">Pagamentos de {{ mes }} de {{ ano }}</h1>
+
+    <table border="1" repeat="1" cellpadding="5">
+    <tr><th>Processo</th><th>Documento</th><th>Data</th><th>Número da operação</th><th>Valor</th><th>Modalidade</th><th>Parcial</th><th>Página</th></tr>
+    {% for p in pagamentos %}
+	<tr><td>{{ p.termo }}</td><td class="peq">{{ p.documento }}</td><td>{{ p.data }}</td>
+	<td class="peq">{{ p.oper }}</td><td class="num peq">{{ p.valor }}</td>
+	<td>{{ p.modalidade }}</td><td>{{ p.parcial }}</td><td>{{ p.pagina }}</td></tr>
+    {% endfor %}
+    </table>
+
+   
+    <p>Total: {{ total }}</p>
+
+    <br />
+    Por modalidade
+    <ul>
+    {% for p in pm %}
+       <li>{{ p.modalidade }}: R$ {{ p.total }}</li>
+    {% endfor %}
+    </ul>
+  <div id="footerContent">
+      pág <pdf:pagenumber example="00" />
+  </div> 
+</body>
+</html>

@@ -1,0 +1,27 @@
+{% extends "admin/base_site.html" %}
+{% load proto_tags %}
+{% block content %}
+<h1 repeat="1">Inventário por local</h1>
+
+{% comment %}
+    <form action="{% url patrimonio.views.por_estado 1 %}" method="GET">
+       <input type="hidden" value="{{ termo.id }}" name="termo" />
+       <input type="submit" value="Versão para impressão" />
+    </form> {% endcomment %}
+
+    <h4>{% if endereco %}{{ endereco }}{% else %}{{ detalhe.endereco }} - {{ detalhe }}{% endif %}</h4>
+ 
+    <table border="0" repeat="1" cellpadding="5">
+    <tr>{% if endereco %}<th>Local</th>{% endif %}<th>Procedência</th><th>Marca</th><th>Modelo</th><th>Part number</th><th>Descrição</th><th>NS</th></tr>
+    {% for d in detalhes %}
+        <tr>{% if endereco %}<td>{{ d.detalhe }}</td>{% endif %}<td colspan="7"></td></tr>
+           {% for p in d.patrimonio %}
+              <tr><td></td><td></td><td>{{ p.procedencia }}</td><td>{{ p.marca }}</td><td>{{ p.modelo }}</td><td>{{ p.part_number }}</td><td>{{ p.descricao }}</td><td>{{ p.ns }}</td></tr>
+              {% for f in p.patrimonio_set.all %}
+                 <tr><td></td><td></td><td></td><td>{{ f.procedencia }}</td><td>{{ f.marca }}</td><td>{{ f.modelo }}</td><td>{{ f.part_number }}</td><td>{{ p.descricao }}</td><td>{{ f.ns }}</td></tr>
+              {% endfor %}
+           {% endfor %}
+    {% endfor %}
+    </table>
+
+{% endblock %}

@@ -1,0 +1,8 @@
+            <ul class="actionlist">
+            {% for rel in relatorios %}
+            <li>
+               <a href="{{ rel.url }}">{{ rel.nome }}</a>
+            </li>
+            {% endfor %}
+            </ul>
+

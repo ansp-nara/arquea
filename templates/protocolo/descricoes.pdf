@@ -1,0 +1,43 @@
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style>
+@import url('/var/www/django/media/css/pdf.css');
+@page {
+  background-image: url('/var/www/django/media/img/papel_timbrado.jpg');
+  top: 3cm;
+  left: 1.5cm;
+  right: 1.5cm;
+  bottom: 2cm;
+  @frame footer {
+                -pdf-frame-content: footerContent;
+                bottom: 0.5cm;
+                margin-right: 1cm;
+                height: 1cm;
+		left: -2.3cm;
+                } 
+} 
+</style> 
+</head>
+<body>
+{% for prot in protocolos %}
+{% if prot.protocolos %}
+<h1 repeat="1">{{ prot.descricao }}</h1>
+
+    <table border="0" repeat="1" cellpadding="5">
+    <tr><th>Tipo e número</th><th>Referente</th><th>Valor</th><th>Estado</th></tr>
+    {% for p in prot.protocolos %}
+	<tr><td>({{ p.tipo_documento }} {{ p.num_documento }})</td><td>{{ p.referente }}</td>
+	<td class="num peq">{{ p.mostra_valor }}</td><td class="num peq">{{ p.estado }}</td></tr>
+	    {% for a in p.arquivo_set.all %}
+	        <tr><td></td><td colspan="3"><a href="{{ a.arquivo.url }}">arquivo</a></td></tr>
+	    {% endfor %}
+    {% endfor %}
+    </table>
+{% endif %}
+{% endfor %}
+  <div id="footerContent">
+      pág <pdf:pagenumber example="00" />
+  </div> 
+</body>
+</html>

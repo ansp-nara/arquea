@@ -1,0 +1,12 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<form method="POST">{% csrf_token %}
+<label for="id_estado">Estado</label>:
+<select name="estado" id="id_estado">
+  {% for e in estados %}
+     <option value="{{ e.id }}">{{ e }}</option>
+  {% endfor %}
+</select>
+<input type="submit" value="Enviar">
+</form>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% load proto_tags %}
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style>
+@import url('/var/www/django/media/css/pdf.css');
+@page {
+  size: a3 landscape;
+  background-image: url('/var/www/django/media/img/papel_timbrado.jpg');
+  top: 3cm;
+  left: 1.5cm;
+  right: 1.5cm;
+  bottom: 2cm;
+  @frame footer {
+                -pdf-frame-content: footerContent;
+                bottom: 0.5cm;
+                margin-right: 1cm;
+                height: 1cm;
+		left: -2.3cm;
+                } 
+} 
+</style> 
+</head>
+<body>
+<h1 repeat="1">Prestação de contas do processo {{ termo }}</h1>
+
+    {% for m in modalidades %}
+    <table border="0" repeat="1" cellpadding="5">
+ 	   <tr><th>{{ m.modalidade }}</th></tr>
+           {% for p in m.parcial %}
+	      {% for pgto in p.pgtos %}
+	         <tr><td></td><td>Parcial {{ p.num }}/página {{ pgto.pagina }}</td><td width="40%">{{ pgto.pg.origem_fapesp.item_outorga }}</td>
+		     <td>{{ pgto.pg.conta_corrente.data_oper }}</td>
+		     <td>{% if pgto.pg.conta_corrente.imagem %}<a href="{{ pgto.pg.conta_corrente.imagem.url }}">{{ pgto.pg.conta_corrente.cod_oper }}</a>{% else %}{{ pgto.pg.conta_corrente.cod_oper }}{% endif %}</td>
+		     <td>{{ pgto.pg.valor_fapesp|moeda }}</td>
+		     <td>{% if pgto.pg.conta_corrente.extrato_financeiro.comprovante %}<a href="{{ pgto.pg.conta_corrente.extrato_financeiro.comprovante.url }}">comprovante da liberação</a>{% endif %}</td></tr>
+		 {% for a in pgto.pg.auditoria_set.all %}
+		     <tr><td></td><td></td><td>{{ a.tipo }}</td><td>{% if a.arquivo %}<a href="{{ a.arquivo.url }}">arquivo</a>{% endif %}</td><td>{{ a.estado }}</td></tr>
+		 {% endfor %}
+	      {% endfor %}
+           {% endfor %}
+    </table>
+    {% endfor %}
+
+
+  <div id="footerContent">
+      pág <pdf:pagenumber example="00" />
+  </div> 
+</body>
+</html>

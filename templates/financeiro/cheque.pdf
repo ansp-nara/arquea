@@ -1,0 +1,40 @@
+</html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <style>
+  @import url('/var/www/media/css/cheque.css');
+  @page {
+    size: a4;
+    top: 2cm;
+    left: 1.5cm;
+    right: 1.5cm;
+    bottom: 2cm;
+
+    @frame assinatura {
+       -pdf-frame-content: box;
+       top:20cm;
+       left:6.8cm;
+    }
+  }
+  </style>
+</head>
+<body>
+  <img src="http://sistema.ansp.br{% if cc.imagem %}{{ cc.imagem.url }}{% else %}/files/extratocc/cheque_branco.jpg{% endif %}">
+
+  <div class="cheque">
+  <hr size="10" color="#999999" />
+  <br />
+  <p>CÓPIA DO CHEQUE Nº:{{ cc.cod_oper }}  /  Processo {{ termo }}</p>
+  <p>DO BANCO: 001</p>
+  <p>UTILIZADO PARA: {{ cc.capa }}</p> 
+  <br/><br/><br/><br/><br />
+  </div>
+  <div id="box">
+  <table cellpadding="1">	      
+    <tr><th>CHEQUE ASSINADO POR:</th></tr>
+    <tr><td>Prof. Lopez</td></tr>
+    <tr><td>&nbsp;</td></tr>
+  </table>
+  </div>
+</body>
+</html>
