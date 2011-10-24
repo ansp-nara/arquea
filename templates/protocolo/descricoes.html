@@ -1,0 +1,25 @@
+{% extends "admin/base_site.html" %}
+{% load proto_tags %}
+{% block content %}
+    <form action="{% url protocolo.views.protocolos_descricao 1 %}" method="GET">
+       <input type="hidden" value="{{ termo.id }}" name="termo" />
+       <input type="submit" value="Versão para impressão" />
+    </form>
+
+{% for prot in protocolos %}
+{% if prot.protocolos %}
+<h1 repeat="1">{{ prot.descricao }}</h1>
+
+    <table border="0" repeat="1" cellpadding="5">
+    <tr><th>Tipo e número</th><th>Referente</th><th>Valor</th><th>Estado</th></tr>
+    {% for p in prot.protocolos %}
+	<tr><td>({{ p.tipo_documento }} {{ p.num_documento }})</td><td>{{ p.referente }}</td>
+	<td class="num peq">{{ p.mostra_valor }}</td><td class="num peq">{{ p.estado }}</td></tr>
+	    {% for a in p.arquivo_set.all %}
+	        <tr><td></td><td colspan="3"><a href="{{ a.arquivo.url }}">arquivo</a></td></tr>
+	    {% endfor %}
+    {% endfor %}
+    </table>
+{% endif %}
+{% endfor %}
+{% endblock %}

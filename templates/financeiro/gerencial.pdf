@@ -1,0 +1,75 @@
+{% load proto_tags %}
+<html xmlns="http://www.w3.org/1999/xhtml" lang="pt-br" xml:lang="pt-br" >
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style>
+@import url('/var/www/media/css/pdf.css');
+@page {
+  size: a3 landscape;
+  background-image: url('/var/www/media/img/papel_timbrado.jpg');
+  top: 3cm;
+  left: 1.5cm;
+  right: 1.5cm;
+  bottom: 2cm;
+  @frame footer {
+                -pdf-frame-content: footerContent;
+                bottom: 0.5cm;
+                margin-right: 1cm;
+                height: 1cm;
+		left: -2.3cm;
+                } 
+} 
+</style> 
+</head>
+<body>
+<h1 repeat="1">Processo {{ termo }}</h1>
+
+    <table border="1" repeat="1" cellpadding="5">
+    <tr><th>Modalidade</th><th>Concessão</th>
+    {% for m in meses %}
+      <th>{{ m }}</th>
+    {% endfor %}
+    <th>Total realizado</th><th>Saldo</th></tr>
+    {% for m in modalidades %}
+	<tr><td class="peq">{{ m.modalidade }}</td><td class="num peq">{{ m.concedido }}</td>
+	{% for v in m.meses|dictsort:"ord" %}
+	  <td>{{ v.valor }}</td>
+	{% endfor %}
+        <td>{{ m.realizado }}</td><td>{{ m.saldo }}</td></tr>
+    {% endfor %}
+    <tr><td>Total (R$)</td><td>{{ gerais.concedido_real|moeda }}</td>
+    {% for t in totais|dictsort:"ord" %}
+        <td>{{ t.total_real|moeda }}</td>
+    {% endfor %}
+    <td>{{ gerais.gasto_real|moeda }}</td><td>{{ gerais.saldo_real|moeda }}<td>
+    </tr>
+    <tr><td>Total (US$)</td><td>{{ gerais.concedido_dolar|moeda:0 }}</td>
+    {% for t in totais|dictsort:"ord" %}
+        <td>{{ t.total_dolar|moeda:0 }}</td>
+    {% endfor %}
+    <td>{{ gerais.gasto_dolar|moeda:0 }}</td><td>{{ gerais.saldo_dolar|moeda:0 }}<td>
+    </tr>
+    </table>
+
+{% for m in modalidades %}
+ <pdf:nextpage />
+  <h3>{{ m.modalidade }}</h3>
+  <table border="1" repeat="1" cellpadding="5">
+  </th><th>Quantidade</th><th width="20%">Descrição</th><th>Concessão</th>
+    {% for m in meses %}
+      <th>{{ m }}</th>
+    {% endfor %}
+  <th>Total realizado</th><th>Saldo</th></tr>
+  {% for it, valores in m.itens.items %}
+     <tr><td>{{ it.quantidade }}</td><td>{{ it.descricao }}</td><td>{{ it.valor|moeda }}</td>
+     {% for v in valores|dictsort:"ord" %}<td>{{ v.valor }}</td>{% endfor %}
+     <td>{{ it.mostra_valor_realizado }}</td><td>{{ it.saldo|moeda }}</td></tr>
+  {% endfor %}
+  </table>
+{% endfor %}
+
+  <div id="footerContent">
+      pág <pdf:pagenumber example="00" />
+  </div> 
+</body>
+</html>

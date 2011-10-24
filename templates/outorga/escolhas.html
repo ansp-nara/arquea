@@ -1,0 +1,24 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<form method="GET">
+
+
+<label for="id_termo">Termo de outorga:</label>
+<select name="termo" id="id_termo">
+  <option value="0">----------</option>
+  {% for t in termos %}
+     <option value="{{ t.id }}">{{ t }}</option>
+  {% endfor %}
+</select>
+<label for="id_entidade">Entidade:</label>
+<select name="entidade" id="id_entidade">
+  <option value="0">----------</option>
+</select>
+<label for="id_item">Item do termo de outorga:</label>
+<select name="item" id="id_item">
+  <option value="0">----------</option>
+</select>
+<input type="submit" value="Enviar">
+</form>
+{% endblock %}
+

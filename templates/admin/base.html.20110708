@@ -1,0 +1,192 @@
+{% load static %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="{{ LANGUAGE_CODE }}" xml:lang="{{ LANGUAGE_CODE }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
+<head>
+	<title>{% block title %}{% endblock %}</title>
+	<link rel="stylesheet" type="text/css" href="{% block stylesheet %}{% load adminmedia %}{% admin_media_prefix %}css/base.css{% endblock %}" />
+	{% block extrastyle %}{% endblock %}
+	<!--[if lte IE 7]><link rel="stylesheet" type="text/css" href="{% block stylesheet_ie %}{% load adminmedia %}{% admin_media_prefix %}css/ie.css{% endblock %}" /><![endif]-->
+	{% if LANGUAGE_BIDI %}<link rel="stylesheet" type="text/css" href="{% block stylesheet_rtl %}{% admin_media_prefix %}css/rtl.css{% endblock %}" />{% endif %}
+	<script type="text/javascript">window.__admin_media_prefix__ = "{% filter escapejs %}{% admin_media_prefix %}{% endfilter %}";</script>
+	{% block extrahead %}{% endblock %}
+	{% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock %}
+
+        <script type="text/javascript" src="/media/js/jquery.js"></script>
+	{% comment %}<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>{% endcomment %}
+	<script type="text/javascript" src="{% get_static_prefix %}js/jquery-blockUI.js"></script>
+        <script type="text/javascript" src="{% get_static_prefix %}js/csrf.js"></script>
+	<!--<script type="text/javascript" src="/media/js/jquery.accordion.js"></script>
+	
+	<script type="text/javascript"> 
+		$(function(){ 
+			$('#efeito').accordion({ 
+			autoheight:false 
+			}); 
+		}); 
+	</script>-->
+	
+	<script type="text/javascript"> <!-- modal box e slider de acoes recentes -->
+		$(document).ready(function() {
+            $('.modal-box').hide();
+			$('.modal-call').click(function() {
+                var id = '#mod-'+$(this).attr('app');
+				$.blockUI({ message: $(id) });
+			}); 
+			
+			$('.modal-close').click(function() { 
+            $.unblockUI(); 
+            return false; 
+			});
+			
+		}); 
+		
+		$(document).ready(function(){
+		 	$(".btn-slide-actions").click(function(){
+			$("#content-actions").slideToggle("default").css("z-index",1000);
+			$(this).toggleClass("active"); return false;
+			});
+		});
+
+	</script> 
+	
+	
+</head>
+{% load i18n %}
+
+<body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}">
+	{% block header %}
+{% if not is_popup %}
+    <!-- Header -->
+    <div id="header">
+		<div class="header-content">
+			<!--<div id="branding">
+			{% block branding %}{% endblock %}
+			</div>-->
+			<div id="branding" class="header-logo">
+				<h1><a href="/admin">ANSP - Sistema administrativo - página inicial</a></h1>
+			</div>
+			
+			<div class="header-sites">
+				<ul>
+					<li><span class="meta-label2">Sites:</span></li>
+					<li><a href="http://www.ansp.br" target="_blank">Rede ANSP</a></li>
+					<li><span class="meta-sep2">/</span></li>
+					<li><a href="http://intranet.ansp.br/" target="_blank">Intranet NARA</a></li>
+					<li><span class="meta-sep2">/</span></li>
+					<li><a href="http://diariodebordo.ansp.br/" target="_blank">Diário de Bordo</a></li>
+					<li><span class="meta-sep2">/</span></li>
+					<li><a href="http://www.fapesp.br" target="_blank">FAPESP</a></li>
+				</ul>			
+			</div>
+			
+			{% if user.is_active and user.is_staff %}
+			<div id="user-tools">
+				<ul>
+				<li class="username">{% trans 'Welcome,' %}<strong> {% filter force_escape %}{% firstof user.first_name user.username %}{% endfilter %}</strong></li>
+				{% block userlinks %}
+					{% url django-admindocs-docroot as docsroot %}
+					{% if docsroot %}
+					<li><a href="{{ docsroot }}">{% trans 'Documentation' %}</a></li>
+					<li>/</li>
+					{% endif %}
+					{% url admin:password_change as password_change_url %}
+					{% if password_change_url %}
+					<li><a class="change-pass" href="{{ password_change_url }}">
+					{% else %}
+					<li><a class="change-pass" href="{{ root_path }}password_change/">
+					{% endif %}
+					{% trans 'Change password' %}</a></li>
+					{% url django_cas.views.logout as logout_url %}
+					{% if logout_url %}
+					<li><a class="sair" href="{{ logout_url }}">
+					{% else %}
+					<li><a class="sair" href="{{ root_path }}logout/">
+					{% endif %}
+					{% trans 'Log out' %}</a></li>
+				{% endblock %}
+				</ul>
+			</div>
+			{% endif %}
+			{% block nav-global %}{% endblock %}
+			{% block breadcrumbs %}<div class="breadcrumbs">Você está em: <a href="/">{% trans 'Home' %}</a>{% if title %} &rsaquo; {{ title }}{% endif %}</div>{% endblock %}
+    {% endif %}
+
+        {% if messages %}
+        <ul class="messagelist">{% for message in messages %}
+          <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+	{% endfor %}</ul>
+        {% endif %}
+		</div>
+    </div><!-- END HEADER -->
+    {% endblock %}
+    
+<!-- END Header -->
+
+<!-- Container -->
+<div id="container">
+    <!-- Content -->
+    <div id="content" class="{% block coltype %}colM{% endblock %}">
+        {% block pretitle %}{% endblock %}
+        {% block content_title %}{% if title %}<h1>{{ title }}</h1>{% endif %}{% endblock %} 
+        {% block content %}
+        {% block object-tools %}{% endblock %}
+        {{ content }}
+        {% endblock %}
+        {% block sidebar %}{% endblock %}
+        <!--<br class="clear" />-->
+    </div>
+    <!-- END Content -->
+
+	</div><!-- END Container -->
+ {% block footer %}
+	<div id="footer">
+	
+		<div class="footer-content">
+		
+			<div class="content-modules-footer">
+				<h2>Módulos carregados</h2>
+				<ul>{% if adm_app_list %}
+				{% for app in adm_app_list %}
+					
+						<li>
+							<a href="/{{ app.app_url }}" class="section modal-call2" app="{{app.name}}">{% blocktrans with app.name as name %}{{ name }}{% endblocktrans %}</a></li>
+					
+				{% endfor %}
+			{% else %}
+				<p class="edit-alert">{% trans "You don't have permission to edit anything." %}</p>
+			{% endif %}
+				</ul>
+			</div><!-- end content-modules-footer -->
+			<div class="footer-sites">
+				<h2>Sites</h2>
+				<ul>
+					<li><a href="http://www.ansp.br">Rede ANSP</a></li>
+					<li><a href="http://intranet.ansp.br">Intranet NARA</a></li>
+					<li><a href="http://diariodebordo.ansp.br">Diário de Bordo</a></li>
+					<li><a href="http://www.fapesp.br">FAPESP</a></li>
+				</ul>
+			</div>
+			
+			<div class="nara-logo">
+				<a href="http://www.ansp.br/nara">Sobre nós</a>
+			</div>
+			
+			<div class="footer-copy">
+					Copyright©2010 <span class="meta-sep2">/</span> NARA <span class="meta-sep2">/</span> {% trans "Todos os direitos reservados" %}
+					<span class="meta-sep2">/</span>
+					<span class="links-copy">
+					<a href="Http://www.ansp.br">termos de uso</a>
+					<span class="meta-sep2">/</span>
+					<a href="Http://www.ansp.br">Segurança e privacidade</a>
+					<span class="meta-sep2">/</span>
+					<a href="Http://www.ansp.br">www.ansp.br</a>
+					<span class="meta-sep2">/</span>
+					<a href="http://www.fapesp.br">www.fapesp.br</a></span>
+					</span>
+				</div>
+			
+		</div>
+	</div>
+	{% endblock %}
+</body>
+</html>

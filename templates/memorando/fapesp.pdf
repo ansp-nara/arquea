@@ -1,0 +1,54 @@
+{% load proto_tags %}
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style>
+@import url('/var/www/media/css/memorando.css');
+@page {
+  size: a4 portrait;
+  background-image: url('/var/www/media/img/papel_timbrado.jpg');
+  top: 3cm;
+  left: 3cm;
+  right: 3cm;
+  bottom: 2cm;
+  @frame footer {
+                -pdf-frame-content: footerContent;
+                bottom: 0.5cm;
+                margin-right: 1cm;
+                height: 1cm;
+                left: -2.3cm;
+                }
+}
+</style>
+</head>
+<body>
+<p style="text-align:left;">{{ m.identificacao.endereco.entidade.sigla }} - {{ m.identificacao.area }}</p>
+<p style="text-align:left;">{{ m.identificacao.contato }}</p>
+<p style="text-align:left;">Memorando {{ m.memorando.numero }}</p>
+<p style="text-align:left;">Processo {{ m.memorando.termo }}</p>
+<p style="text-align:left;">Outorgado Dr. Luis Fernandez Lopez</p>
+<br />
+<p style="text-align:right;">São Paulo, {{ m.data|date:"j \de F \de Y"|lower }}</p>
+<br />
+<br />
+<br />
+<p style="text-align:left;">Prezado Senhor</p>
+<p>{{ m.introducao|safe }}</p>
+{% for c in corpos %}
+<p style="text-align:justify;">{{ c.numero }}) {{ c.pergunta|safe }}</p>
+{% for p in c.respostas %}
+<p style="text-align:justify;font-weight:bold;">Resp: {{ p|safe }}</p>
+{% endfor %}
+<br />
+{% endfor %}
+<p>{{ m.conclusao|safe }}</p>
+<br />
+<p style="text-align:center;">Atenciosamente,</p>
+<br />
+<br />
+<p style="text-align:center;">{{ m.assinatura.membro.nome }}<br />{{ m.assinatura.membro.cargo_atual }}<br />Núcleo de Apoio à Rede Acadêmica - NARA</p>
+<br />
+
+</body>
+</html>
+

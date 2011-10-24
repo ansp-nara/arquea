@@ -1,0 +1,18 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<form method="GET">
+{% if meses %}
+<select name="mes" id="id_mes">
+  {% for mes in meses %}
+     <option value="{{ mes }}">{{ mes }}</option>
+  {% endfor %}
+</select>
+{% endif %}
+<select name="ano" id="id_ano">
+  {% for ano in anos %}
+     <option value="{{ ano }}">{{ ano }}</option>
+  {% endfor %}
+</select>
+<input type="submit" value="Enviar">
+</form>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends "admin/base_site.html" %}
+{% load proto_tags %}
+{% block content %}
+
+<h1>Processo {{ termo }}</h1>
+<h4><a href="{% url financeiro.views.relatorio_gerencial 1 %}?termo={{ termo.id }}">Imprimir</a></h4>
+
+    <table border="1" cellpadding="5">
+    <tr><th>Modalidade</th><th>Concessão</th>
+    {% for m in meses %}
+      <th>{{ m }}</th>
+    {% endfor %}
+    <th>Total realizado</th><th>Saldo</th></tr>
+    {% for m in modalidades %}
+	<tr><td class="peq">{{ m.modalidade }}</td><td class="num peq">{{ m.concedido }}</td>
+	{% for v in m.meses|dictsort:"ord" %}
+	  <td>{{ v.valor }}</td>
+	{% endfor %}
+        <td>{{ m.realizado }}</td><td>{{ m.saldo }}</td></tr>
+    {% endfor %}
+    <tr><td>Total (R$)</td><td>{{ gerais.concedido_real|moeda }}</td>
+    {% for t in totais|dictsort:"ord" %}
+        <td>{{ t.total_real|moeda }}</td>
+    {% endfor %}
+    <td>{{ gerais.gasto_real|moeda }}</td><td>{{ gerais.saldo_real|moeda }}<td>
+    </tr>
+    <tr><td>Total (US$)</td><td>{{ gerais.concedido_dolar|moeda:0 }}</td>
+    {% for t in totais|dictsort:"ord" %}
+        <td>{{ t.total_dolar|moeda:0 }}</td>
+    {% endfor %}
+    <td>{{ gerais.gasto_dolar|moeda:0 }}</td><td>{{ gerais.saldo_dolar|moeda:0 }}<td>
+    </tr>
+    </table>
+
+{% for m in modalidades %}
+  <h3>{{ m.modalidade.nome }}</h3>
+  <table border="1" repeat="1" cellpadding="5">
+  </th><th>Quantidade</th><th width="20%">Descrição</th><th>Concessão</th>
+    {% for m in meses %}
+      <th>{{ m }}</th>
+    {% endfor %}
+  <th>Total realizado</th><th>Saldo</th></tr>
+  {% for it, valores in m.itens.items %}
+     <tr><td>{{ it.quantidade }}</td><td>{{ it.descricao }}</td><td>{{ it.valor|moeda:m.modalidade.moeda_nacional }}</td>
+     {% for v in valores|dictsort:"ord" %}<td>{{ v.valor }}</td>{% endfor %}
+     <td>{{ it.mostra_valor_realizado }}</td><td>{{ it.saldo|moeda:m.modalidade.moeda_nacional }}</td></tr>
+  {% endfor %}
+  </table>
+{% endfor %}
+{% endblock %}

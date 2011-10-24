@@ -1,0 +1,21 @@
+{% extends "admin/base_site.html" %}
+{% load proto_tags %}
+{% block content %}
+<h1 repeat="1">Extrato da conta corrente do projeto em {{ ano }}</h1>
+
+    <table border="0" repeat="1" cellpadding="5">
+       <tr><th>Data</th><th>Documento</th><th>Histórico</th><th>Valor</th><th>Imagem do cheque</th><th>Parciais</th><th>Tem pagamento?</th></tr>
+    {% for e in extrato %}
+        {% if e.data_oper %}
+ 	   <tr><td>{{ e.data_oper|date:"d/m/Y" }}</td><td>{{ e.cod_oper }}</td><td>{{ e.historico }}</td><td>{{ e.valor }}</td><td>{% if e.imagem %}<a href="{{ e.imagem.url }}">cheque</a>{% endif %}</td><td>{{ e.parciais }}</td><td>{% if e.pagamento_set.count %}T{% else %}Não t{% endif %}em</td></tr>
+           {% if e.obs %}
+              <tr><td></td><td colspan="5"><b>Observação</b>: {{ e.obs }}</td></tr>
+           {% endif %}
+	{% else %}
+	   <tr><td colspan=3><b>Saldo ao final do mês</b></td><td><b>{{ e }}</b></td></tr>
+	{% endif %}
+    {% endfor %}
+    </table>
+
+
+{% endblock %}

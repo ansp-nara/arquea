@@ -1,0 +1,26 @@
+{% extends "admin/base_site.html" %}
+{% load proto_tags %}
+{% block content %}
+<h1 repeat="1">Pagamentos de {{ mes }} de {{ ano }}</h1>
+
+    <table border="1" repeat="1" cellpadding="5">
+    <tr><th>Processo</th><th>Documento</th><th>Data</th><th>Número da operação</th><th>Valor</th><th>Modalidade</th><th>Parcial</th><th>Página</th></tr>
+    {% for p in pagamentos %}
+	<tr><td>{{ p.termo }}</td><td class="peq">{{ p.documento }}</td><td>{{ p.data }}</td>
+	<td class="peq">{{ p.oper }}</td><td class="num peq">{{ p.valor }}</td>
+	<td>{{ p.modalidade }}</td><td>{{ p.parcial }}</td><td>{{ p.pagina }}</td></tr>
+    {% endfor %}
+    </table>
+
+   
+    <p>Total: {{ total }}</p>
+
+    <br />
+    Por modalidade
+    <ul>
+    {% for p in pm %}
+       <li>{{ p.modalidade }}: R$ {{ p.total }}</li>
+    {% endfor %}
+    </ul>
+
+{% endblock %}

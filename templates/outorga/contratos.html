@@ -1,0 +1,22 @@
+{% extends "admin/base_site.html" %}
+{% load proto_tags %}
+{% block content %}
+<h1 repeat="1">Contratos por entidade</h1>
+
+    <table border="0" repeat="1" cellpadding="5">
+    {% for e in entidades %}
+ 	   <tr><th>{{ e.entidade }}</th></tr>
+           {% for c in e.contratos %}
+	         <tr><td></td><td>Início {{ c.inicio|date:"d/m/Y" }}</td><td>Término {{ c.termino|date:"d/m/Y" }}</td>
+		     <td>{{ c.numero }}</td>
+		     <td>{% if c.arquivo %}<a href="{{ c.arquivo.url }}">arquivo</a>{% endif %}</td>
+		     <td>{% if c.auto %}Auto{% endif %}</td>
+		 {% for os in c.os %}
+		     <tr><td></td><td></td><td>Início<br />{{ os.data_inicio|date:"d/m/Y" }}</td><td>Término<br />{{ os.data_rescisao|date:"d/m/Y" }}</td><td>{{ os.tipo.nome }} - {{ os.numero }}</td><td width="30%">{{ os.descricao }}</td><td>{% for a in os.arquivos.all %}<a href="{{ a.arquivo.url }}">arquivo</a> - {% endfor %}</td><td>{{ os.estado }}</td></tr>
+		 {% endfor %}
+	      {% endfor %}
+         
+    {% endfor %}
+    </table>
+
+{% endblock %}

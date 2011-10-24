@@ -1,0 +1,19 @@
+{% extends "admin/base_site.html" %}
+{% load proto_tags %}
+{% block content %}
+<h1 repeat="1">Outorga {{ termo }}</h1>
+
+    <table border="0" cellpadding="5">
+    {% for p in parciais %}
+	<tr><td>Parcial {{ p.parcial }}</td><td>(Diferença)  {{ p.diff }}</td></tr>
+	{% for d in p.dados %}
+	   <tr><td></td><td>{{ d.cheque }}</td><td>(Diferença)  {{ d.diff }}</td></tr>
+           {% for pg in d.pgtos %}
+	      <tr><td></td><td></td><td>{{ pg.pg.protocolo.num_documento }}</td><td>{{ pg.pg.valor_fapesp }}</td><td>{{ pg.pg.valor_patrocinio }}
+	      <td style="color:red;">{% if not pg.naparcial %}Tem parcial errada{% endif %}</td></tr>
+	   {% endfor %}
+	{% endfor %}
+    {% endfor %}
+    </table>
+
+{% endblock %}

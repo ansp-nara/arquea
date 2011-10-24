@@ -1,0 +1,15 @@
+{% extends "admin/base_site.html" %}
+{% load proto_tags %}
+{% block content %}
+<h1 repeat="1">Arquivos por entidade</h1>
+
+    <table border="0" cellpadding="5">
+    {% for e in entidades %}
+	<tr><td>{{ e.sigla }}</td></tr>
+	{% for a in e.arquivoentidade_set.all %}
+	   <tr><td></td><td>{{ a.data }}</td><td>{{ a.tipo }}</td><td><a href="{{ a.arquivo.url }}">{{ a.arquivo.name }}</a></td></tr>
+	{% endfor %}
+    {% endfor %}
+    </table>
+
+{% endblock %}

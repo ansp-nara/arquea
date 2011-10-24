@@ -1,0 +1,30 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="pt-br" xml:lang="pt-br" >
+<head>
+<link rel="stylesheet" type="text/css" href="/media/css/monitor.css" media="screen" />
+
+<title>Gráficos</title>
+</head>
+
+<body>
+	<div id="root">
+		<span class="logo">
+		</span>
+
+		<h2>Lista de links dispon&iacute;veis</h2>
+		<ul>
+			{% for link in links %}
+			<li>
+				<a href="{% url monitor.views.grafico link.id %}">
+				<p class="description">{{ link.descricao }}</p>
+				<span>
+				<IMG SRC="http://143.108.30.25/rtgplot.cgi?t1=if{{ link.t1 }}Octets_{{ link.roteador }}&t2=if{{ link.t2 }}Octets_{{ link.roteador }}&{% for p in link.portas %}iid={{ p }}&{% endfor %}begin={{ link.dia }}&end={{ link.agora }}&borderb=10&xplot=150&yplot=76&units=bits/s&factor=8&scalex=yes&{% if link.aggr %}aggr=yes{% else %}filled=yes{% endif %}">
+				</span>
+				</a>
+			</li>
+			
+			{% endfor %}
+		</ul>
+	</div>
+</body>
+</html>

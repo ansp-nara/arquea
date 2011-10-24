@@ -1,0 +1,41 @@
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style>
+@import url('/var/www/django/media/css/pdf.css');
+@page {
+  size: a4;
+  background-image: url('/var/www/django/media/img/papel_timbrado.jpg');
+  top: 3cm;
+  left: 1.5cm;
+  right: 1.5cm;
+  bottom: 2cm;
+  @frame footer {
+                -pdf-frame-content: footerContent;
+                bottom: 0.5cm;
+                margin-right: 1cm;
+                height: 1cm;
+		left: -2.3cm;
+                } 
+} 
+</style> 
+</head>
+<body>
+<h1 repeat="1">Extrato do financeiro do projeto {{ termo }}</h1>
+
+    <table border="0" repeat="1" cellpadding="5">
+       <tr><th>Data</th><th>Código</th><th>Histórico</th><th>Valor</th><th>Arquivo</th><th>Parciais</th></tr>
+    {% for e in extrato %}
+ 	   <tr><td>{{ e.data|date:"d/m/Y" }}</td><td>{{ e.cod }}</td><td>{{ e.historico }}</td><td>{{ e.valor }}</td><td>{% if e.comprovante %}<a href="{{ e.comprovante.url }}">comprovante</a>{% endif %}</td>{% ifequal e.cod "PGMP" %}<td style="color:red;">{{ e.diferenca }} (Diferença)</td>{% endifequal %}</tr>
+           {% for cc in e.cheques %}
+              <tr><td colspan="3"></td><td>{{ cc.valor }}</td><td><a href="http://sistema.nara.org.br/financeiro/extratocc/{{ cc.id }}">{{ cc.cod }}</a></td><td>{{ cc.parciais }}</td></tr>
+           {% endfor %}
+    {% endfor %}
+    </table>
+
+
+  <div id="footerContent">
+      pág <pdf:pagenumber example="00" />
+  </div> 
+</body>
+</html>
