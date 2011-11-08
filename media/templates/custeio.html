@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load intranet_extras %}
+
+{% block conteudo %}
+
+<h3>Custeio do NARA - processo {{ termo }}</h3>
+
+<table class="custeio-processo">
+{% for o in acordo %}
+   <tr class="{% cycle 'linha1' 'linha2' %}"><td colspan="7">{{ o.desc }} ({{ o.total|moeda }})</td><td class="align-center"><a href="http://sistema.ansp.br/financeiro/relatorios/acordos?termo={{ termo }}#origem_{{ o.id }}">Detalhes</a></tr>
+   {% comment %}
+   {% for p in o.pg %}
+     <tr><td></td><td>{{ p.cod }}</td><td>{{ p.data }}</td><td>{{ p.descricao }}</td><td>{{ p.referente }}</td><td>{{ p.valor }}</td><td>[{{ p.tipo }} - {{ p.numero }}]</tr>
+     {% for a in p.docs %}
+        <tr><td></td><td></td><td colspan="3">{{ a.tipo }}</td><td>parcial {{ a.parcial }}/página {{ a.pagina }}</td><td><a href="{{ a.url }}">arquivo</td></tr>
+     {% endfor %} 
+   {% endfor %}
+   {% endcomment %}
+{% endfor %}
+</table>
+
+{% endblock %}
+
+<script>
+</script>  
+ 

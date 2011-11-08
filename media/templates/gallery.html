@@ -1,0 +1,7 @@
+	<ul>
+             {% for photo in photos %}
+		<li>
+			<a href="{{ photo.url }}"><img src="{{photo.thumbnail}}" /></a>
+		</li>
+             {% endfor %}
+	</ul>

@@ -1,0 +1,47 @@
+{% load cache cms_tags menu_tags %}
+
+{% block header %}
+
+<div id="header">
+	<div class="header-content">
+		<span class="local">Rua Dr. Ov&iacute;dio Pires de Campos, 215 - 2º andar | CEP 05403-010 | Cerqueira C&eacute;sar - S&atilde;o Paulo-SP</span>
+		<a class="logo" href="{% page_id_url "home" %}">ANSP - Intranet</a>
+			
+		<ul class="header-menu">
+                    {% show_menu_below_id "superior" 0 0 0 0 "cms/sub_menu_home.html" %}      
+		</ul>
+			
+			<!-- caixa de busca e caixa de login -->
+			<div class="top-boxes">
+				<div class="search-box">
+					
+					<fieldset>
+						<form method="get" action="/search">	
+							<!-- <label>Buscar</label> -->
+							<input class="search-text" type="text" value="buscar" name="q" OnClick="value='';" OnBlur="value='buscar';"/>
+							<button class="btn-search" type="submit" name="Go">Ok</button>
+						</form>
+					</fieldset>
+				</div> <!-- end search-box -->
+		</div> <!-- end top-boxes -->
+	</div>	
+		<div class="userbar">
+			<div class="user-feedback">Voc&ecirc; est&aacute; em:&nbsp;</div><a href="#">{% show_breadcrumb %}</a>
+                    
+                        <span class="user-status">
+                            {% if user.is_authenticated %}
+
+                                <p class="username">{{ user.first_name }}</p>
+                                <ul>
+					<li><a href="{% url intranet.views.membros %}">Membros</a></li>
+                                        <li>|</li>
+                                        <li><a href="{% url django_cas.views.logout %}">Sair</a></li>
+                                </ul>
+                            {% else %}
+                                <p class="username"><a href="{% url django_cas.views.login %}">Entrar</a></p>
+                            {% endif %}
+                        </span>
+		</div> <!-- end userbar -->
+</div>
+	
+{% endblock %}

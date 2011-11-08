@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load intranet_extras %}
+
+{% block conteudo %}
+
+<h3>Gráfico de gastos e saldo por modalidade do processo {{ termo }}</h3>
+
+<h4>Escala linear <a href="#" onclick="ver_grafico('grafico_linear', '{% url intranet.views.grafico_barra termo_id %}', 'Carregando gráfico em escala linear', this);">Ver</a></h4>
+<span id="grafico_linear"></span>
+<br />
+
+<h4>Escala logarítmica <a href="#" onclick="ver_grafico('grafico_log', '{% url intranet.views.grafico_barra termo_id %}?log=True', 'Carregando gráfico em escala logarítmica', this);">Ver</a></h4>
+<span id="grafico_log"></span>
+<br />
+
+<h4>Gráfico pizza dos valores concedidos por modalidade <a href="#" onclick="ver_grafico('grafico_pizza', '{% url intranet.views.grafico_pizza termo_id %}', 'Carregando gráfico de pizza', this);">Ver</a></h4>
+<span id="grafico_pizza"></span>
+
+{% endblock %}
+
+<script>
+</script>  

@@ -1,0 +1,46 @@
+{% extends "isms/base.html" %}
+
+{% block content %}
+<div id="info">
+<strong>Company:</strong> {{ company }}
+</div>
+<br>
+
+<table style="text-align: left; width: 100%;" border="1" cellpadding="2" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+      <td class="menu">Section</td>
+      <td class="menu">Maximum</td>
+      {% for e in total %}
+      <td class="menu">Assessment<br/>at {{ e.date|date:"m/d/Y" }}</td>
+      {% endfor %}
+    </tr>
+
+    {% for s in sections %}
+    <tr>
+      <td>{{ s.section }}</td>
+      <td style="text-align: center;">{{ s.maximum }}</td>
+      {% for e in s.evals %}
+      <td style="text-align: center;">{{ e.current }}</td>
+      {% endfor %}
+    </tr>
+    {% endfor %}
+
+    <tr>
+      <td class="menu" colspan="{{ total.count|add:'2' }}" rowspan="1"></td>
+    </tr>
+
+    <tr>
+      <td class="total">TOTAL</td>
+      <td class="total2">{{ tmax }}</td>
+      {% for c in tcur %}
+      <td class="total2">{{ c }}</td>
+      {% endfor %}
+    </tr>
+
+  </tbody>
+</table>
+
+{% endblock %}

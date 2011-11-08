@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<!-- depois eu transfiro para a folha de css e marco com os comentarios -->
+
+<h3>Agenda - resultado da consulta (pessoa física ou jurídica)</h3>
+
+<!-- template para dados dos membros nara/ansp -->
+        <div class="tabnav">
+                <ul>
+                   <li><a href="{% url intranet.views.agenda char=char pess='fis' %}">Pessoa física</a></li>
+                   <li><a href="{% url intranet.views.agenda char=char pess='jur' %}">Pessoa jurídica</a></li>
+                </ul>
+        </div>
+	<div class="tabnav">
+		<ul>   
+			{% for ch in letters %}
+			<li><a href="{% url intranet.views.agenda char=ch pess=pess %}">{{ ch|upper }}</a></li>
+			{% endfor %}
+		</ul>
+	</div>
+        
+		<div class="content-aba">
+                  {% if pess == 'fis' %}
+                     {% for c in agenda.object_list %}
+			<div class="contato-display">
+
+				<ul class="contato-dados1">
+					<li><a href="mailto:{{ c.email }}">{{ c.nome }}</a></li>
+				</ul>
+				{% for ident in c.identificacao_set.all %}
+				<ul class="contato-dados2">
+					<li>{{ ident.endereco.entidade.nome }} - {{ ident.endereco.entidade.sigla }}</li>
+					<li>|</li>
+					<li>{{ ident.funcao }}</li>
+				</ul>
+
+				<ul class="contato-dados3">
+					<li>{{ ident.endereco.endereco_completo }}</li>
+				</ul>
+					{% endfor %}	
+				<ul class="contato-dados4">
+					<li>Telefone:</li>
+					<li>{{ c.tel }}</li>
+				</ul>
+				
+			</div> <!-- fecha div membro-display -->
+                      {% endfor %}
+                    {% else %}
+		      {% for e in agenda.object_list %}
+			<!-- formato de contato se a consulta for por pessoa jur�dica -->
+			
+			<div class="contato-display">
+				<ul>
+					<li>
+						<ul class="contato-dados1">
+							<li><a href="http://usp.br" target="_blank">{{ e.nome }} - {{ e.sigla }}</a></li>
+							<li>|</li>
+							<li>CNPJ:</li>
+							<li>{{ e.cnpj }}</li>
+						</ul>
+					
+									{% for ident in e.identificacoes %}	
+						<ul class="contato-dados2">
+							<li><a href="mailto:{{ ident.contato.email }}">{{ ident.contato.nome }}</a></li>
+							<li>|</li>
+							<li>{{ ident.funcao }}</li>
+						</ul>
+
+						<ul class="contato-dados3">
+							<li>{{ ident.endereco.endereco_completo }}</li>
+						</ul>
+						
+						<ul class="contato-dados4">
+							<li>Telefone:</li>
+							<li>{{ ident.contato.tel }}</li>
+						</ul>
+								{% endfor %}
+					</li>			
+				</ul>		
+			</div> <!-- fecha div membro-display -->
+                      {% endfor %}
+                 {% endif %}
+		</div>
+
+            <div class="paginador">
+        {% if agenda.has_previous %}
+            <a href="?page={{ agenda.previous_page_number }}">anterior</a>
+        {% endif %}
+
+        <span class="current">
+            Página {{ agenda.number }} de {{ agenda.paginator.num_pages }}.
+        </span>
+
+        {% if agenda.has_next %}
+            <a href="?page={{ agenda.next_page_number }}">próxima</a>
+        {% endif %}
+        </div> <!-- div paginador - fim -->
+
+
+{% endblock %}
+
+<script>
+</script>  

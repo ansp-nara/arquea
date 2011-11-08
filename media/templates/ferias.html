@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load intranet_extras %}
+
+{% block conteudo %}
+
+<h3>Escala de férias em {{ ano }}</h3>
+
+<table border="1">
+   <tr><th rowspan="2">Funcionário</th><th colspan="2">férias oficiais</th><th colspan="4">férias informais</th></tr>
+   <tr><td>início</td><td>término</td><td>início x</td><td>término x</td><td>início y</td><td>término y</td></tr>
+   {% for f in ferias %}
+      <tr><td>{{ f.nome }}</td>
+         {% for o in f.oficial %}
+          <td>{{ o.inicio }}</td><td>{{ o.termino }}</td>
+         {% endfor %}
+         {% for o in f.informal %}
+          <td>{{ o.inicio }}</td><td>{{ o.termino }}</td>
+         {% endfor %}
+      </tr>
+   {% endfor %}
+</table>
+
+{% endblock %}
+

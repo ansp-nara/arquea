@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block conteudo %}
+
+<h3>Agenda</h3>
+
+	<div class="tabnav">
+		<ul>   
+			{% for ch in letters %}
+			<li><a href="{% url intranet.views.agenda ch %}">{{ ch|upper }}</a></li>
+			{% endfor %}
+		</ul>
+	</div>
+
+	<ul class="agenda-lista">
+	{% for c in contatos.object_list %}
+		<li class="agenda-resultados">{{ c.nome }} - {{ c.contato_ent }} - {{ c.email }} - {{ c.telefone }}</li>
+	{% endfor %}
+	</ul>
+	
+	<div class="paginador">
+        {% if contatos.has_previous %}
+            <a href="?page={{ contatos.previous_page_number }}">anterior</a>
+        {% endif %}
+
+        <span class="current">
+            Página {{ contatos.number }} de {{ contatos.paginator.num_pages }}.
+        </span>
+
+        {% if contatos.has_next %}
+            <a href="?page={{ contatos.next_page_number }}">próxima</a>
+        {% endif %}
+	</div> <!-- div paginador - fim -->
+{% endblock %}
+

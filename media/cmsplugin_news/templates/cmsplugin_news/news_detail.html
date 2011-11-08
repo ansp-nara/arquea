@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+
+<p><span class="news-date">{{ object.pub_date|date:"Y - F, jS" }}</span>
+	<h3>{{ object.title }}</h3>
+	{{ object.content|safe }}
+	
+</p>
+{% endblock %}

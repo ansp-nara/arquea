@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block conteudo %}
+
+{{ body|safe }}
+
+<div class="custeio-list">
+
+	<p>Escolha abaixo o número do processo que você deseja acessar:</p>
+
+	<form method="GET" action="">
+		<select name="termo">
+		{% for t in termos %}
+		   <option value="{{ t.id }}">{{ t.termo }}</option>
+		{% endfor %}
+		</select>
+		<button type="submit" value="Enviar" >Enviar</button>
+	</form>
+
+</div>
+{{ graficos|safe }}
+
+{% endblock %}
+
+<script>
+</script>  
