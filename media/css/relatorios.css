@@ -1,0 +1,42 @@
+.rel-title{
+	display:block;
+	width:100%;
+	margin:0;
+	padding:10px 0; 
+	text-align:center;
+	border-bottom:dotted 1px #134089;
+	}
+
+.m-block1{
+	display:block;
+	border:solid 1px;
+	border-color:#fff #fff #ccc #fff;
+	padding:10px;
+	}
+	
+.m-block1:hover{
+	background:#ffffcc;
+	border:solid 1px #ccc;
+	border-size:0 1px;
+	}	
+	
+.m-respostas{
+	display:block;
+	border:solid 1px #dadada;
+	background:#fff;
+	padding:10px;
+	}
+	
+.m-respostas:hover{
+	background:#fff;
+	}	
+	
+.m-pagtos{
+	display:block;
+	border:solid 1px #dadada;
+	padding:10px;
+	margin-bottom:5px;
+	background:#ccccff;
+	}
+	
+.spacing1{margin-left:15px; display:block;}	
