@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% load intranet_extras %}
+{% block extrahead %}
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+
+      // Load the Visualization API and the piechart package.
+      google.load('visualization', '1.0', {'packages':['corechart']});
+
+      // Set a callback to run when the Google Visualization API is loaded.
+      google.setOnLoadCallback(drawPie);
+      google.setOnLoadCallback(drawColumn);
+
+      // Callback that creates and populates a data table,
+      // instantiates the pie chart, passes in the data and
+      // draws it.
+      function drawPie() {
+
+      // Create the data table.
+      var data = new google.visualization.DataTable();
+      data.addColumn('string', 'Modalidades');
+      data.addColumn('number', 'Gastos');
+      data.addRows([
+        {% for d in dados %}
+           ['{{ d.0 }}', {{ d.1 }}],
+        {% endfor %}
+      ]);
+
+      var formatter = new google.visualization.NumberFormat({decimalSymbol:',', groupingSymbol:'.', prefix:'R$ '});
+      formatter.format(data, 1);
+
+      // Set chart options
+      var options = {'title':'Gastos do processo por modalidade',
+                     'width':600,
+                     'height':450};
+
+      // Instantiate and draw our chart, passing in some options.
+      var chart = new google.visualization.PieChart(document.getElementById('pie_div'));
+      chart.draw(data, options);
+      }
+
+      function drawColumn() {
+
+      // Create the data table.
+      var data = new google.visualization.DataTable();
+      data.addColumn('string', 'Modalidades');
+      data.addColumn('number', 'Concedido');
+      data.addColumn('number', 'Realizado');
+      data.addRows([
+        {% for d in dados %}
+           ['{{ d.0 }}', {{ d.1 }}, {{ d.2 }}],
+        {% endfor %}
+      ]);
+
+      var formatter = new google.visualization.NumberFormat({decimalSymbol:',', groupingSymbol:'.', prefix:'R$ '});
+      formatter.format(data, 1);
+      formatter.format(data, 2);
+
+      // Set chart options
+      var options = {'title':'Gastos do processo por modalidade',
+                     'vAxis':{format:'R$ ###0.00'},
+                     'width':600,
+                     'height':450};
+
+      // Instantiate and draw our chart, passing in some options.
+      var chart = new google.visualization.ColumnChart(document.getElementById('column_div'));
+      chart.draw(data, options);
+
+      options = {'title':'Gastos do processo por modalidade em escala logaritmica',
+                     'vAxis':{format:'R$ ###0.00', logScale:true},
+                     'width':600,
+                     'height':450};
+      var chart = new google.visualization.ColumnChart(document.getElementById('column_log_div'));
+      chart.draw(data, options);
+
+    }
+
+
+    </script>
+{% endblock %}
+
+{% block conteudo %}
+
+<h3>Gráfico de gastos e saldo por modalidade do processo {{ termo }}</h3>
+
+<div id="column_div"></div>
+<br />
+
+<div id="column_log_div"></div>
+<br />
+
+<div id="pie_div"></div>
+
+{% endblock %}
+
+<script>
+</script>  

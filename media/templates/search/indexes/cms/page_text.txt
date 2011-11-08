@@ -1,0 +1,6 @@
+{{ object.get_title }}
+{% for pl in object.placeholders.all %}
+   {% for plugin in pl.get_plugins %}
+      {{ plugin.text.body }}
+   {% endfor %}
+{% endfor %}

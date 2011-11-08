@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% load cache cms_tags intranet_extras menu_tags %}
+{% block conteudo %}
+{% placeholder body %}
+<ul class="lista-nivel1">
+  {% reunioes %}
+</ul>
+{% endblock %}

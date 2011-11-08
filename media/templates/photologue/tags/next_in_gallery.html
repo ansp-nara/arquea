@@ -1,0 +1,6 @@
+<div class="photo-btn-next">
+{% if photo %}
+<span>Pr&oacute;xima</span>
+<a title="{{ photo.title }}" href="{{ photo.get_absolute_url }}"><img src="{{ photo.get_tiny_url }}"/></a>
+{% endif %}
+</div>

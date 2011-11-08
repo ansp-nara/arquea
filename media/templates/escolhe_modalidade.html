@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block conteudo %}
+
+<p>Escolha uma modalidade:</p>
+
+<form method="GET" action="">
+<select name="modalidade">
+{% for m in modalidades %}
+   <option value="{{ m.id }}">{{ m.modalidade }}</option>
+{% endfor %}
+</select>
+<input type="submit" value="Enviar" />
+</form>
+
+{% endblock %}
+
+<script>
+</script>  

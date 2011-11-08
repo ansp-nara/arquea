@@ -1,0 +1,44 @@
+{% extends "isms/base.html" %}
+
+{% block content %}
+<div class="description">
+	<strong>About</strong><br /><br />
+	<span>ISA is a web system based on Django developed to evaluate the information security in an organization using the controls from the ISO 27002 standard. You can use ISA as an indicator during the implementation process of an ISMS. It helps to identify the controls that need to be handled according with the project scope and/or with the organization's goals.</span><br /><br /><br />
+	
+	<div class="insert">
+		<strong>New Assessment</strong>
+		<span class="line"></span>
+		<form action="{% url isms.views.atualiza %}" method="POST">
+		{{ form.company.label_tag }}: {{ form.company }}
+		<br />
+		{{ form.date.errors }}
+		{{ form.date.label_tag }}:
+		{{ form.date }}
+		<span class="example-data">{{ form.date.help_text }}</span>
+		<br />
+		<input type="submit" name="submit" class="button" value="Add assessment" />
+		</form>
+	</div>
+	<div class="edit">
+		<strong>Edit Assessment</strong>
+		<span class="line"></span>
+		<form id="id_edit" action="{% url isms.views.atualiza %}" method="POST">
+		{{ form.company.label_tag }}:&nbsp;&nbsp;&nbsp;&nbsp; {{ form.company }}
+		<br />
+		{{ form.evaluation.label_tag }}: {{ form.evaluation }}
+		<br />
+		<input type="submit" name="submit" class="button" value="View/change" />
+		</form>
+	</div>
+	<div class="compare">
+		<strong>Reports</strong>
+		<span class="line"></span>
+		<form action="{% url isms.views.atualiza %}" method="POST">
+		{{ form.company.label_tag }}: {{ form.company }}
+		<br />
+		<input type="submit" name="submit" class="button" value="Get report" />
+		</form>
+	</div>
+</div>
+{{ form.media }}
+{% endblock %}

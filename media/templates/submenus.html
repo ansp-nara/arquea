@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% load cache cms_tags menu_tags %}
+{% block conteudo %}
+{% placeholder body %}
+<ul class="lista-nivel1">
+  {% show_menu_below_id current_page.reverse_id %}
+</ul>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends "isms/base.html" %}
+
+{% block content %}
+
+
+<form method="POST"><input type="hidden" name="eval" value="{{ eval.id }}" />
+<div id="info">
+<input type="hidden" name="company" value="{{ company.id }}" />Company {{ company }}
+<label for="id_date">Date</label> <input type="text" name="date" id="id_date" />
+</div>
+<br>
+
+<table style="text-align: left; width: 100%;" border="1" cellpadding="2" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+      <td class="menu" colspan="2" rowspan="1">ABNT NBR ISO 27001:2006 (Annex A)</td>
+      <td class="menu" colspan="1" rowspan="2">Implemented <br>controls</td>
+      <td class="menu" colspan="1" rowspan="2">Standard <br> requirements</td>
+      <td class="menu" colspan="1" rowspan="2">Mandatory <br> requirement</td>
+      <td class="menu" colspan="1" rowspan="2">Observation</td>
+    </tr>
+
+    <tr>
+      <td class="menu" width="10%">Section</td>
+      <td class="menu" colspan="2" rowspan="1">Control</td>
+    </tr>
+ 
+   {% for form in formset.forms %}
+    <tr>
+      <td colspan="2" rowspan="1">{{ form.iso }}{{ form.evaluation }}</td>
+      <td style="text-align: center;" colspan="1" rowspan="1">
+      {{ form.implemented }}</td>
+
+      <td style="text-align: center;" colspan="1" rowspan="1">
+      {{ form.standard }}</td>
+
+
+      <td style="text-align: center;" colspan="1" rowspan="1">
+      {{ form.mandatory }}</td>
+
+      <td style="text-align: center;">{{ form.observation }}</td>
+    </tr>
+
+    {% endfor %}   
+
+
+  </tbody>
+</table>
+{{ formset.management_form }}
+<input type="submit" value="Save">
+</form>
+{% endblock %}

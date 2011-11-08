@@ -1,0 +1,21 @@
+{% extends "photologue/root.html" %}
+
+{% block title %}{{ object.title }}{% endblock %}
+
+{% block conteudo %}
+
+<h1>{{ object.title }}</h1>
+<h2>Data de publica&ccedil;&atilde;o: {{ object.date_added|date:"l, F jS, Y" }}</h2>
+{% if object.description %}<p>{{ object.description }}</p>{% endif %}
+<div class="photo-gallery">
+    <ul>
+	{% for photo in object.public %}
+		<li class="gallery-photo-thumb">
+			<a href="{{ photo.get_absolute_url }}"><img src="{{ photo.get_thumbnail_url }}" alt="{{ photo.title }}"/></a>
+		</li>	
+	{% endfor %}
+	</ul>
+</div>
+<p><a class="link-acesso" href="{% url pl-gallery-list 1 %}">Todas as galerias</a></p>
+
+{% endblock %}
