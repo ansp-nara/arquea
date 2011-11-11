@@ -145,6 +145,25 @@ class Endereco(models.Model):
 
 
 
+class ASN(models.Model):
+    """
+    Tabela com os ASs da Internet
+    """
+
+    numero = models.IntegerField(u'Número do AS')
+    entidade = models.ForeignKey('identificacao.Entidade', null=True, blank=True)
+    pais = models.CharField(u'País', null=True, blank=True, max_length=3)
+
+    def __unicode__(self):
+	if self.entidade:
+	    return '%s - %s' % (self.numero, self.entidade)
+        else: return self.numero
+
+    class Meta:
+        verbose_name = (u'ASN')
+        verbose_name_plural = (u'ASNs')
+        ordering = ('numero',)
+
 class Entidade(models.Model):
 
     """
@@ -169,7 +188,7 @@ class Entidade(models.Model):
     nome = models.CharField(_(u'Nome'), max_length=255, help_text=_(u'Razão Social (ex. Telecomunicações de São Paulo S.A.)'))
     url = models.URLField(_(u'URL'), verify_exists=True, blank=True, help_text=_(u'ex. www.telefonica.com.br'))
     sigla = models.CharField(_(u'Sigla'), max_length=20, help_text=_(u'Nome Fantasia (ex. TELEFÔNICA)'), unique=True)
-    asn = models.IntegerField(_(u'ASN'), blank=True, null=True, help_text=_(u' '))
+    pertence = models.BooleanField(u'Pertence à ANSP?')
     cnpj = CNPJField(_(u'CNPJ'), blank=True, help_text=_(u'ex. 00.000.000/0000-00'))
     fisco = models.BooleanField(_(u'Fisco'), help_text=_(u'ex. Ativo no site da Receita Federal?'))
 

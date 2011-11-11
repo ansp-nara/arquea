@@ -98,7 +98,7 @@ class EntidadeAdmin(admin.ModelAdmin):
                      'classes': ('wide',)
                  }),
                  (None, {
-                     'fields': ('url', ('cnpj', 'fisco'), 'asn'),
+                     'fields': ('url', ('cnpj', 'fisco'), 'pertence'),
                      'classes': ('wide',)
                  }),
 
@@ -158,3 +158,4 @@ admin.site.register(Agenda)
 admin.site.register(TipoArquivoEntidade)
 admin.site.register(Acesso)
 admin.site.register(NivelAcesso)
+admin.site.register(ASN)
