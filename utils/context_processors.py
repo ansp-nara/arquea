@@ -39,4 +39,6 @@ def applist(request):
 					
 	app_list = app_dict.values()
 	app_list.sort(lambda x, y: cmp(x['name'], y['name']))
+        for app in app_list:
+            app['models'].sort(lambda x, y: cmp(x['name'], y['name']))
 	return {'adm_app_list': app_list}
