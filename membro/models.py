@@ -246,6 +246,7 @@ class Ferias(models.Model):
     membro = models.ForeignKey('membro.Membro', verbose_name=_(u'Membro'), limit_choices_to=Q(historico__funcionario=True)&Q(historico__termino__isnull=True))
     inicio = NARADateField(_(u'Início'), help_text=_(u'Início do período de trabalho'))
     realizado = models.BooleanField(_(u'Férias já tiradas?'))
+    decimo_terceiro = models.BooleanField(_(u'Primeira parcela do décimo terceiro junto com as férias?'))
 
     # Retorna o membro e o período de férias.
     def __unicode__(self):
