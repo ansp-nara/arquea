@@ -76,7 +76,8 @@ admin.site.register(Assinatura, AssinaturaAdmin)
 class ControleFeriasInline(admin.TabularInline):
     model = ControleFerias
     form = ControleFeriasAdminForm
-    extra = 1
+    formset = ControleFeriasAdminFormSet
+    extra = 0
 
 class FeriasAdmin(admin.ModelAdmin):
 
@@ -91,7 +92,7 @@ class FeriasAdmin(admin.ModelAdmin):
                      'classes': ('wide',)
                  }),
                  ('Período de Trabalho', {
-                     'fields': (('inicio', 'realizado'), ),
+                     'fields': (('inicio', 'realizado'), 'decimo_terceiro'),
                      'classes': ('wide',)
                  }),
     )

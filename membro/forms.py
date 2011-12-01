@@ -5,7 +5,7 @@ from identificacao.models import Entidade
 from django.forms.util import ErrorList
 from django import forms
 import re
-
+from django.forms.models import BaseInlineFormSet, inlineformset_factory
 
 EMAIL_RE = re.compile(
     r"(^[-!#$%&'*+/=?^_`{}|~0-9A-Z]+(\.[-!#$%&'*+/=?^_`{}|~0-9A-Z]+)*"  # dot-atom
@@ -132,9 +132,38 @@ class ControleFeriasAdminForm(forms.ModelForm):
         inicio = self.cleaned_data.get('inicio')
         if inicio > termino:
             raise forms.ValidationError(u"Data de término anterior à data de início")
+
+        oficial = self.cleaned_data.get('oficial')
+
+        dias = termino - inicio
+        if oficial and dias.days != 19 and dias.days != 29:
+            raise forms.ValidationError(u'Férias oficiais devem durar 20 ou 30 dias')
         
         return self.cleaned_data
 
 
     class Meta:
         model = ControleFerias
+
+class BaseControleFeriasAdminFormSet(BaseInlineFormSet):
+
+    def clean(self):
+        if any(self.errors):
+            return
+
+        
+        if self.total_form_count() > 3:
+            raise forms.ValidationError(u'Não pode haver mais de 3 Controles de Férias')
+
+        oficiais = 0
+        nao_oficiais = 1
+        for i in range(0, self.total_form_count()-1):
+            form = self.forms[i]
+            if form.cleaned_data.get('oficial') is True: oficiais += 1
+            else: nao_oficiais += 1
+
+
+        if oficiais > 1 or nao_oficiais > 2:
+            raise forms.ValidationError(u'No máximo um período oficial e dois não oficiais')
+
+ControleFeriasAdminFormSet = inlineformset_factory(Ferias, ControleFerias, formset=BaseControleFeriasAdminFormSet)
