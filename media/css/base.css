@@ -688,7 +688,7 @@ div.system-message p.system-message-title {
 	line-height:20px;
 	outline:none;
 	cursor:pointer;
-	background:url(../img/admin/bg-btn-edit.png) no-repeat bottom left;
+	background:url(../img/admin/bg-btn-show.png) no-repeat bottom left;
 	color:rgba(0,112,158,1);
 	font-weight:bold;
 	}
