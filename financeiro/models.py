@@ -23,6 +23,7 @@ class ExtratoCC(models.Model):
     extrato_financeiro = models.ForeignKey('financeiro.ExtratoFinanceiro', verbose_name=_(u'Extrato Financeiro'), blank=True, null=True) 
     data_oper = NARADateField(_(u'Data da operação'))
     cod_oper = models.IntegerField(_(u'Documento'))
+    despesa_caixa = models.BooleanField(_(u'Despesa de caixa?'))
     valor = models.DecimalField(_(u'Valor'), max_digits=12, decimal_places=2)
     historico = models.CharField(_(u'Histórico'), max_length=30)
     data_extrato = NARADateField(_(u'Data do extrato'), null=True, blank=True)
