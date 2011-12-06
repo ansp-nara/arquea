@@ -24,7 +24,7 @@ class ExtratoCCAdmin(admin.ModelAdmin):
     
     fieldsets = (
 		  (None, {
-			  'fields': (('termo', 'extrato_financeiro'), ('data_oper', 'cod_oper'), ('historico', 'valor')),
+			  'fields': (('termo', 'extrato_financeiro', 'despesa_caixa'), ('data_oper', 'cod_oper'), ('historico', 'valor')),
 			  'classes': ('wide',)
 		  }),
 		  ('Extras', {
@@ -68,7 +68,7 @@ class PagamentoAdmin(admin.ModelAdmin):
     search_fields = ('protocolo__num_documento', 'conta_corrente__cod_oper', 'protocolo__descricao2__descricao', 'protocolo__descricao2__entidade__sigla', 'protocolo__referente')
     form = PagamentoAdminForm
     inlines = (AuditoriaInline, )
-    list_filter = ('protocolo__termo', 'origem_fapesp__item_outorga__natureza_gasto__modalidade')
+    list_filter = ('protocolo__termo', 'origem_fapesp__item_outorga__natureza_gasto__modalidade', 'conta_corrente__extrato_financeiro')
     filter_horizontal = ('pergunta',)
    
     def lookup_allowed(self, key, value):
