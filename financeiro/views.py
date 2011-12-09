@@ -243,7 +243,7 @@ def relatorio_gerencial(request, pdf=False):
 	    gerais = {'concedido_real': cr, 'concedido_dolar': cd, 'gasto_real': gr, 'gasto_dolar': gd, 'saldo_real': cr-gr, 'saldo_dolar': cd-gd}
             treal = {}
 	    tdolar = {}
-	    for ng in Natureza_gasto.objects.filter(termo=t):
+	    for ng in Natureza_gasto.objects.filter(termo=t).exclude(modalidade__sigla='REI'):
 		separador = '.'
 		moeda = 'US$'
 		if ng.modalidade.moeda_nacional: 
@@ -302,7 +302,7 @@ def relatorio_acordos(request, pdf=False):
 		geral = Decimal('0.0')
 		itens = []
 		for o in  a.origemfapesp_set.filter(item_outorga__natureza_gasto__termo=t):
-		    it = {'desc':o.item_outorga.__unicode__(), 'id':o.id}
+		    it = {'desc':'%s - %s' % (o.item_outorga.entidade, o.item_outorga.descricao), 'id':o.id}
 		    total = Decimal('0.0')
 		    pg = []
 		    for p in o.pagamento_set.order_by('conta_corrente__data_oper'):
@@ -530,7 +530,7 @@ def parciais(request, caixa=False, pdf=False):
 		pgs = []
 		for a in ads:
 		    if caixa:
-		        if a.pagamento.conta_corrente.extrato_financeiro and a.pagamento.conta_corrente.extrato_financeiro.despesa_caixa and a.pagamento not in pgs:
+		        if a.pagamento.conta_corrente and a.pagamento.conta_corrente.despesa_caixa and a.pagamento not in pgs:
 			  pgs.append(a.pagamento)
 	            else:
 		        if a.pagamento not in pgs:
@@ -539,7 +539,7 @@ def parciais(request, caixa=False, pdf=False):
 
 		ch = []
 		for p in pgs:
-		    if p.conta_corrente not in ch:
+		    if p.conta_corrente and p.conta_corrente not in ch:
 			ch.append(p.conta_corrente)
 			
 			
@@ -547,9 +547,9 @@ def parciais(request, caixa=False, pdf=False):
 		total_diff = Decimal('0.0')
 		for ecc in ch:
 		    pagos = ecc.pagamento_set.aggregate(Sum('valor_fapesp'))
-		    pago = pagos['valor_fapesp__sum']
+		    pago = pagos['valor_fapesp__sum'] or Decimal('0.0')
 		    pagos = ecc.pagamento_set.aggregate(Sum('valor_patrocinio'))
-		    pago = pago + (pagos['valor_patrocinio__sum'] or Decimal('0.0'))
+		    #pago = pago + (pagos['valor_patrocinio__sum'] or Decimal('0.0'))
 		    diff = ecc.valor+pago
 		    total_diff += diff
 		    este = {'cheque':ecc.cod_oper, 'diff':diff}
