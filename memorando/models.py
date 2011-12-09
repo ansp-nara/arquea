@@ -151,3 +151,10 @@ class MemorandoSimples(models.Model):
 	    dest = self.destinatario.split('\n')
 	    return '<br />'.join(dest)		
 
+
+class Arquivo(models.Model):
+    arquivo = models.FileField(upload_to='memorando')
+    memorando = models.ForeignKey('memorando.MemorandoSimples')
+
+    def __unicode__(self):
+        return self.arquivo.name

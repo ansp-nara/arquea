@@ -50,9 +50,14 @@ admin.site.register(MemorandoFAPESP, MemorandoFAPESPAdmin)
 admin.site.register(MemorandoResposta, MemorandoRespostaAdmin)
 admin.site.register(Assunto)
 
+class ArquivoInline(admin.TabularInline):
+    model = Arquivo
+    extra = 1
+
 class MemorandoSimplesAdmin(admin.ModelAdmin):
     form = MemorandoSimplesForm
     list_display = ('__unicode__', 'assunto', 'data')
+    inlines = [ArquivoInline]
 
 admin.site.register(MemorandoSimples, MemorandoSimplesAdmin)
 
