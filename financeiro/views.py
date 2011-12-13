@@ -491,15 +491,28 @@ def financeiro_parciais(request, pdf=False):
 		    for c in ef.extratocc_set.all():
                         v_fapesp = Decimal('0.0')
 			#total += c.valor
-			parcs = []		    
+			mods = {}		    
 			for p in c.pagamento_set.all():
                             v_fapesp += p.valor_fapesp
+                            modalidade = p.origem_fapesp.item_outorga.natureza_gasto.modalidade.sigla
+                            if modalidade not in mods.keys():
+                                mods[modalidade] = {}
 			    for a in p.auditoria_set.all():
-				if not a.parcial in parcs:
-				    parcs.append(a.parcial)
+				if not a.parcial in mods[modalidade].keys():
+				    mods[modalidade][a.parcial] = []
+                                if not a.pagina in mods[modalidade][a.parcial]:
+                                    mods[modalidade][a.parcial].append(a.pagina)
 			total -= v_fapesp
 	    
-			ch = {'id':c.id, 'valor':c.valor, 'cod': c.cod_oper, 'parciais':', '.join([str(p) for p in parcs])}
+			parc = ''
+			for modalidade in mods.keys():
+			    parc += '%s [parcial ' % modalidade
+			    for p in mods[modalidade].keys():
+				pags = mods[modalidade][p]
+				pags.sort()
+				parc += '%s (%s)' % (p, ','.join([str(k) for k in pags]))
+                            parc += ']       '
+			ch = {'id':c.id, 'valor':c.valor, 'cod': c.cod_oper, 'parciais':parc}
                         if v_fapesp != c.valor:
                             ch.update({'v_fapesp':v_fapesp})
 			ex['cheques'].append(ch)
