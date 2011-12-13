@@ -19,6 +19,7 @@ CODIGO_FINANCEIRO = (
   ('ANMP', 'Anulacao'),
   ('ESMP', 'Estorno ANMP'),
 )
+
 class ExtratoCC(models.Model):
     extrato_financeiro = models.ForeignKey('financeiro.ExtratoFinanceiro', verbose_name=_(u'Extrato Financeiro'), blank=True, null=True) 
     data_oper = NARADateField(_(u'Data da operação'))
@@ -51,13 +52,28 @@ class ExtratoCC(models.Model):
 	return s['valor__sum']
 	
     def parciais(self):
-	pc = []
+	mods = {}		    
 	for p in self.pagamento_set.all():
-	    for a in p.auditoria_set.all():
-		if not a.parcial in pc:
-		    pc.append(a.parcial)
-		    
-	return ', '.join([str(p) for p in pc])
+            modalidade = p.origem_fapesp.item_outorga.natureza_gasto.modalidade.sigla
+            if modalidade not in mods.keys():
+                mods[modalidade] = {}
+    	        for a in p.auditoria_set.all():
+		    if not a.parcial in mods[modalidade].keys():
+			mods[modalidade][a.parcial] = []
+                    if not a.pagina in mods[modalidade][a.parcial]:
+                        mods[modalidade][a.parcial].append(a.pagina)
+			
+	    
+	parc = ''
+	for modalidade in mods.keys():
+	    parc += '%s [parcial ' % modalidade
+	    for p in mods[modalidade].keys():
+		pags = mods[modalidade][p]
+		pags.sort()
+		parc += '%s (%s)' % (p, ','.join([str(k) for k in pags]))
+            parc += ']  '
+
+	return parc
 
 class TipoComprovanteFinanceiro(models.Model):
     nome = models.CharField(max_length=50)
