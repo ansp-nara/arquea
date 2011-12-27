@@ -400,7 +400,8 @@ def extrato_financeiro(request, ano=datetime.datetime.now().year, pdf=False):
 		ex = {'data':ef.data_libera, 'cod':ef.cod, 'historico':ef.historico, 'valor':ef.valor, 'comprovante':ef.comprovante, 'cheques':[]}
 		total = Decimal('0.0')
 		for c in ef.extratocc_set.all():
-		    total += c.valor
+                    valor = c.pagamento_set.aggregate(Sum('valor_fapesp'))
+		    total += valor['valor_fapesp__sum'] or Decimal('0.0')
 		    parciais = []		    
 		    for p in c.pagamento_set.all():
 			for a in p.auditoria_set.all():
@@ -415,7 +416,7 @@ def extrato_financeiro(request, ano=datetime.datetime.now().year, pdf=False):
 	    if pdf:	
 	        return render_to_pdf('financeiro/financeiro.pdf', {'ano':ano, 'extrato':extrato}, filename='financeiro_%s/%s.pdf' % (mes,ano))
             else:
-                return render_to_response('financeiro/financeiro.html', {'ano':ano, 'extrato':extrato}, context_instance=RequestContext(request))
+                return render_to_response('financeiro/financeiro.html', {'mes':mes, 'termo':termo, 'ano':ano, 'extrato':extrato}, context_instance=RequestContext(request))
 	else:
 	    meses = range(0,13)
  	    return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all(), 'meses':meses}, context_instance=RequestContext(request))
