@@ -22,7 +22,7 @@
 </style> 
 </head>
 <body>
-<h1 repeat="1">Processo {{ termo }}</h1>
+<h1 repeat="1">Relatório gerencial do processo {{ termo }}, atualizado em {{ atualizado|date:"d/m/Y" }}</h1>
 
     <table border="1" repeat="1" cellpadding="5">
     <tr><th>Modalidade</th><th>Concessão</th>

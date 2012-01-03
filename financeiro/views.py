@@ -206,7 +206,7 @@ def relatorio_gerencial(request, pdf=False):
     if request.method == 'GET':
 	if request.GET.get('termo'):
 	    import locale
-	    locale.setlocale(locale.LC_ALL, 'pt_BR')
+	    locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
 	    id = int(request.GET.get('termo'))
 	    t = get_object_or_404(Termo,id=id)
 	    retorno = []
@@ -216,6 +216,8 @@ def relatorio_gerencial(request, pdf=False):
 	    afinal = (t.inicio+t.duracao()).year
 	    mes = t.inicio.month
 	    mfinal = (t.inicio+t.duracao()).month
+            ultimo = Pagamento.objects.filter(protocolo__termo=t).aggregate(ultimo=Max('conta_corrente__data_oper'))
+            ultimo = ultimo['ultimo']
 	    while ano < afinal or (ano <= afinal and mes <= mfinal):
 		dt = datetime.date(ano,mes,1)
 		meses.append(dt.strftime('%B de %Y').decode('latin1'))
@@ -284,9 +286,9 @@ def relatorio_gerencial(request, pdf=False):
 		retorno.append(item)
 
             if pdf:
-	        return render_to_pdf('financeiro/gerencial.pdf', {'termo':t, 'meses':meses, 'modalidades':retorno, 'totais':totalizador, 'gerais':gerais}, context_instance=RequestContext(request))
+	        return render_to_pdf('financeiro/gerencial.pdf', {'atualizado':ultimo, 'termo':t, 'meses':meses, 'modalidades':retorno, 'totais':totalizador, 'gerais':gerais}, context_instance=RequestContext(request))
             else:
-                return render_to_response('financeiro/gerencial.html', {'termo':t, 'meses':meses, 'modalidades':retorno, 'totais':totalizador, 'gerais':gerais}, context_instance=RequestContext(request))
+                return render_to_response('financeiro/gerencial.html', {'atualizado':ultimo, 'termo':t, 'meses':meses, 'modalidades':retorno, 'totais':totalizador, 'gerais':gerais}, context_instance=RequestContext(request))
 	else:
 	   return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all()}, context_instance=RequestContext(request))
 
@@ -466,8 +468,15 @@ def financeiro_parciais(request, pdf=False):
             parciais.sort()
 	    for parcial in parciais:
 		extrato = []
-		liberado = ExtratoFinanceiro.objects.filter(termo=termo, parcial=parcial).aggregate(Sum('valor'))
-		liberado = liberado['valor__sum']
+		liberacoes = ExtratoFinanceiro.objects.filter(termo=termo, parcial=parcial)
+                liberado = liberacoes.filter(cod='PGMP').aggregate(Sum('valor'))['valor__sum'] or Decimal('0.0')
+                devolvido = liberacoes.filter(cod='DVMP').aggregate(Sum('valor'))['valor__sum'] or Decimal('0.0')
+                concedido = liberacoes.filter(cod='COMP').aggregate(Sum('valor'))['valor__sum'] or Decimal('0.0')
+		suplementado = liberacoes.filter(cod='SUMP').aggregate(Sum('valor'))['valor__sum'] or Decimal('0.0')
+		anulado = liberacoes.filter(cod='ANMP').aggregate(Sum('valor'))['valor__sum'] or Decimal('0.0')
+                cancelado = liberacoes.filter(cod='CAMP').aggregate(Sum('valor'))['valor__sum'] or Decimal('0.0')
+                pagamentos = liberado+devolvido
+                concessoes = concedido+suplementado+anulado+cancelado
 		diferenca_total = Decimal('0.0')
 		anterior = datetime.date(1971,1,1)
 		tdia = Decimal('0.0')
@@ -517,12 +526,13 @@ def financeiro_parciais(request, pdf=False):
                         if v_fapesp != c.valor:
                             ch.update({'v_fapesp':v_fapesp})
 			ex['cheques'].append(ch)
-		    ex['diferenca'] = ef.valor-total
-		    diferenca_total += ef.valor-total
+                    if ef.cod == 'PGMP' or ef.cod == 'DVMP':
+  		        ex['diferenca'] = ef.valor-total
+		        diferenca_total += ef.valor-total
 		    if total > ef.valor: ex['cor'] = 'red'
 		    else: ex['cor'] = 'blue'
 		    extrato.append(ex)
-		retorno.append({'parcial':parcial, 'extrato':extrato, 'liberado':liberado, 'diferenca_total':diferenca_total})
+		retorno.append({'parcial':parcial, 'extrato':extrato, 'liberado':-liberado, 'devolvido':devolvido, 'pagamentos':-pagamentos, 'diferenca_total':diferenca_total, 'concedido':concedido, 'suplementado':suplementado, 'anulado':anulado, 'cancelado':cancelado, 'concessoes':concessoes})
 	    if pdf:	    
 	        return render_to_pdf('financeiro/financeiro_parcial.pdf', {'termo':termo, 'parciais':retorno}, filename='financeiro_parciais_%s.pdf' % termo.__unicode__())
             else:
@@ -551,10 +561,11 @@ def parciais(request, caixa=False, pdf=False):
 			  pgs.append(a.pagamento)
 		      
 
-		ch = []
-		for p in pgs:
-		    if p.conta_corrente and p.conta_corrente not in ch:
-			ch.append(p.conta_corrente)
+		ch = ExtratoCC.objects.filter(extrato_financeiro__parcial=parcial, extrato_financeiro__termo=termo)
+                if caixa: ch = ch.filter(despesa_caixa=True)
+		#for p in pgs:
+		#    if p.conta_corrente and p.conta_corrente not in ch:
+		#	ch.append(p.conta_corrente)
 			
 			
 		ret = []
@@ -566,7 +577,7 @@ def parciais(request, caixa=False, pdf=False):
 		    #pago = pago + (pagos['valor_patrocinio__sum'] or Decimal('0.0'))
 		    diff = ecc.valor+pago
 		    total_diff += diff
-		    este = {'cheque':ecc.cod_oper, 'diff':diff}
+		    este = {'cheque':ecc, 'diff':diff}
 		    pgtos = []
 		    for p in ecc.pagamento_set.all():
 			ok = True
@@ -585,7 +596,7 @@ def parciais(request, caixa=False, pdf=False):
             if pdf:
 	        return render_to_pdf('financeiro/parciais.pdf', {'parciais':retorno, 'termo':termo}, filename='parciais.pdf')
             else:
-                return render_to_response('financeiro/parciais.html', {'parciais':retorno, 'termo':termo}, context_instance=RequestContext(request))
+                return render_to_response('financeiro/parciais.html', {'caixa':caixa, 'parciais':retorno, 'termo':termo}, context_instance=RequestContext(request))
 	else:
  	    return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all()}, context_instance=RequestContext(request))
 		   
