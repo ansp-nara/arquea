@@ -18,6 +18,7 @@ CODIGO_FINANCEIRO = (
   ('SUMP', 'Supl. Bens/Serv. Pais'),
   ('ANMP', 'Anulacao'),
   ('ESMP', 'Estorno ANMP'),
+  ('CAMP', 'Canc. Bens/Serv. Pais'),
 )
 
 class ExtratoCC(models.Model):
@@ -54,14 +55,15 @@ class ExtratoCC(models.Model):
     def parciais(self):
 	mods = {}		    
 	for p in self.pagamento_set.all():
-            modalidade = p.origem_fapesp.item_outorga.natureza_gasto.modalidade.sigla
-            if modalidade not in mods.keys():
-                mods[modalidade] = {}
-    	        for a in p.auditoria_set.all():
-		    if not a.parcial in mods[modalidade].keys():
-			mods[modalidade][a.parcial] = []
-                    if not a.pagina in mods[modalidade][a.parcial]:
-                        mods[modalidade][a.parcial].append(a.pagina)
+            if p.origem_fapesp:
+                modalidade = p.origem_fapesp.item_outorga.natureza_gasto.modalidade.sigla
+                if modalidade not in mods.keys():
+                    mods[modalidade] = {}
+    	            for a in p.auditoria_set.all():
+		        if not a.parcial in mods[modalidade].keys():
+		   	    mods[modalidade][a.parcial] = []
+                        if not a.pagina in mods[modalidade][a.parcial]:
+                            mods[modalidade][a.parcial].append(a.pagina)
 			
 	    
 	parc = ''
@@ -140,6 +142,8 @@ class Pagamento(models.Model):
 
     def codigo_operacao(self):
     	return self.conta_corrente.cod_oper
+    codigo_operacao.short_description = 'Operação Bancária'
+    codigo_operacao.admin_order_field = 'conta_corrente__cod_oper'
 
     def anexos(self):
         retorno = u'Não'
@@ -171,9 +175,26 @@ class Pagamento(models.Model):
 
     def nota(self):
         return self.protocolo.num_documento
+    nota.short_description = 'NF'
+    nota.admin_order_field = 'protocolo__num_documento'
 
     def formata_valor_fapesp(self):
         return 'R$ %s' % formata_moeda(self.valor_fapesp, ',')
+    formata_valor_fapesp.short_description = 'Valor Fapesp'
+    formata_valor_fapesp.admin_order_field = 'valor_fapesp'
+
+    def pagina(self):
+        if self.auditoria_set.count() > 0:
+            return self.auditoria_set.all()[0].pagina
+        return ''
+    pagina.short_description = u'Página'
+    pagina.admin_order_field = 'auditoria__pagina'
+
+    def parcial(self):
+        if self.auditoria_set.count() > 0:
+            return self.auditoria_set.all()[0].parcial
+        return ''
+    parcial.admin_order_field = 'auditoria__parcial'
 
     class Meta:
     	ordering = ('conta_corrente',)

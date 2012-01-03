@@ -30,8 +30,8 @@ class PagamentoAdminForm(forms.ModelForm):
 	    termo = instance.protocolo.termo
 	    try:
 		t = termo #Termo.objects.get(id=termo)
-		self.fields['protocolo'].queryset = Protocolo.objects.filter(id=instance.protocolo.id)
-		self.fields['origem_fapesp'].queryset = OrigemFapesp.objects.filter(id=instance.origem_fapesp.id)
+		self.fields['protocolo'].queryset = Protocolo.objects.filter(termo=t)
+		self.fields['origem_fapesp'].queryset = OrigemFapesp.objects.filter(item_outorga__natureza_gasto__termo=t)
 		self.fields['termo'].value = t
 	    except:
 		pass

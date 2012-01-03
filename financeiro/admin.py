@@ -34,6 +34,7 @@ class ExtratoCCAdmin(admin.ModelAdmin):
     )
     
     list_display = ('data_oper', 'cod_oper', 'historico', 'valor')
+    list_filter = ('data_oper',)
     search_fields = ('cod_oper',)
     inlines = (PagamentoInline,)
     form = ExtratoCCAdminForm
@@ -64,7 +65,7 @@ class PagamentoAdmin(admin.ModelAdmin):
 		  }),
     )
     
-    list_display = ('item', 'codigo_operacao', 'formata_valor_fapesp', 'nota', 'data', 'anexos')
+    list_display = ('item', 'nota', 'data', 'codigo_operacao', 'formata_valor_fapesp', 'parcial', 'pagina')
     search_fields = ('protocolo__num_documento', 'conta_corrente__cod_oper', 'protocolo__descricao2__descricao', 'protocolo__descricao2__entidade__sigla', 'protocolo__referente')
     form = PagamentoAdminForm
     inlines = (AuditoriaInline, )
@@ -97,13 +98,25 @@ class AuditoriaAdmin(admin.ModelAdmin):
     )
     
     list_display = ('pagamento', 'tipo', 'parcial', 'pagina')
+
+class EstadoAdmin(admin.ModelAdmin):
+    search_fields = ('nome',)
     
-admin.site.register(Estado)
-admin.site.register(TipoComprovante)
-admin.site.register(LocalizaPatrocinio)
+class LocalizaPatrocinioAdmin(admin.ModelAdmin):
+    search_fields = ('consignado',)
+
+class TipoComprovanteAdmin(admin.ModelAdmin):
+    search_fields = ('nome',)
+
+class TipoComprovanteFinanceiroAdmin(admin.ModelAdmin):
+    search_fields = ('nome',)
+
+admin.site.register(Estado, EstadoAdmin)
+admin.site.register(TipoComprovante, TipoComprovanteAdmin)
+admin.site.register(LocalizaPatrocinio, LocalizaPatrocinioAdmin)
 admin.site.register(ExtratoCC, ExtratoCCAdmin)
 admin.site.register(ExtratoFinanceiro, ExtratoFinanceiroAdmin)
 admin.site.register(Pagamento, PagamentoAdmin)
 admin.site.register(ExtratoPatrocinio, ExtratoPatrocinioAdmin)
 admin.site.register(Auditoria, AuditoriaAdmin)
-admin.site.register(TipoComprovanteFinanceiro)
+admin.site.register(TipoComprovanteFinanceiro, TipoComprovanteFinanceiroAdmin)
