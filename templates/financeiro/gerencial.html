@@ -2,15 +2,15 @@
 {% load proto_tags %}
 {% block content %}
 
-<h1>Processo {{ termo }}</h1>
+<h1>Relatório gerencial do processo {{ termo }}, atualizado em {{ atualizado|date:"d/m/Y" }}</h1>
 <h4><a href="{% url financeiro.views.relatorio_gerencial 1 %}?termo={{ termo.id }}">Imprimir</a></h4>
 
     <table border="1" cellpadding="5">
-    <tr><th>Modalidade</th><th>Concessão</th>
+    <tr><th>Modalidade</th><th width="4%">Concessão</th>
     {% for m in meses %}
-      <th>{{ m }}</th>
+      <th width="4%">{{ m }}</th>
     {% endfor %}
-    <th>Total realizado</th><th>Saldo</th></tr>
+    <th width="4%">Total realizado</th><th width="4%">Saldo</th></tr>
     {% for m in modalidades %}
 	<tr><td class="peq">{{ m.modalidade }}</td><td class="num peq">{{ m.concedido }}</td>
 	{% for v in m.meses|dictsort:"ord" %}
