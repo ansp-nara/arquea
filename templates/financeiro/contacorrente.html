@@ -4,10 +4,10 @@
 <h1 repeat="1">Extrato da conta corrente do projeto em {{ ano }}</h1>
 
     <table border="0" repeat="1" cellpadding="5">
-       <tr><th>Data</th><th>Documento</th><th>Histórico</th><th>Valor</th><th>Imagem do cheque</th><th>Parciais</th><th>Tem pagamento?</th></tr>
+    <tr><th>Data</th><th>Documento</th><th>Histórico</th><th>Valor</th><th>Liberação do financeiro</th><th>Pagamento</th><th>Imagem do cheque</th></tr>
     {% for e in extrato %}
         {% if e.data_oper %}
- 	   <tr><td>{{ e.data_oper|date:"d/m/Y" }}</td><td>{{ e.cod_oper }}</td><td>{{ e.historico }}</td><td>{{ e.valor }}</td><td>{% if e.imagem %}<a href="{{ e.imagem.url }}">cheque</a>{% endif %}</td><td>{{ e.parciais }}</td><td>{% if e.pagamento_set.count %}T{% else %}Não t{% endif %}em</td></tr>
+ 	   <tr><td>{{ e.data_oper|date:"d/m/Y" }}</td><td>{{ e.cod_oper }}</td><td>{{ e.historico }}</td><td>{{ e.valor|moeda }}</td><td>{% if e.extrato_financeiro %}{{ e.extrato_financeiro.valor|moeda }}{% endif %}</td><td>{{ e.parciais }}</td><td>{% if e.imagem %}<a href="{{ e.imagem.url }}">cheque</a>{% endif %}</td></tr>
            {% if e.obs %}
               <tr><td></td><td colspan="5"><b>Observação</b>: {{ e.obs }}</td></tr>
            {% endif %}
