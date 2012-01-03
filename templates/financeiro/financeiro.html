@@ -1,7 +1,8 @@
 {% extends "admin/base_site.html" %}
 {% load proto_tags %}
 {% block content %}
-<h1 repeat="1">Extrato do financeiro da FAPESP, projeto {{ termo }}{% if mes %}, mês {{ mes }}{% endif %}</h1>
+<h1 repeat="1">Extrato do financeiro da FAPESP</h1>
+<h1>Processo {{ termo }}{% if mes %} - mês {{ mes }}{% endif %}</h1>
 
     <table border="0" repeat="1" cellpadding="5">
        <tr><th>Data</th><th>Código</th><th>Histórico</th><th>Valor</th><th>Arquivo</th><th>Parciais</th></tr>
