@@ -368,7 +368,7 @@ class OrdemDeServicoAdmin(admin.ModelAdmin):
                  }),
     )
 
-    list_display = ('numero', 'tipo', 'data_inicio', 'data_rescisao', 'mostra_prazo', 'descricao')
+    list_display = ('numero', 'tipo', 'entidade', 'data_inicio', 'data_rescisao', 'mostra_prazo', 'descricao')
 
     list_display_links = ('descricao', )
 
