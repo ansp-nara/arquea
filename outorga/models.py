@@ -49,7 +49,7 @@ class Modalidade(models.Model):
 
     sigla = models.CharField(_(u'Sigla'), max_length=10, blank=True, help_text=_(u'ex. STB'), unique=True)
     nome = models.CharField(_(u'Nome'), max_length=40, blank=True, help_text=_(u'ex. Serviços de Terceiros no Brasil'))
-    moeda_nacional = models.BooleanField(_(u'R$'), help_text=_(u'ex. Moeda Nacional?'))
+    moeda_nacional = models.BooleanField(_(u'R$'), help_text=_(u'ex. Moeda Nacional?'), default=True)
 
 
     # Retorna a sigla e o nome da modalidade.
@@ -389,13 +389,18 @@ class Termo(models.Model):
 
     # Calcula total de despesas (R$) realizadas durante o termo.
     @ property
-    def total_realizado_real(self):
+    def total_realizado_real_old(self):
         total = Decimal('0.00')
-	for n in self.natureza_gasto_set.all():
-	    if n.modalidade.moeda_nacional:
-		total += n.total_realizado
+        for n in self.natureza_gasto_set.all():
+            if n.modalidade.moeda_nacional:
+                total += n.total_realizado
         return total
 
+    @property
+    def total_realizado_real(self):
+        from financeiro.models import Pagamento
+        total = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional=True, origem_fapesp__item_outorga__natureza_gasto__termo=self).aggregate(Sum('valor_fapesp'))
+        return total['valor_fapesp__sum']
 
     # Retorna o total de despesas (R$) em formato moeda.
     def formata_realizado_real(self):
@@ -413,13 +418,18 @@ class Termo(models.Model):
 
     # Calcula total de despesas ($) realizadas durante o termo.
     @ property
-    def total_realizado_dolar(self):
+    def total_realizado_dolar_old(self):
         total = Decimal('0.00')
 	for n in self.natureza_gasto_set.all():
 	    if not n.modalidade.moeda_nacional:
 		total += n.total_realizado
         return total
 
+    @property
+    def total_realizado_dolar(self):
+        from financeiro.models import Pagamento
+        total = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional=False, origem_fapesp__item_outorga__natureza_gasto__termo=self).aggregate(Sum('valor_fapesp'))
+        return total['valor_fapesp__sum']
 
     # Retorna o total de despesas ($) em formato moeda.
     def formata_realizado_dolar(self):
@@ -1416,9 +1426,12 @@ class OrdemDeServico(models.Model):
       existe_arquivo.allow_tags = True
       existe_arquivo.short_description = _(u'Arquivo')
 
+      def entidade(self):
+          return self.contrato.entidade
+
       class Meta:
-	  verbose_name = _(u'Alteração de contrato')
-	  verbose_name_plural = _(u'Alteração de contratos')
+	  verbose_name = _(u'Alteração de contrato (OS)')
+	  verbose_name_plural = _(u'Alteração de contratos (OS)')
 
 
 class ArquivoOS(models.Model):
