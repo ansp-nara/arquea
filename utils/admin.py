@@ -6,6 +6,10 @@ from django.db import models
 from django.http import HttpResponse, HttpResponseNotFound
 from django.db.models.query import QuerySet
 from django.utils.encoding import smart_str
+from django.template.response import TemplateResponse
+from utils.functions import render_to_pdf
+
+from django.shortcuts import render_to_response
 
 class AutoCompleteAdmin(admin.ModelAdmin):
     """
@@ -68,3 +72,36 @@ class AutoCompleteAdmin(admin.ModelAdmin):
             kwargs['widget'] = ForeignKeySearchInput(db_field.rel,
                                     self.related_search_fields[db_field.name])
         return super(AutoCompleteAdmin, self).formfield_for_dbfield(db_field, **kwargs)
+
+
+class PrintModelAdmin(admin.ModelAdmin):
+
+    def changelist_view(self, request, extra_context=None):
+        if request.method == 'GET' and request.GET.get('pdf') == '1':
+            o = request.GET.get('o')
+            q = request.GET.copy()
+            del q['pdf']
+            if o and self.actions is not None:
+                try:
+		    o = int(o)
+		    q['o'] = o-1
+                except: pass
+            request.GET = q
+            lpp = self.list_per_page
+            self.list_per_page = 4000000000
+            ldl = self.list_display_links
+            self.list_display_links = (None,)
+            actions = self.actions
+            self.actions = None
+            page = super(PrintModelAdmin,self).changelist_view(request, extra_context)
+            self.list_per_page = lpp
+            self.list_display_links = ldl
+            self.actions = actions
+            if isinstance(page, TemplateResponse):
+                page = render_to_pdf('admin/change_list.pdf', page.resolve_context(page.context_data), filename='list_%s.pdf' % self.opts.module_name)
+        else:
+            if extra_context: extra_context = extra_context.update({'pdf':True})
+            else: extra_context = {'pdf':True} 
+            page = super(PrintModelAdmin,self).changelist_view(request, extra_context)
+        return page
+
