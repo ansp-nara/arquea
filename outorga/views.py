@@ -285,3 +285,44 @@ def relatorio_termos(request):
     if request.method == 'GET':
         termos = Termo.objects.order_by('-ano')
         return render_to_response('outorga/termos.html', {'termos':termos})
+
+@login_required
+def lista_acordos(request):
+    processos = []                  
+    for t in Termo.objects.filter(ano__gte=2004).order_by('-ano'):
+        processo = {'processo':t}
+        acordos = []
+        for a in Acordo.objects.filter(origemfapesp__item_outorga__natureza_gasto__termo=t).distinct():
+            acordo = {'acordo':a}
+            itens = []
+            for it in Item.objects.filter(origemfapesp__acordo=a, natureza_gasto__termo=t).order_by('natureza_gasto__modalidade__sigla'):
+                itens.append('%s - %s' % (it.natureza_gasto.modalidade.sigla, it.descricao))
+            acordo.update({'itens':itens})
+            acordos.append(acordo)
+        processo.update({'acordos':acordos})
+        processos.append(processo)
+
+    return render_to_response('outorga/acordos.html', {'processos':processos})
+
+@login_required
+def item_modalidade(request, pdf=False):
+    if request.method == 'GET':
+        if request.GET.get('termo') and request.GET.get('modalidade'):
+            termo_id = request.GET.get('termo')
+            termo = get_object_or_404(Termo, id=termo_id)
+            mod_id = request.GET.get('modalidade')
+            mod = get_object_or_404(Modalidade, id=mod_id)
+	    itens = []
+            for item in Item.objects.filter(natureza_gasto__termo=termo, natureza_gasto__modalidade=mod):
+		pags = []
+                total = Decimal('0.0')
+                for p in Pagamento.objects.filter(origem_fapesp__item_outorga=item):
+		    pags.append({'p':p, 'docs':p.auditoria_set.all()})
+                    total += p.valor_fapesp
+                itens.append({'item':item, 'total':total, 'pagtos':pags})
+            if pdf:
+                return render_to_pdf('outorga/por_item_modalidade.pdf', {'termo':termo, 'modalidade':mod, 'itens':itens}, filename='%s-%s.pdf' % (termo, mod.sigla))
+            else:
+                return render_to_response('outorga/por_item_modalidade.html', {'termo':termo, 'modalidade':mod, 'itens':itens}, context_instance=RequestContext(request))
+        else:
+	    return render_to_response('outorga/termo_mod.html', {'termos':Termo.objects.all(), 'modalidades':Modalidade.objects.all()}, context_instance=RequestContext(request))
