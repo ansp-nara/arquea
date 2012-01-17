@@ -1,9 +1,8 @@
 {% load adminmedia %}
 {% load i18n %}
-{% if cl.search_fields %}
 
 <div id="toolbar">
-
+{% if cl.search_fields %}
 	<form id="changelist-search" action="" method="get">
 	
 		<div id="changelist-searcharea"><!-- DIV needed for valid HTML -->
@@ -25,7 +24,7 @@
 		</div>
 		
 	</form>
-	
+
+{% endif %}	
 </div>
 <script type="text/javascript">document.getElementById("searchbar").focus();</script>
-{% endif %}
