@@ -73,7 +73,7 @@ class BaseCorpoInlineFormSet(BaseInlineFormSet):
         if data:
             memorando_id = data.get('memorando')
             if memorando_id:
-                m = MemorandoResposta.objects.get(id=memorando_id)
+                m = MemorandoFAPESP.objects.get(id=memorando_id)
                 for f in self.forms:
                     f.fields['pergunta'].queryset = Pergunta.objects.filter(memorando=m)
                 self.empty_form.fields['pergunta'].queryset = Pergunta.objects.filter(memorando=m)
