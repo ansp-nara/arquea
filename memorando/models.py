@@ -86,6 +86,7 @@ class MemorandoResposta(models.Model):
     obs = models.TextField(null=True, blank=True)
     introducao = models.TextField(_(u'Introdução'), null=True, blank=True)
     conclusao = models.TextField(_(u'Conclusão'), null=True, blank=True)
+    #classificacao = models.ForeignKey('financeiro.TipoComprovante', verbose_name=_(u'Classificação'))
 
     def __unicode__(self):
         return '%s/%s' % (self.data.year, self.numero)
@@ -102,7 +103,7 @@ class MemorandoResposta(models.Model):
     class Meta:
         verbose_name = _(u'Memorando de resposta à FAPESP')
         verbose_name_plural = _(u'Memorandos de resposta à FAPESP')
-        ordering = ('-data',)
+        ordering = ('data',)
 
     def termo(self):
         return self.memorando.termo
@@ -114,12 +115,13 @@ class Corpo(models.Model):
     pergunta = models.ForeignKey('memorando.Pergunta')
     resposta = models.TextField()
     anexo = models.FileField(upload_to='memorando', null=True, blank=True)
+    concluido = models.BooleanField('Ok')
 
     def __unicode__(self):
         return '%s' % self.pergunta.numero
 
     class Meta:
-        ordering = ('pergunta__numero',)
+        ordering = ('pergunta__numero', 'memorando__data')
 	
 class MemorandoSimples(models.Model):
     data = models.DateField(auto_now_add=True)
