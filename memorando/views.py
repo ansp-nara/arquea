@@ -9,6 +9,7 @@ from utils.functions import render_to_pdf
 from models import *
 from django.contrib.auth.decorators import permission_required, login_required
 from django.utils.html import strip_tags
+from django.template import RequestContext
 
 # Create your views here.
 
@@ -79,7 +80,7 @@ def fapesp(request, mem):
 def relatorio(request):
     mem = request.GET.get('mem')
     if not mem:
-        return render_to_response('memorando/escolhe_memorando.html', {'memorandos':MemorandoFAPESP.objects.all()})
+        return render_to_response('memorando/escolhe_memorando.html', {'memorandos':MemorandoFAPESP.objects.all()}, context_instance=RequestContext(request))
     m = get_object_or_404(MemorandoFAPESP,pk=mem)
-    return render_to_response('memorando/relatorio.html', {'memorando':m})
+    return render_to_response('memorando/relatorio.html', {'memorando':m}, context_instance=RequestContext(request))
 
