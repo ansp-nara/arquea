@@ -23,6 +23,11 @@ class AgendadoInline(admin.TabularInline):
     model = Agendado
     extra = 1
 
+class EnderecoDetalheInline(admin.TabularInline):
+    model = EnderecoDetalhe
+    extra = 1
+    fieldsets = ((None,{'fields':('tipo', 'complemento')}),)
+
 class EnderecoAdmin(admin.ModelAdmin):
 
     """
@@ -44,6 +49,8 @@ class EnderecoAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'cep', 'bairro', 'cidade', 'estado', 'pais')
 
     search_fields = ['entidade__nome', 'entidade__sigla', 'identificacao__contato__nome', 'rua', 'bairro', 'cidade', 'estado', 'pais']
+
+    inlines = [EnderecoDetalheInline]
 
 admin.site.register(Endereco, EnderecoAdmin)
 
@@ -104,7 +111,7 @@ class EntidadeAdmin(admin.ModelAdmin):
 
     )
 
-    list_display = ('sigla_nome','url', 'cnpj', 'fisco')
+    list_display = ('sigla_nome', 'sigla_completa', 'url', 'cnpj', 'fisco')
 
     list_filter = ('fisco', )
 
