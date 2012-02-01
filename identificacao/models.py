@@ -81,7 +81,7 @@ class EnderecoDetalhe(models.Model):
     endereco = models.ForeignKey('identificacao.Endereco', null=True, blank=True)
     tipo = models.ForeignKey('identificacao.TipoDetalhe')
     complemento = models.TextField()
-    detalhe = models.ForeignKey('identificacao.EnderecoDetalhe', null=True, blank=True)
+    detalhe = models.ForeignKey('identificacao.EnderecoDetalhe', verbose_name=u'ou Detalhe pai', null=True, blank=True)
 
     def save(self, *args, **kwargs):
         if self.endereco == None and self.detalhe == None:
@@ -125,7 +125,7 @@ class Endereco(models.Model):
     cep = models.CharField(_(u'CEP'), max_length=8, blank=True, help_text=_(u'ex. 05403010'))
     estado = models.CharField(_(u'Estado'), max_length=50, blank=True, help_text=_(u'ex. SP'))
     pais = models.CharField(_(u'País'), max_length=50, blank=True, help_text=_(u'ex. Brasil'))
-
+    data_inatividade = models.DateField(_(u'Data de inatividade'), blank=True, null=True)
 
     # Retorna os campos rua, num e compl (se existir).
     def __unicode__(self):
@@ -197,6 +197,12 @@ class Entidade(models.Model):
     def __unicode__(self):
         return self.sigla
 
+    def sigla_completa(self):
+        if self.entidade:
+           return u'%s - %s' % (self.entidade.sigla_completa(), self.sigla)
+        else:
+           return u'%s' % self.sigla
+    sigla_completa.short_description = _(u'Faz parte de')
 
     # Retorna a sigla e o nome.
     def sigla_nome(self):

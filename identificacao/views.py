@@ -7,6 +7,7 @@ from django.utils import simplejson
 from models import *
 from django.http import Http404, HttpResponse
 from django.contrib.auth.decorators import login_required
+from django.template import RequestContext
 
 def escolhe_entidade(request):
     if request.method == 'POST':
@@ -46,4 +47,4 @@ def escolhe_endereco(request):
 
 @login_required
 def arquivos_entidade(request):
-    return render_to_response('identificacao/arquivos_entidade.html', {'entidades': [e for e in Entidade.objects.all() if e.arquivoentidade_set.count() > 0]})
+    return render_to_response('identificacao/arquivos_entidade.html', {'entidades': [e for e in Entidade.objects.all() if e.arquivoentidade_set.count() > 0]}, context_instance=RequestContext(request))
