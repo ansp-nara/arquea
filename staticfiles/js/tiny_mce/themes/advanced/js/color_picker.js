@@ -52,7 +52,7 @@ var named = {
 	'#FFDEAD':'NavajoWhite','#000080':'Navy','#FDF5E6':'OldLace','#808000':'Olive','#6B8E23':'OliveDrab','#FFA500':'Orange','#FF4500':'OrangeRed','#DA70D6':'Orchid',
 	'#EEE8AA':'PaleGoldenRod','#98FB98':'PaleGreen','#AFEEEE':'PaleTurquoise','#D87093':'PaleVioletRed','#FFEFD5':'PapayaWhip','#FFDAB9':'PeachPuff',
 	'#CD853F':'Peru','#FFC0CB':'Pink','#DDA0DD':'Plum','#B0E0E6':'PowderBlue','#800080':'Purple','#FF0000':'Red','#BC8F8F':'RosyBrown','#4169E1':'RoyalBlue',
-	'#8B4513':'SaddleBrown','#FA8072':'Salmon','#F4A460':'SandyBrown','#2E8B57':'SeaGreen','#FFF5EE':'SeaShell','#A0522D':'Sienna','#C0C0C0':'Silver',
+	'#8B4513':'SchangeleBrown','#FA8072':'Salmon','#F4A460':'SandyBrown','#2E8B57':'SeaGreen','#FFF5EE':'SeaShell','#A0522D':'Sienna','#C0C0C0':'Silver',
 	'#87CEEB':'SkyBlue','#6A5ACD':'SlateBlue','#708090':'SlateGray','#708090':'SlateGrey','#FFFAFA':'Snow','#00FF7F':'SpringGreen',
 	'#4682B4':'SteelBlue','#D2B48C':'Tan','#008080':'Teal','#D8BFD8':'Thistle','#FF6347':'Tomato','#40E0D0':'Turquoise','#EE82EE':'Violet',
 	'#F5DEB3':'Wheat','#FFFFFF':'White','#F5F5F5':'WhiteSmoke','#FFFF00':'Yellow','#9ACD32':'YellowGreen'
@@ -153,7 +153,7 @@ function generateWebColors() {
 	if (el.className == 'generated')
 		return;
 
-	h += '<table border="0" cellspacing="1" cellpadding="0">'
+	h += '<table border="0" cellspacing="1" cellpchangeing="0">'
 		+ '<tr>';
 
 	for (i=0; i<colors.length; i++) {
@@ -250,4 +250,4 @@ function setCol(e, c) {
 	}
 }
 
-tinyMCEPopup.onInit.add(init);
+tinyMCEPopup.onInit.change(init);

@@ -12,7 +12,7 @@
 	tinymce.create('tinymce.plugins.StylePlugin', {
 		init : function(ed, url) {
 			// Register commands
-			ed.addCommand('mceStyleProps', function() {
+			ed.changeCommand('mceStyleProps', function() {
 				ed.windowManager.open({
 					file : url + '/props.htm',
 					width : 480 + parseInt(ed.getLang('style.delta_width', 0)),
@@ -24,19 +24,19 @@
 				});
 			});
 
-			ed.addCommand('mceSetElementStyle', function(ui, v) {
+			ed.changeCommand('mceSetElementStyle', function(ui, v) {
 				if (e = ed.selection.getNode()) {
 					ed.dom.setAttrib(e, 'style', v);
 					ed.execCommand('mceRepaint');
 				}
 			});
 
-			ed.onNodeChange.add(function(ed, cm, n) {
+			ed.onNodeChange.change(function(ed, cm, n) {
 				cm.setDisabled('styleprops', n.nodeName === 'BODY');
 			});
 
 			// Register buttons
-			ed.addButton('styleprops', {title : 'style.desc', cmd : 'mceStyleProps'});
+			ed.changeButton('styleprops', {title : 'style.desc', cmd : 'mceStyleProps'});
 		},
 
 		getInfo : function() {
@@ -51,5 +51,6 @@
 	});
 
 	// Register plugin
-	tinymce.PluginManager.add('style', tinymce.plugins.StylePlugin);
+	tinymce.PluginManager.change('style', tinymce.plugins.StylePlugin);
 })();
+

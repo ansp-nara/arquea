@@ -39,11 +39,17 @@ class Contato(models.Model):
     """
 
 
-    nome = models.CharField(_(u'Nome'), max_length=100, help_text=_(u'ex. João Andrade'), unique=True)
+    primeiro_nome = models.CharField(_(u'Primeiro nome'), max_length=100, help_text=_(u'ex. João Andrade'))
+    ultimo_nome = models.CharField(_(u'Último nome'), max_length=45)
     email = models.CharField(_(u'E-mail'), max_length=100, blank=True, help_text=_(u'ex. joao@joao.br'))
     ativo = models.BooleanField(_(u'Ativo'))
     tel = models.CharField(_(u'Telefone'), max_length=100, help_text=_(u'ex. Com. (11)2222-2222, Cel. (11)9999-9999, Fax (11)3333-3333, ...'))
+    documento = models.CharField(max_length=30, null=True, blank=True)
 
+
+    @property
+    def nome(self):
+	return '%s %s' % (self.primeiro_nome, self.ultimo_nome or '')
 
     # Retorna o nome.
     def __unicode__(self):
@@ -65,7 +71,7 @@ class Contato(models.Model):
 
     # Define a ordenação dos dados pelo nome.
     class Meta:
-        ordering = ('nome', )
+        ordering = ('primeiro_nome', 'ultimo_nome')
 
 
 class TipoDetalhe(models.Model):
@@ -78,22 +84,42 @@ class TipoDetalhe(models.Model):
         ordering = ('nome',)
 
 class EnderecoDetalhe(models.Model):
-    endereco = models.ForeignKey('identificacao.Endereco', null=True, blank=True)
+    endereco = models.ForeignKey('identificacao.Endereco', limit_choices_to={'data_inatividade__isnull':True}, null=True, blank=True)
     tipo = models.ForeignKey('identificacao.TipoDetalhe')
     complemento = models.TextField()
     detalhe = models.ForeignKey('identificacao.EnderecoDetalhe', verbose_name=u'ou Detalhe pai', null=True, blank=True)
+    ordena = models.CharField(editable=False, max_length=1000, null=True)
 
     def save(self, *args, **kwargs):
         if self.endereco == None and self.detalhe == None:
             return
         if self.endereco != None and self.detalhe != None:
             return
+        self.ordena = self.__unicode__()
         super(EnderecoDetalhe,self).save(*args,**kwargs)
 
 
     def __unicode__(self):
-        return self.complemento
+        if self.endereco:
+            return '%s - %s' % (self.endereco, self.complemento)
+        else:
+            return '%s - %s' % (self.detalhe, self.complemento)
 
+    def detalhes(self):
+	if self.endereco:
+	    return self.complemento
+	else:
+	    return '%s - %s' % (self.detalhe.detalhes(), self.complemento)
+
+    @property
+    def end(self):
+	if self.endereco: return self.endereco
+        return self.detalhe.end
+
+    class Meta:
+        ordering = ('ordena', )
+    #    verbose_name = u'Detalhe do endereço'
+    #    verbose_name_plural = u'Detalhes dos endereços'
 
 class Endereco(models.Model):
 
@@ -118,7 +144,7 @@ class Endereco(models.Model):
 
     entidade = models.ForeignKey('identificacao.Entidade', verbose_name=_(u'Entidade'))
     rua = models.CharField(_(u'Logradouro'), max_length=100, help_text=_(u'ex. R. Dr. Ovídio Pires de Campos'))
-    num = models.IntegerField(_(u'Num.'), help_text=_(u'ex. 215'))
+    num = models.IntegerField(_(u'Num.'), help_text=_(u'ex. 215'), null=True, blank=True)
     compl = models.CharField(_(u'Complemento'), max_length=100, blank=True, help_text=_(u'ex. 2. andar - Prédio da PRODESP'))
     bairro = models.CharField(_(u'Bairro'), max_length=50, blank=True, help_text=_(u'ex. Cerqueira César'))
     cidade =  models.CharField(_(u'Cidade'), max_length=50, blank=True, help_text=_(u'ex. São Paulo'))
@@ -127,13 +153,16 @@ class Endereco(models.Model):
     pais = models.CharField(_(u'País'), max_length=50, blank=True, help_text=_(u'ex. Brasil'))
     data_inatividade = models.DateField(_(u'Data de inatividade'), blank=True, null=True)
 
+
     # Retorna os campos rua, num e compl (se existir).
     def __unicode__(self):
-        if self.compl:
-            return u'%s - %s, %s, %s' % (self.entidade.sigla, self.rua, self.num, self.compl)
-        else:
-            return u'%s - %s, %s' % (self.entidade.sigla, self.rua, self.num)
+        return u'%s - %s' % (self.entidade.sigla, self.logradouro())
     __unicode__.short_description = _(u'Logradouro')
+
+    def logradouro(self):
+        num = ', %s' % self.num if self.num else ''
+        compl = ', %s' % self.compl if self.compl else ''
+        return u'%s%s%s' % (self.rua, num, compl)
 
 
     # Define a descricao do modelo, a ordenação dos dados pela cidade e a unicidade dos dados.
@@ -142,7 +171,6 @@ class Endereco(models.Model):
         verbose_name_plural = _(u'Endereços')
         ordering = ('entidade', )
         unique_together = (('rua', 'num', 'compl', 'bairro', 'cidade', 'cep', 'estado', 'pais'),)
-
 
 
 class ASN(models.Model):
@@ -155,8 +183,8 @@ class ASN(models.Model):
     pais = models.CharField(u'País', null=True, blank=True, max_length=3)
 
     def __unicode__(self):
-	if self.entidade:
-	    return '%s - %s' % (self.numero, self.entidade)
+        if self.entidade:
+            return '%s - %s' % (self.numero, self.entidade)
         else: return self.numero
 
     class Meta:
@@ -188,7 +216,7 @@ class Entidade(models.Model):
     nome = models.CharField(_(u'Nome'), max_length=255, help_text=_(u'Razão Social (ex. Telecomunicações de São Paulo S.A.)'))
     url = models.URLField(_(u'URL'), verify_exists=True, blank=True, help_text=_(u'ex. www.telefonica.com.br'))
     sigla = models.CharField(_(u'Sigla'), max_length=20, help_text=_(u'Nome Fantasia (ex. TELEFÔNICA)'), unique=True)
-    pertence = models.BooleanField(u'Pertence à ANSP?')
+    #asn = models.IntegerField(_(u'ASN'), blank=True, null=True, help_text=_(u' '))
     cnpj = CNPJField(_(u'CNPJ'), blank=True, help_text=_(u'ex. 00.000.000/0000-00'))
     fisco = models.BooleanField(_(u'Fisco'), help_text=_(u'ex. Ativo no site da Receita Federal?'))
 
@@ -261,7 +289,8 @@ class Identificacao(models.Model):
 
 
 #    monitor = models.ForeignKey('rede.Monitor', verbose_name=_(u'Monitor'))
-    endereco = models.ForeignKey('identificacao.Endereco', verbose_name=_(u'Entidade'))
+    # entidade = models.ForeignKey('identificacao.Entidade', null=True, blank=True)
+    endereco = models.ForeignKey('identificacao.Endereco', limit_choices_to={'data_inatividade__isnull':True}, verbose_name=_(u'Entidade'))
     contato = models.ForeignKey('identificacao.Contato', verbose_name=_(u'Contato'))
     historico = models.DateTimeField(_(u'Histórico'), default=datetime.now(), editable=False)
     area = models.CharField(_(u'Área'), max_length=50, blank=True, help_text=_(u'ex. Administração'))
@@ -346,23 +375,56 @@ class Agendado(models.Model):
 
 class Acesso(models.Model):
     identificacao = models.ForeignKey('identificacao.Identificacao', verbose_name=u'Identificação')
-    niveis = models.ManyToManyField('identificacao.NivelAcesso', verbose_name=u'Níveis de acesso')
-    liberacao = models.DateField(u'Liberação')
-    encerramento = models.DateField(null=True, blank=True)
-    obs = models.TextField()
+    niveis = models.ManyToManyField('identificacao.NivelAcesso', verbose_name=u'Níveis de acesso', null=True, blank=True)
+    liberacao = models.DateTimeField(u'Liberação', null=True, blank=True)
+    encerramento = models.DateTimeField(null=True, blank=True)
+    obs = models.TextField(null=True, blank=True)
     detalhe = models.ManyToManyField('identificacao.EnderecoDetalhe', null=True, blank=True)
 
     def __unicode__(self):
-        return '%s - %s' % (self.identificacao, self.nivel)
+        return '%s - %s' % (self.identificacao, self.lista_niveis())
+
+    def lista_niveis(self):
+        lista = ', '.join([n.nome for n in self.niveis.all()])
+        return lista
 
 class NivelAcesso(models.Model): 
-    nivel = models.IntegerField(u'Nível')
+    nome = models.CharField(max_length=50)
     explicacao = models.TextField('Explicação')
 
     def __unicode__(self):
-        return self.nome
+        return '%s' % self.nome
 
     class Meta:
         verbose_name = u'Nível de acesso'
         verbose_name_plural = u'Níveis de acesso'
 
+
+
+class Ecossistema(models.Model):
+    identificacao = models.ForeignKey('identificacao.Identificacao', verbose_name=u'Entidade/contato')
+    incentivo = models.BooleanField(u'Incentivar a dar palestra?')
+    monitora = models.BooleanField(u'Monitorar o convite?')
+    data_envio = models.DateField(u'Data de envio do e-mail', null=True, blank=True)
+    data_resposta = models.DateField(u'Data de resposta ao e-mail', null=True, blank=True)
+    dar_palestra = models.BooleanField(u'Vai dar palestra?')
+    palestrante = models.CharField(max_length=50, null=True, blank=True)
+    tema = models.CharField(max_length=50, null=True, blank=True)
+    temas_adicionais = models.TextField(u'Temas adicionais sugeridos', null=True, blank=True)
+    data_envio_postal = models.DateField(u'Data de envio do material postal', null=True, blank=True)
+    inscricoes_solicitadas = models.IntegerField(u'Número de inscrições solicitadas', null=True, blank=True)
+    inscricoes_aceitas = models.IntegerField(u'Número de inscrições aceitas', null=True, blank=True)
+    comentarios = models.TextField(u'Comentários', null=True, blank=True)
+    hotel = models.BooleanField(u'Quer hotel?')
+    
+    contato_pat = models.BooleanField(u'Contato para patrocínio?')
+    vip = models.BooleanField()
+    chaser = models.CharField(max_length=40, null=True, blank=True)
+    vai_pat = models.BooleanField(u'Vai patrocinar?')
+
+    def __unicode__(self):
+        return '%s' % self.identificacao.endereco.entidade.sigla
+
+    class Meta:
+        ordering = ('identificacao__endereco__entidade__sigla',)
+                                                                         

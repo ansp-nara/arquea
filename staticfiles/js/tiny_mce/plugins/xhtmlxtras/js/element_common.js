@@ -47,11 +47,11 @@ function getDateTime(d, fmt) {
 	fmt = fmt.replace("%r", "%I:%M:%S %p");
 	fmt = fmt.replace("%Y", "" + d.getFullYear());
 	fmt = fmt.replace("%y", "" + d.getYear());
-	fmt = fmt.replace("%m", addZeros(d.getMonth()+1, 2));
-	fmt = fmt.replace("%d", addZeros(d.getDate(), 2));
-	fmt = fmt.replace("%H", "" + addZeros(d.getHours(), 2));
-	fmt = fmt.replace("%M", "" + addZeros(d.getMinutes(), 2));
-	fmt = fmt.replace("%S", "" + addZeros(d.getSeconds(), 2));
+	fmt = fmt.replace("%m", changeZeros(d.getMonth()+1, 2));
+	fmt = fmt.replace("%d", changeZeros(d.getDate(), 2));
+	fmt = fmt.replace("%H", "" + changeZeros(d.getHours(), 2));
+	fmt = fmt.replace("%M", "" + changeZeros(d.getMinutes(), 2));
+	fmt = fmt.replace("%S", "" + changeZeros(d.getSeconds(), 2));
 	fmt = fmt.replace("%I", "" + ((d.getHours() + 11) % 12 + 1));
 	fmt = fmt.replace("%p", "" + (d.getHours() < 12 ? "AM" : "PM"));
 	fmt = fmt.replace("%%", "%");
@@ -59,7 +59,7 @@ function getDateTime(d, fmt) {
 	return fmt;
 }
 
-function addZeros(value, len) {
+function changeZeros(value, len) {
 	var i;
 
 	value = "" + value;
@@ -72,7 +72,7 @@ function addZeros(value, len) {
 	return value;
 }
 
-function selectByValue(form_obj, field_name, value, add_custom, ignore_case) {
+function selectByValue(form_obj, field_name, value, change_custom, ignore_case) {
 	if (!form_obj || !form_obj.elements[field_name])
 		return;
 
@@ -89,7 +89,7 @@ function selectByValue(form_obj, field_name, value, add_custom, ignore_case) {
 			option.selected = false;
 	}
 
-	if (!found && add_custom && value != '') {
+	if (!found && change_custom && value != '') {
 		var option = new Option('Value: ' + value, value);
 		option.selected = true;
 		sel.options[sel.options.length] = option;
@@ -134,7 +134,7 @@ SXE = {
 SXE.focusElement = SXE.inst.selection.getNode();
 
 SXE.initElementDialog = function(element_name) {
-	addClassesToList('class', 'xhtmlxtras_styles');
+	changeClassesToList('class', 'xhtmlxtras_styles');
 	TinyMCE_EditableSelects.init();
 
 	element_name = element_name.toLowerCase();
@@ -215,7 +215,7 @@ SXE.removeClass = function(elm,cl) {
 	elm.className = newClassNames.substring(0,newClassNames.length-1); //removes extra space at the end
 }
 
-SXE.addClass = function(elm,cl) {
+SXE.changeClass = function(elm,cl) {
 	if(!SXE.containsClass(elm,cl)) elm.className ? elm.className += " " + cl : elm.className = cl;
 	return true;
 }

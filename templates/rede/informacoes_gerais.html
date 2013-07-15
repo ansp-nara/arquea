@@ -1,0 +1,27 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<h2>Entidades ligadas à ANSP</h2>
+<table>
+<tr>
+	<th width="20%">Entidade</th>
+	<th width="10%">URL</th>
+	<th width="20%">Endereço</th>
+	<th width="10%">Cidade</th>
+	<th width="10%">CEP</th>
+	<th width="20%">Ponto de entrada na ANSP</th>
+	<th width="10%">Outras informações</th>
+</tr>
+
+{% for e in info %}
+<tr>
+	<td>{{ e.participante.entidade.sigla }} - {{ e.participante.entidade.nome }}</td>
+	<td>{{ e.participante.entidade.url }}</td>
+	<td>{{ e.participante.rua }}, {{ e.participante.num }}. {{ e.participante.bairro }}.</td>
+	<td>{{ e.participante.cidade }}</td>
+	<td>{{ e.participante.cep }}</td>
+	<td><a href="{% url admin:rede_enlace_change e.id %}">{{ e.entrada_ansp }}</a></td>
+	<td><a href="{% url rede.views.planilha_informacoes_tecnicas e.id %}">Ver</a></td>
+</tr>
+{% endfor %}
+</table>
+{% endblock %}

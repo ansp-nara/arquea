@@ -7,12 +7,23 @@ from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode
 from identificacao.models import Entidade
+from rede.models import PlanejaAquisicaoRecurso
 
 class Natureza_gastoInline(admin.TabularInline):
     model = Natureza_gasto
     extra = 6
 
 
+class PlanejamentoInline(admin.StackedInline):
+    model = PlanejaAquisicaoRecurso
+    extra = 2
+    fieldsets = (
+                 (None, {
+                         'fields': (('os', 'ano'), ('tipo', 'referente'), ('quantidade', 'valor_unitario'), ('projeto', 'unidade', 'instalacao'), 'obs'),
+                         'classes': ('wide',)
+                        }
+                 ),
+                )
 
 class ArquivoInline(admin.TabularInline):
     model = Arquivo
@@ -61,7 +72,7 @@ class OutorgaInline(admin.StackedInline):
     extra = 1
     verbose_name = _(' ')
     verbose_name_plural = _('Pedidos de Concessão')
-
+    ordering = ('-data_solicitacao',)
 
 class OrigemFapespInline(admin.TabularInline):
     model = OrigemFapesp
@@ -180,12 +191,13 @@ class TermoAdmin(admin.ModelAdmin):
 
     fieldsets = (
                  (None, {
-                     'fields': (('ano', 'processo', 'digito', 'inicio', 'estado'), ('parecer', 'parecer_final', 'orcamento', 'extrato_financeiro'), ('quitacao', 'doacao')),
+                     'fields': (('ano', 'processo', 'digito', 'inicio', 'estado'), 'parecer', 'parecer_final', 'orcamento', 'extrato_financeiro', 'quitacao', 'doacao'),
                  }),
     )
 
-    list_display = ('__unicode__', 'inicio', 'duracao_meses', 'termo_real', 'formata_realizado_real', 'termo_dolar', 'formata_realizado_dolar', 'estado')
+    #list_display = ('__unicode__', 'inicio', 'duracao_meses', 'termo_real', 'termo_dolar', 'formata_realizado_dolar', 'estado')
 
+    list_display = ('__unicode__', 'inicio', 'duracao_meses', 'termo_real', 'formata_realizado_real', 'formata_saldo_real', 'termo_dolar', 'formata_realizado_dolar', 'formata_saldo_dolar', 'estado')
     inlines = (OutorgaInline, Natureza_gastoInline)
 
     search_fields = ('ano', 'processo', 'inicio')
@@ -292,14 +304,14 @@ class ItemAdmin(admin.ModelAdmin):
 
     search_fields = ('natureza_gasto__modalidade__sigla', 'natureza_gasto__modalidade__nome', 'natureza_gasto__termo__ano', 'natureza_gasto__termo__processo', 'descricao', 'justificativa', 'obs')
 
-    list_filter = ('natureza_gasto__termo', 'natureza_gasto__modalidade', 'entidade') #EntidadeListFilter)
+    list_filter = ('natureza_gasto__termo', 'natureza_gasto__modalidade') 
 
     inlines = [OrigemFapespInline]
     form = ItemAdminForm
     
     list_display_links = ('mostra_descricao', )
 
-    list_per_page = 10
+    list_per_page = 20
 
 admin.site.register(Item, ItemAdmin)
 
@@ -372,14 +384,14 @@ class OrdemDeServicoAdmin(admin.ModelAdmin):
 
     list_display_links = ('descricao', )
 
-    inlines = (ArquivoOSInline,)
+    inlines = (ArquivoOSInline, PlanejamentoInline)
 
-    search_fields = ('numero', 'acordo__descricao', 'contrato__entidade__sigla', 'contrato__entidade__nome', 'descricao', 'data_inicio', 'data_rescisao')
+    search_fields = ('numero', 'acordo__descricao', 'contrato__entidade__sigla', 'contrato__entidade__nome', 'descricao', 'data_inicio', 'data_rescisao', 'tipo__nome')
 
     list_per_page = 10
     filter_horizontal = ('pergunta',)
 
 admin.site.register(OrdemDeServico,OrdemDeServicoAdmin)
-admin.site.register(ArquivoOS)
+#admin.site.register(ArquivoOS)
 admin.site.register(TipoContrato)
 admin.site.register(OrigemFapesp)

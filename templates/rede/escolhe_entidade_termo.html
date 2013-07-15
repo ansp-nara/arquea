@@ -1,0 +1,42 @@
+{% extends "admin/base_site.html" %}
+{% load proto_tags %}
+{% block extrahead %}
+<script type="text/javascript" src="/media/js/selects.js"></script>
+{% endblock %}
+{% block content %}
+<h1>Realizado de terceiros</h1>
+<form method="GET">
+<label for="id_entidade">Entidade:</label>
+<select name="entidade" id="id_entidade">
+  <option value="" selected>Nenhum</option>
+  {% for e in entidades %}
+     <option value="{{ e.id }}">{{ e }}</option>
+  {% endfor %}
+</select>
+<br />
+<label for="id_termo">Termo:</label>
+<select name="termo" id="id_termo">
+  <option value="" selected>Nenhum</option>
+  {% for t in termos %}
+     <option value="{{ t.id }}">{{ t }}</option>
+  {% endfor %}
+</select>
+<br />
+<label for="id_beneficiado">Beneficiado:</label>
+<select name="beneficiado" id="id_beneficiado">
+  <option value="" selected>Todos</option>
+  {% for e in beneficiados %}
+     <option value="{{ e.id }}">{{ e }}</option>
+  {% endfor %}
+</select>
+<br />
+<label for="id_tiposervico">Serviço:</label>
+<select name="tiposervico" id="id_tiposervico" multiple="multiple">
+{% for d in descricoes %}
+   <option value="{{ d.id }}">{{ d }}</option>
+{% endfor %}
+</select>
+<br />
+<input type="submit" value="Enviar">
+</form>
+{% endblock %}

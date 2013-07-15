@@ -26,7 +26,10 @@ class AgendadoInline(admin.TabularInline):
 class EnderecoDetalheInline(admin.TabularInline):
     model = EnderecoDetalhe
     extra = 1
-    fieldsets = ((None,{'fields':('tipo', 'complemento')}),)
+
+class ASNInline(admin.TabularInline):
+    model = ASN
+    extra = 1
 
 class EnderecoAdmin(admin.ModelAdmin):
 
@@ -41,15 +44,14 @@ class EnderecoAdmin(admin.ModelAdmin):
                      'classes': ('wide',)
                  }),
                  (None, {
-                     'fields': (('rua', 'num'), ('compl', 'cep'), ('bairro', 'cidade'), ('estado', 'pais')),
+                     'fields': (('rua', 'num'), ('compl', 'cep'), ('bairro', 'cidade'), ('estado', 'pais'), 'data_inatividade'),
                      'classes': ('wide',)
                  }),
     )
 
     list_display = ('__unicode__', 'cep', 'bairro', 'cidade', 'estado', 'pais')
 
-    search_fields = ['entidade__nome', 'entidade__sigla', 'identificacao__contato__nome', 'rua', 'bairro', 'cidade', 'estado', 'pais']
-
+    search_fields = ['entidade__nome', 'entidade__sigla', 'identificacao__contato__primeiro_nome', 'identificacao__contato__ultimo_nome', 'rua', 'bairro', 'cidade', 'estado', 'pais']
     inlines = [EnderecoDetalheInline]
 
 admin.site.register(Endereco, EnderecoAdmin)
@@ -78,14 +80,14 @@ class ContatoAdmin(admin.ModelAdmin):
 
     fieldsets = (
                  (None, {
-                     'fields': (('nome', 'ativo'), ('email', 'tel')),
+                     'fields': (('primeiro_nome', 'ultimo_nome', 'ativo'), ('email', 'tel', 'documento')),
                      'classes': ('wide',)
                  }),
     )
 
     list_display = ('nome', 'contato_ent', 'email', 'tel', 'ativo')
 
-    search_fields = ['nome', 'email']
+    search_fields = ['primeiro_nome', 'ultimo_nome', 'email']
 
     form = ContatoAdminForm
 
@@ -105,7 +107,7 @@ class EntidadeAdmin(admin.ModelAdmin):
                      'classes': ('wide',)
                  }),
                  (None, {
-                     'fields': ('url', ('cnpj', 'fisco'), 'pertence'),
+                     'fields': ('url', ('cnpj', 'fisco')),
                      'classes': ('wide',)
                  }),
 
@@ -115,7 +117,7 @@ class EntidadeAdmin(admin.ModelAdmin):
 
     list_filter = ('fisco', )
 
-    inlines = [ArquivoEntidadeInline, EntidadeHistoricoInline, AgendadoInline]
+    inlines = [ArquivoEntidadeInline, ASNInline, EntidadeHistoricoInline, AgendadoInline]
 
     search_fields = ['sigla', 'nome']
 
@@ -143,7 +145,7 @@ class IdentificacaoAdmin(admin.ModelAdmin):
 
     list_display = ('__unicode__', 'funcao', 'area', 'formata_historico')
 
-    search_fields = ['endereco__entidade__nome', 'endereco__entidade__sigla', 'contato__nome', 'funcao', 'area']
+    search_fields = ['endereco__entidade__nome', 'endereco__entidade__sigla', 'contato__primeiro_nome', 'contato__ultimo_nome', 'funcao', 'area']
 
 admin.site.register(Identificacao, IdentificacaoAdmin)
 
@@ -157,6 +159,13 @@ class EnderecoDetalheAdmin(admin.ModelAdmin):
 		 }),
     )
 
+    search_fields = ['endereco__entidade__sigla', 'endereco__rua', 'detalhe__endereco__entidade__sigla']
+
+class ASNAdmin(admin.ModelAdmin):
+
+    list_display = ('numero', 'entidade', 'pais')
+    search_fields = ('entidade__sigla', 'numero')
+
 
 admin.site.register(EnderecoDetalhe,EnderecoDetalheAdmin)
 admin.site.register(TipoDetalhe)
@@ -165,4 +174,5 @@ admin.site.register(Agenda)
 admin.site.register(TipoArquivoEntidade)
 admin.site.register(Acesso)
 admin.site.register(NivelAcesso)
-admin.site.register(ASN)
+admin.site.register(ASN, ASNAdmin)
+admin.site.register(Ecossistema)

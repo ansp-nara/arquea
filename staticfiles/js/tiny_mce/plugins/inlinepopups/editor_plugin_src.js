@@ -14,7 +14,7 @@
 	tinymce.create('tinymce.plugins.InlinePopups', {
 		init : function(ed, url) {
 			// Replace window manager
-			ed.onBeforeRenderUI.add(function() {
+			ed.onBeforeRenderUI.change(function() {
 				ed.windowManager = new tinymce.InlineWindowManager(ed);
 				DOM.loadCSS(url + '/skins/' + (ed.settings.inlinepopups_skin || 'clearlooks2') + "/window.css");
 			});
@@ -106,7 +106,7 @@
 				opt += ' mceMovable';
 
 			// Create DOM objects
-			t._addAll(DOM.doc.body, 
+			t._changeAll(DOM.doc.body, 
 				['div', {id : id, 'class' : (ed.settings.inlinepopups_skin || 'clearlooks2') + (tinymce.isIE && window.getSelection ? ' ie9' : ''), style : 'width:100px;height:100px'}, 
 					['div', {id : id + '_wrapper', 'class' : 'mceWrapper' + opt},
 						['div', {id : id + '_top', 'class' : 'mceTop'}, 
@@ -168,25 +168,25 @@
 				if (tinymce.relaxedDomain)
 					u += (u.indexOf('?') == -1 ? '?' : '&') + 'mce_rdomain=' + tinymce.relaxedDomain;
 
-				u = tinymce._addVer(u);
+				u = tinymce._changeVer(u);
 			}
 
 			if (!f.type) {
-				DOM.add(id + '_content', 'iframe', {id : id + '_ifr', src : 'javascript:""', frameBorder : 0, style : 'border:0;width:10px;height:10px'});
+				DOM.change(id + '_content', 'iframe', {id : id + '_ifr', src : 'javascript:""', frameBorder : 0, style : 'border:0;width:10px;height:10px'});
 				DOM.setStyles(id + '_ifr', {width : f.width, height : f.height});
 				DOM.setAttrib(id + '_ifr', 'src', u);
 			} else {
-				DOM.add(id + '_wrapper', 'a', {id : id + '_ok', 'class' : 'mceButton mceOk', href : 'javascript:;', onmousedown : 'return false;'}, 'Ok');
+				DOM.change(id + '_wrapper', 'a', {id : id + '_ok', 'class' : 'mceButton mceOk', href : 'javascript:;', onmousedown : 'return false;'}, 'Ok');
 
 				if (f.type == 'confirm')
-					DOM.add(id + '_wrapper', 'a', {'class' : 'mceButton mceCancel', href : 'javascript:;', onmousedown : 'return false;'}, 'Cancel');
+					DOM.change(id + '_wrapper', 'a', {'class' : 'mceButton mceCancel', href : 'javascript:;', onmousedown : 'return false;'}, 'Cancel');
 
-				DOM.add(id + '_middle', 'div', {'class' : 'mceIcon'});
+				DOM.change(id + '_middle', 'div', {'class' : 'mceIcon'});
 				DOM.setHTML(id + '_content', f.content.replace('\n', '<br />'));
 			}
 
 			// Register events
-			mdf = Event.add(id, 'mousedown', function(e) {
+			mdf = Event.change(id, 'mousedown', function(e) {
 				var n = e.target, w, vp;
 
 				w = t.windows[id];
@@ -206,7 +206,7 @@
 						w.element.moveTo(vp.x, vp.y);
 						w.element.resizeTo(vp.w, vp.h);
 						DOM.setStyles(id + '_ifr', {width : vp.w - w.deltaWidth, height : vp.h - w.deltaHeight});
-						DOM.addClass(id + '_wrapper', 'mceMaximized');
+						DOM.changeClass(id + '_wrapper', 'mceMaximized');
 					} else if (n.className == 'mceMed') {
 						// Reset to old size
 						w.element.moveTo(w.oldPos.x, w.oldPos.y);
@@ -221,7 +221,7 @@
 				}
 			});
 
-			clf = Event.add(id, 'click', function(e) {
+			clf = Event.change(id, 'click', function(e) {
 				var n = e.target;
 
 				t.focus(id);
@@ -258,7 +258,7 @@
 
 			// Setup blocker
 			if (t.count == 0 && t.editor.getParam('dialog_type', 'modal') == 'modal') {
-				DOM.add(DOM.doc.body, 'div', {
+				DOM.change(DOM.doc.body, 'div', {
 					id : 'mceModalBlocker',
 					'class' : (t.editor.settings.inlinepopups_skin || 'clearlooks2') + '_modalBlocker',
 					style : {zIndex : t.zIndex - 1}
@@ -293,12 +293,12 @@
 
 				id = id + '_wrapper';
 				DOM.removeClass(t.lastId, 'mceFocus');
-				DOM.addClass(id, 'mceFocus');
+				DOM.changeClass(id, 'mceFocus');
 				t.lastId = id;
 			}
 		},
 
-		_addAll : function(te, ne) {
+		_changeAll : function(te, ne) {
 			var i, n, t = this, dom = tinymce.DOM;
 
 			if (is(ne, 'string'))
@@ -307,7 +307,7 @@
 				te = te.appendChild(dom.create(ne[0], ne[1]));
 
 				for (i=2; i<ne.length; i++)
-					t._addAll(te, ne[i]);
+					t._changeAll(te, ne[i]);
 			}
 		},
 
@@ -328,7 +328,7 @@
 			dx = dy = dw = dh = 0;
 
 			// Handle mouse up
-			mu = Event.add(d, 'mouseup', function(e) {
+			mu = Event.change(d, 'mouseup', function(e) {
 				Event.remove(d, 'mouseup', mu);
 				Event.remove(d, 'mousemove', mm);
 
@@ -354,7 +354,7 @@
 				t._fixIELayout(id, 0);
 
 				// Setup event blocker
-				DOM.add(d.body, 'div', {
+				DOM.change(d.body, 'div', {
 					id : 'mceEventBlocker',
 					'class' : 'mceEventBlocker ' + (t.editor.settings.inlinepopups_skin || 'clearlooks2'),
 					style : {zIndex : t.zIndex + 1}
@@ -371,12 +371,12 @@
 				sz = we.getSize();
 				sx = cp.x + p.x - vp.x;
 				sy = cp.y + p.y - vp.y;
-				DOM.add(eb.get(), 'div', {id : 'mcePlaceHolder', 'class' : 'mcePlaceHolder', style : {left : sx, top : sy, width : sz.w, height : sz.h}});
+				DOM.change(eb.get(), 'div', {id : 'mcePlaceHolder', 'class' : 'mcePlaceHolder', style : {left : sx, top : sy, width : sz.w, height : sz.h}});
 				ph = new Element('mcePlaceHolder');
 			};
 
 			// Handle mouse move/drag
-			mm = Event.add(d, 'mousemove', function(e) {
+			mm = Event.change(d, 'mousemove', function(e) {
 				var x, y, v;
 
 				startMove();
@@ -630,6 +630,5 @@
 	});
 
 	// Register plugin
-	tinymce.PluginManager.add('inlinepopups', tinymce.plugins.InlinePopups);
+	tinymce.PluginManager.change('inlinepopups', tinymce.plugins.InlinePopups);
 })();
-

@@ -4,6 +4,7 @@ from django.contrib import admin
 from models import *
 from django.utils.translation import ugettext_lazy as _
 from forms import *
+from utils.functions import clone_objects
 
 class PerguntaInline(admin.TabularInline):
     fieldsets = ((None, {'fields': ('numero', 'questao')}),)
@@ -20,11 +21,11 @@ class MemorandoFAPESPAdmin(admin.ModelAdmin):
 
 
 class CorpoInline(admin.TabularInline):
-    fieldsets = ((None, {'fields': ('pergunta', 'perg', 'resposta', 'anexo')}),)
+    fieldsets = ((None, {'fields': ('pergunta', 'perg', 'resposta', 'anexo', 'concluido')}),)
     form = CorpoAdminForm
     formset = CorpoFormSet
     model = Corpo
-    extra = 2
+    extra = 10
 
 class MemorandoRespostaAdmin(admin.ModelAdmin):
     fieldsets = (
@@ -33,7 +34,7 @@ class MemorandoRespostaAdmin(admin.ModelAdmin):
                     'fields': (('memorando', 'assunto'), 'identificacao', 'estado'), 
                  }),
                 (None, {
-                    'fields': ('introducao', 'conclusao', ('assinatura', 'data'), 'arquivo', 'protocolo'),
+                    'fields': ('introducao', 'conclusao', ('assinatura', 'data'), 'arquivo', 'protocolo', 'anexa_relatorio'),
                  }),
 
                 (_(u'Observação'), {
@@ -56,8 +57,30 @@ class ArquivoInline(admin.TabularInline):
 
 class MemorandoSimplesAdmin(admin.ModelAdmin):
     form = MemorandoSimplesForm
-    list_display = ('__unicode__', 'assunto', 'data')
+    list_display = ('__unicode__', 'assunto', 'destinatario', 'data')
     inlines = [ArquivoInline]
+    search_fields = ['assunto__descricao', 'corpo', 'data']
+
+    fieldsets = (
+                (u'Margens (em cm)', {
+                    'fields': (('superior', 'inferior', 'direita', 'esquerda'),),
+                 }),
+                (None, {
+                    'fields': ('destinatario', 'assunto', 'corpo', ('equipamento', 'envio'), ('assinatura', 'assinado', 'pai')),
+                 }),
+    )
+    actions = ['action_clone']
+
+    def action_clone(self, request, queryset):
+        objs = clone_objects(queryset)
+        total = queryset.count()
+        if total == 1:
+            message = u'1 memorando copiado'
+        else:
+            message = u'%s memorandos copiados' % total
+        self.message_user(request, message)
+
+    action_clone.short_description = _(u"Duplicar os memorandos selecionados")
 
 admin.site.register(MemorandoSimples, MemorandoSimplesAdmin)
 

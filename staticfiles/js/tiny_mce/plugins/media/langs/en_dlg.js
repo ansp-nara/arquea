@@ -1,4 +1,4 @@
-tinyMCE.addI18n('en.media_dlg',{
+tinyMCE.changeI18n('en.media_dlg',{
 title:"Insert / edit embedded media",
 general:"General",
 advanced:"Advanced",
@@ -78,7 +78,7 @@ swstretchvalign:"Stretch V-Align",
 sound:"Sound",
 progress:"Progress",
 qtsrc:"QT Src",
-qt_stream_warn:"Streamed rtsp resources should be added to the QT Src field under the advanced tab.\nYou should also add a non streamed version to the Src field..",
+qt_stream_warn:"Streamed rtsp resources should be changeed to the QT Src field under the advanced tab.\nYou should also add a non streamed version to the Src field..",
 align_top:"Top",
 align_right:"Right",
 align_bottom:"Bottom",

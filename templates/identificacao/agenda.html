@@ -1,0 +1,82 @@
+{% extends "admin/base_site.html" %}
+{% load proto_tags %}
+{% block extrahead %}
+<style type="text/css">
+.tabnav {
+        width: 100%;
+        height: 30px;
+        margin: 0 auto;
+        border-bottom:solid 1px #9fc3e5;
+}
+.tabnav ul{margin:10px 20px 0 20px;}
+.tabnav ul li {
+        display:block;
+        float:left;
+        margin:0 1px;
+        border-top-left-radius:5px;
+        border-top-right-radius:5px;
+        -moz-border-top-left-radius:5px;
+        -moz-border-top-right-radius:5px;
+        -webkit-border-top-left-radius:5px;
+        -webkit-border-top-right-radius:5px;
+        }
+
+.tabnav ul li span {
+        background: #0015b0;
+        color: #fff;
+        min-width:15px;
+        font-size:12px;
+        font-weight:bold;
+        pchangeing:5px;
+        text-align:center;
+        line-height:20px;
+        float:left;
+}
+        
+.tabnav ul li a {
+        float:left;
+        background: #9fc3e5;
+        /*background: #9fc3e5 url("tab.jpg") top left no-repeat;*/
+        text-decoration: none;
+        line-height:20px;
+        color: #fff;
+        font-size: 12px;
+        font-weight: bold;
+        display: block;
+        min-width: 15px;
+        height: 20px;
+        margin:0;
+        pchangeing:5px;
+        text-align: center;
+}
+
+.tabnav ul li a:hover{background:#6699cc;}
+
+.tabnav-click {background:#464646; color:#ff0000;}
+</style>
+{% endblock %}
+{% block content %}
+  <a href="{% url identificacao.views.agenda 'pdf' tipo %}?agenda={{ agenda }}">Versão para impressão</a>
+  <div class="tabnav">
+    <ul>
+        {% for t in tipos %}
+        <li>{% if t.id == tipo %}<span>{{ t.nome }}</span>{% else %}<a href="{% url identificacao.views.agenda t.id %}?agenda={{ agenda }}">{{ t.nome }}</a>{% endif %}</li>
+        {% endfor %}
+    </ul>
+  </div>
+
+  <table>
+  {% for e in entidades %}
+    <tr><td width="20%">{% if not e.filho %}{% if e.entidade.url %}<a href="{{ e.entidade.url }}">{{ e.entidade.sigla }}</a>{% else %}{{ e.entidade.sigla }}{% endif %}{% endif %}</td><td colspan="3">{% if e.filho %}<span style="font-weight:bold;">{{ e.entidade.sigla }}</span> - {% endif %}{{ e.entidade.nome }}</td></tr>
+    {% for a in e.areas %}
+      <tr><td></td><td colspan="3">{{ a.area }}</td></tr>
+      {% for c in a.contatos %}
+         <tr><td></td><td width="15%"></td><td>{% if c.contato.ativo %}<b>{{ c.contato.nome }}</b>{% else %}<span style="color:red;">{{ c.contato.nome }}</span>{% endif %} ({{ c.contato.email }})</td><td>{{ c.funcao }}</td></tr>
+         <tr><td></td><td></td><td>{{ c.endereco.logradouro }} - CEP: {{ c.endereco.cep }}</td></tr>
+         <tr><td></td><td></td><td>{{ c.endereco.bairro}} - {{ c.endereco.cidade }} - {{ c.endereco.estado }}</td></tr>
+         <tr><td></td><td></td><td>{{ c.contato.tel }}</td></tr>
+      {% endfor %}
+    {% endfor %}
+  {% endfor %}
+  </table>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<h1 repeat="1">Distribuição das concessões por acordo nos processos a partir de 2005</h1>
+<h4><a href="{% url outorga.views.lista_acordos 1 %}">Imprimir</a></h4>
+
+    <table border="0" repeat="1" cellpchangeing="5">
+    <tr><th>Processo</th><th>Acordo</th><th>Modalidade</th><th>Entidade</th><th>Item da outorga</th></tr>
+    {% for p in processos %}
+           <tr><th>{{ p.processo }}</th></tr>
+           {% for a in p.acordos %}
+                 <tr><td></td><td>{{ a.acordo }}</td></tr>
+                 {% for it in a.itens %}
+                     <tr><td></td><td></td><td>{{ it.modalidade }}</td><td>{{ it.entidade }}</td><td>{{ it.descricao }}</td></tr>
+                 {% endfor %}
+              {% endfor %}
+
+    {% endfor %}
+    </table>
+
+{% endblock %}

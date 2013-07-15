@@ -22,13 +22,13 @@
 				return /^(mceItemFlash|mceItemShockWave|mceItemWindowsMedia|mceItemQuickTime|mceItemRealMedia)$/.test(n.className);
 			};
 
-			ed.onPreInit.add(function() {
+			ed.onPreInit.change(function() {
 				// Force in _value parameter this extra parameter is required for older Opera versions
-				ed.serializer.addRules('param[name|value|_mce_value]');
+				ed.serializer.changeRules('param[name|value|_mce_value]');
 			});
 
 			// Register commands
-			ed.addCommand('mceMedia', function() {
+			ed.changeCommand('mceMedia', function() {
 				ed.windowManager.open({
 					file : url + '/media.htm',
 					width : 430 + parseInt(ed.getLang('media.delta_width', 0)),
@@ -40,13 +40,13 @@
 			});
 
 			// Register buttons
-			ed.addButton('media', {title : 'media.desc', cmd : 'mceMedia'});
+			ed.changeButton('media', {title : 'media.desc', cmd : 'mceMedia'});
 
-			ed.onNodeChange.add(function(ed, cm, n) {
+			ed.onNodeChange.change(function(ed, cm, n) {
 				cm.setActive('media', n.nodeName == 'IMG' && isMediaElm(n));
 			});
 
-			ed.onInit.add(function() {
+			ed.onInit.change(function() {
 				var lo = {
 					mceItemFlash : 'flash',
 					mceItemShockWave : 'shockwave',
@@ -55,17 +55,17 @@
 					mceItemRealMedia : 'realmedia'
 				};
 
-				ed.selection.onSetContent.add(function() {
+				ed.selection.onSetContent.change(function() {
 					t._spansToImgs(ed.getBody());
 				});
 
-				ed.selection.onBeforeSetContent.add(t._objectsToSpans, t);
+				ed.selection.onBeforeSetContent.change(t._objectsToSpans, t);
 
 				if (ed.settings.content_css !== false)
 					ed.dom.loadCSS(url + "/css/content.css");
 
 				if (ed.theme && ed.theme.onResolveName) {
-					ed.theme.onResolveName.add(function(th, o) {
+					ed.theme.onResolveName.change(function(th, o) {
 						if (o.name == 'img') {
 							each(lo, function(v, k) {
 								if (ed.dom.hasClass(o.node, k)) {
@@ -79,21 +79,21 @@
 				}
 
 				if (ed && ed.plugins.contextmenu) {
-					ed.plugins.contextmenu.onContextMenu.add(function(th, m, e) {
+					ed.plugins.contextmenu.onContextMenu.change(function(th, m, e) {
 						if (e.nodeName == 'IMG' && /mceItem(Flash|ShockWave|WindowsMedia|QuickTime|RealMedia)/.test(e.className)) {
-							m.add({title : 'media.edit', icon : 'media', cmd : 'mceMedia'});
+							m.change({title : 'media.edit', icon : 'media', cmd : 'mceMedia'});
 						}
 					});
 				}
 			});
 
-			ed.onBeforeSetContent.add(t._objectsToSpans, t);
+			ed.onBeforeSetContent.change(t._objectsToSpans, t);
 
-			ed.onSetContent.add(function() {
+			ed.onSetContent.change(function() {
 				t._spansToImgs(ed.getBody());
 			});
 
-			ed.onPreProcess.add(function(ed, o) {
+			ed.onPreProcess.change(function(ed, o) {
 				var dom = ed.dom;
 
 				if (o.set) {
@@ -164,7 +164,7 @@
 				}
 			});
 
-			ed.onPostProcess.add(function(ed, o) {
+			ed.onPostProcess.change(function(ed, o) {
 				o.content = o.content.replace(/_mce_value=/g, 'value=');
 			});
 
@@ -174,7 +174,7 @@
 				return n ? ed.dom.decode(n[1]) : '';
 			};
 
-			ed.onPostProcess.add(function(ed, o) {
+			ed.onPostProcess.change(function(ed, o) {
 				if (ed.getParam('media_use_script')) {
 					o.content = o.content.replace(/<img[^>]+>/g, function(im) {
 						var cl = getAttr(im, 'class');
@@ -263,12 +263,12 @@
 						k = 'url';
 
 					if (v)
-						dom.add(ob, 'span', {_mce_name : 'param', name : k, '_mce_value' : v});
+						dom.change(ob, 'span', {_mce_name : 'param', name : k, '_mce_value' : v});
 				}
 			});
 
 			if (!stc)
-				dom.add(ob, 'span', tinymce.extend({_mce_name : 'embed', type : o.type, style : dom.getAttrib(n, 'style')}, p));
+				dom.change(ob, 'span', tinymce.extend({_mce_name : 'embed', type : o.type, style : dom.getAttrib(n, 'style')}, p));
 
 			return ob;
 		},
@@ -410,5 +410,5 @@
 	});
 
 	// Register plugin
-	tinymce.PluginManager.add('media', tinymce.plugins.MediaPlugin);
+	tinymce.PluginManager.change('media', tinymce.plugins.MediaPlugin);
 })();

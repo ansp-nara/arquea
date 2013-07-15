@@ -50,16 +50,16 @@
 			t.onPostProcess = new tinymce.util.Dispatcher(t);
 
 			// Register default handlers
-			t.onPreProcess.add(t._preProcess);
-			t.onPostProcess.add(t._postProcess);
+			t.onPreProcess.change(t._preProcess);
+			t.onPostProcess.change(t._postProcess);
 
 			// Register optional preprocess handler
-			t.onPreProcess.add(function(pl, o) {
+			t.onPreProcess.change(function(pl, o) {
 				ed.execCallback('paste_preprocess', pl, o);
 			});
 
 			// Register optional postprocess
-			t.onPostProcess.add(function(pl, o) {
+			t.onPostProcess.change(function(pl, o) {
 				ed.execCallback('paste_postprocess', pl, o);
 			});
 
@@ -100,12 +100,12 @@
 			}
 
 			// Add command for external usage
-			ed.addCommand('mceInsertClipboardContent', function(u, o) {
+			ed.changeCommand('mceInsertClipboardContent', function(u, o) {
 				process(o, true);
 			});
 
 			if (!getParam(ed, "paste_text_use_dialog")) {
-				ed.addCommand('mcePasteText', function(u, v) {
+				ed.changeCommand('mcePasteText', function(u, v) {
 					var cookie = tinymce.util.Cookie;
 
 					ed.pasteAsPlainText = !ed.pasteAsPlainText;
@@ -125,10 +125,10 @@
 				});
 			}
 
-			ed.addButton('pastetext', {title: 'paste.paste_text_desc', cmd: 'mcePasteText'});
-			ed.addButton('selectall', {title: 'paste.selectall_desc', cmd: 'selectall'});
+			ed.changeButton('pastetext', {title: 'paste.paste_text_desc', cmd: 'mcePasteText'});
+			ed.changeButton('selectall', {title: 'paste.selectall_desc', cmd: 'selectall'});
 
-			// This function grabs the contents from the clipboard by adding a
+			// This function grabs the contents from the clipboard by changeing a
 			// hidden div and placing the caret inside it and after the browser paste
 			// is done it grabs that contents and processes that
 			function grabContent(e) {
@@ -145,7 +145,7 @@
 					return;
 
 				// Create container to paste into
-				n = dom.add(body, 'div', {id : '_mcePaste', 'class' : 'mcePaste'}, '\uFEFF<br _mce_bogus="1">');
+				n = dom.change(body, 'div', {id : '_mcePaste', 'class' : 'mcePaste'}, '\uFEFF<br _mce_bogus="1">');
 
 				// If contentEditable mode we need to find out the position of the closest element
 				if (body != ed.getDoc().body)
@@ -153,7 +153,7 @@
 				else
 					posY = body.scrollTop;
 
-				// Styles needs to be applied after the element is added to the document since WebKit will otherwise remove all styles
+				// Styles needs to be applied after the element is changeed to the document since WebKit will otherwise remove all styles
 				dom.setStyles(n, {
 					position : 'absolute',
 					left : -10000,
@@ -256,13 +256,13 @@
 			if (getParam(ed, "paste_auto_cleanup_on_paste")) {
 				// Is it's Opera or older FF use key handler
 				if (tinymce.isOpera || /Firefox\/2/.test(navigator.userAgent)) {
-					ed.onKeyDown.add(function(ed, e) {
+					ed.onKeyDown.change(function(ed, e) {
 						if (((tinymce.isMac ? e.metaKey : e.ctrlKey) && e.keyCode == 86) || (e.shiftKey && e.keyCode == 45))
 							grabContent(e);
 					});
 				} else {
 					// Grab contents on paste event on Gecko and WebKit
-					ed.onPaste.addToTop(function(ed, e) {
+					ed.onPaste.changeToTop(function(ed, e) {
 						return grabContent(e);
 					});
 				}
@@ -270,7 +270,7 @@
 
 			// Block all drag/drop events
 			if (getParam(ed, "paste_block_drop")) {
-				ed.onInit.add(function() {
+				ed.onInit.change(function() {
 					ed.dom.bind(ed.getBody(), ['dragend', 'dragover', 'draggesture', 'dragdrop', 'drop', 'drag'], function(e) {
 						e.preventDefault();
 						e.stopPropagation();
@@ -394,11 +394,11 @@
 
 										// Translate certain MS Office styles into their CSS equivalents
 										switch (name) {
-											case "mso-padding-alt":
-											case "mso-padding-top-alt":
-											case "mso-padding-right-alt":
-											case "mso-padding-bottom-alt":
-											case "mso-padding-left-alt":
+											case "mso-pchangeing-alt":
+											case "mso-pchangeing-top-alt":
+											case "mso-pchangeing-right-alt":
+											case "mso-pchangeing-bottom-alt":
+											case "mso-pchangeing-left-alt":
 											case "mso-margin-alt":
 											case "mso-margin-top-alt":
 											case "mso-margin-right-alt":
@@ -437,7 +437,7 @@
 												n[i++] = "min-width:" + ensureUnits(value);
 												return;
 
-											case "mso-padding-between-alt":
+											case "mso-pchangeing-between-alt":
 												n[i++] = "border-collapse:separate;border-spacing:" + ensureUnits(value);
 												return;
 
@@ -651,7 +651,7 @@
 					else
 						html = p.innerHTML.replace(/__MCE_ITEM__/g, '').replace(/^\s*\w+\.(&nbsp;|\u00a0)+\s*/, '');
 
-					// Create li and add paragraph data into the new li
+					// Create li and change paragraph data into the new li
 					li = listElm.appendChild(dom.create('li', 0, html));
 					dom.remove(p);
 
@@ -742,11 +742,11 @@
 
 		/**
 		 * Instead of the old plain text method which tried to re-create a paste operation, the
-		 * new approach adds a plain text mode toggle switch that changes the behavior of paste.
+		 * new approach changes a plain text mode toggle switch that changes the behavior of paste.
 		 * This function is passed the same input that the regular paste plugin produces.
-		 * It performs additional scrubbing and produces (and inserts) the plain text.
+		 * It performs changeitional scrubbing and produces (and inserts) the plain text.
 		 * This approach leverages all of the great existing functionality in the paste
-		 * plugin, and requires minimal changes to add the new functionality.
+		 * plugin, and requires minimal changes to change the new functionality.
 		 * Speednet - June 2009
 		 */
 		_insertPlainText : function(ed, dom, h) {
@@ -773,7 +773,7 @@
 					entities = ("34,quot,38,amp,39,apos,60,lt,62,gt," + ed.serializer.settings.entities).split(",");
 
 				// If HTML content with line-breaking tags, then remove all cr/lf chars because only tags will break a line
-				if (/<(?:p|br|h[1-6]|ul|ol|dl|table|t[rdh]|div|blockquote|fieldset|pre|address|center)[^>]*>/i.test(h)) {
+				if (/<(?:p|br|h[1-6]|ul|ol|dl|table|t[rdh]|div|blockquote|fieldset|pre|changeress|center)[^>]*>/i.test(h)) {
 					process([
 						/[\n\r]+/g
 					]);
@@ -785,7 +785,7 @@
 				}
 
 				process([
-					[/<\/(?:p|h[1-6]|ul|ol|dl|table|div|blockquote|fieldset|pre|address|center)>/gi, "\n\n"],		// Block tags get a blank line after them
+					[/<\/(?:p|h[1-6]|ul|ol|dl|table|div|blockquote|fieldset|pre|changeress|center)>/gi, "\n\n"],		// Block tags get a blank line after them
 					[/<br[^>]*>|<\/tr>/gi, "\n"],				// Single linebreak for <br /> tags and table rows
 					[/<\/t[dh]>\s*<t[dh][^>]*>/gi, "\t"],		// Table cells get tabs betweem them
 					/<[a-z!\/?][^>]*>/gi,						// Delete all remaining tags
@@ -886,7 +886,7 @@
 					}
 				}
 
-				// Insert content at the caret, plus add a marker for repositioning the caret
+				// Insert content at the caret, plus change a marker for repositioning the caret
 				ed.execCommand("mceInsertRawHTML", false, h + '<span id="_plain_text_marker">&nbsp;</span>');
 
 				// Reposition the caret to the marker, which was placed immediately after the inserted content.
@@ -922,7 +922,7 @@
 			var t = this, ed = t.editor;
 
 			// Register command(s) for backwards compatibility
-			ed.addCommand("mcePasteWord", function() {
+			ed.changeCommand("mcePasteWord", function() {
 				ed.windowManager.open({
 					file: t.url + "/pasteword.htm",
 					width: parseInt(getParam(ed, "paste_dialog_width")),
@@ -932,7 +932,7 @@
 			});
 
 			if (getParam(ed, "paste_text_use_dialog")) {
-				ed.addCommand("mcePasteText", function() {
+				ed.changeCommand("mcePasteText", function() {
 					ed.windowManager.open({
 						file : t.url + "/pastetext.htm",
 						width: parseInt(getParam(ed, "paste_dialog_width")),
@@ -943,10 +943,10 @@
 			}
 
 			// Register button for backwards compatibility
-			ed.addButton("pasteword", {title : "paste.paste_word_desc", cmd : "mcePasteWord"});
+			ed.changeButton("pasteword", {title : "paste.paste_word_desc", cmd : "mcePasteWord"});
 		}
 	});
 
 	// Register plugin
-	tinymce.PluginManager.add("paste", tinymce.plugins.PastePlugin);
-})();
+	tinymce.PluginManager.change("paste", tinymce.plugins.PastePlugin);
+})();

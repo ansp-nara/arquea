@@ -55,6 +55,7 @@ class Sessao(models.Model):
 
 class Atribuicao(models.Model):   
     membro = models.ForeignKey('membro.Membro')
+    relatorio = models.FileField(u'Relatório', upload_to='evento', null=True, blank=True)
     area = models.ForeignKey('evento.AreaOperacional', verbose_name=_(u'Área operacional'))
     sessao = models.ForeignKey('evento.Sessao', verbose_name=_(u'Sessão'))
 

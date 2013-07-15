@@ -30,6 +30,7 @@ class TipoDocumento(models.Model):
 
 
     nome = models.CharField(_('Nome'), max_length=100, help_text='ex. Nota Fiscal', unique=True)
+    sigla = models.CharField(max_length=10)
 
 
     # Define a descrição do modelo (singular e plural) e a ordenação dos dados.
@@ -104,6 +105,12 @@ class Origem(models.Model):
         verbose_name_plural = _('Origens')
 
 
+class TipoFeriado(models.Model):
+    nome = models.CharField(max_length=45)
+    movel = models.BooleanField(u'Móvel')
+
+    def __unicode__(self):
+        return self.nome
 
 class Feriado(models.Model):
 
@@ -143,23 +150,23 @@ class Feriado(models.Model):
 
     feriado = models.DateField(_('Feriado'))
     descricao = models.CharField(_(u'Descrição'), max_length=80, blank=True, help_text='ex. Natal')
-    movel = models.BooleanField(_(u'Este feriado é móvel?'))
+    tipo = models.ForeignKey('protocolo.TipoFeriado', null=True, blank=True)
+    #movel = models.BooleanField(_(u'Este feriado é móvel?'))
 
 
     # Retorna a data do feriado de acordo com sua classificação.    
     def __unicode__(self):
-        if self.movel:
-            return self.feriado.strftime("%d/%m/%y")
-        else:
-            return self.feriado.strftime("%d/%m")
+        return self.feriado.strftime("%d/%m/%y")
  
 
     # Define um método da classe que verifica se uma data é feriado.
     @classmethod
     def dia_de_feriado(cls,data):
-        dm = data in [f.feriado for f in cls.objects.filter(movel=True)]
-        df = (data.month, data.day) in [(f.feriado.month, f.feriado.day) for f in cls.objects.filter(movel=False)]
-        return (dm or df)
+    #    dm = data in [f.feriado for f in cls.objects.filter(movel=True)]
+    #    df = (data.month, data.day) in [(f.feriado.month, f.feriado.day) for f in cls.objects.filter(movel=False)]
+    #    return (dm or df)
+        dm = data in [f.feriado for f in cls.objects.all()]
+        return dm
 
 
     # Define a ordenação da visualização dos dados.
@@ -283,15 +290,16 @@ class Protocolo(models.Model):
     moeda_estrangeira = models.BooleanField(_(u'Dólar?'), help_text=_(u'O valor do documento está em dolar?'))
     valor_total = models.DecimalField(_(u'Valor total'), max_digits=12, decimal_places=2, blank=True, null=True, help_text=_(u'Atenção: só preencher este campo caso haja algum erro na soma dos itens deste protocolo'))
     referente = models.CharField(_(u'Referente'), max_length=100, blank=True, null=True)
-
+    procedencia = models.ForeignKey('identificacao.Entidade', verbose_name=_(u'Procedência'), null=True, blank=True)
 
     # Retorna os campos termo, descrição, estado e data de vencimento.
     def __unicode__(self):
         dt = self.data_vencimento or self.data_chegada
-        if self.descricao2:
-            return '%s - %s - %s - %s %s - %s' % (self.termo.__unicode__(), self.descricao2.__unicode__(), dt.strftime("%d/%m"), self.tipo_documento, self.num_documento, self.mostra_valor())
-        else:
-            return '%s - %s - %s - %s %s - %s' % (self.termo.__unicode__(), self.entidade(), dt.strftime("%d/%m"), self.tipo_documento, self.num_documento, self.mostra_valor())
+        #if self.descricao2:
+        #    return '%s - %s - %s - %s %s - %s' % (self.termo.__unicode__(), self.descricao2.__unicode__(), dt.strftime("%d/%m"), self.tipo_documento, self.num_documento, self.mostra_valor())
+        #else:
+        #    return '%s - %s - %s - %s %s - %s' % (self.termo.__unicode__(), self.entidade(), dt.strftime("%d/%m"), self.tipo_documento, self.num_documento, self.mostra_valor())
+        return '%s - %s %s - %s' % (dt.strftime("%d/%m"), self.tipo_documento, self.num_documento, self.mostra_valor())
 
     # Caso seja um pedido, exibe um link para as cotações
     def cotacoes(self):
@@ -361,6 +369,11 @@ class Protocolo(models.Model):
     vencimento.short_description = _(u'Vencimento')
     vencimento.admin_order_field = 'data_vencimento'
 
+    # Retorna a data de recebimento formatada.
+    def chegada(self):
+        return self.data_chegada.strftime("%d/%m/%y")
+    vencimento.short_description = _(u'Recebimento')
+    vencimento.admin_order_field = 'data_chegada'
 
     # Marca em vermelho o estado 'pendente'.
     def colorir(self):

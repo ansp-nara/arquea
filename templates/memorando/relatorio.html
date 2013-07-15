@@ -11,7 +11,7 @@
 	
 	<h3  style="color:#134089;">Introdução</h3>
 	{% for r in memorando.memorandoresposta_set.all %}
-		<p><span style="color:red;">Data: {{ r.data }}</span> - {{ r.introducao }}</p>
+		<p><span style="color:red;">Data: {{ r.data }}</span> - {{ r.introducao|safe }}</p>
 		
 		{% endfor %}
 		{% for p in memorando.pergunta_set.all %}
@@ -28,7 +28,8 @@
 				<strong>Respostas</strong>
 				{% for c in p.corpo_set.all %}
 					<span  class="spacing1">
-							<p style="color:red;">Data: {{ c.memorando.data }}  {{ c.resposta|safe }}</p>
+						<p style="color:red;">Data: {{ c.memorando.data }}  {{ c.resposta|safe }}</p>
+						{% if c.anexo %}<p>Arquivo <a href="{{ c.anexo.url }}">anexo</a></p>{% endif %}
 					</span>	
 				{% endfor %}
 			</span>

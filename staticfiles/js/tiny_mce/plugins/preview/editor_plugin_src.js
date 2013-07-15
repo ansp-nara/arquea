@@ -20,7 +20,7 @@
 				css[k] = ed.documentBaseURI.toAbsolute(u);
 			});
 
-			ed.addCommand('mcePreview', function() {
+			ed.changeCommand('mcePreview', function() {
 				ed.windowManager.open({
 					file : ed.getParam("plugin_preview_pageurl", url + "/preview.html"),
 					width : parseInt(ed.getParam("plugin_preview_width", "550")),
@@ -34,7 +34,7 @@
 				});
 			});
 
-			ed.addButton('preview', {title : 'preview.preview_desc', cmd : 'mcePreview'});
+			ed.changeButton('preview', {title : 'preview.preview_desc', cmd : 'mcePreview'});
 		},
 
 		getInfo : function() {
@@ -49,5 +49,5 @@
 	});
 
 	// Register plugin
-	tinymce.PluginManager.add('preview', tinymce.plugins.Preview);
+	tinymce.PluginManager.change('preview', tinymce.plugins.Preview);
 })();

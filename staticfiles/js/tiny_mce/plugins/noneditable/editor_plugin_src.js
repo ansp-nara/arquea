@@ -19,7 +19,7 @@
 			editClass = ed.getParam("noneditable_editable_class", "mceEditable");
 			nonEditClass = ed.getParam("noneditable_noneditable_class", "mceNonEditable");
 
-			ed.onNodeChange.addToTop(function(ed, cm, n) {
+			ed.onNodeChange.changeToTop(function(ed, cm, n) {
 				var sc, ec;
 
 				// Block if start or end is inside a non editable element
@@ -69,10 +69,10 @@
 
 			if (s !== t.disabled) {
 				if (s) {
-					ed.onKeyDown.addToTop(t._block);
-					ed.onKeyPress.addToTop(t._block);
-					ed.onKeyUp.addToTop(t._block);
-					ed.onPaste.addToTop(t._block);
+					ed.onKeyDown.changeToTop(t._block);
+					ed.onKeyPress.changeToTop(t._block);
+					ed.onKeyUp.changeToTop(t._block);
+					ed.onPaste.changeToTop(t._block);
 				} else {
 					ed.onKeyDown.remove(t._block);
 					ed.onKeyPress.remove(t._block);
@@ -86,5 +86,5 @@
 	});
 
 	// Register plugin
-	tinymce.PluginManager.add('noneditable', tinymce.plugins.NonEditablePlugin);
+	tinymce.PluginManager.change('noneditable', tinymce.plugins.NonEditablePlugin);
 })();

@@ -99,11 +99,11 @@ class Membro(models.Model):
     email = models.CharField(_(u'E-mail'), max_length=50, blank=True, help_text=_(u'ex. nome@empresa.br'))
     ramal = models.IntegerField(_(u'Ramal'), blank=True, null=True)
     obs = models.TextField(_(u'Observação'), blank=True)
-    url_lattes = models.URLField(_(u'Currículo Lattes'), verify_exists=True, blank=True, help_text=_(u'URL do Currículo Lattes'))
+    url_lattes = models.URLField(_(u'Currículo Lattes'), verify_exists=False, blank=True, help_text=_(u'URL do Currículo Lattes'))
     foto = models.ImageField(upload_to='membro', blank=True, null=True)
     data_nascimento = NARADateField(_(u'Nascimento'), help_text=_(u'Data de nascimento'), blank=True, null=True)
     site = models.BooleanField(_(u'Exibir no site?'))
-
+    contato = models.ForeignKey('identificacao.Contato', null=True, blank=True)
 
     # Retorna o nome e o cargo.
     def __unicode__(self):
@@ -139,6 +139,10 @@ class Membro(models.Model):
     @property
     def funcionario(self):
         return Historico.ativos.filter(membro=self, funcionario=True).count() > 0
+
+    @property
+    def ativo(self):
+        return Historico.ativos.filter(membro=self).count() > 0
 
     # Define a ordenação e unicidade dos dados.
     class Meta:
@@ -246,7 +250,6 @@ class Ferias(models.Model):
     membro = models.ForeignKey('membro.Membro', verbose_name=_(u'Membro'), limit_choices_to=Q(historico__funcionario=True)&Q(historico__termino__isnull=True))
     inicio = NARADateField(_(u'Início'), help_text=_(u'Início do período de trabalho'))
     realizado = models.BooleanField(_(u'Férias já tiradas?'))
-    decimo_terceiro = models.BooleanField(_(u'Primeira parcela do décimo terceiro junto com as férias?'))
 
     # Retorna o membro e o período de férias.
     def __unicode__(self):
@@ -287,6 +290,10 @@ class ControleFerias(models.Model):
     termino = NARADateField()
     oficial = models.BooleanField(_(u'Oficial?'))
     obs = models.TextField(null=True, blank=True)
+    vendeu10 = models.BooleanField(_(u'Vendeu 10 dias?'))
+    antecipa13 = models.BooleanField(_(u'Antecipação de 13º salário?'))
+    dias_uteis_fato = models.IntegerField(_(u'Dias úteis tirados de fato'))
+    dias_uteis_aberto = models.IntegerField(_(u'Dias úteis em aberto'))
 
     def __unicode__(self):
 	return "%s - %s" % (self.inicio, self.termino)
@@ -313,14 +320,14 @@ class DispensaLegal(models.Model):
     inicio_realizada = NARADateField(_(u'Início da realização da dispensa'), blank=True, null=True)
     realizada = models.BooleanField(_(u'Já realizada?'))
     atestado = models.BooleanField(_(u'Há atestado?'))
-    arquivo = models.FileField(upload_to='/dispensas/')
+    arquivo = models.FileField(upload_to='dispensas/', null=True, blank=True)
 
     def __unicode__(self):
 	return "%s - %s" % (self.membro, self.justificativa)
 
     class Meta:
-        verbose_name = _(u'Dispensa Legal')
-        verbose_name_plural = _(u'Dispensas Legais')
+        verbose_name = _(u'Dispensa')
+        verbose_name_plural = _(u'Dispensas')
 
 class Banco(models.Model):
 
@@ -432,7 +439,7 @@ class DadoBancario(models.Model):
 
 class Cargo(models.Model):
     nome = models.CharField(max_length=100)
-    hierarquia = models.IntegerField()
+    hierarquia = models.IntegerField(null=True, blank=True)
 
     def __unicode__(self):
         return '%s' % self.nome
@@ -472,3 +479,30 @@ class Arquivo(models.Model):
 
     def __unicode__(self):
         return '%s - %s' % (self.membro.nome, self.arquivo.name)
+
+
+class Controle(models.Model):
+    membro = models.ForeignKey('membro.Membro')
+    entrada = models.DateTimeField()
+    saida = models.DateTimeField(null=True, blank=True)
+    obs = models.TextField(_(u'Comentários'), blank=True, null=True)
+    almoco_devido = models.BooleanField(_(u'Hora de almoço devida?'), default=True)
+    almoco = models.IntegerField(_(u'Tempo de almoço em minutos'), null=True, blank=True, default=60)
+
+
+    def __unicode__(self):
+        if self.saida:
+            return '%s - de %s a %s' % (self.membro, self.entrada, self.saida)
+        else:
+            return '%s - %s' % (self.membro, self.entrada)
+
+    def segundos(self):
+        if not self.saida: return 0
+        delta = self.saida-self.entrada
+        return delta.seconds
+
+    class Meta:
+        ordering = ('-entrada',)
+
+    def permanencia(self):
+	return '%2dh%2dmin' % (self.segundos()/3600, self.segundos()/60%60)

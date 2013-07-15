@@ -1,0 +1,19 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+  <h2>{{ mes }}/{{ ano }}</h2>
+  <table>
+   <tr><th>Nome</th>
+   {% for dia in dias %}
+      <th>{{ dia }}</th>
+   {% endfor %}
+   </tr>
+   {% for linha in dados %}
+   <tr>
+      {% for dado in linha %}
+        <td>{{ dado }}</td>
+      {% endfor %}
+   </tr>
+   {% endfor %}
+  </table>
+{% endblock %}
+

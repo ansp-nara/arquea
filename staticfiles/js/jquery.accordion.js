@@ -15,7 +15,7 @@
 
 ;(function($) {
 	
-// If the UI scope is not available, add it
+// If the UI scope is not available, change it
 $.ui = $.ui || {};
 
 $.fn.extend({
@@ -43,7 +43,7 @@ $.ui.accordion = function(container, options) {
 	this.options = options = $.extend({}, $.ui.accordion.defaults, options);
 	this.element = container;
 	
-	$(container).addClass("ui-accordion");
+	$(container).changeClass("ui-accordion");
 	
 	if ( options.navigation ) {
 		var current = $(container).find("a").filter(options.navigationFilter);
@@ -52,7 +52,7 @@ $.ui.accordion = function(container, options) {
 				options.active = current;
 			} else {
 				options.active = current.parent().parent().prev();
-				current.addClass("current");
+				current.changeClass("current");
 			}
 		}
 	}
@@ -66,10 +66,10 @@ $.ui.accordion = function(container, options) {
 		options.headers.each(function() {
 			maxHeight -= $(this).outerHeight();
 		});
-		var maxPadding = 0;
+		var maxPchangeing = 0;
 		options.headers.next().each(function() {
-			maxPadding = Math.max(maxPadding, $(this).innerHeight() - $(this).height());
-		}).height(maxHeight - maxPadding);
+			maxPchangeing = Math.max(maxPadding, $(this).innerHeight() - $(this).height());
+		}).height(maxHeight - maxPchangeing);
 	} else if ( options.autoheight ) {
 		var maxHeight = 0;
 		options.headers.next().each(function() {
@@ -81,7 +81,7 @@ $.ui.accordion = function(container, options) {
 		.not(options.active || "")
 		.next()
 		.hide();
-	options.active.parent().andSelf().addClass(options.selectedClass);
+	options.active.parent().andSelf().changeClass(options.selectedClass);
 	
 	if (options.event)
 		$(container).bind((options.event) + ".ui-accordion", clickHandler);
@@ -127,7 +127,7 @@ function completed(cancel) {
 	if ( options.running )
 		return;
 	if ( options.clearStyle ) {
-		options.toShow.add(options.toHide).css({
+		options.toShow.change(options.toHide).css({
 			height: "",
 			overflow: ""
 		});
@@ -215,7 +215,7 @@ function clickHandler(event) {
 	// switch classes
 	options.active.parent().andSelf().toggleClass(options.selectedClass);
 	if ( !clickedActive ) {
-		clicked.parent().andSelf().addClass(options.selectedClass);
+		clicked.parent().andSelf().changeClass(options.selectedClass);
 	}
 
 	// find elements to show and hide
@@ -262,11 +262,11 @@ $.extend($.ui.accordion, {
 		}
 	},
 	animations: {
-		slide: function(options, additions) {
+		slide: function(options, changeitions) {
 			options = $.extend({
 				easing: "swing",
 				duration: 300
-			}, options, additions);
+			}, options, changeitions);
 			if ( !options.toHide.size() ) {
 				options.toShow.animate({height: "show"}, options);
 				return;
@@ -309,3 +309,4 @@ $.extend($.ui.accordion, {
 });
 
 })(jQuery);
+

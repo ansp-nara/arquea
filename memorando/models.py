@@ -79,9 +79,10 @@ class MemorandoResposta(models.Model):
     assunto = models.ForeignKey('memorando.Assunto')
     assinatura = models.ForeignKey('membro.Assinatura')
     numero = models.IntegerField(editable=False)
+    anexa_relatorio = models.BooleanField(u'Anexar relatório de inventário?')
     identificacao = models.ForeignKey('identificacao.Identificacao', verbose_name=_(u'Identificação'))
     data = models.DateField()
-    arquivo = models.FileField(upload_to='memorando', null=True, blank=True)
+    arquivo = models.FileField('Documento assinado', upload_to='memorando', null=True, blank=True)
     protocolo = models.FileField(upload_to='memorando', null=True, blank=True)
     obs = models.TextField(null=True, blank=True)
     introducao = models.TextField(_(u'Introdução'), null=True, blank=True)
@@ -114,7 +115,7 @@ class Corpo(models.Model):
     memorando = models.ForeignKey('memorando.MemorandoResposta')
     pergunta = models.ForeignKey('memorando.Pergunta')
     resposta = models.TextField()
-    anexo = models.FileField(upload_to='memorando', null=True, blank=True)
+    anexo = models.FileField(u'Anexo (em pdf)', upload_to='memorando', null=True, blank=True)
     concluido = models.BooleanField('Ok')
 
     def __unicode__(self):
@@ -124,8 +125,12 @@ class Corpo(models.Model):
         ordering = ('pergunta__numero', 'memorando__data')
 	
 class MemorandoSimples(models.Model):
-    data = models.DateField(auto_now_add=True)
-    destinatario = models.TextField()
+    superior = models.IntegerField(default=3)
+    inferior = models.IntegerField(default=2)
+    esquerda = models.IntegerField(default=3)
+    direita = models.IntegerField(default=3)
+    data = models.DateField(auto_now_change=True)
+    destinatario = models.TextField(u'Destinatário')
     numero = models.IntegerField(editable=False)
     assunto = models.ForeignKey('memorando.Assunto')
     corpo = models.TextField()
@@ -133,12 +138,15 @@ class MemorandoSimples(models.Model):
     envio = models.BooleanField('Envio?')
     assinatura = models.ForeignKey('membro.Membro')
     assinado = models.FileField(_(u'Memorando assinado'), upload_to='memorandos', null=True, blank=True)
+    pai = models.ForeignKey('memorando.MemorandoSimples', verbose_name=u'Memorando pai', null=True, blank=True)
 
     def __unicode__(self):
         return '%s/%s' % (self.data.year, self.numero)
+    __unicode__.admin_order_field = 'data'
         
     class Meta:
-	    verbose_name_plural = u'Memorandos Simples'
+        verbose_name_plural = u'Memorandos Simples'
+        ordering = ('-data',)
 	
     '''
     O método para salvar uma instância é sobrescrito para que o número sequencial
@@ -152,7 +160,6 @@ class MemorandoSimples(models.Model):
     def destino(self):
 	    dest = self.destinatario.split('\n')
 	    return '<br />'.join(dest)		
-
 
 class Arquivo(models.Model):
     arquivo = models.FileField(upload_to='memorando')

@@ -167,3 +167,10 @@ class BaseControleFeriasAdminFormSet(BaseInlineFormSet):
             raise forms.ValidationError(u'No máximo um período oficial e dois não oficiais')
 
 ControleFeriasAdminFormSet = inlineformset_factory(Ferias, ControleFerias, formset=BaseControleFeriasAdminFormSet)
+
+
+class ControleObs(forms.ModelForm):
+
+    class Meta:
+	model = Controle
+        fields = ('obs',)

@@ -1,4 +1,4 @@
-addEvent(window, 'load', reorder_init);
+changeEvent(window, 'load', reorder_init);
 
 var lis;
 var top = 0;
@@ -120,13 +120,13 @@ function setOrder(id_list) {
     draw();
 }
 
-function addEvent(elm, evType, fn, useCapture)
-// addEvent and removeEvent
+function changeEvent(elm, evType, fn, useCapture)
+// changeEvent and removeEvent
 // cross-browser event handling for IE5+,  NS6 and Mozilla
 // By Scott Andrew
 {
-  if (elm.addEventListener){
-    elm.addEventListener(evType, fn, useCapture);
+  if (elm.changeEventListener){
+    elm.changeEventListener(evType, fn, useCapture);
     return true;
   } else if (elm.attachEvent){
     var r = elm.attachEvent("on"+evType, fn);
@@ -135,3 +135,4 @@ function addEvent(elm, evType, fn, useCapture)
     elm['on'+evType] = fn;
   }
 }
+

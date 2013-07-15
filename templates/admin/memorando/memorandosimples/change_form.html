@@ -17,14 +17,14 @@
      <a href="../../../">{% trans "Home" %}</a> &rsaquo;
      <a href="../../">{{ app_label|capfirst|escape }}</a> &rsaquo; 
      {% if has_change_permission %}<a href="../">{{ opts.verbose_name_plural|capfirst }}</a>{% else %}{{ opts.verbose_name_plural|capfirst }}{% endif %} &rsaquo; 
-     {% if add %}{% trans "Add" %} {{ opts.verbose_name }}{% else %}{{ original|truncatewords:"18" }}{% endif %}
+     {% if change %}{% trans "Add" %} {{ opts.verbose_name }}{% else %}{{ original|truncatewords:"18" }}{% endif %}
 </div>
 {% endif %}{% endblock %}
 
 {% block content %}<div id="content-main">
 {% block object-tools %}
 {% if change %}{% if not is_popup %}
-  <a class="print_btn" href="http://sistema.nara.org.br/memorando/simples/{{ object_id }}">Imprimir</a>
+  <a class="print_btn" href="http://sistema.ansp.br/memorando/simples/{{ object_id }}">Imprimir</a>
   <ul class="object-tools"><li><a href="history/" class="historylink">{% trans "History" %}</a></li>
   {% if has_absolute_url %}<li><a href="../../../r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
   </ul>
@@ -55,7 +55,7 @@
 
 {% submit_row %}
 
-{% if adminform and add %}
+{% if adminform and change %}
    <script type="text/javascript">document.getElementById("{{ adminform.first_field.auto_id }}").focus();</script>
 {% endif %}
 

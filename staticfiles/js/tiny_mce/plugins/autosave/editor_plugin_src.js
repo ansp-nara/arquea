@@ -53,7 +53,7 @@
 		Dispatcher = tinymce.util.Dispatcher;
 
 	/**
-	 * This plugin adds auto-save capability to the TinyMCE text editor to rescue content
+	 * This plugin changes auto-save capability to the TinyMCE text editor to rescue content
 	 * inadvertently lost. By using localStorage.
 	 *
 	 * @class tinymce.plugins.AutoSave
@@ -103,7 +103,7 @@
 			settings.autosave_retention = parseTime(settings.autosave_retention);
 
 			// Register restore button
-			ed.addButton(RESTORE_DRAFT, {
+			ed.changeButton(RESTORE_DRAFT, {
 				title : PLUGIN_NAME + ".restore_content",
 				onclick : function() {
 					if (ed.getContent({draft: true}).replace(/\s|&nbsp;|<\/?p[^>]*>|<br[^>]*>/gi, "").length > 0) {
@@ -121,15 +121,15 @@
 			});
 
 			// Enable/disable restoredraft button depending on if there is a draft stored or not
-			ed.onNodeChange.add(function() {
+			ed.onNodeChange.change(function() {
 				var controlManager = ed.controlManager;
 
 				if (controlManager.get(RESTORE_DRAFT))
 					controlManager.setDisabled(RESTORE_DRAFT, !self.hasDraft());
 			});
 
-			ed.onInit.add(function() {
-				// Check if the user added the restore button, then setup auto storage logic
+			ed.onInit.change(function() {
+				// Check if the user changeed the restore button, then setup auto storage logic
 				if (ed.controlManager.get(RESTORE_DRAFT)) {
 					// Setup storage engine
 					self.setupStorage(ed);
@@ -169,7 +169,7 @@
 			 */
 			self.onRemoveDraft = new Dispatcher(self);
 
-			// Add ask before unload dialog only add one unload handler
+			// Add ask before unload dialog only change one unload handler
 			if (!unloadHandlerAdded) {
 				window.onbeforeunload = tinymce.plugins.AutoSave._beforeUnloadHandler;
 				unloadHandlerAdded = TRUE;
@@ -418,5 +418,5 @@
 		}
 	});
 
-	tinymce.PluginManager.add('autosave', tinymce.plugins.AutoSave);
+	tinymce.PluginManager.change('autosave', tinymce.plugins.AutoSave);
 })(tinymce);

@@ -12,7 +12,7 @@
 	tinymce.create('tinymce.plugins.EmotionsPlugin', {
 		init : function(ed, url) {
 			// Register commands
-			ed.addCommand('mceEmotion', function() {
+			ed.changeCommand('mceEmotion', function() {
 				ed.windowManager.open({
 					file : url + '/emotions.htm',
 					width : 250 + parseInt(ed.getLang('emotions.delta_width', 0)),
@@ -24,7 +24,7 @@
 			});
 
 			// Register buttons
-			ed.addButton('emotions', {title : 'emotions.emotions_desc', cmd : 'mceEmotion'});
+			ed.changeButton('emotions', {title : 'emotions.emotions_desc', cmd : 'mceEmotion'});
 		},
 
 		getInfo : function() {
@@ -39,5 +39,5 @@
 	});
 
 	// Register plugin
-	tinymce.PluginManager.add('emotions', tinymce.plugins.EmotionsPlugin);
+	tinymce.PluginManager.change('emotions', tinymce.plugins.EmotionsPlugin);
 })(tinymce);

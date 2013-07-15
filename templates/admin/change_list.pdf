@@ -1,0 +1,19 @@
+{% extends "base.pdf" %}
+{% load adminmedia admin_list i18n %}
+
+{% block extrastyle %}
+@import url('/var/www/media/css/pdf_changelist.css');
+{% endblock %}
+
+{% block content %}
+  <div id="content-main">
+    <h1>Lista de {{ cl.opts.verbose_name_plural }}</h1>
+    <div class="changelist-module{% if cl.has_filters %} filtered{% endif %}" id="changelist">
+
+
+      {% result_list cl %}
+
+    </div>
+  </div>
+{% endblock %}
+

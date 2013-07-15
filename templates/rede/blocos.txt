@@ -1,0 +1,3 @@
+{% for b in blocos %}
+{{ b }},{{ b.AS }},{{ b.entidade }},{{ b.designado }},{{ b.rir }},{{ b.obs }}
+{% endfor %}

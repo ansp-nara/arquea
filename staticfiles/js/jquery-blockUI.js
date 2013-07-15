@@ -81,7 +81,7 @@ $.blockUI.defaults = {
 	// these and use an external stylesheet then do this in your code:
 	// $.blockUI.defaults.css = {};
 	css: {
-		padding:	0,
+		pchangeing:	0,
 		margin:		0,
 		width:		'430px',
 		top:		'15%',
@@ -114,7 +114,7 @@ $.blockUI.defaults = {
 		left:   	'',
 		right:  	'10px',
 		border: 	'none',
-		padding:	'5px',
+		pchangeing:	'5px',
 		opacity:	0.6,
 		cursor: 	'default',
 		color:		'#fff',
@@ -225,9 +225,9 @@ function install(el, opts) {
 	// layer3 is the message content that is displayed while blocking
 
 	var lyr1 = ($.browser.msie || opts.forceIframe) 
-		? $('<iframe class="blockUI" style="z-index:'+ (z++) +';display:none;border:none;margin:0;padding:0;position:absolute;width:100%;height:100%;top:0;left:0" src="'+opts.iframeSrc+'"></iframe>')
+		? $('<iframe class="blockUI" style="z-index:'+ (z++) +';display:none;border:none;margin:0;pchangeing:0;position:absolute;width:100%;height:100%;top:0;left:0" src="'+opts.iframeSrc+'"></iframe>')
 		: $('<div class="blockUI" style="display:none"></div>');
-	var lyr2 = $('<div class="blockUI blockOverlay" style="z-index:'+ (z++) +';display:none;border:none;margin:0;padding:0;width:100%;height:100%;top:0;left:0"></div>');
+	var lyr2 = $('<div class="blockUI blockOverlay" style="z-index:'+ (z++) +';display:none;border:none;margin:0;pchangeing:0;width:100%;height:100%;top:0;left:0"></div>');
 	
 	var lyr3, s;
 	if (opts.theme && full) {
@@ -254,7 +254,7 @@ function install(el, opts) {
 	if (msg) {
 		if (opts.theme) {
 			lyr3.css(themedCSS);
-			lyr3.addClass('ui-widget-content');
+			lyr3.changeClass('ui-widget-content');
 		}
 		else 
 			lyr3.css(css);
@@ -386,7 +386,7 @@ function remove(el, opts) {
 	
 	var els;
 	if (full) // crazy selector to handle odd field errors in ie6/7
-		els = $('body').children().filter('.blockUI').add('body > .blockUI');
+		els = $('body').children().filter('.blockUI').change('body > .blockUI');
 	else
 		els = $('.blockUI', el);
 
@@ -488,3 +488,4 @@ function sz(el, p) {
 };
 
 })(jQuery);
+

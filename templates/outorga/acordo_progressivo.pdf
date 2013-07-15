@@ -1,0 +1,36 @@
+{% extends "base.pdf" %}
+{% load proto_tags %}
+{% block content %}
+<h1 repeat="1"></h1>
+
+    <table border="0" repeat="1" cellpchangeing="5">
+    <tr><th colspan="2"></th>
+    {% for t in termos %}
+       <th>Processo {{ t }}<br />{{ t.inicio|date:"d/m/Y" }} a {{ t.termino|date:"d/m/Y" }}</th>
+    {% endfor %}
+    </tr>
+    {% for a in acordos %}
+    <tr>
+       <td>{{ a.nome }}</td>
+       <td>Concedido<br />Realizado<br />Saldo</td>
+       {% for t in a.termos %}
+          <td>{{ t.concedido|moeda }}<br />{{ t.realizado|moeda }}<br />{{ t.saldo|moeda }}</td>
+       {% endfor %}
+    </tr>
+    {% endfor %}
+    </table>
+
+    {% for a in acordos %}
+    <h4>{{ a.nome }}</h4>
+    <table border="0">
+       <tr><th>Termo</th><th>Item da outorga</th><th>Entidade</th><th>Concedido</th><th>Realizado</th><th>Saldo</th</tr>
+       {% for t in a.termos %}
+          {% for item in t.itens %}
+             <tr><td>{% if forloop.counter == 1 %}{{ t.termo }}{% endif %}</td>
+                 <td>{{ item.item.descricao }}</td><td>{{ item.item.entidade }}</td>
+                 <td>{{ item.concedido|moeda }}</td><td>{{ item.realizado|moeda }}</td><td>{{ item.saldo|moeda }}</td></tr>
+          {% endfor %}
+       {% endfor %}
+    </table>
+    {% endfor %}
+{% endblock %}

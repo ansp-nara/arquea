@@ -1,0 +1,12 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<form method="GET">
+<label for="id_tipo">Tipo</label>:
+<select name="tipo" id="id_tipo">
+  {% for t in tipos %}
+     <option value="{{ t.id }}">{{ t }}</option>
+  {% endfor %}
+</select>
+<input type="submit" value="Enviar">
+</form>
+{% endblock %}

@@ -20,7 +20,6 @@ CODIGO_FINANCEIRO = (
   ('ESMP', 'Estorno ANMP'),
   ('CAMP', 'Canc. Bens/Serv. Pais'),
 )
-
 class ExtratoCC(models.Model):
     extrato_financeiro = models.ForeignKey('financeiro.ExtratoFinanceiro', verbose_name=_(u'Extrato Financeiro'), blank=True, null=True) 
     data_oper = NARADateField(_(u'Data da operação'))
@@ -61,7 +60,7 @@ class ExtratoCC(models.Model):
                     mods[modalidade] = {}
     	            for a in p.auditoria_set.all():
 		        if not a.parcial in mods[modalidade].keys():
-		   	    mods[modalidade][a.parcial] = []
+		  	    mods[modalidade][a.parcial] = []
                         if not a.pagina in mods[modalidade][a.parcial]:
                             mods[modalidade][a.parcial].append(a.pagina)
 			
@@ -76,7 +75,6 @@ class ExtratoCC(models.Model):
             parc += ']  '
 
 	return parc
-
 class TipoComprovanteFinanceiro(models.Model):
     nome = models.CharField(max_length=50)
 
@@ -168,6 +166,7 @@ class Pagamento(models.Model):
         if self.origem_fapesp:
 	   return '%s' % self.origem_fapesp.item_outorga.__unicode__()
 	else: return u'Não é Fapesp'
+    item.short_description = u'Item do orçamento'	
 
     def data(self):
         return self.protocolo.data_vencimento
@@ -179,7 +178,10 @@ class Pagamento(models.Model):
     nota.admin_order_field = 'protocolo__num_documento'
 
     def formata_valor_fapesp(self):
-        return 'R$ %s' % formata_moeda(self.valor_fapesp, ',')
+        moeda = 'R$'
+        if self.origem_fapesp and self.origem_fapesp.item_outorga.natureza_gasto.modalidade.moeda_nacional == False:
+	    moeda = 'US$'
+        return '%s %s' % (moeda, formata_moeda(self.valor_fapesp, ','))
     formata_valor_fapesp.short_description = 'Valor Fapesp'
     formata_valor_fapesp.admin_order_field = 'valor_fapesp'
 
@@ -265,6 +267,10 @@ class TipoComprovante(models.Model):
     class Meta:
 	verbose_name = _(u'Tipo de comprovante')
 	verbose_name_plural = _(u'Tipos de comprovante')
+        ordering = ('nome',)
 
     def __unicode__(self):
 	return self.nome
+
+
+

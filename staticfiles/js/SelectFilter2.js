@@ -3,7 +3,7 @@ SelectFilter2 - Turns a multiple-select box into a filter interface.
 
 Different than SelectFilter because this is coupled to the admin framework.
 
-Requires core.js, SelectBox.js and addevent.js.
+Requires core.js, SelectBox.js and changeevent.js.
 */
 
 function findForm(node) {
@@ -47,8 +47,8 @@ var SelectFilter = {
         // <ul class="selector-chooser">
         var selector_chooser = quickElement('ul', selector_div, '');
         selector_chooser.className = 'selector-chooser';
-        var add_link = quickElement('a', quickElement('li', selector_chooser, ''), gettext('Add'), 'href', 'javascript: (function(){ SelectBox.move("' + field_id + '_from","' + field_id + '_to");})()');
-        add_link.className = 'selector-add';
+        var change_link = quickElement('a', quickElement('li', selector_chooser, ''), gettext('Add'), 'href', 'javascript: (function(){ SelectBox.move("' + field_id + '_from","' + field_id + '_to");})()');
+        change_link.className = 'selector-add';
         var remove_link = quickElement('a', quickElement('li', selector_chooser, ''), gettext('Remove'), 'href', 'javascript: (function(){ SelectBox.move("' + field_id + '_to","' + field_id + '_from");})()');
         remove_link.className = 'selector-remove';
 
@@ -58,7 +58,7 @@ var SelectFilter = {
         quickElement('h2', selector_chosen, interpolate(gettext('Chosen %s'), [field_name]));
         var selector_filter = quickElement('p', selector_chosen, gettext('Select your choice(s) and click '));
         selector_filter.className = 'selector-filter';
-        quickElement('img', selector_filter, '', 'src', admin_media_prefix + (is_stacked ? 'img/admin/selector_stacked-add.gif':'img/admin/selector-add.gif'), 'alt', 'Add');
+        quickElement('img', selector_filter, '', 'src', admin_media_prefix + (is_stacked ? 'img/admin/selector_stacked-change.gif':'img/admin/selector-add.gif'), 'alt', 'Add');
         var to_box = quickElement('select', selector_chosen, '', 'id', field_id + '_to', 'multiple', 'multiple', 'size', from_box.size, 'name', from_box.getAttribute('name'));
         to_box.className = 'filtered';
         var clear_all = quickElement('a', selector_chosen, gettext('Clear all'), 'href', 'javascript: (function() { SelectBox.move_all("' + field_id + '_to", "' + field_id + '_from");})()');
@@ -67,11 +67,11 @@ var SelectFilter = {
         from_box.setAttribute('name', from_box.getAttribute('name') + '_old');
 
         // Set up the JavaScript event handlers for the select box filter interface
-        addEvent(filter_input, 'keyup', function(e) { SelectFilter.filter_key_up(e, field_id); });
-        addEvent(filter_input, 'keydown', function(e) { SelectFilter.filter_key_down(e, field_id); });
-        addEvent(from_box, 'dblclick', function() { SelectBox.move(field_id + '_from', field_id + '_to'); });
-        addEvent(to_box, 'dblclick', function() { SelectBox.move(field_id + '_to', field_id + '_from'); });
-        addEvent(findForm(from_box), 'submit', function() { SelectBox.select_all(field_id + '_to'); });
+        changeEvent(filter_input, 'keyup', function(e) { SelectFilter.filter_key_up(e, field_id); });
+        changeEvent(filter_input, 'keydown', function(e) { SelectFilter.filter_key_down(e, field_id); });
+        changeEvent(from_box, 'dblclick', function() { SelectBox.move(field_id + '_from', field_id + '_to'); });
+        changeEvent(to_box, 'dblclick', function() { SelectBox.move(field_id + '_to', field_id + '_from'); });
+        changeEvent(findForm(from_box), 'submit', function() { SelectBox.select_all(field_id + '_to'); });
         SelectBox.init(field_id + '_from');
         SelectBox.init(field_id + '_to');
         // Move selected from_box options to to_box
@@ -111,3 +111,5 @@ var SelectFilter = {
         return true;
     }
 }
+
+

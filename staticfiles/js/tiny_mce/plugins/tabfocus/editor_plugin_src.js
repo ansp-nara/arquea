@@ -81,17 +81,17 @@
 				}
 			};
 
-			ed.onKeyUp.add(tabCancel);
+			ed.onKeyUp.change(tabCancel);
 
 			if (tinymce.isGecko) {
-				ed.onKeyPress.add(tabHandler);
-				ed.onKeyDown.add(tabCancel);
+				ed.onKeyPress.change(tabHandler);
+				ed.onKeyDown.change(tabCancel);
 			} else
-				ed.onKeyDown.add(tabHandler);
+				ed.onKeyDown.change(tabHandler);
 
-			ed.onInit.add(function() {
+			ed.onInit.change(function() {
 				each(DOM.select('a:first,a:last', ed.getContainer()), function(n) {
-					Event.add(n, 'focus', function() {ed.focus();});
+					Event.change(n, 'focus', function() {ed.focus();});
 				});
 			});
 		},
@@ -108,5 +108,5 @@
 	});
 
 	// Register plugin
-	tinymce.PluginManager.add('tabfocus', tinymce.plugins.TabFocusPlugin);
+	tinymce.PluginManager.change('tabfocus', tinymce.plugins.TabFocusPlugin);
 })();

@@ -104,12 +104,12 @@ function init() {
 		if (href.charAt(0) == '#')
 			selectByValue(formObj, 'anchorlist', href);
 
-		addClassesToList('classlist', 'advlink_styles');
+		changeClassesToList('classlist', 'advlink_styles');
 
 		selectByValue(formObj, 'classlist', inst.dom.getAttrib(elm, 'class'), true);
 		selectByValue(formObj, 'targetlist', inst.dom.getAttrib(elm, 'target'), true);
 	} else
-		addClassesToList('classlist', 'advlink_styles');
+		changeClassesToList('classlist', 'advlink_styles');
 }
 
 function checkPrefix(n) {
@@ -364,7 +364,7 @@ function getAnchorListHTML(id, target) {
 	var nodes = inst.dom.select('a.mceItemAnchor,img.mceItemAnchor'), name, i;
 	var html = "";
 
-	html += '<select id="' + id + '" name="' + id + '" class="mceAnchorList" o2nfocus="tinyMCE.addSelectAccessibility(event, this, window);" onchange="this.form.' + target + '.value=';
+	html += '<select id="' + id + '" name="' + id + '" class="mceAnchorList" o2nfocus="tinyMCE.changeSelectAccessibility(event, this, window);" onchange="this.form.' + target + '.value=';
 	html += 'this.options[this.selectedIndex].value;">';
 	html += '<option value="">---</option>';
 
@@ -477,7 +477,7 @@ function getLinkListHTML(elm_id, target_form_element, onchange_func) {
 	var html = "";
 
 	html += '<select id="' + elm_id + '" name="' + elm_id + '"';
-	html += ' class="mceLinkList" onfoc2us="tinyMCE.addSelectAccessibility(event, this, window);" onchange="this.form.' + target_form_element + '.value=';
+	html += ' class="mceLinkList" onfoc2us="tinyMCE.changeSelectAccessibility(event, this, window);" onchange="this.form.' + target_form_element + '.value=';
 	html += 'this.options[this.selectedIndex].value;';
 
 	if (typeof(onchange_func) != "undefined")
@@ -499,7 +499,7 @@ function getTargetListHTML(elm_id, target_form_element) {
 	var targets = tinyMCEPopup.getParam('theme_advanced_link_targets', '').split(';');
 	var html = '';
 
-	html += '<select id="' + elm_id + '" name="' + elm_id + '" onf2ocus="tinyMCE.addSelectAccessibility(event, this, window);" onchange="this.form.' + target_form_element + '.value=';
+	html += '<select id="' + elm_id + '" name="' + elm_id + '" onf2ocus="tinyMCE.changeSelectAccessibility(event, this, window);" onchange="this.form.' + target_form_element + '.value=';
 	html += 'this.options[this.selectedIndex].value;">';
 	html += '<option value="_self">' + tinyMCEPopup.getLang('advlink_dlg.target_same') + '</option>';
 	html += '<option value="_blank">' + tinyMCEPopup.getLang('advlink_dlg.target_blank') + ' (_blank)</option>';
@@ -525,4 +525,4 @@ function getTargetListHTML(elm_id, target_form_element) {
 
 // While loading
 preinit();
-tinyMCEPopup.onInit.add(init);
+tinyMCEPopup.onInit.change(init);

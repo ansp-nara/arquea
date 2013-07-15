@@ -1,25 +1,36 @@
 {% extends "admin/base_site.html" %}
 {% load proto_tags %}
 {% block content %}
-<h1 repeat="1">Extrato do financeiro do processo {{ termo }}</h1>
+<h1 repeat="1" style="text-align:center;">Extrato do financeiro do processo {{ termo }}</h1>
+<h4><a href="{% url financeiro.views.financeiro_parciais 3 %}?termo={{ termo.id }}">Imprimir em A3</a></h4>
+<h4><a href="{% url financeiro.views.financeiro_parciais 4 %}?termo={{ termo.id }}">Imprimir em A4</a></h4>
 
    {% for p in parciais %}
-    <h2>Parcial {{ p.parcial }}</h2>
+   <h2 style="color:blue;">{% if p.parcial %}Parcial {{ p.parcial }}{% else %}Totais do processo{% endif %}</h2>
+{% if p.parcial %}
 <h2>Total liberado: {{ p.liberado|moeda }}</h2>
 <h2>Total devolvido: {{ p.devolvido|moeda }}</h2>
+<h2>Total estornado: {{ p.estornado|moeda }}</h2>
 <h2>Total gasto: {{ p.pagamentos|moeda }}</h2>
+<h3>O valor abaixo representa a soma de todas as diferenças apontadas nesta parcial. Diferenças negativas (entre parênteses) representam valores a serem devolvidos para a Fapesp, enquanto diferenças positivas representam valores a favor da ANSP.</h3>
+<h2>Diferenças existentes: {{ p.diferenca_total|moeda }}</h2>
+{% else %}
 <h2>Concessões: {{ p.concedido|moeda }}</h2>
 <h2>Suplementações: {{ p.suplementado|moeda }}</h2>
 <h2>Anulações: {{ p.anulado|moeda }}</h2>
 <h2>Cancelamentos: {{ p.cancelado|moeda }}</h2>
 <h2>Total de concessões: {{ p.concessoes|moeda }}</h2>
-<h2>Diferença existente: {{ p.diferenca_total|moeda }}</h2>
-    <table border="0" repeat="1" cellpadding="5">
+{% endif %}
+
+    <table border="0" repeat="1" cellpchangeing="5">
        <tr><th>Data</th><th>Código</th><th>Histórico</th><th>Valor</th><th>Comprovante</th><th>Modalidade - [Parcial/(Página)]</th></tr>
     {% for e in p.extrato %}
- 	   <tr><td>{% if e.data %}{{ e.data|date:"d/m/Y" }} ({{ e.valor_data }}){% endif %}</td><td>{{ e.cod }}</td><td>{{ e.historico }}</td><td>{{ e.valor|moeda }}</td><td>{% if e.comprovante %}<a href="{{ e.comprovante.url }}">comprovante</a>{% endif %}</td>{% if e.diferenca %}<td style="color:{{ e.cor }};">{{ e.diferenca|moeda }} (Diferença)</td>{% endif %}</tr>
+ 	   <tr><td>{% if e.data %}{{ e.data|date:"d/m/Y" }} [{{ e.valor_data|moeda }}]{% endif %}</td><td>{{ e.cod }}</td><td>{{ e.historico }}</td><td>{{ e.valor|moeda }}</td><td>{% if e.comprovante %}<a href="{{ e.comprovante.url }}">comprovante</a>{% endif %}</td><td style="color:{{ e.cor }};">{% if e.diferenca %}{{ e.diferenca|moeda }} (Diferença){% endif %}</td>{% if e.patrocinio %}<td>Discordância do movimento da conta corrente: {{ e.patrocinio|moeda }}</td>{% endif %}</tr>
            {% for cc in e.cheques %}
-              <tr><td colspan="3"></td><td>{{ cc.valor|moeda }}</td><td><a href="http://sistema.nara.org.br/financeiro/extratocc/{{ cc.id }}">{{ cc.cod }}</a></td><td>{{ cc.parciais }}</td></tr>
+              <tr><td colspan="3"></td><td>{{ cc.valor|moeda }}</td><td><a href="http://sistema.ansp.br/financeiro/extratocc/{{ cc.id }}">{{ cc.cod }}</a></td><td>{{ cc.parciais }}</td></tr>
+              {% if cc.obs %}
+                  <tr><td colspan="3"></td><td colspan="3"><b>Observação:</b> {{ cc.obs }}</td></tr>
+              {% endif %}
            {% endfor %}
     {% endfor %}
     </table>

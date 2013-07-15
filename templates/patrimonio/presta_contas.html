@@ -1,0 +1,66 @@
+{% extends "admin/base_site.html" %}
+{% load proto_tags %}
+{% block extrastyle %}
+<style type="text/css">
+  div.col1 {float:left; min-width:200px;}
+  div.col2 {float:right;}
+  div.menor {float:left; width:60px;}
+  div.medio {float:left; width:180px;}
+  div.maior {float:left; width:250px; white-space:normal; margin-right:5px;}
+  ins {float:left;}
+  div#theader {font-weight:bold;}
+  div#blocos {overflow:hidden;}
+  </style>
+{% endblock %}
+{% block extrahead %}
+<script type="text/javascript" src="/media/js/jstree/_lib/jquery.js"></script>
+<script type="text/javascript" src="/media/js/jstree/jquery.jstree.js"></script>
+{% endblock %}
+{% block content %}
+<h1>Prestação de contas patrimonial</h1>
+<div id="theader">
+<div class="col1">
+Processo/Modalidade/Item/NF
+</div>
+<div class="col2">
+ <div class="menor">Tipo</div>
+ <div class="maior">NS</div>
+ <div class="maior">Descrição</div>
+ <div class="medio">Tipo equipamento</div>
+ <div class="menor">Valor</div>
+ <div class="menor">Agilis</div>
+ <div class="menor">Checado</div>
+</div>
+<div style="clear:both;"> </div>
+</div>
+<div id="blocos">
+</div>
+<script type="text/javascript">
+$(function() {
+    $("#blocos").jstree({
+        json_data : {
+            ajax: {
+		url: function(node) {
+                         if (node == -1){
+                             return '{% url patrimonio.views.abre_arvore %}';
+                         }
+		         return '{% url patrimonio.views.abre_arvore %}?id='+node.attr("o_id")+'&model='+node.attr("o_model");
+	             },
+                type:"get",
+		success: function(ops) {
+ 		    data = [];
+		    for (opnum in ops) {
+			var op = ops[opnum];
+			node = {"data":op["data"], "attr":op["attr"], "state":"closed"};
+			data.push(node);
+		    }
+		    return data;
+		}
+	    }
+	},
+        core : {"html_titles" : true,  "load_open" : true },
+	plugins : [ "themes", "json_data"]
+    });
+});
+</script>
+{% endblock %}

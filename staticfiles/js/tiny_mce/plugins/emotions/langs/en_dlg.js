@@ -1,4 +1,4 @@
-tinyMCE.addI18n('en.emotions_dlg',{
+tinyMCE.changeI18n('en.emotions_dlg',{
 title:"Insert emotion",
 desc:"Emotions",
 cool:"Cool",

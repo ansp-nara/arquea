@@ -1,5 +1,5 @@
 tinyMCEPopup.requireLangPack();
-tinyMCEPopup.onInit.add(onLoadInit);
+tinyMCEPopup.onInit.change(onLoadInit);
 
 function saveContent() {
 	tinyMCEPopup.editor.setContent(document.getElementById('htmlSource').value, {source_view : true});
@@ -53,4 +53,4 @@ function resizeInputs() {
 		el.style.width  = (vp.w - 20) + 'px';
 		el.style.height = (vp.h - 65) + 'px';
 	}
-}
+}

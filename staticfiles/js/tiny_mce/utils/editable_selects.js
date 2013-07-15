@@ -16,7 +16,7 @@ var TinyMCE_EditableSelects = {
 
 		for (i=0; i<nl.length; i++) {
 			if (nl[i].className.indexOf('mceEditableSelect') != -1) {
-				o = new Option('(value)', '__mce_add_custom__');
+				o = new Option('(value)', '__mce_change_custom__');
 
 				o.className = 'mceAddSelectValue';
 
@@ -29,7 +29,7 @@ var TinyMCE_EditableSelects = {
 	onChangeEditableSelect : function(e) {
 		var d = document, ne, se = window.event ? window.event.srcElement : e.target;
 
-		if (se.options[se.selectedIndex].value == '__mce_add_custom__') {
+		if (se.options[se.selectedIndex].value == '__mce_change_custom__') {
 			ne = d.createElement("input");
 			ne.id = se.id + "_custom";
 			ne.name = se.name + "_custom";
@@ -50,7 +50,7 @@ var TinyMCE_EditableSelects = {
 
 		if (se) {
 			if (se.previousSibling.value != '') {
-				addSelectValue(document.forms[0], se.id, se.previousSibling.value, se.previousSibling.value);
+				changeSelectValue(document.forms[0], se.id, se.previousSibling.value, se.previousSibling.value);
 				selectByValue(document.forms[0], se.id, se.previousSibling.value);
 			} else
 				selectByValue(document.forms[0], se.id, '');

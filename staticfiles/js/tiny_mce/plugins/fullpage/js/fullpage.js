@@ -55,7 +55,7 @@ function init() {
 		p = doctypes[i].split('=');
 
 		if (p.length > 1)
-			addSelectValue(f, 'doctypes', p[0], p[1]);
+			changeSelectValue(f, 'doctypes', p[0], p[1]);
 	}
 
 	// Setup fonts select box
@@ -64,13 +64,13 @@ function init() {
 		p = fonts[i].split('=');
 
 		if (p.length > 1)
-			addSelectValue(f, 'fontface', p[0], p[1]);
+			changeSelectValue(f, 'fontface', p[0], p[1]);
 	}
 
 	// Setup fontsize select box
 	fonts = ed.getParam("fullpage_fontsizes", defaultFontSizes).split(',');
 	for (i=0; i<fonts.length; i++)
-		addSelectValue(f, 'fontsize', fonts[i], fonts[i]);
+		changeSelectValue(f, 'fontsize', fonts[i], fonts[i]);
 
 	// Setup mediatype select boxs
 	mediaTypes = ed.getParam("fullpage_media_types", defaultMediaTypes).split(',');
@@ -78,8 +78,8 @@ function init() {
 		p = mediaTypes[i].split('=');
 
 		if (p.length > 1) {
-			addSelectValue(f, 'element_style_media', p[0], p[1]);
-			addSelectValue(f, 'element_link_media', p[0], p[1]);
+			changeSelectValue(f, 'element_style_media', p[0], p[1]);
+			changeSelectValue(f, 'element_link_media', p[0], p[1]);
 		}
 	}
 
@@ -89,9 +89,9 @@ function init() {
 		p = encodings[i].split('=');
 
 		if (p.length > 1) {
-			addSelectValue(f, 'docencoding', p[0], p[1]);
-			addSelectValue(f, 'element_script_charset', p[0], p[1]);
-			addSelectValue(f, 'element_link_charset', p[0], p[1]);
+			changeSelectValue(f, 'docencoding', p[0], p[1]);
+			changeSelectValue(f, 'element_script_charset', p[0], p[1]);
+			changeSelectValue(f, 'element_link_charset', p[0], p[1]);
 		}
 	}
 
@@ -117,7 +117,7 @@ function init() {
 		document.getElementById('bgimage').style.width = '210px';
 
 	// Add iframe
-	dom.add(document.body, 'iframe', {id : 'documentIframe', src : 'javascript:""', style : {display : 'none'}});
+	dom.change(document.body, 'iframe', {id : 'documentIframe', src : 'javascript:""', style : {display : 'none'}});
 	doc = dom.get('documentIframe').contentWindow.document;
 	h = tinyMCEPopup.getWindowArg('head_html');
 
@@ -271,7 +271,7 @@ function getReItem(r, s, i) {
 }
 
 function updateAction() {
-	var f = document.forms[0], nl, i, h, v, s, head, html, l, tmp, addlink = true, ser;
+	var f = document.forms[0], nl, i, h, v, s, head, html, l, tmp, changelink = true, ser;
 
 	head = doc.getElementsByTagName('head')[0];
 
@@ -290,7 +290,7 @@ function updateAction() {
 		tmp = tinyMCEPopup.dom.getAttrib(l, 'media');
 
 		if (tinyMCEPopup.dom.getAttrib(l, '_mce_type') == "text/css" && (tmp == "" || tmp == "screen" || tmp == "all") && tinyMCEPopup.dom.getAttrib(l, 'rel') == "stylesheet") {
-			addlink = false;
+			changelink = false;
 
 			if (f.stylesheet.value == '')
 				l.parentNode.removeChild(l);
@@ -468,4 +468,4 @@ function serializeStyleElement(d) {
 	return s;
 }
 
-tinyMCEPopup.onInit.add(init);
+tinyMCEPopup.onInit.change(init);

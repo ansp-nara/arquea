@@ -19,7 +19,7 @@
 			t.editor = ed;
 
 			// Register commands
-			ed.addCommand('mceIESpell', function() {
+			ed.changeCommand('mceIESpell', function() {
 				try {
 					sp = new ActiveXObject("ieSpell.ieSpellExtension");
 					sp.CheckDocumentNode(ed.getDoc().documentElement);
@@ -35,7 +35,7 @@
 			});
 
 			// Register buttons
-			ed.addButton('iespell', {title : 'iespell.iespell_desc', cmd : 'mceIESpell'});
+			ed.changeButton('iespell', {title : 'iespell.iespell_desc', cmd : 'mceIESpell'});
 		},
 
 		getInfo : function() {
@@ -50,5 +50,5 @@
 	});
 
 	// Register plugin
-	tinymce.PluginManager.add('iespell', tinymce.plugins.IESpell);
+	tinymce.PluginManager.change('iespell', tinymce.plugins.IESpell);
 })();

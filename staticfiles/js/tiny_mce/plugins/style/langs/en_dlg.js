@@ -1,4 +1,4 @@
-tinyMCE.addI18n('en.style_dlg',{
+tinyMCE.changeI18n('en.style_dlg',{
 title:"Edit CSS Style",
 apply:"Apply",
 text_tab:"Text",
@@ -40,7 +40,7 @@ box_width:"Width",
 box_height:"Height",
 box_float:"Float",
 box_clear:"Clear",
-padding:"Padding",
+pchangeing:"Padding",
 same:"Same for all",
 top:"Top",
 right:"Right",

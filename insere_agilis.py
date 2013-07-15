@@ -8,6 +8,7 @@ import settings
 setup_environ(settings)
 from financeiro.models import *
 import sys
+import time
 
 try:
   parcial = int(sys.argv[1])
@@ -18,7 +19,7 @@ except:
 TIPOS = {'STB':'STC',
          'DET':'STR',
 	 'MCN':'MCS',
-         'STB_OUT':'STB',
+         'STB_OUT':'STC',
          'DIA':'MNT'}
 cj = cookielib.CookieJar()
 opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
@@ -44,6 +45,9 @@ for m in pagamentos.values_list('origem_fapesp__item_outorga__natureza_gasto__mo
 if 'MPN' in mods:
    mods.remove('MPN')
 
+if 'STE' in mods:
+   mods.remove('STE')
+
 for m in mods:
         
     data = urllib.urlencode([('processo', '2010/52277-8'), ('parcial', parcial), ('tipoPrestacao', 'PRN'), ('tipoDespesa', TIPOS[m]), ('Prosseguir', 'Prosseguir')])
@@ -63,7 +67,14 @@ for m in mods:
         nf = pg.protocolo.num_documento
         if pg.protocolo.tipo_documento.nome.lower().find('anexo') == 0:
 	    nf = '%s %s' % (pg.protocolo.tipo_documento.nome, nf)
-	dt += [('notaFiscal', nf), ('dataNotaFiscal', pg.protocolo.data_vencimento.strftime('%d/%m/%Y')), ('cheque', pg.conta_corrente.cod_oper), ('pagina', pg.auditoria_set.filter(parcial=parcial).values_list('pagina', flat=True)[0]), ('valorItem', '%s,%s' % (int, dec))]
+
+        try:
+           data_nota = pg.protocolo.data_vencimento.strftime('%d/%m/%Y')
+        except:
+           print nf
+           data_nota = pg.protocolo.data_chegada.strftime('%d/%m/%Y')
+	
+        dt += [('notaFiscal', nf), ('dataNotaFiscal', data_nota), ('cheque', pg.conta_corrente.cod_oper), ('pagina', pg.auditoria_set.filter(parcial=parcial).values_list('pagina', flat=True)[0]), ('valorItem', '%s,%s' % (int, dec))]
 
     for k in range(0, 4):
 	dt += [('notaFiscal', ''), ('dataNotaFiscal', ''), ('cheque', ''), ('pagina', ''), ('valorItem', '')]
@@ -77,6 +88,7 @@ for m in mods:
 
 	txt = p2.read()
 
+        time.sleep(60)
         if txt.find('Erros') >= 0:
 	   print 'Erro encontrado na inserção dos itens abaixo'
 	   print dt[5*i:5*i+25]

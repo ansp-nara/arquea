@@ -6,8 +6,8 @@
 @import url('/var/www/media/css/pdf.css');
 @page {
   size: a3 landscape;
-  background-image: url('/var/www/media/img/papel_timbrado.jpg');
-  top: 3cm;
+  background-image: url('/var/www/media/img/papel_timbrado_paisagem.jpg');
+  top: 5cm;
   left: 1.5cm;
   right: 1.5cm;
   bottom: 2cm;
@@ -24,7 +24,7 @@
 <body>
 <h1 repeat="1">Relatório gerencial do processo {{ termo }}, atualizado em {{ atualizado|date:"d/m/Y" }}</h1>
 
-    <table border="1" repeat="1" cellpadding="5">
+    <table border="1" repeat="1" cellpchangeing="5">
     <tr><th>Modalidade</th><th>Concessão</th>
     {% for m in meses %}
       <th>{{ m }}</th>
@@ -35,7 +35,7 @@
 	{% for v in m.meses|dictsort:"ord" %}
 	  <td>{{ v.valor }}</td>
 	{% endfor %}
-        <td>{{ m.realizado }}</td><td>{{ m.saldo }}</td></tr>
+        <td>{{ m.realizado|safe }}</td><td>{{ m.saldo|safe }}</td></tr>
     {% endfor %}
     <tr><td>Total (R$)</td><td>{{ gerais.concedido_real|moeda }}</td>
     {% for t in totais|dictsort:"ord" %}
@@ -54,7 +54,7 @@
 {% for m in modalidades %}
  <pdf:nextpage />
   <h3>{{ m.modalidade }}</h3>
-  <table border="1" repeat="1" cellpadding="5">
+  <table border="1" repeat="1" cellpchangeing="5">
   </th><th>Quantidade</th><th width="20%">Descrição</th><th>Concessão</th>
     {% for m in meses %}
       <th>{{ m }}</th>

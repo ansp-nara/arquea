@@ -31,7 +31,7 @@ function setBrowserDisabled(id, state) {
 		if (state) {
 			lnk.setAttribute("realhref", lnk.getAttribute("href"));
 			lnk.removeAttribute("href");
-			tinyMCEPopup.dom.addClass(img, 'disabled');
+			tinyMCEPopup.dom.changeClass(img, 'disabled');
 		} else {
 			if (lnk.getAttribute("realhref"))
 				lnk.setAttribute("href", lnk.getAttribute("realhref"));
@@ -63,7 +63,7 @@ function openBrowser(img_id, target_form_element, type, option) {
 		tinyMCEPopup.openBrowser(target_form_element, type, option);
 }
 
-function selectByValue(form_obj, field_name, value, add_custom, ignore_case) {
+function selectByValue(form_obj, field_name, value, change_custom, ignore_case) {
 	if (!form_obj || !form_obj.elements[field_name])
 		return;
 
@@ -80,7 +80,7 @@ function selectByValue(form_obj, field_name, value, add_custom, ignore_case) {
 			option.selected = false;
 	}
 
-	if (!found && add_custom && value != '') {
+	if (!found && change_custom && value != '') {
 		var option = new Option(value, value);
 		option.selected = true;
 		sel.options[sel.options.length] = option;
@@ -99,13 +99,13 @@ function getSelectValue(form_obj, field_name) {
 	return elm.options[elm.selectedIndex].value;
 }
 
-function addSelectValue(form_obj, field_name, name, value) {
+function changeSelectValue(form_obj, field_name, name, value) {
 	var s = form_obj.elements[field_name];
 	var o = new Option(name, value);
 	s.options[s.options.length] = o;
 }
 
-function addClassesToList(list_id, specific_option) {
+function changeClassesToList(list_id, specific_option) {
 	// Setup class droplist
 	var styleSelectElm = document.getElementById(list_id);
 	var styles = tinyMCEPopup.getParam('theme_advanced_styles', false);
@@ -197,4 +197,4 @@ function getStyle(elm, attrib, style) {
 		style = attrib;
 
 	return tinyMCEPopup.dom.getStyle(elm, style);
-}
+}

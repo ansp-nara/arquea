@@ -12,7 +12,7 @@
 	tinymce.create('tinymce.plugins.AdvancedImagePlugin', {
 		init : function(ed, url) {
 			// Register commands
-			ed.addCommand('mceAdvImage', function() {
+			ed.changeCommand('mceAdvImage', function() {
 				// Internal image object like a flash placeholder
 				if (ed.dom.getAttrib(ed.selection.getNode(), 'class').indexOf('mceItem') != -1)
 					return;
@@ -28,7 +28,7 @@
 			});
 
 			// Register buttons
-			ed.addButton('image', {
+			ed.changeButton('image', {
 				title : 'advimage.image_desc',
 				cmd : 'mceAdvImage'
 			});
@@ -46,5 +46,5 @@
 	});
 
 	// Register plugin
-	tinymce.PluginManager.add('advimage', tinymce.plugins.AdvancedImagePlugin);
+	tinymce.PluginManager.change('advimage', tinymce.plugins.AdvancedImagePlugin);
 })();

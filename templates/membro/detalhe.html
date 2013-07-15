@@ -1,0 +1,10 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+  <h2>{{ membro.nome }}</h2>
+{% for m in meses %}
+<h3>{{ m.mes }} ({{ m.total }})</h3>
+{% for d in m.controles %}
+{{ d.entrada|date:"d/m  H:i" }} <b>a</b> {{ d.saida|date:"d/m  H:i" }} ({{ d.permanencia }})<br />
+{% endfor %}
+{% endfor %}
+{% endblock %}

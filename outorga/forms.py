@@ -55,7 +55,7 @@ class ItemAdminForm(forms.ModelForm):
 
     # Define os arquivos .js que serão utilizados.
     class Media:
-        js = ('/site-media/js/selects.js', '/site-media/js/jquery.js', )
+        js = ('/site-media/js/selects.js',)
 
 
 
@@ -108,4 +108,4 @@ class OrigemFapespAdminForm(forms.ModelForm):
 
     # Define os arquivos .js que serão utilizados.
     class Media:
-        js = ('/site-media/js/selects.js', '/site-media/js/jquery.js', )
+        js = ('/site-media/js/selects.js', )

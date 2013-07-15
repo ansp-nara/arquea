@@ -1,0 +1,30 @@
+{% extends "admin/base_site.html" %}
+{% load proto_tags %}
+{% block extrahead %}
+<script type="text/javascript" src="/media/js/selects.js"></script>
+{% endblock %}
+{% block content %}
+<h1>Planejamento de aquisição de recursos</h1>
+<form method="GET">
+<label for="id_anoproj">Ano:</label>
+<select name="anoproj" id="id_anoproj">
+  <option value="" selected>Nenhum</option>
+  {% for ap in anoproj %}
+     <option value="{{ ap.0 }}/{{ ap.1.id }}">{{ ap.0 }} - {{ ap.1 }}</option>
+  {% endfor %}
+</select>
+<br />
+<label for="id_os">OS:</label>
+<select name="os" id="id_os">
+  <option value="" selected>Nenhum</option>
+  {% for o in oss %}
+     <option value="{{ o.id }}">{{ o }}</option>
+  {% endfor %}
+</select>
+<br />
+<input type="submit" value="Enviar">
+</form>
+<script type="text/javascript">
+$("#id_anoproj").on("change", function() {ajax_select_ano_proj();});
+</script>
+{% endblock %}

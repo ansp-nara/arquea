@@ -16,41 +16,41 @@
 			pbRE = new RegExp(sep.replace(/[\?\.\*\[\]\(\)\{\}\+\^\$\:]/g, function(a) {return '\\' + a;}), 'g');
 
 			// Register commands
-			ed.addCommand('mcePageBreak', function() {
+			ed.changeCommand('mcePageBreak', function() {
 				ed.execCommand('mceInsertContent', 0, pb);
 			});
 
 			// Register buttons
-			ed.addButton('pagebreak', {title : 'pagebreak.desc', cmd : cls});
+			ed.changeButton('pagebreak', {title : 'pagebreak.desc', cmd : cls});
 
-			ed.onInit.add(function() {
+			ed.onInit.change(function() {
 				if (ed.settings.content_css !== false)
 					ed.dom.loadCSS(url + "/css/content.css");
 
 				if (ed.theme.onResolveName) {
-					ed.theme.onResolveName.add(function(th, o) {
+					ed.theme.onResolveName.change(function(th, o) {
 						if (o.node.nodeName == 'IMG' && ed.dom.hasClass(o.node, cls))
 							o.name = 'pagebreak';
 					});
 				}
 			});
 
-			ed.onClick.add(function(ed, e) {
+			ed.onClick.change(function(ed, e) {
 				e = e.target;
 
 				if (e.nodeName === 'IMG' && ed.dom.hasClass(e, cls))
 					ed.selection.select(e);
 			});
 
-			ed.onNodeChange.add(function(ed, cm, n) {
+			ed.onNodeChange.change(function(ed, cm, n) {
 				cm.setActive('pagebreak', n.nodeName === 'IMG' && ed.dom.hasClass(n, cls));
 			});
 
-			ed.onBeforeSetContent.add(function(ed, o) {
+			ed.onBeforeSetContent.change(function(ed, o) {
 				o.content = o.content.replace(pbRE, pb);
 			});
 
-			ed.onPostProcess.add(function(ed, o) {
+			ed.onPostProcess.change(function(ed, o) {
 				if (o.get)
 					o.content = o.content.replace(/<img[^>]+>/g, function(im) {
 						if (im.indexOf('class="mcePageBreak') !== -1)
@@ -73,5 +73,5 @@
 	});
 
 	// Register plugin
-	tinymce.PluginManager.add('pagebreak', tinymce.plugins.PageBreakPlugin);
+	tinymce.PluginManager.change('pagebreak', tinymce.plugins.PageBreakPlugin);
 })();

@@ -18,7 +18,7 @@
 			t.editor = ed;
 
 			// Register commands
-			ed.addCommand('mceFullScreen', function() {
+			ed.changeCommand('mceFullScreen', function() {
 				var win, de = DOM.doc.documentElement;
 
 				if (ed.getParam('fullscreen_is_enabled')) {
@@ -78,8 +78,8 @@
 					if (tinymce.isIE)
 						vp.h -= 1;
 
-					n = DOM.add(DOM.doc.body, 'div', {id : 'mce_fullscreen_container', style : 'position:' + (tinymce.isIE6 || (tinymce.isIE && !DOM.boxModel) ? 'absolute' : 'fixed') + ';top:0;left:0;width:' + vp.w + 'px;height:' + vp.h + 'px;z-index:200000;'});
-					DOM.add(n, 'div', {id : 'mce_fullscreen'});
+					n = DOM.change(DOM.doc.body, 'div', {id : 'mce_fullscreen_container', style : 'position:' + (tinymce.isIE6 || (tinymce.isIE && !DOM.boxModel) ? 'absolute' : 'fixed') + ';top:0;left:0;width:' + vp.w + 'px;height:' + vp.h + 'px;z-index:200000;'});
+					DOM.change(n, 'div', {id : 'mce_fullscreen'});
 
 					tinymce.each(ed.settings, function(v, n) {
 						s[n] = v;
@@ -104,7 +104,7 @@
 						s.theme_advanced_toolbar_location = 'top';
 
 					t.fullscreenEditor = new tinymce.Editor('mce_fullscreen', s);
-					t.fullscreenEditor.onInit.add(function() {
+					t.fullscreenEditor.onInit.change(function() {
 						t.fullscreenEditor.setContent(ed.getContent());
 						t.fullscreenEditor.focus();
 					});
@@ -115,7 +115,7 @@
 					t.fullscreenElement.update();
 					//document.body.overflow = 'hidden';
 
-					t.resizeFunc = tinymce.dom.Event.add(DOM.win, 'resize', function() {
+					t.resizeFunc = tinymce.dom.Event.change(DOM.win, 'resize', function() {
 						var vp = tinymce.DOM.getViewPort(), fed = t.fullscreenEditor, outerSize, innerSize;
 
 						// Get outer/inner size to get a delta size that can be used to calc the new iframe size
@@ -128,9 +128,9 @@
 			});
 
 			// Register buttons
-			ed.addButton('fullscreen', {title : 'fullscreen.desc', cmd : 'mceFullScreen'});
+			ed.changeButton('fullscreen', {title : 'fullscreen.desc', cmd : 'mceFullScreen'});
 
-			ed.onNodeChange.add(function(ed, cm) {
+			ed.onNodeChange.change(function(ed, cm) {
 				cm.setActive('fullscreen', ed.getParam('fullscreen_is_enabled'));
 			});
 		},
@@ -147,5 +147,5 @@
 	});
 
 	// Register plugin
-	tinymce.PluginManager.add('fullscreen', tinymce.plugins.FullScreenPlugin);
+	tinymce.PluginManager.change('fullscreen', tinymce.plugins.FullScreenPlugin);
 })();

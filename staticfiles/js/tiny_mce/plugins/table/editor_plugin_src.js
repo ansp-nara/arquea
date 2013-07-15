@@ -296,7 +296,7 @@
 				startCell.colSpan = (endX - startX) + 1;
 				startCell.rowSpan = (endY - startY) + 1;
 
-				// Remove other cells and add it's contents to the start cell
+				// Remove other cells and change it's contents to the start cell
 				for (y = startY; y <= endY; y++) {
 					for (x = startX; x <= endX; x++) {
 						cell = grid[y][x].elm;
@@ -691,7 +691,7 @@
 				// Add new selection
 				for (y = startY; y <= maxY; y++) {
 					for (x = startX; x <= maxX; x++)
-						dom.addClass(grid[y][x].elm, 'mceSelected');
+						dom.changeClass(grid[y][x].elm, 'mceSelected');
 				}
 			}
 		};
@@ -746,12 +746,12 @@
 				['split_cells', 'table.split_cells_desc', 'mceTableSplitCells', true],
 				['merge_cells', 'table.merge_cells_desc', 'mceTableMergeCells', true]
 			], function(c) {
-				ed.addButton(c[0], {title : c[1], cmd : c[2], ui : c[3]});
+				ed.changeButton(c[0], {title : c[1], cmd : c[2], ui : c[3]});
 			});
 
 			// Select whole table is a table border is clicked
 			if (!tinymce.isIE) {
-				ed.onClick.add(function(ed, e) {
+				ed.onClick.change(function(ed, e) {
 					e = e.target;
 
 					if (e.nodeName === 'TABLE')
@@ -760,7 +760,7 @@
 			}
 
 			// Handle node change updates
-			ed.onNodeChange.add(function(ed, cm, n) {
+			ed.onNodeChange.change(function(ed, cm, n) {
 				var p;
 
 				n = ed.selection.getStart();
@@ -785,13 +785,13 @@
 				cm.setDisabled('merge_cells', !p);
 			});
 
-			ed.onInit.add(function(ed) {
+			ed.onInit.change(function(ed) {
 				var startTable, startCell, dom = ed.dom, tableGrid;
 
 				winMan = ed.windowManager;
 
 				// Add cell selection logic
-				ed.onMouseDown.add(function(ed, e) {
+				ed.onMouseDown.change(function(ed, e) {
 					if (e.button != 2) {
 						cleanup();
 
@@ -828,7 +828,7 @@
 					}
 				});
 
-				ed.onMouseUp.add(function(ed, e) {
+				ed.onMouseUp.change(function(ed, e) {
 					var rng, sel = ed.selection, selectedCells, nativeSel = sel.getSel(), walker, node, lastNode, endNode;
 
 					// Move selection to startCell
@@ -891,59 +891,59 @@
 					}
 				});
 
-				ed.onKeyUp.add(function(ed, e) {
+				ed.onKeyUp.change(function(ed, e) {
 					cleanup();
 				});
 
 				// Add context menu
 				if (ed && ed.plugins.contextmenu) {
-					ed.plugins.contextmenu.onContextMenu.add(function(th, m, e) {
+					ed.plugins.contextmenu.onContextMenu.change(function(th, m, e) {
 						var sm, se = ed.selection, el = se.getNode() || ed.getBody();
 
 						if (ed.dom.getParent(e, 'td') || ed.dom.getParent(e, 'th') || ed.dom.select('td.mceSelected,th.mceSelected').length) {
 							m.removeAll();
 
 							if (el.nodeName == 'A' && !ed.dom.getAttrib(el, 'name')) {
-								m.add({title : 'advanced.link_desc', icon : 'link', cmd : ed.plugins.advlink ? 'mceAdvLink' : 'mceLink', ui : true});
-								m.add({title : 'advanced.unlink_desc', icon : 'unlink', cmd : 'UnLink'});
-								m.addSeparator();
+								m.change({title : 'advanced.link_desc', icon : 'link', cmd : ed.plugins.advlink ? 'mceAdvLink' : 'mceLink', ui : true});
+								m.change({title : 'advanced.unlink_desc', icon : 'unlink', cmd : 'UnLink'});
+								m.changeSeparator();
 							}
 
 							if (el.nodeName == 'IMG' && el.className.indexOf('mceItem') == -1) {
-								m.add({title : 'advanced.image_desc', icon : 'image', cmd : ed.plugins.advimage ? 'mceAdvImage' : 'mceImage', ui : true});
-								m.addSeparator();
+								m.change({title : 'advanced.image_desc', icon : 'image', cmd : ed.plugins.advimage ? 'mceAdvImage' : 'mceImage', ui : true});
+								m.changeSeparator();
 							}
 
-							m.add({title : 'table.desc', icon : 'table', cmd : 'mceInsertTable', value : {action : 'insert'}});
-							m.add({title : 'table.props_desc', icon : 'table_props', cmd : 'mceInsertTable'});
-							m.add({title : 'table.del', icon : 'delete_table', cmd : 'mceTableDelete'});
-							m.addSeparator();
+							m.change({title : 'table.desc', icon : 'table', cmd : 'mceInsertTable', value : {action : 'insert'}});
+							m.change({title : 'table.props_desc', icon : 'table_props', cmd : 'mceInsertTable'});
+							m.change({title : 'table.del', icon : 'delete_table', cmd : 'mceTableDelete'});
+							m.changeSeparator();
 
 							// Cell menu
-							sm = m.addMenu({title : 'table.cell'});
-							sm.add({title : 'table.cell_desc', icon : 'cell_props', cmd : 'mceTableCellProps'});
-							sm.add({title : 'table.split_cells_desc', icon : 'split_cells', cmd : 'mceTableSplitCells'});
-							sm.add({title : 'table.merge_cells_desc', icon : 'merge_cells', cmd : 'mceTableMergeCells'});
+							sm = m.changeMenu({title : 'table.cell'});
+							sm.change({title : 'table.cell_desc', icon : 'cell_props', cmd : 'mceTableCellProps'});
+							sm.change({title : 'table.split_cells_desc', icon : 'split_cells', cmd : 'mceTableSplitCells'});
+							sm.change({title : 'table.merge_cells_desc', icon : 'merge_cells', cmd : 'mceTableMergeCells'});
 
 							// Row menu
-							sm = m.addMenu({title : 'table.row'});
-							sm.add({title : 'table.row_desc', icon : 'row_props', cmd : 'mceTableRowProps'});
-							sm.add({title : 'table.row_before_desc', icon : 'row_before', cmd : 'mceTableInsertRowBefore'});
-							sm.add({title : 'table.row_after_desc', icon : 'row_after', cmd : 'mceTableInsertRowAfter'});
-							sm.add({title : 'table.delete_row_desc', icon : 'delete_row', cmd : 'mceTableDeleteRow'});
-							sm.addSeparator();
-							sm.add({title : 'table.cut_row_desc', icon : 'cut', cmd : 'mceTableCutRow'});
-							sm.add({title : 'table.copy_row_desc', icon : 'copy', cmd : 'mceTableCopyRow'});
-							sm.add({title : 'table.paste_row_before_desc', icon : 'paste', cmd : 'mceTablePasteRowBefore'}).setDisabled(!clipboardRows);
-							sm.add({title : 'table.paste_row_after_desc', icon : 'paste', cmd : 'mceTablePasteRowAfter'}).setDisabled(!clipboardRows);
+							sm = m.changeMenu({title : 'table.row'});
+							sm.change({title : 'table.row_desc', icon : 'row_props', cmd : 'mceTableRowProps'});
+							sm.change({title : 'table.row_before_desc', icon : 'row_before', cmd : 'mceTableInsertRowBefore'});
+							sm.change({title : 'table.row_after_desc', icon : 'row_after', cmd : 'mceTableInsertRowAfter'});
+							sm.change({title : 'table.delete_row_desc', icon : 'delete_row', cmd : 'mceTableDeleteRow'});
+							sm.changeSeparator();
+							sm.change({title : 'table.cut_row_desc', icon : 'cut', cmd : 'mceTableCutRow'});
+							sm.change({title : 'table.copy_row_desc', icon : 'copy', cmd : 'mceTableCopyRow'});
+							sm.change({title : 'table.paste_row_before_desc', icon : 'paste', cmd : 'mceTablePasteRowBefore'}).setDisabled(!clipboardRows);
+							sm.change({title : 'table.paste_row_after_desc', icon : 'paste', cmd : 'mceTablePasteRowAfter'}).setDisabled(!clipboardRows);
 
 							// Column menu
-							sm = m.addMenu({title : 'table.col'});
-							sm.add({title : 'table.col_before_desc', icon : 'col_before', cmd : 'mceTableInsertColBefore'});
-							sm.add({title : 'table.col_after_desc', icon : 'col_after', cmd : 'mceTableInsertColAfter'});
-							sm.add({title : 'table.delete_col_desc', icon : 'delete_col', cmd : 'mceTableDeleteCol'});
+							sm = m.changeMenu({title : 'table.col'});
+							sm.change({title : 'table.col_before_desc', icon : 'col_before', cmd : 'mceTableInsertColBefore'});
+							sm.change({title : 'table.col_after_desc', icon : 'col_after', cmd : 'mceTableInsertColAfter'});
+							sm.change({title : 'table.delete_col_desc', icon : 'delete_col', cmd : 'mceTableDeleteCol'});
 						} else
-							m.add({title : 'table.desc', icon : 'table', cmd : 'mceInsertTable'});
+							m.change({title : 'table.desc', icon : 'table', cmd : 'mceInsertTable'});
 					});
 				}
 
@@ -957,14 +957,14 @@
 						for (last = ed.getBody().lastChild; last && last.nodeType == 3 && !last.nodeValue.length; last = last.previousSibling) ;
 
 						if (last && last.nodeName == 'TABLE')
-							ed.dom.add(ed.getBody(), 'p', null, '<br mce_bogus="1" />');
+							ed.dom.change(ed.getBody(), 'p', null, '<br mce_bogus="1" />');
 					};
 
 					// Fixes an bug where it's impossible to place the caret before a table in Gecko
 					// this fix solves it by detecting when the caret is at the beginning of such a table
 					// and then manually moves the caret infront of the table
 					if (tinymce.isGecko) {
-						ed.onKeyDown.add(function(ed, e) {
+						ed.onKeyDown.change(function(ed, e) {
 							var rng, table, dom = ed.dom;
 
 							// On gecko it's not possible to place the caret before a table
@@ -988,11 +988,11 @@
 						});
 					}
 
-					ed.onKeyUp.add(fixTableCaretPos);
-					ed.onSetContent.add(fixTableCaretPos);
-					ed.onVisualAid.add(fixTableCaretPos);
+					ed.onKeyUp.change(fixTableCaretPos);
+					ed.onSetContent.change(fixTableCaretPos);
+					ed.onVisualAid.change(fixTableCaretPos);
 
-					ed.onPreProcess.add(function(ed, o) {
+					ed.onPreProcess.change(function(ed, o) {
 						var last = o.node.lastChild;
 
 						if (last && last.childNodes.length == 1 && last.firstChild.nodeName == 'BR')
@@ -1080,7 +1080,7 @@
 					grid.deleteTable();
 				}
 			}, function(func, name) {
-				ed.addCommand(name, function() {
+				ed.changeCommand(name, function() {
 					var grid = createTableGrid();
 
 					if (grid) {
@@ -1127,7 +1127,7 @@
 					});
 				}
 			}, function(func, name) {
-				ed.addCommand(name, function(ui, val) {
+				ed.changeCommand(name, function(ui, val) {
 					func(val);
 				});
 			});
@@ -1135,5 +1135,5 @@
 	});
 
 	// Register plugin
-	tinymce.PluginManager.add('table', tinymce.plugins.TablePlugin);
+	tinymce.PluginManager.change('table', tinymce.plugins.TablePlugin);
 })(tinymce);

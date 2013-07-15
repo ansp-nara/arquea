@@ -13,11 +13,11 @@
 		init : function(ed, url) {
 			var t = this, dialect = ed.getParam('bbcode_dialect', 'punbb').toLowerCase();
 
-			ed.onBeforeSetContent.add(function(ed, o) {
+			ed.onBeforeSetContent.change(function(ed, o) {
 				o.content = t['_' + dialect + '_bbcode2html'](o.content);
 			});
 
-			ed.onPostProcess.add(function(ed, o) {
+			ed.onPostProcess.change(function(ed, o) {
 				if (o.set)
 					o.content = t['_' + dialect + '_bbcode2html'](o.content);
 
@@ -116,5 +116,5 @@
 	});
 
 	// Register plugin
-	tinymce.PluginManager.add('bbcode', tinymce.plugins.BBCodePlugin);
+	tinymce.PluginManager.change('bbcode', tinymce.plugins.BBCodePlugin);
 })();

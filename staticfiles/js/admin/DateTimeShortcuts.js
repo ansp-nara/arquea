@@ -28,15 +28,15 @@ var DateTimeShortcuts = {
         for (i=0; i<inputs.length; i++) {
             var inp = inputs[i];
             if (inp.getAttribute('type') == 'text' && inp.className.match(/vTimeField/)) {
-                DateTimeShortcuts.addClock(inp);
+                DateTimeShortcuts.changeClock(inp);
             }
             else if (inp.getAttribute('type') == 'text' && inp.className.match(/vDateField/)) {
-                DateTimeShortcuts.addCalendar(inp);
+                DateTimeShortcuts.changeCalendar(inp);
             }
         }
     },
     // Add clock widget to a given field
-    addClock: function(inp) {
+    changeClock: function(inp) {
         var num = DateTimeShortcuts.clockInputs.length;
         DateTimeShortcuts.clockInputs[num] = inp;
 
@@ -76,7 +76,7 @@ var DateTimeShortcuts = {
         clock_box.className = 'clockbox module';
         clock_box.setAttribute('id', DateTimeShortcuts.clockDivName + num);
         document.body.appendChild(clock_box);
-        addEvent(clock_box, 'click', DateTimeShortcuts.cancelEventPropagation);
+        changeEvent(clock_box, 'click', DateTimeShortcuts.cancelEventPropagation);
 
         quickElement('h2', clock_box, gettext('Choose a time'));
         time_list = quickElement('ul', clock_box, '');
@@ -111,7 +111,7 @@ var DateTimeShortcuts = {
 
         // Show the clock box
         clock_box.style.display = 'block';
-        addEvent(window.document, 'click', function() { DateTimeShortcuts.dismissClock(num); return true; });
+        changeEvent(window.document, 'click', function() { DateTimeShortcuts.dismissClock(num); return true; });
     },
     dismissClock: function(num) {
        document.getElementById(DateTimeShortcuts.clockDivName + num).style.display = 'none';
@@ -123,7 +123,7 @@ var DateTimeShortcuts = {
        DateTimeShortcuts.dismissClock(num);
     },
     // Add calendar widget to a given field.
-    addCalendar: function(inp) {
+    changeCalendar: function(inp) {
         var num = DateTimeShortcuts.calendars.length;
 
         DateTimeShortcuts.calendarInputs[num] = inp;
@@ -167,7 +167,7 @@ var DateTimeShortcuts = {
         cal_box.className = 'calendarbox module';
         cal_box.setAttribute('id', DateTimeShortcuts.calendarDivName1 + num);
         document.body.appendChild(cal_box);
-        addEvent(cal_box, 'click', DateTimeShortcuts.cancelEventPropagation);
+        changeEvent(cal_box, 'click', DateTimeShortcuts.cancelEventPropagation);
 
         // next-prev links
         var cal_nav = quickElement('div', cal_box, '');
@@ -227,7 +227,7 @@ var DateTimeShortcuts = {
         cal_box.style.top = Math.max(0, findPosY(cal_link) - 75) + 'px';
 
         cal_box.style.display = 'block';
-        addEvent(window.document, 'click', function() { DateTimeShortcuts.dismissCalendar(num); return true; });
+        changeEvent(window.document, 'click', function() { DateTimeShortcuts.dismissCalendar(num); return true; });
     },
     dismissCalendar: function(num) {
         document.getElementById(DateTimeShortcuts.calendarDivName1+num).style.display = 'none';
@@ -271,4 +271,4 @@ var DateTimeShortcuts = {
     }
 }
 
-addEvent(window, 'load', DateTimeShortcuts.init);
+changeEvent(window, 'load', DateTimeShortcuts.init);

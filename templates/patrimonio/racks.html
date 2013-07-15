@@ -1,0 +1,53 @@
+{% extends "admin/base_site.html" %}
+{% load proto_tags %}
+{% block extrahead %}
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/racks.css" />
+<style type="text/css" media="screen">
+  #u {background:#ffffff url('{{ STATIC_URL }}img//1u.png') repeat-y;float:left;width:7px;height:798px;}
+  #rack {height:820px;float:left;margin-right:10px;margin-top:20px;margin-bottom:30px;}
+  #dc {margin-top:50px;}
+  #roteador {width:100%;float:left;background:#81878b;display:block;border-bottom:1px solid #fff;}
+  #espaco {width:100%;float:left;background:#fff;display:block;}
+  #interno {display:block;float:left;width:199px;}
+  #u-n {border:1px solid #999a9a;background:#d8d8d8;color:#636363;float:left;width:13px;height:13px;font:8px Verdana,Arial;pchangeing:2px;}
+  #bloco-n {display:block;width:19px;float:left;margin-right:1px;}
+  </style>
+ 
+<style type="text/css" media="print">
+  #u {background:#ffffff url('{{ STATIC_URL }}img/1u.png') repeat-y !important;float:left;width:7px;height:798px;}
+  #rack {height:820px;float:left;margin-right:10px;margin-top:20px;}
+  #roteador {width:100%;float:left;background:#81878b !important;display:block;border-bottom:1px solid #fff;}
+  #espaco {width:100%;float:left;background:#fff;display:block;}
+  #interno {display:block;float:left;width:199px;}
+</style>
+   <script type="text/javascript" src="{{ STATIC_URL }}js/racks.js"></script>
+{% endblock %}
+
+{% block content %}
+{% for dc in dcs %}
+<div id="dc">
+<h1>{{ dc.nome }}</h1>
+{% for rack in dc.racks %}
+<div id="rack">
+    <h2>{{ rack.nome }} ({{ rack.vazio }} ocupado)</h2>
+    <div id="bloco-n">
+        <script>
+        for(i={% widthratio rack.altura 3 1 %};i>0;i--){
+            document.write('<div id="u-n">'+i+'</div>');
+        }
+        </script>
+    </div>
+    <div id="u"></div>
+    <div id="interno">
+  {% for eq in rack.equipamentos %}
+       <div id="{% if eq.descricao %}roteador" rel="tooltip" title="{{ eq.descricao }}"{% else %}espaco"{% endif %} style="height:{% widthratio eq.tamanho 3 19 %}px;">{% if eq.imagem %}<img src="{{ eq.imagem }}" />{% endif %}</div>
+  {% endfor %}
+    </div>
+   <div id="u"></div>
+</div>
+{% endfor %}
+</div>
+<div style="clear:both;"></div>
+{% endfor %}
+{% endblock %}
+

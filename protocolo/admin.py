@@ -2,7 +2,7 @@
 
 import datetime
 from django.contrib import admin
-from models import Origem, TipoDocumento, Estado, Protocolo, Feriado, ItemProtocolo, Cotacao, Arquivo, Descricao
+from models import Origem, TipoDocumento, Estado, Protocolo, Feriado, ItemProtocolo, Cotacao, Arquivo, Descricao, TipoFeriado
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import Group
 from django.core.mail import send_mail
@@ -10,25 +10,7 @@ from django.http import HttpResponseRedirect
 from forms import CotacaoAdminForm, ProtocoloAdminForm, ItemAdminForm
 from utils.admin import AutoCompleteAdmin
 from financeiro.models import Estado as EstadoDespesa
-
-
-def clone_objects(objects):
-    def clone(from_object):
-        args = dict([(fld.name, getattr(from_object, fld.name))
-                for fld in from_object._meta.fields
-                        if fld is not from_object._meta.pk]);
-
-        return from_object.__class__.objects.create(**args)
-
-    if not hasattr(objects,'__iter__'):
-       objects = [ objects ]
-
-    # We always have the objects in a list now
-    objs = []
-    for object in objects:
-        obj = clone(object)
-        obj.save()
-        objs.append(obj)
+from utils.functions import clone_objects
 
 admin.site.register(TipoDocumento)
 admin.site.register(Estado)
@@ -65,7 +47,7 @@ class ProtocoloAdmin(admin.ModelAdmin):
 #    O método 'response_change' 	Encaminha o usuário para a tela de cadastramento após a alteração do protocolo com estado 
 #            		       	classificado como 'Encaminha despesa'.
 
-#    O método 'response_add' 	Encaminha o usuário para a tela de cadastramento após a adição de um novo protocolo com estado
+#    O método 'response_change' 	Encaminha o usuário para a tela de cadastramento após a adição de um novo protocolo com estado
 #              			classificado como 'Encaminha despesa'.
 
 
@@ -87,7 +69,7 @@ class ProtocoloAdmin(admin.ModelAdmin):
                     'classes': ('wide',)
                  }),
                 (None, {
-                    'fields': (('referente', 'data_validade', 'data_vencimento'), ),
+                    'fields': (('referente', 'procedencia', 'data_validade', 'data_vencimento'), ),
                     'classes': ('wide',)
                  }),
                 ('Cotação', {
@@ -96,13 +78,13 @@ class ProtocoloAdmin(admin.ModelAdmin):
                  }),
     )
 
-    list_display = ('doc_num', 'descricao2', 'referente', 'vencimento', 'mostra_valor', 'existe_arquivo', 'colorir', 'cotacoes')
+    list_display = ('doc_num', 'descricao2', 'referente', 'vencimento', 'chegada', 'mostra_valor', 'existe_arquivo', 'colorir', 'cotacoes')
 
     list_display_links = ('doc_num', )
 
     related_search_fields = {'identificacao': ('entidade__sigla', )}
 
-    list_filter = ('termo', 'estado', 'data_vencimento')
+    list_filter = ('termo', 'estado', 'data_vencimento', 'pagamento__origem_fapesp__item_outorga__natureza_gasto__modalidade')
     
     #list_editable = ('estado',)
     actions = [ 'action_clone' ]
@@ -175,23 +157,23 @@ class ProtocoloAdmin(admin.ModelAdmin):
             if obj.estado.nome == u'Autorizada':
                 super(ProtocoloAdmin,self).response_change(request, obj)
                 e, created = Estado.objects.get_or_create(nome=u'Solicitar Liberação')
-                url = '/admin/financeiro/fontepagadora/add/?protocolo=%s&valor=%s&estado=%s' % (obj.id, obj.valor, e.id)
+                url = '/admin/financeiro/fontepagadora/change/?protocolo=%s&valor=%s&estado=%s' % (obj.id, obj.valor, e.id)
                 return HttpResponseRedirect(url)
 
         return super(ProtocoloAdmin,self).response_change(request, obj)
 
 
     # Encaminha o usuário para a tela de cadastramento da Fonte Pagadora quando uma despesa é adicionada.
-    def response_add(self, request, obj, post_url_continue='../%s/'):
+    def response_change(self, request, obj, post_url_continue='../%s/'):
         if self.muda_estado:
             self.muda_estado = 0
             if obj.estado.nome == u'Autorizada':
-                super(ProtocoloAdmin,self).response_add(request, obj)
+                super(ProtocoloAdmin,self).response_change(request, obj)
                 e, created = Estado.objects.get_or_create(nome=u'Solicitar Liberação')
-                url = '/admin/financeiro/fontepagadora/add/?protocolo=%s&valor=%s&estado=%s' % (obj.id, obj.valor, e.id)
+                url = '/admin/financeiro/fontepagadora/change/?protocolo=%s&valor=%s&estado=%s' % (obj.id, obj.valor, e.id)
                 return HttpResponseRedirect(url)
 
-        return super(ProtocoloAdmin,self).response_add(request, obj)
+        return super(ProtocoloAdmin,self).response_change(request, obj)
 
     ## Encaminha o usuário para a tela de cadastramento de despesa após alteração do protocolo.
     #def response_change(self, request, obj):
@@ -201,25 +183,25 @@ class ProtocoloAdmin(admin.ModelAdmin):
                 #super(ProtocoloAdmin,self).response_change(request, obj)
                 #e, created = EstadoDespesa.objects.get_or_create(nome=u'Encaminha para Fonte Pagadora')
                 #if obj.termo is not None:
-                    #url = '/admin/financeiro/despesa/add/?protocolo=%s&valor_despesa=%s&termo=%s&estado=%s' % (obj.id, obj.valor, obj.termo.id, e.id)
+                    #url = '/admin/financeiro/despesa/change/?protocolo=%s&valor_despesa=%s&termo=%s&estado=%s' % (obj.id, obj.valor, obj.termo.id, e.id)
                 #else:
-                    #url = '/admin/financeiro/despesa/add/?protocolo=%s&valor_despesa=%s&estado=%s' % (obj.id, obj.valor, e.id)
+                    #url = '/admin/financeiro/despesa/change/?protocolo=%s&valor_despesa=%s&estado=%s' % (obj.id, obj.valor, e.id)
                 #return HttpResponseRedirect(url)
         
         #return super(ProtocoloAdmin,self).response_change(request, obj)
 
 
     ## Encaminha o usuário para a tela de cadastramento de despesa após a inclusão de um protocolo.
-    #def response_add(self, request, obj, post_url_continue='../%s/'):
+    #def response_change(self, request, obj, post_url_continue='../%s/'):
         #if self.muda_estado:
             #self.muda_estado = 0
             #if obj.estado.nome == u'Encaminha despesa':
-                #super(ProtocoloAdmin,self).response_add(request, obj)
+                #super(ProtocoloAdmin,self).response_change(request, obj)
                 #e, created = EstadoDespesa.objects.get_or_create(nome=u'Encaminha para Fonte Pagadora')
                 #if obj.termo is not None:
-                    #url = '/admin/financeiro/despesa/add/?protocolo=%s&valor_despesa=%s&termo=%s&estado=%s' % (obj.id, obj.valor, obj.termo.id, e.id)
+                    #url = '/admin/financeiro/despesa/change/?protocolo=%s&valor_despesa=%s&termo=%s&estado=%s' % (obj.id, obj.valor, obj.termo.id, e.id)
                 #else:
-                    #url = '/admin/financeiro/despesa/add/?protocolo=%s&valor_despesa=%s&estado=%s' % (obj.id, obj.valor, e.id)
+                    #url = '/admin/financeiro/despesa/change/?protocolo=%s&valor_despesa=%s&estado=%s' % (obj.id, obj.valor, e.id)
                 #return HttpResponseRedirect(url)
         
         #return super(ProtocoloAdmin,self).response_change(request, obj)
@@ -315,9 +297,9 @@ class CotacaoAdmin(admin.ModelAdmin):
 
 
     # Redireciona o usuário para uma tela onde mostra todas as cotações de um determinado pedido após a inclusão da cotação.
-    def response_add(self, request, obj, post_url_continue='../%s/'):
+    def response_change(self, request, obj, post_url_continue='../%s/'):
         if request.REQUEST.has_key('return_to'):
-            super(CotacaoAdmin,self).response_add(request, obj)
+            super(CotacaoAdmin,self).response_change(request, obj)
             return HttpResponseRedirect(request.REQUEST['return_to'])
         else:
             return super(CotacaoAdmin,self).response_change(request, obj)
@@ -333,15 +315,15 @@ class FeriadoAdmin(admin.ModelAdmin):
 
     fieldsets = (
                 (None, {
-                    'fields': (('feriado', 'descricao'), 'movel')
+                    'fields': (('feriado', 'descricao'), 'tipo')
                  }),
     )
 
-    list_display = ('__unicode__', 'descricao', 'movel')
+    list_display = ('__unicode__', 'descricao', 'tipo')
 
     search_fields = ('descricao', )
 
-    list_filter = ['movel']
+    list_filter = ['tipo']
 
     list_per_page = 10
 
@@ -432,5 +414,7 @@ admin.site.register(Arquivo,ArquivoAdmin)
 
 class DescricaoAdmin(admin.ModelAdmin):
      list_display = ('entidade', 'descricao')
+     search_fields = ('entidade', 'descricao')
 
 admin.site.register(Descricao, DescricaoAdmin)
+admin.site.register(TipoFeriado)
