@@ -12,14 +12,14 @@
 
     @frame assinatura {
        -pdf-frame-content: box;
-       top:20cm;
+       top:25cm;
        left:6.8cm;
     }
   }
   </style>
 </head>
 <body>
-  <img src="http://sistema.ansp.br{% if cc.imagem %}{{ cc.imagem.url }}{% else %}/files/extratocc/cheque_branco.jpg{% endif %}">
+  <img src="/var/www{% if cc.imagem %}{{ cc.imagem.url }}{% else %}/files/extratocc/cheque_branco.jpg{% endif %}">
 
   <div class="cheque">
   <hr size="10" color="#999999" />
@@ -29,8 +29,8 @@
   <p>UTILIZADO PARA: {{ cc.capa }}</p> 
   <br/><br/><br/><br/><br />
   </div>
-  <div id="box">
-  <table cellpadding="1">	      
+  <div id="box" style="float:left;">
+  <table cellpchangeing="1">	      
     <tr><th>CHEQUE ASSINADO POR:</th></tr>
     <tr><td>Prof. Lopez</td></tr>
     <tr><td>&nbsp;</td></tr>

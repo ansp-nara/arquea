@@ -11,10 +11,17 @@
   {% endfor %}
 </select>
 <label for="id_modalidade">Modalidade:</label>
-<select name="modalidade" id="modalidade">
+<select name="modalidade" id="id_modalidade">
   <option value="0">----------</option>
   {% for m in modalidades %}
       <option value="{{ m.id }}">{{ m.sigla }}</option>
+  {% endfor %}
+</select>
+<label for="id_entidade">Entidade (não obrigatório):</label>
+<select name="entidade" id="id_entidade">
+  <option value="0">----------</option>
+  {% for e in entidades %}
+      <option value="{{ e.id }}">{{ e.sigla }}</option>
   {% endfor %}
 </select>
 <input type="submit" value="Enviar">

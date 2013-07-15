@@ -71,7 +71,6 @@ class Tipo(models.Model):
         ordering = ("nome", )
 
 
-
 class Patrimonio(models.Model):
 
     """
@@ -79,23 +78,38 @@ class Patrimonio(models.Model):
 
     """
 
+    checado = models.BooleanField()
     patrimonio = models.ForeignKey('patrimonio.Patrimonio', null=True, blank=True, verbose_name=_(u'Contido em'), related_name='contido')
-    pagamento = models.ForeignKey('financeiro.Pagamento')
+    pagamento = models.ForeignKey('financeiro.Pagamento', null=True, blank=True)
     tipo = models.ForeignKey('patrimonio.Tipo')
-    descricao = models.TextField(_(u'Descrição'))
+    apelido = models.CharField(max_length=30, null=True, blank=True)
+    descricao = models.TextField(_(u'Descrição NF'))
+    descricao_tecnica = models.TextField(u'Descrição técnica', null=True, blank=True)
     part_number = models.CharField(null=True, blank=True, max_length=50)
-    marca = models.CharField(_(u'Marca ou Editora'), null=True, blank=True, max_length=100)
+    marca = models.CharField(_(u'Marca/Editora'), null=True, blank=True, max_length=100)
     modelo = models.CharField(null=True, blank=True, max_length=100)
     ns = models.CharField(_(u'Número de série'), null=True, blank=True, max_length=50)
-    valor = models.DecimalField(u'Valor de compra', max_digits=12, decimal_places=2)
+    valor = models.DecimalField(u'Vl unit', max_digits=12, decimal_places=2, null=True, blank=True)
     imagem = models.ImageField(upload_to='patrimonio', null=True, blank=True)
     procedencia = models.CharField(_(u'Procedência'), null=True, blank=True, max_length=100)
     obs = models.TextField(null=True, blank=True)
     isbn = models.CharField(_(u'ISBN'), null=True, blank=True, max_length=20)
+    agilis = models.BooleanField(_(u'Agilis?'), default=True)
+    ncm = models.CharField(u'NCM/SH', null=True, blank=True, max_length=30)
+    especificacao = models.FileField(u'Especificação', upload_to='patrimonio', null=True, blank=True)
     titulo_autor = models.CharField(_(u'Título e autor'), null=True, blank=True, max_length=100)
+    complemento = models.CharField('Compl', max_length=100, null=True, blank=True)
+    ean = models.CharField(u'EAN', max_length=45, null=True, blank=True)
+    tamanho = models.DecimalField(u'Tamanho (em U)', max_digits=5, decimal_places=2, blank=True, null=True)
+    equipamento = models.ForeignKey('patrimonio.Equipamento', null=True, blank=True)
+    tem_numero_fmusp = models.BooleanField('Tem número de patrimônio FMUSP?', default=False)
+    numero_fmusp = models.IntegerField('Número de patrimônio FMUSP', null=True, blank=True)
 
     def __unicode__(self):
-        return '%s' % self.descricao
+        if self.pagamento:
+            return '%s - %s  - %s - %s' % (self.pagamento.protocolo.num_documento, self.apelido, self.ns, self.descricao)
+        else:
+            return '%s - %s - %s' % (self.apelido, self.ns, self.descricao)
 
     def historico_atual(self):
         ht = self.historicolocal_set.order_by('-data')
@@ -103,14 +117,19 @@ class Patrimonio(models.Model):
         return ht[0]
    
 
+    def posicao(self):
+        ht = self.historico_atual()
+        if not ht: return ''
+        return '%s - %s' % (ht.endereco.complemento, ht.posicao)
+
     # Retorna os patrimônios de um termo.
     @classmethod
     def patrimonios_termo(cls, t):
         return cls.objects.filter(pagamento_protocolo__termo=t)
 
-
     def nf(self):
         return '%s' % self.pagamento.protocolo.num_documento
+    nf.short_description = u'NF'
 
     # Define a descrição do modelo.
     class Meta:
@@ -118,6 +137,15 @@ class Patrimonio(models.Model):
         verbose_name_plural = _(u'Patrimônio')
 	ordering = ('tipo', 'descricao')
 
+    # retorna modalidade, parcial e pagina para exibicao no admin
+    def auditoria(self):
+        if not self.pagamento:
+            return ''
+        if not self.pagamento.origem_fapesp:
+            return ''
+        modalidade = self.pagamento.origem_fapesp.item_outorga.natureza_gasto.modalidade.sigla
+        return '%s (%s/%s)' % (modalidade, self.pagamento.parcial(), self.pagamento.pagina())
+    auditoria.short_description = u'Material (par/pág)'
 
 
 class HistoricoLocal(models.Model):
@@ -186,10 +214,12 @@ class HistoricoLocal(models.Model):
     data = models.DateField(_(u'Data'))
     estado =  models.ForeignKey(Estado, verbose_name=_(u'Estado do Patrimônio'))
     memorando = models.ForeignKey('memorando.MemorandoSimples', null=True, blank=True)
+    posicao = models.CharField(u'Posição', max_length=50, null=True, blank=True)
+    pai = models.ForeignKey(Patrimonio, null=True, blank=True, related_name='filhos')
 
     # Retorna a data o patrimônio e o endereco.
     def __unicode__(self):
-        return u'%s - %s | %s' % (self.data.strftime('%d/%m/%Y'), self.patrimonio, self.endereco)
+        return u'%s - %s | %s' % (self.data.strftime('%d/%m/%Y'), self.patrimonio, self.endereco or '')
 
 
 
@@ -201,4 +231,95 @@ class HistoricoLocal(models.Model):
         unique_together = (('patrimonio', 'endereco', 'descricao', 'data'), )
 
 
+    def posicao_int(self):
+        try:
+            return int(self.posicao)
+        except:
+            try:
+                return int(self.posicao.split('.F')[1].split('.')[0])
+            except:
+		return -1
 
+class Direcao(models.Model):
+	origem = models.CharField(max_length=15)
+	destino = models.CharField(max_length=15)
+	
+	def __unicode__(self):
+		return '%s - %s' % (self.origem, self.destino)
+		
+	class Meta:
+		verbose_name = u'Direção'
+		verbose_name_plural = u'Direções'
+	
+class DistribuicaoUnidade(models.Model):
+	nome = models.CharField(max_length=45)
+	sigla = models.CharField(max_length=4)
+	
+	def __unicode__(self):
+		return '%s' % self.sigla
+		
+class Distribuicao(models.Model):
+	inicio = models.IntegerField()
+	final = models.IntegerField()
+	unidade = models.ForeignKey('patrimonio.DistribuicaoUnidade')
+	direcao = models.ForeignKey('patrimonio.Direcao')
+	
+	def __unicode__(self):
+		return '%s - %s' % (self.inicio, self.final)
+		
+	class Meta:
+		verbose_name = u'Distribuição'
+		verbose_name_plural = u'Distribuições'
+
+class UnidadeDimensao(models.Model):
+	nome = models.CharField(max_length=15)
+	
+	def __unicode__(self):
+		return '%s' % self.nome
+		
+	class Meta:
+		verbose_name = u'Unidade da dimensão'
+		verbose_name_plural = u'Unidades das dimensões'
+		
+class Dimensao(models.Model):
+	altura = models.DecimalField(max_digits=6, decimal_places=3, null=True, blank=True)
+	largura = models.DecimalField(max_digits=6, decimal_places=3, null=True, blank=True)
+	profundidade = models.DecimalField(max_digits=6, decimal_places=3, null=True, blank=True)
+	peso = models.DecimalField(max_digits=6, decimal_places=3, null=True, blank=True)
+	unidade = models.ForeignKey('patrimonio.UnidadeDimensao')
+	
+	def __unicode__(self):
+		return '%s x %s x %s %s - %s kg' % (self.altura, self.largura, self.profundidade, self.unidade, self.peso)
+	
+	class Meta:
+		verbose_name = u'Dimensão'
+		verbose_name_plural = u'Dimensões'
+
+class TipoEquipamento(models.Model):
+    nome = models.CharField(max_length=45)
+
+    def __unicode__(self):
+        return '%s' % self.nome
+
+    class Meta:
+	ordering = ('nome',)
+
+class Equipamento(models.Model):
+    descricao = models.TextField(_(u'Descrição'))
+    part_number = models.CharField(null=True, blank=True, max_length=50)
+    marca = models.CharField(_(u'Marca ou Editora'), null=True, blank=True, max_length=100)
+    modelo = models.CharField(null=True, blank=True, max_length=100)
+    imagem = models.ImageField(u'Imagem do equipamento', upload_to='patrimonio', null=True, blank=True)
+    isbn = models.CharField(_(u'ISBN'), null=True, blank=True, max_length=20)
+    ncm = models.CharField(u'NCM/SH', null=True, blank=True, max_length=30)
+    titulo_autor = models.CharField(_(u'Título e autor'), null=True, blank=True, max_length=100)
+    tamanho = models.DecimalField(u'Tamanho (em U)', max_digits=5, decimal_places=2, null=True, blank=True)
+    especificacao = models.FileField(u'Especificação', upload_to='patrimonio', null=True, blank=True)
+    tipo = models.ForeignKey('patrimonio.TipoEquipamento', null=True, blank=True)
+    convencoes = models.ManyToManyField('patrimonio.Distribuicao', verbose_name=u'Convenções')
+
+    def __unicode__(self):
+        return '%s - %s' % (self.descricao, self.part_number)
+
+    class Meta:
+	ordering = ('descricao',)

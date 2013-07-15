@@ -1,0 +1,15 @@
+{% extends "admin/base_site.html" %}
+{% load proto_tags %}
+{% block content %}
+<p>Selecione uma agenda:</p>
+<form action="" method="GET">
+<label for="id_agenda">Agenda:</label>
+<select name="agenda" id="id_agenda">
+{% for a in agendas %}
+<option value="{{ a.id }}">{{ a.nome }}</option>
+{% endfor %}
+</select>
+<input type="submit" value="Escolher" />
+</form>
+{% endblock %}
+

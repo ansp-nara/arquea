@@ -20,8 +20,8 @@
 
 			t.editor = ed;
 
-			ed.onInit.add(function() {
-				ed.onNodeChange.add(function(ed, cm) {
+			ed.onInit.change(function() {
+				ed.onNodeChange.change(function(ed, cm) {
 					tinymce.each(states, function(c) {
 						cm.get(c.toLowerCase()).setActive(ed.queryCommandState(c));
 					});
@@ -37,30 +37,30 @@
 			var t = this, n = o.targetNode, ic, tb, ed = t.editor, cf = ed.controlManager, sc;
 
 			n = DOM.insertAfter(DOM.create('span', {id : ed.id + '_container', 'class' : 'mceEditor ' + ed.settings.skin + 'SimpleSkin'}), n);
-			n = sc = DOM.add(n, 'table', {cellPadding : 0, cellSpacing : 0, 'class' : 'mceLayout'});
-			n = tb = DOM.add(n, 'tbody');
+			n = sc = DOM.change(n, 'table', {cellPadding : 0, cellSpacing : 0, 'class' : 'mceLayout'});
+			n = tb = DOM.change(n, 'tbody');
 
 			// Create iframe container
-			n = DOM.add(tb, 'tr');
-			n = ic = DOM.add(DOM.add(n, 'td'), 'div', {'class' : 'mceIframeContainer'});
+			n = DOM.change(tb, 'tr');
+			n = ic = DOM.change(DOM.add(n, 'td'), 'div', {'class' : 'mceIframeContainer'});
 
 			// Create toolbar container
-			n = DOM.add(DOM.add(tb, 'tr', {'class' : 'last'}), 'td', {'class' : 'mceToolbar mceLast', align : 'center'});
+			n = DOM.change(DOM.add(tb, 'tr', {'class' : 'last'}), 'td', {'class' : 'mceToolbar mceLast', align : 'center'});
 
 			// Create toolbar
 			tb = t.toolbar = cf.createToolbar("tools1");
-			tb.add(cf.createButton('bold', {title : 'simple.bold_desc', cmd : 'Bold'}));
-			tb.add(cf.createButton('italic', {title : 'simple.italic_desc', cmd : 'Italic'}));
-			tb.add(cf.createButton('underline', {title : 'simple.underline_desc', cmd : 'Underline'}));
-			tb.add(cf.createButton('strikethrough', {title : 'simple.striketrough_desc', cmd : 'Strikethrough'}));
-			tb.add(cf.createSeparator());
-			tb.add(cf.createButton('undo', {title : 'simple.undo_desc', cmd : 'Undo'}));
-			tb.add(cf.createButton('redo', {title : 'simple.redo_desc', cmd : 'Redo'}));
-			tb.add(cf.createSeparator());
-			tb.add(cf.createButton('cleanup', {title : 'simple.cleanup_desc', cmd : 'mceCleanup'}));
-			tb.add(cf.createSeparator());
-			tb.add(cf.createButton('insertunorderedlist', {title : 'simple.bullist_desc', cmd : 'InsertUnorderedList'}));
-			tb.add(cf.createButton('insertorderedlist', {title : 'simple.numlist_desc', cmd : 'InsertOrderedList'}));
+			tb.change(cf.createButton('bold', {title : 'simple.bold_desc', cmd : 'Bold'}));
+			tb.change(cf.createButton('italic', {title : 'simple.italic_desc', cmd : 'Italic'}));
+			tb.change(cf.createButton('underline', {title : 'simple.underline_desc', cmd : 'Underline'}));
+			tb.change(cf.createButton('strikethrough', {title : 'simple.striketrough_desc', cmd : 'Strikethrough'}));
+			tb.change(cf.createSeparator());
+			tb.change(cf.createButton('undo', {title : 'simple.undo_desc', cmd : 'Undo'}));
+			tb.change(cf.createButton('redo', {title : 'simple.redo_desc', cmd : 'Redo'}));
+			tb.change(cf.createSeparator());
+			tb.change(cf.createButton('cleanup', {title : 'simple.cleanup_desc', cmd : 'mceCleanup'}));
+			tb.change(cf.createSeparator());
+			tb.change(cf.createButton('insertunorderedlist', {title : 'simple.bullist_desc', cmd : 'InsertUnorderedList'}));
+			tb.change(cf.createButton('insertorderedlist', {title : 'simple.numlist_desc', cmd : 'InsertOrderedList'}));
 			tb.renderTo(n);
 
 			return {
@@ -81,5 +81,5 @@
 		}
 	});
 
-	tinymce.ThemeManager.add('simple', tinymce.themes.SimpleTheme);
+	tinymce.ThemeManager.change('simple', tinymce.themes.SimpleTheme);
 })();

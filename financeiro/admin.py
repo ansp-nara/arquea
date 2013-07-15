@@ -5,6 +5,13 @@ from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode
 from memorando.models import Corpo
+from utils.admin import PrintModelAdmin
+from rede.models import Recurso
+
+class RecursoInline(admin.TabularInline):
+    model = Recurso
+    extra = 2
+
 
 #class AuditoriaQuestionaInline(admin.TabularInline):
 #    model = Corpo.pagamento.through
@@ -17,6 +24,7 @@ class PagamentoInline(admin.TabularInline):
     form = PagamentoAdminForm
 
 class AuditoriaInline(admin.TabularInline):
+    form = AuditoriaAdminForm
     model = Auditoria
     choices = 1
   
@@ -34,7 +42,6 @@ class ExtratoCCAdmin(admin.ModelAdmin):
     )
     
     list_display = ('data_oper', 'cod_oper', 'historico', 'valor')
-    list_filter = ('data_oper',)
     search_fields = ('cod_oper',)
     inlines = (PagamentoInline,)
     form = ExtratoCCAdminForm
@@ -50,9 +57,10 @@ class ExtratoFinanceiroAdmin(admin.ModelAdmin):
     
     list_display = ('termo', 'data_libera', 'cod', 'historico', 'valor')
     list_filter = ('termo',)
+    search_fields = ('historico',)
     
     
-class PagamentoAdmin(admin.ModelAdmin):
+class PagamentoAdmin(PrintModelAdmin):
     
     fieldsets = (
 		  (None, {
@@ -68,8 +76,8 @@ class PagamentoAdmin(admin.ModelAdmin):
     list_display = ('item', 'nota', 'data', 'codigo_operacao', 'formata_valor_fapesp', 'parcial', 'pagina')
     search_fields = ('protocolo__num_documento', 'conta_corrente__cod_oper', 'protocolo__descricao2__descricao', 'protocolo__descricao2__entidade__sigla', 'protocolo__referente')
     form = PagamentoAdminForm
-    inlines = (AuditoriaInline, )
-    list_filter = ('protocolo__termo', 'origem_fapesp__item_outorga__natureza_gasto__modalidade', 'conta_corrente__extrato_financeiro')
+    inlines = (AuditoriaInline, RecursoInline)
+    list_filter = ('protocolo__termo', 'origem_fapesp__item_outorga__natureza_gasto__modalidade')
     filter_horizontal = ('pergunta',)
    
     def lookup_allowed(self, key, value):
@@ -86,7 +94,9 @@ class ExtratoPatrocinioAdmin(admin.ModelAdmin):
 		  }),
     )
     
-    list_display = ('localiza', 'data_oper', 'historico', 'valor')
+    list_display = ('localiza', 'cod_oper', 'data_oper', 'historico', 'valor')
+    search_fields = ('cod_oper',)
+    ordering = ('-data_oper',)
     
 class AuditoriaAdmin(admin.ModelAdmin):
   
@@ -98,10 +108,11 @@ class AuditoriaAdmin(admin.ModelAdmin):
     )
     
     list_display = ('pagamento', 'tipo', 'parcial', 'pagina')
+    search_fields = ('parcial', 'pagina')
 
 class EstadoAdmin(admin.ModelAdmin):
     search_fields = ('nome',)
-    
+
 class LocalizaPatrocinioAdmin(admin.ModelAdmin):
     search_fields = ('consignado',)
 
@@ -120,3 +131,4 @@ admin.site.register(Pagamento, PagamentoAdmin)
 admin.site.register(ExtratoPatrocinio, ExtratoPatrocinioAdmin)
 admin.site.register(Auditoria, AuditoriaAdmin)
 admin.site.register(TipoComprovanteFinanceiro, TipoComprovanteFinanceiroAdmin)
+

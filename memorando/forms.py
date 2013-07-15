@@ -11,6 +11,7 @@ from django.utils.translation import ugettext_lazy as _
 from tinymce.widgets import TinyMCE
 from django.utils.html import strip_tags
 from utils import widgets
+from ckeditor.widgets import CKEditorWidget
 
 class MemorandoRespostaForm(forms.ModelForm):
     introducao = forms.CharField(required=False, label=u'Introdução', widget=TinyMCE(attrs={'cols': 160, 'rows': 180}, mce_attrs={'height':500}))
@@ -28,7 +29,8 @@ class PerguntaAdminForm(forms.ModelForm):
         model = Pergunta
 
 class MemorandoSimplesForm(forms.ModelForm):
-    corpo = forms.CharField(widget=TinyMCE(attrs={'cols': 160, 'rows': 180}, mce_attrs={'height':500}))
+    #corpo = forms.CharField(widget=TinyMCE(attrs={'cols': 160, 'rows': 180}, mce_attrs={'height':500}))
+    corpo = forms.CharField(widget=CKEditorWidget())
 
 
     class Meta:
@@ -39,7 +41,7 @@ class CorpoAdminForm(forms.ModelForm):
     pergunta = forms.ModelChoiceField(Pergunta.objects.all(), label=_(u'Pergunta'),
               widget=forms.Select(attrs={'onchange': 'ajax_select_pergunta(this.id);'}))
     perg = forms.CharField(label='Texto da pergunta', widget=widgets.PlainTextWidget, required=False)
-    resposta = forms.CharField(label='Resposta', widget=TinyMCE(attrs={'cols': 70, 'rows': 30}, mce_attrs={'height':120}))
+    resposta = forms.CharField(label='Resposta', widget=TinyMCE(attrs={'cols': 50, 'rows': 30}, mce_attrs={'height':120}))
 
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=':',
@@ -59,7 +61,7 @@ class CorpoAdminForm(forms.ModelForm):
         model = Corpo
 
     class Media:
-        js = ('/media/js/jquery.js', '/media/js/selects.js')
+        js = ('/media/js/selects.js', )
 
 	
 class BaseCorpoInlineFormSet(BaseInlineFormSet):

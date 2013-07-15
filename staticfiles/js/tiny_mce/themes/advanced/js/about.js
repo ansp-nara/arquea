@@ -69,4 +69,4 @@ function insertHelpIFrame() {
 	}
 }
 
-tinyMCEPopup.onInit.add(init);
+tinyMCEPopup.onInit.change(init);

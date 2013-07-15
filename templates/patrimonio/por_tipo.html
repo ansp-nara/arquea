@@ -1,0 +1,16 @@
+{% extends "admin/base_site.html" %}
+{% load proto_tags %}
+{% block content %}
+<h1 repeat="1">Inventário por tipo</h1>
+{% comment %}<h4><a href="{% url patrimonio.views.por_local 1 %}?endereco={{ end }}&detalhe={{ det }}">Imprimir</a></h4>{% endcomment %}
+
+<h4>Patrimonios do tipo {{ tipo }}</h4>
+ 
+    <table border="0" repeat="1" cellpchangeing="5">
+    <tr><th>Checado</th><th>ID</th><th>Procedência</th><th>Marca</th><th>Modelo</th><th>Part number</th><th>Descrição</th><th>NS</th><th>Local</th><th>Posição</th><th>Estado</th><th>NF</th></tr>
+     {% for p in patrimonios %}
+              <tr><td>{{ p.checado }}</td><td>{{ p.id }}</td><td>{{ p.procedencia }}</td><td>{{ p.marca }}</td><td>{{ p.modelo }}</td><td>{{ p.part_number }}</td><td>{{ p.descricao }}</td><td>{{ p.ns }}</td><td>{{ p.historico_atual.endereco.end }}</td><td>{{ p.historico_atual.endereco.complemento }}</td><td>{{ p.historico_atual.estado }}</td><td>{{ p.pagamento.protocolo.num_documento }}</td></tr>
+    {% endfor %}
+    </table>
+
+{% endblock %}

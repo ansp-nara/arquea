@@ -1,0 +1,7 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+  <h2>{{ membro.nome }}</h2>
+{% for d in dados %}
+{{ d.entrada|date:"d/m  H:i" }} a {{ d.saida|date:"d/m  H:i" }} ({{ d.permanencia }})<br />
+{% endfor %}
+{% endblock %}

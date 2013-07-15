@@ -66,6 +66,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
     'django_cas.middleware.CASMiddleware',
     'middleware.SSLRedirect',
 )
@@ -85,7 +86,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.i18n', 
     'django.core.context_processors.media',
     'django.core.context_processors.static', 
-    'django.core.context_processors.request', 
+    'django.core.context_processors.request',
+    'django.contrib.messages.context_processors.messages', 
     'sistema.utils.context_processors.applist',)
 
 INSTALLED_APPS = (
@@ -94,6 +96,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.admin',
+    'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_cas',
     'sistema.protocolo',
@@ -108,7 +111,9 @@ INSTALLED_APPS = (
     'sistema.monitor',
     'sistema.rede',
     'sistema.evento',
+    'sistema.processo',
     'tinymce',
+    'ckeditor',
 )
 
 AUTHENTICATION_BACKENDS = (
@@ -123,14 +128,21 @@ CAS_LOGOUT_COMPLETELY = True
 
 # Faz com que os cookies sejam descartados quando o browser for fechado
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-
+SESSION_COOKIE_AGE = 1200
+SESSION_SAVE_EVERY_REQUEST = True
 
 LOGIN_REDIRECT_URL = '/'
 
 SERVER_EMAIL='sistema@ansp.br'
 
 #CACHE_BACKEND = 'memcached://127.0.0.1:11211/'
-EMAIL_HOST='gmail-smtp-in.l.google.com'
+#EMAIL_HOST='gmail-smtp-in.l.google.com'
+EMAIL_HOST='smtp.gmail.com'
+EMAIL_PORT=587
+EMAIL_HOST_USER='nara@ansp.br'
+EMAIL_HOST_PASSWORD='Seg!@nsp'
+EMAIL_USE_TLS=True
+
 
 STATICFILES_DIRS = (
      '/var/lib/sistema/staticfiles',
@@ -139,4 +151,7 @@ STATIC_ROOT = '/var/www/media/'
 STATIC_URL = '/media/'
 
 TINYMCE_JS_URL='/media/js/tiny_mce/tiny_mce.js'
-TINYMCE_DEFAULT_CONFIG={'theme':'advanced', 'plugins': 'table,style', 'theme_advanced_buttons3_add_before' : 'styleprops,tablecontrols,separator', 'height':80}
+TINYMCE_DEFAULT_CONFIG={'theme':'advanced', 'plugins': 'table,style', 'theme_advanced_buttons3_change_before' : 'styleprops,tablecontrols,separator', 'height':80}
+
+
+CKEDITOR_UPLOAD_PATH='/var/www/files/ckeditor'

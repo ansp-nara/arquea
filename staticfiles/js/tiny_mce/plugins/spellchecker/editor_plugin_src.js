@@ -37,14 +37,14 @@
 				t.hasSupport = true;
 
 				// Disable the context menu when spellchecking is active
-				ed.onContextMenu.addToTop(function(ed, e) {
+				ed.onContextMenu.changeToTop(function(ed, e) {
 					if (t.active)
 						return false;
 				});
 			}
 
 			// Register commands
-			ed.addCommand('mceSpellCheck', function() {
+			ed.changeCommand('mceSpellCheck', function() {
 				if (t.rpcUrl == '{backend}') {
 					// Enable/disable native spellchecker
 					t.editor.getBody().spellcheck = t.active = !t.active;
@@ -70,31 +70,31 @@
 					t._done();
 			});
 
-			ed.onInit.add(function() {
+			ed.onInit.change(function() {
 				if (ed.settings.content_css !== false)
 					ed.dom.loadCSS(url + '/css/content.css');
 			});
 
-			ed.onClick.add(t._showMenu, t);
-			ed.onContextMenu.add(t._showMenu, t);
-			ed.onBeforeGetContent.add(function() {
+			ed.onClick.change(t._showMenu, t);
+			ed.onContextMenu.change(t._showMenu, t);
+			ed.onBeforeGetContent.change(function() {
 				if (t.active)
 					t._removeWords();
 			});
 
-			ed.onNodeChange.add(function(ed, cm) {
+			ed.onNodeChange.change(function(ed, cm) {
 				cm.setActive('spellchecker', t.active);
 			});
 
-			ed.onSetContent.add(function() {
+			ed.onSetContent.change(function() {
 				t._done();
 			});
 
-			ed.onBeforeGetContent.add(function() {
+			ed.onBeforeGetContent.change(function() {
 				t._done();
 			});
 
-			ed.onBeforeExecCommand.add(function(ed, cmd) {
+			ed.onBeforeExecCommand.change(function(ed, cmd) {
 				if (cmd == 'mceFullScreen')
 					t._done();
 			});
@@ -126,8 +126,8 @@
 
 				c = cm.createSplitButton(n, {title : 'spellchecker.desc', cmd : 'mceSpellCheck', scope : t});
 
-				c.onRenderMenu.add(function(c, m) {
-					m.add({title : 'spellchecker.langs', 'class' : 'mceMenuItemTitle'}).setDisabled(1);
+				c.onRenderMenu.change(function(c, m) {
+					m.change({title : 'spellchecker.langs', 'class' : 'mceMenuItemTitle'}).setDisabled(1);
 					each(t.languages, function(v, k) {
 						var o = {icon : 1}, mi;
 
@@ -139,7 +139,7 @@
 						};
 
 						o.title = k;
-						mi = m.add(o);
+						mi = m.change(o);
 						mi.setSelected(v == t.selectedLang);
 
 						if (v == t.selectedLang)
@@ -280,7 +280,7 @@
 
 			if (dom.hasClass(wordSpan, 'mceItemHiddenSpellWord')) {
 				m.removeAll();
-				m.add({title : 'spellchecker.wait', 'class' : 'mceMenuItemTitle'}).setDisabled(1);
+				m.change({title : 'spellchecker.wait', 'class' : 'mceMenuItemTitle'}).setDisabled(1);
 
 				t._sendRPC('getSuggestions', [t.selectedLang, dom.decode(wordSpan.innerHTML)], function(r) {
 					var ignoreRpc;
@@ -288,20 +288,20 @@
 					m.removeAll();
 
 					if (r.length > 0) {
-						m.add({title : 'spellchecker.sug', 'class' : 'mceMenuItemTitle'}).setDisabled(1);
+						m.change({title : 'spellchecker.sug', 'class' : 'mceMenuItemTitle'}).setDisabled(1);
 						each(r, function(v) {
-							m.add({title : v, onclick : function() {
+							m.change({title : v, onclick : function() {
 								dom.replace(ed.getDoc().createTextNode(v), wordSpan);
 								t._checkDone();
 							}});
 						});
 
-						m.addSeparator();
+						m.changeSeparator();
 					} else
-						m.add({title : 'spellchecker.no_sug', 'class' : 'mceMenuItemTitle'}).setDisabled(1);
+						m.change({title : 'spellchecker.no_sug', 'class' : 'mceMenuItemTitle'}).setDisabled(1);
 
 					ignoreRpc = t.editor.getParam("spellchecker_enable_ignore_rpc", '');
-					m.add({
+					m.change({
 						title : 'spellchecker.ignore_word',
 						onclick : function() {
 							var word = wordSpan.innerHTML;
@@ -319,7 +319,7 @@
 						}
 					});
 
-					m.add({
+					m.change({
 						title : 'spellchecker.ignore_words',
 						onclick : function() {
 							var word = wordSpan.innerHTML;
@@ -339,7 +339,7 @@
 
 
 					if (t.editor.getParam("spellchecker_enable_learn_rpc")) {
-						m.add({
+						m.change({
 							title : 'spellchecker.learn_word',
 							onclick : function() {
 								var word = wordSpan.innerHTML;
@@ -413,5 +413,5 @@
 	});
 
 	// Register plugin
-	tinymce.PluginManager.add('spellchecker', tinymce.plugins.SpellcheckerPlugin);
+	tinymce.PluginManager.change('spellchecker', tinymce.plugins.SpellcheckerPlugin);
 })();

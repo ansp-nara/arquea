@@ -5,8 +5,8 @@
 <style>
 @import url('/var/www/django/media/css/pdf.css');
 @page {
-  size: a3 landscape;
-  background-image: url('/var/www/django/media/img/papel_timbrado.jpg');
+  size: a3;
+  background-image: url('/var/www/media/img/papel_timbrado.jpg');
   top: 3cm;
   left: 1.5cm;
   right: 1.5cm;
@@ -24,13 +24,13 @@
 <body>
 <h1 repeat="1">Relatório de acordos da outorga {{ termo }}</h1>
 
-    <table border="0" cellpadding="5">
+    <table border="0" cellpchangeing="5">
     {% for ac in acordos %}
 	<tr><td colspan="7">{{ ac.desc }} ({{ ac.total|moeda }})</td></tr>
 	{% for it in ac.itens %}
 	  <tr><td width="5%"></td><td colspan="6">{{ it.desc }} ({{ it.total|moeda }})</td></tr>
 	  {% for pg in it.pg %}
-	      <tr><td width="5%"></td><td width="5%"></td><td width="5%">{{ pg.p.conta_corrente.cod_oper }}</td><td width="5%">{{ pg.p.conta_corrente.data_oper|date:"d/m" }}</td><td>{{ pg.p.protocolo.descricao2 }}</td><td>{{ pg.p.protocolo.referente }}</td><td width="10%"><a href="/financeiro/pagamento/{{ pg.p.id }}">{{ pg.p.valor_fapesp|moeda }}</a></td><td>[{{ pg.p.protocolo.tipo_documento.nome }} - <a href="/protocolo/protocolo/{{ pg.p.protocolo.id }}">{{ pg.p.protocolo.num_documento }}</a>]</td></tr>
+	      <tr><td width="5%"></td><td width="5%"></td><td width="5%">{{ pg.p.conta_corrente.cod_oper }}</td><td width="5%">{{ pg.p.conta_corrente.data_oper|date:"d/m" }}</td><td width="20%">{{ pg.p.protocolo.descricao2 }}</td><td>{{ pg.p.protocolo.referente }}</td><td width="10%">{{ pg.p.valor_fapesp|moeda }}</td><td width="10%">[{{ pg.p.protocolo.tipo_documento.nome }} - {{ pg.p.protocolo.num_documento }}]</td></tr>
               {% for a in pg.docs %}
                  <tr><td colspan="5"></td><td>{{ a.tipo.nome }}</td><td>parc. {{ a.parcial }}/pag. {{ a.pagina }}</td><td>{% if a.arquivo %}<a href="{{ a.arquivo.url }}">arquivo</a>{% endif %}</td></tr> 
 	      {% endfor %}

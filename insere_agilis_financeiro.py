@@ -8,6 +8,7 @@ import settings
 setup_environ(settings)
 from financeiro.models import *
 import sys
+import time
 
 try:
   parcial = int(sys.argv[1])
@@ -57,6 +58,6 @@ while i < financeiros.count():
     req = urllib2.Request(url='http://internet.aquila.fapesp.br/agilis/PconlineIncluiVld.do?method=Incluir', data=data)
     p2 = urllib2.urlopen(req)
     #print p2.read()
-
+    time.sleep(60)
     i += 9
 

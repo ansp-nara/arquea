@@ -7,9 +7,7 @@ from django.http import HttpResponse, HttpResponseNotFound
 from django.db.models.query import QuerySet
 from django.utils.encoding import smart_str
 from django.template.response import TemplateResponse
-from utils.functions import render_to_pdf
-
-from django.shortcuts import render_to_response
+from functions import render_to_pdf
 
 class AutoCompleteAdmin(admin.ModelAdmin):
     """
@@ -83,8 +81,8 @@ class PrintModelAdmin(admin.ModelAdmin):
             del q['pdf']
             if o and self.actions is not None:
                 try:
-		    o = int(o)
-		    q['o'] = o-1
+                    o = int(o)
+                    q['o'] = o-1
                 except: pass
             request.GET = q
             lpp = self.list_per_page
@@ -101,7 +99,7 @@ class PrintModelAdmin(admin.ModelAdmin):
                 page = render_to_pdf('admin/change_list.pdf', page.resolve_context(page.context_data), filename='list_%s.pdf' % self.opts.module_name)
         else:
             if extra_context: extra_context = extra_context.update({'pdf':True})
-            else: extra_context = {'pdf':True} 
+            else: extra_context = {'pdf':True}
             page = super(PrintModelAdmin,self).changelist_view(request, extra_context)
         return page
 

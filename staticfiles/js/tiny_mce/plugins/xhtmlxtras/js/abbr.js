@@ -25,4 +25,4 @@ function removeAbbr() {
 	tinyMCEPopup.close();
 }
 
-tinyMCEPopup.onInit.add(init);
+tinyMCEPopup.onInit.change(init);

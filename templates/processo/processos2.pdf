@@ -1,0 +1,43 @@
+{% load proto_tags %}
+<html xmlns="http://www.w3.org/1999/xhtml" lang="pt-br" xml:lang="pt-br" >
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style>
+@import url('/var/www/media/css/pdf.css');
+@page {
+  size: a3 landscape;
+  background-image: url('/var/www/media/img/papel_timbrado.jpg');
+  top: 3cm;
+  left: 1.5cm;
+  right: 1.5cm;
+  bottom: 2cm;
+  @frame footer {
+                -pdf-frame-content: footerContent;
+                bottom: 0.5cm;
+                margin-right: 1cm;
+                height: 1cm;
+		left: -2.3cm;
+                } 
+} 
+</style> 
+</head>
+<body>
+<h1 repeat="1">Processos</h1>
+
+    <table border="0" cellpchangeing="5">
+    {% for a in areas %}
+        {% for g in a.grupos %}
+            {% for m in g.macroprocessos %}
+                {% for p in m.processos %}
+                   <tr><td width="14%">{{ a.area }}</td><td width="18%">{{ g.grupo }}</td><td>{{ m.macroprocesso.nome }}</td><td>{{ p }}</td></tr>
+                {% endfor %}
+            {% endfor %}
+        {% endfor %}
+    {% endfor %}
+    </table>
+
+  <div id="footerContent">
+      pág <pdf:pagenumber example="00" />
+  </div> 
+</body>
+</html>

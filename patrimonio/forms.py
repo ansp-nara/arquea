@@ -27,32 +27,52 @@ class PatrimonioAdminForm(forms.ModelForm):
                  initial=None, error_class=ErrorList, label_suffix=':',
                  empty_permitted=False, instance=None):
 
+        if instance and instance.pagamento: 
+            if initial:
+                initial.update({'termo':instance.pagamento.protocolo.termo})
+            else:
+                initial = {'termo':instance.pagamento.protocolo.termo}
         super(PatrimonioAdminForm, self).__init__(data, files, auto_id, prefix, initial,
                                             error_class, label_suffix, empty_permitted, instance)
 
         pg = self.fields['pagamento']
-        if instance:
-	    pg.queryset = Pagamento.objects.filter(protocolo__termo=instance.pagamento.protocolo.termo)
-	elif data and data['termo']:
+	pt = self.fields['patrimonio']
+	if data and data['termo']:
 	    t = data['termo']
 	    t = Termo.objects.get(id=t)
 	    pg.queryset = Pagamento.objects.filter(protocolo__termo=t)
+        elif instance and instance.pagamento:
+            pg.choices = [(p.id, p.__unicode__()) for p in Pagamento.objects.filter(id=instance.pagamento.id)]
 	else:
             pg.queryset = Pagamento.objects.filter(id__lte=0)
+
+        if instance and instance.patrimonio:
+            pt.choices = [(p.id, p.__unicode__()) for p in Patrimonio.objects.filter(id=instance.patrimonio.id)]
+        elif data:
+            pt.queryset = Patrimonio.objects.all()
+        else:
+            pt.queryset = Patrimonio.objects.filter(id__lte=0)
         
     termo = forms.ModelChoiceField(Termo.objects.all(), label=_(u'Termo de outorga'), required=False)
 
-    npgto = forms.CharField(label=_(u'Número do cheque ou da nota'), required=False,
+    npgto = forms.CharField(label=_(u'Número do cheque ou do documento'), required=False,
             widget=forms.TextInput(attrs={'onchange': 'ajax_filter_pagamentos("/patrimonio/escolhe_pagamento", this.value);'}))
 
     part_number = forms.CharField(required=False, widget=forms.TextInput(attrs={'onchange':'ajax_patrimonio_existente(this.value);'}))
 
+    nf = forms.CharField(label=_(u'Número da NF ou NS'), required=False,
+            widget=forms.TextInput(attrs={'onchange': 'ajax_filter_patrimonio(this.value);'}))
+
+    tem_numero_fmusp = forms.BooleanField(label=u'Tem número de patrimônio FMUSP?', required=False, 
+            widget=forms.CheckboxInput(attrs={'onchange':'ajax_numero_fmusp();'}))
+
+    
     class Meta:
         model = Patrimonio
 
 
     class Media:
-        js = ('/media/js/jquery.js', '/media/js/selects.js')
+        js = ('/media/js/selects.js', '/media/js/patrimonio.js')
 
 
 
@@ -80,14 +100,14 @@ class HistoricoLocalAdminForm(forms.ModelForm):
         if instance or data:
             if instance:
                 end = EnderecoDetalhe.objects.filter(id=instance.endereco.id)
-            else:
-                if data.has_key('%s-entidade' % prefix) and data['%s-entidade' % prefix]:
-                    end = EnderecoDetalhe.objects.filter(endereco__entidade__id=data['%s-entidade' % prefix])
-                elif data.has_key('%s-endereco' % prefix) and data['%s-endereco' % prefix]:
-                    end = EnderecoDetalhe.objects.filter(endereco__id=data['%s-endereco' % prefix])
+            #else:
+            #    if data.has_key('%s-entidade' % prefix) and data['%s-entidade' % prefix]:
+            #        end = EnderecoDetalhe.objects.filter(endereco__entidade__id=data['%s-entidade' % prefix])
+            #    elif data.has_key('%s-endereco' % prefix) and data['%s-endereco' % prefix]:
+            #        end = EnderecoDetalhe.objects.filter(endereco__id=data['%s-endereco' % prefix])
 
         else:
             end = EnderecoDetalhe.objects.filter(id__lte=0)
 
-        self.fields['endereco'].queryset = end
-
+        #self.fields['endereco'].queryset = end
+        self.fields['endereco'].choices = [(e.id, e.__unicode__()) for e in end]

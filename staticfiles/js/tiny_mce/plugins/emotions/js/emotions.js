@@ -19,4 +19,4 @@ var EmotionsDialog = {
 	}
 };
 
-tinyMCEPopup.onInit.add(EmotionsDialog.init, EmotionsDialog);
+tinyMCEPopup.onInit.change(EmotionsDialog.init, EmotionsDialog);

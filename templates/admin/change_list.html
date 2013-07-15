@@ -56,10 +56,15 @@
 {% block content %}
   <div id="content-main">
     {% block object-tools %}
-      {% if has_add_permission %}
+      {% if has_change_permission %}
         <ul class="object-tools">
+          {% if pdf %}
           <li>
-            <a href="add/{% if is_popup %}?_popup=1{% endif %}" class="addlink">
+            <a href="{{ cl.get_query_string }}&pdf=1" class="printlink">Imprimir esta lista</a>
+          </li>
+          {% endif %}
+          <li>
+            <a href="change/{% if is_popup %}?_popup=1{% endif %}" class="addlink">
               {% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}
             </a>
           </li>

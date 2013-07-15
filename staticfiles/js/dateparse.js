@@ -140,11 +140,11 @@ var dateParsePatterns = [
             var d = new Date();
             var day = d.getDay();
             var newDay = parseWeekday(bits[1]);
-            var addDays = newDay - day;
+            var changeDays = newDay - day;
             if (newDay <= day) {
-                addDays += 7;
+                changeDays += 7;
             }
-            d.setDate(d.getDate() + addDays);
+            d.setDate(d.getDate() + changeDays);
             return d;
         }
     },

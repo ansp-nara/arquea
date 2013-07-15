@@ -23,7 +23,7 @@
 		 */
 		init : function(ed, url) {
 			// Register the command so that it can be invoked by using tinyMCE.activeEditor.execCommand('mceExample');
-			ed.addCommand('mceExample', function() {
+			ed.changeCommand('mceExample', function() {
 				ed.windowManager.open({
 					file : url + '/dialog.htm',
 					width : 320 + parseInt(ed.getLang('example.delta_width', 0)),
@@ -36,21 +36,21 @@
 			});
 
 			// Register example button
-			ed.addButton('example', {
+			ed.changeButton('example', {
 				title : 'example.desc',
 				cmd : 'mceExample',
 				image : url + '/img/example.gif'
 			});
 
 			// Add a node change handler, selects the button in the UI when a image is selected
-			ed.onNodeChange.add(function(ed, cm, n) {
+			ed.onNodeChange.change(function(ed, cm, n) {
 				cm.setActive('example', n.nodeName == 'IMG');
 			});
 		},
 
 		/**
 		 * Creates control instances based in the incomming name. This method is normally not
-		 * needed since the addButton method of the tinymce.Editor class is a more easy way of adding buttons
+		 * needed since the changeButton method of the tinymce.Editor class is a more easy way of adding buttons
 		 * but you sometimes need to create more complex controls like listboxes, split buttons etc then this
 		 * method can be used to create those.
 		 *
@@ -80,5 +80,5 @@
 	});
 
 	// Register plugin
-	tinymce.PluginManager.add('example', tinymce.plugins.ExamplePlugin);
+	tinymce.PluginManager.change('example', tinymce.plugins.ExamplePlugin);
 })();

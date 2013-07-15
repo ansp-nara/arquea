@@ -1,0 +1,48 @@
+{% extends "admin/base_site.html" %}
+{% load proto_tags %}
+{% block extrahead %}
+<script src="/media/js/jquery.js" type="text/javascript"></script>
+<script type="text/javascript">
+</script>
+<style>
+table tr td {
+  border:0;
+}
+</style>
+{% endblock %}
+{% block content %}
+<h1>Realizado de terceiros</h1>
+    <form action="{% url rede.views.planejamento2 1 %}" method="GET">
+       <input type="hidden" value="{{ entidade.id }}" name="entidade" />
+       <input type="hidden" value="{{ termo.id }}" name="termo" />
+       {% if beneficiado %}
+       <input type="hidden" value="{{ beneficiado.id }}" name="beneficiado" />
+       {% endif %}
+       {% for s in servicos %}
+       <input type="hidden" value="{{ s }}" name="tiposervico" />
+       {% endfor %}
+       <input type="submit" value="Versão para impressão" />
+    </form>
+
+<h3>{{ entidade }}{% if beneficiado %} - {{ beneficiado }} ({{ sem|moeda }}, {{ com|moeda }}){% endif %}</h3>
+<h3>Processo {{ termo }}</h3>
+
+<h4 style="color:red;">O valor total por nota refere-se à soma dos ítens descritos, com e sem impostos, conforme beneficiado e serviço selecionados no filtro.</h4>
+<table>
+{% for p in pagamentos %}
+   <tr><th>Nota fiscal</th><th>Valor total sem imposto</th><th>Valor total com imposto</th></tr>
+   <tr><td>{{ p.nf }}</td><td>{{ p.sem|moeda }}</td><td>{{ p.com|moeda }}</td></tr>
+      <tr><td colspan="3">
+          <table border="1">
+             <tr><th>OS e contrato</th><th>Número de vezes que foi pago</th><th>Descrição do item</th><th>Valor unitário sem imposto</th><th>Valor unitário com imposto</th></tr>
+      {% for r in p.recursos %}
+             <tr style="border-top:1px solid;border-color:#c8c8c8"><td><a href="{{ r.os.primeiro_arquivo.url }}">{{ r.os }}</a> <a href="{{ r.os.contrato.arquivo.url }}">CT {{ r.os.contrato.numero }}</a></td><td>{{ r.quantidade }}</td><td>{{ r.tipo }} - {{ r.referente }}</td><td>{{ r.sem|moeda }}</td><td>{{ r.com|moeda }}</td></tr>
+      {% for b in r.beneficiados %}
+         <tr><td>{{ b }}</td><td>{{ b.porcentagem|floatformat:"-2" }} %</td></tr>
+      {% endfor %}
+   {% endfor %}
+   </table></tr>
+{% endfor %}
+</table>
+{% endblock %}
+

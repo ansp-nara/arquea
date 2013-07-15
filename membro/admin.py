@@ -22,7 +22,7 @@ class MembroAdmin(admin.ModelAdmin):
 
     fieldsets = (
                  (None, {
-                     'fields': ('nome', ('email', 'ramal'), ('foto', 'site') ),
+                     'fields': ('nome', ('email', 'ramal'), ('foto', 'site'), 'contato' ),
                      'classes': ('wide',)
                  }),
                  (None, {
@@ -92,7 +92,7 @@ class FeriasAdmin(admin.ModelAdmin):
                      'classes': ('wide',)
                  }),
                  ('Período de Trabalho', {
-                     'fields': (('inicio', 'realizado'), 'decimo_terceiro'),
+                     'fields': (('inicio', 'realizado')),
                      'classes': ('wide',)
                  }),
     )
@@ -150,3 +150,15 @@ class DispensaLegalAdmin(admin.ModelAdmin):
     list_display = ('membro', 'tipo', 'inicio_direito', 'realizada')
 
 admin.site.register(DispensaLegal, DispensaLegalAdmin)
+
+class ControleAdmin(admin.ModelAdmin):
+    list_filter = ('membro',)
+
+    def queryset(self, request):
+        qs = super(ControleAdmin, self).queryset(request)
+        if request.user.is_superuser == False: 
+            qs = qs.filter(membro__email=request.user.email)
+  
+        return qs
+
+admin.site.register(Controle, ControleAdmin)

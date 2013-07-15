@@ -74,20 +74,20 @@ class PesquisaAdmin(admin.ModelAdmin):
             #self.muda_estado = 0
             #if obj.estado.nome == u'Pago':
                 #super(DespesaAdmin,self).response_change(request, obj)
-                #url = '/admin/financeiro/presta_conta/add/?despesa=%s&valor=%s&estado=%s' % (obj.id, obj.valor_despesa, obj.estado.id)
+                #url = '/admin/financeiro/presta_conta/change/?despesa=%s&valor=%s&estado=%s' % (obj.id, obj.valor_despesa, obj.estado.id)
                 #return HttpResponseRedirect(url)
         
         #return super(DespesaAdmin,self).response_change(request, obj)
 
-    #def response_add(self, request, obj, post_url_continue='../%s/'):
+    #def response_change(self, request, obj, post_url_continue='../%s/'):
         #if self.muda_estado:
             #self.muda_estado = 0
             #if obj.estado.nome == u'Pago':
-                #super(DespesaAdmin,self).response_add(request, obj)
-                #url = '/admin/financeiro/presta_conta/add/?despesa=%s&valor=%s&estado=%s' % (obj.id, obj.valor_despesa, obj.estado.id)
+                #super(DespesaAdmin,self).response_change(request, obj)
+                #url = '/admin/financeiro/presta_conta/change/?despesa=%s&valor=%s&estado=%s' % (obj.id, obj.valor_despesa, obj.estado.id)
                 #return HttpResponseRedirect(url)
         
-        #return super(DespesaAdmin,self).response_add(request, obj)
+        #return super(DespesaAdmin,self).response_change(request, obj)
     def save_model(self, request, obj, form, change):
         obj.usuario = request.user
         obj.save()

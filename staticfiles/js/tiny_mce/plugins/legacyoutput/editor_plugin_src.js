@@ -16,14 +16,14 @@
 
 (function(tinymce) {
 	// Override inline_styles setting to force TinyMCE to produce deprecated contents
-	tinymce.onAddEditor.addToTop(function(tinymce, editor) {
+	tinymce.onAddEditor.changeToTop(function(tinymce, editor) {
 		editor.settings.inline_styles = false;
 	});
 
 	// Create the legacy ouput plugin
 	tinymce.create('tinymce.plugins.LegacyOutput', {
 		init : function(editor) {
-			editor.onInit.add(function() {
+			editor.onInit.change(function() {
 				var alignElements = 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li,table,img',
 					fontSizes = tinymce.explode(editor.settings.font_size_style_values),
 					serializer = editor.serializer;
@@ -61,17 +61,17 @@
 				// Force parsing of the serializer rules
 				serializer._setup();
 
-				// Check that deprecated elements are allowed if not add them
+				// Check that deprecated elements are allowed if not change them
 				tinymce.each('b,i,u,strike'.split(','), function(name) {
 					var rule = serializer.rules[name];
 
 					if (!rule)
-						serializer.addRules(name);
+						serializer.changeRules(name);
 				});
 
 				// Add font element if it's missing
 				if (!serializer.rules["font"])
-					serializer.addRules("font[face|size|color|style]");
+					serializer.changeRules("font[face|size|color|style]");
 
 				// Add the missing and depreacted align attribute for the serialization engine
 				tinymce.each(alignElements.split(','), function(name) {
@@ -91,7 +91,7 @@
 				});
 
 				// Listen for the onNodeChange event so that we can do special logic for the font size and font name drop boxes
-				editor.onNodeChange.add(function(editor, control_manager) {
+				editor.onNodeChange.change(function(editor, control_manager) {
 					var control, fontElm, fontName, fontSize;
 
 					// Find font element get it's name and size
@@ -132,5 +132,5 @@
 	});
 
 	// Register plugin
-	tinymce.PluginManager.add('legacyoutput', tinymce.plugins.LegacyOutput);
+	tinymce.PluginManager.change('legacyoutput', tinymce.plugins.LegacyOutput);
 })(tinymce);

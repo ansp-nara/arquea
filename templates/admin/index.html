@@ -24,7 +24,7 @@
             {% else %}
             <ul class="actionlist">
             {% for entry in admin_log %}
-            <li class="{% if entry.is_addition %}addlink{% endif %}{% if entry.is_change %}changelink{% endif %}{% if entry.is_deletion %}deletelink{% endif %}">
+            <li class="{% if entry.is_changeition %}addlink{% endif %}{% if entry.is_change %}changelink{% endif %}{% if entry.is_deletion %}deletelink{% endif %}">
                 {% if entry.is_deletion %}
                     {{ entry.object_repr }}
                 {% else %}
@@ -67,3 +67,4 @@
 {% block sidebar %}
 {% endblock %}
 -->
+

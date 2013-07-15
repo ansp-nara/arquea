@@ -1,0 +1,41 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<form method="GET">
+<label for="id_termo">Termo de outorga:</label>
+<select name="termo" id="id_termo">
+  <option value="0">Todos</option>
+  {% for t in termos %}
+     <option value="{{ t.id }}">{{ t }}</option>
+  {% endfor %}
+</select>
+<br />
+<label for="id_modalidade">Modalidade</label>
+<select name="modalidade" id="id_modalidade">
+    <option value="1">Material permanente</option>
+    <option value="2">Material de consumo</option>
+</select>
+<br />
+<label for="id_agilis">Têm Agilis</label>
+<select name="agilis" id="id_agilis">
+     <option value="-">---------</option>
+     <option value="0">Não</option>
+     <option value="1">Sim</option>
+</select>
+<br />
+<label for="id_doado">Doado para FUSSESP</label>
+<select name="doado" id="id_doado">
+     <option value="2">Todos</option>
+     <option value="0">Não doados</option>
+     <option value="1">Doados</option>
+</select>
+<br />
+<label for="id_localizado">Localização</label>
+<select name="localizado" id="id_localizado">
+     <option value="2">Todos</option>
+     <option value="0">Não localizados</option>
+     <option value="1">Localizados</option>
+</select>
+<br />
+<input type="submit" value="Enviar">
+</form>
+{% endblock %}

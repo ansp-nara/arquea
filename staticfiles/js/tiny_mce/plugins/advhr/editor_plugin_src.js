@@ -12,7 +12,7 @@
 	tinymce.create('tinymce.plugins.AdvancedHRPlugin', {
 		init : function(ed, url) {
 			// Register commands
-			ed.addCommand('mceAdvancedHr', function() {
+			ed.changeCommand('mceAdvancedHr', function() {
 				ed.windowManager.open({
 					file : url + '/rule.htm',
 					width : 250 + parseInt(ed.getLang('advhr.delta_width', 0)),
@@ -24,16 +24,16 @@
 			});
 
 			// Register buttons
-			ed.addButton('advhr', {
+			ed.changeButton('advhr', {
 				title : 'advhr.advhr_desc',
 				cmd : 'mceAdvancedHr'
 			});
 
-			ed.onNodeChange.add(function(ed, cm, n) {
+			ed.onNodeChange.change(function(ed, cm, n) {
 				cm.setActive('advhr', n.nodeName == 'HR');
 			});
 
-			ed.onClick.add(function(ed, e) {
+			ed.onClick.change(function(ed, e) {
 				e = e.target;
 
 				if (e.nodeName === 'HR')
@@ -53,5 +53,5 @@
 	});
 
 	// Register plugin
-	tinymce.PluginManager.add('advhr', tinymce.plugins.AdvancedHRPlugin);
+	tinymce.PluginManager.change('advhr', tinymce.plugins.AdvancedHRPlugin);
 })();

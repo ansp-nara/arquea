@@ -1,0 +1,52 @@
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style>
+@import url('/var/www/media/css/pdf.css');
+
+
+@page {
+  size:a3 landscape;
+          background-image: url('/var/www/media/img/papel_timbrado.jpg');
+  top: 3cm;
+  left: 1.5cm;
+  right: 1.5cm;
+  bottom: 2cm;
+  @frame footer {
+                -pdf-frame-content: footerContent;
+                bottom: 0.5cm;
+                margin-right: 1cm;
+                height: 1cm;
+                left: -2.3cm;
+                }
+}
+</style>
+</head>
+<body>
+
+{% for rack in racks %}
+<div style="float:left;">
+<h2>{{ rack.nome }} ({{ rack.vazio }} ocupado)</h2>
+<table class="tabela" cellpchangeing="0" cellspacing="0">
+   <tr>
+     <td width="2px" style="background-color:#f00;">&nbsp;</td>
+     <td width="140px">
+       <table style="width:100%; margin:0; pchangeing:0;">
+  {% for eq in rack.equipamentos %}
+       <tr>
+    <td style="background-color:#{% if eq.descricao %}000;" rel="tooltip" title="{{ eq.descricao }}"{% else %}fff;"{% endif %} height="{% widthratio eq.tamanho 1 5 %}px" width="100%">&nbsp;</td>
+    </tr>
+  {% endfor %}
+       </table>
+    </td>
+   <td width="2px" style="background-color:#f00;">&nbsp;</td>
+   </tr>
+</table>
+</div>
+{% if forloop.counter|divisibleby:"5" %}
+<div style="clear:both;"></div>
+{% endif %}
+{% endfor %}
+
+</body>
+</html>

@@ -1,5 +1,6 @@
 import os
 from mod_python import apache
+from mod_python import util
 from django.core.handlers.base import BaseHandler
 from django.core.handlers.modpython import ModPythonRequest
 
@@ -35,5 +36,9 @@ def accesshandler(req):
     request=AccessHandler()(req)
     if request.user.is_authenticated():
 	if permission_name and request.user.has_perm(permission_name):
-	    return apache.OK 
+	    return apache.OK
+        else:
+	    return apache.HTTP_UNAUTHORIZED
+    else:
+        util.redirect(req, str('%s?next=%s' % ('http://sistema.ansp.br/accounts/login', request.path)))
     return apache.HTTP_UNAUTHORIZED

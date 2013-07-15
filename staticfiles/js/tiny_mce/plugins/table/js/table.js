@@ -5,7 +5,7 @@ var action, orgTableWidth, orgTableHeight, dom = tinyMCEPopup.editor.dom;
 function insertTable() {
 	var formObj = document.forms[0];
 	var inst = tinyMCEPopup.editor, dom = inst.dom;
-	var cols = 2, rows = 2, border = 0, cellpadding = -1, cellspacing = -1, align, width, height, className, caption, frame, rules;
+	var cols = 2, rows = 2, border = 0, cellpchangeing = -1, cellspacing = -1, align, width, height, className, caption, frame, rules;
 	var html = '', capEl, elm;
 	var cellLimit, rowLimit, colLimit;
 
@@ -22,7 +22,7 @@ function insertTable() {
 	cols = formObj.elements['cols'].value;
 	rows = formObj.elements['rows'].value;
 	border = formObj.elements['border'].value != "" ? formObj.elements['border'].value  : 0;
-	cellpadding = formObj.elements['cellpadding'].value != "" ? formObj.elements['cellpadding'].value : "";
+	cellpchangeing = formObj.elements['cellpadding'].value != "" ? formObj.elements['cellpadding'].value : "";
 	cellspacing = formObj.elements['cellspacing'].value != "" ? formObj.elements['cellspacing'].value : "";
 	align = getSelectValue(formObj, "align");
 	frame = getSelectValue(formObj, "tframe");
@@ -60,7 +60,7 @@ function insertTable() {
 	if (action == "update") {
 		inst.execCommand('mceBeginUndoLevel');
 
-		dom.setAttrib(elm, 'cellPadding', cellpadding, true);
+		dom.setAttrib(elm, 'cellPchangeing', cellpadding, true);
 		dom.setAttrib(elm, 'cellSpacing', cellspacing, true);
 		dom.setAttrib(elm, 'border', border);
 		dom.setAttrib(elm, 'align', align);
@@ -128,7 +128,7 @@ function insertTable() {
 		elm.style.backgroundColor = bgcolor;
 		elm.style.height = getCSSSize(height);
 
-		inst.addVisual();
+		inst.changeVisual();
 
 		// Fix for stange MSIE align bug
 		//elm.outerHTML = elm.outerHTML;
@@ -149,7 +149,7 @@ function insertTable() {
 
 	html += makeAttrib('id', id);
 	html += makeAttrib('border', border);
-	html += makeAttrib('cellpadding', cellpadding);
+	html += makeAttrib('cellpchangeing', cellpadding);
 	html += makeAttrib('cellspacing', cellspacing);
 	html += makeAttrib('_mce_new', '1');
 
@@ -245,7 +245,7 @@ function insertTable() {
 		dom.setAttrib(node, '_mce_new', '');
 	});
 
-	inst.addVisual();
+	inst.changeVisual();
 	inst.execCommand('mceEndUndoLevel');
 
 	tinyMCEPopup.close();
@@ -282,7 +282,7 @@ function init() {
 	document.getElementById('bordercolor_pickcontainer').innerHTML = getColorPickerHTML('bordercolor_pick','bordercolor');
 	document.getElementById('bgcolor_pickcontainer').innerHTML = getColorPickerHTML('bgcolor_pick','bgcolor');
 
-	var cols = 2, rows = 2, border = tinyMCEPopup.getParam('table_default_border', '0'), cellpadding = tinyMCEPopup.getParam('table_default_cellpadding', ''), cellspacing = tinyMCEPopup.getParam('table_default_cellspacing', '');
+	var cols = 2, rows = 2, border = tinyMCEPopup.getParam('table_default_border', '0'), cellpchangeing = tinyMCEPopup.getParam('table_default_cellpadding', ''), cellspacing = tinyMCEPopup.getParam('table_default_cellspacing', '');
 	var align = "", width = "", height = "", bordercolor = "", bgcolor = "", className = "";
 	var id = "", summary = "", style = "", dir = "", lang = "", background = "", bgcolor = "", bordercolor = "", rules = "", frame = "";
 	var inst = tinyMCEPopup.editor, dom = inst.dom;
@@ -306,7 +306,7 @@ function init() {
 
 		st = dom.parseStyle(dom.getAttrib(elm, "style"));
 		border = trimSize(getStyle(elm, 'border', 'borderWidth'));
-		cellpadding = dom.getAttrib(elm, 'cellpadding', "");
+		cellpchangeing = dom.getAttrib(elm, 'cellpadding', "");
 		cellspacing = dom.getAttrib(elm, 'cellspacing', "");
 		width = trimSize(getStyle(elm, 'width', 'width'));
 		height = trimSize(getStyle(elm, 'height', 'height'));
@@ -331,7 +331,7 @@ function init() {
 		formObj.insert.value = inst.getLang('update');
 	}
 
-	addClassesToList('class', "table_styles");
+	changeClassesToList('class', "table_styles");
 	TinyMCE_EditableSelects.init();
 
 	// Update form
@@ -342,7 +342,7 @@ function init() {
 	formObj.cols.value = cols;
 	formObj.rows.value = rows;
 	formObj.border.value = border;
-	formObj.cellpadding.value = cellpadding;
+	formObj.cellpchangeing.value = cellpadding;
 	formObj.cellspacing.value = cellspacing;
 	formObj.width.value = width;
 	formObj.height.value = height;
@@ -451,4 +451,4 @@ function changedStyle() {
 	}
 }
 
-tinyMCEPopup.onInit.add(init);
+tinyMCEPopup.onInit.change(init);

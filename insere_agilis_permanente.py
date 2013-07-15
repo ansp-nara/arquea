@@ -9,6 +9,7 @@ setup_environ(settings)
 from financeiro.models import *
 from patrimonio.models import *
 import sys
+import time
 
 try:
   parcial = int(sys.argv[1])
@@ -30,8 +31,9 @@ req = urllib2.Request(url='http://internet.aquila.fapesp.br/agilis/PconlineSelec
 p = urllib2.urlopen(req)
 
 eqs = {}
-for e in Equipamento.objects.filter(pagamento__protocolo__termo__id=13):
-    texto = '%s %s %s %s' % (e.modelo, e.pagamento.id, e.valor, e.marca)
+patrimonios = Patrimonio.objects.filter(pagamento__protocolo__termo__id=13, pagamento__origem_fapesp__item_outorga__natureza_gasto__modalidade__sigla='MPN')
+for e in patrimonios.filter(agilis=True):
+    texto = '%s - %s - %s' % (e.modelo, e.pagamento.id, e.marca)
     if e.pagamento.auditoria_set.filter(parcial=parcial).count() == 0: continue
     if texto in eqs.keys():
         eqs[texto].append(e)
@@ -52,16 +54,23 @@ for eq in eqs.keys():
         dec = 0
 
     nf = pg.protocolo.num_documento
+    sn = ','.join([pt.ns for pt in eqs[eq]])
+    print eq
+    modelo, pgto, marca = eq.split(' - ')
+    for pt in patrimonios.filter(agilis=False, modelo=modelo, pagamento__id=pgto, marca=marca):
+        sn += ',%s' % pt.ns
+    if len(sn) > 170: sn = sn[:170]
+
     if pg.protocolo.tipo_documento.nome.lower().find('anexo') == 0:
         nf = '%s %s' % (pg.protocolo.tipo_documento.nome, nf)
-    dt = [('notaFiscal', nf), ('dataNotaFiscal', pg.protocolo.data_vencimento.strftime('%d/%m/%Y')), ('cheque', pg.conta_corrente.cod_oper), ('pagina', pg.auditoria_set.filter(parcial=parcial).values_list('pagina', flat=True)[0]), ('valorItem', '%s,%s' % (int, dec)), ('descricao', e.nome), ('quantidade', qtd), ('marca', e.marca or ''), ('modelo', e.modelo or '')]
+    dt = [('notaFiscal', nf), ('dataNotaFiscal', pg.protocolo.data_vencimento.strftime('%d/%m/%Y')), ('cheque', pg.conta_corrente.cod_oper), ('pagina', pg.auditoria_set.filter(parcial=parcial).values_list('pagina', flat=True)[0]), ('valorItem', '%s,%s' % (int, dec)), ('descricao', e.descricao), ('quantidade', qtd), ('marca', e.marca or ''), ('modelo', e.modelo or ''), ('observacao', sn), ('procedencia', e.procedencia or '')]
 
     data = urllib.urlencode(dt+[('method', 'Incluir')])
     req = urllib2.Request(url='http://internet.aquila.fapesp.br/agilis/PconlineIncluiOuAlteraMpe.do?method=Incluir', data=data)
     p2 = urllib2.urlopen(req)
     txt = p2.read()	
 
-
+    time.sleep(60)
     if txt.find('Erros') >= 0:
         print 'Erro encontrado na inserç ã o dos itens abaixo'
         print dt

@@ -14,7 +14,7 @@
 			this.editor = ed;
 
 			// Register commands
-			ed.addCommand('mceAdvLink', function() {
+			ed.changeCommand('mceAdvLink', function() {
 				var se = ed.selection;
 
 				// No selection and not in link
@@ -32,14 +32,14 @@
 			});
 
 			// Register buttons
-			ed.addButton('link', {
+			ed.changeButton('link', {
 				title : 'advlink.link_desc',
 				cmd : 'mceAdvLink'
 			});
 
-			ed.addShortcut('ctrl+k', 'advlink.advlink_desc', 'mceAdvLink');
+			ed.changeShortcut('ctrl+k', 'advlink.advlink_desc', 'mceAdvLink');
 
-			ed.onNodeChange.add(function(ed, cm, n, co) {
+			ed.onNodeChange.change(function(ed, cm, n, co) {
 				cm.setDisabled('link', co && n.nodeName != 'A');
 				cm.setActive('link', n.nodeName == 'A' && !n.name);
 			});
@@ -57,5 +57,5 @@
 	});
 
 	// Register plugin
-	tinymce.PluginManager.add('advlink', tinymce.plugins.AdvancedLinkPlugin);
+	tinymce.PluginManager.change('advlink', tinymce.plugins.AdvancedLinkPlugin);
 })();

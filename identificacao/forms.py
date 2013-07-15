@@ -82,5 +82,5 @@ class EnderecoDetalheAdminForm(forms.ModelForm):
         model = EnderecoDetalhe
 
     class Media:
-        js = ('/media/js/selects.js', '/media/js/jquery.js')
+        js = ('/media/js/selects.js',)
 

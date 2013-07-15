@@ -329,7 +329,7 @@ class Termo(models.Model):
     def real(self):
         total = Decimal('0.00')
         for ng in self.natureza_gasto_set.all():
-            if ng.modalidade.moeda_nacional == True:
+            if ng.modalidade.moeda_nacional == True and ng.modalidade.sigla != 'REI':
                 total += ng.valor_concedido
         return total
 
@@ -337,9 +337,10 @@ class Termo(models.Model):
     # Formata o valor do atributo real.
     def termo_real(self):
         if self.real > 0:
-            return 'R$ %s' % (formata_moeda(self.real, ','))
+            return '<b>R$ %s</b>' % (formata_moeda(self.real, ','))
         return '-'
-    termo_real.short_description=_(u'Concessão (R$)')
+    termo_real.allow_tags=True
+    termo_real.short_description=_(u'Concessão  sem REI')
 
 
     # Retorna a soma das naturezas (dolar) de um termo.
@@ -357,20 +358,21 @@ class Termo(models.Model):
         if self.dolar > 0:
             return '$ %s' % (formata_moeda(self.dolar, '.'))
         return '-'
-    termo_dolar.short_description=_(u'Concessão ($)')
+    termo_dolar.short_description=_(u'Concessão')
 
 
-    # Duracao do termo como um 'timedelta'
-    def duracao(self):
-        inicio = self.inicio
+    @property
+    def termino(self):
         termino = datetime.date.min
 
         for pedido in self.outorga_set.all():
             if pedido.termino > termino: termino = pedido.termino
 
-        dif = termino - inicio
+        return termino
 
-	return dif
+    # Duracao do termo como um 'timedelta'
+    def duracao(self):
+        return self.termino - self.inicio
 
     # Calcula os meses de duração do processo a partir dos dados do modelo Outorga
     def duracao_meses(self):
@@ -391,16 +393,16 @@ class Termo(models.Model):
     @ property
     def total_realizado_real_old(self):
         total = Decimal('0.00')
-        for n in self.natureza_gasto_set.all():
-            if n.modalidade.moeda_nacional:
-                total += n.total_realizado
+	for n in self.natureza_gasto_set.all():
+	    if n.modalidade.moeda_nacional:
+		total += n.total_realizado
         return total
 
     @property
     def total_realizado_real(self):
         from financeiro.models import Pagamento
         total = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional=True, origem_fapesp__item_outorga__natureza_gasto__termo=self).aggregate(Sum('valor_fapesp'))
-        return total['valor_fapesp__sum']
+        return total['valor_fapesp__sum'] or Decimal('0.0')
 
     # Retorna o total de despesas (R$) em formato moeda.
     def formata_realizado_real(self):
@@ -409,27 +411,22 @@ class Termo(models.Model):
 
         valor = formata_moeda(self.total_realizado_real, ',')
 	if self.real < self.total_realizado_real:
-            return '<span style="color: red">R$ %s</span>' % valor
+            return '<span style="color: red"><b>R$ %s</b></span>' % valor
 
-        return 'R$ %s' % valor
+        return '<b>R$ %s</b>' % valor
     formata_realizado_real.allow_tags = True
-    formata_realizado_real.short_description=_(u'Realizado (R$)')
+    formata_realizado_real.short_description=_(u'Realizado')
 
 
     # Calcula total de despesas ($) realizadas durante o termo.
     @ property
-    def total_realizado_dolar_old(self):
+    def total_realizado_dolar(self):
         total = Decimal('0.00')
 	for n in self.natureza_gasto_set.all():
 	    if not n.modalidade.moeda_nacional:
 		total += n.total_realizado
         return total
 
-    @property
-    def total_realizado_dolar(self):
-        from financeiro.models import Pagamento
-        total = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional=False, origem_fapesp__item_outorga__natureza_gasto__termo=self).aggregate(Sum('valor_fapesp'))
-        return total['valor_fapesp__sum']
 
     # Retorna o total de despesas ($) em formato moeda.
     def formata_realizado_dolar(self):
@@ -441,8 +438,24 @@ class Termo(models.Model):
             return '<span style="color: red">$ %s</span>' % valor
         return '$ %s' % valor
     formata_realizado_dolar.allow_tags = True
-    formata_realizado_dolar.short_description=_(u'Realizado ($)')
+    formata_realizado_dolar.short_description=_(u'Realizado')
 
+
+    def saldo_real(self):
+	return self.real - self.total_realizado_real
+
+    def saldo_dolar(self):
+	return self.dolar - self.total_realizado_dolar
+
+
+    def formata_saldo_real(self):
+	return '<b>R$ %s</b>' % formata_moeda(self.saldo_real(), ',')
+    formata_saldo_real.allow_tags=True
+    formata_saldo_real.short_description=_(u'Saldo')
+
+    def formata_saldo_dolar(self):
+        return '$ %s' % formata_moeda(self.saldo_dolar(), '.')
+    formata_saldo_dolar.short_description=_(u'Saldo')
 
     # Define atributos.
     vigencia = property(duracao_meses)
@@ -475,7 +488,14 @@ class Termo(models.Model):
         verbose_name_plural = _(u'Termos de Outorga')
         ordering = ("-ano", )
 
+    @classmethod
+    def termo_ativo(cls):
+        hoje = datetime.datetime.now().date()
+        for t in Termo.objects.order_by('-inicio'):
+	    if t.inicio <= hoje and t.termino >= hoje:
+		return t
 
+        return None
 
 class Categoria(models.Model):
 
@@ -912,8 +932,11 @@ class Natureza_gasto(models.Model):
 
 
     def saldo(self):
+        if self.total_realizado > self.valor_concedido:
+            return '<span style="color: red">%s</span>' % self.formata_valor(self.valor_concedido - self.total_realizado)
         return self.formata_valor(self.valor_concedido - self.total_realizado)
-
+    saldo.allow_tags = True
+	
     # Define a descrição e a ordenação dos dados pelo Termo de Outorga.
     class Meta:
         verbose_name = _(u'Pasta')
@@ -1075,7 +1098,7 @@ class Item(models.Model):
 
     # Retorna a descrição e o termo, se existir.
     def __unicode__(self):
-        return u'%s - %s' % (self.natureza_gasto.termo.__unicode__(), self.descricao)
+        return u'%s' % (self.descricao)
 
 
     # Retorna o Termo se o pedido de concessão estiver conectado a um termo.
@@ -1126,11 +1149,16 @@ class Item(models.Model):
         if hasattr(self, 'origemfapesp_set'):
 	    for of in self.origemfapesp_set.all():
 	        if after:
-		    pgs = of.pagamento_set.filter(conta_corrente__data_oper__gte=dt)
+		    if self.natureza_gasto.modalidade.moeda_nacional:
+   		        pgs = of.pagamento_set.filter(conta_corrente__data_oper__gte=dt)
+                    else:
+			pgs = of.pagamento_set.filter(protocolo__data_vencimento__gte=dt)
 		else:
-    		    pgs = of.pagamento_set.filter(conta_corrente__data_oper__month=dt.strftime('%m'), conta_corrente__data_oper__year=dt.strftime('%Y'))
+                    if self.natureza_gasto.modalidade.moeda_nacional:
+    		        pgs = of.pagamento_set.filter(conta_corrente__data_oper__month=dt.strftime('%m'), conta_corrente__data_oper__year=dt.strftime('%Y'))
+                    else:
+                        pgs = of.pagamento_set.filter(protocolo__data_vencimento__month=dt.strftime('%m'), protocolo__data_vencimento__year=dt.strftime('%Y'))
 		for fp in pgs:
-		    #if fp.extrato:
 		       total += fp.valor_fapesp
         return total
 
@@ -1162,8 +1190,8 @@ class Item(models.Model):
 
     # Define a descrição (singular e plural) e a ordenação pela data de solicitação do pedido de concessão.
     class Meta:
-        verbose_name = _(u'Item do Pedido')
-        verbose_name_plural = _(u'Itens do Pedido')
+        verbose_name = _(u'Item do Orçamento')
+        verbose_name_plural = _(u'Itens do Orçamento')
         ordering = ('-natureza_gasto__termo__ano', 'descricao')
 
 
@@ -1358,6 +1386,7 @@ class TipoContrato(models.Model):
       class Meta:
       	  verbose_name = u'Tipo de documento'
 	  verbose_name_plural = u'Tipos de documento'
+          ordering = ('nome',)
 
 class OrdemDeServico(models.Model):
 
@@ -1399,11 +1428,11 @@ class OrdemDeServico(models.Model):
       descricao = models.TextField(_(u'Descrição'))
       #arquivo = models.FileField(upload_to='OS', null=True, blank=True)
       pergunta = models.ManyToManyField('memorando.Pergunta', null=True, blank=True)
-
+      substituicoes = models.TextField(null=True, blank=True)
 
       # Retorna a descrição.
       def __unicode__(self):
-	  return u"%s" % self.numero
+	  return u"%s %s" % (self.tipo, self.numero)
 
 
       # Retorna o prazo para solicitar recisão (campo 'antes_rescisao').
@@ -1429,9 +1458,15 @@ class OrdemDeServico(models.Model):
       def entidade(self):
           return self.contrato.entidade
 
+      def primeiro_arquivo(self):
+          osf = self.arquivos.all()
+          if osf.count() > 0: return osf[0].arquivo
+          return None
+
       class Meta:
 	  verbose_name = _(u'Alteração de contrato (OS)')
 	  verbose_name_plural = _(u'Alteração de contratos (OS)')
+          ordering = ('tipo', 'numero')
 
 
 class ArquivoOS(models.Model):

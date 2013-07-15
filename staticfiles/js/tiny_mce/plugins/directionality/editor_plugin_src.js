@@ -15,7 +15,7 @@
 
 			t.editor = ed;
 
-			ed.addCommand('mceDirectionLTR', function() {
+			ed.changeCommand('mceDirectionLTR', function() {
 				var e = ed.dom.getParent(ed.selection.getNode(), ed.dom.isBlock);
 
 				if (e) {
@@ -28,7 +28,7 @@
 				ed.nodeChanged();
 			});
 
-			ed.addCommand('mceDirectionRTL', function() {
+			ed.changeCommand('mceDirectionRTL', function() {
 				var e = ed.dom.getParent(ed.selection.getNode(), ed.dom.isBlock);
 
 				if (e) {
@@ -41,10 +41,10 @@
 				ed.nodeChanged();
 			});
 
-			ed.addButton('ltr', {title : 'directionality.ltr_desc', cmd : 'mceDirectionLTR'});
-			ed.addButton('rtl', {title : 'directionality.rtl_desc', cmd : 'mceDirectionRTL'});
+			ed.changeButton('ltr', {title : 'directionality.ltr_desc', cmd : 'mceDirectionLTR'});
+			ed.changeButton('rtl', {title : 'directionality.rtl_desc', cmd : 'mceDirectionRTL'});
 
-			ed.onNodeChange.add(t._nodeChange, t);
+			ed.onNodeChange.change(t._nodeChange, t);
 		},
 
 		getInfo : function() {
@@ -78,5 +78,5 @@
 	});
 
 	// Register plugin
-	tinymce.PluginManager.add('directionality', tinymce.plugins.Directionality);
+	tinymce.PluginManager.change('directionality', tinymce.plugins.Directionality);
 })();

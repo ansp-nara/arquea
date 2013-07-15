@@ -609,7 +609,7 @@ function ajax_filter_origem_protocolo(termo_campo, termo)
 	    alert('Erro: Sem retorno da requisição.');
 	  }
       });
-      if (!$("#id_auditoria_set-0-pagina").val()){
+/*      if (!$("#id_auditoria_set-0-pagina").val()){
        $.ajax({
 	  type: "POST",
 	  url: "/financeiro/parcial_pagina_termo",
@@ -623,7 +623,7 @@ function ajax_filter_origem_protocolo(termo_campo, termo)
 	    alert('Erro: Sem retorno da requisição.');
 	  }
        });
-      }
+      }*/
 }
 
 function ajax_filter_protocolo_numero(numero)
@@ -787,21 +787,32 @@ function ajax_patrimonio_existente(pn)
 }
 
 
-function ajax_filter_enderecos() {
-     ent_id = $("#id_entidade").val();
+function ajax_filter_enderecos(id_ent) {
+     ent_id = $("#"+id_ent).val();
      $("#id_endereco").html('<option value="0">Carregando...</option>');
 
      $.ajax({
        type: "POST",
-       url: "/identificacao/escolhe_entidade",
+       url: "/identificacao/escolhe_entidade_filhos",
        dataType: "json",
        data: {'entidade': ent_id},
        success: function(retorno){
           $("#id_endereco").empty();
           $("#id_endereco").append('<option value="">------------</option>');
-          $.each(retorno, function(i, item){
+          $.each(retorno['enderecos'], function(i, item){
               $("#id_endereco").append('<option value="'+item.pk+'">'+item.valor+'</option>');
           });
+          if (retorno['filhos'].length > 0) {
+              $("#id_entidade1").empty();
+    	      $("#id_entidade1").append('<option value="">-----------</option>');
+              $.each(retorno['filhos'], function(i, item){
+	          $("#id_entidade1").append('<option value="'+item.pk+'">'+item.valor+'</option>');
+              });
+              $("#filhos").show();
+          }
+          else if (id_ent == 'id_entidade') {
+              $("#filhos").hide();
+          }
        },
      });
 } 
@@ -825,6 +836,25 @@ function ajax_filter_locais() {
      });
 }
 
+function ajax_filter_nivel(nivel, ed_id) {
+     $("#id_detalhe_"+nivel).html('<option value="0">Carregando</option>');
+
+     $.ajax({
+       type: "POST",
+       url: "/patrimonio/escolhe_detalhe",
+       dataType: "json",
+       data: {'detalhe': ed_id},
+       success: function(retorno){
+          $("#id_detalhe_"+nivel).empty();
+          $("#id_detalhe_"+nivel).append('<option value="">------------</option>');
+          $.each(retorno, function(i, item){
+              $("#id_detalhe_"+nivel).append('<option value="'+item.pk+'">'+item.valor+'</option>');
+          });
+
+       },
+     });
+}
+    
 function ajax_filter_pagamentos_memorando(termo)
 {
      n = parseInt($("#id_corpo_set-TOTAL_FORMS").val());
@@ -844,7 +874,7 @@ function ajax_filter_pagamentos_memorando(termo)
           $.each(retorno, function(i, item){
               for(j=0;j<n;j++){
                  var opt = new Object ({value:item.pk, text:item.valor});
-                 SelectBox.add_to_cache("id_corpo_set-"+j+"-pagamento_from", opt);
+                 SelectBox.change_to_cache("id_corpo_set-"+j+"-pagamento_from", opt);
               }
               $("#id_corpo_set-__prefix__-pagamento_from").append('<option value="'+item.pk+'">'+item.valor+'</option>');
           });
@@ -931,3 +961,105 @@ function ajax_select_pergunta(id_field)
 $(window).load(function () {
     ajax_init_pagamentos();
 });	
+
+function ajax_filter_pagamentos2(url)
+{
+      termo = $("#id_termo").val()
+      $.ajax({
+          type: "POST",
+          url: url,
+          dataType: "json",
+          data: {'termo':termo},
+          success: function(retorno) {
+              $("#id_pagamento").empty();
+              $("#id_pagamento").append('<option value="">-----</option>');
+              $.each(retorno, function(i, item){
+                  $("#id_pagamento").append('<option value="'+item.pk+'">'+item.valor+'</option>');
+              });
+          },
+          error: function(erro) {
+             alert('Erro: Sem retorno de requisição.');
+          }
+       });
+
+}
+
+function ajax_filter_patrimonio(num_doc)
+{
+       p_id = "#id_patrimonio";
+       $(p_id).html('Carregando...');
+       $.ajax({
+           type: "POST",
+           url: "/patrimonio/escolhe_patrimonio",
+           dataType: "json",
+           data: {'num_doc':num_doc},
+           success: function(retorno) {
+              $(p_id).empty();
+              $(p_id).append('<option value="">-----</option>');
+              $.each(retorno, function(i, item){
+                  $(p_id).append('<option value="'+item.pk+'">'+item.valor+'</option>');
+              });
+           },
+           error: function(erro) {
+              alert('Erro: Sem retorno de requisição.');
+           }
+       });
+}
+
+function ajax_prox_audit(origem)
+{
+      if (!$("#id_auditoria_set-0-pagina").val()){
+       $.ajax({
+          type: "POST",
+          url: "/financeiro/parcial_pagina_termo",
+          dataType: "json",
+          data: {'orig_id':origem},
+          success: function(retorno) {
+              $("#id_auditoria_set-0-parcial").val(retorno['parcial']);
+              $("#id_auditoria_set-0-pagina").val(retorno['pagina']);
+          },
+          error: function(erro) {
+            alert('Erro: Sem retorno da requisição.');
+          }
+       });
+      }
+}
+
+function ajax_nova_pagina(parcial)
+{
+    $.ajax({
+       type:"POST",
+       url:"/financeiro/nova_pagina",
+       dataType:"json",
+       data: {'orig_id':$("#id_origem_fapesp").val(), 'parcial':parcial.value},
+       success: function(retorno){
+           numero = parcial.id.split("-")[1];
+           $("#id_auditoria_set-"+numero+"-pagina").val(retorno);
+       }
+    });
+}
+
+function ajax_select_ano_proj()
+{
+       anoproj = $("#id_anoproj").val();
+       partes = anoproj.split("/");
+       ano = partes[0];
+       proj_id = partes[1];
+       $("#id_os").html('Carregando...');
+       $.ajax({
+           type: "POST",
+           url: "/rede/planeja_contrato",
+           dataType: "json",
+           data: {'ano':ano, 'proj_id':proj_id},
+           success: function(retorno) {
+                $("#id_os").html('<option value="">Nenhum</option>');
+	            $.each(retorno.oss, function(i, item){
+                     $("#id_os").append('<option value="'+item.pk+'">'+item.valor+'</option>');
+ 	            });
+	   },
+	   error: function(erro) {
+              alert('Erro: Sem retorno de requisição.');
+           }
+       });
+
+}

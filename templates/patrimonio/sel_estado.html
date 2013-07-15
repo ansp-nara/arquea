@@ -4,7 +4,7 @@
 <label for="id_estado">Estado</label>:
 <select name="estado" id="id_estado">
   {% for e in estados %}
-     <option value="{{ e.id }}">{{ e }}</option>
+     <option value="{{ e.id }}">{{ e }} ({{ e.historicolocal_set.count }})</option>
   {% endfor %}
 </select>
 <input type="submit" value="Enviar">

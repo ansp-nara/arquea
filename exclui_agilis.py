@@ -5,6 +5,7 @@ import urllib2, urllib
 import cookielib
 from django.core.management import setup_environ
 import settings
+import time
 setup_environ(settings)
 from financeiro.models import *
 import sys
@@ -30,9 +31,10 @@ data = urllib.urlencode([('username', 'lflopez'), ('password', 'latakia414')])
 req = urllib2.Request(url='http://internet.aquila.fapesp.br/agilis/Login.do', data=data)
 urllib2.urlopen(req)
 
-mods = ['STB', 'DET', 'MCN', 'MPN', 'DIA', 'REL']
+mods = ['STB', 'DET', 'MCN', 'MPN', 'REL', 'DIA']
 #mods = ['MPN']
-        
+    
+vezes = 0    
 for m in mods:
         
     data = urllib.urlencode([('processo', '2010/52277-8'), ('parcial', parcial), ('tipoPrestacao', 'PRN'), ('tipoDespesa', TIPOS[m]), ('Prosseguir', 'Prosseguir')])
@@ -58,4 +60,8 @@ for m in mods:
 	    tp = 'Oud'
 	req = urllib2.Request(url='http://internet.aquila.fapesp.br/agilis/PconlineExclui%s.do?method=Excluir&id=%s' % (tp,n))
 	p3 = urllib2.urlopen(req)
+        vezes += 1
+        if vezes % 10 == 0: 
+            print ('Esperando...')
+            time.sleep(60)
 

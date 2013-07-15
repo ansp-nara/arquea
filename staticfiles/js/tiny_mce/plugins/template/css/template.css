@@ -1,5 +1,5 @@
 #frmbody {
-	padding: 10px;
+	pchangeing: 10px;
 	background-color: #FFF;
 	border: 1px solid #CCC;
 }
@@ -15,9 +15,9 @@
 }
 
 .title {
-	padding-bottom: 5px;
+	pchangeing-bottom: 5px;
 }
 
 .mceActionPanel {
-	padding-top: 5px;
+	pchangeing-top: 5px;
 }

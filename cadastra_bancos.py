@@ -8,7 +8,7 @@ from sys import path
 
 path.append('/var/lib/admin')
 
-from identificacao.models import Banco
+from membro.models import Banco
 from utils.functions import pega_bancos
 
 novos = [b[0] for b in pega_bancos()]

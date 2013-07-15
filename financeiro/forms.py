@@ -5,13 +5,17 @@ from outorga.models import Termo, OrigemFapesp
 from django.utils.translation import ugettext_lazy as _
 from django.forms.util import ErrorList
 from protocolo.models import Protocolo
+from django.forms.models import inlineformset_factory, BaseInlineFormSet
 
 class PagamentoAdminForm(forms.ModelForm):
 
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=':',
                  empty_permitted=False, instance=None):
-		   
+	
+        if instance and not data:
+            initial = {'termo': instance.protocolo.termo.id}
+	   
         super(PagamentoAdminForm, self).__init__(data, files, auto_id, prefix, initial,
                                             error_class, label_suffix, empty_permitted, instance)
 
@@ -22,17 +26,16 @@ class PagamentoAdminForm(forms.ModelForm):
 	      termo = data['termo']
 	      try:
 		t = Termo.objects.get(id=termo)
-		self.fields['protocolo'].queryset = Protocolo.objects.filter(termo=t).order_by('descricao2__entidade__nome', 'descricao2__descricao')
-		self.fields['origem_fapesp'].queryset = OrigemFapesp.objects.filter(item_outorga__natureza_gasto__termo=t)
+		self.fields['protocolo'].queryset = Protocolo.objects.filter(termo=t).order_by('tipo_documento', 'num_documento', 'data_vencimento')
+		self.fields['origem_fapesp'].queryset = OrigemFapesp.objects.filter(item_outorga__natureza_gasto__termo=t).order_by('acordo__descricao', 'item_outorga__descricao')
 	      except:
 		pass
 	elif instance:
 	    termo = instance.protocolo.termo
 	    try:
 		t = termo #Termo.objects.get(id=termo)
-		self.fields['protocolo'].queryset = Protocolo.objects.filter(termo=t)
-		self.fields['origem_fapesp'].queryset = OrigemFapesp.objects.filter(item_outorga__natureza_gasto__termo=t)
-		self.fields['termo'].value = t
+		self.fields['protocolo'].queryset = Protocolo.objects.filter(termo=t).order_by('tipo_documento', 'num_documento', 'data_vencimento')
+		self.fields['origem_fapesp'].queryset = OrigemFapesp.objects.filter(item_outorga__natureza_gasto__termo=t).order_by('acordo__descricao', 'item_outorga__descricao')
 	    except:
 		pass
 	    
@@ -45,7 +48,7 @@ class PagamentoAdminForm(forms.ModelForm):
         model = Pagamento
         
     class Media:
-        js = ('/media/js/jquery.js', '/media/js/selects.js',)
+        js = ('/media/js/selects.js',)
 
     cod_oper = forms.CharField(label=_(u'Código da operação'), required=False,
     	      widget=forms.TextInput(attrs={'onchange':'ajax_filter_cc_cod(this.value);'}))
@@ -56,6 +59,8 @@ class PagamentoAdminForm(forms.ModelForm):
     numero = forms.CharField(label=_(u'Número do protocolo'), required=False,
 	      widget=forms.TextInput(attrs={'onchange': 'ajax_filter_protocolo_numero(this.value);'}))
 	     
+    origem_fapesp = forms.ModelChoiceField(OrigemFapesp.objects.all(), label=_(u'Origem Fapesp'),
+              required=False, widget=forms.Select(attrs={'onchange':'ajax_prox_audit(this.value);'}))
 
     def clean(self):
         valor = self.cleaned_data.get('valor_fapesp')
@@ -74,3 +79,14 @@ class ExtratoCCAdminForm(forms.ModelForm):
 
     class Meta:
     	model = ExtratoCC
+
+
+
+class AuditoriaAdminForm(forms.ModelForm):
+
+    parcial = forms.IntegerField(label=u'Parcial', widget=forms.TextInput(attrs={'onchange': 'ajax_nova_pagina(this);'}))
+
+    class Meta:
+	model = Auditoria
+
+

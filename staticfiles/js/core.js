@@ -5,9 +5,9 @@ var isOpera = (navigator.userAgent.indexOf("Opera")>=0) && parseFloat(navigator.
 var isIE = ((document.all) && (!isOpera)) && parseFloat(navigator.appVersion.split("MSIE ")[1].split(";")[0]);
 
 // Cross-browser event handlers.
-function addEvent(obj, evType, fn) {
-    if (obj.addEventListener) {
-        obj.addEventListener(evType, fn, false);
+function changeEvent(obj, evType, fn) {
+    if (obj.changeEventListener) {
+        obj.changeEventListener(evType, fn, false);
         return true;
     } else if (obj.attachEvent) {
         var r = obj.attachEvent("on" + evType, fn);

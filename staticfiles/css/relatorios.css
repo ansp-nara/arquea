@@ -2,7 +2,7 @@
 	display:block;
 	width:100%;
 	margin:0;
-	padding:10px 0; 
+	pchangeing:10px 0; 
 	text-align:center;
 	border-bottom:dotted 1px #134089;
 	}
@@ -11,7 +11,7 @@
 	display:block;
 	border:solid 1px;
 	border-color:#fff #fff #ccc #fff;
-	padding:10px;
+	pchangeing:10px;
 	}
 	
 .m-block1:hover{
@@ -24,7 +24,7 @@
 	display:block;
 	border:solid 1px #dadada;
 	background:#fff;
-	padding:10px;
+	pchangeing:10px;
 	}
 	
 .m-respostas:hover{
@@ -34,7 +34,7 @@
 .m-pagtos{
 	display:block;
 	border:solid 1px #dadada;
-	padding:10px;
+	pchangeing:10px;
 	margin-bottom:5px;
 	background:#ccccff;
 	}

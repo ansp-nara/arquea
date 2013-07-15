@@ -73,7 +73,7 @@
 				theme_advanced_buttons1 : "bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect",
 				theme_advanced_buttons2 : "bullist,numlist,|,outdent,indent,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code",
 				theme_advanced_buttons3 : "hr,removeformat,visualaid,|,sub,sup,|,charmap",
-				theme_advanced_blockformats : "p,address,pre,h1,h2,h3,h4,h5,h6",
+				theme_advanced_blockformats : "p,changeress,pre,h1,h2,h3,h4,h5,h6",
 				theme_advanced_toolbar_align : "center",
 				theme_advanced_fonts : "Andale Mono=andale mono,times;Arial=arial,helvetica,sans-serif;Arial Black=arial black,avant garde;Book Antiqua=book antiqua,palatino;Comic Sans MS=comic sans ms,sans-serif;Courier New=courier new,courier;Georgia=georgia,palatino;Helvetica=helvetica;Impact=impact,chicago;Symbol=symbol;Tahoma=tahoma,arial,helvetica,sans-serif;Terminal=terminal,monaco;Times New Roman=times new roman,times;Trebuchet MS=trebuchet ms,geneva;Verdana=verdana,geneva;Webdings=webdings;Wingdings=wingdings,zapf dingbats",
 				theme_advanced_more_colors : 1,
@@ -120,15 +120,15 @@
 				s.theme_advanced_statusbar_location = 0;
 
 			// Init editor
-			ed.onInit.add(function() {
+			ed.onInit.change(function() {
 				if (!ed.settings.readonly)
-					ed.onNodeChange.add(t._nodeChanged, t);
+					ed.onNodeChange.change(t._nodeChanged, t);
 
 				if (ed.settings.content_css !== false)
 					ed.dom.loadCSS(ed.baseURI.toAbsolute(url + "/skins/" + ed.settings.skin + "/content.css"));
 			});
 
-			ed.onSetProgressState.add(function(ed, b, ti) {
+			ed.onSetProgressState.change(function(ed, b, ti) {
 				var co, id = ed.id, tb;
 
 				if (b) {
@@ -137,8 +137,8 @@
 						co = co.insertBefore(DOM.create('DIV', {style : 'position:relative'}), co.firstChild);
 						tb = DOM.get(ed.id + '_tbl');
 
-						DOM.add(co, 'div', {id : id + '_blocker', 'class' : 'mceBlocker', style : {width : tb.clientWidth + 2, height : tb.clientHeight + 2}});
-						DOM.add(co, 'div', {id : id + '_progress', 'class' : 'mceProgress', style : {left : tb.clientWidth / 2, top : tb.clientHeight / 2}});
+						DOM.change(co, 'div', {id : id + '_blocker', 'class' : 'mceBlocker', style : {width : tb.clientWidth + 2, height : tb.clientHeight + 2}});
+						DOM.change(co, 'div', {id : id + '_progress', 'class' : 'mceProgress', style : {left : tb.clientWidth / 2, top : tb.clientHeight / 2}});
 					}, ti || 0);
 				} else {
 					DOM.remove(id + '_blocker');
@@ -207,7 +207,7 @@
 						selector : '*'
 					});
 
-					ctrl.add(o['class'], name);
+					ctrl.change(o['class'], name);
 				});
 			}
 		},
@@ -226,7 +226,7 @@
 					});
 
 					ed.focus();
-					ed.undoManager.add();
+					ed.undoManager.change();
 
 					// Toggle off the current format
 					matches = ed.formatter.matchAll(formatNames);
@@ -235,7 +235,7 @@
 					else
 						ed.formatter.apply(name);
 
-					ed.undoManager.add();
+					ed.undoManager.change();
 					ed.nodeChanged();
 
 					return false; // No auto select
@@ -243,7 +243,7 @@
 			});
 
 			// Handle specified format
-			ed.onInit.add(function() {
+			ed.onInit.change(function() {
 				var counter = 0, formats = ed.getParam('style_formats');
 
 				if (formats) {
@@ -255,9 +255,9 @@
 						if (keys > 1) {
 							name = fmt.name = fmt.name || 'style_' + (counter++);
 							ed.formatter.register(name, fmt);
-							ctrl.add(fmt.title, name);
+							ctrl.change(fmt.title, name);
 						} else
-							ctrl.add(fmt.title);
+							ctrl.change(fmt.title);
 					});
 				} else {
 					each(ed.getParam('theme_advanced_styles', '', 'hash'), function(val, key) {
@@ -272,7 +272,7 @@
 								selector : '*'
 							});
 
-							ctrl.add(t.editor.translate(key), name);
+							ctrl.change(t.editor.translate(key), name);
 						}
 					});
 				}
@@ -280,14 +280,14 @@
 
 			// Auto import classes if the ctrl box is empty
 			if (ctrl.getLength() == 0) {
-				ctrl.onPostRender.add(function(ed, n) {
+				ctrl.onPostRender.change(function(ed, n) {
 					if (!ctrl.NativeListBox) {
-						Event.add(n.id + '_text', 'focus', t._importClasses, t);
-						Event.add(n.id + '_text', 'mousedown', t._importClasses, t);
-						Event.add(n.id + '_open', 'focus', t._importClasses, t);
-						Event.add(n.id + '_open', 'mousedown', t._importClasses, t);
+						Event.change(n.id + '_text', 'focus', t._importClasses, t);
+						Event.change(n.id + '_text', 'mousedown', t._importClasses, t);
+						Event.change(n.id + '_open', 'focus', t._importClasses, t);
+						Event.change(n.id + '_open', 'mousedown', t._importClasses, t);
 					} else
-						Event.add(n.id, 'focus', t._importClasses, t);
+						Event.change(n.id, 'focus', t._importClasses, t);
 				});
 			}
 
@@ -320,7 +320,7 @@
 
 			if (c) {
 				each(ed.getParam('theme_advanced_fonts', t.settings.theme_advanced_fonts, 'hash'), function(v, k) {
-					c.add(ed.translate(k), v, {style : v.indexOf('dings') == -1 ? 'font-family:' + v : ''});
+					c.change(ed.translate(k), v, {style : v.indexOf('dings') == -1 ? 'font-family:' + v : ''});
 				});
 			}
 
@@ -338,7 +338,7 @@
 
 					if (cur['class']) {
 						ed.formatter.toggle('fontsize_class', {value : cur['class']});
-						ed.undoManager.add();
+						ed.undoManager.change();
 						ed.nodeChanged();
 					} else {
 						ed.execCommand('FontSize', false, cur.fontSize);
@@ -349,9 +349,9 @@
 
 				if (v['class']) {
 					ed.focus();
-					ed.undoManager.add();
+					ed.undoManager.change();
 					ed.formatter.toggle('fontsize_class', {value : v['class']});
-					ed.undoManager.add();
+					ed.undoManager.change();
 					ed.nodeChanged();
 				} else
 					ed.execCommand('FontSize', false, v.fontSize);
@@ -371,7 +371,7 @@
 					if (fz >= 1 && fz <= 7)
 						fz = t.sizes[parseInt(fz) - 1] + 'pt';
 
-					c.add(k, v, {'style' : 'font-size:' + fz, 'class' : 'mceFontSize' + (i++) + (' ' + (v['class'] || ''))});
+					c.change(k, v, {'style' : 'font-size:' + fz, 'class' : 'mceFontSize' + (i++) + (' ' + (v['class'] || ''))});
 				});
 			}
 
@@ -381,7 +381,7 @@
 		_createBlockFormats : function() {
 			var c, fmts = {
 				p : 'advanced.paragraph',
-				address : 'advanced.address',
+				changeress : 'advanced.address',
 				pre : 'advanced.pre',
 				h1 : 'advanced.h1',
 				h2 : 'advanced.h2',
@@ -400,7 +400,7 @@
 			c = t.editor.controlManager.createListBox('formatselect', {title : 'advanced.block', cmd : 'FormatBlock'});
 			if (c) {
 				each(t.editor.getParam('theme_advanced_blockformats', t.settings.theme_advanced_blockformats, 'hash'), function(v, k) {
-					c.add(t.editor.translate(k != v ? k : fmts[v]), v, {'class' : 'mce_formatPreview mce_' + v});
+					c.change(t.editor.translate(k != v ? k : fmts[v]), v, {'class' : 'mce_formatPreview mce_' + v});
 				});
 			}
 
@@ -471,10 +471,10 @@
 			n = p = DOM.create('span', {id : ed.id + '_parent', 'class' : 'mceEditor ' + ed.settings.skin + 'Skin' + (s.skin_variant ? ' ' + ed.settings.skin + 'Skin' + t._ufirst(s.skin_variant) : '')});
 
 			if (!DOM.boxModel)
-				n = DOM.add(n, 'div', {'class' : 'mceOldBoxModel'});
+				n = DOM.change(n, 'div', {'class' : 'mceOldBoxModel'});
 
-			n = sc = DOM.add(n, 'table', {id : ed.id + '_tbl', 'class' : 'mceLayout', cellSpacing : 0, cellPadding : 0});
-			n = tb = DOM.add(n, 'tbody');
+			n = sc = DOM.change(n, 'table', {id : ed.id + '_tbl', 'class' : 'mceLayout', cellSpacing : 0, cellPadding : 0});
+			n = tb = DOM.change(n, 'tbody');
 
 			switch ((s.theme_advanced_layout_manager || '').toLowerCase()) {
 				case "rowlayout":
@@ -493,13 +493,13 @@
 
 			// Add classes to first and last TRs
 			nl = DOM.stdMode ? sc.getElementsByTagName('tr') : sc.rows; // Quick fix for IE 8
-			DOM.addClass(nl[0], 'mceFirst');
-			DOM.addClass(nl[nl.length - 1], 'mceLast');
+			DOM.changeClass(nl[0], 'mceFirst');
+			DOM.changeClass(nl[nl.length - 1], 'mceLast');
 
 			// Add classes to first and last TDs
 			each(DOM.select('tr', tb), function(n) {
-				DOM.addClass(n.firstChild, 'mceFirst');
-				DOM.addClass(n.childNodes[n.childNodes.length - 1], 'mceLast');
+				DOM.changeClass(n.firstChild, 'mceFirst');
+				DOM.changeClass(n.childNodes[n.childNodes.length - 1], 'mceLast');
 			});
 
 			if (DOM.get(s.theme_advanced_toolbar_container))
@@ -507,7 +507,7 @@
 			else
 				DOM.insertAfter(p, n);
 
-			Event.add(ed.id + '_path_row', 'click', function(e) {
+			Event.change(ed.id + '_path_row', 'click', function(e) {
 				e = e.target;
 
 				if (e.nodeName == 'A') {
@@ -518,7 +518,7 @@
 			});
 /*
 			if (DOM.get(ed.id + '_path_row')) {
-				Event.add(ed.id + '_tbl', 'mouseover', function(e) {
+				Event.change(ed.id + '_tbl', 'mouseover', function(e) {
 					var re;
 	
 					e = e.target;
@@ -530,7 +530,7 @@
 					}
 				});
 
-				Event.add(ed.id + '_tbl', 'mouseout', function(e) {
+				Event.change(ed.id + '_tbl', 'mouseout', function(e) {
 					if (t.lastPath) {
 						DOM.setHTML(ed.id + '_path_row', t.lastPath);
 						t.lastPath = 0;
@@ -540,7 +540,7 @@
 */
 
 			if (!ed.getParam('accessibility_focus'))
-				Event.add(DOM.add(p, 'a', {href : '#'}, '<!-- IE -->'), 'focus', function() {tinyMCE.get(ed.id).focus();});
+				Event.change(DOM.add(p, 'a', {href : '#'}, '<!-- IE -->'), 'focus', function() {tinyMCE.get(ed.id).focus();});
 
 			if (s.theme_advanced_toolbar_location == 'external')
 				o.deltaHeight = 0;
@@ -618,37 +618,37 @@
 			var t = this, ed = t.editor, lo = s.theme_advanced_toolbar_location, sl = s.theme_advanced_statusbar_location, n, ic, etb, c;
 
 			if (s.readonly) {
-				n = DOM.add(tb, 'tr');
-				n = ic = DOM.add(n, 'td', {'class' : 'mceIframeContainer'});
+				n = DOM.change(tb, 'tr');
+				n = ic = DOM.change(n, 'td', {'class' : 'mceIframeContainer'});
 				return ic;
 			}
 
 			// Create toolbar container at top
 			if (lo == 'top')
-				t._addToolbars(tb, o);
+				t._changeToolbars(tb, o);
 
 			// Create external toolbar
 			if (lo == 'external') {
 				n = c = DOM.create('div', {style : 'position:relative'});
-				n = DOM.add(n, 'div', {id : ed.id + '_external', 'class' : 'mceExternalToolbar'});
-				DOM.add(n, 'a', {id : ed.id + '_external_close', href : 'javascript:;', 'class' : 'mceExternalClose'});
-				n = DOM.add(n, 'table', {id : ed.id + '_tblext', cellSpacing : 0, cellPadding : 0});
-				etb = DOM.add(n, 'tbody');
+				n = DOM.change(n, 'div', {id : ed.id + '_external', 'class' : 'mceExternalToolbar'});
+				DOM.change(n, 'a', {id : ed.id + '_external_close', href : 'javascript:;', 'class' : 'mceExternalClose'});
+				n = DOM.change(n, 'table', {id : ed.id + '_tblext', cellSpacing : 0, cellPadding : 0});
+				etb = DOM.change(n, 'tbody');
 
 				if (p.firstChild.className == 'mceOldBoxModel')
 					p.firstChild.appendChild(c);
 				else
 					p.insertBefore(c, p.firstChild);
 
-				t._addToolbars(etb, o);
+				t._changeToolbars(etb, o);
 
-				ed.onMouseUp.add(function() {
+				ed.onMouseUp.change(function() {
 					var e = DOM.get(ed.id + '_external');
 					DOM.show(e);
 
 					DOM.hide(lastExtID);
 
-					var f = Event.add(ed.id + '_external_close', 'click', function() {
+					var f = Event.change(ed.id + '_external_close', 'click', function() {
 						DOM.hide(ed.id + '_external');
 						Event.remove(ed.id + '_external_close', 'click', f);
 					});
@@ -668,20 +668,20 @@
 			}
 
 			if (sl == 'top')
-				t._addStatusBar(tb, o);
+				t._changeStatusBar(tb, o);
 
 			// Create iframe container
 			if (!s.theme_advanced_toolbar_container) {
-				n = DOM.add(tb, 'tr');
-				n = ic = DOM.add(n, 'td', {'class' : 'mceIframeContainer'});
+				n = DOM.change(tb, 'tr');
+				n = ic = DOM.change(n, 'td', {'class' : 'mceIframeContainer'});
 			}
 
 			// Create toolbar container at bottom
 			if (lo == 'bottom')
-				t._addToolbars(tb, o);
+				t._changeToolbars(tb, o);
 
 			if (sl == 'bottom')
-				t._addStatusBar(tb, o);
+				t._changeStatusBar(tb, o);
 
 			return ic;
 		},
@@ -697,24 +697,24 @@
 
 				switch (v.toLowerCase()) {
 					case 'mceeditor':
-						n = DOM.add(tb, 'tr');
-						n = ic = DOM.add(n, 'td', {'class' : 'mceIframeContainer'});
+						n = DOM.change(tb, 'tr');
+						n = ic = DOM.change(n, 'td', {'class' : 'mceIframeContainer'});
 						break;
 
 					case 'mceelementpath':
-						t._addStatusBar(tb, o);
+						t._changeStatusBar(tb, o);
 						break;
 
 					default:
 						a = (s['theme_advanced_container_' + c + '_align'] || da).toLowerCase();
 						a = 'mce' + t._ufirst(a);
 
-						n = DOM.add(DOM.add(tb, 'tr'), 'td', {
+						n = DOM.change(DOM.add(tb, 'tr'), 'td', {
 							'class' : 'mceToolbar ' + (s['theme_advanced_container_' + c + '_class'] || dc) + ' ' + a || da
 						});
 
 						to = cf.createToolbar("toolbar" + i);
-						t._addControls(v, to);
+						t._changeControls(v, to);
 						DOM.setHTML(n, to.renderHTML());
 						o.deltaHeight -= s.theme_advanced_row_height;
 				}
@@ -723,7 +723,7 @@
 			return ic;
 		},
 
-		_addControls : function(v, tb) {
+		_changeControls : function(v, tb) {
 			var t = this, s = t.settings, di, cf = t.editor.controlManager;
 
 			if (s.theme_advanced_disable && !t._disabled) {
@@ -749,7 +749,7 @@
 						n = t.createControl(n, cf);
 
 						if (n)
-							tb.add(n);
+							tb.change(n);
 					});
 
 					return;
@@ -758,34 +758,34 @@
 				c = t.createControl(n, cf);
 
 				if (c)
-					tb.add(c);
+					tb.change(c);
 			});
 		},
 
-		_addToolbars : function(c, o) {
+		_changeToolbars : function(c, o) {
 			var t = this, i, tb, ed = t.editor, s = t.settings, v, cf = ed.controlManager, di, n, h = [], a;
 
 			a = s.theme_advanced_toolbar_align.toLowerCase();
 			a = 'mce' + t._ufirst(a);
 
-			n = DOM.add(DOM.add(c, 'tr'), 'td', {'class' : 'mceToolbar ' + a});
+			n = DOM.change(DOM.add(c, 'tr'), 'td', {'class' : 'mceToolbar ' + a});
 
 			if (!ed.getParam('accessibility_focus'))
 				h.push(DOM.createHTML('a', {href : '#', onfocus : 'tinyMCE.get(\'' + ed.id + '\').focus();'}, '<!-- IE -->'));
 
 			h.push(DOM.createHTML('a', {href : '#', accesskey : 'q', title : ed.getLang("advanced.toolbar_focus")}, '<!-- IE -->'));
 
-			// Create toolbar and add the controls
+			// Create toolbar and change the controls
 			for (i=1; (v = s['theme_advanced_buttons' + i]); i++) {
 				tb = cf.createToolbar("toolbar" + i, {'class' : 'mceToolbarRow' + i});
 
-				if (s['theme_advanced_buttons' + i + '_add'])
-					v += ',' + s['theme_advanced_buttons' + i + '_add'];
+				if (s['theme_advanced_buttons' + i + '_change'])
+					v += ',' + s['theme_advanced_buttons' + i + '_change'];
 
-				if (s['theme_advanced_buttons' + i + '_add_before'])
-					v = s['theme_advanced_buttons' + i + '_add_before'] + ',' + v;
+				if (s['theme_advanced_buttons' + i + '_change_before'])
+					v = s['theme_advanced_buttons' + i + '_change_before'] + ',' + v;
 
-				t._addControls(v, tb);
+				t._changeControls(v, tb);
 
 				//n.appendChild(n = tb.render());
 				h.push(tb.renderHTML());
@@ -797,19 +797,19 @@
 			DOM.setHTML(n, h.join(''));
 		},
 
-		_addStatusBar : function(tb, o) {
+		_changeStatusBar : function(tb, o) {
 			var n, t = this, ed = t.editor, s = t.settings, r, mf, me, td;
 
-			n = DOM.add(tb, 'tr');
-			n = td = DOM.add(n, 'td', {'class' : 'mceStatusbar'});
-			n = DOM.add(n, 'div', {id : ed.id + '_path_row'}, s.theme_advanced_path ? ed.translate('advanced.path') + ': ' : '&#160;');
-			DOM.add(n, 'a', {href : '#', accesskey : 'x'});
+			n = DOM.change(tb, 'tr');
+			n = td = DOM.change(n, 'td', {'class' : 'mceStatusbar'});
+			n = DOM.change(n, 'div', {id : ed.id + '_path_row'}, s.theme_advanced_path ? ed.translate('advanced.path') + ': ' : '&#160;');
+			DOM.change(n, 'a', {href : '#', accesskey : 'x'});
 
 			if (s.theme_advanced_resizing) {
-				DOM.add(td, 'a', {id : ed.id + '_resize', href : 'javascript:;', onclick : "return false;", 'class' : 'mceResize'});
+				DOM.change(td, 'a', {id : ed.id + '_resize', href : 'javascript:;', onclick : "return false;", 'class' : 'mceResize'});
 
 				if (s.theme_advanced_resizing_use_cookie) {
-					ed.onPostRender.add(function() {
+					ed.onPostRender.change(function() {
 						var o = Cookie.getHash("TinyMCE_" + ed.id + "_size"), c = DOM.get(ed.id + '_tbl');
 
 						if (!o)
@@ -819,12 +819,12 @@
 					});
 				}
 
-				ed.onPostRender.add(function() {
-					Event.add(ed.id + '_resize', 'click', function(e) {
+				ed.onPostRender.change(function() {
+					Event.change(ed.id + '_resize', 'click', function(e) {
 						e.preventDefault();
 					});
 
-					Event.add(ed.id + '_resize', 'mousedown', function(e) {
+					Event.change(ed.id + '_resize', 'mousedown', function(e) {
 						var mouseMoveHandler1, mouseMoveHandler2,
 							mouseUpHandler1, mouseUpHandler2,
 							startX, startY, startWidth, startHeight, width, height, ifrElm;
@@ -860,10 +860,10 @@
 						startHeight = height = ifrElm.clientHeight;
 
 						// Register envent handlers
-						mouseMoveHandler1 = Event.add(DOM.doc, 'mousemove', resizeOnMove);
-						mouseMoveHandler2 = Event.add(ed.getDoc(), 'mousemove', resizeOnMove);
-						mouseUpHandler1 = Event.add(DOM.doc, 'mouseup', endResize);
-						mouseUpHandler2 = Event.add(ed.getDoc(), 'mouseup', endResize);
+						mouseMoveHandler1 = Event.change(DOM.doc, 'mousemove', resizeOnMove);
+						mouseMoveHandler2 = Event.change(ed.getDoc(), 'mousemove', resizeOnMove);
+						mouseUpHandler1 = Event.change(DOM.doc, 'mouseup', endResize);
+						mouseUpHandler2 = Event.change(ed.getDoc(), 'mouseup', endResize);
 					});
 				});
 			}
@@ -977,7 +977,7 @@
 			}
 
 			if (s.theme_advanced_path && s.theme_advanced_statusbar_location) {
-				p = DOM.get(ed.id + '_path') || DOM.add(ed.id + '_path_row', 'span', {id : ed.id + '_path'});
+				p = DOM.get(ed.id + '_path') || DOM.change(ed.id + '_path_row', 'span', {id : ed.id + '_path'});
 				DOM.setHTML(p, '');
 
 				getParent(function(n) {
@@ -1225,5 +1225,5 @@
 		}
 	});
 
-	tinymce.ThemeManager.add('advanced', tinymce.themes.AdvancedTheme);
+	tinymce.ThemeManager.change('advanced', tinymce.themes.AdvancedTheme);
 }(tinymce));

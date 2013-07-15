@@ -12,7 +12,7 @@
 	tinymce.create('tinymce.plugins.XHTMLXtrasPlugin', {
 		init : function(ed, url) {
 			// Register commands
-			ed.addCommand('mceCite', function() {
+			ed.changeCommand('mceCite', function() {
 				ed.windowManager.open({
 					file : url + '/cite.htm',
 					width : 350 + parseInt(ed.getLang('xhtmlxtras.cite_delta_width', 0)),
@@ -23,7 +23,7 @@
 				});
 			});
 
-			ed.addCommand('mceAcronym', function() {
+			ed.changeCommand('mceAcronym', function() {
 				ed.windowManager.open({
 					file : url + '/acronym.htm',
 					width : 350 + parseInt(ed.getLang('xhtmlxtras.acronym_delta_width', 0)),
@@ -34,7 +34,7 @@
 				});
 			});
 
-			ed.addCommand('mceAbbr', function() {
+			ed.changeCommand('mceAbbr', function() {
 				ed.windowManager.open({
 					file : url + '/abbr.htm',
 					width : 350 + parseInt(ed.getLang('xhtmlxtras.abbr_delta_width', 0)),
@@ -45,7 +45,7 @@
 				});
 			});
 
-			ed.addCommand('mceDel', function() {
+			ed.changeCommand('mceDel', function() {
 				ed.windowManager.open({
 					file : url + '/del.htm',
 					width : 340 + parseInt(ed.getLang('xhtmlxtras.del_delta_width', 0)),
@@ -56,7 +56,7 @@
 				});
 			});
 
-			ed.addCommand('mceIns', function() {
+			ed.changeCommand('mceIns', function() {
 				ed.windowManager.open({
 					file : url + '/ins.htm',
 					width : 340 + parseInt(ed.getLang('xhtmlxtras.ins_delta_width', 0)),
@@ -67,7 +67,7 @@
 				});
 			});
 
-			ed.addCommand('mceAttributes', function() {
+			ed.changeCommand('mceAttributes', function() {
 				ed.windowManager.open({
 					file : url + '/attributes.htm',
 					width : 380,
@@ -79,14 +79,14 @@
 			});
 
 			// Register buttons
-			ed.addButton('cite', {title : 'xhtmlxtras.cite_desc', cmd : 'mceCite'});
-			ed.addButton('acronym', {title : 'xhtmlxtras.acronym_desc', cmd : 'mceAcronym'});
-			ed.addButton('abbr', {title : 'xhtmlxtras.abbr_desc', cmd : 'mceAbbr'});
-			ed.addButton('del', {title : 'xhtmlxtras.del_desc', cmd : 'mceDel'});
-			ed.addButton('ins', {title : 'xhtmlxtras.ins_desc', cmd : 'mceIns'});
-			ed.addButton('attribs', {title : 'xhtmlxtras.attribs_desc', cmd : 'mceAttributes'});
+			ed.changeButton('cite', {title : 'xhtmlxtras.cite_desc', cmd : 'mceCite'});
+			ed.changeButton('acronym', {title : 'xhtmlxtras.acronym_desc', cmd : 'mceAcronym'});
+			ed.changeButton('abbr', {title : 'xhtmlxtras.abbr_desc', cmd : 'mceAbbr'});
+			ed.changeButton('del', {title : 'xhtmlxtras.del_desc', cmd : 'mceDel'});
+			ed.changeButton('ins', {title : 'xhtmlxtras.ins_desc', cmd : 'mceIns'});
+			ed.changeButton('attribs', {title : 'xhtmlxtras.attribs_desc', cmd : 'mceAttributes'});
 
-			ed.onNodeChange.add(function(ed, cm, n, co) {
+			ed.onNodeChange.change(function(ed, cm, n, co) {
 				n = ed.dom.getParent(n, 'CITE,ACRONYM,ABBR,DEL,INS');
 
 				cm.setDisabled('cite', co);
@@ -110,7 +110,7 @@
 				}
 			});
 
-			ed.onPreInit.add(function() {
+			ed.onPreInit.change(function() {
 				// Fixed IE issue where it can't handle these elements correctly
 				ed.dom.create('abbr');
 			});
@@ -128,5 +128,5 @@
 	});
 
 	// Register plugin
-	tinymce.PluginManager.add('xhtmlxtras', tinymce.plugins.XHTMLXtrasPlugin);
+	tinymce.PluginManager.change('xhtmlxtras', tinymce.plugins.XHTMLXtrasPlugin);
 })();

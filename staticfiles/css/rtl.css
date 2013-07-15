@@ -10,14 +10,14 @@ body {
 
 .login .form-row label {
     float: right;
-    padding-left: 0.5em;
-    padding-right: 0;
+    pchangeing-left: 0.5em;
+    pchangeing-right: 0;
     text-align: left;
 }
 
 .login .submit-row {
     clear: both;
-    padding: 1em 9.4em 0 0;
+    pchangeing: 1em 9.4em 0 0;
 }
 
 /* GLOBAL */
@@ -30,15 +30,15 @@ th {
     text-align: right;
 }
 
-.addlink, .changelink {
-    padding-left: 0px;
-    padding-right: 12px;
+.changelink, .changelink {
+    pchangeing-left: 0px;
+    pchangeing-right: 12px;
     background-position: 100% 0.2em;
 }
 
 .deletelink {
-    padding-left: 0px;
-    padding-right: 12px;
+    pchangeing-left: 0px;
+    pchangeing-right: 12px;
     background-position: 100% 0.25em;
 }
 
@@ -76,8 +76,8 @@ div.breadcrumbs {
 /* dashboard styles */
 
 .dashboard .module table td a {
-    padding-left: .6em;
-    padding-right: 12px;
+    pchangeing-left: .6em;
+    pchangeing-right: 12px;
 }
 
 /* changelists styles */
@@ -105,10 +105,10 @@ div.breadcrumbs {
 
 #changelist-filter li.selected {
     border-left: 0px none;
-    padding-left: 0px;
+    pchangeing-left: 0px;
     margin-left: 0;
     border-right: 5px solid #ccc;
-    padding-right: 5px;
+    pchangeing-right: 5px;
     margin-right: -10px;
 }
 
@@ -122,7 +122,7 @@ div.breadcrumbs {
 /* FORMS */
 
 .aligned label {
-    padding: 0 0 3px 1em;
+    pchangeing: 0 0 3px 1em;
     float: right;
 }
 
@@ -136,7 +136,7 @@ div.breadcrumbs {
 
 .submit-row .deletelink {
     background: url(../img/admin/icon_deletelink.gif) 0 50% no-repeat;
-    padding-right: 14px;
+    pchangeing-right: 14px;
 }
 
 .vDateField, .vTimeField {
@@ -145,8 +145,8 @@ div.breadcrumbs {
 
 form ul.inline li {
     float: right;
-    padding-right: 0;
-    padding-left: 7px;
+    pchangeing-right: 0;
+    pchangeing-left: 7px;
 }
 
 input[type=submit].default, .submit-row input.default {
@@ -160,12 +160,12 @@ fieldset .field-box {
 
 .errorlist li {
     background-position: 100% .3em;
-    padding: 4px 25px 4px 5px;
+    pchangeing: 4px 25px 4px 5px;
 }
 
 .errornote {
     background-position: 100% .3em;
-    padding: 4px 25px 4px 5px;
+    pchangeing: 4px 25px 4px 5px;
 }
 
 /* WIDGETS */
@@ -205,8 +205,8 @@ fieldset .field-box {
 }
 
 .inline-related h3 span.delete {
-    padding-right: 20px;
-    padding-left: inherit;
+    pchangeing-right: 20px;
+    pchangeing-left: inherit;
     left: 10px;
     right: inherit;
 }

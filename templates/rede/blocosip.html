@@ -1,0 +1,80 @@
+{% extends "admin/base_site.html" %}
+{% load proto_tags %}
+{% block extrastyle %}
+<style type="text/css">
+  div.col1 {float:left;}
+  div.col2 {float:right;}
+  div.colunas {float:left; width:140px;}
+  div.obs {float:left; width:230px;}
+  ins {float:left;}
+  div#theader {font-weight:bold;}
+  </style>
+{% endblock %}
+{% block extrahead %}
+<script type="text/javascript" src="/media/js/jstree/_lib/jquery.js"></script>
+<script type="text/javascript" src="/media/js/jstree/jquery.jstree.js"></script>
+{% endblock %}
+{% block content %}
+<h1>Blocos IP</h1>
+<div id="theader">
+<div class="col1">
+Bloco IP
+</div>
+<div class="col2">
+ <div class="colunas">AS anunciante</div>
+ <div class="colunas">AS proprietário</div>
+ <div class="colunas">Usado por</div>
+ <div class="colunas">Designado para</div>
+ <div class="colunas">RIR</div>
+ <div class="obs">Obs</div>
+</div>
+<div style="clear:both;"> </div>
+</div>
+<div id="blocos">
+<ul>
+{% for b in blocos %}
+   <li style="pchangeing-top:6px;">
+      <div>
+        <div class="col1"><a href="{% url admin:rede_blocoip_change b.id %}">{{ b }}</a></div>
+        <div class="col2">
+           <div class="colunas">{{ b.asn }}</div>
+           <div class="colunas">{{ b.proprietario|default_if_none:"-" }}</div>
+           <div class="colunas">{{ b.usuario|default_if_none:"-" }}</div>
+           <div class="colunas">{{ b.designado|default_if_none:"-" }}</div>
+           <div class="colunas">{{ b.rir }}</div>
+           <div class="obs">{{ b.obs }}</div>
+        </div>
+        <div style="clear:both;"> </div>
+      </div>
+   {% if not b.leaf %}
+   <ul>
+   {% for sb in b.blocoip_set.all %}
+   <li style="pchangeing-top:4px;">
+      <div>
+        <div class="col1"><a href="{% url admin:rede_blocoip_change sb.id %}">{{ sb }}</a></div>
+        <div class="col2">
+           <div class="colunas">{{ sb.asn }}</div>
+           <div class="colunas">{{ sb.proprietario|default_if_none:"-" }}</div>
+           <div class="colunas">{{ sb.usuario|default_if_none:"-" }}</div>
+           <div class="colunas">{{ sb.designado|default_if_none:"-" }}</div>
+           <div class="colunas">{{ sb.rir }}</div>
+           <div class="obs">{{ sb.obs }}</div>
+        </div>
+        <div style="clear:both;"> </div>
+      </div>
+   </li>
+   {% endfor %}
+   </ul>
+   {% endif %}
+   </li> 
+{% endfor %}
+</ul>
+</div>
+<script type="text/javascript">
+$(function() {
+   $("#blocos").jstree({
+		plugins : [ "themes", "html_data"]
+	});
+});
+</script>
+{% endblock %}

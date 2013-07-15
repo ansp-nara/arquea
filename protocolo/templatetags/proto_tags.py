@@ -5,6 +5,8 @@ from protocolo.models import Protocolo, Cotacao
 from django.utils.translation import ugettext_lazy as _
 from django.utils.safestring import mark_safe
 from decimal import Decimal
+from django.shortcuts import get_object_or_404
+from membro.models import Membro
 
 register = Library()
 
@@ -43,24 +45,51 @@ def link_cotacao(pk):
 
 @register.inclusion_tag('admin/relatorios.html')
 def lista_relatorios():
-    relatorios = []
-    relatorios.append({'url':'/financeiro/relatorios/pagamentos_mes', 'nome':u'Pagamentos por mês'})
-    relatorios.append({'url':'/financeiro/relatorios/pagamentos_parcial', 'nome':u'Pagamentos por parcial'})
-    relatorios.append({'url':'/financeiro/relatorios/gerencial', 'nome':u'Gerencial'})
-    relatorios.append({'url':'/financeiro/relatorios/acordos', 'nome':u'Acordos'})
-    relatorios.append({'url':'/financeiro/relatorios/parciais', 'nome':u'Diferenças totais'})
-    relatorios.append({'url':'/financeiro/relatorios/caixa', 'nome':u'Diferenças de caixa'})
-    relatorios.append({'url':'/financeiro/extrato', 'nome':u'Extrato da conta corrente'})
-    relatorios.append({'url':'/financeiro/extrato_mes', 'nome':u'Extrato da conta corrente por mês'})
-    relatorios.append({'url':'/financeiro/extrato_tarifas', 'nome':u'Extrato de tarifas por mês'})
-    relatorios.append({'url':'/financeiro/extrato_financeiro', 'nome':u'Extrato do financeiro por mês'})
-    relatorios.append({'url':'/financeiro/extrato_financeiro_parciais', 'nome':u'Extrato do financeiro por parcial'})
-    relatorios.append({'url':'/financeiro/relatorios/prestacao', 'nome':u'Prestação de contas'})
-    relatorios.append({'url':'/protocolo/descricao', 'nome':u'Protocolos por descrição'})
-    relatorios.append({'url':'/outorga/relatorios/contratos', 'nome':u'Contratos'})
-    relatorios.append({'url':'/identificacao/relatorios/arquivos', 'nome':u'Medições de serviços'})
-    relatorios.append({'url':'/memorando/relatorio', 'nome':u'Memorandos FAPESP'})
-    return {'relatorios':relatorios}
+    gerenciais = []
+    administrativos = []
+    tecnicos = []
+    administrativos.append({'url':'/financeiro/relatorios/pagamentos_mes', 'nome':u'Pagamentos por mês'})
+    administrativos.append({'url':'/financeiro/relatorios/pagamentos_parcial', 'nome':u'Pagamentos por parcial'})
+    gerenciais.append({'url':'/financeiro/relatorios/gerencial', 'nome':u'Gerencial'})
+    gerenciais.append({'url':'/financeiro/relatorios/acordos', 'nome':u'Acordos'})
+    administrativos.append({'url':'/financeiro/relatorios/parciais', 'nome':u'Diferenças totais'})
+    administrativos.append({'url':'/financeiro/relatorios/caixa', 'nome':u'Diferenças de caixa'})
+    administrativos.append({'url':'/financeiro/extrato', 'nome':u'Extrato da conta corrente'})
+    administrativos.append({'url':'/financeiro/extrato_mes', 'nome':u'Extrato da conta corrente por mês'})
+    administrativos.append({'url':'/financeiro/extrato_tarifas', 'nome':u'Extrato de tarifas por mês'})
+    administrativos.append({'url':'/financeiro/extrato_financeiro', 'nome':u'Extrato do financeiro por mês'})
+    administrativos.append({'url':'/financeiro/extrato_financeiro_parciais', 'nome':u'Extrato do financeiro por parcial'})
+    administrativos.append({'url':'/financeiro/relatorios/prestacao', 'nome':u'Prestação de contas'})
+    administrativos.append({'url':'/protocolo/descricao', 'nome':u'Protocolos por descrição'})
+    gerenciais.append({'url':'/outorga/relatorios/contratos', 'nome':u'Contratos'})
+    tecnicos.append({'url':'/identificacao/relatorios/arquivos', 'nome':u'Documentos por entidade'})
+    administrativos.append({'url':'/memorando/relatorio', 'nome':u'Memorandos FAPESP'})
+    gerenciais.append({'url':'/outorga/relatorios/lista_acordos', 'nome':u'Concessões por  acordo'})
+    administrativos.append({'url':'/outorga/relatorios/item_modalidade', 'nome':u'Itens do orçamento por modalidade'})
+    tecnicos.append({'url':'/patrimonio/relatorio/por_estado', 'nome':u'Patrimônio por estado do item'})
+    tecnicos.append({'url':'/patrimonio/relatorio/por_local', 'nome':u'Patrimônio por localização'})
+    tecnicos.append({'url':'/patrimonio/relatorio/por_tipo', 'nome':u'Patrimônio por tipo'})
+    administrativos.append({'url':'/identificacao/agenda', 'nome':u'Agenda'})
+    administrativos.append({'url':'/identificacao/ecossistema/par', 'nome':u'Ecossistema'})
+    administrativos.append({'url':'/membro/mensalf', 'nome':u'Controle de horário mensal'})
+    gerenciais.append({'url':'/outorga/relatorios/acordo_progressivo', 'nome':u'Gerencial progressivo'})
+    gerenciais.append({'url':'/processo/processos', 'nome':u'Processos'})
+    tecnicos.append({'url':'/rede/planejamento', 'nome':u'Planejamento por ano'})
+    tecnicos.append({'url':'/rede/planejamento2', 'nome':u'Serviços contratados por processo'})
+    tecnicos.append({'url':'/rede/info', 'nome':u'Enlaces'})
+    administrativos.append({'url':'/patrimonio/relatorio/por_termo', 'nome':u'Patrimônio por termo de outorga'})
+    tecnicos.append({'url':'/patrimonio/racks', 'nome':u'Racks (provisório)'})
+    tecnicos.append({'url':'/patrimonio/relatorio/por_marca', 'nome':u'Patrimônio por marca'})
+    administrativos.append({'url':'/logs', 'nome':u'Registro de uso do sistema por ano'})
+    tecnicos.append({'url':'/rede/blocosip', 'nome':u'Lista de blocos IP'})
+    tecnicos.append({'url':'/patrimonio/relatorio/por_tipo_equipamento2', 'nome':u'Patrimônio por tipo de equipamento'})
+    administrativos.append({'url':'/patrimonio/relatorio/presta_contas', 'nome':u'Prestação de contas patrimonial (em construção)'})
+    tecnicos.append({'url':'/patrimonio/relatorio/por_tipo_equipamento', 'nome':u'Busca por tipo de equipamento'})
+
+    gerenciais.sort(key=lambda x: x['nome'])
+    administrativos.sort(key=lambda x: x['nome'])
+    tecnicos.sort(key=lambda x: x['nome'])
+    return {'relatorios':[{'nome':u'gerenciais', 'rel':gerenciais}, {'nome':u'administrativos', 'rel':administrativos}, {'nome':u'técnicos', 'rel':tecnicos}]}
 
 
 @register.filter(name='moeda')
@@ -76,9 +105,10 @@ def moeda(value, nac=1):
         return value
 
     i, d = str(value).split('.')
-    s = ''
+    if len(d) > 2: d = d[:2]
+    s = '%s %s'
     if i[0] == '-':
-       s = '- '
+       s = '%s (%s)'
        i = i[1:len(i)]
 
     res = []
@@ -96,5 +126,20 @@ def moeda(value, nac=1):
 	m = 'US$'
     res.reverse()
     i = si.join(res)
-    return '%s %s %s' % (m, s, sep.join((i,d)))
+    return s % (m, sep.join((i,d)))
+
+@register.inclusion_tag('membro/controle.html')
+def controle_horario(user):
+    try:
+        membro = Membro.objects.get(contato__email=user.email)
+    except Membro.DoesNotExist:
+        return {}
+
+    controles = membro.controle_set.all()
+    acao = u'entrada'
+    if controles:
+        controle = controles[0]
+        if controle.saida == None: acao = u'saída'
+
+    return {'acao':acao, 'user':user.first_name}
 

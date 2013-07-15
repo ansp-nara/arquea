@@ -1,0 +1,33 @@
+{% extends "admin/base_site.html" %}
+{% block extrahead %}
+<script src="/media/js/por_tipo.js"></script>
+{% endblock %}
+{% block content %}
+<form method="GET">
+<label for="id_tipo">Tipo</label>:
+<select name="tipo" id="id_tipo" onchange="sel_tipo_equip()">
+     <option value="0">Todos</option>
+  {% for t in tipos %}
+     <option value="{{ t.id }}">{{ t }}</option>
+  {% endfor %}
+</select>
+<br />
+<label for="id_estado">Estado</label>
+<select name="estado" id="id_estado">
+     <option value="0">Todos</option>
+  {% for e in estados %}
+     <option value="{{ e.id }}">{{ e }}</option>
+  {% endfor %}
+</select>
+<br />
+<label for="id_partnumber">Part number</label>
+<select name="partnumber" id="id_partnumber">
+     <option value="0">Todos</option>
+  {% for p in pns %}
+     <option value="{{ p }}">{{ p }}</option>
+  {% endfor %}
+</select>
+<br />
+<input type="submit" value="Enviar">
+</form>
+{% endblock %}

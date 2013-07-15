@@ -1,15 +1,16 @@
 {% extends "admin/base_site.html" %}
 {% load proto_tags %}
 {% block content %}
-<h1 repeat="1">Saldo {% if caixa %}em caixa {% endif %}a ser devolvido à Fapesp no final do processo {{ termo }}</h1>
+<h1>Processo {{ termo }}</h1>
+<h1 repeat="1">Saldo {% if caixa %}em caixa {% endif %}a ser devolvido à Fapesp</h1>
 
-    <table border="0" cellpadding="5">
+    <table border="0" cellpchangeing="5">
     {% for p in parciais %}
 	<tr><td>Parcial {{ p.parcial }}</td><td>(Devolver à Fapesp)  {{ p.diff|moeda }}</td></tr>
 	{% for d in p.dados %}
-	   <tr style="font-weight:bold;"><td></td><td>{{ d.cheque.cod_oper }}</td><td>{{ d.cheque.data_oper|date:"d/m/Y" }}</td><td>(Devolver à Fapesp)  {{ d.diff|moeda }}</td></tr>
+	   <tr style="font-weight:bold;"><td></td><td>Cheque {{ d.cheque.cod_oper }}</td><td>{{ d.cheque.data_oper|date:"d/m/Y" }}</td><td>(Devolver à Fapesp)  {{ d.diff|moeda }}</td></tr>
            {% for pg in d.pgtos %}
-	      <tr><td></td><td>{{ pg.pg.origem_fapesp.item_outorga.natureza_gasto.modalidade.sigla }} - parcial {{ pg.pg.parcial }} - página {{ pg.pg.pagina }}</td><td>{{ pg.pg.protocolo.num_documento }}</td><td><a href="/financeiro/pagamento/{{ pg.pg.id }}">{{ pg.pg.valor_fapesp|moeda }}</a></td><td>{{ pg.pg.valor_patrocinio }}
+	      <tr><td></td><td>{{ pg.pg.origem_fapesp.item_outorga.natureza_gasto.modalidade.sigla }} - parcial {{ pg.pg.parcial }} - página {{ pg.pg.pagina }}</td><td>{{ pg.pg.protocolo.num_documento }}</td><td><a href="/financeiro/pagamento/{{ pg.pg.id }}">{{ pg.pg.valor_fapesp|moeda }}</a></td><td>{{ pg.pg.valor_patrocinio|default_if_none:"" }}
 	      <td style="color:red;">{% if not pg.naparcial %}Tem parcial errada{% endif %}</td></tr>
 	   {% endfor %}
 	{% endfor %}

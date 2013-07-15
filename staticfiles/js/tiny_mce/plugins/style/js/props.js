@@ -75,10 +75,10 @@ function init() {
 	fillSelect(0, 'box_height_measurement', 'style_box_height_measurement', defaultMeasurement, ';', true);
 	fillSelect(0, 'box_float', 'style_float', 'left;right;none', ';', true);
 	fillSelect(0, 'box_clear', 'style_clear', 'left;right;both;none', ';', true);
-	fillSelect(0, 'box_padding_left_measurement', 'style_padding_left_measurement', defaultMeasurement, ';', true);
-	fillSelect(0, 'box_padding_top_measurement', 'style_padding_top_measurement', defaultMeasurement, ';', true);
-	fillSelect(0, 'box_padding_bottom_measurement', 'style_padding_bottom_measurement', defaultMeasurement, ';', true);
-	fillSelect(0, 'box_padding_right_measurement', 'style_padding_right_measurement', defaultMeasurement, ';', true);
+	fillSelect(0, 'box_pchangeing_left_measurement', 'style_padding_left_measurement', defaultMeasurement, ';', true);
+	fillSelect(0, 'box_pchangeing_top_measurement', 'style_padding_top_measurement', defaultMeasurement, ';', true);
+	fillSelect(0, 'box_pchangeing_bottom_measurement', 'style_padding_bottom_measurement', defaultMeasurement, ';', true);
+	fillSelect(0, 'box_pchangeing_right_measurement', 'style_padding_right_measurement', defaultMeasurement, ';', true);
 	fillSelect(0, 'box_margin_left_measurement', 'style_margin_left_measurement', defaultMeasurement, ';', true);
 	fillSelect(0, 'box_margin_top_measurement', 'style_margin_top_measurement', defaultMeasurement, ';', true);
 	fillSelect(0, 'box_margin_bottom_measurement', 'style_margin_bottom_measurement', defaultMeasurement, ';', true);
@@ -185,7 +185,7 @@ function setupFormData() {
 
 	selectByValue(f, 'box_clear', ce.style.clear, true, true);
 
-	setupBox(f, ce, 'box_padding', 'padding', '');
+	setupBox(f, ce, 'box_pchangeing', 'padding', '');
 	setupBox(f, ce, 'box_margin', 'margin', '');
 
 	// Setup border fields
@@ -446,13 +446,13 @@ function generateCSS() {
 
 	ce.style.clear = f.box_clear.value;
 
-	if (!f.box_padding_same.checked) {
-		ce.style.paddingTop = f.box_padding_top.value + (isNum(f.box_padding_top.value) ? f.box_padding_top_measurement.value : "");
-		ce.style.paddingRight = f.box_padding_right.value + (isNum(f.box_padding_right.value) ? f.box_padding_right_measurement.value : "");
-		ce.style.paddingBottom = f.box_padding_bottom.value + (isNum(f.box_padding_bottom.value) ? f.box_padding_bottom_measurement.value : "");
-		ce.style.paddingLeft = f.box_padding_left.value + (isNum(f.box_padding_left.value) ? f.box_padding_left_measurement.value : "");
+	if (!f.box_pchangeing_same.checked) {
+		ce.style.pchangeingTop = f.box_padding_top.value + (isNum(f.box_padding_top.value) ? f.box_padding_top_measurement.value : "");
+		ce.style.pchangeingRight = f.box_padding_right.value + (isNum(f.box_padding_right.value) ? f.box_padding_right_measurement.value : "");
+		ce.style.pchangeingBottom = f.box_padding_bottom.value + (isNum(f.box_padding_bottom.value) ? f.box_padding_bottom_measurement.value : "");
+		ce.style.pchangeingLeft = f.box_padding_left.value + (isNum(f.box_padding_left.value) ? f.box_padding_left_measurement.value : "");
 	} else
-		ce.style.padding = f.box_padding_top.value + (isNum(f.box_padding_top.value) ? f.box_padding_top_measurement.value : "");		
+		ce.style.pchangeing = f.box_padding_top.value + (isNum(f.box_padding_top.value) ? f.box_padding_top_measurement.value : "");		
 
 	if (!f.box_margin_same.checked) {
 		ce.style.marginTop = f.box_margin_top.value + (isNum(f.box_margin_top.value) ? f.box_margin_top_measurement.value : "");
@@ -556,7 +556,7 @@ function showDisabledControls() {
 	for (i=0; i<f.length; i++) {
 		for (a=0; a<f[i].elements.length; a++) {
 			if (f[i].elements[a].disabled)
-				tinyMCEPopup.editor.dom.addClass(f[i].elements[a], "disabled");
+				tinyMCEPopup.editor.dom.changeClass(f[i].elements[a], "disabled");
 			else
 				tinyMCEPopup.editor.dom.removeClass(f[i].elements[a], "disabled");
 		}
@@ -570,7 +570,7 @@ function fillSelect(f, s, param, dval, sep, em) {
 	sep = typeof(sep) == "undefined" ? ";" : sep;
 
 	if (em)
-		addSelectValue(f, s, "", "");
+		changeSelectValue(f, s, "", "");
 
 	ar = tinyMCEPopup.getParam(param, dval).split(sep);
 	for (i=0; i<ar.length; i++) {
@@ -584,12 +584,12 @@ function fillSelect(f, s, param, dval, sep, em) {
 		p = ar[i].split('=');
 
 		if (p.length > 1) {
-			addSelectValue(f, s, p[0], p[1]);
+			changeSelectValue(f, s, p[0], p[1]);
 
 			if (se)
 				selectByValue(f, s, p[1]);
 		} else {
-			addSelectValue(f, s, p[0], p[0]);
+			changeSelectValue(f, s, p[0], p[0]);
 
 			if (se)
 				selectByValue(f, s, p[0]);
@@ -638,4 +638,4 @@ function synch(fr, to) {
 		selectByValue(f, to + "_measurement", f.elements[fr + "_measurement"].value);
 }
 
-tinyMCEPopup.onInit.add(init);
+tinyMCEPopup.onInit.change(init);

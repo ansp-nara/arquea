@@ -1,3 +1,4 @@
+{% load proto_tags %}
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 
 
@@ -10,11 +11,11 @@
 	<!--[if lte IE 7]><link rel="stylesheet" type="text/css" href="{% block stylesheet_ie %}{% load adminmedia %}{% admin_media_prefix %}css/ie.css{% endblock %}" /><![endif]-->
 	{% if LANGUAGE_BIDI %}<link rel="stylesheet" type="text/css" href="{% block stylesheet_rtl %}{% admin_media_prefix %}css/rtl.css{% endblock %}" />{% endif %}
 	<script type="text/javascript">window.__admin_media_prefix__ = "{% filter escapejs %}{% admin_media_prefix %}{% endfilter %}";</script>
-	{% block extrahead %}{% endblock %}
 	{% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock %}
 
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 	<script type="text/javascript" src="/media/js/jquery-blockUI.js"></script>
+        {% block extrahead %}{% endblock %}
 	<!--<script type="text/javascript" src="/media/js/jquery.accordion.js"></script>
 	
 	<script type="text/javascript"> 
@@ -130,6 +131,7 @@ $(document).ajaxSend(function(event, xhr, settings) {
 				<ul>
 				<li class="username">{% trans 'Welcome,' %}<strong> {% filter force_escape %}{% firstof user.first_name user.username %}{% endfilter %}</strong></li>
 				{% block userlinks %}
+                                        <li >{% controle_horario user %}</li>
 					{% url django-admindocs-docroot as docsroot %}
 					{% if docsroot %}
 					<li><a href="{{ docsroot }}">{% trans 'Documentation' %}</a></li>
@@ -192,8 +194,8 @@ $(document).ajaxSend(function(event, xhr, settings) {
 									<th scope="row">{{ model.name }}</th>
 								{% endif %}
 
-								{% if model.perms.add %}
-									<td><a href="{{ model.admin_url }}add/" class="addlink">{% trans 'Add' %}</a></td>
+								{% if model.perms.change %}
+									<td><a href="{{ model.admin_url }}change/" class="addlink">{% trans 'Add' %}</a></td>
 								{% else %}
 									<td>&nbsp;</td>
 								{% endif %}
@@ -255,8 +257,8 @@ $(document).ajaxSend(function(event, xhr, settings) {
 				<h2>Sites</h2>
 				<ul>
 					<li><a href="http://www.ansp.br">Rede ANSP</a></li>
-					<li><a href="http://www.intranet.ansp.br">Intranet NARA</a></li>
-					<li><a href="http://www.diariodebordo.ansp.br">Diário de Bordo</a></li>
+					<li><a href="http://intranet.ansp.br">Intranet NARA</a></li>
+					<li><a href="http://diariodebordo.ansp.br">Diário de Bordo</a></li>
 					<li><a href="http://www.fapesp.br">FAPESP</a></li>
 				</ul>
 			</div>

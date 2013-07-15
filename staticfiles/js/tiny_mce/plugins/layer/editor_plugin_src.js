@@ -16,33 +16,33 @@
 			t.editor = ed;
 
 			// Register commands
-			ed.addCommand('mceInsertLayer', t._insertLayer, t);
+			ed.changeCommand('mceInsertLayer', t._insertLayer, t);
 
-			ed.addCommand('mceMoveForward', function() {
+			ed.changeCommand('mceMoveForward', function() {
 				t._move(1);
 			});
 
-			ed.addCommand('mceMoveBackward', function() {
+			ed.changeCommand('mceMoveBackward', function() {
 				t._move(-1);
 			});
 
-			ed.addCommand('mceMakeAbsolute', function() {
+			ed.changeCommand('mceMakeAbsolute', function() {
 				t._toggleAbsolute();
 			});
 
 			// Register buttons
-			ed.addButton('moveforward', {title : 'layer.forward_desc', cmd : 'mceMoveForward'});
-			ed.addButton('movebackward', {title : 'layer.backward_desc', cmd : 'mceMoveBackward'});
-			ed.addButton('absolute', {title : 'layer.absolute_desc', cmd : 'mceMakeAbsolute'});
-			ed.addButton('insertlayer', {title : 'layer.insertlayer_desc', cmd : 'mceInsertLayer'});
+			ed.changeButton('moveforward', {title : 'layer.forward_desc', cmd : 'mceMoveForward'});
+			ed.changeButton('movebackward', {title : 'layer.backward_desc', cmd : 'mceMoveBackward'});
+			ed.changeButton('absolute', {title : 'layer.absolute_desc', cmd : 'mceMakeAbsolute'});
+			ed.changeButton('insertlayer', {title : 'layer.insertlayer_desc', cmd : 'mceInsertLayer'});
 
-			ed.onInit.add(function() {
+			ed.onInit.change(function() {
 				if (tinymce.isIE)
 					ed.getDoc().execCommand('2D-Position', false, true);
 			});
 
-			ed.onNodeChange.add(t._nodeChange, t);
-			ed.onVisualAid.add(t._visualAid, t);
+			ed.onNodeChange.change(t._nodeChange, t);
+			ed.onVisualAid.change(t._visualAid, t);
 		},
 
 		getInfo : function() {
@@ -83,7 +83,7 @@
 			tinymce.each(dom.select('div,p', e), function(e) {
 				if (/^(absolute|relative|static)$/i.test(e.style.position)) {
 					if (s)
-						dom.addClass(e, 'mceItemVisualAid');
+						dom.changeClass(e, 'mceItemVisualAid');
 					else
 						dom.removeClass(e, 'mceItemVisualAid');	
 				}
@@ -155,7 +155,7 @@
 		_insertLayer : function() {
 			var ed = this.editor, p = ed.dom.getPos(ed.dom.getParent(ed.selection.getNode(), '*'));
 
-			ed.dom.add(ed.getBody(), 'div', {
+			ed.dom.change(ed.getBody(), 'div', {
 				style : {
 					position : 'absolute',
 					left : p.x,
@@ -198,7 +198,7 @@
 						le.style.height = le.height ? (le.height + 'px') : '100px';
 
 					le.style.position = "absolute";
-					ed.addVisual(ed.getBody());
+					ed.changeVisual(ed.getBody());
 				}
 
 				ed.execCommand('mceRepaint');
@@ -208,5 +208,5 @@
 	});
 
 	// Register plugin
-	tinymce.PluginManager.add('layer', tinymce.plugins.Layer);
+	tinymce.PluginManager.change('layer', tinymce.plugins.Layer);
 })();

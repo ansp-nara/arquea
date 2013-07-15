@@ -1,0 +1,24 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+  <h2>Horários</h2>
+ <form method="GET">
+    <select name="ano">
+       {% for ano in anos %}
+       <option value="{{ ano }}">{% if ano == 0 %}Todos{% else %}{{ ano }}{% endif %}</option>
+       {% endfor %}
+    </select>
+    <select name="mes">
+       {% for mes in meses %}
+       <option value="{{ mes }}">{% if mes == 0 %}Todos{% else %}{{ mes }}{% endif %}</option>
+       {% endfor %}
+    </select>
+    <br />
+    <select name="funcionario">
+       {% for func in funcionarios %}
+       <option value="{{ func.id }}">{{ func.nome }}</option>
+       {% endfor %}
+    </select>
+    <input type="submit" value="Enviar">
+ </form>
+{% endblock %}
+

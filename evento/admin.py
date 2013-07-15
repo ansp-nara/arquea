@@ -8,6 +8,7 @@ class EventoAdmin(admin.ModelAdmin):
                 )
   
     list_display = ('tipo', 'local', 'descricao', 'inicio')
+    search_fields = ('descricao',)
 
 admin.site.register(Tipo)
 admin.site.register(Evento, EventoAdmin)
@@ -24,6 +25,7 @@ class SessaoAdmin(admin.ModelAdmin):
                 )
     list_display = ('descricao', 'inicio', 'termino')
     inlines = [AtribuicaoInline,]
+    search_fields = ('area', 'descricao')
 
 admin.site.register(Sessao, SessaoAdmin)
 admin.site.register(AreaOperacional)

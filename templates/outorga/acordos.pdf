@@ -5,7 +5,7 @@
 <style>
 @import url('/var/www/django/media/css/pdf.css');
 @page {
-  size: a4 landscape;
+  size: a4;
   background-image: url('/var/www/django/media/img/papel_timbrado.jpg');
   top: 3cm;
   left: 1.5cm;
@@ -22,13 +22,22 @@
 </style> 
 </head>
 <body>
-<h1 repeat="1">Acumulado por acordo</h1>
+<h1 repeat="1">Distribuição das concessões por acordo nos processos a partir de 2005</h1>
 
-    <table border="1" repeat="1" cellpadding="5">
-    {% for a in acordos %}<tr>
-       {% for d in a %}<td>{{ d|moeda }}</td>{% endfor %}
-    </tr>{% endfor %}
+    <table border="0" repeat="1" cellpchangeing="5">
+    <tr><th>Processo</th><th>Acordo</th><th>Modalidade</th><th>Entidade</th><th>Item do termo de outorga</th></tr>
+    {% for p in processos %}
+           <tr><td>{{ p.processo }}</td></tr>
+           {% for a in p.acordos %}
+                 <tr><td width="10%"></td><td>{{ a.acordo }}</td></tr>
+                 {% for it in a.itens %}
+                     <tr><td></td><td width="25%"></td><td width="10%">{{ it.modalidade }}</td><td width="10%">{{ it.entidade }}</td><td>{{ it.descricao }}</td></tr>
+                 {% endfor %}
+              {% endfor %}
+
+    {% endfor %}
     </table>
+
 
   <div id="footerContent">
       pág <pdf:pagenumber example="00" />

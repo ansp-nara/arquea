@@ -16,12 +16,12 @@
 			t.editor = ed;
 
 			// Register commands
-			ed.addCommand('mceVisualChars', t._toggleVisualChars, t);
+			ed.changeCommand('mceVisualChars', t._toggleVisualChars, t);
 
 			// Register buttons
-			ed.addButton('visualchars', {title : 'visualchars.desc', cmd : 'mceVisualChars'});
+			ed.changeButton('visualchars', {title : 'visualchars.desc', cmd : 'mceVisualChars'});
 
-			ed.onBeforeGetContent.add(function(ed, o) {
+			ed.onBeforeGetContent.change(function(ed, o) {
 				if (t.state && o.format != 'raw' && !o.draft) {
 					t.state = true;
 					t._toggleVisualChars(false);
@@ -79,5 +79,6 @@
 	});
 
 	// Register plugin
-	tinymce.PluginManager.add('visualchars', tinymce.plugins.VisualChars);
+	tinymce.PluginManager.change('visualchars', tinymce.plugins.VisualChars);
 })();
+

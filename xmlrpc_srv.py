@@ -94,19 +94,15 @@ def termos():
     """
     retorno = []
     for t in Termo.objects.all():
-        retorno.append({'id':t.id, 'termo':t.__unicode__()})
+        retorno.append({'id':t.id, 'termo':t.__unicode__(), 'ano':t.ano})
 
     return retorno
 
 dispatcher.register_function(termos, 'termos')
 
-def custeio(termo_id):
-    """
-    Gastos com custio do nara para um determinado processo
-    """
+def custo_acordos(termo_id, acordos):
     retorno = []
-    acordo = Acordo.objects.get(descricao__startswith="Custeio NARA")
-    for o in OrigemFapesp.objects.filter(acordo=acordo,item_outorga__natureza_gasto__termo__id=termo_id):
+    for o in OrigemFapesp.objects.filter(acordo__in=acordos,item_outorga__natureza_gasto__termo__id=termo_id):
         it = {'desc':o.item_outorga.__unicode__(), 'id':o.id}
         total = Decimal('0.0')
         pg = []
@@ -116,7 +112,7 @@ def custeio(termo_id):
             for a in p.auditoria_set.all():
                 url = ''
                 if a.arquivo: url = a.arquivo.url
-	        audits.append({'tipo':a.tipo.nome, 'parcial':a.parcial, 'pagina':a.pagina, 'url':url})
+                audits.append({'tipo':a.tipo.nome, 'parcial':a.parcial, 'pagina':a.pagina, 'url':url})
             pags.update({'docs':audits})
             pg.append(pags)
             total += p.valor_fapesp
@@ -124,6 +120,25 @@ def custeio(termo_id):
         it.update({'total':float(total), 'pg':pg})
         retorno.append(it)
     return retorno
+
+def custo_links(termo_id):
+    acordos = Acordo.objects.filter(descricao__startswith="Links por")
+    return custo_acordos(termo_id, acordos)
+
+dispatcher.register_function(custo_links, 'custo_links')
+
+def custo_suporte(termo_id):
+    acordos = Acordo.objects.filter(descricao__startswith="Suporte t")
+    return custo_acordos(termo_id, acordos)
+
+dispatcher.register_function(custo_suporte, 'custo_suporte')
+
+def custeio(termo_id):
+    """
+    Gastos com custeio do nara para um determinado processo
+    """
+    acordos = Acordo.objects.filter(descricao__startswith="Custeio NARA")
+    return custo_acordos(termo_id, acordos)
 
 dispatcher.register_function(custeio, 'custeio')
 
