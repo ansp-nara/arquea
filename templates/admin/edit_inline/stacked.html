@@ -1,4 +1,4 @@
-{% load i18n adminmedia %}
+{% load i18n admin_static %}
 <div class="inline-group" id="{{ inline_admin_formset.formset.prefix }}-group">
   <h2>{{ inline_admin_formset.opts.verbose_name_plural|title }}</h2>
 {{ inline_admin_formset.formset.management_form }}
@@ -36,15 +36,15 @@
             }
         }
         var updateSelectFilter = function() {
-            // If any SelectFilter widgets were changeed, instantiate a new instance.
+            // If any SelectFilter widgets were added, instantiate a new instance.
             if (typeof SelectFilter != "undefined"){
                 $(".selectfilter").each(function(index, value){
                   var namearr = value.name.split('-');
-                  SelectFilter.init(value.id, namearr[namearr.length-1], false, "{% admin_media_prefix %}");
+                  SelectFilter.init(value.id, namearr[namearr.length-1], false, "{% static "" %}");
                 })
                 $(".selectfilterstacked").each(function(index, value){
                   var namearr = value.name.split('-');
-                  SelectFilter.init(value.id, namearr[namearr.length-1], true, "{% admin_media_prefix %}");
+                  SelectFilter.init(value.id, namearr[namearr.length-1], true, "{% static "" %}");
                 })
             }
         }
@@ -61,13 +61,13 @@
         }
         $(rows).formset({
             prefix: "{{ inline_admin_formset.formset.prefix }}",
-            changeText: "{% blocktrans with inline_admin_formset.opts.verbose_name|title as verbose_name %}Add another {{ verbose_name }}{% endblocktrans %}",
+            addText: "{% blocktrans with inline_admin_formset.opts.verbose_name|title as verbose_name %}Add another {{ verbose_name }}{% endblocktrans %}",
             formCssClass: "dynamic-{{ inline_admin_formset.formset.prefix }}",
             deleteCssClass: "inline-deletelink",
             deleteText: "{% trans "Remove" %}",
             emptyCssClass: "empty-form",
             removed: updateInlineLabel,
-            changeed: (function(row) {
+            added: (function(row) {
                 initPrepopulatedFields(row);
                 reinitDateTimeShortCuts();
                 updateSelectFilter();
@@ -77,4 +77,3 @@
     });
 })(django.jQuery);
 </script>
-

@@ -1,14 +1,14 @@
 {% extends "admin/base_site.html" %}
-{% load adminmedia admin_list i18n %}
+{% load adminm_static admin_list i18n %}
 
-{% block stylesheet %}{% admin_media_prefix %}css/changelists.css{% endblock %}
+{% block stylesheet %}{% static "css/changelists.css" %}{% endblock %}
 {% block bodyclass %}change-list{% endblock %}
 
 {% block content %}
 <div>
 <h1>Cotações para o pedido {{ pai.descricao }}</h1>
-<div style="width:60%;pchangeing:1em;border:1px solid #00cccc;margin-bottom:1em;background:#d9ffff;">
-<span style="background:url({% admin_media_prefix %}img/admin/ico_i.png) no-repeat 0 7px;pchangeing:1em 0 12px 28px">
+<div style="width:60%;padding:1em;border:1px solid #00cccc;margin-bottom:1em;background:#d9ffff;">
+<span style="background:url({% static "img/admin/ico_i.png" %}) no-repeat 0 7px;padding:1em 0 12px 28px">
 {{ ref }}
 {% if pai.responsavel %}
   {% ifequal pai.responsavel user %}
@@ -20,7 +20,7 @@
 Ninguém ainda é responsável por estas cotações.</span>
 {% endif %}
 </div>
-<ul class="object-tools"><li><a href="/admin/protocolo/cotacao/change/?protocolo={{ pai.id }}&return_to={{ return_to }}{% if is_popup %}&_popup=1{% endif %}" class="addlink">{% blocktrans %}Add{% endblocktrans %} cotação</a></li></ul>
+<ul class="object-tools"><li><a href="/admin/protocolo/cotacao/add/?protocolo={{ pai.id }}&return_to={{ return_to }}{% if is_popup %}&_popup=1{% endif %}" class="addlink">{% blocktrans %}Add{% endblocktrans %} cotação</a></li></ul>
 </p>
 </div>
 {% block result_list %}
@@ -44,7 +44,7 @@ Ninguém ainda é responsável por estas cotações.</span>
 <td>{{ c.identificacao.entidade }}</td>
 <td>{{ c.mostra_valor }}</td>
 <td>{{ c.estado }}</td>
-<td><a href="/admin/protocolo/cotacao/{{ c.id }}/?return_to={{ return_to }}" class="change-another">{% trans "Alterar" %}</a></td>
+<td><a href="/admin/protocolo/cotacao/{{ c.id }}/?return_to={{ return_to }}" class="add-another">{% trans "Alterar" %}</a></td>
 </tr>
 {% endfor %}
 <tbody>
