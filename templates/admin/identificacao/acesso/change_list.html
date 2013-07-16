@@ -1,17 +1,18 @@
 {% extends "admin/change_list.html" %}
-{% load adminmedia admin_list i18n %}
+{% load admin_list i18n %}
 
     {% block object-tools %}
-      {% if has_change_permission %}
+      {% if has_add_permission %}
         <ul class="object-tools">
           <li>
-            <a href="{% url identificacao.views.acessos_terremark %}" class="changelink">Acesso à Terremark (em .csv)</a>
+            <a href="{% url identificacao.views.acessos_terremark %}" class="addlink">Acesso à Terremark (em .csv)</a>
           </li>
           <li>
-            <a href="change/{% if is_popup %}?_popup=1{% endif %}" class="addlink">
+            <a href="add/{% if is_popup %}?_popup=1{% endif %}" class="addlink">
               {% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}
             </a>
           </li>
         </ul>
       {% endif %}
     {% endblock %}
+

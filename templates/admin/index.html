@@ -1,7 +1,7 @@
 {% extends "admin/base_site.html" %}
-{% load i18n proto_tags %}
+{% load i18n proto_tags admin_static %}
 
-{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% load adminmedia %}{% admin_media_prefix %}css/dashboard.css" />{% endblock %}
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "css/dashboard.css" %}"/>{% endblock %}
 
 {% block coltype %}colMS{% endblock %}
 
@@ -24,7 +24,7 @@
             {% else %}
             <ul class="actionlist">
             {% for entry in admin_log %}
-            <li class="{% if entry.is_changeition %}addlink{% endif %}{% if entry.is_change %}changelink{% endif %}{% if entry.is_deletion %}deletelink{% endif %}">
+            <li class="{% if entry.is_addition %}addlink{% endif %}{% if entry.is_change %}changelink{% endif %}{% if entry.is_deletion %}deletelink{% endif %}">
                 {% if entry.is_deletion %}
                     {{ entry.object_repr }}
                 {% else %}
@@ -67,4 +67,3 @@
 {% block sidebar %}
 {% endblock %}
 -->
-
