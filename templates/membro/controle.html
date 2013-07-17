@@ -1,4 +1,6 @@
+{% if acao %}
 <form action="/membro/controle" method="POST">{% csrf_token %}
 <input type="hidden" name="acao" value="{{ acao }}">
 <input type="image" value="Registrar {{ acao }}" src="/media/img/{{ acao }}.png" style="color:rgb(204,204,255);">
 </form>
+{% endif %}
