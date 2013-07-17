@@ -1,14 +1,13 @@
 from outorga.models import *
 from financeiro.models import Pagamento
 from django.http import Http404, HttpResponse
-from django.utils import simplejson
+import json as simplejson
 from django.template.response import TemplateResponse
 from identificacao.models import Entidade, Identificacao, ASN
 from models import *
 from utils.functions import render_to_pdf
 from django.db.models import Q
 from django.contrib.auth.decorators import permission_required, login_required
-from django.utils import simplejson
 
 # Create your views here.
 def escolhe_pagamento(request):

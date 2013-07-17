@@ -1,6 +1,6 @@
 import httplib
 from django.core import serializers
-from django.utils import simplejson
+import json as simplejson
 import os
 import ho.pisa as pisa
 from sx.pisa3.pisa_pdf import *
@@ -17,13 +17,13 @@ def render_to_pdf(template_src, context_dict, context_instance=None, filename='f
     html  = template.render(context)
     pdf = pisaPDF()
     pdf_princ = pisa.pisaDocument(StringIO.StringIO(html.encode("utf-8"))) #, link_callback=fetch_resources)
-    pdf.changeDocument(pdf_princ)
+    pdf.addDocument(pdf_princ)
     a = 0
     for f,d,t in attachments:
         a += 1
-        pdf.changeDocument(pisa.pisaDocument(StringIO.StringIO((u'<div style="text-align:center; font-size:22px; padding-top:12cm;"><strong>Anexo %s<br />%s</strong></div>' % (a,d)).encode('utf-8'))))
-        if t == 1: pdf.changeFromFile(open(f, "rb"))
-        elif t == 2: pdf.changeFromString(f)
+        pdf.addDocument(pisa.pisaDocument(StringIO.StringIO((u'<div style="text-align:center; font-size:22px; padding-top:12cm;"><strong>Anexo %s<br />%s</strong></div>' % (a,d)).encode('utf-8'))))
+        if t == 1: pdf.addFromFile(open(f, "rb"))
+        elif t == 2: pdf.addFromString(f)
     if not pdf_princ.err:
         response = HttpResponse(mimetype='application/pdf')
         response.write(pdf.getvalue())
@@ -192,4 +192,3 @@ class UnicodeWriter:
     def writerows(self, rows):
         for row in rows:
             self.writerow(row)
-

@@ -11,7 +11,7 @@ from django.contrib.auth.models import Group
 from django.contrib import admin
 from django.http import Http404, HttpResponse
 from utils.functions import pega_lista, formata_moeda, render_to_pdf
-from django.utils import simplejson
+import json as simplejson
 from models import *
 from decimal import Decimal
 from django.db.models import Q, Max

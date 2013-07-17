@@ -6,7 +6,7 @@ from django.http import Http404, HttpResponse
 from django.contrib import admin
 from django.core.exceptions import PermissionDenied
 from outorga.models import Termo, Modalidade, Item, Natureza_gasto, Acordo
-from django.utils import simplejson
+import json as simplejson
 from utils.functions import render_to_pdf
 from decimal import Decimal
 from identificacao.models import *
