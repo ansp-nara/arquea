@@ -133,7 +133,7 @@ def controle_horario(user):
     try:
         membro = Membro.objects.get(contato__email=user.email)
     except Membro.DoesNotExist:
-        return {}
+        return {'acao':None}
 
     controles = membro.controle_set.all()
     acao = u'entrada'
