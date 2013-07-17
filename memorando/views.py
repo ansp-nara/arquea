@@ -3,7 +3,7 @@
 from django.shortcuts import get_object_or_404, render_to_response
 from financeiro.models import Pagamento
 from outorga.models import Termo
-from django.utils import simplejson
+import json as simplejson
 from django.http import Http404, HttpResponse
 from utils.functions import render_to_pdf
 from models import *
