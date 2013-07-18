@@ -214,7 +214,7 @@ class Entidade(models.Model):
 
     entidade = models.ForeignKey('identificacao.Entidade', verbose_name=_(u'Faz parte de'), null=True, blank=True, related_name='entidade_em')
     nome = models.CharField(_(u'Nome'), max_length=255, help_text=_(u'Razão Social (ex. Telecomunicações de São Paulo S.A.)'))
-    url = models.URLField(_(u'URL'), verify_exists=True, blank=True, help_text=_(u'ex. www.telefonica.com.br'))
+    url = models.URLField(_(u'URL'), blank=True, help_text=_(u'ex. www.telefonica.com.br'))
     sigla = models.CharField(_(u'Sigla'), max_length=20, help_text=_(u'Nome Fantasia (ex. TELEFÔNICA)'), unique=True)
     #asn = models.IntegerField(_(u'ASN'), blank=True, null=True, help_text=_(u' '))
     cnpj = CNPJField(_(u'CNPJ'), blank=True, help_text=_(u'ex. 00.000.000/0000-00'))
