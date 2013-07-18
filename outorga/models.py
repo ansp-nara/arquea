@@ -289,7 +289,7 @@ class Termo(models.Model):
     modalidade = models.ManyToManyField('outorga.Modalidade', through='Natureza_gasto', verbose_name=_(u'Pasta'))
     parecer = models.FileField(u'Parecer inicial', upload_to='termo', blank=True, null=True)
     parecer_final = models.FileField(u'Parecer final', upload_to='termo', blank=True, null=True)
-	projeto = models.FileField(u'Projeto', upload_to='termo', blank=True, null=True)
+    projeto = models.FileField(u'Projeto', upload_to='termo', blank=True, null=True)
     orcamento = models.FileField(_(u'Orçamento'), upload_to='termo', blank=True, null=True)
     quitacao = models.FileField(_(u'Quitação'), upload_to='termo', blank=True, null=True)
     doacao = models.FileField(_(u'Doação'), upload_to='termo', blank=True, null=True)
