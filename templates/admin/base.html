@@ -132,19 +132,15 @@ $(document).ajaxSend(function(event, xhr, settings) {
 				<li class="username">{% trans 'Welcome,' %}<strong> {% filter force_escape %}{% firstof user.first_name user.username %}{% endfilter %}</strong></li>
 				{% block userlinks %}
                                         <li >{% controle_horario user %}</li>
-					{% url django-admindocs-docroot as docsroot %}
-					{% if docsroot %}
-					<li><a href="{{ docsroot }}">{% trans 'Documentation' %}</a></li>
-					<li>/</li>
-					{% endif %}
-					{% url admin:password_change as password_change_url %}
+
+					{% url 'admin:password_change' as password_change_url %}
 					{% if password_change_url %}
 					<li><a class="change-pass" href="{{ password_change_url }}">
 					{% else %}
 					<li><a class="change-pass" href="{{ root_path }}password_change/">
 					{% endif %}
 					{% trans 'Change password' %}</a></li>
-					{% url django_cas.views.logout as logout_url %}
+					{% url 'django_cas.views.logout' as logout_url %}
 					{% if logout_url %}
 					<li><a class="sair" href="{{ logout_url }}">
 					{% else %}
