@@ -1,3 +1,4 @@
+
 import httplib
 from django.core import serializers
 import json as simplejson
@@ -9,6 +10,8 @@ import cgi
 from django.template import Context, loader, RequestContext
 from django.http import HttpResponse
 import settings
+from datetime import date, timedelta
+import calendar
 
 def render_to_pdf(template_src, context_dict, context_instance=None, filename='file.pdf', attachments=[]):
     template = loader.get_template(template_src)
@@ -95,6 +98,14 @@ def pega_lista(request, obj, filtro):
             retorno = [{"pk":"0","valor":"Nenhum registro"}]
             json = simplejson.dumps(retorno)
     return json
+
+
+def working_days(year, month):
+    fromdate = date(year, month, 1)
+    dias_mes = calendar.monthrange(year, month)[1]
+    daygenerator = (fromdate + timedelta(x + 1) for x in range(dias_mes))
+    return sum(day.weekday() < 5 for day in daygenerator)
+
 
 def clone_objects(objects):
     def clone(from_object):
