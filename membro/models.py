@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 
 
-from django.db import models
-from utils.models import NARADateField
-from django.utils.translation import ugettext_lazy as _
-from django.db.models import Q
+from datetime import timedelta, datetime, date
 from dateutil.relativedelta import *
+from django.db import models
+from django.db.models import Q
+from django.utils.translation import ugettext_lazy as _
+from protocolo.models import Feriado
+from utils.models import NARADateField
 
-import datetime
+
 
 
 #from utils.models import CPFField
@@ -99,7 +101,7 @@ class Membro(models.Model):
     email = models.CharField(_(u'E-mail'), max_length=50, blank=True, help_text=_(u'ex. nome@empresa.br'))
     ramal = models.IntegerField(_(u'Ramal'), blank=True, null=True)
     obs = models.TextField(_(u'Observação'), blank=True)
-    url_lattes = models.URLField(_(u'Currículo Lattes'), verify_exists=False, blank=True, help_text=_(u'URL do Currículo Lattes'))
+    url_lattes = models.URLField(_(u'Currículo Lattes'), blank=True, help_text=_(u'URL do Currículo Lattes'))
     foto = models.ImageField(upload_to='membro', blank=True, null=True)
     data_nascimento = NARADateField(_(u'Nascimento'), help_text=_(u'Data de nascimento'), blank=True, null=True)
     site = models.BooleanField(_(u'Exibir no site?'))
@@ -323,7 +325,37 @@ class DispensaLegal(models.Model):
     arquivo = models.FileField(upload_to='dispensas/', null=True, blank=True)
 
     def __unicode__(self):
-	return "%s - %s" % (self.membro, self.justificativa)
+        return "%s - %s" % (self.membro, self.justificativa)
+    
+    @property
+    def termino_realizada(self):
+        """
+        Calcula a data de termino da dispensa, discontado o sábado e o domingo
+        Leva em conta os feriados.
+        """
+        feriados = Feriado.objects.all().filter(feriado__gte = date(self.inicio_realizada.year, self.inicio_realizada.month, 1))
+        
+        soma_dias = 0
+        for x in range(self.dias_uteis):
+            d = self.inicio_realizada + timedelta(days=x)
+            
+            # verifica se o dia é feriado
+            tem_feriado = False
+            for feriado in feriados:
+                tem_feriado = tem_feriado or (d == feriado.feriado)
+            
+            # se for feriado ou final-de-semana, pula o dia
+            if tem_feriado or d.weekday() >= 5:
+                soma_dias = soma_dias + 2
+            else:
+                soma_dias = soma_dias + 1
+            
+        if soma_dias > 0:
+            return self.inicio_realizada + timedelta(soma_dias-1)
+        else:
+            return self.inicio_realizada
+        
+        
 
     class Meta:
         verbose_name = _(u'Dispensa')
@@ -499,7 +531,11 @@ class Controle(models.Model):
     def segundos(self):
         if not self.saida: return 0
         delta = self.saida-self.entrada
-        return delta.seconds
+        segundos_trabalhados = delta.seconds
+        if self.almoco_devido:
+            segundos_trabalhados = segundos_trabalhados - (self.almoco * 60)
+            
+        return segundos_trabalhados
 
     class Meta:
         ordering = ('-entrada',)
