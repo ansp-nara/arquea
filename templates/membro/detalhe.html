@@ -6,5 +6,13 @@
 {% for d in m.controles %}
 {{ d.entrada|date:"d/m  H:i" }} <b>a</b> {{ d.saida|date:"d/m  H:i" }} ({{ d.permanencia }})<br />
 {% endfor %}
-{% endfor %}
+
+<p>
+	<div><strong>Total do mês = </strong>{{ m.total_horas_periodo }}</div>
+	<div><strong>Total a realizar = </strong>{{ m.total_horas_restante }}</div>
+</p>
+
+ 
+ 
+ {% endfor %}
 {% endblock %}

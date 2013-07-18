@@ -2,19 +2,25 @@
 
 # Create your views here.
 
-import datetime
-from models import *
-from utils.functions import render_to_pdf
-from django.contrib.auth.decorators import permission_required, login_required
+from datetime import date, timedelta, datetime
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse
+from django.http import HttpResponseRedirect, Http404, HttpResponseForbidden
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
-from django.http import HttpResponseRedirect, Http404, HttpResponseForbidden
-from django.contrib import messages
 from forms import *
-from django.core.urlresolvers import reverse
+from models import *
+from protocolo.models import Feriado
+from utils.functions import render_to_pdf
+import calendar
+import logging
+
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
 
 def ferias(context):
-    now = datetime.datetime.now()
+    now = datetime.now()
     funcionarios = []
     for f in [m for m in Membro.objects.all() if m.funcionario is True]:
         func = {}
@@ -25,7 +31,7 @@ def ferias(context):
         if ferias.count() == 0:
             continue
         ferias = ferias[0]
-        final = ferias.inicio - datetime.timedelta(1)
+        final = ferias.inicio - timedelta(1)
         final = datetime.date(final.year+1, final.month, final.day)
         func['periodo'] = '%s a %s' % (ferias.inicio.strftime("%d/%m/%Y"), final.strftime("%d/%m/%Y"))
         try:
@@ -51,10 +57,10 @@ def controle(request):
         if acao == u'entrada':
             controle = Controle()
             controle.membro = membro
-            controle.entrada = datetime.datetime.now()
+            controle.entrada = datetime.now()
         else:
             controle = membro.controle_set.all()[0]
-            controle.saida = datetime.datetime.now()
+            controle.saida = datetime.now()
         controle.save()
         messages.info(request, u'Sua %s foi registrada com sucesso.' % acao)
         return HttpResponseRedirect(reverse('membro.views.observacao', kwargs={'id':controle.id}))
@@ -83,7 +89,7 @@ def mensal(request, ano=2012, mes=7):
 @login_required
 def detalhes(request):
     membro = get_object_or_404(Membro, contato__email=request.user.email)
-    agora = datetime.datetime.now()
+    agora = datetime.now()
 
     return TemplateResponse(request, 'membro/detalhes.html', {'membro':membro, 'dados':Controle.objects.filter(membro=membro, entrada__month=agora.month)})
 
@@ -112,13 +118,76 @@ def mensal_func(request):
                 else:
 		    cm.append(c)
 
+        total_horas_periodo = 0
         for m in meses:
-	    total = sum([c.segundos() for c in m['controles']])
-            total = '%2dh%2dmin' % (total/3600, total/60%60)
-            m.update({'total':total})
+
+            # total de horas trabalhadas	        
+            total = sum([c.segundos() for c in m['controles']])
+            total_str = '%2dh%2dmin' % (total/3600, total/60%60)
+            m.update({'total':total_str})
+
+            feriados = Feriado.objects.filter(feriado__year=c.entrada.year, feriado__month=c.entrada.month)
+            
+            folgas = DispensaLegal.objects.filter(membro=funcionario)
+         
+            # ferias_ini < mes_ini < ferias_fim  OR  mes_ini < ferias_ini < mes_fim
+            mes_corrente_ini = date(c.entrada.year, c.entrada.month, 01)
+            mes_corrente_fim = date(c.entrada.year, c.entrada.month, 01) + timedelta(calendar.monthrange(c.entrada.year, c.entrada.month)[1])
+            ferias = ControleFerias.objects.filter(Q(inicio__lte=mes_corrente_ini, termino__gte=mes_corrente_ini) |
+                                                   Q(inicio__gte=mes_corrente_ini, inicio__lte=mes_corrente_fim),
+                                                   ferias__membro__id=funcionario)
+            
+            # int com o total de dias de trabalho (business day) no mes
+            soma_dias_de_trabalho = 0
+            # flag somente para a soma de dias durante o while. Sai quando trocar o mes
+            date_flag = mes_corrente_ini
+            while date_flag.month == c.entrada.month:
+            
+                # é final de semana?
+                is_final_de_semana = date_flag.weekday() >= 5;
+                
+                # é feriado?
+                is_feriado = False
+                for feriado_dia in feriados:
+                    is_feriado = is_feriado or (date_flag == feriado_dia.feriado)
+
+                # é folga?
+                is_folga = False
+                for folga in folgas:
+                    # gera um range de dias entre o período de início e final de folga
+                    if folga.inicio_realizada == folga.termino_realizada:
+                        is_folga = is_folga or (date_flag == folga.inicio_realizada)
+                    else:
+                        periodo_folga = (folga.inicio_realizada + timedelta(days=d) for d in range((folga.termino_realizada - folga.inicio_realizada).days + 1))
+                        for dia_folga in periodo_folga:
+                            is_folga = is_folga or (date_flag == dia_folga)
+
+                # soma os dias de trabalho
+                if not is_final_de_semana and not is_feriado and not is_folga:
+                    soma_dias_de_trabalho = soma_dias_de_trabalho + 1
+#                 else:
+#                     logger.debug("nao e dia util =" + str(date_flag)
+#                                  + (" is_final_de_semana=" + str(is_final_de_semana) if is_final_de_semana else "") 
+#                                  + (" is_feriado=" + str(is_feriado) if is_feriado else "") 
+#                                  + (" is_folga=" + str(is_folga) if is_folga else "")
+#                     )
+                
+                date_flag = date_flag + timedelta(days=1)
+                
+            
+            # as horas totais do período são as horas do total de dias do mes menos os finais de semana, ferias e folgas
+            total_horas_periodo = (soma_dias_de_trabalho * 8 * 60 * 60)
+            total_horas_periodo_str = '%2dh%2dmin' % (total_horas_periodo/3600, total_horas_periodo/60%60)
+            
+            total_horas_restante = total_horas_periodo - total;
+            total_horas_restante_str = '%2dh%2dmin' % (total_horas_restante/3600, total_horas_restante/60%60)
+            
+            m.update({'total_horas_periodo':total_horas_periodo_str})
+            m.update({'total_horas_restante':total_horas_restante_str})
+        
         return TemplateResponse(request, 'membro/detalhe.html', {'meses':meses, 'membro':membro})
     else:
-        hoje = datetime.datetime.now()
+        hoje = datetime.now()
         anos = [0]+range(2012, hoje.year+1)
         meses = range(13)
         funcionarios = [m for m in Membro.objects.all() if m.funcionario]
