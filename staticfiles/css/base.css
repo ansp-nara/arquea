@@ -485,7 +485,7 @@ input[type=text], input[type=password], textarea, select, .vTextField {
 	-moz-border-radius:10px;
 	-webkit-border-radius:10px;
 	border-radius:10px;
-	width:380px;
+	min-width:380px;
 }
 
 .modal-call{
@@ -562,6 +562,7 @@ input[type=text], input[type=password], textarea, select, .vTextField {
 	-webkit-border-radius:10px;
 	border-radius:10px;
 	padding:5px;
+	min-width: 380px;
 	background:url(../img/admin/bg-modalbox.jpg) repeat-x top center;}
 
 /* MODULES - HEADER */
