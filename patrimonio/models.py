@@ -128,7 +128,10 @@ class Patrimonio(models.Model):
         return cls.objects.filter(pagamento_protocolo__termo=t)
 
     def nf(self):
-        return '%s' % self.pagamento.protocolo.num_documento
+        if self.pagamento is not None and self.pagamento.protocolo is not None:
+            return '%s' % self.pagamento.protocolo.num_documento
+        else:
+            return ''
     nf.short_description = u'NF'
 
     # Define a descrição do modelo.
@@ -256,7 +259,7 @@ class DistribuicaoUnidade(models.Model):
 	sigla = models.CharField(max_length=4)
 	
 	def __unicode__(self):
-		return '%s' % self.sigla
+		return '%s - %s' % (self.sigla, self.nome)
 		
 class Distribuicao(models.Model):
 	inicio = models.IntegerField()
