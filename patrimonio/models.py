@@ -268,7 +268,7 @@ class Distribuicao(models.Model):
 	direcao = models.ForeignKey('patrimonio.Direcao')
 	
 	def __unicode__(self):
-		return '%s - %s' % (self.inicio, self.final)
+		return u'%s - %s' % (self.inicio, self.final)
 		
 	class Meta:
 		verbose_name = u'Distribuição'
@@ -278,7 +278,7 @@ class UnidadeDimensao(models.Model):
 	nome = models.CharField(max_length=15)
 	
 	def __unicode__(self):
-		return '%s' % self.nome
+		return u'%s' % self.nome
 		
 	class Meta:
 		verbose_name = u'Unidade da dimensão'
