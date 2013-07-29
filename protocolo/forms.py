@@ -151,7 +151,7 @@ class ProtocoloAdminForm(forms.ModelForm):
 
 
     class Media:
-        js = ('/media/js/selects.js', '/media/js/protocolo.js', '/media/js/jquery.js')
+        js = ('/media/js/selects.js', '/media/js/protocolo.js',)
         
 
     # Verifica se o termo do protocolo é o mesmo termo do item do pedido de outorga relacionada a despesa desse protocolo.

@@ -83,7 +83,7 @@ class HistoricoLocalAdminForm(forms.ModelForm):
         model = HistoricoLocal
 
     class Media:
-        js = ('/media/js/selects.js', '/media/js/jquery.js')
+        js = ('/media/js/selects.js',)
 
 
     entidade = forms.ModelChoiceField(Entidade.objects.all(), required=False,

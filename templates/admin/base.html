@@ -13,9 +13,9 @@
 	<script type="text/javascript">window.__admin_media_prefix__ = "{% filter escapejs %}{% static "" %}{% endfilter %}";</script>
 	{% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock %}
 
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-	<script type="text/javascript" src="/media/js/jquery-blockUI.js"></script>
+	<script type="text/javascript" src="/media/js/jquery.min.js"></script>
         {% block extrahead %}{% endblock %}
+	<script type="text/javascript" src="/media/js/jquery-blockUI.js"></script>
 	<!--<script type="text/javascript" src="/media/js/jquery.accordion.js"></script>
 	
 	<script type="text/javascript"> 
@@ -31,7 +31,10 @@
             $('.modal-box').hide();
 			$('.modal-call-header').click(function() {
                 var id = '#mod-'+$(this).attr('app');
-				$.blockUI({ message: $(id) });
+				$.blockUI({ 
+				    message: $(id),
+				    css: { top: '20%' }  
+				});
 			}); 
 			
 			$('.modal-close').click(function() { 
@@ -260,7 +263,7 @@ $(document).ajaxSend(function(event, xhr, settings) {
 			</div>
 			
 			<div class="nara-logo">
-				<a href="http://www.ansp.br/nara">Sobre nós</a>
+				<a href="http://www.ansp.br/index.php/br/nara">Sobre nós</a>
 			</div>
 			
 			<div class="footer-copy">
