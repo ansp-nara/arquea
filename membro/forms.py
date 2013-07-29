@@ -1,16 +1,22 @@
 # -*- coding: utf-8 -*-
 
-from models import *
-from identificacao.models import Entidade
-from django.forms.util import ErrorList
 from django import forms
-import re
 from django.forms.models import BaseInlineFormSet, inlineformset_factory
+from django.forms.util import ErrorList
+from django.utils.translation import ugettext_lazy as _
+from identificacao.models import Entidade
+from models import *
+import logging
+import re
+
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
 
 EMAIL_RE = re.compile(
     r"(^[-!#$%&'*+/=?^_`{}|~0-9A-Z]+(\.[-!#$%&'*+/=?^_`{}|~0-9A-Z]+)*"  # dot-atom
     r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-\011\013\014\016-\177])*"' # quoted-string
     r')@(?:[A-Z0-9-]+\.)+[A-Z]{2,6}$', re.IGNORECASE)  # domain
+
 
 
 # Faz a validação de um e-mmail
@@ -174,3 +180,36 @@ class ControleObs(forms.ModelForm):
     class Meta:
 	model = Controle
         fields = ('obs',)
+
+class ControleAdminForms(forms.ModelForm):
+    
+    def clean(self):
+        cleaned_data = super(ControleAdminForms, self).clean()
+        
+        entrada = cleaned_data.get("entrada")
+        saida = cleaned_data.get("saida")
+        
+        # Checar horarios de entrada e saida
+        if entrada > saida:
+            msg = _(u"Entrada não pode ser depois que a saída.")
+            self._errors["entrada"] = self.error_class([msg])
+            self._errors["saida"] = self.error_class([msg])
+
+            # These fields are no longer valid. Remove them from the cleaned data.
+            del cleaned_data["entrada"]
+            del cleaned_data["saida"]
+
+        # Checar se horario de almoço vai fazer as horas ficarem negativas 
+        almoco = cleaned_data.get("almoco")
+        tempo_de_trabalho = saida - entrada
+        if tempo_de_trabalho.total_seconds() <= (almoco * 60):
+            msg = _(u"Período de trabalho menor que o tempo de almoço.")
+            self._errors["almoco"] = self.error_class([msg])
+            del cleaned_data["almoco"]
+        
+        # Always return the full collection of cleaned data.
+        return cleaned_data
+        
+        
+    
+    

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from django.contrib import admin
-from models import *
 from django.utils.translation import ugettext_lazy as _
 from forms import *
+from models import *
 
 
 
@@ -153,6 +153,7 @@ admin.site.register(DispensaLegal, DispensaLegalAdmin)
 
 class ControleAdmin(admin.ModelAdmin):
     list_filter = ('membro',)
+    form = ControleAdminForms
 
     def queryset(self, request):
         qs = super(ControleAdmin, self).queryset(request)
