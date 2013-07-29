@@ -14,7 +14,7 @@
 <label for="final_id">Final: </label>
 <select name="final" id="final_id">
 {% for ano in anos %}
-<option value="{{ ano }}">{{ ano }}</option>
+<option value="{{ ano }}" {% if forloop.last %}selected{% endif %}>{{ ano }}</option>
 {% endfor %}
 </select>
 <br />
