@@ -501,7 +501,7 @@ def racks(request):
                 eixoY = int(round(((126 - pos - tam) * 19)/3))
                 
                 # x a partir do topo do container
-                equipamentos.append({'eixoY': eixoY, 'tamanho':tam, 'imagem':imagem, 'descricao':pt.descricao or u'Sem descrição', 'range':range(tam-1)})
+                equipamentos.append({'id': pt.id, 'eixoY': eixoY, 'tamanho':tam, 'imagem':imagem, 'descricao':pt.descricao or u'Sem descrição', 'range':range(tam-1)})
             
             rack = {'nome':rack.apelido, 'altura':126, 'equipamentos':equipamentos}
             if altura > 1:
