@@ -14,6 +14,11 @@ import datetime
 
 class Estado(models.Model):
 
+    # Declaração de variáveis estáticas
+    PATRIMONIO_ATIVO = 22
+
+
+
     """
     Uma instância dessa classe representa um estado do patrimônio ou do equipamento.
     Exemplo de estado do Patrimônio: Emprestado, Mautenção, Doado, ...
@@ -78,32 +83,34 @@ class Patrimonio(models.Model):
 
     """
 
-    checado = models.BooleanField()
     patrimonio = models.ForeignKey('patrimonio.Patrimonio', null=True, blank=True, verbose_name=_(u'Contido em'), related_name='contido')
     pagamento = models.ForeignKey('financeiro.Pagamento', null=True, blank=True)
-    tipo = models.ForeignKey('patrimonio.Tipo')
+    ns = models.CharField(_(u'Número de série'), null=True, blank=True, max_length=50)
+    complemento = models.CharField('Compl', max_length=100, null=True, blank=True)
+    valor = models.DecimalField(u'Vl unit', max_digits=12, decimal_places=2, null=True, blank=True)
+    procedencia = models.CharField(_(u'Procedência'), null=True, blank=True, max_length=100)
+    obs = models.TextField(null=True, blank=True)
+    agilis = models.BooleanField(_(u'Agilis?'), default=True)
+    equipamento = models.ForeignKey('patrimonio.Equipamento', null=True, blank=True)
+    checado = models.BooleanField()
     apelido = models.CharField(max_length=30, null=True, blank=True)
     descricao = models.TextField(_(u'Descrição NF'))
+    ean = models.CharField(u'EAN', max_length=45, null=True, blank=True)
+    tem_numero_fmusp = models.BooleanField('Tem número de patrimônio FMUSP?', default=False)
+    numero_fmusp = models.IntegerField('Número de patrimônio FMUSP', null=True, blank=True)
+
+# Campos duplicados que existem no Model de Equipamento
+    tipo = models.ForeignKey('patrimonio.Tipo')
     descricao_tecnica = models.TextField(u'Descrição técnica', null=True, blank=True)
     part_number = models.CharField(null=True, blank=True, max_length=50)
     marca = models.CharField(_(u'Marca/Editora'), null=True, blank=True, max_length=100)
     modelo = models.CharField(null=True, blank=True, max_length=100)
-    ns = models.CharField(_(u'Número de série'), null=True, blank=True, max_length=50)
-    valor = models.DecimalField(u'Vl unit', max_digits=12, decimal_places=2, null=True, blank=True)
     imagem = models.ImageField(upload_to='patrimonio', null=True, blank=True)
-    procedencia = models.CharField(_(u'Procedência'), null=True, blank=True, max_length=100)
-    obs = models.TextField(null=True, blank=True)
     isbn = models.CharField(_(u'ISBN'), null=True, blank=True, max_length=20)
-    agilis = models.BooleanField(_(u'Agilis?'), default=True)
-    ncm = models.CharField(u'NCM/SH', null=True, blank=True, max_length=30)
-    especificacao = models.FileField(u'Especificação', upload_to='patrimonio', null=True, blank=True)
     titulo_autor = models.CharField(_(u'Título e autor'), null=True, blank=True, max_length=100)
-    complemento = models.CharField('Compl', max_length=100, null=True, blank=True)
-    ean = models.CharField(u'EAN', max_length=45, null=True, blank=True)
+    especificacao = models.FileField(u'Especificação', upload_to='patrimonio', null=True, blank=True)
+    ncm = models.CharField(u'NCM/SH', null=True, blank=True, max_length=30)
     tamanho = models.DecimalField(u'Tamanho (em U)', max_digits=5, decimal_places=2, blank=True, null=True)
-    equipamento = models.ForeignKey('patrimonio.Equipamento', null=True, blank=True)
-    tem_numero_fmusp = models.BooleanField('Tem número de patrimônio FMUSP?', default=False)
-    numero_fmusp = models.IntegerField('Número de patrimônio FMUSP', null=True, blank=True)
 
     def __unicode__(self):
         if self.pagamento:
@@ -211,12 +218,12 @@ class HistoricoLocal(models.Model):
     """
 
 
+    memorando = models.ForeignKey('memorando.MemorandoSimples', null=True, blank=True)
     patrimonio = models.ForeignKey(Patrimonio, verbose_name=_(u'Patrimônio'))
     endereco = models.ForeignKey('identificacao.EnderecoDetalhe', verbose_name=_(u'Localização'))
+    estado =  models.ForeignKey(Estado, verbose_name=_(u'Estado do Patrimônio'))
     descricao = models.TextField(_(u'Ocorrência'), help_text=_(u'ex. Empréstimo'))
     data = models.DateField(_(u'Data'))
-    estado =  models.ForeignKey(Estado, verbose_name=_(u'Estado do Patrimônio'))
-    memorando = models.ForeignKey('memorando.MemorandoSimples', null=True, blank=True)
     posicao = models.CharField(u'Posição', max_length=50, null=True, blank=True)
     pai = models.ForeignKey(Patrimonio, null=True, blank=True, related_name='filhos')
 
@@ -259,7 +266,7 @@ class DistribuicaoUnidade(models.Model):
 	sigla = models.CharField(max_length=4)
 	
 	def __unicode__(self):
-		return '%s - %s' % (self.sigla, self.nome)
+		return u'%s - %s' % (self.sigla, self.nome)
 		
 class Distribuicao(models.Model):
 	inicio = models.IntegerField()
@@ -292,7 +299,7 @@ class Dimensao(models.Model):
 	unidade = models.ForeignKey('patrimonio.UnidadeDimensao')
 	
 	def __unicode__(self):
-		return '%s x %s x %s %s - %s kg' % (self.altura, self.largura, self.profundidade, self.unidade, self.peso)
+		return u'%s x %s x %s %s - %s kg' % (self.altura, self.largura, self.profundidade, self.unidade, self.peso)
 	
 	class Meta:
 		verbose_name = u'Dimensão'
@@ -320,9 +327,10 @@ class Equipamento(models.Model):
     especificacao = models.FileField(u'Especificação', upload_to='patrimonio', null=True, blank=True)
     tipo = models.ForeignKey('patrimonio.TipoEquipamento', null=True, blank=True)
     convencoes = models.ManyToManyField('patrimonio.Distribuicao', verbose_name=u'Convenções')
+    dimensao = models.ForeignKey('patrimonio.Dimensao', null=True, blank=True)
 
     def __unicode__(self):
-        return '%s - %s' % (self.descricao, self.part_number)
+        return u'%s - %s' % (self.descricao, self.part_number)
 
     class Meta:
 	ordering = ('descricao',)
