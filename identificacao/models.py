@@ -101,9 +101,9 @@ class EnderecoDetalhe(models.Model):
 
     def __unicode__(self):
         if self.endereco:
-            return '%s - %s' % (self.endereco, self.complemento)
+            return u'%s - %s' % (self.endereco, self.complemento)
         else:
-            return '%s - %s' % (self.detalhe, self.complemento)
+            return u'%s - %s' % (self.detalhe, self.complemento)
 
     def detalhes(self):
 	if self.endereco:
@@ -184,7 +184,7 @@ class ASN(models.Model):
 
     def __unicode__(self):
         if self.entidade:
-            return '%s - %s' % (self.numero, self.entidade)
+            return u'%s - %s' % (self.numero, self.entidade)
         else: return self.numero
 
     class Meta:
@@ -264,7 +264,7 @@ class EntidadeHistorico(models.Model):
     tipo = models.ForeignKey('identificacao.TipoEntidade')
 
     def __unicode__(self):
-        return '%s %s %s' % (self.entidade.sigla, self.tipo.nome, self.inicio)
+        return u'%s %s %s' % (self.entidade.sigla, self.tipo.nome, self.inicio)
 
 
 class Identificacao(models.Model):
@@ -335,7 +335,7 @@ class ArquivoEntidade(models.Model):
     tipo = models.ForeignKey('identificacao.TipoArquivoEntidade')
   
     def __unicode__(self):
-	return '%s - %s' % (self.entidade.sigla, self.arquivo.name)
+	return u'%s - %s' % (self.entidade.sigla, self.arquivo.name)
 
     class Meta:
         ordering = ('tipo', '-data')
@@ -355,7 +355,7 @@ class PapelEntidade(models.Model):
     entidade = models.ForeignKey('identificacao.Entidade')
       
     def __unicode__(self):
-        return '%s - %s' % (self.entidade, self.tipo)
+        return u'%s - %s' % (self.entidade, self.tipo)
 	 
 
 class Agenda(models.Model):
@@ -382,7 +382,7 @@ class Acesso(models.Model):
     detalhe = models.ManyToManyField('identificacao.EnderecoDetalhe', null=True, blank=True)
 
     def __unicode__(self):
-        return '%s - %s' % (self.identificacao, self.lista_niveis())
+        return u'%s - %s' % (self.identificacao, self.lista_niveis())
 
     def lista_niveis(self):
         lista = ', '.join([n.nome for n in self.niveis.all()])
@@ -393,7 +393,7 @@ class NivelAcesso(models.Model):
     explicacao = models.TextField('Explicação')
 
     def __unicode__(self):
-        return '%s' % self.nome
+        return u'%s' % self.nome
 
     class Meta:
         verbose_name = u'Nível de acesso'
@@ -423,7 +423,7 @@ class Ecossistema(models.Model):
     vai_pat = models.BooleanField(u'Vai patrocinar?')
 
     def __unicode__(self):
-        return '%s' % self.identificacao.endereco.entidade.sigla
+        return u'%s' % self.identificacao.endereco.entidade.sigla
 
     class Meta:
         ordering = ('identificacao__endereco__entidade__sigla',)
