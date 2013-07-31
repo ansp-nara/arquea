@@ -23,6 +23,7 @@ from django.template.response import TemplateResponse
 from django.db.models import Q
 import itertools
 
+
 # Gera uma lista dos protocolos conforme o termo selecionado.
 def escolhe_termo(request):
     if request.method == 'POST':
@@ -91,7 +92,7 @@ def escolhe_pagamento(request):
 	if not retorno:
 	    retorno = [{"pk":"0","valor":"Nenhum registro"}]
 	    
-	json = simplejson.dumps(retorno)
+	    json = simplejson.dumps(retorno)
     else:
         raise Http404
     return HttpResponse(json, mimetype="application/json")
@@ -458,43 +459,62 @@ def por_termo(request, pdf=0):
 
 @login_required
 def racks(request):
-    locais = Patrimonio.objects.filter(equipamento__tipo__nome='Rack', historicolocal__estado__id=22).values_list('historicolocal__endereco', flat=True).order_by('historicolocal__endereco').distinct()
+    # Busca patrimonios do tipo RACK com o estado ATIVO
+    locais = Patrimonio.objects.filter(equipamento__tipo__nome='Rack', historicolocal__estado__id=Estado.PATRIMONIO_ATIVO).values_list('historicolocal__endereco', flat=True).order_by('historicolocal__endereco').distinct()
     dcs = []
-    f = open('/tmp/debug.txt', 'w')
-    for l in locais:
+    debugFile = open('/tmp/debug.txt', 'w')
+    for local in locais:
         racks = []
-        for r in Patrimonio.objects.filter(equipamento__tipo__nome='Rack', historicolocal__endereco__id=l):
-            alt = 127
+        for rack in Patrimonio.objects.filter(equipamento__tipo__nome='Rack', historicolocal__endereco__id=local):
+            altura = 127
             vazio = 0
             equipamentos = []
-            pts = list(r.contido.filter(historicolocal__posicao__isnull=False).order_by('-historicolocal__posicao').distinct('historicolocal__posicao'))
+            
+            eixoY = 0
+            
+            # ordena os equipamentos do rack conforme a posição no rack
+            pts = list(rack.contido.filter(historicolocal__posicao__isnull=False).order_by('-historicolocal__posicao').distinct('historicolocal__posicao'))
             pts.sort(key=lambda x: x.historico_atual().posicao_int(), reverse=True)
-            f.write('%s - %s\n' % (l, r))
+
             for pt in pts:
                 pos = pt.historico_atual().posicao_int()
-                f.write('     %s\n' % pos)
+                debugFile.write('     %s\n' % pos)
+
                 if pos == 1 or pt.tamanho is None: continue
-                if alt > pos+int(round(pt.tamanho*3)):
-                    tam = alt-(pos+int(round(pt.tamanho*3)))
-                    alt -= tam
+                
+                # calculando a altura do pt
+                if altura > pos+int(round(pt.tamanho*3)):
+                    tam = altura-(pos+int(round(pt.tamanho*3)))
+                    altura -= tam
                     equipamentos.append({'tamanho':tam, 'range':range(tam-1)})
                     vazio += tam
                 tam = int(round(pt.tamanho*3))
-                alt -= tam
+                altura -= tam
+                
+                # Setando Imagem do equipamento
                 imagem = None
                 if pt.equipamento:
                     if pt.equipamento.imagem:
                         imagem = pt.equipamento.imagem.url
-                equipamentos.append({'tamanho':tam, 'imagem':imagem, 'descricao':pt.descricao or u'Sem descrição', 'range':range(tam-1)})
-            rack = {'nome':r.apelido, 'altura':126, 'equipamentos':equipamentos}
-            if alt > 1:
-                equipamentos.append({'tamanho':alt-1, 'range':range(alt-2)})
-                vazio += alt-1
-            rack['vazio'] = '%.2f%%' % ((rack['altura']-vazio)*100.0/rack['altura'],)
+
+                # calculo da posição em pixel do eixoY, top-down
+                eixoY = int(round(((126 - pos - tam) * 19)/3))
+                
+                # x a partir do topo do container
+                equipamentos.append({'eixoY': eixoY, 'tamanho':tam, 'imagem':imagem, 'descricao':pt.descricao or u'Sem descrição', 'range':range(tam-1)})
+            
+            rack = {'nome':rack.apelido, 'altura':126, 'equipamentos':equipamentos}
+            if altura > 1:
+                
+                equipamentos.append({'tamanho':altura-1, 'range':range(altura-2)})
+                vazio += altura-1
+                
+            rack['vazio'] = '%.2f%%'    % ((rack['altura']-vazio)*100.0/rack['altura'],)
             racks.append(rack)
-        dc = {'nome':EnderecoDetalhe.objects.get(id=l).complemento, 'racks':racks}
+        dc = {'nome':EnderecoDetalhe.objects.get(id=local).complemento, 'racks':racks}
         dcs.append(dc)
-    f.close()
+        
+    debugFile.close()
     return TemplateResponse(request, 'patrimonio/racks.html', {'dcs':dcs})
 
 @login_required
@@ -506,6 +526,7 @@ def racks1(request):
     alt = 0
     vazio = 0
     for ed in detalhes:
+        equipamentos = []
         info = ed.complemento.split('.')
         if info[0] != r:
             if alt > 1: 
@@ -560,20 +581,20 @@ def abre_arvore(request):
         model = request.GET.get('model')
         if model == 'termo':
 	    for n in Termo.objects.get(id=id).natureza_gasto_set.filter(item__origemfapesp__pagamento__patrimonio__isnull=False).distinct():
-	        ret.append({'data':n.modalidade.sigla, 'attr':{'style':'pchangeing-top:4px;', 'o_id':n.id, 'o_model': n._meta.module_name}})
+	        ret.append({'data':n.modalidade.sigla, 'attr':{'style':'padding-top:4px;', 'o_id':n.id, 'o_model': n._meta.module_name}})
         elif model == 'natureza_gasto':
             for i in Natureza_gasto.objects.get(id=id).item_set.filter(origemfapesp__pagamento__patrimonio__isnull=False).distinct():
-                ret.append({'data':i.__unicode__(), 'attr':{'style':'pchangeing-top:4px;', 'o_id':i.id, 'o_model': i._meta.module_name}})
+                ret.append({'data':i.__unicode__(), 'attr':{'style':'padding-top:4px;', 'o_id':i.id, 'o_model': i._meta.module_name}})
         elif model == 'item':
 	    for o in Item.objects.get(id=id).origemfapesp_set.filter(pagamento__patrimonio__isnull=False).distinct():
                 for p in o.pagamento_set.filter(patrimonio__isnull=False).distinct():
-                    ret.append({'data':'%s %s' % (p.protocolo.tipo_documento.sigla or '', p.protocolo.num_documento), 'attr':{'style':'pchangeing-top:4px;', 'o_id':p.id, 'o_model':p._meta.module_name}})
+                    ret.append({'data':'%s %s' % (p.protocolo.tipo_documento.sigla or '', p.protocolo.num_documento), 'attr':{'style':'padding-top:4px;', 'o_id':p.id, 'o_model':p._meta.module_name}})
         elif model == 'pagamento':
             for pt in Pagamento.objects.get(id=id).patrimonio_set.all():
                 ret.append({'data':'<div><div class="col1"></div><div class="col2"><div class="menor">%s</div><div class="maior">%s</div><div class="maior">%s - %s</div><div class="medio">%s</div><div class="menor">%s</div><div class="menor">%s</div><div class="menor">%s</div></div><div style="clear:both;"></div></div>' % (pt.tipo, pt.ns, pt.descricao, pt.complemento, pt.equipamento.tipo, pt.valor, 'Sim' if pt.agilis else u'Não', 'Sim' if pt.checado else u'Não'), 'attr':{'style':'height:130px;'}})
     else:
         for t in Termo.objects.all():
-	    ret.append({'data':t.__unicode__(), 'attr':{'style':'pchangeing-top:6px;', 'o_id':t.id, 'o_model': t._meta.module_name}})
+	    ret.append({'data':t.__unicode__(), 'attr':{'style':'padding-top:6px;', 'o_id':t.id, 'o_model': t._meta.module_name}})
     json = simplejson.dumps(ret)
     return HttpResponse(json, mimetype="application/json")
 
@@ -591,7 +612,7 @@ def abre_arvore_tipo(request):
         model = request.GET.get('model')
         if model == 'tipoequipamento':
             for e in TipoEquipamento.objects.get(id=id).equipamento_set.all():
-		ret.append({'data':e.descricao, 'attr':{'style':'pchangeing-top:4px;', 'o_id':e.id, 'o_model': e._meta.module_name}})
+		ret.append({'data':e.descricao, 'attr':{'style':'padding-top:4px;', 'o_id':e.id, 'o_model': e._meta.module_name}})
         elif model == 'equipamento':
             patrimonios = list(Equipamento.objects.get(id=id).patrimonio_set.all())
             try:
@@ -600,11 +621,11 @@ def abre_arvore_tipo(request):
 		pass
             for p in patrimonios:
                 ha = p.historico_atual()
-		ret.append({'data':'<div><div class="col1"></div><div class="col2"><div class="medio">%s</div><div class="maior">%s</div><div class="menor">%s</div><div class="medio">%s</div><div class="medio">%s</div><div class="medio">%s</div><div class="medio">%s</div><div class="menor">%s</div></div><div style="clear:both;"></div></div>' % (ha.endereco.end.entidade if ha else 'ND' , ha.endereco.complemento if ha else 'ND', ha.posicao if ha and ha.posicao else 'ND', p.equipamento.marca, p.equipamento.modelo, p.equipamento.part_number, p.ns, ha.estado if ha else 'ND'), 'attr':{'style':'pchangeing-top:4px;'}})
+		ret.append({'data':'<div><div class="col1"></div><div class="col2"><div class="medio">%s</div><div class="maior">%s</div><div class="menor">%s</div><div class="medio">%s</div><div class="medio">%s</div><div class="medio">%s</div><div class="medio">%s</div><div class="menor">%s</div></div><div style="clear:both;"></div></div>' % (ha.endereco.end.entidade if ha else 'ND' , ha.endereco.complemento if ha else 'ND', ha.posicao if ha and ha.posicao else 'ND', p.equipamento.marca, p.equipamento.modelo, p.equipamento.part_number, p.ns, ha.estado if ha else 'ND'), 'attr':{'style':'padding-top:4px;'}})
     else:
         for tp in TipoEquipamento.objects.all():
-            #ret.append({'data':'%s <a onclick="$(\'#blocos\').jstree(\'open_all\', \'#%s-%s\')" style="color:#0000aa;">Abrir tudo</a>' % (tp.__unicode__(), tp._meta.module_name, tp.id), 'attr':{'id':'%s-%s'% (tp._meta.module_name, tp.id), 'style':'pchangeing-top:6px;', 'o_id':tp.id, 'o_model': tp._meta.module_name}})
-            ret.append({'data':'%s <a onclick="abre_fecha(\'%s-%s\', \'blocos\')" id="a-%s-%s" style="color:#0000aa;">Abrir tudo</a>' % (tp.__unicode__(), tp._meta.module_name, tp.id, tp._meta.module_name, tp.id), 'attr':{'id':'%s-%s'% (tp._meta.module_name, tp.id), 'style':'pchangeing-top:6px;', 'o_id':tp.id, 'o_model': tp._meta.module_name}})
+            #ret.append({'data':'%s <a onclick="$(\'#blocos\').jstree(\'open_all\', \'#%s-%s\')" style="color:#0000aa;">Abrir tudo</a>' % (tp.__unicode__(), tp._meta.module_name, tp.id), 'attr':{'id':'%s-%s'% (tp._meta.module_name, tp.id), 'style':'padding-top:6px;', 'o_id':tp.id, 'o_model': tp._meta.module_name}})
+            ret.append({'data':'%s <a onclick="abre_fecha(\'%s-%s\', \'blocos\')" id="a-%s-%s" style="color:#0000aa;">Abrir tudo</a>' % (tp.__unicode__(), tp._meta.module_name, tp.id, tp._meta.module_name, tp.id), 'attr':{'id':'%s-%s'% (tp._meta.module_name, tp.id), 'style':'padding-top:6px;', 'o_id':tp.id, 'o_model': tp._meta.module_name}})
 
 
 
