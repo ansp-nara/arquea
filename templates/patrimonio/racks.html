@@ -9,9 +9,9 @@
   #roteador {width:100%;float:left;background:#81878b;display:block;border-bottom:1px solid #fff;}
   #espaco {width:100%;float:left;background:#fff;display:block;}
   #interno {display:block;float:left;width:199px;}
-  #u-n {border:1px solid #999a9a;background:#d8d8d8;color:#636363;float:left;width:13px;height:13px;font:8px Verdana,Arial;pchangeing:2px;}
+  #u-n {border:1px solid #999a9a;background:#d8d8d8;color:#636363;float:left;width:13px;height:13px;font:8px Verdana,Arial;padding:2px;}
   #bloco-n {display:block;width:19px;float:left;margin-right:1px;}
-  </style>
+</style>
  
 <style type="text/css" media="print">
   #u {background:#ffffff url('{{ STATIC_URL }}img/1u.png') repeat-y !important;float:left;width:7px;height:798px;}
@@ -21,6 +21,7 @@
   #interno {display:block;float:left;width:199px;}
 </style>
    <script type="text/javascript" src="{{ STATIC_URL }}js/racks.js"></script>
+   <script type="text/javascript" src="{{ STATIC_URL }}js/admin/RelatedObjectLookups.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -40,12 +41,52 @@
     <div id="u"></div>
     <div id="interno">
   {% for eq in rack.equipamentos %}
-       <div id="{% if eq.descricao %}roteador" rel="tooltip" title="{{ eq.descricao }}"{% else %}espaco"{% endif %} style="height:{% widthratio eq.tamanho 3 19 %}px;">{% if eq.imagem %}<img src="{{ eq.imagem }}" />{% endif %}</div>
+       {% if eq.id %}
+	       <a href="{% url "admin:patrimonio_patrimonio_change" eq.id %}" onclick="return showAddAnotherPopup(this);">
+	   {% endif %}
+       <div id="{% if eq.descricao %}roteador" rel="tooltip" title="{{ eq.descricao }}"{% else %}espaco"{% endif %} style="height:{% widthratio eq.tamanho 3 19 %}px;">{% if eq.imagem %}<img src="{{ eq.imagem }}" />{% endif %}
+           {{ eq.id }}
+       </div>
+       {% if eq.id %}
+           </a>
+       {% endif %}
   {% endfor %}
     </div>
    <div id="u"></div>
 </div>
 {% endfor %}
+
+{% comment %}Testando modificar o desenho para position:absolute com margin-top{% endcomment %}
+{% comment %}
+{% for rack in dc.racks %}
+<div id="rack">
+    <h2>{{ rack.nome }} ({{ rack.vazio }} ocupado)</h2>
+    <div id="bloco-n">
+        <script>
+        for(i={% widthratio rack.altura 3 1 %};i>0;i--){
+            document.write('<div id="u-n">'+i+'</div>');
+        }
+        </script>
+    </div>
+    <div id="u"></div>
+    <div id="interno" style="position:relative;">
+  {% for eq in rack.equipamentos %}
+       {% if eq.id %}
+           <a href="{% url "admin:patrimonio_patrimonio_change" eq.id %}" onclick="return showAddAnotherPopup(this);">
+       {% endif %}
+       {% if eq.descricao %}
+           <div id="roteador" rel="tooltip" title="{{ eq.descricao }}" style="position:absolute; margin-top:{{ eq.eixoY }}px; height:{% widthratio eq.tamanho 3 19 %}px;">{% if eq.imagem %}<img src="{{ eq.imagem }}" />{% endif %}</div>
+       {% endif %}
+       {% if eq.id %}
+           </a>
+       {% endif %}
+  {% endfor %}
+    </div>
+   <div id="u" style="margin-left:199px; "></div>
+</div>
+{% endfor %}
+{% endcomment %}
+
 </div>
 <div style="clear:both;"></div>
 {% endfor %}
