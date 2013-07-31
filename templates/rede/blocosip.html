@@ -33,9 +33,9 @@ Bloco IP
 <div id="blocos">
 <ul>
 {% for b in blocos %}
-   <li style="pchangeing-top:6px;">
+   <li style="padding-top:6px;">
       <div>
-        <div class="col1"><a href="{% url admin:rede_blocoip_change b.id %}">{{ b }}</a></div>
+        <div class="col1"><a href="{% url "admin:rede_blocoip_change" b.id %}">{{ b }}</a></div>
         <div class="col2">
            <div class="colunas">{{ b.asn }}</div>
            <div class="colunas">{{ b.proprietario|default_if_none:"-" }}</div>
@@ -49,9 +49,9 @@ Bloco IP
    {% if not b.leaf %}
    <ul>
    {% for sb in b.blocoip_set.all %}
-   <li style="pchangeing-top:4px;">
+   <li style="padding-top:4px;">
       <div>
-        <div class="col1"><a href="{% url admin:rede_blocoip_change sb.id %}">{{ sb }}</a></div>
+        <div class="col1"><a href="{% url "admin:rede_blocoip_change" sb.id %}">{{ sb }}</a></div>
         <div class="col2">
            <div class="colunas">{{ sb.asn }}</div>
            <div class="colunas">{{ sb.proprietario|default_if_none:"-" }}</div>
