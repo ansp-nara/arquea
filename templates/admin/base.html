@@ -13,9 +13,9 @@
 	<script type="text/javascript">window.__admin_media_prefix__ = "{% filter escapejs %}{% static "" %}{% endfilter %}";</script>
 	{% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock %}
 
-	<script type="text/javascript" src="/media/js/jquery.min.js"></script>
+	<script type="text/javascript" src="{% static "js/jquery.min.js" %}></script>
         {% block extrahead %}{% endblock %}
-	<script type="text/javascript" src="/media/js/jquery-blockUI.js"></script>
+	<script type="text/javascript" src="{% static "js/jquery-blockUI.js" %}"></script>
 	<!--<script type="text/javascript" src="/media/js/jquery.accordion.js"></script>
 	
 	<script type="text/javascript"> 
