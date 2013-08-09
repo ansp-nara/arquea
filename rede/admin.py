@@ -3,8 +3,10 @@
 from django.contrib import admin
 from models import *
 from forms import *
+from django.utils.translation import ugettext_lazy as _
 from django.contrib.admin import SimpleListFilter
 from identificacao.models import Entidade
+from utils.functions import clone_objects
 
 class DesignadoFilter(SimpleListFilter):
     title = u'designado'
@@ -116,7 +118,22 @@ class PlanejaAquisicaoRecursoAdmin(admin.ModelAdmin):
 
     inlines = [BeneficiadoInline]
 
-admin.site.register(TipoServico)
+class TipoServicoAdmin(admin.ModelAdmin):
+
+    actions = ['action_clone',]
+    
+    def action_clone(self, request, queryset):
+        objs = clone_objects(queryset)
+        total = queryset.count()
+        if total == 1:
+            message = _(u'1 tipo de serviço copiado')
+        else:
+            message = _(u'%s tipos de serviço copiados') % total
+        self.message_user(request, message)
+
+    action_clone.short_description = _(u"Copiar os tipos de serviço selecionados")
+
+admin.site.register(TipoServico, TipoServicoAdmin)
 admin.site.register(Projeto)
 admin.site.register(Unidade)
 admin.site.register(Recurso, RecursoAdmin)
