@@ -475,10 +475,10 @@ class _tree_struct {
 }
 
 class json_tree extends _tree_struct { 
-	function __construct($table = "tree", $fields = array(), $change_fields = array("title" => "title", "type" => "type")) {
+	function __construct($table = "tree", $fields = array(), $add_fields = array("title" => "title", "type" => "type")) {
 		parent::__construct($table, $fields);
-		$this->fields = array_merge($this->fields, $change_fields);
-		$this->change_fields = $add_fields;
+		$this->fields = array_merge($this->fields, $add_fields);
+		$this->add_fields = $add_fields;
 	}
 
 	function create_node($data) {
@@ -491,9 +491,9 @@ class json_tree extends _tree_struct {
 		return "{ \"status\" : 0 }";
 	}
 	function set_data($data) {
-		if(count($this->change_fields) == 0) { return "{ \"status\" : 1 }"; }
+		if(count($this->add_fields) == 0) { return "{ \"status\" : 1 }"; }
 		$s = "UPDATE `".$this->table."` SET `".$this->fields["id"]."` = `".$this->fields["id"]."` "; 
-		foreach($this->change_fields as $k => $v) {
+		foreach($this->add_fields as $k => $v) {
 			if(isset($data[$k]))	$s .= ", `".$this->fields[$v]."` = \"".$this->db->escape($data[$k])."\" ";
 			else					$s .= ", `".$this->fields[$v]."` = `".$this->fields[$v]."` ";
 		}
@@ -506,14 +506,14 @@ class json_tree extends _tree_struct {
 	function move_node($data) { 
 		$id = parent::_move((int)$data["id"], (int)$data["ref"], (int)$data["position"], (int)$data["copy"]);
 		if(!$id) return "{ \"status\" : 0 }";
-		if((int)$data["copy"] && count($this->change_fields)) {
+		if((int)$data["copy"] && count($this->add_fields)) {
 			$ids	= array_keys($this->_get_children($id, true));
 			$data	= $this->_get_children((int)$data["id"], true);
 
 			$i = 0;
 			foreach($data as $dk => $dv) {
 				$s = "UPDATE `".$this->table."` SET `".$this->fields["id"]."` = `".$this->fields["id"]."` "; 
-				foreach($this->change_fields as $k => $v) {
+				foreach($this->add_fields as $k => $v) {
 					if(isset($dv[$k]))	$s .= ", `".$this->fields[$v]."` = \"".$this->db->escape($dv[$k])."\" ";
 					else				$s .= ", `".$this->fields[$v]."` = `".$this->fields[$v]."` ";
 				}

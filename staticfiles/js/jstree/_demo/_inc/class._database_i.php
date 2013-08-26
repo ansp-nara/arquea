@@ -139,7 +139,7 @@ class _database {
 		return $this->data->insert_id;
 	}
 	function escape($string) {
-		if(!$this->data) return changeslashes($string);
+		if(!$this->data) return addslashes($string);
 		return $this->data->escape_string($string);
 	}
 

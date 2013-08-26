@@ -93,7 +93,7 @@
 	}
 
 	jQuery.each([ "keydown", "keyup", "keypress" ], function() {
-		jQuery.event.special[ this ] = { change: keyHandler };
+		jQuery.event.special[ this ] = { add: keyHandler };
 	});
 
-})( jQuery
+})( jQuery );

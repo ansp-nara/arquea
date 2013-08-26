@@ -171,7 +171,7 @@ $(function () {
 	</ul>
 </div>
 <style type="text/css" class="source below">
-#demo4 a { white-space:normal !important; height: auto; pchangeing:1px 2px; } 
+#demo4 a { white-space:normal !important; height: auto; padding:1px 2px; } 
 #demo4 li > ins { vertical-align:top; }
 #demo4 .jstree-hovered, #demo4 .jstree-clicked { border:0; }
 </style>
@@ -220,8 +220,8 @@ $(function () {
 <div id="description">
 <p>Here is a PHP &amp; mySQL enabled demo. You can use the classes/DB structure included, but those are not thoroughly tested and not officially a part of jstree. In the log window you can also see all function calls as they happen on the instance.</p>
 <div id="mmenu" style="height:30px; overflow:auto;">
-<input type="button" id="change_folder" value="add folder" style="display:block; float:left;"/>
-<input type="button" id="change_default" value="add file" style="display:block; float:left;"/>
+<input type="button" id="add_folder" value="add folder" style="display:block; float:left;"/>
+<input type="button" id="add_default" value="add file" style="display:block; float:left;"/>
 <input type="button" id="rename" value="rename" style="display:block; float:left;"/>
 <input type="button" id="remove" value="remove" style="display:block; float:left;"/>
 <input type="button" id="cut" value="cut" style="display:block; float:left;"/>
@@ -239,7 +239,7 @@ $(function () {
 	<input type="button" style='width:170px; height:24px; margin:5px auto;' id="analyze" value="analyze" onclick="$('#alog').load('./server.php?analyze');" />
 	<input type="button" style='width:170px; height:24px; margin:5px auto;' value="refresh" onclick="$('#demo').jstree('refresh',-1);" />
 </div>
-<div id='alog' style="border:1px solid gray; pchangeing:5px; height:100px; margin-top:15px; overflow:auto; font-family:Monospace;"></div>
+<div id='alog' style="border:1px solid gray; padding:5px; height:100px; margin-top:15px; overflow:auto; font-family:Monospace;"></div>
 <!-- JavaScript neccessary for the tree -->
 <script type="text/javascript" class="source below">
 $(function () {
@@ -438,9 +438,9 @@ $("#demo")
 $(function () { 
 	$("#mmenu input").click(function () {
 		switch(this.id) {
-			case "change_default":
-			case "change_folder":
-				$("#demo").jstree("create", null, "last", { "attr" : { "rel" : this.id.toString().replace("change_", "") } });
+			case "add_default":
+			case "add_folder":
+				$("#demo").jstree("create", null, "last", { "attr" : { "rel" : this.id.toString().replace("add_", "") } });
 				break;
 			case "search":
 				$("#demo").jstree("search", document.getElementById("text").value);

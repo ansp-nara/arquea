@@ -36,7 +36,7 @@
 .syntaxhighlighter table tbody
 {
 	margin: 0 !important;
-	pchangeing: 0 !important;
+	padding: 0 !important;
 	border: 0 !important;
 	outline: 0 !important;
 	background: none !important;
@@ -71,7 +71,7 @@
 {
 	width: 99.9% !important; /* 99% fixes IE8 horizontal scrollbar */
 	margin: 1em 0 1em 0 !important;
-	pchangeing: 1px !important; /* adds a little border on top and bottom */
+	padding: 1px !important; /* adds a little border on top and bottom */
 	position: relative !important;
 }
 
@@ -112,14 +112,14 @@
 .syntaxhighlighter .line .number code
 {
 	width: 2.7em !important;
-	pchangeing-right: .3em !important;
+	padding-right: .3em !important;
 	text-align: right !important;
 	display: block !important;
 }
 
 .syntaxhighlighter .line .content
 {
-	pchangeing-left: .5em !important;
+	padding-left: .5em !important;
 }
 
 .syntaxhighlighter .line .spaces
@@ -168,13 +168,13 @@
 	right: 0px !important;
 	top: 0px !important;
 	font-size: 1px !important;
-	pchangeing: 8px 8px 8px 0 !important; /* in px because images don't scale with ems */
+	padding: 8px 8px 8px 0 !important; /* in px because images don't scale with ems */
 }
 
 .syntaxhighlighter.collapsed .toolbar
 {
 	font-size: 80% !important;
-	pchangeing: .2em 0 .5em .5em !important;
+	padding: .2em 0 .5em .5em !important;
 	position: static !important;
 }
 
@@ -202,7 +202,7 @@
 	width: auto !important;
 	float: none !important;
 	height: 16px !important;
-	pchangeing-left: 20px !important;
+	padding-left: 20px !important;
 }
 
 .syntaxhighlighter .toolbar .item.viewSource
