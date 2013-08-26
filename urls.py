@@ -11,7 +11,7 @@ urlpatterns = patterns('',
     # Example:
     # (r'^sistema/', include('sistema.foo.urls')),
 
-    # Uncomment the admin/doc line below and change 'django.contrib.admindocs'
+    # Uncomment the admin/doc line below and add 'django.contrib.admindocs'
     # to INSTALLED_APPS to enable admin documentation:
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
@@ -38,3 +38,4 @@ urlpatterns = patterns('',
     (r'^logs$', 'utils.views.uso_admin'),
     (r'^', include(admin.site.urls)),
 )
+

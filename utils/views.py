@@ -6,6 +6,12 @@ from membro.models import Membro
 from django.template.response import TemplateResponse
 from django.contrib.auth.decorators import permission_required, login_required
 import datetime
+import logging
+
+
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
+
 
 def verifica(request):
     return HttpResponse('Ok')

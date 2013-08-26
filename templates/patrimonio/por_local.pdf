@@ -37,7 +37,7 @@ th {text-align: left;}
 
     <h4>{% if endereco %}{{ endereco }}{% else %}{{ detalhe.endereco }} - {{ detalhe }}{% endif %}</h4>
  
-    <table border="0" repeat="1" cellpchangeing="5">
+    <table border="0" repeat="1" cellpadding="5">
     <tr>{% if endereco %}<th>Local</th>{% endif %}<th>Procedência</th><th>NF</th><th>Marca</th><th>Modelo</th><th>Part number</th><th width="30%">Descrição</th><th>NS</th><th>Estado</th></tr>
     {% for d in detalhes %}
         <tr><td></td>{% if endereco %}<td>{{ d.detalhe }}</td>{% endif %}<td colspan="7"></td></tr>

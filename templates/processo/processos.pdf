@@ -24,7 +24,7 @@
 <body>
 <h1 repeat="1">Processos</h1>
 
-    <table border="0" cellpchangeing="5">
+    <table border="0" cellpadding="5">
     {% for a in areas %}
     <tr><td colspan="4">{{ a.area }}</td></tr>
         {% for g in a.grupos %}

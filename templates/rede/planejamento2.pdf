@@ -2,8 +2,8 @@
 {% load proto_tags %}
 {% block pagesize %}a3{% endblock %}
 {% block extrastyle %}
-td { pchangeing-top:3px; padding-left:2px;}
-th { pchangeing-top:3px; }
+td { padding-top:3px; padding-left:2px;}
+th { padding-top:3px; }
 table tr td {
   border:0;
 }
@@ -20,7 +20,7 @@ table tr td {
    <tr><td><table border="1">
    <tr><th>Nota fiscal</th><th>Valor total sem imposto</th><th>Valor total com imposto</th></tr>
    <tr><td>{{ p.nf }}</td><td>{{ p.sem|moeda }}</td><td>{{ p.com|moeda }}</td></tr>
-      <tr><td colspan="3" style="pchangeing:5px;">
+      <tr><td colspan="3" style="padding:5px;">
           <table border="1">
              <tr><th rowspan="2">OS e contrato</th><th rowspan="2">Número de vezes que foi pago</th><th rowspan="2">Descrição do item</th> <th colspan="2">Valor sem imposto</th><th colspan="2">Valor com imposto</th></tr>
              <tr><th width="10%">Unitário</th><th  width="10%">Subtotal</th><th  width="10%">Unitário</th><th  width="10%">Subtotal</th></tr>
@@ -37,3 +37,4 @@ table tr td {
 {% endfor %}
 </table>
 {% endblock %}
+

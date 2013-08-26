@@ -13,7 +13,7 @@
        <input type="submit" value="Versão para impressão com as linhas completas em A3" />
     </form>
 
-    <table border="0" repeat="1" cellpchangeing="5">
+    <table border="0" repeat="1" cellpadding="5">
     {% for a in areas %}
     <tr><td colspan="4">{{ a.area }}</td></tr>
         {% for g in a.grupos %}
