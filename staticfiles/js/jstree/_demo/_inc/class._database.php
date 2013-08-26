@@ -132,7 +132,7 @@ class _database {
 		return mysql_insert_id();
 	}
 	function escape($string){
-		if(!$this->link) return changeslashes($string);
+		if(!$this->link) return addslashes($string);
 		return mysql_real_escape_string($string);
 	}
 

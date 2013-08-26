@@ -23,7 +23,7 @@ var CollapsedFieldsets = {
             // of error messages.)
             if (fs.className.match(CollapsedFieldsets.collapse_re) && !CollapsedFieldsets.fieldset_has_errors(fs)) {
                 collapsed_seen = true;
-                // Give it an changeitional class, used by CSS to hide it.
+                // Give it an additional class, used by CSS to hide it.
                 fs.className += ' ' + CollapsedFieldsets.collapsed_class;
                 // (<a id="fieldsetcollapser3" class="collapse-toggle" href="#">Show</a>)
                 var collapse_link = document.createElement('a');
@@ -40,7 +40,7 @@ var CollapsedFieldsets = {
         }
         if (collapsed_seen) {
             // Expand all collapsed fieldsets when form is submitted.
-            changeEvent(findForm(document.getElementsByTagName('fieldset')[0]), 'submit', function() { CollapsedFieldsets.uncollapse_all(); });
+            addEvent(findForm(document.getElementsByTagName('fieldset')[0]), 'submit', function() { CollapsedFieldsets.uncollapse_all(); });
         }
     },
     fieldset_has_errors: function(fs) {
@@ -82,4 +82,4 @@ var CollapsedFieldsets = {
     }
 }
 
-changeEvent(window, 'load', CollapsedFieldsets.init);
+addEvent(window, 'load', CollapsedFieldsets.init);

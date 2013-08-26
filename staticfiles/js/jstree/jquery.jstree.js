@@ -48,15 +48,15 @@
 			while (css_rules[++j]);
 			return false;
 		},
-		change_css : function(rule_name, sheet) {
+		add_css : function(rule_name, sheet) {
 			if($.jstree.css.get_css(rule_name, false, sheet)) { return false; }
-			if(sheet.insertRule) { sheet.insertRule(rule_name + ' { }', 0); } else { sheet.changeRule(rule_name, null, 0); }
+			if(sheet.insertRule) { sheet.insertRule(rule_name + ' { }', 0); } else { sheet.addRule(rule_name, null, 0); }
 			return $.vakata.css.get_css(rule_name);
 		},
 		remove_css : function(rule_name, sheet) { 
 			return $.vakata.css.get_css(rule_name, true, sheet); 
 		},
-		change_sheet : function(opts) {
+		add_sheet : function(opts) {
 			var tmp = false, is_new = true;
 			if(opts.str) {
 				if(opts.title) { tmp = $("style[id='" + opts.title + "-stylesheet']")[0]; }
@@ -154,7 +154,7 @@
 				s.plugins = t;
 
 				// push the new object to the instances array (at the same time set the default classes to the container) and init
-				instances[instance_id] = new $.jstree._instance(instance_id, $(this).changeClass("jstree jstree-" + instance_id), s); 
+				instances[instance_id] = new $.jstree._instance(instance_id, $(this).addClass("jstree jstree-" + instance_id), s); 
 				// init all activated plugins for this instance
 				$.each(instances[instance_id]._get_settings().plugins, function (i, val) { instances[instance_id].data[val] = {}; });
 				$.each(instances[instance_id]._get_settings().plugins, function (i, val) { if(plugins[val]) { plugins[val].__init.apply(instances[instance_id]); } });
@@ -271,13 +271,13 @@
 		var u = navigator.userAgent.toLowerCase(),
 			v = (u.match( /.+?(?:rv|it|ra|ie)[\/: ]([\d.]+)/ ) || [0,'0'])[1],
 			css_string = '' + 
-				'.jstree ul, .jstree li { display:block; margin:0 0 0 0; pchangeing:0 0 0 0; list-style-type:none; } ' + 
+				'.jstree ul, .jstree li { display:block; margin:0 0 0 0; padding:0 0 0 0; list-style-type:none; } ' + 
 				'.jstree li { display:block; min-height:18px; line-height:18px; white-space:nowrap; margin-left:18px; min-width:18px; } ' + 
 				'.jstree-rtl li { margin-left:0; margin-right:18px; } ' + 
 				'.jstree > ul > li { margin-left:0px; } ' + 
 				'.jstree-rtl > ul > li { margin-right:0px; } ' + 
-				'.jstree ins { display:inline-block; text-decoration:none; width:18px; height:18px; margin:0 0 0 0; pchangeing:0; } ' + 
-				'.jstree a { display:inline-block; line-height:16px; height:16px; color:black; white-space:nowrap; text-decoration:none; pchangeing:1px 2px; margin:0; } ' + 
+				'.jstree ins { display:inline-block; text-decoration:none; width:18px; height:18px; margin:0 0 0 0; padding:0; } ' + 
+				'.jstree a { display:inline-block; line-height:16px; height:16px; color:black; white-space:nowrap; text-decoration:none; padding:1px 2px; margin:0; } ' + 
 				'.jstree a:focus { outline: none; } ' + 
 				'.jstree a > ins { height:16px; width:16px; } ' + 
 				'.jstree a > .jstree-icon { margin-right:3px; } ' + 
@@ -299,14 +299,14 @@
 				'.jstree-rtl li li { margin-left:0px; margin-right:18px; } ' + 
 				'li.jstree-open ul { display:block; } ' + 
 				'li.jstree-closed ul { display:none !important; } ' + 
-				'.jstree li a { display:inline; border-width:0 !important; pchangeing:0px 2px !important; } ' + 
+				'.jstree li a { display:inline; border-width:0 !important; padding:0px 2px !important; } ' + 
 				'.jstree li a ins { height:16px; width:16px; margin-right:3px; } ' + 
 				'.jstree-rtl li a ins { margin-right:0px; margin-left:3px; } ';
 		}
 		// Correct IE 7 (shifts anchor nodes onhover)
 		if(/msie/.test(u) && parseInt(v, 10) == 7) { 
 			is_ie7 = true;
-			css_string += '.jstree li a { border-width:0 !important; pchangeing:0px 2px !important; } ';
+			css_string += '.jstree li a { border-width:0 !important; padding:0px 2px !important; } ';
 		}
 		// correct ff2 lack of display:inline-block
 		if(!/compatible/.test(u) && /mozilla/.test(u) && parseFloat(v, 10) < 1.9) {
@@ -319,7 +319,7 @@
 				/* this shouldn't be here as it is theme specific */
 		}
 		// the default stylesheet
-		$.vakata.css.change_sheet({ str : css_string, title : "jstree" });
+		$.vakata.css.add_sheet({ str : css_string, title : "jstree" });
 	});
 
 	// core functions (open, close, create, update, delete)
@@ -348,7 +348,7 @@
 			init	: function () { 
 				this.set_focus(); 
 				if(this._get_settings().core.rtl) {
-					this.get_container().changeClass("jstree-rtl").css("direction", "rtl");
+					this.get_container().addClass("jstree-rtl").css("direction", "rtl");
 				}
 				this.get_container().html("<ul><li class='jstree-last jstree-leaf'><ins>&#160;</ins><a class='jstree-loading' href='#'><ins class='jstree-icon'>&#160;</ins>" + this._get_string("loading") + "</a></li></ul>");
 				this.data.core.li_height = this.get_container_ul().find("li.jstree-closed, li.jstree-leaf").eq(0).height() || 18;
@@ -436,7 +436,7 @@
 					.undelegate(".jstree")
 					.removeData("jstree_instance_id")
 					.find("[class^='jstree']")
-						.changeBack()
+						.addBack()
 						.attr("class", function () { return this.className.replace(/jstree[^ ]*|$/ig,''); });
 				$(document)
 					.unbind(".jstree-" + n)
@@ -454,7 +454,7 @@
 
 			lock : function () {
 				this.data.core.locked = true;
-				this.get_container().children("ul").changeClass("jstree-locked").css("opacity","0.7");
+				this.get_container().children("ul").addClass("jstree-locked").css("opacity","0.7");
 				this.__callback({});
 			},
 			unlock : function () {
@@ -544,7 +544,7 @@
 				var f = $.jstree._focused();
 				if(f) { f.unset_focus(); }
 
-				this.get_container().changeClass("jstree-focused"); 
+				this.get_container().addClass("jstree-focused"); 
 				focused_instance = this.get_index(); 
 				this.__callback();
 			},
@@ -625,7 +625,7 @@
 			correct_state	: function (obj) {
 				obj = this._get_node(obj);
 				if(!obj || obj === -1) { return false; }
-				obj.removeClass("jstree-closed jstree-open").changeClass("jstree-leaf").children("ul").remove();
+				obj.removeClass("jstree-closed jstree-open").addClass("jstree-leaf").children("ul").remove();
 				this.__callback({ "obj" : obj });
 			},
 			// open/close
@@ -636,7 +636,7 @@
 				var s = skip_animation || is_ie6 ? 0 : this._get_settings().core.animation,
 					t = this;
 				if(!this._is_loaded(obj)) {
-					obj.children("a").changeClass("jstree-loading");
+					obj.children("a").addClass("jstree-loading");
 					this.load_node(obj, function () { t.open_node(obj, callback, skip_animation); }, callback);
 				}
 				else {
@@ -646,7 +646,7 @@
 						});
 					}
 					if(s) { obj.children("ul").css("display","none"); }
-					obj.removeClass("jstree-closed").changeClass("jstree-open").children("a").removeClass("jstree-loading");
+					obj.removeClass("jstree-closed").addClass("jstree-open").children("a").removeClass("jstree-loading");
 					if(s) { obj.children("ul").stop(true, true).slideDown(s, function () { this.style.display = ""; t.after_open(obj); }); }
 					else { t.after_open(obj); }
 					this.__callback({ "obj" : obj });
@@ -660,7 +660,7 @@
 					t = this;
 				if(!obj.length || !obj.hasClass("jstree-open")) { return false; }
 				if(s) { obj.children("ul").attr("style","display:block !important"); }
-				obj.removeClass("jstree-open").changeClass("jstree-closed");
+				obj.removeClass("jstree-open").addClass("jstree-closed");
 				if(s) { obj.children("ul").stop(true, true).slideUp(s, function () { this.style.display = ""; t.after_close(obj); }); }
 				else { t.after_close(obj); }
 				this.__callback({ "obj" : obj });
@@ -679,7 +679,7 @@
 				}
 				else {
 					original_obj = obj;
-					if(obj.is(".jstree-closed")) { obj = obj.find("li.jstree-closed").changeBack(); }
+					if(obj.is(".jstree-closed")) { obj = obj.find("li.jstree-closed").addBack(); }
 					else { obj = obj.find("li.jstree-closed"); }
 				}
 				var _this = this;
@@ -695,17 +695,17 @@
 				var _this = this;
 				obj = obj ? this._get_node(obj) : this.get_container();
 				if(!obj || obj === -1) { obj = this.get_container_ul(); }
-				obj.find("li.jstree-open").changeBack().each(function () { _this.close_node(this, !do_animation); });
+				obj.find("li.jstree-open").addBack().each(function () { _this.close_node(this, !do_animation); });
 				this.__callback({ "obj" : obj });
 			},
 			clean_node	: function (obj) {
 				obj = obj && obj != -1 ? $(obj) : this.get_container_ul();
-				obj = obj.is("li") ? obj.find("li").changeBack() : obj.find("li");
+				obj = obj.is("li") ? obj.find("li").addBack() : obj.find("li");
 				obj.removeClass("jstree-last")
-					.filter("li:last-child").changeClass("jstree-last").end()
+					.filter("li:last-child").addClass("jstree-last").end()
 					.filter(":has(li)")
-						.not(".jstree-open").removeClass("jstree-leaf").changeClass("jstree-closed");
-				obj.not(".jstree-open, .jstree-closed").changeClass("jstree-leaf").children("ul").remove();
+						.not(".jstree-open").removeClass("jstree-leaf").addClass("jstree-closed");
+				obj.not(".jstree-open, .jstree-closed").addClass("jstree-leaf").children("ul").remove();
 				this.__callback({ "obj" : obj });
 			},
 			// rollback
@@ -739,7 +739,7 @@
 				if(!js) { js = {}; }
 				if(js.attr) { d.attr(js.attr); }
 				if(js.metadata) { d.data(js.metadata); }
-				if(js.state) { d.changeClass("jstree-" + js.state); }
+				if(js.state) { d.addClass("jstree-" + js.state); }
 				if(!js.data) { js.data = this._get_string("new_node"); }
 				if(!$.isArray(js.data)) { tmp = js.data; js.data = []; js.data.push(tmp); }
 				$.each(js.data, function (i, m) {
@@ -750,12 +750,12 @@
 						if(!m.attr) { m.attr = {}; }
 						if(!m.attr.href) { m.attr.href = '#'; }
 						tmp.attr(m.attr)[ s.html_titles ? "html" : "text" ](m.title);
-						if(m.language) { tmp.changeClass(m.language); }
+						if(m.language) { tmp.addClass(m.language); }
 					}
 					tmp.prepend("<ins class='jstree-icon'>&#160;</ins>");
 					if(!m.icon && js.icon) { m.icon = js.icon; }
 					if(m.icon) { 
-						if(m.icon.indexOf("/") === -1) { tmp.children("ins").changeClass(m.icon); }
+						if(m.icon.indexOf("/") === -1) { tmp.children("ins").addClass(m.icon); }
 						else { tmp.children("ins").css("background","url('" + m.icon + "') center center no-repeat"); }
 					}
 					d.append(tmp);
@@ -839,11 +839,11 @@
 				this.__rollback();
 				var p = this._get_parent(obj), prev = $([]), t = this;
 				obj.each(function () {
-					prev = prev.change(t._get_prev(this));
+					prev = prev.add(t._get_prev(this));
 				});
 				obj = obj.detach();
 				if(p !== -1 && p.find("> ul > li").length === 0) {
-					p.removeClass("jstree-open jstree-closed").changeClass("jstree-leaf");
+					p.removeClass("jstree-open jstree-closed").addClass("jstree-leaf");
 				}
 				this.clean_node(p);
 				this.__callback({ "obj" : obj, "prev" : prev, "parent" : p });
@@ -925,7 +925,7 @@
 				if(!obj.cy) {
 					if(obj.op && obj.np && obj.op[0] === obj.np[0] && obj.cp - 1 === obj.o.index()) { return false; }
 					obj.o.each(function () { 
-						if(r.parentsUntil(".jstree", "li").changeBack().index(this) !== -1) { ret = false; return false; }
+						if(r.parentsUntil(".jstree", "li").addBack().index(this) !== -1) { ret = false; return false; }
 					});
 				}
 				return ret;
@@ -945,7 +945,7 @@
 				var o = false;
 				if(is_copy) {
 					o = obj.o.clone(true);
-					o.find("*[id]").changeBack().each(function () {
+					o.find("*[id]").addBack().each(function () {
 						if(this.id) { this.id = "copy_" + this.id; }
 					});
 				}
@@ -961,7 +961,7 @@
 					obj.ot.clean_node(obj.op);
 					obj.rt.clean_node(obj.np);
 					if(!obj.op.find("> ul > li").length) {
-						obj.op.removeClass("jstree-open jstree-closed").changeClass("jstree-leaf").children("ul").remove();
+						obj.op.removeClass("jstree-open jstree-closed").addClass("jstree-leaf").children("ul").remove();
 					}
 				} catch (e) { }
 
@@ -989,7 +989,7 @@
 			e1 = $('<textarea cols="10" rows="2"></textarea>').css({ position: 'absolute', top: -1000, left: 0 }).appendTo('body');
 			e2 = $('<textarea cols="10" rows="2" style="overflow: hidden;"></textarea>').css({ position: 'absolute', top: -1000, left: 0 }).appendTo('body');
 			scrollbar_width = e1.width() - e2.width();
-			e1.change(e2).remove();
+			e1.add(e2).remove();
 		} 
 		else {
 			e1 = $('<div />').css({ width: 100, height: 100, overflow: 'auto', position: 'absolute', top: -1000, left: 0 })
@@ -1109,7 +1109,7 @@
 				if(!obj.length) { return false; }
 				//if(this.data.ui.hovered && obj.get(0) === this.data.ui.hovered.get(0)) { return; }
 				if(!obj.hasClass("jstree-hovered")) { this.dehover_node(); }
-				this.data.ui.hovered = obj.children("a").changeClass("jstree-hovered").parent();
+				this.data.ui.hovered = obj.children("a").addClass("jstree-hovered").parent();
 				this._fix_scroll(obj);
 				this.__callback({ "obj" : obj });
 			},
@@ -1141,8 +1141,8 @@
 					proceed = false;
 					switch(!0) {
 						case (is_range):
-							this.data.ui.last_selected.changeClass("jstree-last-selected");
-							obj = obj[ obj.index() < this.data.ui.last_selected.index() ? "nextUntil" : "prevUntil" ](".jstree-last-selected").changeBack();
+							this.data.ui.last_selected.addClass("jstree-last-selected");
+							obj = obj[ obj.index() < this.data.ui.last_selected.index() ? "nextUntil" : "prevUntil" ](".jstree-last-selected").addBack();
 							if(s.select_limit == -1 || obj.length < s.select_limit) {
 								this.data.ui.last_selected.removeClass("jstree-last-selected");
 								this.data.ui.selected.each(function () {
@@ -1178,11 +1178,11 @@
 				}
 				if(proceed && !is_selected) {
 					if(!is_range) { this.data.ui.last_selected = obj; }
-					obj.children("a").changeClass("jstree-clicked");
+					obj.children("a").addClass("jstree-clicked");
 					if(s.selected_parent_open) {
 						obj.parents(".jstree-closed").each(function () { t.open_node(this, false, true); });
 					}
-					this.data.ui.selected = this.data.ui.selected.change(obj);
+					this.data.ui.selected = this.data.ui.selected.add(obj);
 					this._fix_scroll(obj.eq(0));
 					this.__callback({ "obj" : obj, "e" : e });
 				}
@@ -1246,7 +1246,7 @@
 				.bind("move_node.jstree", $.proxy(function (e, data) {
 					if(this._get_settings().crrm.move.open_onmove) {
 						var t = this;
-						data.rslt.np.parentsUntil(".jstree").changeBack().filter(".jstree-closed").each(function () {
+						data.rslt.np.parentsUntil(".jstree").addBack().filter(".jstree-closed").each(function () {
 							t.open_node(this, false, true);
 						});
 					}
@@ -1276,7 +1276,7 @@
 						"class" : "jstree-rename-input",
 						// "size" : t.length,
 						"css" : {
-							"pchangeing" : "0",
+							"padding" : "0",
 							"border" : "1px solid silver",
 							"position" : "absolute",
 							"left"  : (rtl ? "auto" : (w1 + w2 + 4) + "px"),
@@ -1444,14 +1444,14 @@
 				if(!theme_name) { return false; }
 				if(!theme_url) { theme_url = $.jstree._themes + theme_name + '/style.css'; }
 				if($.inArray(theme_url, themes_loaded) == -1) {
-					$.vakata.css.change_sheet({ "url" : theme_url });
+					$.vakata.css.add_sheet({ "url" : theme_url });
 					themes_loaded.push(theme_url);
 				}
 				if(this.data.themes.theme != theme_name) {
 					this.get_container().removeClass('jstree-' + this.data.themes.theme);
 					this.data.themes.theme = theme_name;
 				}
-				this.get_container().changeClass('jstree-' + theme_name);
+				this.get_container().addClass('jstree-' + theme_name);
 				if(!this.data.themes.dots) { this.hide_dots(); }
 				else { this.show_dots(); }
 				if(!this.data.themes.icons) { this.hide_icons(); }
@@ -1461,11 +1461,11 @@
 			get_theme	: function () { return this.data.themes.theme; },
 
 			show_dots	: function () { this.data.themes.dots = true; this.get_container().children("ul").removeClass("jstree-no-dots"); },
-			hide_dots	: function () { this.data.themes.dots = false; this.get_container().children("ul").changeClass("jstree-no-dots"); },
+			hide_dots	: function () { this.data.themes.dots = false; this.get_container().children("ul").addClass("jstree-no-dots"); },
 			toggle_dots	: function () { if(this.data.themes.dots) { this.hide_dots(); } else { this.show_dots(); } },
 
 			show_icons	: function () { this.data.themes.icons = true; this.get_container().children("ul").removeClass("jstree-no-icons"); },
-			hide_icons	: function () { this.data.themes.icons = false; this.get_container().children("ul").changeClass("jstree-no-icons"); },
+			hide_icons	: function () { this.data.themes.icons = false; this.get_container().children("ul").addClass("jstree-no-icons"); },
 			toggle_icons: function () { if(this.data.themes.icons) { this.hide_icons(); } else { this.show_icons(); } }
 		}
 	});
@@ -1689,7 +1689,7 @@
 				}
 				switch(!0) {
 					case (!s.data && !s.ajax): throw "Neither data nor ajax settings supplied.";
-					// function option changeed here for easier model integration (also supporting async - see callback)
+					// function option added here for easier model integration (also supporting async - see callback)
 					case ($.isFunction(s.data)):
 						s.data.call(this, obj, $.proxy(function (d) {
 							d = this._parse_json(d, obj);
@@ -1807,7 +1807,7 @@
 					d = $("<li />");
 					if(js.attr) { d.attr(js.attr); }
 					if(js.metadata) { d.data(js.metadata); }
-					if(js.state) { d.changeClass("jstree-" + js.state); }
+					if(js.state) { d.addClass("jstree-" + js.state); }
 					if(!$.isArray(js.data)) { tmp = js.data; js.data = []; js.data.push(tmp); }
 					$.each(js.data, function (i, m) {
 						tmp = $("<a />");
@@ -1817,12 +1817,12 @@
 							if(!m.attr) { m.attr = {}; }
 							if(!m.attr.href) { m.attr.href = '#'; }
 							tmp.attr(m.attr)[ t ? "html" : "text" ](m.title);
-							if(m.language) { tmp.changeClass(m.language); }
+							if(m.language) { tmp.addClass(m.language); }
 						}
 						tmp.prepend("<ins class='jstree-icon'>&#160;</ins>");
 						if(!m.icon && js.icon) { m.icon = js.icon; }
 						if(m.icon) { 
-							if(m.icon.indexOf("/") === -1) { tmp.children("ins").changeClass(m.icon); }
+							if(m.icon.indexOf("/") === -1) { tmp.children("ins").addClass(m.icon); }
 							else { tmp.children("ins").css("background","url('" + m.icon + "') center center no-repeat"); }
 						}
 						d.append(tmp);
@@ -1830,7 +1830,7 @@
 					d.prepend("<ins class='jstree-icon'>&#160;</ins>");
 					if(js.children) { 
 						if(s.progressive_render && js.state !== "open") {
-							d.changeClass("jstree-closed").data("jstree_children", js.children);
+							d.addClass("jstree-closed").data("jstree_children", js.children);
 						}
 						else {
 							if(s.progressive_unload) { d.data("jstree_children", js.children); }
@@ -2025,7 +2025,7 @@
 						if(langs[ln] != this.data.languages.current_language) { str += " display:none; "; }
 						str += " } ";
 					}
-					sh = $.vakata.css.change_sheet({ 'str' : str, 'title' : "jstree-languages" });
+					sh = $.vakata.css.add_sheet({ 'str' : str, 'title' : "jstree-languages" });
 				}
 			},
 			create_node : function (obj, position, js, callback) {
@@ -2036,7 +2036,7 @@
 					if($.isArray(langs) && langs.length) {
 						for(ln = 0; ln < langs.length; ln++) {
 							if(!a.is("." + langs[ln])) {
-								t.append(a.eq(0).clone().removeClass(langs.join(" ")).changeClass(langs[ln]));
+								t.append(a.eq(0).clone().removeClass(langs.join(" ")).addClass(langs[ln]));
 							}
 						}
 						a.not("." + langs.join(", .")).remove();
@@ -2225,7 +2225,7 @@
 			}
 
 			// maybe use a scrolling parent element instead of document?
-			if(e.type === "mousemove") { // thought of changeing scroll in order to move the helper, but mouse poisition is n/a
+			if(e.type === "mousemove") { // thought of adding scroll in order to move the helper, but mouse poisition is n/a
 				var d = $(document), t = d.scrollTop(), l = d.scrollLeft();
 				if(e.pageY - t < 20) { 
 					if(sti && dir1 === "down") { clearInterval(sti); sti = false; }
@@ -2276,8 +2276,8 @@
 		}
 	};
 	$(function() {
-		var css_string = '#vakata-dragged { display:block; margin:0 0 0 0; pchangeing:4px 4px 4px 24px; position:absolute; top:-2000px; line-height:16px; z-index:10000; } ';
-		$.vakata.css.change_sheet({ str : css_string, title : "vakata" });
+		var css_string = '#vakata-dragged { display:block; margin:0 0 0 0; padding:4px 4px 4px 24px; position:absolute; top:-2000px; line-height:16px; z-index:10000; } ';
+		$.vakata.css.add_sheet({ str : css_string, title : "vakata" });
 	});
 
 	$.jstree.plugin("dnd", {
@@ -2692,18 +2692,18 @@
 	});
 	$(function() {
 		var css_string = '' + 
-			'#vakata-dragged ins { display:block; text-decoration:none; width:16px; height:16px; margin:0 0 0 0; pchangeing:0; position:absolute; top:4px; left:4px; ' + 
+			'#vakata-dragged ins { display:block; text-decoration:none; width:16px; height:16px; margin:0 0 0 0; padding:0; position:absolute; top:4px; left:4px; ' + 
 			' -moz-border-radius:4px; border-radius:4px; -webkit-border-radius:4px; ' +
 			'} ' + 
 			'#vakata-dragged .jstree-ok { background:green; } ' + 
 			'#vakata-dragged .jstree-invalid { background:red; } ' + 
-			'#jstree-marker { pchangeing:0; margin:0; font-size:12px; overflow:hidden; height:12px; width:8px; position:absolute; top:-30px; z-index:10001; background-repeat:no-repeat; display:none; background-color:transparent; text-shadow:1px 1px 1px white; color:black; line-height:10px; } ' + 
-			'#jstree-marker-line { pchangeing:0; margin:0; line-height:0%; font-size:1px; overflow:hidden; height:1px; width:100px; position:absolute; top:-30px; z-index:10000; background-repeat:no-repeat; display:none; background-color:#456c43; ' + 
+			'#jstree-marker { padding:0; margin:0; font-size:12px; overflow:hidden; height:12px; width:8px; position:absolute; top:-30px; z-index:10001; background-repeat:no-repeat; display:none; background-color:transparent; text-shadow:1px 1px 1px white; color:black; line-height:10px; } ' + 
+			'#jstree-marker-line { padding:0; margin:0; line-height:0%; font-size:1px; overflow:hidden; height:1px; width:100px; position:absolute; top:-30px; z-index:10000; background-repeat:no-repeat; display:none; background-color:#456c43; ' + 
 			' cursor:pointer; border:1px solid #eeeeee; border-left:0; -moz-box-shadow: 0px 0px 2px #666; -webkit-box-shadow: 0px 0px 2px #666; box-shadow: 0px 0px 2px #666; ' + 
 			' -moz-border-radius:1px; border-radius:1px; -webkit-border-radius:1px; ' +
 			'}' + 
 			'';
-		$.vakata.css.change_sheet({ str : css_string, title : "jstree" });
+		$.vakata.css.add_sheet({ str : css_string, title : "jstree" });
 		m = $("<div />").attr({ id : "jstree-marker" }).hide().html("&raquo;")
 			.bind("mouseleave mouseenter", function (e) { 
 				m.hide();
@@ -2802,31 +2802,31 @@
 			},
 			_prepare_checkboxes : function (obj) {
 				obj = !obj || obj == -1 ? this.get_container().find("> ul > li") : this._get_node(obj);
-				if(obj === false) { return; } // changeed for removing root nodes
+				if(obj === false) { return; } // added for removing root nodes
 				var c, _this = this, t, ts = this._get_settings().checkbox.two_state, rc = this._get_settings().checkbox.real_checkboxes, rcn = this._get_settings().checkbox.real_checkboxes_names;
 				obj.each(function () {
 					t = $(this);
 					c = t.is("li") && (t.hasClass("jstree-checked") || (rc && t.children(":checked").length)) ? "jstree-checked" : "jstree-unchecked";
-					t.find("li").changeBack().each(function () {
+					t.find("li").addBack().each(function () {
 						var $t = $(this), nm;
-						$t.children("a" + (_this.data.languages ? "" : ":eq(0)") ).not(":has(.jstree-checkbox)").prepend("<ins class='jstree-checkbox'>&#160;</ins>").parent().not(".jstree-checked, .jstree-unchecked").changeClass( ts ? "jstree-unchecked" : c );
+						$t.children("a" + (_this.data.languages ? "" : ":eq(0)") ).not(":has(.jstree-checkbox)").prepend("<ins class='jstree-checkbox'>&#160;</ins>").parent().not(".jstree-checked, .jstree-unchecked").addClass( ts ? "jstree-unchecked" : c );
 						if(rc) {
 							if(!$t.children(":checkbox").length) {
 								nm = rcn.call(_this, $t);
 								$t.prepend("<input type='checkbox' class='jstree-real-checkbox' id='" + nm[0] + "' name='" + nm[0] + "' value='" + nm[1] + "' />");
 							}
 							else {
-								$t.children(":checkbox").changeClass("jstree-real-checkbox");
+								$t.children(":checkbox").addClass("jstree-real-checkbox");
 							}
 						}
 						if(!ts) {
 							if(c === "jstree-checked" || $t.hasClass("jstree-checked") || $t.children(':checked').length) {
-								$t.find("li").changeBack().addClass("jstree-checked").children(":checkbox").prop("checked", true);
+								$t.find("li").addBack().addClass("jstree-checked").children(":checkbox").prop("checked", true);
 							}
 						}
 						else {
 							if($t.hasClass("jstree-checked") || $t.children(':checked').length) {
-								$t.changeClass("jstree-checked").children(":checkbox").prop("checked", true);
+								$t.addClass("jstree-checked").children(":checkbox").prop("checked", true);
 							}
 						}
 					});
@@ -2842,25 +2842,25 @@
 				state = (state === false || state === true) ? state : obj.hasClass("jstree-checked");
 				if(this._get_settings().checkbox.two_state) {
 					if(state) { 
-						obj.removeClass("jstree-checked").changeClass("jstree-unchecked"); 
+						obj.removeClass("jstree-checked").addClass("jstree-unchecked"); 
 						if(rc) { obj.children(":checkbox").prop("checked", false); }
 					}
 					else { 
-						obj.removeClass("jstree-unchecked").changeClass("jstree-checked"); 
+						obj.removeClass("jstree-unchecked").addClass("jstree-checked"); 
 						if(rc) { obj.children(":checkbox").prop("checked", true); }
 					}
 				}
 				else {
 					if(state) { 
-						coll = obj.find("li").changeBack();
+						coll = obj.find("li").addBack();
 						if(!coll.filter(".jstree-checked, .jstree-undetermined").length) { return false; }
-						coll.removeClass("jstree-checked jstree-undetermined").changeClass("jstree-unchecked"); 
+						coll.removeClass("jstree-checked jstree-undetermined").addClass("jstree-unchecked"); 
 						if(rc) { coll.children(":checkbox").prop("checked", false); }
 					}
 					else { 
-						coll = obj.find("li").changeBack();
+						coll = obj.find("li").addBack();
 						if(!coll.filter(".jstree-unchecked, .jstree-undetermined").length) { return false; }
-						coll.removeClass("jstree-unchecked jstree-undetermined").changeClass("jstree-checked"); 
+						coll.removeClass("jstree-unchecked jstree-undetermined").addClass("jstree-checked"); 
 						if(rc) { coll.children(":checkbox").prop("checked", true); }
 						if(this.data.ui) { this.data.ui.last_selected = obj; }
 						this.data.checkbox.last_selected = obj;
@@ -2869,23 +2869,23 @@
 						var $this = $(this);
 						if(state) {
 							if($this.children("ul").children("li.jstree-checked, li.jstree-undetermined").length) {
-								$this.parentsUntil(".jstree", "li").changeBack().removeClass("jstree-checked jstree-unchecked").addClass("jstree-undetermined");
-								if(rc) { $this.parentsUntil(".jstree", "li").changeBack().children(":checkbox").prop("checked", false); }
+								$this.parentsUntil(".jstree", "li").addBack().removeClass("jstree-checked jstree-unchecked").addClass("jstree-undetermined");
+								if(rc) { $this.parentsUntil(".jstree", "li").addBack().children(":checkbox").prop("checked", false); }
 								return false;
 							}
 							else {
-								$this.removeClass("jstree-checked jstree-undetermined").changeClass("jstree-unchecked");
+								$this.removeClass("jstree-checked jstree-undetermined").addClass("jstree-unchecked");
 								if(rc) { $this.children(":checkbox").prop("checked", false); }
 							}
 						}
 						else {
 							if($this.children("ul").children("li.jstree-unchecked, li.jstree-undetermined").length) {
-								$this.parentsUntil(".jstree", "li").changeBack().removeClass("jstree-checked jstree-unchecked").addClass("jstree-undetermined");
-								if(rc) { $this.parentsUntil(".jstree", "li").changeBack().children(":checkbox").prop("checked", false); }
+								$this.parentsUntil(".jstree", "li").addBack().removeClass("jstree-checked jstree-unchecked").addClass("jstree-undetermined");
+								if(rc) { $this.parentsUntil(".jstree", "li").addBack().children(":checkbox").prop("checked", false); }
 								return false;
 							}
 							else {
-								$this.removeClass("jstree-unchecked jstree-undetermined").changeClass("jstree-checked");
+								$this.removeClass("jstree-unchecked jstree-undetermined").addClass("jstree-checked");
 								if(rc) { $this.children(":checkbox").prop("checked", true); }
 							}
 						}
@@ -2939,13 +2939,13 @@
 			},
 
 			show_checkboxes : function () { this.get_container().children("ul").removeClass("jstree-no-checkboxes"); },
-			hide_checkboxes : function () { this.get_container().children("ul").changeClass("jstree-no-checkboxes"); },
+			hide_checkboxes : function () { this.get_container().children("ul").addClass("jstree-no-checkboxes"); },
 
 			_repair_state : function (obj) {
 				obj = this._get_node(obj);
 				if(!obj.length) { return; }
 				if(this._get_settings().checkbox.two_state) {
-					obj.find('li').changeBack().not('.jstree-checked').removeClass('jstree-undetermined').addClass('jstree-unchecked').children(':checkbox').prop('checked', true);
+					obj.find('li').addBack().not('.jstree-checked').removeClass('jstree-undetermined').addClass('jstree-unchecked').children(':checkbox').prop('checked', true);
 					return;
 				}
 				var rc = this._get_settings().checkbox.real_checkboxes,
@@ -2956,8 +2956,8 @@
 				else if(a === 0 && b === 0) { this.change_state(obj, true); }
 				else if(a === c) { this.change_state(obj, false); }
 				else { 
-					obj.parentsUntil(".jstree","li").changeBack().removeClass("jstree-checked jstree-unchecked").addClass("jstree-undetermined");
-					if(rc) { obj.parentsUntil(".jstree", "li").changeBack().children(":checkbox").prop("checked", false); }
+					obj.parentsUntil(".jstree","li").addBack().removeClass("jstree-checked jstree-unchecked").addClass("jstree-undetermined");
+					if(rc) { obj.parentsUntil(".jstree", "li").addBack().children(":checkbox").prop("checked", false); }
 				}
 			},
 			reselect : function () {
@@ -2984,7 +2984,7 @@
 	});
 	$(function() {
 		var css_string = '.jstree .jstree-real-checkbox { display:none; } ';
-		$.vakata.css.change_sheet({ str : css_string, title : "jstree" });
+		$.vakata.css.add_sheet({ str : css_string, title : "jstree" });
 	});
 })(jQuery);
 //*/
@@ -3429,8 +3429,8 @@
 				this.get_container()
 					.bind("search.jstree", function (e, data) {
 						$(this).children("ul").find("li").hide().removeClass("jstree-last");
-						data.rslt.nodes.parentsUntil(".jstree").changeBack().show()
-							.filter("ul").each(function () { $(this).children("li:visible").eq(-1).changeClass("jstree-last"); });
+						data.rslt.nodes.parentsUntil(".jstree").addBack().show()
+							.filter("ul").each(function () { $(this).children("li:visible").eq(-1).addClass("jstree-last"); });
 					})
 					.bind("clear_search.jstree", function () {
 						$(this).children("ul").find("li").css("display","").end().end().jstree("clean_node", -1);
@@ -3472,7 +3472,7 @@
 				}
 				if(this.data.search.result.length) { this.clear_search(); }
 				this.data.search.result = this.get_container().find("a" + (this.data.languages ? "." + this.get_lang() : "" ) + ":" + (s.search_method) + "(" + this.data.search.str + ")");
-				this.data.search.result.changeClass("jstree-search").parent().parents(".jstree-closed").each(function () {
+				this.data.search.result.addClass("jstree-search").parent().parents(".jstree-closed").each(function () {
 					t.open_node(this, false, true);
 				});
 				this.__callback({ nodes : this.data.search.result, str : str });
@@ -3543,11 +3543,11 @@
 			w = $.vakata.context.cnt.width();
 			if(x + w > $(document).width()) { 
 				x = $(document).width() - (w + 5); 
-				$.vakata.context.cnt.find("li > ul").changeClass("right"); 
+				$.vakata.context.cnt.find("li > ul").addClass("right"); 
 			}
 			if(y + h > $(document).height()) { 
 				y = y - (h + t[0].offsetHeight); 
-				$.vakata.context.cnt.find("li > ul").changeClass("bottom"); 
+				$.vakata.context.cnt.find("li > ul").addClass("bottom"); 
 			}
 
 			$.vakata.context.cnt
@@ -3621,18 +3621,18 @@
 	};
 	$(function () {
 		var css_string = '' + 
-			'#vakata-contextmenu { display:block; visibility:hidden; left:0; top:-200px; position:absolute; margin:0; pchangeing:0; min-width:180px; background:#ebebeb; border:1px solid silver; z-index:10000; *width:180px; } ' + 
+			'#vakata-contextmenu { display:block; visibility:hidden; left:0; top:-200px; position:absolute; margin:0; padding:0; min-width:180px; background:#ebebeb; border:1px solid silver; z-index:10000; *width:180px; } ' + 
 			'#vakata-contextmenu ul { min-width:180px; *width:180px; } ' + 
-			'#vakata-contextmenu ul, #vakata-contextmenu li { margin:0; pchangeing:0; list-style-type:none; display:block; } ' + 
-			'#vakata-contextmenu li { line-height:20px; min-height:20px; position:relative; pchangeing:0px; } ' + 
-			'#vakata-contextmenu li a { pchangeing:1px 6px; line-height:17px; display:block; text-decoration:none; margin:1px 1px 0 1px; } ' + 
+			'#vakata-contextmenu ul, #vakata-contextmenu li { margin:0; padding:0; list-style-type:none; display:block; } ' + 
+			'#vakata-contextmenu li { line-height:20px; min-height:20px; position:relative; padding:0px; } ' + 
+			'#vakata-contextmenu li a { padding:1px 6px; line-height:17px; display:block; text-decoration:none; margin:1px 1px 0 1px; } ' + 
 			'#vakata-contextmenu li ins { float:left; width:16px; height:16px; text-decoration:none; margin-right:2px; } ' + 
 			'#vakata-contextmenu li a:hover, #vakata-contextmenu li.vakata-hover > a { background:gray; color:white; } ' + 
 			'#vakata-contextmenu li ul { display:none; position:absolute; top:-2px; left:100%; background:#ebebeb; border:1px solid gray; } ' + 
 			'#vakata-contextmenu .right { right:100%; left:auto; } ' + 
 			'#vakata-contextmenu .bottom { bottom:-1px; top:auto; } ' + 
-			'#vakata-contextmenu li.vakata-separator { min-height:0; height:1px; line-height:1px; font-size:1px; overflow:hidden; margin:0 2px; background:silver; /* border-top:1px solid #fefefe; */ pchangeing:0; } ';
-		$.vakata.css.change_sheet({ str : css_string, title : "vakata" });
+			'#vakata-contextmenu li.vakata-separator { min-height:0; height:1px; line-height:1px; font-size:1px; overflow:hidden; margin:0 2px; background:silver; /* border-top:1px solid #fefefe; */ padding:0; } ';
+		$.vakata.css.add_sheet({ str : css_string, title : "vakata" });
 		$.vakata.context.cnt
 			.delegate("a","click", function (e) { e.preventDefault(); })
 			.delegate("a","mouseup", function (e) {
@@ -3652,7 +3652,7 @@
 					if($.vakata.context.vis) { 
 						var o = $.vakata.context.cnt.find("ul:visible").last().children(".vakata-hover").removeClass("vakata-hover").prevAll("li:not(.vakata-separator)").first();
 						if(!o.length) { o = $.vakata.context.cnt.find("ul:visible").last().children("li:not(.vakata-separator)").last(); }
-						o.changeClass("vakata-hover");
+						o.addClass("vakata-hover");
 						e.stopImmediatePropagation(); 
 						e.preventDefault();
 					} 
@@ -3661,14 +3661,14 @@
 					if($.vakata.context.vis) { 
 						var o = $.vakata.context.cnt.find("ul:visible").last().children(".vakata-hover").removeClass("vakata-hover").nextAll("li:not(.vakata-separator)").first();
 						if(!o.length) { o = $.vakata.context.cnt.find("ul:visible").last().children("li:not(.vakata-separator)").first(); }
-						o.changeClass("vakata-hover");
+						o.addClass("vakata-hover");
 						e.stopImmediatePropagation(); 
 						e.preventDefault();
 					} 
 				})
 				.bind("keydown", "right", function (e) { 
 					if($.vakata.context.vis) { 
-						$.vakata.context.cnt.find(".vakata-hover").children("ul").show().children("li:not(.vakata-separator)").removeClass("vakata-hover").first().changeClass("vakata-hover");
+						$.vakata.context.cnt.find(".vakata-hover").children("ul").show().children("li:not(.vakata-separator)").removeClass("vakata-hover").first().addClass("vakata-hover");
 						e.stopImmediatePropagation(); 
 						e.preventDefault();
 					} 
@@ -3826,7 +3826,7 @@
 								icons_css += '} ';
 							}
 						});
-						if(icons_css !== "") { $.vakata.css.change_sheet({ 'str' : icons_css, title : "jstree-types" }); }
+						if(icons_css !== "") { $.vakata.css.add_sheet({ 'str' : icons_css, title : "jstree-types" }); }
 					}, this))
 				.bind("before.jstree", $.proxy(function (e, data) { 
 						var s, t, 
@@ -4015,7 +4015,7 @@
 			// this used to use html() and clean the whitespace, but this way any attached data was lost
 			this.data.html_data.original_container_html = this.get_container().find(" > ul > li").clone(true);
 			// remove white space from LI node - otherwise nodes appear a bit to the right
-			this.data.html_data.original_container_html.find("li").changeBack().contents().filter(function() { return this.nodeType == 3; }).remove();
+			this.data.html_data.original_container_html.find("li").addBack().contents().filter(function() { return this.nodeType == 3; }).remove();
 		},
 		defaults : { 
 			data : false,
@@ -4044,8 +4044,8 @@
 							if(d && d !== "" && d.toString && d.toString().replace(/^[\s\n]+$/,"") !== "") {
 								d = $(d);
 								if(!d.is("ul")) { d = $("<ul />").append(d); }
-								if(obj == -1 || !obj) { this.get_container().children("ul").empty().append(d.children()).find("li, a").filter(function () { return !this.firstChild || !this.firstChild.tagName || this.firstChild.tagName !== "INS"; }).prepend("<ins class='jstree-icon'>&#160;</ins>").end().filter("a").children("ins:first-child").not(".jstree-icon").changeClass("jstree-icon"); }
-								else { obj.children("a.jstree-loading").removeClass("jstree-loading"); obj.append(d).children("ul").find("li, a").filter(function () { return !this.firstChild || !this.firstChild.tagName || this.firstChild.tagName !== "INS"; }).prepend("<ins class='jstree-icon'>&#160;</ins>").end().filter("a").children("ins:first-child").not(".jstree-icon").changeClass("jstree-icon"); obj.removeData("jstree_is_loading"); }
+								if(obj == -1 || !obj) { this.get_container().children("ul").empty().append(d.children()).find("li, a").filter(function () { return !this.firstChild || !this.firstChild.tagName || this.firstChild.tagName !== "INS"; }).prepend("<ins class='jstree-icon'>&#160;</ins>").end().filter("a").children("ins:first-child").not(".jstree-icon").addClass("jstree-icon"); }
+								else { obj.children("a.jstree-loading").removeClass("jstree-loading"); obj.append(d).children("ul").find("li, a").filter(function () { return !this.firstChild || !this.firstChild.tagName || this.firstChild.tagName !== "INS"; }).prepend("<ins class='jstree-icon'>&#160;</ins>").end().filter("a").children("ins:first-child").not(".jstree-icon").addClass("jstree-icon"); obj.removeData("jstree_is_loading"); }
 								this.clean_node(obj);
 								if(s_call) { s_call.call(this); }
 							}
@@ -4073,7 +4073,7 @@
 								.children("ul").empty()
 								.append(this.data.html_data.original_container_html)
 								.find("li, a").filter(function () { return !this.firstChild || !this.firstChild.tagName || this.firstChild.tagName !== "INS"; }).prepend("<ins class='jstree-icon'>&#160;</ins>").end()
-								.filter("a").children("ins:first-child").not(".jstree-icon").changeClass("jstree-icon");
+								.filter("a").children("ins:first-child").not(".jstree-icon").addClass("jstree-icon");
 							this.clean_node();
 						}
 						if(s_call) { s_call.call(this); }
@@ -4085,7 +4085,7 @@
 							this.get_container()
 								.children("ul").empty().append(d.children())
 								.find("li, a").filter(function () { return !this.firstChild || !this.firstChild.tagName || this.firstChild.tagName !== "INS"; }).prepend("<ins class='jstree-icon'>&#160;</ins>").end()
-								.filter("a").children("ins:first-child").not(".jstree-icon").changeClass("jstree-icon");
+								.filter("a").children("ins:first-child").not(".jstree-icon").addClass("jstree-icon");
 							this.clean_node();
 						}
 						if(s_call) { s_call.call(this); }
@@ -4114,8 +4114,8 @@
 							if(d) {
 								d = $(d);
 								if(!d.is("ul")) { d = $("<ul />").append(d); }
-								if(obj == -1 || !obj) { this.get_container().children("ul").empty().append(d.children()).find("li, a").filter(function () { return !this.firstChild || !this.firstChild.tagName || this.firstChild.tagName !== "INS"; }).prepend("<ins class='jstree-icon'>&#160;</ins>").end().filter("a").children("ins:first-child").not(".jstree-icon").changeClass("jstree-icon"); }
-								else { obj.children("a.jstree-loading").removeClass("jstree-loading"); obj.append(d).children("ul").find("li, a").filter(function () { return !this.firstChild || !this.firstChild.tagName || this.firstChild.tagName !== "INS"; }).prepend("<ins class='jstree-icon'>&#160;</ins>").end().filter("a").children("ins:first-child").not(".jstree-icon").changeClass("jstree-icon"); obj.removeData("jstree_is_loading"); }
+								if(obj == -1 || !obj) { this.get_container().children("ul").empty().append(d.children()).find("li, a").filter(function () { return !this.firstChild || !this.firstChild.tagName || this.firstChild.tagName !== "INS"; }).prepend("<ins class='jstree-icon'>&#160;</ins>").end().filter("a").children("ins:first-child").not(".jstree-icon").addClass("jstree-icon"); }
+								else { obj.children("a.jstree-loading").removeClass("jstree-loading"); obj.append(d).children("ul").find("li, a").filter(function () { return !this.firstChild || !this.firstChild.tagName || this.firstChild.tagName !== "INS"; }).prepend("<ins class='jstree-icon'>&#160;</ins>").end().filter("a").children("ins:first-child").not(".jstree-icon").addClass("jstree-icon"); obj.removeData("jstree_is_loading"); }
 								this.clean_node(obj);
 								if(s_call) { s_call.call(this); }
 							}
@@ -4162,18 +4162,18 @@
 		__init : function () {
 			var s = this._get_settings().themeroller;
 			this.get_container()
-				.changeClass("ui-widget-content")
-				.changeClass("jstree-themeroller")
+				.addClass("ui-widget-content")
+				.addClass("jstree-themeroller")
 				.delegate("a","mouseenter.jstree", function (e) {
 					if(!$(e.currentTarget).hasClass("jstree-loading")) {
-						$(this).changeClass(s.item_h);
+						$(this).addClass(s.item_h);
 					}
 				})
 				.delegate("a","mouseleave.jstree", function () {
 					$(this).removeClass(s.item_h);
 				})
 				.bind("init.jstree", $.proxy(function (e, data) { 
-						data.inst.get_container().find("> ul > li > .jstree-loading > ins").changeClass("ui-icon-refresh");
+						data.inst.get_container().find("> ul > li > .jstree-loading > ins").addClass("ui-icon-refresh");
 						this._themeroller(data.inst.get_container().find("> ul > li"));
 					}, this))
 				.bind("open_node.jstree create_node.jstree", $.proxy(function (e, data) { 
@@ -4196,15 +4196,15 @@
 									return this.className.toString()
 										.replace(s.item_clsd,"").replace(s.item_open,"").replace(s.item_leaf,"")
 										.indexOf("ui-icon-") === -1; 
-								}).removeClass(s.item_open + " " + s.item_clsd).changeClass(s.item_leaf || "jstree-no-icon");
+								}).removeClass(s.item_open + " " + s.item_clsd).addClass(s.item_leaf || "jstree-no-icon");
 					}, this))
 				.bind("select_node.jstree", $.proxy(function (e, data) {
-						data.rslt.obj.children("a").changeClass(s.item_a);
+						data.rslt.obj.children("a").addClass(s.item_a);
 					}, this))
 				.bind("deselect_node.jstree deselect_all.jstree", $.proxy(function (e, data) {
 						this.get_container()
 							.find("a." + s.item_a).removeClass(s.item_a).end()
-							.find("a.jstree-clicked").changeClass(s.item_a);
+							.find("a.jstree-clicked").addClass(s.item_a);
 					}, this))
 				.bind("dehover_node.jstree", $.proxy(function (e, data) {
 						data.rslt.obj.children("a").removeClass(s.item_h);
@@ -4212,7 +4212,7 @@
 				.bind("hover_node.jstree", $.proxy(function (e, data) {
 						this.get_container()
 							.find("a." + s.item_h).not(data.rslt.obj).removeClass(s.item_h);
-						data.rslt.obj.children("a").changeClass(s.item_h);
+						data.rslt.obj.children("a").addClass(s.item_h);
 					}, this))
 				.bind("move_node.jstree", $.proxy(function (e, data) {
 						this._themeroller(data.rslt.o);
@@ -4237,40 +4237,40 @@
 				obj = (!obj || obj == -1) ? this.get_container_ul() : obj.parent();
 				obj
 					.find("li.jstree-closed")
-						.children("ins.jstree-icon").removeClass(s.opened).changeClass("ui-icon " + s.closed).end()
-						.children("a").changeClass(s.item)
-							.children("ins.jstree-icon").changeClass("ui-icon")
+						.children("ins.jstree-icon").removeClass(s.opened).addClass("ui-icon " + s.closed).end()
+						.children("a").addClass(s.item)
+							.children("ins.jstree-icon").addClass("ui-icon")
 								.filter(function() { 
 									return this.className.toString()
 										.replace(s.item_clsd,"").replace(s.item_open,"").replace(s.item_leaf,"")
 										.indexOf("ui-icon-") === -1; 
-								}).removeClass(s.item_leaf + " " + s.item_open).changeClass(s.item_clsd || "jstree-no-icon")
+								}).removeClass(s.item_leaf + " " + s.item_open).addClass(s.item_clsd || "jstree-no-icon")
 								.end()
 							.end()
 						.end()
 					.end()
 					.find("li.jstree-open")
-						.children("ins.jstree-icon").removeClass(s.closed).changeClass("ui-icon " + s.opened).end()
-						.children("a").changeClass(s.item)
-							.children("ins.jstree-icon").changeClass("ui-icon")
+						.children("ins.jstree-icon").removeClass(s.closed).addClass("ui-icon " + s.opened).end()
+						.children("a").addClass(s.item)
+							.children("ins.jstree-icon").addClass("ui-icon")
 								.filter(function() { 
 									return this.className.toString()
 										.replace(s.item_clsd,"").replace(s.item_open,"").replace(s.item_leaf,"")
 										.indexOf("ui-icon-") === -1; 
-								}).removeClass(s.item_leaf + " " + s.item_clsd).changeClass(s.item_open || "jstree-no-icon")
+								}).removeClass(s.item_leaf + " " + s.item_clsd).addClass(s.item_open || "jstree-no-icon")
 								.end()
 							.end()
 						.end()
 					.end()
 					.find("li.jstree-leaf")
 						.children("ins.jstree-icon").removeClass(s.closed + " ui-icon " + s.opened).end()
-						.children("a").changeClass(s.item)
-							.children("ins.jstree-icon").changeClass("ui-icon")
+						.children("a").addClass(s.item)
+							.children("ins.jstree-icon").addClass("ui-icon")
 								.filter(function() { 
 									return this.className.toString()
 										.replace(s.item_clsd,"").replace(s.item_open,"").replace(s.item_leaf,"")
 										.indexOf("ui-icon-") === -1; 
-								}).removeClass(s.item_clsd + " " + s.item_open).changeClass(s.item_leaf || "jstree-no-icon");
+								}).removeClass(s.item_clsd + " " + s.item_open).addClass(s.item_leaf || "jstree-no-icon");
 			}
 		},
 		defaults : {
@@ -4287,9 +4287,9 @@
 	$(function() {
 		var css_string = '' + 
 			'.jstree-themeroller .ui-icon { overflow:visible; } ' + 
-			'.jstree-themeroller a { pchangeing:0 2px; } ' + 
+			'.jstree-themeroller a { padding:0 2px; } ' + 
 			'.jstree-themeroller .jstree-no-icon { display:none; }';
-		$.vakata.css.change_sheet({ str : css_string, title : "jstree" });
+		$.vakata.css.add_sheet({ str : css_string, title : "jstree" });
 	});
 })(jQuery);
 //*/
@@ -4403,7 +4403,7 @@
 				.bind("select_node.jstree deselect_node.jstree ", $.proxy(function (e, data) { 
 						data.rslt.obj.each(function () { 
 							var ref = data.inst.get_container().find(" > .jstree-wholerow li:visible:eq(" + ( parseInt((($(this).offset().top - data.inst.get_container().offset().top + data.inst.get_container()[0].scrollTop) / data.inst.data.core.li_height),10)) + ")");
-							// ref.children("a")[e.type === "select_node" ? "changeClass" : "removeClass"]("jstree-clicked");
+							// ref.children("a")[e.type === "select_node" ? "addClass" : "removeClass"]("jstree-clicked");
 							ref.children("a").attr("class",data.rslt.obj.children("a").attr("class"));
 						});
 					}, this))
@@ -4411,7 +4411,7 @@
 						this.get_container().find(" > .jstree-wholerow .jstree-hovered").removeClass("jstree-hovered " + (this.data.themeroller ? this._get_settings().themeroller.item_h : "" ));
 						if(e.type === "hover_node") {
 							var ref = this.get_container().find(" > .jstree-wholerow li:visible:eq(" + ( parseInt(((data.rslt.obj.offset().top - this.get_container().offset().top + this.get_container()[0].scrollTop) / this.data.core.li_height),10)) + ")");
-							// ref.children("a").changeClass("jstree-hovered");
+							// ref.children("a").addClass("jstree-hovered");
 							ref.children("a").attr("class",data.rslt.obj.children(".jstree-hovered").attr("class"));
 						}
 					}, this))
@@ -4432,7 +4432,7 @@
 						this.dehover_node(e.currentTarget);
 					}, this));
 			if(is_ie7 || is_ie6) {
-				$.vakata.css.change_sheet({ str : ".jstree-" + this.get_index() + " { position:relative; } ", title : "jstree" });
+				$.vakata.css.add_sheet({ str : ".jstree-" + this.get_index() + " { position:relative; } ", title : "jstree" });
 			}
 		},
 		defaults : {
@@ -4444,9 +4444,9 @@
 		_fn : {
 			_prepare_wholerow_span : function (obj) {
 				obj = !obj || obj == -1 ? this.get_container().find("> ul > li") : this._get_node(obj);
-				if(obj === false) { return; } // changeed for removing root nodes
+				if(obj === false) { return; } // added for removing root nodes
 				obj.each(function () {
-					$(this).find("li").changeBack().each(function () {
+					$(this).find("li").addBack().each(function () {
 						var $t = $(this);
 						if($t.children(".jstree-wholerow-span").length) { return true; }
 						$t.prepend("<span class='jstree-wholerow-span' style='width:" + ($t.parentsUntil(".jstree","li").length * 18) + "px;'>&#160;</span>");
@@ -4455,7 +4455,7 @@
 			},
 			_prepare_wholerow_ul : function () {
 				var o = this.get_container().children("ul").eq(0), h = o.html();
-				o.changeClass("jstree-wholerow-real");
+				o.addClass("jstree-wholerow-real");
 				if(this.data.wholerow.last_html !== h) {
 					this.data.wholerow.last_html = h;
 					this.get_container().children(".jstree-wholerow").remove();
@@ -4477,22 +4477,22 @@
 			'.jstree .jstree-wholerow-real a { border-left-color:transparent !important; border-right-color:transparent !important; } ' + 
 			'.jstree .jstree-wholerow { position:relative; z-index:0; height:0; } ' + 
 			'.jstree .jstree-wholerow ul, .jstree .jstree-wholerow li { width:100%; } ' + 
-			'.jstree .jstree-wholerow, .jstree .jstree-wholerow ul, .jstree .jstree-wholerow li, .jstree .jstree-wholerow a { margin:0 !important; pchangeing:0 !important; } ' + 
+			'.jstree .jstree-wholerow, .jstree .jstree-wholerow ul, .jstree .jstree-wholerow li, .jstree .jstree-wholerow a { margin:0 !important; padding:0 !important; } ' + 
 			'.jstree .jstree-wholerow, .jstree .jstree-wholerow ul, .jstree .jstree-wholerow li { background:transparent !important; }' + 
 			'.jstree .jstree-wholerow ins, .jstree .jstree-wholerow span, .jstree .jstree-wholerow input { display:none !important; }' + 
-			'.jstree .jstree-wholerow a, .jstree .jstree-wholerow a:hover { text-indent:-9999px; !important; width:100%; pchangeing:0 !important; border-right-width:0px !important; border-left-width:0px !important; } ' + 
-			'.jstree .jstree-wholerow-span { position:absolute; left:0; margin:0px; pchangeing:0; height:18px; border-width:0; padding:0; z-index:0; }';
+			'.jstree .jstree-wholerow a, .jstree .jstree-wholerow a:hover { text-indent:-9999px; !important; width:100%; padding:0 !important; border-right-width:0px !important; border-left-width:0px !important; } ' + 
+			'.jstree .jstree-wholerow-span { position:absolute; left:0; margin:0px; padding:0; height:18px; border-width:0; padding:0; z-index:0; }';
 		if(is_ff2) {
 			css_string += '' + 
-				'.jstree .jstree-wholerow a { display:block; height:18px; margin:0; pchangeing:0; border:0; } ' + 
+				'.jstree .jstree-wholerow a { display:block; height:18px; margin:0; padding:0; border:0; } ' + 
 				'.jstree .jstree-wholerow-real a { border-color:transparent !important; } ';
 		}
 		if(is_ie7 || is_ie6) {
 			css_string += '' + 
-				'.jstree .jstree-wholerow, .jstree .jstree-wholerow li, .jstree .jstree-wholerow ul, .jstree .jstree-wholerow a { margin:0; pchangeing:0; line-height:18px; } ' + 
+				'.jstree .jstree-wholerow, .jstree .jstree-wholerow li, .jstree .jstree-wholerow ul, .jstree .jstree-wholerow a { margin:0; padding:0; line-height:18px; } ' + 
 				'.jstree .jstree-wholerow a { display:block; height:18px; line-height:18px; overflow:hidden; } ';
 		}
-		$.vakata.css.change_sheet({ str : css_string, title : "jstree" });
+		$.vakata.css.add_sheet({ str : css_string, title : "jstree" });
 	});
 })(jQuery);
 //*/

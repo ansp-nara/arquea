@@ -37,7 +37,7 @@ if (!window.SyntaxHighlighter) var SyntaxHighlighter = function() {
 // references to SyntaxHighlighter.whatever...
 var sh = {
 	defaults : {
-		/** Additional CSS class names to be changeed to highlighter elements. */
+		/** Additional CSS class names to be added to highlighter elements. */
 		'class-name' : '',
 		
 		/** First line number. */
@@ -587,7 +587,7 @@ var sh = {
 		 * @param {String} type		Name of the event.
 		 * @param {Function} func	Handling function.
 		 */
-		changeEvent: function(obj, type, func)
+		addEvent: function(obj, type, func)
 		{
 			if (obj.attachEvent) 
 			{
@@ -600,7 +600,7 @@ var sh = {
 			}
 			else 
 			{
-				obj.changeEventListener(type, func, false);
+				obj.addEventListener(type, func, false);
 			}
 		},
 		
@@ -790,7 +790,7 @@ var sh = {
 		 * 
 		 * @param {Number} number	Number to pad.
 		 * @param {Number} length	Max string length with.
-		 * @return {String}			Returns a string pchangeed with proper amount of '0'.
+		 * @return {String}			Returns a string padded with proper amount of '0'.
 		 */
 		padNumber : function(number, length)
 		{
@@ -1220,7 +1220,7 @@ var sh = {
 	 */
 	all : function(params)
 	{
-		sh.utils.changeEvent(
+		sh.utils.addEvent(
 			window,
 			'load',
 			function() { sh.highlight(params); }
@@ -1290,7 +1290,7 @@ sh.HtmlScript = function(scriptBrushName)
 			result
 			;
 
-		// change all matches from the code
+		// add all matches from the code
 		for (var i = 0; i < regexList.length; i++)
 		{
 			result = sh.utils.getMatches(code, regexList[i]);
@@ -1298,7 +1298,7 @@ sh.HtmlScript = function(scriptBrushName)
 			matches = matches.concat(result);
 		}
 		
-		// change left script bracket
+		// add left script bracket
 		if (htmlScript.left != null && match.left != null)
 		{
 			result = sh.utils.getMatches(match.left, htmlScript.left);
@@ -1306,7 +1306,7 @@ sh.HtmlScript = function(scriptBrushName)
 			matches = matches.concat(result);
 		}
 		
-		// change right script bracket
+		// add right script bracket
 		if (htmlScript.right != null && match.right != null)
 		{
 			result = sh.utils.getMatches(match.right, htmlScript.right);
@@ -1371,7 +1371,7 @@ sh.Highlighter.prototype = {
 		
 		if (regexList != null)
 			for (var i = 0; i < regexList.length; i++) 
-				// BUG: length returns len+1 for array if methods changeed to prototype chain (oising@gmail.com)
+				// BUG: length returns len+1 for array if methods added to prototype chain (oising@gmail.com)
 				if (typeof (regexList[i]) == "object")
 					result = result.concat(sh.utils.getMatches(code, regexList[i]));
 		
@@ -1498,7 +1498,7 @@ sh.Highlighter.prototype = {
 		};
 		
 		// Finally, go through the final list of matches and pull the all
-		// together changeing everything in between that isn't a match.
+		// together adding everything in between that isn't a match.
 		for (var i = 0; i < matches.length; i++) 
 		{
 			var match = matches[i],
@@ -1517,7 +1517,7 @@ sh.Highlighter.prototype = {
 			pos = match.index + match.length;
 		}
 
-		// don't forget to change whatever's remaining in the string
+		// don't forget to add whatever's remaining in the string
 		result += decorate(code.substr(pos), getBrushNameCss() + 'plain');
 
 		return result;
@@ -1579,10 +1579,10 @@ sh.Highlighter.prototype = {
 		if (this.getParam('wrap-lines') == false)
 		 	this.lines.className += ' no-wrap';
 
-		// change custom user style name
+		// add custom user style name
 		className += ' ' + this.getParam('class-name');
 		
-		// change brush alias to the class name for custom CSS
+		// add brush alias to the class name for custom CSS
 		className += ' ' + this.getParam('brush-name');
 		
 		div.className = className;
@@ -1602,7 +1602,7 @@ sh.Highlighter.prototype = {
 
 		this.code = sh.utils.unindent(this.code);
 
-		// change controls toolbar
+		// add controls toolbar
 		if (this.getParam('toolbar')) 
 		{
 			this.bar = this.create('DIV');
@@ -1679,7 +1679,7 @@ return sh;
  * MIT License
  * 
  * provides an augmented, cross-browser implementation of regular expressions
- * including support for changeitional modifiers and syntax. several convenience
+ * including support for additional modifiers and syntax. several convenience
  * methods and a recursive-construct parser are also included.
  */
 
@@ -1715,7 +1715,7 @@ var real = {
 
 /**
  * Accepts a pattern and flags, returns a new, extended RegExp object.
- * differs from a native regex in that changeitional flags and syntax are
+ * differs from a native regex in that additional flags and syntax are
  * supported and browser inconsistencies are ameliorated.
  * @ignore
  */
@@ -1723,7 +1723,7 @@ XRegExp = function (pattern, flags) {
     if (pattern instanceof RegExp) {
         if (flags !== undefined)
             throw TypeError("can't supply flags when constructing one RegExp from another");
-        return pattern.changeFlags(); // new copy
+        return pattern.addFlags(); // new copy
     }
 
     var flags           = flags || "",
@@ -1812,7 +1812,7 @@ XRegExp = function (pattern, flags) {
  * @param {Object} name
  * @param {Object} o
  */
-XRegExp.changePlugin = function (name, o) {
+XRegExp.addPlugin = function (name, o) {
     plugins[name] = o;
 };
 
@@ -1871,11 +1871,11 @@ RegExp.prototype.getNativeFlags = function () {
 
 /**
  * Accepts flags; returns a new XRegExp object generated by recompiling
- * the regex with the changeitional flags (may include non-native flags).
+ * the regex with the additional flags (may include non-native flags).
  * The original regex object is not altered.
  * @ignore
  */
-RegExp.prototype.changeFlags = function (flags) {
+RegExp.prototype.addFlags = function (flags) {
     var regex = new XRegExp(this.source, (flags || "") + this.getNativeFlags());
     if (this._x) {
         regex._x = {
@@ -1948,7 +1948,7 @@ XRegExp.escape = function (str) {
  * 
  * unsupported features:
  *  - backreferences within delimiter patterns when using ``escapeChar``.
- *  - although providing delimiters as regex objects changes the minor feature of
+ *  - although providing delimiters as regex objects adds the minor feature of
  *    independent delimiter flags, it introduces other limitations and is only
  *    intended to be done by the ``XRegExp`` constructor (which can't call
  *    itself while building a regex).
@@ -1967,8 +1967,8 @@ XRegExp.matchRecursive = function (str, left, right, flags, options) {
         /* sticky mode has its own handling in this function, which means you
            can use flag "y" even in browsers which don't support it natively */
         flags        = flags.replace(/y/g, ""),
-        left         = left  instanceof RegExp ? (left.global  ? left  : left.changeFlags("g"))  : new XRegExp(left,  "g" + flags),
-        right        = right instanceof RegExp ? (right.global ? right : right.changeFlags("g")) : new XRegExp(right, "g" + flags),
+        left         = left  instanceof RegExp ? (left.global  ? left  : left.addFlags("g"))  : new XRegExp(left,  "g" + flags),
+        right        = right instanceof RegExp ? (right.global ? right : right.addFlags("g")) : new XRegExp(right, "g" + flags),
         output       = [],
         openTokens   = 0,
         delimStart   = 0,
@@ -2208,7 +2208,7 @@ $(function () {
 			div  = $('<div class="code"><pre class="brush:' + ( $(this).is("script") ? 'js' : 'xml' ) + ';">' + code + '</pre></div>'),
 			demo = $(this).prevAll(".demo:eq(0)");
 		$(this).after(div);
-		if(!$(this).hasClass("below")) divs = divs.change(div);
+		if(!$(this).hasClass("below")) divs = divs.add(div);
 	});
 	SyntaxHighlighter.all();
 
