@@ -41,7 +41,7 @@ class ForeignKeySearchInput(forms.HiddenInput):
         return rendered + mark_safe(u'''
             <style type="text/css" media="screen">
                 #lookup_%(name)s {
-                    pchangeing-right:16px;
+                    padding-right:16px;
                     background: url(
                         %(admin_media_prefix)simg/admin/selector-search.gif
                     ) no-repeat right;

@@ -3,7 +3,7 @@
 {% block content %}
 <h1 repeat="1"></h1>
 
-    <table border="0" repeat="1" cellpchangeing="5">
+    <table border="0" repeat="1" cellpadding="5">
     <tr><th colspan="2"></th>
     {% for t in termos %}
        <th>Processo {{ t }}<br />{{ t.inicio|date:"d/m/Y" }} a {{ t.termino|date:"d/m/Y" }}</th>
@@ -41,3 +41,4 @@
     </table>
     {% endfor %}
 {% endblock %}
+

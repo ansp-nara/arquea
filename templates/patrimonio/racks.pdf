@@ -27,11 +27,11 @@
 {% for rack in racks %}
 <div style="float:left;">
 <h2>{{ rack.nome }} ({{ rack.vazio }} ocupado)</h2>
-<table class="tabela" cellpchangeing="0" cellspacing="0">
+<table class="tabela" cellpadding="0" cellspacing="0">
    <tr>
      <td width="2px" style="background-color:#f00;">&nbsp;</td>
      <td width="140px">
-       <table style="width:100%; margin:0; pchangeing:0;">
+       <table style="width:100%; margin:0; padding:0;">
   {% for eq in rack.equipamentos %}
        <tr>
     <td style="background-color:#{% if eq.descricao %}000;" rel="tooltip" title="{{ eq.descricao }}"{% else %}fff;"{% endif %} height="{% widthratio eq.tamanho 1 5 %}px" width="100%">&nbsp;</td>

@@ -1,7 +1,7 @@
 {% extends "base.pdf" %}
 {% load proto_tags %}
 {% block extrastyle %}
-td { pchangeing-top:3px; padding-left:2px;}
+td { padding-top:3px; padding-left:2px;}
 {% endblock %}
 {% block content %}
 <h1>Realizado de terceiros</h1>
@@ -21,3 +21,4 @@ td { pchangeing-top:3px; padding-left:2px;}
 </table>
 
 {% endblock %}
+

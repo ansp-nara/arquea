@@ -6,7 +6,7 @@
 
 <h4>Patrimonios da marca {{ marca }}</h4>
  
-    <table border="0" repeat="1" cellpchangeing="5">
+    <table border="0" repeat="1" cellpadding="5">
     <tr><th>Checado</th><th>ID</th><th>Procedência</th><th>Modelo</th><th>Part number</th><th>Descrição</th><th>NS</th><th>Tipo</th><th>Local</th><th>Posição</th><th>Estado</th><th>NF</th></tr>
      {% for p in patrimonios %}
               <tr><td>{{ p.checado }}</td><td>{{ p.id }}</td><td>{{ p.procedencia }}</td><td>{{ p.modelo }}</td><td>{{ p.part_number }}</td><td>{{ p.descricao }}</td><td>{{ p.ns }}</td><td>{{ p.tipo }}</td><td>{{ p.historico_atual.endereco.end }}</td><td>{{ p.historico_atual.endereco.complemento }}</td><td>{{ p.historico_atual.estado }}</td><td>{{ p.pagamento.protocolo.num_documento }}</td></tr>
