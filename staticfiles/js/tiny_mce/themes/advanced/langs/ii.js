@@ -1,11 +1,11 @@
-tinyMCE.changeI18n('ii.advanced',{
+tinyMCE.addI18n('ii.advanced',{
 style_select:"\u6837\u5F0F",
 font_size:"\u5B57\u4F53\u5927\u5C0F",
 fontdefault:"\u5B57\u4F53",
 block:"\u683C\u5F0F",
 paragraph:"\u6BB5\u843D",
 div:"DIV\u5C42",
-changeress:"\u5730\u5740",
+address:"\u5730\u5740",
 pre:"\u65E0\u5F0F\u6837\u7F16\u6392",
 h1:"\u6807\u98981",
 h2:"\u6807\u98982",

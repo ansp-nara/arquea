@@ -1,4 +1,4 @@
-tinyMCE.changeI18n('en.simple',{
+tinyMCE.addI18n('en.simple',{
 bold_desc:"Bold (Ctrl+B)",
 italic_desc:"Italic (Ctrl+I)",
 underline_desc:"Underline (Ctrl+U)",
