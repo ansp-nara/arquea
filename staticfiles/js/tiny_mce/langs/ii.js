@@ -1,4 +1,4 @@
-tinyMCE.changeI18n({ii:{
+tinyMCE.addI18n({ii:{
 common:{
 edit_confirm:"\u662F\u5426\u5728\u6B64textarea\u6807\u7B7E\u5185\u4F7F\u7528\"\u6240\u89C1\u5373\u6240\u5F97\"\u6A21\u5F0F\uFF1F",
 apply:"\u5E94\u7528",

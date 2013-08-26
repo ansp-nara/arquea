@@ -37,7 +37,7 @@ function init() {
 	setFormValue('onkeyup', dom.getAttrib(elm, 'onkeyup'));
 	className = dom.getAttrib(elm, 'class');
 
-	changeClassesToList('classlist', 'advlink_styles');
+	addClassesToList('classlist', 'advlink_styles');
 	selectByValue(f, 'classlist', className, true);
 
 	TinyMCE_EditableSelects.init();
@@ -122,5 +122,5 @@ function insertAttribute() {
 	tinyMCEPopup.close();
 }
 
-tinyMCEPopup.onInit.change(init);
-tinyMCEPopup.requireLangPack();
+tinyMCEPopup.onInit.add(init);
+tinyMCEPopup.requireLangPack();

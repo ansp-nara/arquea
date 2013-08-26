@@ -627,4 +627,4 @@ function generatePreview(c) {
 	p.innerHTML = "<!-- x --->" + h;
 }
 
-tinyMCEPopup.onInit.change(init);
+tinyMCEPopup.onInit.add(init);

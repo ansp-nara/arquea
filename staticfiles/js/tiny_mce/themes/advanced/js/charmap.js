@@ -273,13 +273,13 @@ var charmap = [
 	['&shy;',     '&#173;',  false,'soft hyphen']
 ];
 
-tinyMCEPopup.onInit.change(function() {
+tinyMCEPopup.onInit.add(function() {
 	tinyMCEPopup.dom.setHTML('charmapView', renderCharMapHTML());
 });
 
 function renderCharMapHTML() {
 	var charsPerRow = 20, tdWidth=20, tdHeight=20, i;
-	var html = '<table border="0" cellspacing="1" cellpchangeing="0" width="' + (tdWidth*charsPerRow) + '"><tr height="' + tdHeight + '">';
+	var html = '<table border="0" cellspacing="1" cellpadding="0" width="' + (tdWidth*charsPerRow) + '"><tr height="' + tdHeight + '">';
 	var cols=-1;
 
 	for (i=0; i<charmap.length; i++) {
@@ -296,8 +296,8 @@ function renderCharMapHTML() {
 	 }
 
 	if (cols % charsPerRow > 0) {
-		var pchange = charsPerRow - (cols % charsPerRow);
-		for (var i=0; i<pchange-1; i++)
+		var padd = charsPerRow - (cols % charsPerRow);
+		for (var i=0; i<padd-1; i++)
 			html += '<td width="' + tdWidth + '" height="' + tdHeight + '" class="charmap">&nbsp;</td>';
 	}
 
@@ -332,4 +332,4 @@ function previewChar(codeA, codeB, codeN) {
 	elmB.innerHTML = '&amp;' + codeA;
 	elmA.innerHTML = '&amp;' + codeB;
 	elmN.innerHTML = codeN;
-}
+}

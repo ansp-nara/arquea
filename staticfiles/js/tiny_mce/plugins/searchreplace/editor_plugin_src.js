@@ -26,19 +26,19 @@
 			};
 
 			// Register commands
-			ed.changeCommand('mceSearch', function() {
+			ed.addCommand('mceSearch', function() {
 				open('search');
 			});
 
-			ed.changeCommand('mceReplace', function() {
+			ed.addCommand('mceReplace', function() {
 				open('replace');
 			});
 
 			// Register buttons
-			ed.changeButton('search', {title : 'searchreplace.search_desc', cmd : 'mceSearch'});
-			ed.changeButton('replace', {title : 'searchreplace.replace_desc', cmd : 'mceReplace'});
+			ed.addButton('search', {title : 'searchreplace.search_desc', cmd : 'mceSearch'});
+			ed.addButton('replace', {title : 'searchreplace.replace_desc', cmd : 'mceReplace'});
 
-			ed.changeShortcut('ctrl+f', 'searchreplace.search_desc', 'mceSearch');
+			ed.addShortcut('ctrl+f', 'searchreplace.search_desc', 'mceSearch');
 		},
 
 		getInfo : function() {
@@ -53,5 +53,5 @@
 	});
 
 	// Register plugin
-	tinymce.PluginManager.change('searchreplace', tinymce.plugins.SearchReplacePlugin);
+	tinymce.PluginManager.add('searchreplace', tinymce.plugins.SearchReplacePlugin);
 })();

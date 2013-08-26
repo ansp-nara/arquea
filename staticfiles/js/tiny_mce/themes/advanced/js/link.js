@@ -153,4 +153,4 @@ var LinkDialog = {
 };
 
 LinkDialog.preInit();
-tinyMCEPopup.onInit.change(LinkDialog.init, LinkDialog);
+tinyMCEPopup.onInit.add(LinkDialog.init, LinkDialog);

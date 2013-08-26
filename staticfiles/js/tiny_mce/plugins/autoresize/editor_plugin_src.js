@@ -60,15 +60,15 @@
 			t.autoresize_min_height = ed.getElement().offsetHeight;
 
 			// Add appropriate listeners for resizing content area
-			ed.onChange.change(resize);
-			ed.onSetContent.change(resize);
-			ed.onPaste.change(resize);
-			ed.onKeyUp.change(resize);
-			ed.onPostRender.change(resize);
+			ed.onChange.add(resize);
+			ed.onSetContent.add(resize);
+			ed.onPaste.add(resize);
+			ed.onKeyUp.add(resize);
+			ed.onPostRender.add(resize);
 
 			if (ed.getParam('autoresize_on_init', true)) {
 				// Things to do when the editor is ready
-				ed.onInit.change(function(ed, l) {
+				ed.onInit.add(function(ed, l) {
 					// Show throbber until content area is resized properly
 					ed.setProgressState(true);
 					t.throbbing = true;
@@ -77,11 +77,11 @@
 					ed.getBody().style.overflowY = "hidden";
 				});
 
-				ed.onLoadContent.change(function(ed, l) {
+				ed.onLoadContent.add(function(ed, l) {
 					resize();
 
 					// Because the content area resizes when its content CSS loads,
-					// and we can't easily change a listener to its onload event,
+					// and we can't easily add a listener to its onload event,
 					// we'll just trigger a resize after a short loading period
 					setTimeout(function() {
 						resize();
@@ -94,7 +94,7 @@
 			}
 
 			// Register the command so that it can be invoked by using tinyMCE.activeEditor.execCommand('mceExample');
-			ed.changeCommand('mceAutoResize', resize);
+			ed.addCommand('mceAutoResize', resize);
 		},
 
 		/**
@@ -115,5 +115,5 @@
 	});
 
 	// Register plugin
-	tinymce.PluginManager.change('autoresize', tinymce.plugins.AutoResizePlugin);
+	tinymce.PluginManager.add('autoresize', tinymce.plugins.AutoResizePlugin);
 })();

@@ -16,7 +16,7 @@
 			t.editor = ed;
 
 			// Register commands
-			ed.changeCommand('mceFullPageProperties', function() {
+			ed.addCommand('mceFullPageProperties', function() {
 				ed.windowManager.open({
 					file : url + '/fullpage.htm',
 					width : 430 + parseInt(ed.getLang('fullpage.delta_width', 0)),
@@ -29,11 +29,11 @@
 			});
 
 			// Register buttons
-			ed.changeButton('fullpage', {title : 'fullpage.desc', cmd : 'mceFullPageProperties'});
+			ed.addButton('fullpage', {title : 'fullpage.desc', cmd : 'mceFullPageProperties'});
 
-			ed.onBeforeSetContent.change(t._setContent, t);
-			ed.onSetContent.change(t._setBodyAttribs, t);
-			ed.onGetContent.change(t._getContent, t);
+			ed.onBeforeSetContent.add(t._setContent, t);
+			ed.onSetContent.add(t._setBodyAttribs, t);
+			ed.onGetContent.add(t._getContent, t);
 		},
 
 		getInfo : function() {
@@ -149,5 +149,5 @@
 	});
 
 	// Register plugin
-	tinymce.PluginManager.change('fullpage', tinymce.plugins.FullPagePlugin);
+	tinymce.PluginManager.add('fullpage', tinymce.plugins.FullPagePlugin);
 })();
