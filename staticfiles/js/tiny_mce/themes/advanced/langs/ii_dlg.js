@@ -1,4 +1,4 @@
-tinyMCE.changeI18n('ii.advanced_dlg',{
+tinyMCE.addI18n('ii.advanced_dlg',{
 about_title:"\u5173\u4E8ETinyMCE",
 about_general:"\u5173\u4E8E",
 about_help:"\u5E2E\u52A9",

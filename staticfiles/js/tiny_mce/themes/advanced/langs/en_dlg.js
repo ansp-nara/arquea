@@ -1,4 +1,4 @@
-tinyMCE.changeI18n('en.advanced_dlg',{
+tinyMCE.addI18n('en.advanced_dlg',{
 about_title:"About TinyMCE",
 about_general:"About",
 about_help:"Help",
@@ -45,7 +45,7 @@ link_target:"Target",
 link_target_same:"Open link in the same window",
 link_target_blank:"Open link in a new window",
 link_titlefield:"Title",
-link_is_email:"The URL you entered seems to be an email changeress, do you want to add the required mailto: prefix?",
-link_is_external:"The URL you entered seems to external link, do you want to change the required http:// prefix?",
+link_is_email:"The URL you entered seems to be an email address, do you want to add the required mailto: prefix?",
+link_is_external:"The URL you entered seems to external link, do you want to add the required http:// prefix?",
 link_list:"Link list"
 });

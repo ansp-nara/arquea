@@ -1,4 +1,4 @@
-tinyMCE.changeI18n('ii.simple',{
+tinyMCE.addI18n('ii.simple',{
 bold_desc:"\u9ED1\u4F53(Ctrl+B)",
 italic_desc:"\u659C\u4F53(Ctrl+I)",
 underline_desc:"\u5E95\u7EBF(Ctrl+U)",
