@@ -16,8 +16,9 @@
 	}
 
 #box th {
-	pchangeing-top:3px;
+	padding-top:3px;
 	font-weight:normal;
 	}
 #box td {
-	pchangeing-top:12px;
+	padding-top:12px;
+	}

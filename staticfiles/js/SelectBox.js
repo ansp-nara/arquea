@@ -49,7 +49,7 @@ var SelectBox = {
         }
         SelectBox.cache[id].length--;
     },
-    change_to_cache: function(id, option) {
+    add_to_cache: function(id, option) {
         SelectBox.cache[id].push({value: option.value, text: option.text, displayed: 1});
     },
     cache_contains: function(id, value) {
@@ -68,7 +68,7 @@ var SelectBox = {
         var option;
         for (var i = 0; (option = from_box.options[i]); i++) {
             if (option.selected && SelectBox.cache_contains(from, option.value)) {
-                SelectBox.change_to_cache(to, {value: option.value, text: option.text, displayed: 1});
+                SelectBox.add_to_cache(to, {value: option.value, text: option.text, displayed: 1});
                 SelectBox.delete_from_cache(from, option.value);
             }
         }
@@ -81,7 +81,7 @@ var SelectBox = {
         var option;
         for (var i = 0; (option = from_box.options[i]); i++) {
             if (SelectBox.cache_contains(from, option.value)) {
-                SelectBox.change_to_cache(to, {value: option.value, text: option.text, displayed: 1});
+                SelectBox.add_to_cache(to, {value: option.value, text: option.text, displayed: 1});
                 SelectBox.delete_from_cache(from, option.value);
             }
         }
@@ -109,5 +109,3 @@ var SelectBox = {
         }
     }
 }
-
-

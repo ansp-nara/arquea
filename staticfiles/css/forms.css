@@ -4,7 +4,7 @@
 
 .form-row {
     overflow: hidden;
-    pchangeing: 10px;
+    padding: 10px;
     font-size: 11px;
     border-bottom: 1px solid #eee;
 	width:100%;
@@ -15,7 +15,7 @@
 }
 
 form .form-row p {
-    pchangeing-left: 0;
+    padding-left: 0;
     font-size: 11px;
 }
 
@@ -23,7 +23,7 @@ form .form-row p {
 
 form h4 {
     margin: 0 !important;
-    pchangeing: 0 !important;
+    padding: 0 !important;
     border: none !important;
 }
 
@@ -51,12 +51,12 @@ form ul.radiolist label {
 
 form ul.inline {
     margin-left: 0;
-    pchangeing: 0;
+    padding: 0;
 }
 
 form ul.inline li {
     float: left;
-    pchangeing-right: 7px;
+    padding-right: 7px;
 }
 
 /* ALIGNED FIELDSETS */
@@ -79,22 +79,22 @@ form ul.inline li {
 
 form .aligned p, form .aligned ul {
     margin-left: 7em;
-    pchangeing-left: 30px;
+    padding-left: 30px;
 }
 
 form .aligned table p {
     margin-left: 0;
-    pchangeing-left: 0;
+    padding-left: 0;
 }
 
 form .aligned p.help {
-    pchangeing-left: 38px;
+    padding-left: 38px;
 }
 
 .aligned .vCheckboxLabel {
     float: none !important;
     display: inline;
-    pchangeing-left: 4px;
+    padding-left: 4px;
 }
 
 .colM .aligned .vLargeTextField, .colM .aligned .vXMLLargeTextField {
@@ -103,7 +103,7 @@ form .aligned p.help {
 
 .checkbox-row p.help {
     margin-left: 0;
-    pchangeing-left: 0 !important;
+    padding-left: 0 !important;
 }
 
 fieldset .field-box {
@@ -122,7 +122,7 @@ form .wide p {
 }
 
 form .wide p.help {
-    pchangeing-left: 38px;
+    padding-left: 38px;
 }
 
 .colM fieldset.wide .vLargeTextField, .colM fieldset.wide .vXMLLargeTextField {
@@ -148,13 +148,13 @@ fieldset.collapsed h2 {
 fieldset.collapsed .collapse-toggle {
     background: transparent;
     display: inline !important;
-	pchangeing:0 5px;
+	padding:0 5px;
 	color:#ff9900;
 	outline:none;
 }
 
 fieldset.collapse .collapse-toggle{
-	pchangeing:0 5px;
+	padding:0 5px;
 	outline:none;
 	}
 
@@ -168,7 +168,7 @@ fieldset.monospace textarea {
 
 .submit-row {
 	margin:5px 10px;
-    pchangeing: 5px 10px;
+    padding: 5px 10px;
     text-align: center;
     /*background:#fff url(../img/admin/nav-bg.gif) 0 100% repeat-x;*/
     border-top: 1px dotted #0099ff;
@@ -179,7 +179,7 @@ fieldset.monospace textarea {
 
 .submit-row2{
 	margin:5px 10px;
-    pchangeing: 5px 10px;
+    padding: 5px 10px;
     text-align: center;
     /*background:#fff url(../img/admin/nav-bg.gif) 0 100% repeat-x;*/
     margin: 5px 0;
@@ -206,7 +206,7 @@ fieldset.monospace textarea {
 	border-radius:4px;
 	-moz-border-radius:4px;
 	-webkit-border-radius:4px;
-	pchangeing:1px 10px 2px 10px;
+	padding:1px 10px 2px 10px;
 	margin:0 5px;
     /*background: #134089 url(../img/admin/default-bg.gif) bottom repeat-x;*/
     background: #ebebeb;
@@ -224,7 +224,7 @@ fieldset.monospace textarea {
 	border-radius:4px;
 	-moz-border-radius:4px;
 	-webkit-border-radius:4px;
-	pchangeing:5px 10px;
+	padding:5px 10px;
 	margin:0 5px;
     /*background: #134089 url(../img/admin/default-bg.gif) bottom repeat-x;*/
     background: #134089;
@@ -289,7 +289,7 @@ fieldset.monospace textarea {
 /* INLINES */
 
 .inline-group {
-    pchangeing: 0;
+    padding: 0;
     /*border: 1px solid #ccc;*/
     margin: 10px 0;
 }
@@ -305,7 +305,7 @@ fieldset.monospace textarea {
 .inline-related h3 {
     margin: 0;
     color: #666;
-    pchangeing: 10px 5px;
+    padding: 10px 5px;
     font-size: 12px;
     background: #e1e1e1 url(../img/admin/nav-bg.gif) top left repeat-x;
     border-bottom: 1px solid #ddd;
@@ -328,7 +328,7 @@ fieldset.monospace textarea {
 
 .inline-related fieldset.module h3 {
     margin: 0;
-    pchangeing: 2px 5px 3px 5px;
+    padding: 2px 5px 3px 5px;
     font-size: 11px;
     text-align: left;
     font-weight: bold;
@@ -344,7 +344,7 @@ fieldset.monospace textarea {
 .inline-related.tabular fieldset.module table {
     width: 100%;
 	margin:0;
-	pchangeing:0;
+	padding:0;
 }
 
 .last-related fieldset {
@@ -352,25 +352,25 @@ fieldset.monospace textarea {
 }
 
 .inline-group .tabular tr.has_original td {
-    pchangeing-top: 2em;
+    padding-top: 2em;
 }
 
 .inline-group .tabular tr td.original {
-    pchangeing: 2px 0 0 0;
+    padding: 2px 0 0 0;
     width: 0;
     _position: relative;
 }
 
 .inline-group .tabular th.original {
     width: 0px;
-    pchangeing: 0;
+    padding: 0;
 }
 
 .inline-group .tabular td.original p {
     position: absolute;
     left: 0;
     height: 1.1em;
-    pchangeing: 2px 7px;
+    padding: 2px 7px;
     overflow: hidden;
     font-size: 9px;
     font-weight: bold;
@@ -379,34 +379,34 @@ fieldset.monospace textarea {
 }
 
 .inline-group ul.tools {
-    pchangeing: 0;
+    padding: 0;
     margin: 0;
     list-style: none;
 }
 
 .inline-group ul.tools li {
     display: inline;
-    pchangeing: 0 5px;
+    padding: 0 5px;
 }
 
-.inline-group div.change-row,
-.inline-group .tabular tr.change-row td {
+.inline-group div.add-row,
+.inline-group .tabular tr.add-row td {
     color: #666;
-    pchangeing: 3px 5px;
+    padding: 3px 5px;
     border-bottom: 1px solid #ddd;
     background: #e1e1e1 url(../img/admin/nav-bg.gif) top left repeat-x;
 }
 
-.inline-group .tabular tr.change-row td {
-    pchangeing: 4px 5px 3px;
+.inline-group .tabular tr.add-row td {
+    padding: 4px 5px 3px;
     border-bottom: none;
 }
 
-.inline-group ul.tools a.change,
-.inline-group div.change-row a,
-.inline-group .tabular tr.change-row td a {
-    background: url(../img/admin/icon_changelink.gif) 0 50% no-repeat;
-    pchangeing-left: 14px;
+.inline-group ul.tools a.add,
+.inline-group div.add-row a,
+.inline-group .tabular tr.add-row td a {
+    background: url(../img/admin/icon_addlink.gif) 0 50% no-repeat;
+    padding-left: 14px;
     font-size: 11px;
     outline: 0; /* Remove dotted border around link */
 }

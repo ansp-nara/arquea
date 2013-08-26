@@ -10,7 +10,7 @@
 
 .dashboard .module table td a {
     display: block;
-    pchangeing-right: .6em;
+    padding-right: .6em;
 }
 
 /* RECENT ACTIONS MODULE */
@@ -39,7 +39,7 @@ ul.relatedlist li a {
 	float:left;
 	font-size:12px;
 	font-weight:bold;
-	pchangeing:2px 0 2px 20px;
+	padding:2px 0 2px 20px;
 	margin:4px 5px;
 	border-radius:5px;
 	-moz-border-radius:5px;

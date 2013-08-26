@@ -29,14 +29,14 @@ body.login {
 }
 
 .login .form-row {
-    pchangeing: 4px 0;
+    padding: 4px 0;
 	display:block;
 }
 
 .login .form-row label {
     float: left;
     width: 8em;
-    pchangeing-right: 0.5em;
+    padding-right: 0.5em;
     line-height: 2em;
     text-align: right;
     font-size: 1em;

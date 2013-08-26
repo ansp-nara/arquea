@@ -129,7 +129,7 @@ class MemorandoSimples(models.Model):
     inferior = models.IntegerField(default=2)
     esquerda = models.IntegerField(default=3)
     direita = models.IntegerField(default=3)
-    data = models.DateField(auto_now_change=True)
+    data = models.DateField(auto_now_add=True)
     destinatario = models.TextField(u'Destinatário')
     numero = models.IntegerField(editable=False)
     assunto = models.ForeignKey('memorando.Assunto')

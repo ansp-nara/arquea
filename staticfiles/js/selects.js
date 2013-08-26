@@ -874,7 +874,7 @@ function ajax_filter_pagamentos_memorando(termo)
           $.each(retorno, function(i, item){
               for(j=0;j<n;j++){
                  var opt = new Object ({value:item.pk, text:item.valor});
-                 SelectBox.change_to_cache("id_corpo_set-"+j+"-pagamento_from", opt);
+                 SelectBox.add_to_cache("id_corpo_set-"+j+"-pagamento_from", opt);
               }
               $("#id_corpo_set-__prefix__-pagamento_from").append('<option value="'+item.pk+'">'+item.valor+'</option>');
           });
@@ -1062,4 +1062,4 @@ function ajax_select_ano_proj()
            }
        });
 
-}
+}

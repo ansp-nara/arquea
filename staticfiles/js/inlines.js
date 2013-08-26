@@ -32,32 +32,32 @@
 		};
 		var totalForms = $("#id_" + options.prefix + "-TOTAL_FORMS").attr("autocomplete", "off");
 		var maxForms = $("#id_" + options.prefix + "-MAX_NUM_FORMS").attr("autocomplete", "off");
-		// only show the change button if we are allowed to add more items,
+		// only show the add button if we are allowed to add more items,
         // note that max_num = None translates to a blank string.
 		var showAddButton = maxForms.val() == '' || (maxForms.val()-totalForms.val()) > 0;
 		$(this).each(function(i) {
-			$(this).not("." + options.emptyCssClass).changeClass(options.formCssClass);
+			$(this).not("." + options.emptyCssClass).addClass(options.formCssClass);
 		});
 		if ($(this).length && showAddButton) {
-			var changeButton;
+			var addButton;
 			if ($(this).attr("tagName") == "TR") {
 				// If forms are laid out as table rows, insert the
-				// "change" button in a new table row:
+				// "add" button in a new table row:
 				var numCols = this.eq(0).children().length;
-				$(this).parent().append('<tr class="' + options.changeCssClass + '"><td colspan="' + numCols + '"><a href="javascript:void(0)">' + options.addText + "</a></tr>");
-				changeButton = $(this).parent().find("tr:last a");
+				$(this).parent().append('<tr class="' + options.addCssClass + '"><td colspan="' + numCols + '"><a href="javascript:void(0)">' + options.addText + "</a></tr>");
+				addButton = $(this).parent().find("tr:last a");
 			} else {
 				// Otherwise, insert it immediately after the last form:
-				$(this).filter(":last").after('<div class="' + options.changeCssClass + '"><a href="javascript:void(0)">' + options.addText + "</a></div>");
-				changeButton = $(this).filter(":last").next().find("a");
+				$(this).filter(":last").after('<div class="' + options.addCssClass + '"><a href="javascript:void(0)">' + options.addText + "</a></div>");
+				addButton = $(this).filter(":last").next().find("a");
 			}
-			changeButton.click(function() {
+			addButton.click(function() {
 				var totalForms = $("#id_" + options.prefix + "-TOTAL_FORMS");
 				var nextIndex = parseInt(totalForms.val());
 				var template = $("#" + options.prefix + "-empty");
 				var row = template.clone(true);
 				row.removeClass(options.emptyCssClass)
-				    .changeClass(options.formCssClass)
+				    .addClass(options.formCssClass)
 				    .attr("id", options.prefix + "-" + nextIndex)
 				    .insertBefore($(template));
 				row.find("*")
@@ -94,9 +94,9 @@
 				});
 				// Update number of total forms
 				$(totalForms).val(nextIndex + 1);
-				// Hide change button in case we've hit the max, except we want to add infinitely
+				// Hide add button in case we've hit the max, except we want to add infinitely
 				if ((maxForms.val() != '') && (maxForms.val()-totalForms.val()) <= 0) {
-					changeButton.parent().hide();
+					addButton.parent().hide();
 				}
 				// The delete button of each row triggers a bunch of other things
 				row.find("a." + options.deleteCssClass).click(function() {
@@ -110,9 +110,9 @@
 					// Update the TOTAL_FORMS form count.
 					var forms = $("." + options.formCssClass);
 					$("#id_" + options.prefix + "-TOTAL_FORMS").val(forms.length);
-					// Show change button again once we drop below max
+					// Show add button again once we drop below max
 					if ((maxForms.val() == '') || (maxForms.val()-forms.length) > 0) {
-						changeButton.parent().show();
+						addButton.parent().show();
 					}
 					// Also, update names and ids for all remaining form controls
 					// so they remain in sequence:
@@ -124,9 +124,9 @@
 					}
 					return false;
 				});
-				// If a post-change callback was supplied, call it with the added form:
-				if (options.changeed) {
-					options.changeed(row);
+				// If a post-add callback was supplied, call it with the added form:
+				if (options.added) {
+					options.added(row);
 				}
 				return false;
 			});
@@ -136,13 +136,13 @@
 	/* Setup plugin defaults */
 	$.fn.formset.defaults = {
 		prefix: "form",					// The form prefix for your django formset
-		changeText: "add another",			// Text for the add link
+		addText: "add another",			// Text for the add link
 		deleteText: "remove",			// Text for the delete link
-		changeCssClass: "add-row",			// CSS class applied to the add link
+		addCssClass: "add-row",			// CSS class applied to the add link
 		deleteCssClass: "delete-row",	// CSS class applied to the delete link
 		emptyCssClass: "empty-row",		// CSS class applied to the empty row
 		formCssClass: "dynamic-form",	// CSS class applied to each form in a formset
-		changeed: null,					// Function called each time a new form is added
+		added: null,					// Function called each time a new form is added
 		removed: null					// Function called each time a form is deleted
 	}
 })(django.jQuery);

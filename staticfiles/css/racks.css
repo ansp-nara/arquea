@@ -1,7 +1,7 @@
 .tooltip{
    position:absolute;
    display:none;
-   pchangeing: 10px 30px;
+   padding: 10px 30px;
    background:#00f;
    color:#fff;
    -moz-border-radius:5px;
@@ -10,3 +10,4 @@
 }
 
 .tabela tr { height:5px; }
+
