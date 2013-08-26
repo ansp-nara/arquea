@@ -29,7 +29,7 @@ function init() {
 	// Any cells selected
 	if (dom.select('td.mceSelected,th.mceSelected', trElm).length == 0) {
 		// Setup form
-		changeClassesToList('class', 'table_row_styles');
+		addClassesToList('class', 'table_row_styles');
 		TinyMCE_EditableSelects.init();
 
 		formObj.bgcolor.value = bgcolor;
@@ -73,7 +73,7 @@ function updateAction() {
 			}
 		});
 
-		inst.changeVisual();
+		inst.addVisual();
 		inst.nodeChanged();
 		inst.execCommand('mceEndUndoLevel');
 		tinyMCEPopup.close();
@@ -107,7 +107,7 @@ function updateAction() {
 			break;
 	}
 
-	inst.changeVisual();
+	inst.addVisual();
 	inst.nodeChanged();
 	inst.execCommand('mceEndUndoLevel');
 	tinyMCEPopup.close();
@@ -234,4 +234,4 @@ function changedColor() {
 	formObj.style.value = dom.serializeStyle(st);
 }
 
-tinyMCEPopup.onInit.change(init);
+tinyMCEPopup.onInit.add(init);

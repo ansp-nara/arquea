@@ -16,4 +16,4 @@ var ExampleDialog = {
 	}
 };
 
-tinyMCEPopup.onInit.change(ExampleDialog.init, ExampleDialog);
+tinyMCEPopup.onInit.add(ExampleDialog.init, ExampleDialog);

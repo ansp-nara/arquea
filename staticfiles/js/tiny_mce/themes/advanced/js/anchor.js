@@ -34,4 +34,4 @@ var AnchorDialog = {
 	}
 };
 
-tinyMCEPopup.onInit.change(AnchorDialog.init, AnchorDialog);
+tinyMCEPopup.onInit.add(AnchorDialog.init, AnchorDialog);

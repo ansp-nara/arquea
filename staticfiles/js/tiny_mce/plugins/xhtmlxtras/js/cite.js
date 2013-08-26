@@ -25,4 +25,4 @@ function removeCite() {
 	tinyMCEPopup.close();
 }
 
-tinyMCEPopup.onInit.change(init);
+tinyMCEPopup.onInit.add(init);

@@ -18,7 +18,7 @@
 			t.editor = ed;
 
 			// Register commands
-			ed.changeCommand('mceTemplate', function(ui) {
+			ed.addCommand('mceTemplate', function(ui) {
 				ed.windowManager.open({
 					file : url + '/template.htm',
 					width : ed.getParam('template_popup_width', 750),
@@ -29,12 +29,12 @@
 				});
 			});
 
-			ed.changeCommand('mceInsertTemplate', t._insertTemplate, t);
+			ed.addCommand('mceInsertTemplate', t._insertTemplate, t);
 
 			// Register buttons
-			ed.changeButton('template', {title : 'template.desc', cmd : 'mceTemplate'});
+			ed.addButton('template', {title : 'template.desc', cmd : 'mceTemplate'});
 
-			ed.onPreProcess.change(function(ed, o) {
+			ed.onPreProcess.add(function(ed, o) {
 				var dom = ed.dom;
 
 				each(dom.select('div', o.node), function(e) {
@@ -100,7 +100,7 @@
 			t._replaceVals(el);
 
 			ed.execCommand('mceInsertContent', false, el.innerHTML);
-			ed.changeVisual();
+			ed.addVisual();
 		},
 
 		_replaceVals : function(e) {
@@ -120,7 +120,7 @@
 				if (!fmt)
 					return "";
 
-				function changeZeros(value, len) {
+				function addZeros(value, len) {
 					var i;
 
 					value = "" + value;
@@ -137,11 +137,11 @@
 				fmt = fmt.replace("%r", "%I:%M:%S %p");
 				fmt = fmt.replace("%Y", "" + d.getFullYear());
 				fmt = fmt.replace("%y", "" + d.getYear());
-				fmt = fmt.replace("%m", changeZeros(d.getMonth()+1, 2));
-				fmt = fmt.replace("%d", changeZeros(d.getDate(), 2));
-				fmt = fmt.replace("%H", "" + changeZeros(d.getHours(), 2));
-				fmt = fmt.replace("%M", "" + changeZeros(d.getMinutes(), 2));
-				fmt = fmt.replace("%S", "" + changeZeros(d.getSeconds(), 2));
+				fmt = fmt.replace("%m", addZeros(d.getMonth()+1, 2));
+				fmt = fmt.replace("%d", addZeros(d.getDate(), 2));
+				fmt = fmt.replace("%H", "" + addZeros(d.getHours(), 2));
+				fmt = fmt.replace("%M", "" + addZeros(d.getMinutes(), 2));
+				fmt = fmt.replace("%S", "" + addZeros(d.getSeconds(), 2));
 				fmt = fmt.replace("%I", "" + ((d.getHours() + 11) % 12 + 1));
 				fmt = fmt.replace("%p", "" + (d.getHours() < 12 ? "AM" : "PM"));
 				fmt = fmt.replace("%B", "" + this.editor.getLang("template_months_long").split(',')[d.getMonth()]);
@@ -155,5 +155,5 @@
 	});
 
 	// Register plugin
-	tinymce.PluginManager.change('template', tinymce.plugins.TemplatePlugin);
+	tinymce.PluginManager.add('template', tinymce.plugins.TemplatePlugin);
 })();

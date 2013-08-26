@@ -50,4 +50,4 @@ function removeDel() {
 	tinyMCEPopup.close();
 }
 
-tinyMCEPopup.onInit.change(init);
+tinyMCEPopup.onInit.add(init);

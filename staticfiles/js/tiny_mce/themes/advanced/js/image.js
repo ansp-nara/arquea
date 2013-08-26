@@ -91,7 +91,7 @@ var ImageDialog = {
 			ed.execCommand('mceInsertContent', false, '<img id="__mce_tmp" />', {skip_undo : 1});
 			ed.dom.setAttribs('__mce_tmp', args);
 			ed.dom.setAttrib('__mce_tmp', 'id', '');
-			ed.undoManager.change();
+			ed.undoManager.add();
 		}
 
 		tinyMCEPopup.close();
@@ -242,4 +242,4 @@ var ImageDialog = {
 };
 
 ImageDialog.preInit();
-tinyMCEPopup.onInit.change(ImageDialog.init, ImageDialog);
+tinyMCEPopup.onInit.add(ImageDialog.init, ImageDialog);

@@ -65,7 +65,7 @@
 					// Check for existing list element
 					list = dom.getParent(sel.getNode(), 'ol,ul');
 
-					// Switch/change list type if needed
+					// Switch/add list type if needed
 					if (!list || list.nodeName == (name == 'bullist' ? 'OL' : 'UL') || hasFormat(list, format))
 						ed.execCommand(name == 'bullist' ? 'InsertUnorderedList' : 'InsertOrderedList');
 
@@ -88,8 +88,8 @@
 					}
 				});
 
-				btn.onRenderMenu.change(function(btn, menu) {
-					menu.onShowMenu.change(function() {
+				btn.onRenderMenu.add(function(btn, menu) {
+					menu.onShowMenu.add(function() {
 						var dom = t.editor.dom, list = dom.getParent(t.editor.selection.getNode(), 'ol,ul'), fmtList;
 
 						if (list || format) {
@@ -122,12 +122,12 @@
 						}
 					});
 
-					menu.change({id : t.editor.dom.uniqueId(), title : 'advlist.types', 'class' : 'mceMenuItemTitle'}).setDisabled(1);
+					menu.add({id : t.editor.dom.uniqueId(), title : 'advlist.types', 'class' : 'mceMenuItemTitle'}).setDisabled(1);
 
 					each(t[name], function(item) {
 						item.id = t.editor.dom.uniqueId();
 
-						menu.change({id : item.id, title : item.title, onclick : function() {
+						menu.add({id : item.id, title : item.title, onclick : function() {
 							format = item;
 							applyListFormat();
 						}});
@@ -150,5 +150,5 @@
 	});
 
 	// Register plugin
-	tinymce.PluginManager.change('advlist', tinymce.plugins.AdvListPlugin);
+	tinymce.PluginManager.add('advlist', tinymce.plugins.AdvListPlugin);
 })();

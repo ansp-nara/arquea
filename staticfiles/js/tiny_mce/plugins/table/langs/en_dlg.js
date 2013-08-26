@@ -1,4 +1,4 @@
-tinyMCE.changeI18n('en.table_dlg',{
+tinyMCE.addI18n('en.table_dlg',{
 general_tab:"General",
 advanced_tab:"Advanced",
 general_props:"General properties",
@@ -10,7 +10,7 @@ height:"Height",
 cols:"Cols",
 rows:"Rows",
 cellspacing:"Cellspacing",
-cellpchangeing:"Cellpadding",
+cellpadding:"Cellpadding",
 border:"Border",
 align:"Alignment",
 align_default:"Default",

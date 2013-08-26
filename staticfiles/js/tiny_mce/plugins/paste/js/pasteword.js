@@ -48,4 +48,4 @@ var PasteWordDialog = {
 	}
 };
 
-tinyMCEPopup.onInit.change(PasteWordDialog.init, PasteWordDialog);
+tinyMCEPopup.onInit.add(PasteWordDialog.init, PasteWordDialog);

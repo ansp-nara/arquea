@@ -11,11 +11,11 @@
 (function() {
 	tinymce.create('tinymce.plugins.Print', {
 		init : function(ed, url) {
-			ed.changeCommand('mcePrint', function() {
+			ed.addCommand('mcePrint', function() {
 				ed.getWin().print();
 			});
 
-			ed.changeButton('print', {title : 'print.print_desc', cmd : 'mcePrint'});
+			ed.addButton('print', {title : 'print.print_desc', cmd : 'mcePrint'});
 		},
 
 		getInfo : function() {
@@ -30,5 +30,5 @@
 	});
 
 	// Register plugin
-	tinymce.PluginManager.change('print', tinymce.plugins.Print);
+	tinymce.PluginManager.add('print', tinymce.plugins.Print);
 })();

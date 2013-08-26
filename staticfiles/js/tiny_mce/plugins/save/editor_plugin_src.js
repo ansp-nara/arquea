@@ -16,15 +16,15 @@
 			t.editor = ed;
 
 			// Register commands
-			ed.changeCommand('mceSave', t._save, t);
-			ed.changeCommand('mceCancel', t._cancel, t);
+			ed.addCommand('mceSave', t._save, t);
+			ed.addCommand('mceCancel', t._cancel, t);
 
 			// Register buttons
-			ed.changeButton('save', {title : 'save.save_desc', cmd : 'mceSave'});
-			ed.changeButton('cancel', {title : 'save.cancel_desc', cmd : 'mceCancel'});
+			ed.addButton('save', {title : 'save.save_desc', cmd : 'mceSave'});
+			ed.addButton('cancel', {title : 'save.cancel_desc', cmd : 'mceCancel'});
 
-			ed.onNodeChange.change(t._nodeChange, t);
-			ed.changeShortcut('ctrl+s', ed.getLang('save.save_desc'), 'mceSave');
+			ed.onNodeChange.add(t._nodeChange, t);
+			ed.addShortcut('ctrl+s', ed.getLang('save.save_desc'), 'mceSave');
 		},
 
 		getInfo : function() {
@@ -97,6 +97,5 @@
 	});
 
 	// Register plugin
-	tinymce.PluginManager.change('save', tinymce.plugins.Save);
+	tinymce.PluginManager.add('save', tinymce.plugins.Save);
 })();
-

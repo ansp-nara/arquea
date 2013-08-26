@@ -22,7 +22,7 @@
 			t.cleanre = ed.getParam('wordcount_cleanregex', /[0-9.(),;:!?%#$¿'"_+=\\\/-]*/g);
 			t.id = ed.id + '-word-count';
 
-			ed.onPostRender.change(function(ed, cm) {
+			ed.onPostRender.add(function(ed, cm) {
 				var row, id;
 
 				// Add it to the specified id or the theme advanced path
@@ -31,24 +31,24 @@
 					row = tinymce.DOM.get(ed.id + '_path_row');
 
 					if (row)
-						tinymce.DOM.change(row.parentNode, 'div', {'style': 'float: right'}, ed.getLang('wordcount.words', 'Words: ') + '<span id="' + t.id + '">0</span>');
+						tinymce.DOM.add(row.parentNode, 'div', {'style': 'float: right'}, ed.getLang('wordcount.words', 'Words: ') + '<span id="' + t.id + '">0</span>');
 				} else
-					tinymce.DOM.change(id, 'span', {}, '<span id="' + t.id + '">0</span>');
+					tinymce.DOM.add(id, 'span', {}, '<span id="' + t.id + '">0</span>');
 			});
 
-            ed.onInit.change(function(ed) {
-				ed.selection.onSetContent.change(function() {
+            ed.onInit.add(function(ed) {
+				ed.selection.onSetContent.add(function() {
 					t._count(ed);
 				});
 
 				t._count(ed);
 			});
 
-			ed.onSetContent.change(function(ed) {
+			ed.onSetContent.add(function(ed) {
 				t._count(ed);
 			});
 
-			ed.onKeyUp.change(function(ed, e) {
+			ed.onKeyUp.add(function(ed, e) {
 				if (e.keyCode == last)
 					return;
 
@@ -94,5 +94,5 @@
         }
     });
 
-    tinymce.PluginManager.change('wordcount', tinymce.plugins.WordCount);
+    tinymce.PluginManager.add('wordcount', tinymce.plugins.WordCount);
 })();

@@ -31,7 +31,7 @@ function init() {
 	var scope = ed.dom.getAttrib(tdElm, 'scope');
 
 	// Setup form
-	changeClassesToList('class', 'table_cell_styles');
+	addClassesToList('class', 'table_cell_styles');
 	TinyMCE_EditableSelects.init();
 
 	if (!ed.dom.hasClass(tdElm, 'mceSelected')) {
@@ -76,7 +76,7 @@ function updateAction() {
 			updateCell(td);
 		});
 
-		ed.changeVisual();
+		ed.addVisual();
 		ed.nodeChanged();
 		inst.execCommand('mceEndUndoLevel');
 		tinyMCEPopup.close();
@@ -94,7 +94,7 @@ function updateAction() {
 				if (s) {
 					updateCell(tdElm);
 
-					ed.changeVisual();
+					ed.addVisual();
 					ed.nodeChanged();
 					inst.execCommand('mceEndUndoLevel');
 					tinyMCEPopup.close();
@@ -142,7 +142,7 @@ function updateAction() {
 			break;
 	}
 
-	ed.changeVisual();
+	ed.addVisual();
 	ed.nodeChanged();
 	inst.execCommand('mceEndUndoLevel');
 	tinyMCEPopup.close();
@@ -283,4 +283,4 @@ function changedStyle() {
 	}
 }
 
-tinyMCEPopup.onInit.change(init);
+tinyMCEPopup.onInit.add(init);

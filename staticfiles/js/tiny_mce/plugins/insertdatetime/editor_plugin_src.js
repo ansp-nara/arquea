@@ -15,20 +15,20 @@
 
 			t.editor = ed;
 
-			ed.changeCommand('mceInsertDate', function() {
+			ed.addCommand('mceInsertDate', function() {
 				var str = t._getDateTime(new Date(), ed.getParam("plugin_insertdate_dateFormat", ed.getLang('insertdatetime.date_fmt')));
 
 				ed.execCommand('mceInsertContent', false, str);
 			});
 
-			ed.changeCommand('mceInsertTime', function() {
+			ed.addCommand('mceInsertTime', function() {
 				var str = t._getDateTime(new Date(), ed.getParam("plugin_insertdate_timeFormat", ed.getLang('insertdatetime.time_fmt')));
 
 				ed.execCommand('mceInsertContent', false, str);
 			});
 
-			ed.changeButton('insertdate', {title : 'insertdatetime.insertdate_desc', cmd : 'mceInsertDate'});
-			ed.changeButton('inserttime', {title : 'insertdatetime.inserttime_desc', cmd : 'mceInsertTime'});
+			ed.addButton('insertdate', {title : 'insertdatetime.insertdate_desc', cmd : 'mceInsertDate'});
+			ed.addButton('inserttime', {title : 'insertdatetime.inserttime_desc', cmd : 'mceInsertTime'});
 		},
 
 		getInfo : function() {
@@ -46,7 +46,7 @@
 		_getDateTime : function(d, fmt) {
 			var ed = this.editor;
 
-			function changeZeros(value, len) {
+			function addZeros(value, len) {
 				value = "" + value;
 
 				if (value.length < len) {
@@ -61,11 +61,11 @@
 			fmt = fmt.replace("%r", "%I:%M:%S %p");
 			fmt = fmt.replace("%Y", "" + d.getFullYear());
 			fmt = fmt.replace("%y", "" + d.getYear());
-			fmt = fmt.replace("%m", changeZeros(d.getMonth()+1, 2));
-			fmt = fmt.replace("%d", changeZeros(d.getDate(), 2));
-			fmt = fmt.replace("%H", "" + changeZeros(d.getHours(), 2));
-			fmt = fmt.replace("%M", "" + changeZeros(d.getMinutes(), 2));
-			fmt = fmt.replace("%S", "" + changeZeros(d.getSeconds(), 2));
+			fmt = fmt.replace("%m", addZeros(d.getMonth()+1, 2));
+			fmt = fmt.replace("%d", addZeros(d.getDate(), 2));
+			fmt = fmt.replace("%H", "" + addZeros(d.getHours(), 2));
+			fmt = fmt.replace("%M", "" + addZeros(d.getMinutes(), 2));
+			fmt = fmt.replace("%S", "" + addZeros(d.getSeconds(), 2));
 			fmt = fmt.replace("%I", "" + ((d.getHours() + 11) % 12 + 1));
 			fmt = fmt.replace("%p", "" + (d.getHours() < 12 ? "AM" : "PM"));
 			fmt = fmt.replace("%B", "" + ed.getLang("insertdatetime.months_long").split(',')[d.getMonth()]);
@@ -79,5 +79,5 @@
 	});
 
 	// Register plugin
-	tinymce.PluginManager.change('insertdatetime', tinymce.plugins.InsertDateTime);
+	tinymce.PluginManager.add('insertdatetime', tinymce.plugins.InsertDateTime);
 })();

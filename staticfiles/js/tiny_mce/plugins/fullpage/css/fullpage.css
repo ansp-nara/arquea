@@ -41,7 +41,7 @@
 	width: 100%;
 }
 
-.changebutton, .removebutton, .moveupbutton, .movedownbutton {
+.addbutton, .removebutton, .moveupbutton, .movedownbutton {
 	border-top: 1px solid;
 	border-left: 1px solid;
 	border-bottom: 1px solid;
@@ -57,13 +57,13 @@
 	width: 200px;
 }
 
-.changebutton:hover, .removebutton:hover, .moveupbutton:hover, .movedownbutton:hover {
+.addbutton:hover, .removebutton:hover, .moveupbutton:hover, .movedownbutton:hover {
 	border: 1px solid #0A246A;
 	background-color: #B6BDD2;
 }
 
-.changebutton {
-	background-image: url('../images/change.gif');
+.addbutton {
+	background-image: url('../images/add.gif');
 	float: left;
 	margin-right: 3px;
 }
@@ -103,7 +103,7 @@
 	display: none;
 }
 
-#changemenu {
+#addmenu {
 	position: absolute;
 	border: 1px solid gray;
 	display: none;
@@ -111,7 +111,7 @@
 	background-color: white;
 }
 
-#changemenu a {
+#addmenu a {
 	display: block;
 	width: 100%;
 	line-height: 20px;
@@ -119,14 +119,14 @@
 	background-color: white;
 }
 
-#changemenu a:hover {
+#addmenu a:hover {
 	background-color: #B6BDD2;
 	color: black;
 }
 
-#changemenu span {
-	pchangeing-left: 10px;
-	pchangeing-right: 10px;
+#addmenu span {
+	padding-left: 10px;
+	padding-right: 10px;
 }
 
 #updateElementPanel {
@@ -170,7 +170,7 @@
 
 /* MSIE specific styles */
 
-* html .changebutton, * html .removebutton, * html .moveupbutton, * html .movedownbutton {
+* html .addbutton, * html .removebutton, * html .moveupbutton, * html .movedownbutton {
 	width: 22px;
 	height: 22px;
 }
@@ -180,4 +180,3 @@ textarea {
 }
 
 .panel_wrapper div.current {height:420px;}
-

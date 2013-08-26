@@ -16,15 +16,15 @@
 			t.editor = ed;
 
 			// Register commands
-			ed.changeCommand('mceNonBreaking', function() {
+			ed.addCommand('mceNonBreaking', function() {
 				ed.execCommand('mceInsertContent', false, (ed.plugins.visualchars && ed.plugins.visualchars.state) ? '<span _mce_bogus="1" class="mceItemHidden mceItemNbsp">&nbsp;</span>' : '&nbsp;');
 			});
 
 			// Register buttons
-			ed.changeButton('nonbreaking', {title : 'nonbreaking.nonbreaking_desc', cmd : 'mceNonBreaking'});
+			ed.addButton('nonbreaking', {title : 'nonbreaking.nonbreaking_desc', cmd : 'mceNonBreaking'});
 
 			if (ed.getParam('nonbreaking_force_tab')) {
-				ed.onKeyDown.change(function(ed, e) {
+				ed.onKeyDown.add(function(ed, e) {
 					if (tinymce.isIE && e.keyCode == 9) {
 						ed.execCommand('mceNonBreaking');
 						ed.execCommand('mceNonBreaking');
@@ -49,5 +49,5 @@
 	});
 
 	// Register plugin
-	tinymce.PluginManager.change('nonbreaking', tinymce.plugins.Nonbreaking);
+	tinymce.PluginManager.add('nonbreaking', tinymce.plugins.Nonbreaking);
 })();

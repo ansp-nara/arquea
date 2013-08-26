@@ -33,4 +33,4 @@ var PasteTextDialog = {
 	}
 };
 
-tinyMCEPopup.onInit.change(PasteTextDialog.init, PasteTextDialog);
+tinyMCEPopup.onInit.add(PasteTextDialog.init, PasteTextDialog);
