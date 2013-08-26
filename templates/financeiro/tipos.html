@@ -3,7 +3,7 @@
 {% block content %}
 <h1 repeat="1">Tipos de protocolos</h1>
 
-    <table border="0" repeat="1" cellpchangeing="5">
+    <table border="0" repeat="1" cellpadding="5">
     {% for p in protocolos %}
  	   <tr><td>{{ p.tipo }}</td></tr>
            {% for a in p.auditorias %}

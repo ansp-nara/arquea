@@ -24,7 +24,7 @@
             {% else %}
             <ul class="actionlist">
             {% for entry in admin_log %}
-            <li class="{% if entry.is_changeition %}addlink{% endif %}{% if entry.is_change %}changelink{% endif %}{% if entry.is_deletion %}deletelink{% endif %}">
+            <li class="{% if entry.is_addition %}addlink{% endif %}{% if entry.is_change %}changelink{% endif %}{% if entry.is_deletion %}deletelink{% endif %}">
                 {% if entry.is_deletion %}
                     {{ entry.object_repr }}
                 {% else %}
@@ -81,8 +81,8 @@
 							<th scope="row">{{ model.name }}</th>
 						{% endif %}
 
-						{% if model.perms.change %}
-							<td><a href="{{ model.admin_url }}change/" class="addlink">{% trans 'Add' %}</a></td>
+						{% if model.perms.add %}
+							<td><a href="{{ model.admin_url }}add/" class="addlink">{% trans 'Add' %}</a></td>
 						{% else %}
 							<td>&nbsp;</td>
 						{% endif %}

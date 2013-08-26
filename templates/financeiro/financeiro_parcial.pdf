@@ -25,7 +25,7 @@
 <h1 repeat="1">Extrato do financeiro do processo {{ termo }}</h1>
 
    {% for p in parciais %}
-    <table border="0" repeat="1" cellpchangeing="5">
+    <table border="0" repeat="1" cellpadding="5">
     <h2>Parcial {{ p.parcial }} - Total liberado: {{ p.liberado|moeda }}. Diferença existente: {{ p.diferenca_total|moeda }}</h2>
        <tr><th>Data</th><th>Código</th><th>Histórico</th><th>Valor</th><th>Comprovante</th><th>Modalidade - [Parcial/(Página)]</th></tr>
     {% for e in p.extrato %}

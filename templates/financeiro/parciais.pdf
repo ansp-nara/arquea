@@ -22,7 +22,7 @@
 <body>
 <h1 repeat="1">Outorga {{ termo }}</h1>
 
-    <table border="0" cellpchangeing="5">
+    <table border="0" cellpadding="5">
     {% for p in parciais %}
 	<tr><td>Parcial {{ p.parcial }}</td><td>(Diferença)  {{ p.diff|moeda }}</td></tr>
 	{% for d in p.dados %}
