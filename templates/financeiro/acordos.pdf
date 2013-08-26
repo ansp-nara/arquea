@@ -24,7 +24,7 @@
 <body>
 <h1 repeat="1">Relatório de acordos da outorga {{ termo }}</h1>
 
-    <table border="0" cellpchangeing="5">
+    <table border="0" cellpadding="5">
     {% for ac in acordos %}
 	<tr><td colspan="7">{{ ac.desc }} ({{ ac.total|moeda }})</td></tr>
 	{% for it in ac.itens %}

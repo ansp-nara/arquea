@@ -24,7 +24,7 @@
 <body>
 <h1 repeat="1">Extrato da conta corrente do projeto em {{ mes }}/{{ ano }}</h1>
 
-    <table border="0" repeat="1" cellpchangeing="5">
+    <table border="0" repeat="1" cellpadding="5">
        <tr><th>Data</th><th>Documento</th><th>Histórico</th><th>Valor</th></tr>
     {% for e in extrato %}
         {% if e.data_oper %}

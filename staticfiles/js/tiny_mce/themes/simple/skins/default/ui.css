@@ -1,5 +1,5 @@
 /* Reset */
-.defaultSimpleSkin table, .defaultSimpleSkin tbody, .defaultSimpleSkin a, .defaultSimpleSkin img, .defaultSimpleSkin tr, .defaultSimpleSkin div, .defaultSimpleSkin td, .defaultSimpleSkin iframe, .defaultSimpleSkin span, .defaultSimpleSkin * {border:0; margin:0; pchangeing:0; background:transparent; white-space:nowrap; text-decoration:none; font-weight:normal; cursor:default; color:#000}
+.defaultSimpleSkin table, .defaultSimpleSkin tbody, .defaultSimpleSkin a, .defaultSimpleSkin img, .defaultSimpleSkin tr, .defaultSimpleSkin div, .defaultSimpleSkin td, .defaultSimpleSkin iframe, .defaultSimpleSkin span, .defaultSimpleSkin * {border:0; margin:0; padding:0; background:transparent; white-space:nowrap; text-decoration:none; font-weight:normal; cursor:default; color:#000}
 
 /* Containers */
 .defaultSimpleSkin {position:relative}
@@ -29,4 +29,4 @@
 .defaultSimpleSkin span.mce_redo {background-position:-100px 0}
 .defaultSimpleSkin span.mce_cleanup {background-position:-40px 0}
 .defaultSimpleSkin span.mce_insertunorderedlist {background-position:-20px 0}
-.defaultSimpleSkin span.mce_insertorderedlist {background-position:-80px 0}
+.defaultSimpleSkin span.mce_insertorderedlist {background-position:-80px 0}

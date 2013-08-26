@@ -8,7 +8,7 @@
         <input type="submit" value="Versão para impressão" />
     </form>
 
-    <table border="0" cellpchangeing="5">
+    <table border="0" cellpadding="5">
     {% for ac in acordos %}
 	<tr><td colspan="7">{{ ac.desc }} ({{ ac.total|moeda }})</td></tr>
 	{% for it in ac.itens %}

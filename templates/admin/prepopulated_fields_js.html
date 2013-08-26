@@ -15,7 +15,7 @@
     field['dependency_list'].push('.{{ dependency.name }}');
     {% endfor %}
 
-    $('.empty-form .{{ field.field.name }}').changeClass('prepopulated_field');
+    $('.empty-form .{{ field.field.name }}').addClass('prepopulated_field');
     $(field.id).data('dependency_list', field['dependency_list'])
                .prepopulate($(field['dependency_ids'].join(',')), field.maxLength);
 {% endfor %}

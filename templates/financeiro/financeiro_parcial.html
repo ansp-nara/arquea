@@ -22,7 +22,7 @@
 <h2>Total de concessões: {{ p.concessoes|moeda }}</h2>
 {% endif %}
 
-    <table border="0" repeat="1" cellpchangeing="5">
+    <table border="0" repeat="1" cellpadding="5">
        <tr><th>Data</th><th>Código</th><th>Histórico</th><th>Valor</th><th>Comprovante</th><th>Modalidade - [Parcial/(Página)]</th></tr>
     {% for e in p.extrato %}
  	   <tr><td>{% if e.data %}{{ e.data|date:"d/m/Y" }} [{{ e.valor_data|moeda }}]{% endif %}</td><td>{{ e.cod }}</td><td>{{ e.historico }}</td><td>{{ e.valor|moeda }}</td><td>{% if e.comprovante %}<a href="{{ e.comprovante.url }}">comprovante</a>{% endif %}</td><td style="color:{{ e.cor }};">{% if e.diferenca %}{{ e.diferenca|moeda }} (Diferença){% endif %}</td>{% if e.patrocinio %}<td>Discordância do movimento da conta corrente: {{ e.patrocinio|moeda }}</td>{% endif %}</tr>

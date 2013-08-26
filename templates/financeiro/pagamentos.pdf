@@ -22,7 +22,7 @@
 <body>
 <h1 repeat="1">Pagamentos de {{ mes }} de {{ ano }}</h1>
 
-    <table border="1" repeat="1" cellpchangeing="5">
+    <table border="1" repeat="1" cellpadding="5">
     <tr><th>Processo</th><th>Documento</th><th>Data</th><th>Número da operação</th><th>Valor</th><th>Modalidade</th><th>Parcial</th><th>Página</th></tr>
     {% for p in pagamentos %}
 	<tr><td>{{ p.termo }}</td><td class="peq">{{ p.documento }}</td><td>{{ p.data }}</td>

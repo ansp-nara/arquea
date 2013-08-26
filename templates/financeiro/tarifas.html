@@ -3,7 +3,7 @@
 {% block content %}
 <h1 repeat="1">Extrato de tarifas do projeto em {% if mes %}{{ mes }}/{% endif %}{{ ano }}</h1>
 
-    <table border="0" repeat="1" cellpchangeing="5">
+    <table border="0" repeat="1" cellpadding="5">
        <tr><th>Data</th><th>Documento</th><th>Histórico</th><th>Valor</th></tr>
     {% for e in tarifas %}
  	   <tr><td>{{ e.data_oper|date:"d/m/Y" }}</td><td>{{ e.cod_oper }}</td><td>{{ e.historico }}</td><td>{{ e.valor|moeda }}</td></tr>

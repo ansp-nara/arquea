@@ -9,7 +9,7 @@
     </form>
 
     {% for m in modalidades %}
-    <table border="0" repeat="1" cellpchangeing="5">
+    <table border="0" repeat="1" cellpadding="5">
  	   <tr><th>{{ m.modalidade }}</th></tr>
            {% for p in m.parcial %}
 	      {% for pgto in p.pgtos %}

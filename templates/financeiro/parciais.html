@@ -4,7 +4,7 @@
 <h1>Processo {{ termo }}</h1>
 <h1 repeat="1">Saldo {% if caixa %}em caixa {% endif %}a ser devolvido à Fapesp</h1>
 
-    <table border="0" cellpchangeing="5">
+    <table border="0" cellpadding="5">
     {% for p in parciais %}
 	<tr><td>Parcial {{ p.parcial }}</td><td>(Devolver à Fapesp)  {{ p.diff|moeda }}</td></tr>
 	{% for d in p.dados %}

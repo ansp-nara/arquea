@@ -5,7 +5,7 @@
 <h1>Relatório gerencial do processo {{ termo }}, atualizado em {{ atualizado|date:"d/m/Y" }}</h1>
 <h4><a href="{% url financeiro.views.relatorio_gerencial 1 %}?termo={{ termo.id }}">Imprimir</a></h4>
 
-    <table border="1" cellpchangeing="5">
+    <table border="1" cellpadding="5">
     <tr><th>Modalidade</th><th>Concessão</th>
     {% for m in meses %}
       <th>{{ m }}</th>
@@ -34,7 +34,7 @@
 
 {% for m in modalidades %}
   <h3>{{ m.modalidade.nome }}</h3>
-  <table border="1" repeat="1" cellpchangeing="5">
+  <table border="1" repeat="1" cellpadding="5">
   </th><th>Quantidade</th><th width="20%">Descrição</th><th>Concessão</th>
     {% for m in meses %}
       <th>{{ m }}</th>

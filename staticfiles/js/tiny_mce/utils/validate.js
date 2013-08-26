@@ -183,7 +183,7 @@ var AutoValidator = {
 		return c;
 	},
 
-	changeClass : function(n, c, b) {
+	addClass : function(n, c, b) {
 		var o = this.removeClass(n, c);
 		n.className = b ? c + (o != '' ? (' ' + o) : '') : (o != '' ? (o + ' ') : '') + c;
 	},
@@ -200,7 +200,7 @@ var AutoValidator = {
 	mark : function(f, n) {
 		var s = this.settings;
 
-		this.changeClass(n, s.invalid_cls);
+		this.addClass(n, s.invalid_cls);
 		this.markLabels(f, n, s.invalid_cls);
 
 		return false;
@@ -212,7 +212,7 @@ var AutoValidator = {
 		nl = this.tags(f, "label");
 		for (i=0; i<nl.length; i++) {
 			if (nl[i].getAttribute("for") == n.id || nl[i].htmlFor == n.id)
-				this.changeClass(nl[i], ic);
+				this.addClass(nl[i], ic);
 		}
 
 		return null;

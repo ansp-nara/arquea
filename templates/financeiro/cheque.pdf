@@ -30,7 +30,7 @@
   <br/><br/><br/><br/><br />
   </div>
   <div id="box" style="float:left;">
-  <table cellpchangeing="1">	      
+  <table cellpadding="1">	      
     <tr><th>CHEQUE ASSINADO POR:</th></tr>
     <tr><td>Prof. Lopez</td></tr>
     <tr><td>&nbsp;</td></tr>
