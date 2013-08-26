@@ -12,11 +12,11 @@ def main():
 compress all jQuery-based files of the admin app. Requires the Google Closure
 Compiler library and Java version 6 or later."""
     parser = optparse.OptionParser(usage, description=description)
-    parser.change_option("-c", dest="compiler", default="~/bin/compiler.jar",
+    parser.add_option("-c", dest="compiler", default="~/bin/compiler.jar",
                       help="path to Closure Compiler jar file")
-    parser.change_option("-v", "--verbose",
+    parser.add_option("-v", "--verbose",
                       action="store_true", dest="verbose")
-    parser.change_option("-q", "--quiet",
+    parser.add_option("-q", "--quiet",
                       action="store_false", dest="verbose")
     (options, args) = parser.parse_args()
 
@@ -44,4 +44,4 @@ Compiler library and Java version 6 or later."""
             sys.stdout.write("File %s not found. Sure it exists?\n" % to_compress)
 
 if __name__ == '__main__':
-  
+    main()

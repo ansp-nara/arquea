@@ -4,7 +4,7 @@
 		$("fieldset.collapse").each(function(i, elem) {
 			// Don't hide if fields in this fieldset have errors
 			if ( $(elem).find("div.errors").length == 0 ) {
-				$(elem).changeClass("collapsed");
+				$(elem).addClass("collapsed");
 				$(elem).find("h2").first().append(' (<a id="fieldsetcollapser' +
 					i +'" class="collapse-toggle" href="#">' + gettext("Show") +
 					'</a>)');
@@ -19,7 +19,7 @@
 			},
 			function() { // Hide
 				$(this).text(gettext("Show"));
-				$(this).closest("fieldset").changeClass("collapsed");
+				$(this).closest("fieldset").addClass("collapsed");
 				return false;
 			}
 		);

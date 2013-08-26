@@ -47,7 +47,7 @@ class ProtocoloAdmin(admin.ModelAdmin):
 #    O método 'response_change' 	Encaminha o usuário para a tela de cadastramento após a alteração do protocolo com estado 
 #            		       	classificado como 'Encaminha despesa'.
 
-#    O método 'response_change' 	Encaminha o usuário para a tela de cadastramento após a adição de um novo protocolo com estado
+#    O método 'response_add' 	Encaminha o usuário para a tela de cadastramento após a adição de um novo protocolo com estado
 #              			classificado como 'Encaminha despesa'.
 
 
@@ -157,23 +157,23 @@ class ProtocoloAdmin(admin.ModelAdmin):
             if obj.estado.nome == u'Autorizada':
                 super(ProtocoloAdmin,self).response_change(request, obj)
                 e, created = Estado.objects.get_or_create(nome=u'Solicitar Liberação')
-                url = '/admin/financeiro/fontepagadora/change/?protocolo=%s&valor=%s&estado=%s' % (obj.id, obj.valor, e.id)
+                url = '/admin/financeiro/fontepagadora/add/?protocolo=%s&valor=%s&estado=%s' % (obj.id, obj.valor, e.id)
                 return HttpResponseRedirect(url)
 
         return super(ProtocoloAdmin,self).response_change(request, obj)
 
 
     # Encaminha o usuário para a tela de cadastramento da Fonte Pagadora quando uma despesa é adicionada.
-    def response_change(self, request, obj, post_url_continue='../%s/'):
+    def response_add(self, request, obj, post_url_continue='../%s/'):
         if self.muda_estado:
             self.muda_estado = 0
             if obj.estado.nome == u'Autorizada':
-                super(ProtocoloAdmin,self).response_change(request, obj)
+                super(ProtocoloAdmin,self).response_add(request, obj)
                 e, created = Estado.objects.get_or_create(nome=u'Solicitar Liberação')
-                url = '/admin/financeiro/fontepagadora/change/?protocolo=%s&valor=%s&estado=%s' % (obj.id, obj.valor, e.id)
+                url = '/admin/financeiro/fontepagadora/add/?protocolo=%s&valor=%s&estado=%s' % (obj.id, obj.valor, e.id)
                 return HttpResponseRedirect(url)
 
-        return super(ProtocoloAdmin,self).response_change(request, obj)
+        return super(ProtocoloAdmin,self).response_add(request, obj)
 
     ## Encaminha o usuário para a tela de cadastramento de despesa após alteração do protocolo.
     #def response_change(self, request, obj):
@@ -183,25 +183,25 @@ class ProtocoloAdmin(admin.ModelAdmin):
                 #super(ProtocoloAdmin,self).response_change(request, obj)
                 #e, created = EstadoDespesa.objects.get_or_create(nome=u'Encaminha para Fonte Pagadora')
                 #if obj.termo is not None:
-                    #url = '/admin/financeiro/despesa/change/?protocolo=%s&valor_despesa=%s&termo=%s&estado=%s' % (obj.id, obj.valor, obj.termo.id, e.id)
+                    #url = '/admin/financeiro/despesa/add/?protocolo=%s&valor_despesa=%s&termo=%s&estado=%s' % (obj.id, obj.valor, obj.termo.id, e.id)
                 #else:
-                    #url = '/admin/financeiro/despesa/change/?protocolo=%s&valor_despesa=%s&estado=%s' % (obj.id, obj.valor, e.id)
+                    #url = '/admin/financeiro/despesa/add/?protocolo=%s&valor_despesa=%s&estado=%s' % (obj.id, obj.valor, e.id)
                 #return HttpResponseRedirect(url)
         
         #return super(ProtocoloAdmin,self).response_change(request, obj)
 
 
     ## Encaminha o usuário para a tela de cadastramento de despesa após a inclusão de um protocolo.
-    #def response_change(self, request, obj, post_url_continue='../%s/'):
+    #def response_add(self, request, obj, post_url_continue='../%s/'):
         #if self.muda_estado:
             #self.muda_estado = 0
             #if obj.estado.nome == u'Encaminha despesa':
-                #super(ProtocoloAdmin,self).response_change(request, obj)
+                #super(ProtocoloAdmin,self).response_add(request, obj)
                 #e, created = EstadoDespesa.objects.get_or_create(nome=u'Encaminha para Fonte Pagadora')
                 #if obj.termo is not None:
-                    #url = '/admin/financeiro/despesa/change/?protocolo=%s&valor_despesa=%s&termo=%s&estado=%s' % (obj.id, obj.valor, obj.termo.id, e.id)
+                    #url = '/admin/financeiro/despesa/add/?protocolo=%s&valor_despesa=%s&termo=%s&estado=%s' % (obj.id, obj.valor, obj.termo.id, e.id)
                 #else:
-                    #url = '/admin/financeiro/despesa/change/?protocolo=%s&valor_despesa=%s&estado=%s' % (obj.id, obj.valor, e.id)
+                    #url = '/admin/financeiro/despesa/add/?protocolo=%s&valor_despesa=%s&estado=%s' % (obj.id, obj.valor, e.id)
                 #return HttpResponseRedirect(url)
         
         #return super(ProtocoloAdmin,self).response_change(request, obj)
@@ -297,9 +297,9 @@ class CotacaoAdmin(admin.ModelAdmin):
 
 
     # Redireciona o usuário para uma tela onde mostra todas as cotações de um determinado pedido após a inclusão da cotação.
-    def response_change(self, request, obj, post_url_continue='../%s/'):
+    def response_add(self, request, obj, post_url_continue='../%s/'):
         if request.REQUEST.has_key('return_to'):
-            super(CotacaoAdmin,self).response_change(request, obj)
+            super(CotacaoAdmin,self).response_add(request, obj)
             return HttpResponseRedirect(request.REQUEST['return_to'])
         else:
             return super(CotacaoAdmin,self).response_change(request, obj)

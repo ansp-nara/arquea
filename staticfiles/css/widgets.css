@@ -30,7 +30,7 @@
     background: white;
     border: 1px solid #ccc;
     border-width: 0 1px;
-    pchangeing: 3px;
+    padding: 3px;
     color: #999;
     font-size: 10px;
     margin: 0;
@@ -38,7 +38,7 @@
 }
 
 .selector .selector-chosen .selector-filter {
-    pchangeing: 4px 5px;
+    padding: 4px 5px;
 }
 
 .selector .selector-available input {
@@ -51,12 +51,12 @@
     height: 50px;
     background: url(../img/admin/chooser-bg.gif) top center no-repeat;
     margin: 8em 3px 0 3px;
-    pchangeing: 0;
+    padding: 0;
 }
 
 .selector-chooser li {
     margin: 0;
-    pchangeing: 3px;
+    padding: 3px;
     list-style-type: none;
 }
 
@@ -65,15 +65,15 @@
     margin-top: 0;
 }
 
-.selector-change, .selector-remove {
+.selector-add, .selector-remove {
     width: 16px;
     height: 16px;
     display: block;
     text-indent: -3000px;
 }
 
-.selector-change {
-    background: url(../img/admin/selector-change.gif) top center no-repeat;
+.selector-add {
+    background: url(../img/admin/selector-add.gif) top center no-repeat;
     margin-bottom: 2px;
 }
 
@@ -89,7 +89,7 @@ a.selector-chooseall, a.selector-clearall {
     margin-right: auto;
     font-weight: bold;
     color: #666;
-    pchangeing: 3px 0 3px 18px;
+    padding: 3px 0 3px 18px;
 }
 
 a.selector-chooseall:hover, a.selector-clearall:hover {
@@ -99,7 +99,7 @@ a.selector-chooseall:hover, a.selector-clearall:hover {
 a.selector-chooseall {
 	margin-top:10px;
 	min-width:100px;
-    background: url(../img/admin/selector-changeall.gif) left center no-repeat;
+    background: url(../img/admin/selector-addall.gif) left center no-repeat;
 }
 
 a.selector-clearall {
@@ -142,15 +142,15 @@ a.selector-clearall {
 
 .stacked .selector-chooser li {
     float: left;
-    pchangeing: 3px 3px 3px 5px;
+    padding: 3px 3px 3px 5px;
 }
 
 .stacked .selector-chooseall, .stacked .selector-clearall {
     display: none;
 }
 
-.stacked .selector-change {
-    background-image: url(../img/admin/selector_stacked-change.gif);
+.stacked .selector-add {
+    background-image: url(../img/admin/selector_stacked-add.gif);
 }
 
 .stacked .selector-remove {
@@ -163,7 +163,7 @@ a.selector-clearall {
 p.datetime {
     line-height: 20px;
     margin: 0;
-    pchangeing: 0;
+    padding: 0;
     color: #666;
     font-size: 11px;
     font-weight: bold;
@@ -179,7 +179,7 @@ p.datetime {
 table p.datetime {
     font-size: 10px;
     margin-left: 0;
-    pchangeing-left: 0;
+    padding-left: 0;
 }
 
 /* FILE UPLOADS */
@@ -187,7 +187,7 @@ table p.datetime {
 p.file-upload {
     line-height: 20px;
     margin: 0;
-    pchangeing: 0;
+    padding: 0;
     color: #666;
     font-size: 11px;
     font-weight: bold;
@@ -218,12 +218,12 @@ p.file-upload {
 
 .calendar {
     margin: 0;
-    pchangeing: 0;
+    padding: 0;
 }
 
 .calendar table {
     margin: 0;
-    pchangeing: 0;
+    padding: 0;
     border-collapse: collapse;
     background: white;
     width: 99%;
@@ -239,7 +239,7 @@ p.file-upload {
 .calendar th {
     font-size: 10px;
     color: #666;
-    pchangeing: 2px 3px;
+    padding: 2px 3px;
     text-align: center;
     background: #e1e1e1 url(../img/admin/nav-bg.gif) 0 50% repeat-x;
     border-bottom: 1px solid #ddd;
@@ -248,7 +248,7 @@ p.file-upload {
 .calendar td {
     font-size: 11px;
     text-align: center;
-    pchangeing: 0;
+    padding: 0;
     border-top: 1px solid #eee;
     border-bottom: none;
 }
@@ -268,7 +268,7 @@ p.file-upload {
 .calendar td a, .timelist a {
     display: block;
     font-weight: bold;
-    pchangeing: 4px;
+    padding: 4px;
     text-decoration: none;
     color: #444;
 }
@@ -288,7 +288,7 @@ p.file-upload {
     text-align: center;
     color: #ccc;
     margin: 0;
-    pchangeing: 1px 3px;
+    padding: 1px 3px;
 }
 
 .calendarnav a:link, #calendarnav a:visited, #calendarnav a:hover {
@@ -300,7 +300,7 @@ p.file-upload {
     font-size: 10px;
     line-height: 11px;
     border-top: 1px solid #eee;
-    pchangeing: 3px 0 4px;
+    padding: 3px 0 4px;
     color: #ccc;
 }
 
@@ -310,7 +310,7 @@ p.file-upload {
     font-weight: bold;
     font-size: 12px;
     background: #C9DBED url(../img/admin/default-bg.gif) bottom left repeat-x;
-    pchangeing: 1px 4px 2px 4px;
+    padding: 1px 4px 2px 4px;
     color: white;
 }
 
@@ -330,32 +330,32 @@ p.file-upload {
 
 .calendar-cancel {
     margin: 0 !important;
-    pchangeing: 0;
+    padding: 0;
     font-size: 10px;
     background: #e1e1e1 url(../img/admin/nav-bg.gif) 0 50% repeat-x;
     border-top: 1px solid #ddd;
 }
 
 .calendar-cancel a {
-    pchangeing: 2px;
+    padding: 2px;
     color: #999;
 }
 
 ul.timelist, .timelist li {
     list-style-type: none;
     margin: 0;
-    pchangeing: 0;
+    padding: 0;
 }
 
 .timelist a {
-    pchangeing: 2px;
+    padding: 2px;
 }
 
 /* INLINE ORDERER */
 
 ul.orderer {
     position: relative;
-    pchangeing: 0 !important;
+    padding: 0 !important;
     margin: 0 !important;
     list-style-type: none;
 }
@@ -363,7 +363,7 @@ ul.orderer {
 ul.orderer li {
     list-style-type: none;
     display: block;
-    pchangeing: 0;
+    padding: 0;
     margin: 0;
     border: 1px solid #bbb;
     border-width: 0 1px 1px 0;
@@ -382,7 +382,7 @@ ul.orderer li a.selector {
     overflow: hidden;
     width: 83%;
     font-size: 10px !important;
-    pchangeing: 0.6em 0;
+    padding: 0.6em 0;
 }
 
 ul.orderer li a:link, ul.orderer li a:visited {
@@ -433,14 +433,14 @@ ul.orderer li.deleted:hover, ul.orderer li.deleted a.selector:hover {
     cursor: pointer;
 }
 
-.editinline button.changelink {
+.editinline button.addlink {
     border: 0px none;
     color: #5b80b2;
     font-size: 100%;
     cursor: pointer;
 }
 
-.editinline button.changelink:hover {
+.editinline button.addlink:hover {
     color: #036;
     cursor: pointer;
 }
@@ -448,10 +448,10 @@ ul.orderer li.deleted:hover, ul.orderer li.deleted a.selector:hover {
 .editinline table .help {
     text-align: right;
     float: right;
-    pchangeing-left: 2em;
+    padding-left: 2em;
 }
 
-.editinline tfoot .changelink {
+.editinline tfoot .addlink {
     white-space: nowrap;
 }
 
@@ -502,7 +502,8 @@ ul.orderer li.deleted:hover, ul.orderer li.deleted a.selector:hover {
 .editinline-stacked .controls {
     clear: both;
     background: #e1e1e1 url(../img/admin/nav-bg.gif) top left repeat-x;
-    pchangeing: 3px 4px;
+    padding: 3px 4px;
     font-size: 11px;
     border-top: 1px solid #ddd;
 }
+
