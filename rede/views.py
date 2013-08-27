@@ -90,7 +90,24 @@ def planilha_informacoes_tecnicas(request, id=None):
         dados.append({"enlace":e, "contatos_tec":contato_tec, "contatos_adm":contato_adm, "asn":asn, "bloco_ip":blocos, "operadoras":operadoras})
     return TemplateResponse(request, 'rede/informacoes_tecnicas.html', {'dados': dados})
 
+@login_required
+def imprime_informacoes_gerais(request):
+    info = []
+    tecnicos = Identificacao.objects.filter(area__contains='Tec')
+    asns = ASN.objects.all() #filter(pais='BR')
+    blocos_ips = BlocoIP.objects.all()
+    for e in Enlace.objects.all():
+	entidade = e.participante.entidade
+        contato_tec = tecnicos.filter(endereco__entidade=entidade)
+        asn = asns.filter(entidade=entidade)
+        blocos = blocos_ips.filter(designado=entidade)
+        operadoras = e.segmento_set.filter(data_desativacao__isnull=True)
+        info.append({'info':e, "contatos_tec":contato_tec, "asn":asn, "bloco_ip":blocos, "operadoras":operadoras})
 
+    return render_to_pdf('rede/informacoes_gerais.pdf', {'info':info}, filename='informacoes_gerais.pdf')
+
+
+@login_required
 def blocos_texto(request):
     return TemplateResponse(request, 'rede/blocos.txt', {'blocos':BlocoIP.objects.all()}, content_type='text/plain')
 
