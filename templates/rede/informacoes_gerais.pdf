@@ -1,6 +1,6 @@
 {% extends "base.pdf" %}
 {% load proto_tags %}
-{% block pagesize %}a4 landscape{% endblock %}
+{% block pagesize %}a4 {% endblock %}
 {% block extrastyle %}
 td { padding-top:3px; padding-left:2px;}
 th { padding-top:3px; }
