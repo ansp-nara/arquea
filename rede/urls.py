@@ -12,5 +12,7 @@ urlpatterns = patterns('rede.views',
     (r'blocosip', 'blocos_ip'),
     (r'blocos.txt', 'blocos_texto'),
     (r'planeja_contrato$', 'planeja_contrato'),
+    (r'custo_terremark$', 'custo_terremark'),
+    (r'custo_terremark/(?P<pdf>\d)$', 'custo_terremark'),
 )
 

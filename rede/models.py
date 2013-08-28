@@ -303,6 +303,10 @@ class Recurso(models.Model):
         q = Decimal(str(self.quantidade))
 	return q*(self.valor_imposto_mensal)
 
+    def total_sem_imposto(self):
+	q = Decimal(str(self.quantidade))
+        return q*(self.valor_mensal_sem_imposto)
+
 """
 class Projeto(models.Model):
     nome = models.CharField(max_length=200)

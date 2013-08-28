@@ -6,7 +6,7 @@
 {% block extrastyle %}
 {% endblock %}
 @page {
-          background-image: url('/var/www/media/img/papel_timbrado.jpg');
+          background-image: url('/var/www/media/img/papel_timbrado{% block landscape %}{% endblock %}.jpg');
   size: {% block pagesize %}a4{% endblock %};
   top: 5cm;
   left: 1.5cm;

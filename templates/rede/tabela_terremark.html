@@ -1,0 +1,25 @@
+{% extends "admin/base_site.html" %}
+{% load proto_tags %}
+{% block content %}
+<h1>Custos dos recursos contratados</h1>
+<table>
+<tr><th>Contrato</th><th>OS</th><th>Descrição</th><th>Referente</th><th>Unidade</th><th>Preço unitário</th><th>Qtd</th><th>Custo mensal sem imposto</th><th>Custo mensal com imposto</th><th>Meses pagos</th><th>Total sem imposto</th><th>Total com imposto</th><th>Nota fiscal</th><tr>
+{% for r in recursos %}
+   <tr>
+     <td><a href="{% url admin:outorga_contrato_change r.planejamento.os.contrato.id %}">{{ r.planejamento.os.contrato }}</a></td>
+	 <td><a href="{% url admin:outorga_ordemdeservico_change r.planejamento.os.id %}">{{ r.planejamento.os }}</a></td>
+	 <td>{{ r.planejamento.tipo }}</td>
+	 <td>{{ r.planejamento.referente }}</td>
+	 <td>{{ r.planejamento.unidade }}</td>
+	 <td>{{ r.planejamento.valor_unitario|moeda }}</td>
+	 <td>{{ r.planejamento.quantidade }}</td>
+	 <td>{{ r.valor_mensal_sem_imposto|moeda }}</td>
+	 <td>{{ r.valor_imposto_mensal|moeda }}</td>
+	 <td>{{ r.quantidade }}</td>
+	 <td>{{ r.total_sem_imposto|moeda }}</td>
+	 <td>{{ r.total_geral|moeda }}</td>
+	 <td><a href="{% url admin:financeiro_pagamento_change r.pagamento.id %}">{{ r.pagamento.protocolo.num_documento }}</a></td>
+   </tr>
+{% endfor %}
+</table>
+{% endblock %}
