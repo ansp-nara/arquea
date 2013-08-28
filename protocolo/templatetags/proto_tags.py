@@ -76,7 +76,7 @@ def lista_relatorios():
     gerenciais.append({'url':'/processo/processos', 'nome':u'Processos'})
     tecnicos.append({'url':'/rede/planejamento', 'nome':u'Planejamento por ano'})
     tecnicos.append({'url':'/rede/planejamento2', 'nome':u'Serviços contratados por processo'})
-    tecnicos.append({'url':'/rede/info', 'nome':u'Enlaces'})
+    tecnicos.append({'url':'/rede/info', 'nome':u'Dados cadastrais dos participantes'})
     administrativos.append({'url':'/patrimonio/relatorio/por_termo', 'nome':u'Patrimônio por termo de outorga'})
     tecnicos.append({'url':'/patrimonio/racks', 'nome':u'Racks (provisório)'})
     tecnicos.append({'url':'/patrimonio/relatorio/por_marca', 'nome':u'Patrimônio por marca'})
