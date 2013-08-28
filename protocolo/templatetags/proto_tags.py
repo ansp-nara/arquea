@@ -74,6 +74,7 @@ def lista_relatorios():
     administrativos.append({'url':'/membro/mensalf', 'nome':u'Controle de horário mensal'})
     gerenciais.append({'url':'/outorga/relatorios/acordo_progressivo', 'nome':u'Gerencial progressivo'})
     gerenciais.append({'url':'/processo/processos', 'nome':u'Processos'})
+    gerenciais.append({'url':'/rede/custo_terremark', 'nome':u'Custos dos recursos contratados'})
     tecnicos.append({'url':'/rede/planejamento', 'nome':u'Planejamento por ano'})
     tecnicos.append({'url':'/rede/planejamento2', 'nome':u'Serviços contratados por processo'})
     tecnicos.append({'url':'/rede/info', 'nome':u'Dados cadastrais dos participantes'})

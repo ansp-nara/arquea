@@ -12,12 +12,13 @@ table tr td {
 {% endblock %}
 {% block content %}
 <h1>Custos dos recursos contratados</h1>
-<table border="1">
-<tr><th>Contrato</th><th>OS</th><th width="23%">Descrição</th><th width="23%">Referente</th><th>Unidade</th><th>Preço unitário</th><th>Qtd</th><th>Custo mensal sem imposto</th><th>Custo mensal com imposto</th><th>Meses pagos</th><th>Total sem imposto</th><th>Total com imposto</th><th>Nota fiscal</th><tr>
+<table border="1" repeat="1">
+<tr><th>Contrato</th><th>OS</th><th>Data</th><th width="23%">Descrição</th><th width="23%">Referente</th><th>Unidade</th><th>Preço unitário</th><th>Qtd</th><th>Custo mensal sem imposto</th><th>Custo mensal com imposto</th><th>Meses pagos</th><th>Total sem imposto</th><th>Total com imposto</th><th>Nota fiscal</th><tr>
 {% for r in recursos %}
    <tr>
      <td><a href="{% url admin:outorga_contrato_change r.planejamento.os.contrato.id %}">{{ r.planejamento.os.contrato.numero }}</a></td>
 	 <td><a href="{% url admin:outorga_ordemdeservico_change r.planejamento.os.id %}">{{ r.planejamento.os }}</a></td>
+         <td>{{ r.planejamento.os.data_inicio|date:"SHORT_DATE_FORMAT" }}</td>
 	 <td>{{ r.planejamento.tipo }}</td>
 	 <td>{{ r.planejamento.referente }}</td>
 	 <td>{{ r.planejamento.unidade }}</td>
