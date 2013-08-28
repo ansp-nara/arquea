@@ -211,4 +211,9 @@ def blocos_ip(request):
         if request.GET.get('porusuario'):
             return TemplateResponse(request, 'rede/blocosip.html.notree', {'blocos':blocos.order_by('usuario__sigla')})
         return TemplateResponse(request, 'rede/blocosip.html', {'blocos':blocos})
-      
+     
+@login_required
+def custo_terremark(request, pdf=0):
+    if pdf:
+        return render_to_pdf('rede/tabela_terremark.pdf', {'recursos':Recurso.objects.all()})
+    return TemplateResponse(request, 'rede/tabela_terremark.html', {'recursos':Recurso.objects.all()})
