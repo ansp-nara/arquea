@@ -398,6 +398,8 @@ def por_termo(request, pdf=0):
     agilis = request.GET.get('agilis')
     doado = request.GET.get('doado')
     localizado = request.GET.get('localizado')
+    numero_fmusp = request.GET.get('numero_fmusp')
+    template_name = 'por_termo'
 
     if termo_id is None:
         return TemplateResponse(request, 'patrimonio/escolhe_termo.html', {'termos':Termo.objects.all()})
@@ -431,16 +433,25 @@ def por_termo(request, pdf=0):
     elif modalidade == '2':
         patrimonios = patrimonios.filter(pagamento__origem_fapesp__item_outorga__natureza_gasto__modalidade__sigla__in=['MCN', 'MCI'])
 
+    if numero_fmusp == '1':
+	patrimonios = patrimonios.filter(numero_fmusp__isnull=False)
+        template_name = 'por_termo_fm'
+
     for t in qs:
         termo = {'termo':t}
         tps = []
         pat_termo = patrimonios.filter(pagamento__protocolo__termo=t)
+        if numero_fmusp == '1':
+            termo.update({'patrimonios':pat_termo.order_by('numero_fmusp', 'descricao', 'complemento')})
+            termos.append(termo)
+            continue
+
         tipos = pat_termo.values_list('tipo', flat=True).order_by('tipo').distinct()
         for tipo in Tipo.objects.filter(id__in=tipos):
             tp = {'tipo':tipo}
             pgtos = []
             pt = pat_termo.filter(tipo=tipo)
-            pagtos = pt.values_list('pagamento', flat=True).order_by('pagamento').distinct()
+            pagtos = pt.values_list('pagamento', flat=True).order_by('numero_fmusp').distinct()
             for pg in Pagamento.objects.filter(id__in=pagtos):
                 pgto = {'pg': pg, 'patrimonios':pt.filter(pagamento=pg).order_by('numero_fmusp', 'descricao', 'complemento')}
                 pgtos.append(pgto)
@@ -450,12 +461,12 @@ def por_termo(request, pdf=0):
         termos.append(termo)
 
     if pdf:
-        vars = {'termos':termos, 'i':itertools.count(1)}
+        vars = {'termos':termos, 'i':itertools.count(1), 'numero_fmusp':numero_fmusp}
         if termo_id !=0 and len(qs) > 0:
             vars.update({'t':qs[0]})
-	return render_to_pdf('patrimonio/por_termo.pdf', vars, filename='invertario_por_termo.pdf')
+	return render_to_pdf('patrimonio/%s.pdf' % template_name, vars, filename='invertario_por_termo.pdf')
     else:
-        return TemplateResponse(request, 'patrimonio/por_termo.html', {'termos':termos, 'i':itertools.count(1), 't':qs[0], 'm':modalidade, 'a':agilis, 'd':doado, 'l':localizado})
+        return TemplateResponse(request, 'patrimonio/%s.html' % template_name, {'termos':termos, 'i':itertools.count(1), 't':qs[0], 'm':modalidade, 'a':agilis, 'd':doado, 'l':localizado, 'numero_fmusp':numero_fmusp})
 
 @login_required
 def racks(request):
