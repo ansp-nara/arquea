@@ -39,9 +39,11 @@ th {text-align: left;}
               <tr><td></td><td>{{ pg.pg.protocolo.num_documento }}</td><td colspan="6"></td></tr>
               {% for p in pg.patrimonios %}
                  <tr><td>{{ p.numero_fmusp|default_if_none:"" }}</td><td></td><td colspan="2">{% if p.equipamento %}[{{ p.equipamento.tipo }}] {% endif %}{{ p.descricao }} - {{ p.complemento|default:"" }}</td><td>{{ p.valor|moeda }}</td><td>{{ p.marca }}</td><td>{{ p.ns }}</td><td>{{ p.historico_atual.estado }}</td><td>{{ p.historico_atual.endereco }}</td><td>{{ p.historico_atual.posicao|default_if_none:"" }}</td></tr>
+                 {% if not numero_fmusp %}
                  {% for pf in p.contido.all %}
                     <tr><td colspan="2"></td><td width="10px"></td><td width="30%">{% if pf.equipamento %}[{{ pf.equipamento.tipo }}] {% endif %}{{ pf.descricao }} - {{ pf.complemento|default:"" }}</td><td>{{ pf.valor }}</td><td>{{ pf.marca }}</td><td>{{ pf.ns }}</td><td>{{ pf.historico_atual.estado }}</td><td>{{ pf.historico_atual.endereco }}</td><td>{{ pf.historico_atual.posicao|default_if_none:"" }}</td></tr>
                  {% endfor %}
+                 {% endif %}
               {% endfor %}
            {% endfor %}
         {% endfor %}
