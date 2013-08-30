@@ -470,6 +470,47 @@ def por_termo(request, pdf=0):
 
 @login_required
 def racks(request):
+    locais = Patrimonio.objects.filter(equipamento__tipo__nome='Rack', historicolocal__estado__id=22).values_list('historicolocal__endereco', flat=True).order_by('historicolocal__endereco').distinct()
+    dcs = []
+    f = open('/tmp/debug.txt', 'w')
+    for l in locais:
+        racks = []
+        for r in Patrimonio.objects.filter(equipamento__tipo__nome='Rack', historicolocal__endereco__id=l):
+            alt = 127
+            vazio = 0
+            equipamentos = []
+            pts = list(r.contido.filter(historicolocal__posicao__isnull=False).order_by('-historicolocal__posicao').distinct('historicolocal__posicao'))
+            pts.sort(key=lambda x: x.historico_atual().posicao_int(), reverse=True)
+            f.write('%s - %s\n' % (l, r))
+            for pt in pts:
+                pos = pt.historico_atual().posicao_int()
+                f.write('     %s\n' % pos)
+                if pos == 1 or pt.tamanho is None: continue
+                if alt > pos+int(round(pt.tamanho*3)):
+                    tam = alt-(pos+int(round(pt.tamanho*3)))
+                    alt -= tam
+                    equipamentos.append({'tamanho':tam, 'range':range(tam-1)})
+                    vazio += tam
+                tam = int(round(pt.tamanho*3))
+                alt -= tam
+                imagem = None
+                if pt.equipamento:
+                    if pt.equipamento.imagem:
+                        imagem = pt.equipamento.imagem.url
+                equipamentos.append({'tamanho':tam, 'imagem':imagem, 'descricao':pt.descricao or u'Sem descrição', 'range':range(tam-1)})
+            rack = {'nome':r.apelido, 'altura':126, 'equipamentos':equipamentos}
+            if alt > 1:
+                equipamentos.append({'tamanho':alt-1, 'range':range(alt-2)})
+                vazio += alt-1
+            rack['vazio'] = '%.2f%%' % ((rack['altura']-vazio)*100.0/rack['altura'],)
+            racks.append(rack)
+        dc = {'nome':EnderecoDetalhe.objects.get(id=l).complemento, 'racks':racks}
+        dcs.append(dc)
+    f.close()
+    return TemplateResponse(request, 'patrimonio/racks.html', {'dcs':dcs})
+
+@login_required
+def racks_pos_absolute(request):
     # Busca patrimonios do tipo RACK com o estado ATIVO
     locais = Patrimonio.objects.filter(equipamento__tipo__nome='Rack', historicolocal__estado__id=Estado.PATRIMONIO_ATIVO).values_list('historicolocal__endereco', flat=True).order_by('historicolocal__endereco').distinct()
     dcs = []
