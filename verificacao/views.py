@@ -2,23 +2,16 @@
 
 # Create your views here.
 
-from decimal import Decimal
-from django.contrib import admin
 from django.contrib.auth.decorators import permission_required, login_required
-from django.contrib.auth.models import Group
-from django.core.exceptions import PermissionDenied
 from django.db.models import Q, Max, Sum, Count 
 from django.http import Http404, HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import Context, loader, RequestContext
+
 from models import *
 from verificacao.models import VerificacaoEquipamento
-from operator import itemgetter
-from utils.functions import pega_lista, formata_moeda, render_to_pdf
-import cStringIO as StringIO
-import cgi
+from patrimonio.models import Tipo
 import datetime
-import ho.pisa as pisa
 import json as simplejson
 import os
 
@@ -93,138 +86,174 @@ def equipamento_part_number_modelo_vazio(request, json=False):
 def patrimonio_consolidado(request):
     retorno = []
         
+    filtros_entrada = {'filtro_tipo_patrimonio':request.GET.get('filtro_tipo_patrimonio')}
+        
     verificacaoPatrimonio = VerificacaoPatrimonio()
-    equipamentoVazio = verificacaoPatrimonio.equipamentoVazio()
+    
+    equipamentoVazio = verificacaoPatrimonio.equipamentoVazio(filtros_entrada)
     count = sum([len(patrimonios) for patrimonios in equipamentoVazio])
     retorno.append({'desc':u'Patrimonios sem Equipamento', 'url':'patrimonio_equipamento_vazio', 'qtd':count})
     
-    verificacaoPatrimonio = VerificacaoPatrimonioEquipamento()
-    partNumberDiferente = verificacaoPatrimonio.partNumberDiferente()
+    verificacaoPatrimonioEquipamento = VerificacaoPatrimonioEquipamento()
+    partNumberDiferente = verificacaoPatrimonioEquipamento.partNumberDiferente(filtros_entrada)
     count = sum([len(patrimonios) for patrimonios in partNumberDiferente])
     retorno.append({'desc':u'Patrimonio e Equipamento com Part Number diferente', 'url':'patrimonio_equipamento_part_number_diferente', 'qtd':count})
     
-    verificacaoPatrimonio = VerificacaoPatrimonioEquipamento()
-    descricaoDiferente = verificacaoPatrimonio.descricaoDiferente()
+    descricaoDiferente = verificacaoPatrimonioEquipamento.descricaoDiferente(filtros_entrada)
     count = sum([len(patrimonios) for patrimonios in descricaoDiferente])
     retorno.append({'desc':u'Patrimonio e Equipamento com Descricao diferente', 'url':'patrimonio_equipamento_descricao_diferente', 'qtd':count})
 
-    verificacaoPatrimonio = VerificacaoPatrimonioEquipamento()
-    marcaDiferente = verificacaoPatrimonio.marcaDiferente()
+    marcaDiferente = verificacaoPatrimonioEquipamento.marcaDiferente(filtros_entrada)
     count = sum([len(patrimonios) for patrimonios in marcaDiferente])
     retorno.append({'desc':u'Patrimonio e Equipamento com Marca diferente', 'url':'patrimonio_equipamento_marca_diferente', 'qtd':count})
 
-    verificacaoPatrimonio = VerificacaoPatrimonioEquipamento()
-    modeloDiferente = verificacaoPatrimonio.modeloDiferente()
+    modeloDiferente = verificacaoPatrimonioEquipamento.modeloDiferente(filtros_entrada)
     count = sum([len(patrimonios) for patrimonios in modeloDiferente])
     retorno.append({'desc':u'Patrimonio e Equipamento com Modelo diferente', 'url':'patrimonio_equipamento_modelo_diferente', 'qtd':count})
 
-    verificacaoPatrimonio = VerificacaoPatrimonioEquipamento()
-    ncmDiferente = verificacaoPatrimonio.ncmDiferente()
+    ncmDiferente = verificacaoPatrimonioEquipamento.ncmDiferente(filtros_entrada)
     count = sum([len(patrimonios) for patrimonios in ncmDiferente])
     retorno.append({'desc':u'Patrimonio e Equipamento com NCM diferente', 'url':'patrimonio_equipamento_ncm_diferente', 'qtd':count})
     
+    filtros = {"tipos":Tipo.objects.all()}
     
-    return render_to_response('verificacao/patrimonio_consolidado.html', {'verificacoes':retorno}, context_instance=RequestContext(request))
+    return render_to_response('verificacao/patrimonio_consolidado.html', {'verificacoes':retorno, 'filtros':filtros}, context_instance=RequestContext(request))
 
 @login_required
 def patrimonio_equipamento_vazio(request):
-
+    filtros_entrada = {'filtro_tipo_patrimonio':request.GET.get('filtro_tipo_patrimonio')}
+    
     retorno = []
     verficacao = VerificacaoPatrimonio()
-    retorno = verficacao.equipamentoVazio()
+    retorno = verficacao.equipamentoVazio(filtros_entrada)
+    
+    filtros_saida = []
+    if len(retorno) > 0:
+        filtros_saida = {"tipos":VerificacaoPatrimonioEquipamento().listaFiltroTipoPatrimonio(verficacao.equipamentoVazio()[0])}
     
     return render_to_response('verificacao/patrimonio.html', 
-                              {'desc':'Patrimonios sem Equipamento', 'patrimonios':retorno}, 
+                              {'desc':'Patrimonios sem Equipamento', 'patrimonios':retorno, 'filtros':filtros_saida}, 
                               context_instance=RequestContext(request))
 
 @login_required
 def patrimonio_equipamento_part_number_diferente(request):
-    json = request.GET.get('json')
+    ajax = request.GET.get('ajax')
+    filtros_entrada = {'filtro_tipo_patrimonio':request.GET.get('filtro_tipo_patrimonio')}
 
     retorno = []
     verficacao = VerificacaoPatrimonioEquipamento()
-    retorno = verficacao.partNumberDiferente()
+    retorno = verficacao.partNumberDiferente(filtros_entrada)
     
-    if json:
+    filtros_saida = []
+    if len(retorno) > 0:
+        filtros_saida = {"tipos":verficacao.listaFiltroTipoPatrimonio(verficacao.descricaoDiferente()[0])}
+    
+    if ajax:
         return render_to_response('verificacao/patrimonio_equipamento-table.html', 
-                              {'desc':'Patrimonio e Equipamento com Part Number diferente', 'patrimonios':retorno, 'atributo':'part_number'}, 
+                              {'desc':'Patrimonio e Equipamento com Part Number diferente', 'patrimonios':retorno, 'atributo':'part_number', 'filtros':filtros_saida}, 
                               context_instance=RequestContext(request))
     else:
         return render_to_response('verificacao/patrimonio_equipamento.html', 
-                              {'desc':'Patrimonio e Equipamento com Part Number diferente', 'patrimonios':retorno, 'atributo':'part_number'}, 
+                              {'desc':'Patrimonio e Equipamento com Part Number diferente', 'patrimonios':retorno, 'atributo':'part_number', 'filtros':filtros_saida}, 
                               context_instance=RequestContext(request))
 
 
 @login_required
 def patrimonio_equipamento_descricao_diferente(request):
-    json = request.GET.get('json')
+    ajax = request.GET.get('ajax')
+    filtros_entrada = {'filtro_tipo_patrimonio':request.GET.get('filtro_tipo_patrimonio')}
 
     retorno = []
     verficacao = VerificacaoPatrimonioEquipamento()
-    retorno = verficacao.descricaoDiferente()
+    retorno = verficacao.descricaoDiferente(filtros_entrada)
     
-    if json:
+    filtros_saida = []
+    if len(retorno) > 0:
+        filtros_saida = {"tipos":verficacao.listaFiltroTipoPatrimonio(verficacao.descricaoDiferente()[0])}
+    
+    if ajax:
         return render_to_response('verificacao/patrimonio_equipamento-table.html', 
-                              {'desc':'Patrimonio e Equipamento com Descricao diferente', 'patrimonios':retorno, 'atributo':'descricao'}, 
+                              {'desc':'Patrimonio e Equipamento com Descricao diferente', 'patrimonios':retorno, 'atributo':'descricao', 'filtros':filtros_saida}, 
                               context_instance=RequestContext(request))
     else:
         return render_to_response('verificacao/patrimonio_equipamento.html', 
-                              {'desc':'Patrimonio e Equipamento com Descricao diferente', 'patrimonios':retorno, 'atributo':'descricao'}, 
+                              {'desc':'Patrimonio e Equipamento com Descricao diferente', 'patrimonios':retorno, 'atributo':'descricao', 'filtros':filtros_saida}, 
                               context_instance=RequestContext(request))
 
 
 @login_required
 def patrimonio_equipamento_marca_diferente(request):
-    json = request.GET.get('json')
-    
+    ajax = request.GET.get('ajax')
+    filtros_entrada = {'filtro_tipo_patrimonio':request.GET.get('filtro_tipo_patrimonio')}
+
     retorno = []
     verficacao = VerificacaoPatrimonioEquipamento()
-    retorno = verficacao.marcaDiferente()
+    retorno = verficacao.marcaDiferente(filtros_entrada)
     
-    if json:
+    filtros_saida = []
+    if len(retorno) > 0:
+        filtros_saida = {"tipos":verficacao.listaFiltroTipoPatrimonio(verficacao.marcaDiferente()[0])}
+
+    
+    if ajax:
         return render_to_response('verificacao/patrimonio_equipamento-table.html', 
-                              {'desc':'Patrimonio e Equipamento com Marca diferente', 'patrimonios':retorno, 'atributo':'marca'}, 
+                              {'desc':'Patrimonio e Equipamento com Marca diferente', 'patrimonios':retorno, 'atributo':'marca', 'filtros':filtros_saida}, 
                               context_instance=RequestContext(request))
     else:
         return render_to_response('verificacao/patrimonio_equipamento.html', 
-                              {'desc':'Patrimonio e Equipamento com Marca diferente', 'patrimonios':retorno, 'atributo':'marca'}, 
+                              {'desc':'Patrimonio e Equipamento com Marca diferente', 'patrimonios':retorno, 'atributo':'marca', 'filtros':filtros_saida}, 
                               context_instance=RequestContext(request))
 
 
 
 @login_required
 def patrimonio_equipamento_modelo_diferente(request):
-    json = request.GET.get('json')
-    
+    ajax = request.GET.get('ajax')
+    filtros_entrada = {'filtro_tipo_patrimonio':request.GET.get('filtro_tipo_patrimonio')}
+
     retorno = []
     verficacao = VerificacaoPatrimonioEquipamento()
-    retorno = verficacao.modeloDiferente()
+    retorno = verficacao.modeloDiferente(filtros_entrada)
     
-    if json:
+
+    filtros_saida = []
+    if len(retorno) > 0:
+        filtros_saida = {"tipos":verficacao.listaFiltroTipoPatrimonio(verficacao.modeloDiferente()[0])}
+    
+    if ajax:
         return render_to_response('verificacao/patrimonio_equipamento-table.html', 
-                              {'desc':'Patrimonio e Equipamento com Modelo diferente', 'patrimonios':retorno, 'atributo':'modelo'}, 
+                              {'desc':'Patrimonio e Equipamento com Modelo diferente', 'patrimonios':retorno, 'atributo':'modelo', 'filtros':filtros_saida}, 
                               context_instance=RequestContext(request))
     else:
         return render_to_response('verificacao/patrimonio_equipamento.html', 
-                              {'desc':'Patrimonio e Equipamento com Modelo diferente', 'patrimonios':retorno, 'atributo':'modelo'}, 
+                              {'desc':'Patrimonio e Equipamento com Modelo diferente', 'patrimonios':retorno, 'atributo':'modelo', 'filtros':filtros_saida}, 
                               context_instance=RequestContext(request))
 
 
 @login_required
 def patrimonio_equipamento_ncm_diferente(request):
-    json = request.GET.get('json')
-
+    ajax = request.GET.get('ajax')
+    filtros_entrada = {'filtro_tipo_patrimonio':request.GET.get('filtro_tipo_patrimonio')}
+    
+    logger.debug(filtros_entrada)
+    
     retorno = []
     verficacao = VerificacaoPatrimonioEquipamento()
-    retorno = verficacao.ncmDiferente()
+    retorno = verficacao.ncmDiferente(filtros_entrada)
+    
 
-    if json:
+    filtros_saida = []
+    if len(retorno) > 0:
+        filtros_saida = {"tipos":verficacao.listaFiltroTipoPatrimonio(verficacao.ncmDiferente()[0])}
+
+    
+    if ajax:
         return render_to_response('verificacao/patrimonio_equipamento-table.html', 
-                              {'desc':'Patrimonio e Equipamento com NCM diferente', 'patrimonios':retorno, 'atributo':'ncm'}, 
+                              {'desc':'Patrimonio e Equipamento com NCM diferente', 'patrimonios':retorno, 'atributo':'ncm', 'filtros':filtros_saida}, 
                               context_instance=RequestContext(request))
     else:    
         return render_to_response('verificacao/patrimonio_equipamento.html', 
-                              {'desc':'Patrimonio e Equipamento com NCM diferente', 'patrimonios':retorno, 'atributo':'ncm'}, 
+                              {'desc':'Patrimonio e Equipamento com NCM diferente', 'patrimonios':retorno, 'atributo':'ncm', 'filtros':filtros_saida}, 
                               context_instance=RequestContext(request))
 
 
@@ -254,9 +283,3 @@ def copy_attribute_to_patrimonio(request):
         raise ValueError('Valor inválido para o parametro. att_name' + str(att_name))
     
     
-    
-def copy_attribute_to_equipamento(request):
-    # Id do equipamento
-    eq_id = request.GET.get('eq_id')
-
-

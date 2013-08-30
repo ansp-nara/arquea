@@ -1,0 +1,22 @@
+<script type="text/javascript">
+$(document).ready(function() {
+    $("#filtro_tipo_patrimonio").change(function(){
+        $("#form-filter").submit();
+    });
+});
+</script>
+
+
+    <table>
+        <tr><th>Filtro</th></tr>
+        <tr><td>
+            <form id="form-filter" method="GET">
+            <select id="filtro_tipo_patrimonio" name="filtro_tipo_patrimonio">
+                <option value="">---</option>
+                {% for filtro_tipo in filtros.tipos %}
+                    <option value="{{filtro_tipo.id}}" {% if filtro_tipo.id|stringformat:"d" == request.GET.filtro_tipo_patrimonio %}selected{% endif %}>{{ filtro_tipo.nome }}</option>
+                {% endfor %}
+            </select>
+            </form>
+        </td></tr>
+    </table>

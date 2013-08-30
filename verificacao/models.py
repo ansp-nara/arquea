@@ -6,7 +6,7 @@ import datetime
 
 import logging
 from django.db.models import F, Sum, Count
-from patrimonio.models import Equipamento, Patrimonio
+from patrimonio.models import Equipamento, Patrimonio, Tipo
 
 
 # Get an instance of a logger
@@ -72,7 +72,7 @@ class VerificacaoEquipamento():
     
     
 class VerificacaoPatrimonio:
-    def equipamentoVazio(self):
+    def equipamentoVazio(self, filtros=None):
         """
         Verifica patrimonio sem equipamento 
         """
@@ -81,6 +81,9 @@ class VerificacaoPatrimonio:
         retorno = []
         patrimonios = Patrimonio.objects.filter(equipamento_id__isnull=True).order_by("id")
         
+        if filtros and filtros["filtro_tipo_patrimonio"]:
+            patrimonios = patrimonios.filter(tipo=filtros["filtro_tipo_patrimonio"])
+        
         retorno.append(patrimonios)
 
         return retorno
@@ -88,12 +91,23 @@ class VerificacaoPatrimonio:
 
     
 class VerificacaoPatrimonioEquipamento():
+    def listaFiltroTipoPatrimonio(self, patrimonios):
+        pids = patrimonios.values_list('tipo_id', flat=True)
+        tipos = Tipo.objects.filter(id__in=pids)
+        
+        return tipos
+        
+    
     # busca de patrimonio e equipamento
     # com part_number diferente
-    def partNumberDiferente(self):
+    def partNumberDiferente(self, filtros=None):
         retorno = []
         
         patrimonios = Patrimonio.objects.filter(equipamento_id__isnull=False).filter(equipamento__part_number__isnull=False).exclude(equipamento__part_number=F('part_number')).select_related("equipamento").order_by("id")
+
+        if filtros and filtros["filtro_tipo_patrimonio"]:
+            patrimonios = patrimonios.filter(tipo=filtros["filtro_tipo_patrimonio"])
+        
         retorno.append(patrimonios)
 
         return retorno
@@ -101,57 +115,57 @@ class VerificacaoPatrimonioEquipamento():
     
     # busca de patrimonio e equipamento
     # com descrição diferente
-    def descricaoDiferente(self):
+    def descricaoDiferente(self, filtros=None):
         retorno = []
 
         patrimonios = Patrimonio.objects.filter(equipamento_id__isnull=False).filter(equipamento__descricao__isnull=False).exclude(equipamento__descricao=F('descricao')).select_related("equipamento").order_by("id")
-        retorno.append(patrimonios)
 
+        if filtros and filtros["filtro_tipo_patrimonio"]:
+            patrimonios = patrimonios.filter(tipo=filtros["filtro_tipo_patrimonio"])
+        
+        retorno.append(patrimonios)
         return retorno
     
-
-
-# marca
-# modelo
-# imagem
-# isbn
-# ncm
-# titulo_autor
-# tamanho
-# especificacao
-# tipo_id
-
     
     # busca de patrimonio e equipamento
     # com marca diferente
-    def marcaDiferente(self):
+    def marcaDiferente(self, filtros=None):
         retorno = []
         
         patrimonios = Patrimonio.objects.filter(equipamento_id__isnull=False).filter(equipamento__marca__isnull=False).exclude(equipamento__marca=F('marca')).select_related("equipamento").order_by("id")
-        retorno.append(patrimonios)
 
+        if filtros and filtros["filtro_tipo_patrimonio"]:
+            patrimonios = patrimonios.filter(tipo=filtros["filtro_tipo_patrimonio"])
+        
+        retorno.append(patrimonios)
         return retorno
     
      
     # busca de patrimonio e equipamento
     # com modelo diferente
-    def modeloDiferente(self):
+    def modeloDiferente(self, filtros=None):
         retorno = []
         
         patrimonios = Patrimonio.objects.filter(equipamento_id__isnull=False).filter(equipamento__modelo__isnull=False).exclude(equipamento__modelo=F('modelo')).select_related("equipamento").order_by("id")
-        retorno.append(patrimonios)
 
+        if filtros and filtros["filtro_tipo_patrimonio"]:
+            patrimonios = patrimonios.filter(tipo=filtros["filtro_tipo_patrimonio"])
+        
+        retorno.append(patrimonios)
         return retorno   
     
         
     # busca de patrimonio e equipamento
     # com ncm diferente
-    def ncmDiferente(self):
+    def ncmDiferente(self, filtros=None):
         retorno = []
         
         patrimonios = Patrimonio.objects.filter(equipamento_id__isnull=False).filter(equipamento__ncm__isnull=False).exclude(equipamento__ncm=F('ncm')).select_related("equipamento").order_by("id")
-        retorno.append(patrimonios)
 
+        if filtros and filtros["filtro_tipo_patrimonio"]:
+            patrimonios = patrimonios.filter(tipo=filtros["filtro_tipo_patrimonio"])
+        
+        retorno.append(patrimonios)
         return retorno      
     
     
