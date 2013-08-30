@@ -1,5 +1,6 @@
 {% extends "admin/base_site.html" %}
 {% load proto_tags %}
+{% block breadcrumbs %}<div class="breadcrumbs">Você está em: <a href="/verificacao/relatorio/patrimonio_consolidado">Relatório de verificação de patrimonios</a></div>{% endblock %}
 {% block content %}
 
 <style>
@@ -66,7 +67,7 @@ function ajax_verificacao_patr_equi(patrimonio_id, to_object, att_name) {
      $.ajax({
        url: "/verificacao/verificacao/copy_attribute_to_patrimonio",
        dataType: "html",
-       data: {'json':1, 'patrimonio_id': patrimonio_id, 'to_object': to_object, 'att_name':att_name},
+       data: {'ajax':1, 'patrimonio_id': patrimonio_id, 'to_object': to_object, 'att_name':att_name},
        success: function(data){
             $(".tr_data").detach();
             $("#table-data").append(data);
@@ -101,7 +102,7 @@ $(document).ready(function() {
 </script>
 
 <h1 repeat="1">Relatório de verificação de equipamentos - {{ desc }}</h1>
-
+    {% include "./verificacao/filter_tipo_patrimonio.html" %}
     <table border="0" cellpadding="5" id="table-data">
       <tr>
         <th colspan="2">Patrimonio</th>

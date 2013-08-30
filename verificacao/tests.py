@@ -20,21 +20,41 @@ class TestPatrimonioComEquipamentpoVazio(TestCase):
             eq = Equipamento(id=1, part_number="", modelo="", marca="", descricao="") 
             eq.save()
         
-            tipo = Tipo()
-            tipo.save()
+            tipo1 = Tipo()
+            tipo1.nome = 'tipo1'
+            tipo1.save()
+            tipo2 = Tipo()
+            tipo2.nome = 'tipo2'
+            tipo2.save()
         
-            patr = Patrimonio(part_number="", modelo="m2", marca="", descricao="", tipo=tipo, equipamento=eq)
-            patr.save()
-            patr = Patrimonio(part_number="pn1", modelo="m2", marca="", descricao="", tipo=tipo)
-            patr.save()
-            patr = Patrimonio(part_number="pn1", modelo="m2", marca="", descricao="", tipo=tipo)
-            patr.save()
+            patr1 = Patrimonio(part_number="", modelo="m2", marca="", descricao="", tipo=tipo1, equipamento=eq)
+            patr1.save()
+            patr2 = Patrimonio(part_number="pn1", modelo="m2", marca="", descricao="", tipo=tipo2)
+            patr2.save()
+            patr3 = Patrimonio(part_number="pn1", modelo="m2", marca="", descricao="", tipo=tipo2)
+            patr3.save()
             
             verficacao = VerificacaoPatrimonio()
             retorno = verficacao.equipamentoVazio()
             
             self.assertEqual(len(retorno), 1)
             self.assertEqual(len(retorno[0]), 2)
+            
+
+            # check filter            
+            filtro = {"filtro_tipo_patrimonio":1}
+            retorno = verficacao.equipamentoVazio(filtro)
+            
+            self.assertEqual(len(retorno), 1)
+            self.assertEqual(len(retorno[0]), 0)
+            
+            patr3.tipo = tipo1;
+            patr3.save()
+            
+            retorno = verficacao.equipamentoVazio(filtro)
+            
+            self.assertEqual(len(retorno), 1)
+            self.assertEqual(len(retorno[0]), 1)
             
     """
     Testa patrimonio e equipamentos com part_number diferente
@@ -47,21 +67,41 @@ class TestPatrimonioComEquipamentpoVazio(TestCase):
             eq3 = Equipamento(id=3, part_number="pn3", modelo="", marca="", descricao="") 
             eq3.save()
         
-            tipo = Tipo()
-            tipo.save()
+            tipo1 = Tipo()
+            tipo1.nome = 'tipo1'
+            tipo1.save()
+            tipo2 = Tipo()
+            tipo2.nome = 'tipo2'
+            tipo2.save()
         
-            patr = Patrimonio(part_number="pn1", modelo="m2", marca="", descricao="", tipo=tipo, equipamento=eq1)
-            patr.save()
-            patr = Patrimonio(part_number="", modelo="m2", marca="", descricao="", tipo=tipo, equipamento=eq2)
-            patr.save()
-            patr = Patrimonio(part_number="pn11111", modelo="m2", marca="", descricao="", tipo=tipo, equipamento=eq3)
-            patr.save()
+            patr1 = Patrimonio(part_number="pn1", modelo="m2", marca="", descricao="", tipo=tipo1, equipamento=eq1)
+            patr1.save()
+            patr2 = Patrimonio(part_number="", modelo="m2", marca="", descricao="", tipo=tipo1, equipamento=eq2)
+            patr2.save()
+            patr3 = Patrimonio(part_number="pn11111", modelo="m2", marca="", descricao="", tipo=tipo2, equipamento=eq3)
+            patr3.save()
             
             verficacao = VerificacaoPatrimonioEquipamento()
             retorno = verficacao.partNumberDiferente()
             
             self.assertEqual(len(retorno), 1)
             self.assertEqual(len(retorno[0]), 1)
+
+            # check filter            
+            filtro = {"filtro_tipo_patrimonio":1}
+            retorno = verficacao.partNumberDiferente(filtro)
+            
+            self.assertEqual(len(retorno), 1)
+            self.assertEqual(len(retorno[0]), 0)
+            
+            patr3.tipo = tipo1;
+            patr3.save()
+            
+            retorno = verficacao.partNumberDiferente(filtro)
+            
+            self.assertEqual(len(retorno), 1)
+            self.assertEqual(len(retorno[0]), 1)
+            
             
     """
     Testa patrimonio e equipamentos com descricao diferente
@@ -74,18 +114,37 @@ class TestPatrimonioComEquipamentpoVazio(TestCase):
             eq3 = Equipamento(id=3, part_number="", modelo="", marca="", descricao="desc3") 
             eq3.save()
         
-            tipo = Tipo()
-            tipo.save()
+            tipo1 = Tipo()
+            tipo1.nome = 'tipo1'
+            tipo1.save()
+            tipo2 = Tipo()
+            tipo2.nome = 'tipo2'
+            tipo2.save()
         
-            patr = Patrimonio(part_number="pt1", modelo="pt1", marca="m1", descricao="desc1", tipo=tipo, equipamento=eq1)
-            patr.save()
-            patr = Patrimonio(part_number="pt2", modelo="pt2", marca="m2", descricao="", tipo=tipo, equipamento=eq2)
-            patr.save()
-            patr = Patrimonio(part_number="pt3", modelo="pt3", marca="m3", descricao="desc11111", tipo=tipo, equipamento=eq3)
-            patr.save()
+            patr1 = Patrimonio(part_number="pt1", modelo="pt1", marca="m1", descricao="desc1", tipo=tipo1, equipamento=eq1)
+            patr1.save()
+            patr2 = Patrimonio(part_number="pt2", modelo="pt2", marca="m2", descricao="", tipo=tipo1, equipamento=eq2)
+            patr2.save()
+            patr3 = Patrimonio(part_number="pt3", modelo="pt3", marca="m3", descricao="desc11111", tipo=tipo2, equipamento=eq3)
+            patr3.save()
             
             verficacao = VerificacaoPatrimonioEquipamento()
             retorno = verficacao.descricaoDiferente()
+            
+            self.assertEqual(len(retorno), 1)
+            self.assertEqual(len(retorno[0]), 1)
+            
+            # check filter            
+            filtro = {"filtro_tipo_patrimonio":1}
+            retorno = verficacao.descricaoDiferente(filtro)
+            
+            self.assertEqual(len(retorno), 1)
+            self.assertEqual(len(retorno[0]), 0)
+            
+            patr3.tipo = tipo1;
+            patr3.save()
+            
+            retorno = verficacao.descricaoDiferente(filtro)
             
             self.assertEqual(len(retorno), 1)
             self.assertEqual(len(retorno[0]), 1)
@@ -101,22 +160,41 @@ class TestPatrimonioComEquipamentpoVazio(TestCase):
             eq3 = Equipamento(id=3, part_number="", modelo="m3", marca="", descricao="") 
             eq3.save()
         
-            tipo = Tipo()
-            tipo.save()
+            tipo1 = Tipo()
+            tipo1.nome = 'tipo1'
+            tipo1.save()
+            tipo2 = Tipo()
+            tipo2.nome = 'tipo2'
+            tipo2.save()
         
-            patr = Patrimonio(part_number="pt1", modelo="m1", marca="pt1", descricao="pt1", tipo=tipo, equipamento=eq1)
-            patr.save()
-            patr = Patrimonio(part_number="pt2", modelo="", marca="pt2", descricao="pt2", tipo=tipo, equipamento=eq2)
-            patr.save()
-            patr = Patrimonio(part_number="pt3", modelo="m1111", marca="pt3", descricao="pt3", tipo=tipo, equipamento=eq3)
-            patr.save()
+            patr1 = Patrimonio(part_number="pt1", modelo="m1", marca="pt1", descricao="pt1", tipo=tipo1, equipamento=eq1)
+            patr1.save()
+            patr2 = Patrimonio(part_number="pt2", modelo="", marca="pt2", descricao="pt2", tipo=tipo1, equipamento=eq2)
+            patr2.save()
+            patr3 = Patrimonio(part_number="pt3", modelo="m1111", marca="pt3", descricao="pt3", tipo=tipo2, equipamento=eq3)
+            patr3.save()
             
             verficacao = VerificacaoPatrimonioEquipamento()
             retorno = verficacao.modeloDiferente()
             
             self.assertEqual(len(retorno), 1)
             self.assertEqual(len(retorno[0]), 1)
-
+            
+            # check filter            
+            filtro = {"filtro_tipo_patrimonio":1}
+            retorno = verficacao.modeloDiferente(filtro)
+            
+            self.assertEqual(len(retorno), 1)
+            self.assertEqual(len(retorno[0]), 0)
+            
+            patr3.tipo = tipo1;
+            patr3.save()
+            
+            retorno = verficacao.modeloDiferente(filtro)
+            
+            self.assertEqual(len(retorno), 1)
+            self.assertEqual(len(retorno[0]), 1)
+            
             
     """
     Testa patrimonio e equipamentos com marca diferente
@@ -129,18 +207,37 @@ class TestPatrimonioComEquipamentpoVazio(TestCase):
             eq3 = Equipamento(id=3, part_number="", modelo="", marca="m3", descricao="") 
             eq3.save()
         
-            tipo = Tipo()
-            tipo.save()
+            tipo1 = Tipo()
+            tipo1.nome = 'tipo1'
+            tipo1.save()
+            tipo2 = Tipo()
+            tipo2.nome = 'tipo2'
+            tipo2.save()
         
-            patr = Patrimonio(part_number="pt1", modelo="pt1", marca="m1", descricao="pt1", tipo=tipo, equipamento=eq1)
-            patr.save()
-            patr = Patrimonio(part_number="pt2", modelo="pt2", marca="", descricao="pt2", tipo=tipo, equipamento=eq2)
-            patr.save()
-            patr = Patrimonio(part_number="pt3", modelo="pt3", marca="m1111", descricao="pt3", tipo=tipo, equipamento=eq3)
-            patr.save()
+            patr1 = Patrimonio(part_number="pt1", modelo="pt1", marca="m1", descricao="pt1", tipo=tipo1, equipamento=eq1)
+            patr1.save()
+            patr2 = Patrimonio(part_number="pt2", modelo="pt2", marca="", descricao="pt2", tipo=tipo1, equipamento=eq2)
+            patr2.save()
+            patr3 = Patrimonio(part_number="pt3", modelo="pt3", marca="m1111", descricao="pt3", tipo=tipo2, equipamento=eq3)
+            patr3.save()
             
             verficacao = VerificacaoPatrimonioEquipamento()
             retorno = verficacao.marcaDiferente()
+            
+            self.assertEqual(len(retorno), 1)
+            self.assertEqual(len(retorno[0]), 1)
+            
+            # check filter            
+            filtro = {"filtro_tipo_patrimonio":1}
+            retorno = verficacao.marcaDiferente(filtro)
+            
+            self.assertEqual(len(retorno), 1)
+            self.assertEqual(len(retorno[0]), 0)
+            
+            patr3.tipo = tipo1;
+            patr3.save()
+            
+            retorno = verficacao.marcaDiferente(filtro)
             
             self.assertEqual(len(retorno), 1)
             self.assertEqual(len(retorno[0]), 1)
@@ -156,22 +253,41 @@ class TestPatrimonioComEquipamentpoVazio(TestCase):
             eq3 = Equipamento(id=3, part_number="", modelo="", marca="", descricao="", ncm="n3") 
             eq3.save()
         
-            tipo = Tipo()
-            tipo.save()
+            tipo1 = Tipo()
+            tipo1.nome = 'tipo1'
+            tipo1.save()
+            tipo2 = Tipo()
+            tipo2.nome = 'tipo2'
+            tipo2.save()
         
-            patr = Patrimonio(part_number="pt1", modelo="pt1", marca="pt1", descricao="pt1", ncm="n1", tipo=tipo, equipamento=eq1)
-            patr.save()
-            patr = Patrimonio(part_number="pt2", modelo="pt2", marca="pt2", descricao="pt2", ncm="", tipo=tipo, equipamento=eq2)
-            patr.save()
-            patr = Patrimonio(part_number="pt3", modelo="pt3", marca="pt3", descricao="pt3", ncm="n1111", tipo=tipo, equipamento=eq3)
-            patr.save()
+            patr1 = Patrimonio(part_number="pt1", modelo="pt1", marca="pt1", descricao="pt1", ncm="n1", tipo=tipo1, equipamento=eq1)
+            patr1.save()
+            patr2 = Patrimonio(part_number="pt2", modelo="pt2", marca="pt2", descricao="pt2", ncm="", tipo=tipo1, equipamento=eq2)
+            patr2.save()
+            patr3 = Patrimonio(part_number="pt3", modelo="pt3", marca="pt3", descricao="pt3", ncm="n1111", tipo=tipo2, equipamento=eq3)
+            patr3.save()
             
             verficacao = VerificacaoPatrimonioEquipamento()
             retorno = verficacao.ncmDiferente()
             
             self.assertEqual(len(retorno), 1)
             self.assertEqual(len(retorno[0]), 1)
-      
+            
+            # check filter            
+            filtro = {"filtro_tipo_patrimonio":1}
+            retorno = verficacao.ncmDiferente(filtro)
+            
+            self.assertEqual(len(retorno), 1)
+            self.assertEqual(len(retorno[0]), 0)
+            
+            patr3.tipo = tipo1;
+            patr3.save()
+            
+            retorno = verficacao.ncmDiferente(filtro)
+            
+            self.assertEqual(len(retorno), 1)
+            self.assertEqual(len(retorno[0]), 1)
+            
     """
     Testa a copia de atributos entre patrimonio e equipamento
     """

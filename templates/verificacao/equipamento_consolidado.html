@@ -1,6 +1,18 @@
 {% extends "admin/base_site.html" %}
 {% load proto_tags %}
 {% block content %}
+<style>
+th {
+    background-color: lightgray;
+    border: 1px #aaa dotted;
+}
+
+td {
+    border:1px;
+    border-color: lightgray;
+    border-style: dotted;
+}
+</style>
 <h1 repeat="1">Relatório de verificação de Equipamentos</h1>
 
     <table border="0" cellpadding="5">
