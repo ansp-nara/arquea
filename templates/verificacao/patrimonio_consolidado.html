@@ -1,0 +1,28 @@
+{% extends "admin/base_site.html" %}
+{% load proto_tags %}
+{% block content %}
+
+<style>
+ .tr_warning {
+    background-color: lightyellow;
+    
+ }
+</style>
+
+<h1 repeat="1">Relatório de verificação de Patrimonios</h1>
+
+    <table border="0" cellpadding="5">
+    {% if verificacoes %}
+          <tr>
+               <th>Verificação</th>
+               <th style="text-align: center;">Qtd. Erros</th>
+          </tr>
+	    {% for v in verificacoes %}
+		   <tr class="{% if v.qtd != 0 %}tr_warning{% endif %}">
+		       <td><a href="{{ model.admin_url }}{{ v.url }}"</a>{{ v.desc }}</td>
+		       <td style="text-align: center;">{{ v.qtd }}</td>
+		  </tr>
+	    {% endfor %}
+	{% endif %}
+    </table>
+{% endblock %}
