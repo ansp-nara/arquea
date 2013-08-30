@@ -79,20 +79,20 @@ def escolhe_pagamento(request):
         numero = request.POST.get('numero')
         
         if termo and numero:
-	    pgt = Pagamento.objects.filter(protocolo__termo__id=termo)
-	    from django.db.models import Q
-	    for p in pgt.filter(Q(conta_corrente__cod_oper__icontains=numero)|Q(protocolo__num_documento__icontains=numero)):
-	        if p.conta_corrente:
-	            descricao = 'Doc. %s, cheque %s, valor %s' % (p.protocolo.num_documento,p.conta_corrente.cod_oper, p.valor_fapesp)
-		else:
-		    descricao = 'Doc. %s, valor %s' % (p.protocolo.num_documento, p.valor_patrocinio)
+        pgt = Pagamento.objects.filter(protocolo__termo__id=termo)
+        from django.db.models import Q
+        for p in pgt.filter(Q(conta_corrente__cod_oper__icontains=numero)|Q(protocolo__num_documento__icontains=numero)):
+            if p.conta_corrente:
+                descricao = 'Doc. %s, cheque %s, valor %s' % (p.protocolo.num_documento,p.conta_corrente.cod_oper, p.valor_fapesp)
+        else:
+            descricao = 'Doc. %s, valor %s' % (p.protocolo.num_documento, p.valor_patrocinio)
 
-	        retorno.append({'pk':p.pk, 'valor':descricao})
-	        
-	if not retorno:
-	    retorno = [{"pk":"0","valor":"Nenhum registro"}]
-	    
-	    json = simplejson.dumps(retorno)
+            retorno.append({'pk':p.pk, 'valor':descricao})
+            
+    if not retorno:
+        retorno = [{"pk":"0","valor":"Nenhum registro"}]
+        
+        json = simplejson.dumps(retorno)
     else:
         raise Http404
     return HttpResponse(json, mimetype="application/json")
@@ -115,14 +115,14 @@ def escolhe_detalhe(request):
 def escolhe_entidade(request):
     if request.method == 'POST':
         ent_id = request.POST.get('entidade')
-	entidade = get_object_or_404(Entidade, pk=ent_id)
+    entidade = get_object_or_404(Entidade, pk=ent_id)
 
         retorno = []
-	for ed in EnderecoDetalhe.objects.all():
-	    if ed.end.entidade == entidade:
-    	        #descricao = '%s - %s' % (ed.end.__unicode__(), ed.complemento)
+    for ed in EnderecoDetalhe.objects.all():
+        if ed.end.entidade == entidade:
+                #descricao = '%s - %s' % (ed.end.__unicode__(), ed.complemento)
                 descricao = ed.__unicode__()
-	        retorno.append({'pk':ed.pk, 'valor':descricao})
+            retorno.append({'pk':ed.pk, 'valor':descricao})
 
         if not retorno:
             retorno = [{"pk":"0","valor":"Nenhum registro"}]
@@ -181,7 +181,7 @@ def por_estado(request):
                 try:
                     entidades_ids.append(h.endereco.end.entidade.id)
                 except:
-		    pass
+            pass
             entidades = []
             for e in Entidade.objects.filter(id__in=entidades_ids):
                 detalhes = []
@@ -208,7 +208,7 @@ def por_marca(request, pdf=0):
     if request.method == 'GET' and request.GET.get('marca'):
         marca = request.GET.get('marca')
         if pdf:
-	    return render_to_pdf('patrimonio/por_marca.pdf', {'marca':marca, 'patrimonios':Patrimonio.objects.filter(marca=marca), 'filename':'inventario_por_marca.pdf'})
+        return render_to_pdf('patrimonio/por_marca.pdf', {'marca':marca, 'patrimonios':Patrimonio.objects.filter(marca=marca), 'filename':'inventario_por_marca.pdf'})
         return TemplateResponse(request, 'patrimonio/por_marca.html', {'marca':marca, 'patrimonios':Patrimonio.objects.filter(marca=marca)})
     else:
         return TemplateResponse(request, 'patrimonio/sel_marca.html', {'marcas':Patrimonio.objects.values_list('marca', flat=True).order_by('marca').distinct()})
@@ -334,7 +334,7 @@ def por_tipo_equipamento_old(request, pdf=0):
 
     part_number = request.GET.get('partnumber')
     if part_number != '0':
-	patrimonios_tipo = patrimonios_tipo.filter(equipamento__part_number=part_number)
+    patrimonios_tipo = patrimonios_tipo.filter(equipamento__part_number=part_number)
 
     for e in Entidade.objects.all():
         patrimonios_entidade = patrimonios_tipo.all()
@@ -353,9 +353,9 @@ def por_tipo_equipamento_old(request, pdf=0):
                     if p.historico_atual() is None:
                         patrimonios_local = patrimonios_local.exclude(id=p.id)
                     elif p.historico_atual().endereco.complemento != l:
-			patrimonios_local = patrimonios_local.exclude(id=p.id)
+            patrimonios_local = patrimonios_local.exclude(id=p.id)
                 local={'local':l, 'patrimonios':patrimonios_local}
-	        locais.append(local)
+            locais.append(local)
             entidade['locais'] = locais
             entidades.append(entidade)
     
@@ -382,7 +382,7 @@ def filtra_pn_estado(request):
             if not p.historico_atual():
                 patrimonios_estado = patrimonios_estado.exclude(id=p.id)
             elif p.historico_atual().estado !=e:
-		patrimonios_estado = patrimonios_estado.exclude(id=p.id)
+        patrimonios_estado = patrimonios_estado.exclude(id=p.id)
 
         estados.append({'pk':e.id, 'value':'%s (%s)' % (e, patrimonios_estado.order_by('id').distinct().count())})
 
@@ -421,10 +421,10 @@ def por_termo(request, pdf=0):
     if doado == '0':
         patrimonios = patrimonios.exclude(historicolocal__endereco__id=1372, historicolocal__estado__id=1)
     elif doado == '1':
-	patrimonios = patrimonios.filter(historicolocal__endereco__id=1372, historicolocal__estado__id=1)
+    patrimonios = patrimonios.filter(historicolocal__endereco__id=1372, historicolocal__estado__id=1)
 
     if localizado == '1':
-	patrimonios = patrimonios.exclude(historicolocal__endereco__complemento__icontains='Localizado')
+    patrimonios = patrimonios.exclude(historicolocal__endereco__complemento__icontains='Localizado')
     elif localizado == '0':
         patrimonios = patrimonios.filter(historicolocal__endereco__complemento__icontains='Localizado')
 
@@ -434,7 +434,7 @@ def por_termo(request, pdf=0):
         patrimonios = patrimonios.filter(pagamento__origem_fapesp__item_outorga__natureza_gasto__modalidade__sigla__in=['MCN', 'MCI'])
 
     if numero_fmusp == '1':
-	patrimonios = patrimonios.filter(numero_fmusp__isnull=False)
+    patrimonios = patrimonios.filter(numero_fmusp__isnull=False)
         template_name = 'por_termo_fm'
 
     for t in qs:
@@ -464,53 +464,12 @@ def por_termo(request, pdf=0):
         vars = {'termos':termos, 'i':itertools.count(1), 'numero_fmusp':numero_fmusp}
         if termo_id !=0 and len(qs) > 0:
             vars.update({'t':qs[0]})
-	return render_to_pdf('patrimonio/%s.pdf' % template_name, vars, filename='invertario_por_termo.pdf')
+    return render_to_pdf('patrimonio/%s.pdf' % template_name, vars, filename='invertario_por_termo.pdf')
     else:
         return TemplateResponse(request, 'patrimonio/%s.html' % template_name, {'termos':termos, 'i':itertools.count(1), 't':qs[0], 'm':modalidade, 'a':agilis, 'd':doado, 'l':localizado, 'numero_fmusp':numero_fmusp})
 
 @login_required
 def racks(request):
-    locais = Patrimonio.objects.filter(equipamento__tipo__nome='Rack', historicolocal__estado__id=22).values_list('historicolocal__endereco', flat=True).order_by('historicolocal__endereco').distinct()
-    dcs = []
-    f = open('/tmp/debug.txt', 'w')
-    for l in locais:
-        racks = []
-        for r in Patrimonio.objects.filter(equipamento__tipo__nome='Rack', historicolocal__endereco__id=l):
-            alt = 127
-            vazio = 0
-            equipamentos = []
-            pts = list(r.contido.filter(historicolocal__posicao__isnull=False).order_by('-historicolocal__posicao').distinct('historicolocal__posicao'))
-            pts.sort(key=lambda x: x.historico_atual().posicao_int(), reverse=True)
-            f.write('%s - %s\n' % (l, r))
-            for pt in pts:
-                pos = pt.historico_atual().posicao_int()
-                f.write('     %s\n' % pos)
-                if pos == 1 or pt.tamanho is None: continue
-                if alt > pos+int(round(pt.tamanho*3)):
-                    tam = alt-(pos+int(round(pt.tamanho*3)))
-                    alt -= tam
-                    equipamentos.append({'tamanho':tam, 'range':range(tam-1)})
-                    vazio += tam
-                tam = int(round(pt.tamanho*3))
-                alt -= tam
-                imagem = None
-                if pt.equipamento:
-                    if pt.equipamento.imagem:
-                        imagem = pt.equipamento.imagem.url
-                equipamentos.append({'tamanho':tam, 'imagem':imagem, 'descricao':pt.descricao or u'Sem descrição', 'range':range(tam-1)})
-            rack = {'nome':r.apelido, 'altura':126, 'equipamentos':equipamentos}
-            if alt > 1:
-                equipamentos.append({'tamanho':alt-1, 'range':range(alt-2)})
-                vazio += alt-1
-            rack['vazio'] = '%.2f%%' % ((rack['altura']-vazio)*100.0/rack['altura'],)
-            racks.append(rack)
-        dc = {'nome':EnderecoDetalhe.objects.get(id=l).complemento, 'racks':racks}
-        dcs.append(dc)
-    f.close()
-    return TemplateResponse(request, 'patrimonio/racks.html', {'dcs':dcs})
-
-@login_required
-def racks_pos_absolute(request):
     # Busca patrimonios do tipo RACK com o estado ATIVO
     locais = Patrimonio.objects.filter(equipamento__tipo__nome='Rack', historicolocal__estado__id=Estado.PATRIMONIO_ATIVO).values_list('historicolocal__endereco', flat=True).order_by('historicolocal__endereco').distinct()
     dcs = []
@@ -583,7 +542,7 @@ def racks1(request):
         if info[0] != r:
             if alt > 1: 
                 equipamentos.append({'tamanho':alt-1, 'range':range(alt-2)})
-		vazio += alt-1
+        vazio += alt-1
             r = info[0]
             if rack:
                 rack['vazio'] = '%.2f%%' % ((rack['altura']-vazio)*100.0/rack['altura'],)
@@ -609,7 +568,7 @@ def racks1(request):
             imagem = None
             if pt.equipamento:
                 if pt.equipamento.imagem:
-		    imagem = pt.equipamento.imagem.url
+            imagem = pt.equipamento.imagem.url
             equipamentos.append({'tamanho':tam, 'imagem':imagem, 'descricao':pt.descricao or u'Sem descrição', 'range':range(tam-1)})
 
     return TemplateResponse(request, 'patrimonio/racks.html', {'racks':racks})
@@ -632,13 +591,13 @@ def abre_arvore(request):
         id = request.GET.get('id')
         model = request.GET.get('model')
         if model == 'termo':
-	    for n in Termo.objects.get(id=id).natureza_gasto_set.filter(item__origemfapesp__pagamento__patrimonio__isnull=False).distinct():
-	        ret.append({'data':n.modalidade.sigla, 'attr':{'style':'padding-top:4px;', 'o_id':n.id, 'o_model': n._meta.module_name}})
+        for n in Termo.objects.get(id=id).natureza_gasto_set.filter(item__origemfapesp__pagamento__patrimonio__isnull=False).distinct():
+            ret.append({'data':n.modalidade.sigla, 'attr':{'style':'padding-top:4px;', 'o_id':n.id, 'o_model': n._meta.module_name}})
         elif model == 'natureza_gasto':
             for i in Natureza_gasto.objects.get(id=id).item_set.filter(origemfapesp__pagamento__patrimonio__isnull=False).distinct():
                 ret.append({'data':i.__unicode__(), 'attr':{'style':'padding-top:4px;', 'o_id':i.id, 'o_model': i._meta.module_name}})
         elif model == 'item':
-	    for o in Item.objects.get(id=id).origemfapesp_set.filter(pagamento__patrimonio__isnull=False).distinct():
+        for o in Item.objects.get(id=id).origemfapesp_set.filter(pagamento__patrimonio__isnull=False).distinct():
                 for p in o.pagamento_set.filter(patrimonio__isnull=False).distinct():
                     ret.append({'data':'%s %s' % (p.protocolo.tipo_documento.sigla or '', p.protocolo.num_documento), 'attr':{'style':'padding-top:4px;', 'o_id':p.id, 'o_model':p._meta.module_name}})
         elif model == 'pagamento':
@@ -646,7 +605,7 @@ def abre_arvore(request):
                 ret.append({'data':'<div><div class="col1"></div><div class="col2"><div class="menor">%s</div><div class="maior">%s</div><div class="maior">%s - %s</div><div class="medio">%s</div><div class="menor">%s</div><div class="menor">%s</div><div class="menor">%s</div></div><div style="clear:both;"></div></div>' % (pt.tipo, pt.ns, pt.descricao, pt.complemento, pt.equipamento.tipo, pt.valor, 'Sim' if pt.agilis else u'Não', 'Sim' if pt.checado else u'Não'), 'attr':{'style':'height:130px;'}})
     else:
         for t in Termo.objects.all():
-	    ret.append({'data':t.__unicode__(), 'attr':{'style':'padding-top:6px;', 'o_id':t.id, 'o_model': t._meta.module_name}})
+        ret.append({'data':t.__unicode__(), 'attr':{'style':'padding-top:6px;', 'o_id':t.id, 'o_model': t._meta.module_name}})
     json = simplejson.dumps(ret)
     return HttpResponse(json, mimetype="application/json")
 
@@ -664,16 +623,16 @@ def abre_arvore_tipo(request):
         model = request.GET.get('model')
         if model == 'tipoequipamento':
             for e in TipoEquipamento.objects.get(id=id).equipamento_set.all():
-		ret.append({'data':e.descricao, 'attr':{'style':'padding-top:4px;', 'o_id':e.id, 'o_model': e._meta.module_name}})
+        ret.append({'data':e.descricao, 'attr':{'style':'padding-top:4px;', 'o_id':e.id, 'o_model': e._meta.module_name}})
         elif model == 'equipamento':
             patrimonios = list(Equipamento.objects.get(id=id).patrimonio_set.all())
             try:
                 patrimonios.sort(key=lambda x:x.historico_atual().endereco.end.entidade.sigla)
             except:
-		pass
+        pass
             for p in patrimonios:
                 ha = p.historico_atual()
-		ret.append({'data':'<div><div class="col1"></div><div class="col2"><div class="medio">%s</div><div class="maior">%s</div><div class="menor">%s</div><div class="medio">%s</div><div class="medio">%s</div><div class="medio">%s</div><div class="medio">%s</div><div class="menor">%s</div></div><div style="clear:both;"></div></div>' % (ha.endereco.end.entidade if ha else 'ND' , ha.endereco.complemento if ha else 'ND', ha.posicao if ha and ha.posicao else 'ND', p.equipamento.marca, p.equipamento.modelo, p.equipamento.part_number, p.ns, ha.estado if ha else 'ND'), 'attr':{'style':'padding-top:4px;'}})
+        ret.append({'data':'<div><div class="col1"></div><div class="col2"><div class="medio">%s</div><div class="maior">%s</div><div class="menor">%s</div><div class="medio">%s</div><div class="medio">%s</div><div class="medio">%s</div><div class="medio">%s</div><div class="menor">%s</div></div><div style="clear:both;"></div></div>' % (ha.endereco.end.entidade if ha else 'ND' , ha.endereco.complemento if ha else 'ND', ha.posicao if ha and ha.posicao else 'ND', p.equipamento.marca, p.equipamento.modelo, p.equipamento.part_number, p.ns, ha.estado if ha else 'ND'), 'attr':{'style':'padding-top:4px;'}})
     else:
         for tp in TipoEquipamento.objects.all():
             #ret.append({'data':'%s <a onclick="$(\'#blocos\').jstree(\'open_all\', \'#%s-%s\')" style="color:#0000aa;">Abrir tudo</a>' % (tp.__unicode__(), tp._meta.module_name, tp.id), 'attr':{'id':'%s-%s'% (tp._meta.module_name, tp.id), 'style':'padding-top:6px;', 'o_id':tp.id, 'o_model': tp._meta.module_name}})
