@@ -1,0 +1,20 @@
+{% extends "admin/base_site.html" %}
+{% load proto_tags %}
+{% block content %}
+<h1 repeat="1">Relatório de verificação de Equipamentos</h1>
+
+    <table border="0" cellpadding="5">
+    {% if verificacoes %}
+          <tr>
+               <th>Verificação</th>
+               <th>Qtd. Erros</th>
+          </tr>
+	    {% for v in verificacoes %}
+		   <tr>
+		       <td><a href="{{ model.admin_url }}{{ v.url }}"</a>{{ v.desc }}</td>
+		       <td>{{ v.qtd }}</td>
+		  </tr>
+	    {% endfor %}
+	{% endif %}
+    </table>
+{% endblock %}

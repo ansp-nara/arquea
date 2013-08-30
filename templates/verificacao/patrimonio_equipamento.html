@@ -1,0 +1,129 @@
+{% extends "admin/base_site.html" %}
+{% load proto_tags %}
+{% block content %}
+
+<style>
+/* Start by setting display:none to make this hidden.
+   Then we position it in relation to the viewport window
+   with position:fixed. Width, height, top and left speak
+   speak for themselves. Background we set to 80% white with
+   our animation centered, and no-repeating */
+.modal {
+    display:    none;
+    position:   fixed;
+    z-index:    1000;
+    top:        0;
+    left:       0;
+    height:     100%;
+    width:      100%;
+    background: rgba( 255, 255, 255, .8 ) 
+                url('/media/img/admin/loading.gif') 
+                50% 50% 
+                no-repeat;
+}
+
+/* Anytime the body has the loading class, our
+   modal element will be visible */
+body.loading .modal {
+    display: block;
+}
+
+th {
+    background-color: lightgray;
+    border: 1px #aaa dotted;
+}
+
+td {
+    border:1px;
+    border-color: lightgray;
+    border-style: dotted;
+}
+
+.td_buttons {
+    background-color: #eee;
+}
+
+.td_descricao,
+.td_part_number,
+.td_modelo,
+.td_marca,
+.td_ncm {
+    display:none;
+}
+
+{% if atributo != '' %}
+    .td_{{ atributo }} {
+        display: table-cell;
+    }
+{% endif %}
+</style>
+
+<script type="text/javascript">
+
+
+function ajax_verificacao_patr_equi(patrimonio_id, to_object, att_name) {
+    $("body").addClass("loading");
+     $.ajax({
+       url: "/verificacao/verificacao/copy_attribute_to_patrimonio",
+       dataType: "html",
+       data: {'json':1, 'patrimonio_id': patrimonio_id, 'to_object': to_object, 'att_name':att_name},
+       success: function(data){
+            $(".tr_data").detach();
+            $("#table-data").append(data);
+            bindButtons();
+            $("body").removeClass("loading");
+       },
+       error: function(retorno, status, error){
+            alert('ERROR retorno=' + retorno + ' \nstatus=' + status + ' \nerror=' + error);
+       }
+     });
+}
+function bindButtons() {
+    $(".btn_to_pt").click(function(){
+        patrimonio_id = this.id.replace('btn_to_pt_', '');
+        to_object = 'patrimonio';
+        att_name = '{{ atributo }}'
+        ajax_verificacao_patr_equi(patrimonio_id, to_object, att_name);
+    });
+    
+    $(".btn_to_eq").click(function(){
+        patrimonio_id = this.id.replace('btn_to_eq_', '');
+        to_object = 'equipamento';
+        att_name = '{{ atributo }}'
+        ajax_verificacao_patr_equi(patrimonio_id, to_object, att_name);
+    });
+}
+
+$(document).ready(function() {
+    bindButtons();
+});
+    
+</script>
+
+<h1 repeat="1">Relatório de verificação de equipamentos - {{ desc }}</h1>
+
+    <table border="0" cellpadding="5" id="table-data">
+      <tr>
+        <th colspan="2">Patrimonio</th>
+        <th width="1%">&nbsp;</th>
+        <th colspan="2">Equipamento</th>
+      </tr>
+      <tr>
+           <th width="1%">ID</th>
+           <th width="40%" class="td_descricao">Desc</th>
+           <th width="40%" class="td_part_number">Part Number</th>
+           <th width="40%" class="td_modelo">Modelo</th>
+           <th width="40%" class="td_marca">Marca</th>
+           <th width="40%" class="td_ncm">NCM</th>
+           <th width="1%">&nbsp;</th>
+           <th width="1%">ID</th>
+           <th width="40%" class="td_descricao">Desc</th>
+           <th width="40%" class="td_part_number">Part Number</th>
+           <th width="40%" class="td_modelo">Model</th>
+           <th width="40%" class="td_marca">Marca</th>
+           <th width="40%" class="td_ncm">NCM</th>
+           
+      </tr>
+    {% include "./verificacao/patrimonio_equipamento-table.html" %}
+    </table>
+{% endblock %}

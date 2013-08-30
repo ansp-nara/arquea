@@ -48,6 +48,8 @@ def lista_relatorios():
     gerenciais = []
     administrativos = []
     tecnicos = []
+    verificacoes = []
+    
     administrativos.append({'url':'/financeiro/relatorios/pagamentos_mes', 'nome':u'Pagamentos por mês'})
     administrativos.append({'url':'/financeiro/relatorios/pagamentos_parcial', 'nome':u'Pagamentos por parcial'})
     gerenciais.append({'url':'/financeiro/relatorios/gerencial', 'nome':u'Gerencial'})
@@ -86,11 +88,20 @@ def lista_relatorios():
     tecnicos.append({'url':'/patrimonio/relatorio/por_tipo_equipamento2', 'nome':u'Patrimônio por tipo de equipamento'})
     administrativos.append({'url':'/patrimonio/relatorio/presta_contas', 'nome':u'Prestação de contas patrimonial (em construção)'})
     tecnicos.append({'url':'/patrimonio/relatorio/por_tipo_equipamento', 'nome':u'Busca por tipo de equipamento'})
+    
+    verificacoes.append({'url':'/verificacao/relatorio/equipamento_consolidado', 'nome':u'Verificação de equipamentos'})
+    verificacoes.append({'url':'/verificacao/relatorio/patrimonio_consolidado', 'nome':u'Verificação de patrimonios'})
 
     gerenciais.sort(key=lambda x: x['nome'])
     administrativos.sort(key=lambda x: x['nome'])
     tecnicos.sort(key=lambda x: x['nome'])
-    return {'relatorios':[{'nome':u'gerenciais', 'rel':gerenciais}, {'nome':u'administrativos', 'rel':administrativos}, {'nome':u'técnicos', 'rel':tecnicos}]}
+    verificacoes.sort(key=lambda x: x['nome'])
+    
+    return {'relatorios':[{'nome':u'gerenciais', 'rel':gerenciais}, 
+                          {'nome':u'administrativos', 'rel':administrativos}, 
+                          {'nome':u'técnicos', 'rel':tecnicos},
+                          {'nome':u'verificacoes', 'rel':verificacoes}], 
+            }
 
 
 @register.filter(name='moeda')
