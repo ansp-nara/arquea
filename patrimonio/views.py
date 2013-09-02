@@ -514,7 +514,7 @@ def racks(request):
                 # x a partir do topo do container
                 equipamentos.append({'id': pt.id, 'eixoY': eixoY, 'tamanho':tam, 'imagem':imagem, 'descricao':pt.descricao or u'Sem descrição', 'range':range(tam-1)})
             
-            rack = {'nome':rack.apelido, 'altura':126, 'equipamentos':equipamentos}
+            rack = {'nome':rack.apelido, 'altura':126, 'altura_pts': 126/3, 'equipamentos':equipamentos}
             if altura > 1:
                 
                 equipamentos.append({'tamanho':altura-1, 'range':range(altura-2)})
@@ -522,7 +522,7 @@ def racks(request):
                 
             rack['vazio'] = '%.2f%%'    % ((rack['altura']-vazio)*100.0/rack['altura'],)
             racks.append(rack)
-        dc = {'nome':EnderecoDetalhe.objects.get(id=local).complemento, 'racks':racks}
+        dc = {'nome':EnderecoDetalhe.objects.get(id=local).complemento, 'racks':racks, 'id':local}
         dcs.append(dc)
         
     debugFile.close()
