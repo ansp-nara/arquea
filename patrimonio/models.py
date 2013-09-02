@@ -322,12 +322,13 @@ class Equipamento(models.Model):
     imagem = models.ImageField(u'Imagem do equipamento', upload_to='patrimonio', null=True, blank=True)
     isbn = models.CharField(_(u'ISBN'), null=True, blank=True, max_length=20)
     ncm = models.CharField(u'NCM/SH', null=True, blank=True, max_length=30)
+    ean = models.CharField(u'EAN', max_length=45, null=True, blank=True)
     titulo_autor = models.CharField(_(u'Título e autor'), null=True, blank=True, max_length=100)
     tamanho = models.DecimalField(u'Tamanho (em U)', max_digits=5, decimal_places=2, null=True, blank=True)
+    dimensao = models.ForeignKey('patrimonio.Dimensao', null=True, blank=True)
     especificacao = models.FileField(u'Especificação', upload_to='patrimonio', null=True, blank=True)
     tipo = models.ForeignKey('patrimonio.TipoEquipamento', null=True, blank=True)
     convencoes = models.ManyToManyField('patrimonio.Distribuicao', verbose_name=u'Convenções')
-    dimensao = models.ForeignKey('patrimonio.Dimensao', null=True, blank=True)
 
     def __unicode__(self):
         return u'%s - %s' % (self.descricao, self.part_number)
