@@ -3,12 +3,12 @@
 {% block breadcrumbs %}<div class="breadcrumbs">Você está em: <a href="/verificacao/relatorio/equipamento_consolidado">Relatório de verificação de equipamentos</a></div>{% endblock %}
 {% block content %}
 <style>
-th {
+ #table-data th {
     background-color: lightgray;
     border: 1px #aaa dotted;
 }
 
-td {
+ #table-data td {
     border:1px;
     border-color: lightgray;
     border-style: dotted;
@@ -16,7 +16,7 @@ td {
 </style>
 <h1 repeat="1">Relatório de verificação de equipamentos - {{ desc }}</h1>
 
-    <table border="0" cellpadding="5">
+    <table id="table-data" border="0" cellpadding="5">
       <tr>
            <th>ID</th>
            <th>Desc</th>

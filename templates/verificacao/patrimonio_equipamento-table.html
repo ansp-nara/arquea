@@ -7,6 +7,7 @@
                <td class="td_modelo"><a href="{{ model.admin_url }}/admin/patrimonio/patrimonio/{{ pt.id }}/">{{ pt.modelo }}</a></td>
                <td class="td_marca"><a href="{{ model.admin_url }}/admin/patrimonio/patrimonio/{{ pt.id }}/">{{ pt.marca }}</a></td>
                <td class="td_ncm"><a href="{{ model.admin_url }}/admin/patrimonio/patrimonio/{{ pt.id }}/">{{ pt.ncm }}</a></td>
+               <td class="td_tamanho"><a href="{{ model.admin_url }}/admin/patrimonio/patrimonio/{{ pt.id }}/">{{ pt.tamanho }}</a></td>
                <td class="td_buttons">
                     <span style="white-space:nowrap">
                         <button id="btn_to_pt_{{pt.id}}" type="button"  title="Copiar para o patrimonio" class="btn_to_pt"><<</button>
@@ -19,6 +20,7 @@
                <td class="td_modelo"><a href="{{ model.admin_url }}/admin/patrimonio/equipamento/{{ pt.equipamento.id }}/">{{ pt.equipamento.modelo }}</a></td>
                <td class="td_marca"><a href="{{ model.admin_url }}/admin/patrimonio/equipamento/{{ pt.equipamento.id }}/">{{ pt.equipamento.marca }}</a></td>
                <td class="td_ncm"><a href="{{ model.admin_url }}/admin/patrimonio/equipamento/{{ pt.equipamento.id }}/">{{ pt.equipamento.ncm }}</a></td>
+               <td class="td_tamanho"><a href="{{ model.admin_url }}/admin/patrimonio/equipamento/{{ pt.equipamento.id }}/">{{ pt.equipamento.tamanho }}</a></td>
 
           </tr>
         {% endfor %}

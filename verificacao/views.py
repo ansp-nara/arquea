@@ -115,6 +115,10 @@ def patrimonio_consolidado(request):
     count = sum([len(patrimonios) for patrimonios in ncmDiferente])
     retorno.append({'desc':u'Patrimonio e Equipamento com NCM diferente', 'url':'patrimonio_equipamento_ncm_diferente', 'qtd':count})
     
+    tamanhoDiferente = verificacaoPatrimonioEquipamento.tamanhoDiferente(filtros_entrada)
+    count = sum([len(patrimonios) for patrimonios in tamanhoDiferente])
+    retorno.append({'desc':u'Patrimonio e Equipamento com Tamanho diferente', 'url':'patrimonio_equipamento_tamanho_diferente', 'qtd':count})
+    
     filtros = {"tipos":Tipo.objects.all()}
     
     return render_to_response('verificacao/patrimonio_consolidado.html', {'verificacoes':retorno, 'filtros':filtros}, context_instance=RequestContext(request))
@@ -259,6 +263,33 @@ def patrimonio_equipamento_ncm_diferente(request):
 
 
 @login_required
+def patrimonio_equipamento_tamanho_diferente(request):
+    ajax = request.GET.get('ajax')
+    filtros_entrada = {'filtro_tipo_patrimonio':request.GET.get('filtro_tipo_patrimonio')}
+    
+    logger.debug(filtros_entrada)
+    
+    retorno = []
+    verficacao = VerificacaoPatrimonioEquipamento()
+    retorno = verficacao.tamanhoDiferente(filtros_entrada)
+    
+
+    filtros_saida = []
+    if len(retorno) > 0:
+        filtros_saida = {"tipos":verficacao.listaFiltroTipoPatrimonio(verficacao.tamanhoDiferente()[0])}
+
+    
+    if ajax:
+        return render_to_response('verificacao/patrimonio_equipamento-table.html', 
+                              {'desc':'Patrimonio e Equipamento com Tamanho diferente', 'patrimonios':retorno, 'atributo':'tamanho', 'filtros':filtros_saida}, 
+                              context_instance=RequestContext(request))
+    else:    
+        return render_to_response('verificacao/patrimonio_equipamento.html', 
+                              {'desc':'Patrimonio e Equipamento com Tamanho diferente', 'patrimonios':retorno, 'atributo':'tamanho', 'filtros':filtros_saida}, 
+                              context_instance=RequestContext(request))
+
+
+@login_required
 def copy_attribute_to_patrimonio(request):
     # Id do patrimonio
     patrimonio_id = request.GET.get('patrimonio_id')
@@ -279,6 +310,8 @@ def copy_attribute_to_patrimonio(request):
         return patrimonio_equipamento_ncm_diferente(request)
     elif att_name == 'part_number':
         return patrimonio_equipamento_part_number_diferente(request)
+    elif att_name == 'tamanho':
+        return patrimonio_equipamento_tamanho_diferente(request)
     else:
         raise ValueError('Valor inválido para o parametro. att_name' + str(att_name))
     

@@ -168,6 +168,19 @@ class VerificacaoPatrimonioEquipamento():
         retorno.append(patrimonios)
         return retorno      
     
+        
+    # busca de patrimonio e equipamento
+    # com tamanho em Us diferente
+    def tamanhoDiferente(self, filtros=None):
+        retorno = []
+        
+        patrimonios = Patrimonio.objects.filter(equipamento_id__isnull=False).filter(equipamento__tamanho__isnull=False).exclude(equipamento__tamanho=F('tamanho')).select_related("equipamento").order_by("id")
+
+        if filtros and filtros["filtro_tipo_patrimonio"]:
+            patrimonios = patrimonios.filter(tipo=filtros["filtro_tipo_patrimonio"])
+        
+        retorno.append(patrimonios)
+        return retorno     
     
     def copy_attribute(self, to_object, patrimonio_id, att_name):
         """

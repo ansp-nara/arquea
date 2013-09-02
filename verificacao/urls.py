@@ -15,6 +15,7 @@ urlpatterns = patterns('verificacao.views',
     (r'relatorio/patrimonio_equipamento_marca_diferente$', 'patrimonio_equipamento_marca_diferente'),
     (r'relatorio/patrimonio_equipamento_modelo_diferente$', 'patrimonio_equipamento_modelo_diferente'),
     (r'relatorio/patrimonio_equipamento_ncm_diferente$', 'patrimonio_equipamento_ncm_diferente'),
+    (r'relatorio/patrimonio_equipamento_tamanho_diferente$', 'patrimonio_equipamento_tamanho_diferente'),
     (r'verificacao/copy_attribute_to_patrimonio$', 'copy_attribute_to_patrimonio'),
     
     

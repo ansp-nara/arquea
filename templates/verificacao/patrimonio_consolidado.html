@@ -4,18 +4,18 @@
 {% block content %}
 <style>
 
-th {
+ #table-data th {
     background-color: lightgray;
     border: 1px #aaa dotted;
 }
 
-td {
+ #table-data td {
     border:1px;
     border-color: lightgray;
     border-style: dotted;
 }
 
- .tr_warning {
+ #table-data  .tr_warning {
     background-color: lightyellow;
     
  }
@@ -24,7 +24,7 @@ td {
 <h1 repeat="1">Relatório de verificação de Patrimonios</h1>
     {% include "./verificacao/filter_tipo_patrimonio.html" %}
 
-    <table border="0" cellpadding="5">
+    <table border="0" cellpadding="5" id="table-data">
     {% if verificacoes %}
           <tr>
                <th>Verificação</th>
