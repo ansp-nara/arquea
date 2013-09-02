@@ -29,26 +29,26 @@ body.loading .modal {
     display: block;
 }
 
-th {
+ #table-data th {
     background-color: lightgray;
     border: 1px #aaa dotted;
 }
 
-td {
+ #table-data td {
     border:1px;
     border-color: lightgray;
     border-style: dotted;
 }
 
-.td_buttons {
+ #table-data .td_buttons {
     background-color: #eee;
 }
 
-.td_descricao,
-.td_part_number,
-.td_modelo,
-.td_marca,
-.td_ncm {
+ #table-data .td_descricao,
+ #table-data .td_part_number,
+ #table-data .td_modelo,
+ #table-data .td_marca,
+ #table-data .td_ncm {
     display:none;
 }
 
@@ -116,6 +116,7 @@ $(document).ready(function() {
            <th width="40%" class="td_modelo">Modelo</th>
            <th width="40%" class="td_marca">Marca</th>
            <th width="40%" class="td_ncm">NCM</th>
+           <th width="40%" class="td_tamanho">Tamanho</th>
            <th width="1%">&nbsp;</th>
            <th width="1%">ID</th>
            <th width="40%" class="td_descricao">Desc</th>
@@ -123,6 +124,7 @@ $(document).ready(function() {
            <th width="40%" class="td_modelo">Model</th>
            <th width="40%" class="td_marca">Marca</th>
            <th width="40%" class="td_ncm">NCM</th>
+           <th width="40%" class="td_tamanho">Tamanho</th>
            
       </tr>
     {% include "./verificacao/patrimonio_equipamento-table.html" %}

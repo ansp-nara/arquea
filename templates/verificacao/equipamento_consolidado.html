@@ -2,12 +2,12 @@
 {% load proto_tags %}
 {% block content %}
 <style>
-th {
+ #table-data th {
     background-color: lightgray;
     border: 1px #aaa dotted;
 }
 
-td {
+ #table-data td {
     border:1px;
     border-color: lightgray;
     border-style: dotted;
@@ -15,7 +15,7 @@ td {
 </style>
 <h1 repeat="1">Relatório de verificação de Equipamentos</h1>
 
-    <table border="0" cellpadding="5">
+    <table id="table-data" border="0" cellpadding="5">
     {% if verificacoes %}
           <tr>
                <th>Verificação</th>

@@ -287,6 +287,53 @@ class TestPatrimonioComEquipamentpoVazio(TestCase):
             
             self.assertEqual(len(retorno), 1)
             self.assertEqual(len(retorno[0]), 1)
+           
+           
+    """
+    Testa patrimonio e equipamentos com tamanhos diferente
+    """
+    def test_tamanho_diferente(self):
+            eq1 = Equipamento(id=1, part_number="", modelo="", marca="", descricao="", ncm="n1", tamanho=1.0) 
+            eq1.save()
+            eq2 = Equipamento(id=2, part_number="", modelo="", marca="", descricao="", ncm="") 
+            eq2.save()
+            eq3 = Equipamento(id=3, part_number="", modelo="", marca="", descricao="", ncm="n3", tamanho=1.0) 
+            eq3.save()
+        
+            tipo1 = Tipo()
+            tipo1.nome = 'tipo1'
+            tipo1.save()
+            tipo2 = Tipo()
+            tipo2.nome = 'tipo2'
+            tipo2.save()
+        
+            patr1 = Patrimonio(part_number="pt1", modelo="pt1", marca="pt1", descricao="pt1", ncm="n1", tamanho=1.0,  tipo=tipo1, equipamento=eq1)
+            patr1.save()
+            patr2 = Patrimonio(part_number="pt2", modelo="pt2", marca="pt2", descricao="pt2", ncm="", tipo=tipo1, equipamento=eq2)
+            patr2.save()
+            patr3 = Patrimonio(part_number="pt3", modelo="pt3", marca="pt3", descricao="pt3", ncm="n1111", tamanho=11.0, tipo=tipo2, equipamento=eq3)
+            patr3.save()
+            
+            verficacao = VerificacaoPatrimonioEquipamento()
+            retorno = verficacao.tamanhoDiferente()
+            
+            self.assertEqual(len(retorno), 1)
+            self.assertEqual(len(retorno[0]), 1)
+            
+            # check filter            
+            filtro = {"filtro_tipo_patrimonio":1}
+            retorno = verficacao.tamanhoDiferente(filtro)
+            
+            self.assertEqual(len(retorno), 1)
+            self.assertEqual(len(retorno[0]), 0)
+            
+            patr3.tipo = tipo1;
+            patr3.save()
+            
+            retorno = verficacao.tamanhoDiferente(filtro)
+            
+            self.assertEqual(len(retorno), 1)
+            self.assertEqual(len(retorno[0]), 1)
             
     """
     Testa a copia de atributos entre patrimonio e equipamento
