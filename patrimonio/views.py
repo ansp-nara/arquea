@@ -92,7 +92,7 @@ def escolhe_pagamento(request):
 	if not retorno:
 	    retorno = [{"pk":"0","valor":"Nenhum registro"}]
 	    
-	    json = simplejson.dumps(retorno)
+        json = simplejson.dumps(retorno)
     else:
         raise Http404
     return HttpResponse(json, mimetype="application/json")
@@ -411,6 +411,7 @@ def por_termo(request, pdf=0):
 
     termos = []
 
+    import pdb; pdb.set_trace()
     if agilis == '0':
         patrimonios = Patrimonio.objects.filter(agilis=False)
     elif agilis == '1':
