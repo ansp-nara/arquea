@@ -32,7 +32,7 @@ def ferias(context):
             continue
         ferias = ferias[0]
         final = ferias.inicio - timedelta(1)
-        final = datetime.date(final.year+1, final.month, final.day)
+        final = date(final.year+1, final.month, final.day)
         func['periodo'] = '%s a %s' % (ferias.inicio.strftime("%d/%m/%Y"), final.strftime("%d/%m/%Y"))
         try:
             cf = ferias.controleferias_set.get(oficial=True)
