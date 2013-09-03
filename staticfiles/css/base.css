@@ -255,7 +255,7 @@ td, th {
     padding: 3px 5px;
 }
 
-td a, th a {display:block; color:#134089; line-height:22px;}
+td a, th a {/*display:block;*/ color:#134089; line-height:22px;}
 td a:hover, th a:hover {color:#ff9900;}
 
 th {
