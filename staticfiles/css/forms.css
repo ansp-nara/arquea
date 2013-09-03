@@ -359,6 +359,7 @@ fieldset.monospace textarea {
     padding: 2px 0 0 0;
     width: 0;
     _position: relative;
+    visibility: hidden;
 }
 
 .inline-group .tabular th.original {

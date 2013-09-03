@@ -14,6 +14,37 @@ class HistoricoInline(admin.TabularInline):
     model = Historico
     extra = 1
 
+class FeriasInline(admin.TabularInline):
+    model = Ferias
+    extra = 1
+    fields = ('inicio', 'inicio_ferias', 'fim_ferias', 'realizado', 'link_edit')
+    readonly_fields = ('inicio_ferias', 'fim_ferias', 'link_edit')
+
+class DadoBancarioInline(admin.TabularInline):
+
+    """
+    Permite consulta por 'nome' do contato,
+                         'banco', 'agencia' e 'cc' do modelo DadoBancario.
+    """
+
+    fieldsets = (
+                 (None, {
+                     'fields': ('membro', ),
+                     'classes': ('wide',)
+                 }),
+                 (None, {
+                     'fields': ('banco', ('agencia', 'ag_digito', 'conta', 'cc_digito')),
+                     'classes': ('wide',)
+                 }),
+    )
+
+    #list_display = ('membro', 'banco', 'agencia_digito', 'conta_digito')
+
+    #search_fields = ['membro__nome', 'banco', 'agencia', 'cc']
+    
+    extra = 1
+    model = DadoBancario
+
 class MembroAdmin(admin.ModelAdmin):
 
     """
@@ -40,7 +71,7 @@ class MembroAdmin(admin.ModelAdmin):
     list_display_links = ('nome', )
 
     form = MembroAdminForm
-    inlines = [HistoricoInline]
+    inlines = [HistoricoInline, DadoBancarioInline, FeriasInline]
 
     list_per_page = 10
 
@@ -105,34 +136,6 @@ class FeriasAdmin(admin.ModelAdmin):
     search_fields = ['membro__nome', 'membro__cargo']
 
 admin.site.register(Ferias, FeriasAdmin)
-
-
-
-class DadoBancarioAdmin(admin.ModelAdmin):
-
-    """
-    Permite consulta por 'nome' do contato,
-                         'banco', 'agencia' e 'cc' do modelo DadoBancario.
-    """
-
-    fieldsets = (
-                 (None, {
-                     'fields': ('membro', ),
-                     'classes': ('wide',)
-                 }),
-                 (None, {
-                     'fields': ('banco', ('agencia', 'ag_digito', 'conta', 'cc_digito')),
-                     'classes': ('wide',)
-                 }),
-    )
-
-    list_display = ('membro', 'banco', 'agencia_digito', 'conta_digito')
-
-#    form = DadoBancarioAdminForm
-
-    search_fields = ['membro__nome', 'banco', 'agencia', 'cc']
-
-admin.site.register(DadoBancario, DadoBancarioAdmin)
 
 admin.site.register(Cargo)
 admin.site.register(TipoDispensa)

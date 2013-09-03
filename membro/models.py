@@ -8,6 +8,7 @@ from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from protocolo.models import Feriado
 from utils.models import NARADateField
+from django.core.urlresolvers import reverse
 
 
 
@@ -250,12 +251,31 @@ class Ferias(models.Model):
 
 
     membro = models.ForeignKey('membro.Membro', verbose_name=_(u'Membro'), limit_choices_to=Q(historico__funcionario=True)&Q(historico__termino__isnull=True))
-    inicio = NARADateField(_(u'Início'), help_text=_(u'Início do período de trabalho'))
+    inicio = NARADateField(_(u'Início do período aquisitivo'), help_text=_(u'Início do período de trabalho'))
     realizado = models.BooleanField(_(u'Férias já tiradas?'))
+
+    def save(self, *args, **kwargs):
+        self.inicio_ferias = self.inicio + timedelta(365)
+        self.fim_ferias = self.inicio_ferias + timedelta(365)
+        super(Ferias, self).save(*args, **kwargs)
 
     # Retorna o membro e o período de férias.
     def __unicode__(self):
         return u'%s | Início período: %s' % (self.membro, self.inicio.strftime('%d/%m/%Y'))
+
+    def inicio_ferias(self):
+        return (self.inicio + timedelta(365)).strftime('%d/%m/%Y')
+    inicio_ferias.short_description = u'Início do período para férias'
+
+    def fim_ferias(self):
+	return (self.inicio + timedelta(730)).strftime('%d/%m/%Y')
+    fim_ferias.short_description = u'Final do período para férias'
+
+    def link_edit(self):
+        if not self.id: return ''
+	return '<a href="%s?" target="_blank">Detalhes</a>' % reverse('admin:membro_ferias_change', args=[self.id])
+    link_edit.allow_tags = True
+    link_edit.short_description = u'Detalhes do período de férias'
 
     @property
     def trab_termino(self):
@@ -272,8 +292,8 @@ class Ferias(models.Model):
 
     # Diz se o prazo de aquisição das férias já foi completado
     def completo(self):
-        umano = datetime.date(self.inicio.year+1, self.inicio.month, self.inicio.day)
-        return umano <= datetime.datetime.now().date()
+        umano = date(self.inicio.year+1, self.inicio.month, self.inicio.day)
+        return umano <= datetime.now().date()
     completo.boolean = True
 
     # Define a descrição do modelo, ordenação e a unicidade dos dados.
@@ -281,6 +301,7 @@ class Ferias(models.Model):
         verbose_name = _(u'Férias')
         verbose_name_plural = _(u'Férias')
         unique_together = (('membro', 'inicio'),)
+        ordering = ('inicio',)
 
 
 class ControleFerias(models.Model):
