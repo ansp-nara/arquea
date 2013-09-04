@@ -92,13 +92,15 @@ def planilha_informacoes_tecnicas(request, id=None):
 
 @login_required
 def imprime_informacoes_gerais(request):
+    contatos = request.GET.get('contatos')
     info = []
     tecnicos = Identificacao.objects.filter(area__contains='Tec')
     asns = ASN.objects.all() #filter(pais='BR')
     blocos_ips = BlocoIP.objects.all()
     for e in Enlace.objects.filter(participante__entidade__entidadehistorico__ativo=True):
 	entidade = e.participante.entidade
-        contato_tec = tecnicos.filter(endereco__entidade=entidade)
+        if contatos: contato_tec = tecnicos.filter(endereco__entidade=entidade)
+        else: contato_tec = None
         asn = asns.filter(entidade=entidade)
         blocos = blocos_ips.filter(designado=entidade)
         operadoras = e.segmento_set.filter(data_desativacao__isnull=True)
