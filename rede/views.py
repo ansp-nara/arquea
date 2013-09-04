@@ -68,7 +68,7 @@ def planejamento(request, pdf=0):
 
 @login_required
 def planilha_informacoes_gerais(request):
-    info = Enlace.objects.all()
+    info = Enlace.objects.filter(participante__entidade__entidadehistorico__ativo=True)
     return TemplateResponse(request, 'rede/informacoes_gerais.html', {'info': info})
 
 @login_required
@@ -96,7 +96,7 @@ def imprime_informacoes_gerais(request):
     tecnicos = Identificacao.objects.filter(area__contains='Tec')
     asns = ASN.objects.all() #filter(pais='BR')
     blocos_ips = BlocoIP.objects.all()
-    for e in Enlace.objects.all():
+    for e in Enlace.objects.filter(participante__entidade__entidadehistorico__ativo=True):
 	entidade = e.participante.entidade
         contato_tec = tecnicos.filter(endereco__entidade=entidade)
         asn = asns.filter(entidade=entidade)
