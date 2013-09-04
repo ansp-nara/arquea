@@ -2,12 +2,24 @@
         {% for pt in pt_group %}
            <tr class="tr_data">
                <td><a href="{{ model.admin_url }}/admin/patrimonio/patrimonio/{{ pt.id }}/">{{ pt.id }}</a></td>
+           {% if atributo == 'descricao' %}
                <td class="td_descricao"><a href="{{ model.admin_url }}/admin/patrimonio/patrimonio/{{ pt.id }}/">{{ pt.descricao }}</a></td>
+           {% endif %}
+           {% if atributo == 'part_number' %}
                <td class="td_part_number"><a href="{{ model.admin_url }}/admin/patrimonio/patrimonio/{{ pt.id }}/">{{ pt.part_number }}</a></td>
+           {% endif %}
+           {% if atributo == 'modelo' %}
                <td class="td_modelo"><a href="{{ model.admin_url }}/admin/patrimonio/patrimonio/{{ pt.id }}/">{{ pt.modelo }}</a></td>
+           {% endif %}
+           {% if atributo == 'marca' %}
                <td class="td_marca"><a href="{{ model.admin_url }}/admin/patrimonio/patrimonio/{{ pt.id }}/">{{ pt.marca }}</a></td>
+           {% endif %}
+           {% if atributo == 'ncm' %}
                <td class="td_ncm"><a href="{{ model.admin_url }}/admin/patrimonio/patrimonio/{{ pt.id }}/">{{ pt.ncm }}</a></td>
+           {% endif %}
+           {% if atributo == 'tamanho' %}
                <td class="td_tamanho"><a href="{{ model.admin_url }}/admin/patrimonio/patrimonio/{{ pt.id }}/">{{ pt.tamanho }}</a></td>
+           {% endif %}
                <td class="td_buttons">
                     <span style="white-space:nowrap">
                         <button id="btn_to_pt_{{pt.id}}" type="button"  title="Copiar para o patrimonio" class="btn_to_pt"><<</button>
@@ -15,13 +27,24 @@
                     </span>
                </td>
                <td><a href="{{ model.admin_url }}/admin/patrimonio/equipamento/{{ pt.equipamento.id }}/">{{ pt.equipamento.id }}</a></td>
+           {% if atributo == 'descricao' %}
                <td class="td_descricao"><a href="{{ model.admin_url }}/admin/patrimonio/equipamento/{{ pt.equipamento.id }}/">{{ pt.equipamento.descricao }}</a></td>
+           {% endif %}
+           {% if atributo == 'part_number' %}
                <td class="td_part_number"><a href="{{ model.admin_url }}/admin/patrimonio/equipamento/{{ pt.equipamento.id }}/">{{ pt.equipamento.part_number }}</a></td>
+           {% endif %}
+           {% if atributo == 'modelo' %}
                <td class="td_modelo"><a href="{{ model.admin_url }}/admin/patrimonio/equipamento/{{ pt.equipamento.id }}/">{{ pt.equipamento.modelo }}</a></td>
+           {% endif %}
+           {% if atributo == 'marca' %}
                <td class="td_marca"><a href="{{ model.admin_url }}/admin/patrimonio/equipamento/{{ pt.equipamento.id }}/">{{ pt.equipamento.marca }}</a></td>
+           {% endif %}
+           {% if atributo == 'ncm' %}
                <td class="td_ncm"><a href="{{ model.admin_url }}/admin/patrimonio/equipamento/{{ pt.equipamento.id }}/">{{ pt.equipamento.ncm }}</a></td>
+           {% endif %}
+           {% if atributo == 'tamanho' %}
                <td class="td_tamanho"><a href="{{ model.admin_url }}/admin/patrimonio/equipamento/{{ pt.equipamento.id }}/">{{ pt.equipamento.tamanho }}</a></td>
-
+            {% endif %}
           </tr>
         {% endfor %}
     {% endfor %}

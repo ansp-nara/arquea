@@ -48,12 +48,14 @@ body.loading .modal {
  #table-data .td_part_number,
  #table-data .td_modelo,
  #table-data .td_marca,
- #table-data .td_ncm {
+ #table-data .td_ncm,
+ #table-data .td_tamanho
+  {
     display:none;
 }
 
 {% if atributo != '' %}
-    .td_{{ atributo }} {
+  #table-data .td_{{ atributo }} {
         display: table-cell;
     }
 {% endif %}
@@ -103,6 +105,7 @@ $(document).ready(function() {
 
 <h1 repeat="1">Relatório de verificação de equipamentos - {{ desc }}</h1>
     {% include "./verificacao/filter_tipo_patrimonio.html" %}
+    
     <table border="0" cellpadding="5" id="table-data">
       <tr>
         <th colspan="2">Patrimonio</th>
@@ -111,21 +114,44 @@ $(document).ready(function() {
       </tr>
       <tr>
            <th width="1%">ID</th>
+           {% if atributo == 'descricao' %}
            <th width="40%" class="td_descricao">Desc</th>
+           {% endif %}
+           {% if atributo == 'part_number' %}
            <th width="40%" class="td_part_number">Part Number</th>
+           {% endif %}
+           {% if atributo == 'modelo' %}
            <th width="40%" class="td_modelo">Modelo</th>
+           {% endif %}
+           {% if atributo == 'marca' %}
            <th width="40%" class="td_marca">Marca</th>
+           {% endif %}
+           {% if atributo == 'ncm' %}
            <th width="40%" class="td_ncm">NCM</th>
+           {% endif %}
+           {% if atributo == 'tamanho' %}
            <th width="40%" class="td_tamanho">Tamanho</th>
+           {% endif %}
            <th width="1%">&nbsp;</th>
            <th width="1%">ID</th>
+           {% if atributo == 'descricao' %}
            <th width="40%" class="td_descricao">Desc</th>
+           {% endif %}
+           {% if atributo == 'part_number' %}
            <th width="40%" class="td_part_number">Part Number</th>
+           {% endif %}
+           {% if atributo == 'modelo' %}
            <th width="40%" class="td_modelo">Model</th>
+           {% endif %}
+           {% if atributo == 'marca' %}
            <th width="40%" class="td_marca">Marca</th>
+           {% endif %}
+           {% if atributo == 'ncm' %}
            <th width="40%" class="td_ncm">NCM</th>
+           {% endif %}
+           {% if atributo == 'tamanho' %}
            <th width="40%" class="td_tamanho">Tamanho</th>
-           
+           {% endif %}
       </tr>
     {% include "./verificacao/patrimonio_equipamento-table.html" %}
     </table>
