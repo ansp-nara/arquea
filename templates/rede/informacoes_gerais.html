@@ -2,7 +2,11 @@
 {% block content %}
 <h2>Entidades ligadas à ANSP</h2>
 <form action="{% url rede.views.imprime_informacoes_gerais %}" method="GET">
-       <input type="submit" value="Versão para impressão" />
+       <input type="hidden" value="1" name="contatos" />
+       <input type="submit" value="Versão para impressão com contatos" />
+    </form>
+<form action="{% url rede.views.imprime_informacoes_gerais %}" method="GET">
+       <input type="submit" value="Versão para impressão sem contatos" />
     </form>
 <table>
 <tr>
