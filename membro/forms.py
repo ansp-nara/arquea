@@ -205,7 +205,7 @@ class ControleAdminForms(forms.ModelForm):
             tempo_de_trabalho = saida - entrada
             try:
 	        total_seconds = tempo_de_trabalho.total_seconds()
-            except AtributeError:
+            except AttributeError:
    	        total_seconds = tempo_de_trabalho.seconds + tempo_de_trabalho.days * 24 * 3600
 
             if total_seconds <= (almoco * 60):
