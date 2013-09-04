@@ -202,7 +202,12 @@ class ControleAdminForms(forms.ModelForm):
         # Checar se horario de almoço vai fazer as horas ficarem negativas 
         almoco = cleaned_data.get("almoco")
         tempo_de_trabalho = saida - entrada
-        if tempo_de_trabalho.total_seconds() <= (almoco * 60):
+        try:
+	    total_seconds = tempo_de_trabalho.total_seconds()
+        except AttributeError:
+	    total_seconds = tempo_de_trabalho.seconds + tempo_de_trabalho.days * 24 * 3600
+
+        if total_seconds <= (almoco * 60):
             msg = _(u"Período de trabalho menor que o tempo de almoço.")
             self._errors["almoco"] = self.error_class([msg])
             del cleaned_data["almoco"]
