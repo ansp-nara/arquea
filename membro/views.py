@@ -6,7 +6,7 @@ from datetime import date, timedelta, datetime
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect, Http404, HttpResponseForbidden
+from django.http import HttpResponseRedirect, Http404, HttpResponseForbidden, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
 from forms import *
@@ -15,6 +15,7 @@ from protocolo.models import Feriado
 from utils.functions import render_to_pdf
 import calendar
 import logging
+import json as simplejson
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -103,89 +104,94 @@ def mensal_func(request):
 	    raise Http404
         ano = request.GET.get('ano')
         mes = request.GET.get('mes')
-        controles = Controle.objects.filter(membro=funcionario)
-        if ano > '0': controles = controles.filter(entrada__year=ano)
-        if mes > '0': controles = controles.filter(entrada__month=mes)
- 
-        mes = 'acb'
-        if controles.count() > 0:
-            for c in controles:
-                m = c.entrada.strftime('%m/%Y')
-                if m != mes:
-                    cm = [c]
-                    mes = m
-                    meses.append({'mes':mes, 'controles':cm})
-                else:
-		    cm.append(c)
-
-        total_horas_periodo = 0
-        for m in meses:
-
-            # total de horas trabalhadas	        
-            total = sum([c.segundos() for c in m['controles']])
-            total_str = '%2dh%2dmin' % (total/3600, total/60%60)
-            m.update({'total':total_str})
-
-            feriados = Feriado.objects.filter(feriado__year=c.entrada.year, feriado__month=c.entrada.month)
-            
-            folgas = DispensaLegal.objects.filter(membro=funcionario)
-         
-            # ferias_ini < mes_ini < ferias_fim  OR  mes_ini < ferias_ini < mes_fim
-            mes_corrente_ini = date(c.entrada.year, c.entrada.month, 01)
-            mes_corrente_fim = date(c.entrada.year, c.entrada.month, 01) + timedelta(calendar.monthrange(c.entrada.year, c.entrada.month)[1])
-            ferias = ControleFerias.objects.filter(Q(inicio__lte=mes_corrente_ini, termino__gte=mes_corrente_ini) |
-                                                   Q(inicio__gte=mes_corrente_ini, inicio__lte=mes_corrente_fim),
-                                                   ferias__membro__id=funcionario)
-            
-            # int com o total de dias de trabalho (business day) no mes
-            soma_dias_de_trabalho = 0
-            # flag somente para a soma de dias durante o while. Sai quando trocar o mes
-            date_flag = mes_corrente_ini
-            while date_flag.month == c.entrada.month:
-            
-                # é final de semana?
-                is_final_de_semana = date_flag.weekday() >= 5;
-                
-                # é feriado?
-                is_feriado = False
-                for feriado_dia in feriados:
-                    is_feriado = is_feriado or (date_flag == feriado_dia.feriado)
-
-                # é folga?
-                is_folga = False
-                for folga in folgas:
-                    # gera um range de dias entre o período de início e final de folga
-                    if folga.inicio_realizada == folga.termino_realizada:
-                        is_folga = is_folga or (date_flag == folga.inicio_realizada)
-                    else:
-                        periodo_folga = (folga.inicio_realizada + timedelta(days=d) for d in range((folga.termino_realizada - folga.inicio_realizada).days + 1))
-                        for dia_folga in periodo_folga:
-                            is_folga = is_folga or (date_flag == dia_folga)
-
-                # soma os dias de trabalho
-                if not is_final_de_semana and not is_feriado and not is_folga:
-                    soma_dias_de_trabalho = soma_dias_de_trabalho + 1
-#                 else:
-#                     logger.debug("nao e dia util =" + str(date_flag)
-#                                  + (" is_final_de_semana=" + str(is_final_de_semana) if is_final_de_semana else "") 
-#                                  + (" is_feriado=" + str(is_feriado) if is_feriado else "") 
-#                                  + (" is_folga=" + str(is_folga) if is_folga else "")
-#                     )
-                
-                date_flag = date_flag + timedelta(days=1)
-                
-            
-            # as horas totais do período são as horas do total de dias do mes menos os finais de semana, ferias e folgas
-            total_horas_periodo = (soma_dias_de_trabalho * 8 * 60 * 60)
-            total_horas_periodo_str = '%2dh%2dmin' % (total_horas_periodo/3600, total_horas_periodo/60%60)
-            
-            total_horas_restante = total_horas_periodo - total;
-            total_horas_restante_str = '%2dh%2dmin' % (total_horas_restante/3600, total_horas_restante/60%60)
-            
-            m.update({'total_horas_periodo':total_horas_periodo_str})
-            m.update({'total_horas_restante':total_horas_restante_str})
         
-        return TemplateResponse(request, 'membro/detalhe.html', {'meses':meses, 'membro':membro})
+        
+        
+        c = Controle.objects.filter(membro=funcionario)[:1].get()
+#         
+
+        logger.debug("chamando total geral")
+        # Contagem de total geral do funcionario
+        total_meses = c.total_analitico_horas(0, 0)
+        total_geral_banco_horas = 0
+        for m in total_meses:
+             # soma horas extras somente dos meses que não forem o mês em andamento
+             total_geral_banco_horas += m['total_banco_horas']
+              
+        if total_geral_banco_horas >= 0:
+            total_geral_banco_horas_str = '%2dh %02dmin' % (total_geral_banco_horas/3600, total_geral_banco_horas/60%60)
+        else:
+            total_geral_banco_horas_str = '-%2dh %02dmin' % (-total_geral_banco_horas/3600, -total_geral_banco_horas/60%60)
+        total_geral_ferias = Ferias().total_dias_uteis_aberto(funcionario)
+        total_geral_ferias_str = '%2dh %02dmin' % (total_geral_ferias/3600, total_geral_ferias/60%60)
+#         
+
+        logger.debug("chamando total por filtro")
+        meses = c.total_analitico_horas(ano, mes)
+        
+        total_banco_horas = 0
+        total_horas = 0
+        total_horas_periodo = 0
+        total_horas_restante = 0
+        total_horas_dispensa = 0
+        total_horas_ferias = 0
+         
+        for m in meses:
+                        
+            # total de horas trabalhadas
+            total_horas += m['total']
+            total_str = '%2dh %02dmin' % (m['total']/3600, m['total']/60%60)
+            m.update({'total':total_str})
+             
+            # as horas totais do período são as horas do total de dias do mes menos os finais de semana, ferias e dispensas
+            total_horas_periodo += m['total_horas_periodo']
+            total_horas_periodo_str = '%2dh %02dmin' % (m['total_horas_periodo']/3600, m['total_horas_periodo']/60%60)
+            m.update({'total_horas_periodo':total_horas_periodo_str})
+             
+            total_horas_restante += m['total_horas_restante']
+            if m['total_horas_restante'] >= 0:
+                total_horas_restante_str = '%02dh %02dmin' % (m['total_horas_restante']/3600.0, m['total_horas_restante']/60%60)
+            else:
+                total_horas_restante_str = '-%02dh %02dmin' % (-m['total_horas_restante']/3600.0, -m['total_horas_restante']/60%60)
+            m.update({'total_horas_restante':total_horas_restante_str})
+            
+            total_horas_ferias += m['total_horas_ferias']
+            total_horas_ferias_str = '%2dh %02dmin' % (m['total_horas_ferias']/3600, m['total_horas_ferias']/60%60)
+            m.update({'total_horas_ferias':total_horas_ferias_str})
+            
+            total_horas_dispensa += m['total_horas_dispensa']
+            total_horas_dispensa_str = '%2dh %02dmin' % (m['total_horas_dispensa']/3600, m['total_horas_dispensa']/60%60)
+            m.update({'total_horas_dispensa':total_horas_dispensa_str})
+                         # soma horas extras somente dos meses que não forem o mês em andamento
+            total_banco_horas += m['total_banco_horas']
+            if m['total_banco_horas'] >= 0:
+                total_banco_horas_str = '%2dh %02dmin' % (m['total_banco_horas']/3600, m['total_banco_horas']/60%60)
+            else:
+                total_banco_horas_str = '-%2dh %02dmin' % (-m['total_banco_horas']/3600, -m['total_banco_horas']/60%60)
+            m.update({'total_banco_horas':total_banco_horas_str})
+            
+        
+        if total_horas_restante >= 0:
+             total_horas_restante_str = '%2dh %02dmin' % (total_horas_restante/3600, total_horas_restante/60%60)
+        else:
+             total_horas_restante_str = '-%2dh %02dmin' % (-total_horas_restante/3600, -total_horas_restante/60%60)
+             
+        if total_banco_horas >= 0:
+             total_banco_horas_str = '%2dh %02dmin' % (total_banco_horas/3600, total_banco_horas/60%60)
+        else:
+             total_banco_horas_str = '-%2dh %02dmin' % (-total_banco_horas/3600, -total_banco_horas/60%60)
+        
+        
+        total_horas_str = '%2dh %02dmin' % (total_horas/3600, total_horas/60%60)
+        total_horas_periodo_str = '%2dh %02dmin' % (total_horas_periodo/3600, total_horas_periodo/60%60)
+        total_horas_dispensa_str = '%2dh %02dmin' % (total_horas_dispensa/3600, total_horas_dispensa/60%60)
+        total_horas_ferias_str = '%2dh %02dmin' % (total_horas_ferias/3600, total_horas_ferias/60%60)
+        
+        return TemplateResponse(request, 'membro/detalhe.html', {'meses':meses, 'membro':membro, 'total_banco_horas':total_banco_horas_str,
+                                'total_horas':total_horas_str, 'total_horas_periodo':total_horas_periodo_str,
+                                'total_horas_restante':total_horas_restante_str, 'total_horas_dispensa':total_horas_dispensa_str,
+                                'total_horas_ferias':total_horas_ferias_str,
+                                'total_geral_banco_horas':total_geral_banco_horas_str, 'total_geral_ferias':total_geral_ferias_str})
     else:
         hoje = datetime.now()
         anos = [0]+range(2012, hoje.year+1)
@@ -210,4 +216,23 @@ def observacao(request, id):
     else:
         f = ControleObs(instance=controle)
         return TemplateResponse(request, 'membro/observacao.html', {'form':f})
+
+
+@login_required
+def controle_mudar_almoco(request):
+    controle_id = request.GET.get('id')
+    almoco = request.GET.get('almoco')
+    
+#     if request.user.is_superuser == False or not controle_id:
+    if not controle_id: 
+        raise Http404
+    
+    controle = get_object_or_404(Controle, pk=controle_id)
+    controle.almoco_devido = True
+    controle.almoco = almoco
+    controle.save()
+    
+    json = simplejson.dumps('ok')
+    return HttpResponse(json, mimetype="application/json")
+
 

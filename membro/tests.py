@@ -12,9 +12,14 @@ from django.db.models import Q
 from django.test import TestCase
 from django.utils import timezone
 from membro.models import Controle, Membro, Ferias, ControleFerias, \
-    DispensaLegal
+    DispensaLegal, TipoDispensa
 from protocolo.models import Feriado
 import calendar
+
+import logging
+
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
 
 class SimpleTest(TestCase):
     def test_basic_addition(self):
@@ -60,6 +65,28 @@ class MembroControleTest(TestCase):
                             almoco_devido=False, almoco=60)
         self.assertEquals(controle.segundos(), 9 * 60 * 60, 'Deveria ser 32400 mas e ' + str(controle.segundos()))
         
+
+    def test_controle_permanencia_sem_almoco(self):
+        """
+        Teste de permanencia em um dia sem almoco
+        """
+        membro = Membro(id=1, nome='teste')
+        membro.save()
+        
+        controle = Controle(id=1, membro=membro, entrada=timezone.now(), saida=timezone.now()+timedelta(hours=48), 
+                            almoco_devido=False, almoco=60)
+        controle.save()
+        
+        controle = Controle.objects.get(id=1)
+        
+        print controle.entrada
+        print controle.saida
+        print controle.saida-controle.entrada
+        print (controle.saida-controle.entrada).total_seconds()
+        
+        #self.assertEquals(controle.segundos(), 48 * 60 * 60)
+
+
 class MembroControleHorarioTest(TestCase):
     
     def create_ferias(self, ano_corrente, mes_corrente, ferias_data_inicio, ferias_data_fim):
@@ -138,6 +165,29 @@ class MembroControleHorarioTest(TestCase):
         self.assertEqual(controleFerias.count(), 0)
         
 class DispensaLegalTest(TestCase):
+    def test_dia_dispensa_mesmo_dia(self):
+        membro = Membro(id=1)
+        membro.save()
+        
+        tipo = TipoDispensa()
+        tipo.save()
+        # a data é uma sexta-feira
+        dispensaLegal = DispensaLegal(membro=membro, tipo=tipo, dias_uteis=1, inicio_realizada=date(2013,07,19), inicio_direito=date(2013,07,19))
+        dispensaLegal.save()
+        
+        dispensa = DispensaLegal().dia_dispensa(1, date(2013,07,19))
+        
+        self.assertEqual(dispensa['is_dispensa'], True)
+        self.assertEqual(dispensa['horas'], 8)
+        
+        
+    def test_dia_dispensa_dia_diferente(self):
+        # a data é uma sexta-feira
+        dispensaLegal = DispensaLegal(dias_uteis=3, inicio_realizada=date(2013,07,19))
+        # dispensa para sexta, segunda, terca
+        self.assertEqual(dispensaLegal.termino_realizada.weekday(), 1)
+
+
     def test_data_termino_realizada_fim_semana(self):
         # a data é uma sexta-feira
         dispensaLegal = DispensaLegal(dias_uteis=3, inicio_realizada=date(2013,07,19))
@@ -186,3 +236,27 @@ class DispensaLegalTest(TestCase):
         dispensaLegal = DispensaLegal(dias_uteis=3, inicio_realizada=date(2013,07,19))
         # dispensa para sexta, segunda, terca
         self.assertEqual(dispensaLegal.termino_realizada.weekday(), 1)
+        
+        
+class FeriasTest(TestCase):
+    def test_total_dias_uteis_aberto(self):
+        """
+        Teste de permanencia para um dia com almoço normal de uma hora
+        """
+        membro = Membro(id=1, nome='teste')
+        membro.save()
+        
+        ferias = Ferias(id=10, membro=membro, inicio=datetime.now())
+        ferias.save()
+        
+        controleFerias = ControleFerias(ferias=ferias, termino=datetime.now(), inicio=datetime.now(), dias_uteis_fato=20, dias_uteis_aberto=10)
+        controleFerias.save()
+        controleFerias = ControleFerias(ferias=ferias, termino=datetime.now(), inicio=datetime.now(), dias_uteis_fato=0, dias_uteis_aberto=30)
+        controleFerias.save()
+        controleFerias = ControleFerias(ferias=ferias, termino=datetime.now(), inicio=datetime.now(), dias_uteis_fato=0, dias_uteis_aberto=30)
+        controleFerias.save()
+        controleFerias = ControleFerias(ferias=ferias, termino=datetime.now(), inicio=datetime.now(), dias_uteis_fato=30, dias_uteis_aberto=0)
+        controleFerias.save()
+        
+        self.assertEquals(Ferias().total_dias_uteis_aberto(1), 20)
+
