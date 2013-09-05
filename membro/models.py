@@ -309,8 +309,6 @@ class Ferias(models.Model):
             if c.dias_uteis_fato and not c.oficial:
                 total_dias_uteis_aberto = total_dias_uteis_aberto - c.dias_uteis_fato
 
-        logger.debug('total_dias_uteis_aberto %s', total_dias_uteis_aberto)
-
         return total_dias_uteis_aberto * 8 * 60 * 60
     
     def dia_ferias(self, membro_id, dia):
@@ -626,12 +624,14 @@ class Controle(models.Model):
         
         if ano and ano.isdigit() and int(ano) > 0:
             controles = controles.filter(entrada__year=ano)
+            
         if mes and mes.isdigit() and int(mes) > 0: 
             controles = controles.filter(entrada__month=mes)
-
+            
         meses = []
-        mes_anterior = date(1979, 12, 12)
-        dia_anterior = date(1979, 12, 12)
+        mes_anterior = date(1979, 01, 01)
+        dia_anterior = date(1979, 01, 01)
+        
         if controles.count() > 0:
             controleAcumuladorDia = []
             
@@ -641,12 +641,12 @@ class Controle(models.Model):
                 m = c.entrada
                 d = c.entrada
                 
-                if m.month != mes_anterior.month:
+                if m.month != mes_anterior.month or m.year != mes_anterior.year:
                     dias = []
                     meses.append({'mes':m.month, 'ano': m.year, 'dias':dias, 'total':0})
                     mes_anterior = m
                 
-                if d.day != dia_anterior.day:
+                if d.day != dia_anterior.day or d.month != dia_anterior.month or d.year != dia_anterior.year:
                     controleAcumuladorDia = [c]
                     itemControle = ItemControle()
                     itemControle.dia = date(d.year, d.month, d.day) 
@@ -657,7 +657,6 @@ class Controle(models.Model):
                 else:
                     controleAcumuladorDia.append(c)
                     
-                
         total_banco_horas = 0;
         
         for m in meses:

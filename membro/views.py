@@ -106,11 +106,9 @@ def mensal_func(request):
         mes = request.GET.get('mes')
         
         
-        
         c = Controle.objects.filter(membro=funcionario)[:1].get()
 #         
 
-        logger.debug("chamando total geral")
         # Contagem de total geral do funcionario
         total_meses = c.total_analitico_horas(0, 0)
         total_geral_banco_horas = 0
@@ -125,8 +123,6 @@ def mensal_func(request):
         total_geral_ferias = Ferias().total_dias_uteis_aberto(funcionario)
         total_geral_ferias_str = '%2dh %02dmin' % (total_geral_ferias/3600, total_geral_ferias/60%60)
 #         
-
-        logger.debug("chamando total por filtro")
         meses = c.total_analitico_horas(ano, mes)
         
         total_banco_horas = 0
