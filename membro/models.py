@@ -606,7 +606,7 @@ class Controle(models.Model):
             segundos_trabalhados = delta.total_seconds()
         except AttributeError:
             #### AJUSTE PARA O PYTHON < 2.7
-            total_seconds = delta.seconds + delta.days * 24 * 3600
+            segundos_trabalhados = delta.seconds + delta.days * 24 * 3600
         
         if self.almoco_devido:
             segundos_trabalhados = segundos_trabalhados - (self.almoco * 60)
