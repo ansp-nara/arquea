@@ -604,7 +604,7 @@ class Controle(models.Model):
         try:
             #### PYTHON 2.7
             segundos_trabalhados = delta.total_seconds()
-        except AtributeError:
+        except AttributeError:
             #### AJUSTE PARA O PYTHON < 2.7
             total_seconds = delta.seconds + delta.days * 24 * 3600
         
