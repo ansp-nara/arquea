@@ -199,19 +199,26 @@ class ControleAdminForms(forms.ModelForm):
             del cleaned_data["entrada"]
             del cleaned_data["saida"]
 
-        # Checar se horario de almoço vai fazer as horas ficarem negativas 
         if saida:
             almoco = cleaned_data.get("almoco")
             tempo_de_trabalho = saida - entrada
             try:
-	        total_seconds = tempo_de_trabalho.total_seconds()
+	            total_seconds = tempo_de_trabalho.total_seconds()
             except AttributeError:
-   	        total_seconds = tempo_de_trabalho.seconds + tempo_de_trabalho.days * 24 * 3600
+   	            total_seconds = tempo_de_trabalho.seconds + tempo_de_trabalho.days * 24 * 3600
+                   
+            # se for mais que 20h de trabalho
+            if total_seconds > 72000:
+                msg = _(u"Período de trabalho maior que 20h.")
+                self._errors["saida"] = self.error_class([msg])
+                del cleaned_data["saida"]
 
-            if total_seconds <= (almoco * 60):
+            # Checar se horario de almoço vai fazer as horas ficarem negativas 
+            if almoco and total_seconds <= (almoco * 60):
                 msg = _(u"Período de trabalho menor que o tempo de almoço.")
                 self._errors["almoco"] = self.error_class([msg])
                 del cleaned_data["almoco"]
+                
         
         # Always return the full collection of cleaned data.
         return cleaned_data

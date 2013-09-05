@@ -4,19 +4,20 @@
 from datetime import timedelta, datetime, date
 from dateutil.relativedelta import *
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, Sum
 from django.utils.translation import ugettext_lazy as _
 from protocolo.models import Feriado
 from utils.models import NARADateField
+import calendar
+import logging
+#from utils.models import CPFField
+#######
 from django.core.urlresolvers import reverse
 
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
 
 
-
-#from utils.models import CPFField
-
-
-#######
 class CPFField(models.CharField):
     """
     """
@@ -111,8 +112,8 @@ class Membro(models.Model):
     # Retorna o nome e o cargo.
     def __unicode__(self):
         if self.cargo_atual():
-            return '%s (%s)' % (self.nome, self.cargo_atual())
-        return '%s' % (self.nome)
+            return u'%s (%s)' % (self.nome, self.cargo_atual())
+        return u'%s' % (self.nome)
 
 
     # Verifica se o campo ramal está preenchido.
@@ -187,7 +188,7 @@ class Usuario(models.Model):
 
     # Retorna o usuário.
     def __unicode__(self):
-        return '%s' % (self.username)
+        return u'%s' % (self.username)
 
 
     # Define a descrição do modelo, a ordenação e a unicidade dos dados.
@@ -248,8 +249,6 @@ class Ferias(models.Model):
     """
     Controle de período aquisitivo para as férias
     """
-
-
     membro = models.ForeignKey('membro.Membro', verbose_name=_(u'Membro'), limit_choices_to=Q(historico__funcionario=True)&Q(historico__termino__isnull=True))
     inicio = NARADateField(_(u'Início do período aquisitivo'), help_text=_(u'Início do período de trabalho'))
     realizado = models.BooleanField(_(u'Férias já tiradas?'))
@@ -295,6 +294,37 @@ class Ferias(models.Model):
         umano = date(self.inicio.year+1, self.inicio.month, self.inicio.day)
         return umano <= datetime.now().date()
     completo.boolean = True
+    
+    # Retorna o total de dias em aberto para o membro
+    def total_dias_uteis_aberto(self, membro_id):
+        total_dias_uteis_aberto = 0
+        
+        
+        controleFerias = ControleFerias.objects.filter(ferias__membro=membro_id)
+        for c in controleFerias:
+            
+            if c.dias_uteis_aberto:
+                total_dias_uteis_aberto = total_dias_uteis_aberto + c.dias_uteis_aberto
+                
+            if c.dias_uteis_fato and not c.oficial:
+                total_dias_uteis_aberto = total_dias_uteis_aberto - c.dias_uteis_fato
+
+        logger.debug('total_dias_uteis_aberto %s', total_dias_uteis_aberto)
+
+        return total_dias_uteis_aberto * 8 * 60 * 60
+    
+    def dia_ferias(self, membro_id, dia):
+        ferias = ControleFerias.objects.filter(ferias__membro__id=membro_id)
+
+        # verifica se tem algum período de férias com dias úteis tirados de fato
+        # não deve entrar na conta se forem período de férias com venda de dias, ou somente marcação de vencimento de férias
+        is_ferias = False
+        for controle_ferias in ferias:
+            if controle_ferias.dias_uteis_fato > 0:
+                is_ferias =  is_ferias or (controle_ferias.inicio <= dia <= controle_ferias.termino)
+                if is_ferias:
+                    break
+        return is_ferias
 
     # Define a descrição do modelo, ordenação e a unicidade dos dados.
     class Meta:
@@ -319,7 +349,7 @@ class ControleFerias(models.Model):
     dias_uteis_aberto = models.IntegerField(_(u'Dias úteis em aberto'))
 
     def __unicode__(self):
-	return "%s - %s" % (self.inicio, self.termino)
+	return u"%s - %s" % (self.inicio, self.termino)
 
     class Meta:
         verbose_name = _(u'Controle de férias')
@@ -329,7 +359,7 @@ class TipoDispensa(models.Model):
     nome = models.CharField(max_length=100)
 
     def __unicode__(self):
-        return '%s' % self.nome
+        return u'%s' % self.nome
 
 class DispensaLegal(models.Model):
     """
@@ -346,12 +376,12 @@ class DispensaLegal(models.Model):
     arquivo = models.FileField(upload_to='dispensas/', null=True, blank=True)
 
     def __unicode__(self):
-        return "%s - %s" % (self.membro, self.justificativa)
+        return u"%s - %s" % (self.membro, self.justificativa)
     
     @property
     def termino_realizada(self):
         """
-        Calcula a data de termino da dispensa, discontado o sábado e o domingo
+        Calcula a data de termino da dispensa, descontado o sábado e o domingo
         Leva em conta os feriados.
         """
         feriados = Feriado.objects.all().filter(feriado__gte = date(self.inicio_realizada.year, self.inicio_realizada.month, 1))
@@ -376,7 +406,26 @@ class DispensaLegal(models.Model):
         else:
             return self.inicio_realizada
         
+    @classmethod
+    def dia_dispensa(self, membro_id, dia):
+        is_dispensa = False
+        horas_dispensa = 0
+
+        dispensas = DispensaLegal.objects.filter(membro=membro_id)
+        for dispensa in dispensas:
+            if dispensa.inicio_realizada == dispensa.termino_realizada:
+                is_dispensa = is_dispensa or (dia == dispensa.inicio_realizada)
+            else:
+                # gera um range de dias entre o período de início e final de dispensa
+                periodo_dispensa = (dispensa.inicio_realizada + timedelta(days=d_dispensa) for d_dispensa in range((dispensa.termino_realizada - dispensa.inicio_realizada).days + 1))
+                for dia_dispensa in periodo_dispensa:
+                    is_dispensa = is_dispensa or (dia == dia_dispensa)
         
+        if is_dispensa:
+            # **** ALTERAR PARA HORAS
+            horas_dispensa = 8
+                
+        return {'is_dispensa':is_dispensa, 'horas':horas_dispensa}
 
     class Meta:
         verbose_name = _(u'Dispensa')
@@ -449,14 +498,14 @@ class DadoBancario(models.Model):
     # Retorna o banco, a agência e o número da conta.
     def __unicode__(self):
         if self.ag_digito:
-            ag = '%s-%s' % (self.agencia, self.ag_digito)
+            ag = u'%s-%s' % (self.agencia, self.ag_digito)
         else:
-            ag = '%s' % (self.agencia)
+            ag = u'%s' % (self.agencia)
 
         if self.cc_digito:
-            cc = '%s-%s' % (self.conta, self.cc_digito)
+            cc = u'%s-%s' % (self.conta, self.cc_digito)
         else:
-            cc = '%s' % (self.conta)
+            cc = u'%s' % (self.conta)
 
         return u'%s AG. %s CC %s' % (self.banco, ag, cc)
 
@@ -495,7 +544,7 @@ class Cargo(models.Model):
     hierarquia = models.IntegerField(null=True, blank=True)
 
     def __unicode__(self):
-        return '%s' % self.nome
+        return u'%s' % self.nome
 
     class Meta:
         ordering = ('nome',)
@@ -516,7 +565,7 @@ class Historico(models.Model):
     ativos = AtivoManager()
  
     def __unicode__(self):
-        return '%s - %s' % (self.membro.nome, self.cargo.nome)
+        return u'%s - %s' % (self.membro.nome, self.cargo.nome)
 
     def ativo(self):
         return self.termino is None
@@ -531,7 +580,7 @@ class Arquivo(models.Model):
     arquivo = models.FileField(upload_to='membro')
 
     def __unicode__(self):
-        return '%s - %s' % (self.membro.nome, self.arquivo.name)
+        return u'%s - %s' % (self.membro.nome, self.arquivo.name)
 
 
 class Controle(models.Model):
@@ -542,24 +591,175 @@ class Controle(models.Model):
     almoco_devido = models.BooleanField(_(u'Hora de almoço devida?'), default=True)
     almoco = models.IntegerField(_(u'Tempo de almoço em minutos'), null=True, blank=True, default=60)
 
-
     def __unicode__(self):
         if self.saida:
-            return '%s - de %s a %s' % (self.membro, self.entrada, self.saida)
+            return u'%s - de %s a %s' % (self.membro, self.entrada, self.saida)
         else:
-            return '%s - %s' % (self.membro, self.entrada)
+            return u'%s - %s' % (self.membro, self.entrada)
 
     def segundos(self):
         if not self.saida: return 0
         delta = self.saida-self.entrada
-        segundos_trabalhados = delta.seconds
+        
+        try:
+            #### PYTHON 2.7
+            segundos_trabalhados = delta.total_seconds()
+        except AtributeError:
+            #### AJUSTE PARA O PYTHON < 2.7
+            total_seconds = delta.seconds + delta.days * 24 * 3600
+        
         if self.almoco_devido:
             segundos_trabalhados = segundos_trabalhados - (self.almoco * 60)
             
         return segundos_trabalhados
+    
+    def hora_almoco(self):
+        if self.almoco:
+            return self.almoco * 60
+        else:
+            return 0
+        
+    
+    def total_analitico_horas(self, ano, mes):
+        
+        controles = Controle.objects.all().filter(membro=self.membro.id)
+        
+        if ano and ano.isdigit() and int(ano) > 0:
+            controles = controles.filter(entrada__year=ano)
+        if mes and mes.isdigit() and int(mes) > 0: 
+            controles = controles.filter(entrada__month=mes)
+
+        meses = []
+        mes_anterior = date(1979, 12, 12)
+        dia_anterior = date(1979, 12, 12)
+        if controles.count() > 0:
+            controleAcumuladorDia = []
+            
+            dias = []
+            
+            for i, c in enumerate(controles):
+                m = c.entrada
+                d = c.entrada
+                
+                if m.month != mes_anterior.month:
+                    dias = []
+                    meses.append({'mes':m.month, 'ano': m.year, 'dias':dias, 'total':0})
+                    mes_anterior = m
+                
+                if d.day != dia_anterior.day:
+                    controleAcumuladorDia = [c]
+                    itemControle = ItemControle()
+                    itemControle.dia = date(d.year, d.month, d.day) 
+                    itemControle.controles = controleAcumuladorDia
+                    dias.append(itemControle)
+                    
+                    dia_anterior = d
+                else:
+                    controleAcumuladorDia.append(c)
+                    
+                
+        total_banco_horas = 0;
+        
+        for m in meses:
+            total_segundos_trabalhos_mes = 0
+            # int com o total de dias de trabalho (business day) no mes
+            soma_dias_de_trabalho = 0
+            # total de horas de dispensas
+            total_horas_dispensa = 0
+             
+            # total de horas de ferias
+            total_horas_ferias = 0
+            
+            # ferias_ini < mes_ini < ferias_fim  OR  mes_ini < ferias_ini < mes_fim
+            mes_corrente_ini = date(m['ano'], m['mes'], 01)
+            mes_corrente_fim = mes_corrente_ini + timedelta(calendar.monthrange(m['ano'], m['mes'], )[1])
+
+            for d in m['dias']:
+                # total de horas trabalhadas            
+                total_segundos_trabalhos_mes = total_segundos_trabalhos_mes + sum([c.segundos() for c in d.controles])
+            m.update({'total':total_segundos_trabalhos_mes})
+                
+            d = mes_corrente_ini
+            
+            while d < mes_corrente_fim:
+                # verifica se tem algum período de férias com dias úteis tirados de fato
+                # não deve entrar na conta se forem período de férias com venda de dias, ou somente marcação de vencimento de férias
+                is_ferias = Ferias().dia_ferias(self.membro.id, d)
+                      
+                # é final de semana?
+                is_final_de_semana = d.weekday() >= 5;
+                  
+                # é feriado?
+                is_feriado = Feriado().dia_de_feriado(d)
+  
+                # é dispensa?
+                dia_dispensa = DispensaLegal().dia_dispensa(self.membro.id, d)
+                is_dispensa = dia_dispensa['is_dispensa']
+                horas_dispensa = dia_dispensa['horas']
+                                     
+                # soma os dias de trabalho
+                if not is_final_de_semana and not is_feriado:
+                    # conta as horas de dispensas 
+                    if is_dispensa:
+                        total_horas_dispensa += horas_dispensa * 60 * 60
+                    # conta as horas de ferias
+                    if is_ferias:
+                        total_horas_ferias += 8 * 60 * 60
+              
+                d += timedelta(days=1)
+                        
+            # as horas totais do período são as horas do total de dias do mes menos os finais de semana, ferias e dispensas
+            total_horas_periodo = self.total_horas_uteis(mes_corrente_ini, mes_corrente_fim)
+            m.update({'total_horas_periodo':total_horas_periodo})
+            
+            total_horas_restante = total_horas_periodo -total_horas_dispensa -total_horas_ferias - total_segundos_trabalhos_mes;
+             
+            m.update({'total_horas_restante':total_horas_restante})
+            m.update({'total_horas_dispensa':total_horas_dispensa})
+            m.update({'total_horas_ferias':total_horas_ferias})
+             
+             
+            # soma horas extras somente dos meses que não forem o mês em andamento
+            total_banco_horas = 0
+            if datetime.now().year != c.entrada.year or datetime.now().month != c.entrada.month:
+                total_banco_horas = -total_horas_restante
+            m.update({'total_banco_horas':total_banco_horas})
+#         
+        return meses
+    
+    @classmethod
+    def total_horas_uteis(self, data_ini, data_fim):
+        soma_dias_de_trabalho = 0
+        
+        d = data_ini
+        while d < data_fim:
+             # é final de semana?
+             is_final_de_semana = d.weekday() >= 5;
+               
+             # é feriado?
+             is_feriado = Feriado().dia_de_feriado(d)
+             
+             # soma os dias de trabalho
+             if not is_final_de_semana and not is_feriado:
+                 soma_dias_de_trabalho = soma_dias_de_trabalho + 1
+                   
+             d += timedelta(days=1)
+                     
+        # as horas totais do período são as horas do total de dias do mes menos os finais de semana, ferias e dispensas
+        total_horas_periodo = (soma_dias_de_trabalho * 8 * 60 * 60)
+             
+        return total_horas_periodo
 
     class Meta:
         ordering = ('-entrada',)
 
     def permanencia(self):
-	return '%2dh%2dmin' % (self.segundos()/3600, self.segundos()/60%60)
+	   return '%2dh%2dmin' % (self.segundos()/3600, self.segundos()/60%60)
+
+
+class ItemControle:
+    dia = date(1979, 12, 12)
+    controles = []
+    
+    def almoco(self):
+       return 0

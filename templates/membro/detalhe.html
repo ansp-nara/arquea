@@ -1,18 +1,158 @@
 {% extends "admin/base_site.html" %}
 {% block content %}
+<style>
+ .table-consolidado {
+    width: 700px;
+    border: 1px dotted;
+ }
+ #table-controle {
+    width: 900px;
+ }
+ .table-consolidado td,
+ #table-controle td,
+ #table-controle th {
+    border-left: 1px dotted;
+    border-right: 1px dotted;
+    white-space:nowrap;
+    width: 50px;
+ }
+ #table-controle .td-obs {
+    white-space:normal;
+    width: 550px;   
+  }
+  
+ .table-consolidado th,
+ #table-controle th {
+    font-weight:bold;
+    border: 2px black solid ;
+ }
+ .tr-last-line td {
+    font-weight:bold;
+    border-top: 1px solid black;
+  } 
+</style>
   <h2>{{ membro.nome }}</h2>
+  <table class="table-consolidado">
+    <tr><th width="150px">Total de banco de horas</th><td>{{total_geral_banco_horas}}</td></tr>
+    <tr><th>Total de banco de férias</th><td>{{total_geral_ferias}}</td></tr>
+  </table>
+  
+<h3>Total de horas por período</h3>
+<table class="table-consolidado">
+    <tr id="tr-first-line">
+        <th>Mês</th>
+        <th style="text-align:right;">Total de horas úteis</th>
+        <th style="text-align:right;">Total trabalhado</th>
+        <th style="text-align:right;">Total de dispensas</th>
+        <th style="text-align:right;">Total de ferias</th>
+        <th style="text-align:right;">Total banco de horas</th>
+    </tr>
 {% for m in meses %}
-<h3>{{ m.mes }} ({{ m.total }})</h3>
-{% for d in m.controles %}
-{{ d.entrada|date:"d/m  H:i" }} <b>a</b> {{ d.saida|date:"d/m  H:i" }} ({{ d.permanencia }})<br />
+    <tr>
+        <td>{{ m.mes }}/{{ m.ano }}</td>
+        <td style="text-align:right;">{{ m.total_horas_periodo }}</td>
+        <td style="text-align:right;">{{ m.total }}</td>
+        <td style="text-align:right;">{{ m.total_horas_dispensa }}</td>
+        <td style="text-align:right;">{{ m.total_horas_ferias }}</td>
+        <td style="text-align:right;">{{ m.total_banco_horas }}</td>
+     </tr>
+ {% endfor %}
+    <tr class="tr-last-line">
+        <td><strong>Total</strong></td>
+        <td style="text-align:right;">{{ total_horas_periodo }}</td>
+        <td style="text-align:right;">{{ total_horas }}</td>
+        <td style="text-align:right;">{{ total_horas_dispensa }}</td>
+        <td style="text-align:right;">{{ total_horas_ferias }}</td>
+        <td style="text-align:right;">{{ total_banco_horas }}</td>
+     </tr>
+</table>
+  
+  
+<h3>Horas mensais do período</h3>  
+  
+{% for m in meses %}
+<hr>
+<h3>{{ m.mes }}/{{ m.ano }} ({{ m.total }})</h3>
+<table id="table-controle">
+    <tr>
+        <th>dia</th>
+        <th>Entrada</th>
+        <th>Almoço</th>
+        <th>Saída</th>
+        <th>Total</th>
+        <th>Obs</th>
+    </tr>
+{% for dia in m.dias %}
+{% for d in dia.controles %}
+    <tr>
+{% comment %} Junta as celulas de dias iguais {% endcomment %}    
+        <td {% if forloop.first %}{% if dia.controles|length > 1 %}rowspan="{{dia.controles|length}}" style="vertical-align:middle;"{% endif %}{% else %}style="display:none"{% endif %}>{{ d.entrada|date:"d" }}</td>
+        <td><a href="{{ model.admin_url }}/admin/membro/controle/{{ d.id }}/">{{ d.entrada|date:"d/m  H:i" }}</a></td>
+        <td>
+            {% if d.almoco or d.almoco == 0 %}
+                <a href="{{ model.admin_url }}/admin/membro/controle/{{ d.id }}/">{{ d.almoco|default_if_none:"" }}</a>
+            {% else %}
+                <button id="btn_al_0_{{d.id}}" class="btn_al_0">0</button><button id="btn_al_60_{{d.id}}" class="btn_al_60">60</button>
+            {% endif %}
+        </td>
+        <td><a href="{{ model.admin_url }}/admin/membro/controle/{{ d.id }}/">{{ d.saida|date:"d/m  H:i" }}</a></td>
+        <td {% if d.segundos > 72000 %}
+                    style="background-color:red;"
+                {% elif d.segundos < 0%}
+                    style="background-color:red;"
+                {% elif d.segundos > 43200 %}
+                    style="background-color:lightyellow;"
+                {% endif %}>
+            
+            <a href="{{ model.admin_url }}/admin/membro/controle/{{ d.id }}/">{{ d.permanencia }}</a>
+        </td>
+        <td class='td-obs'><a href="{{ model.admin_url }}/admin/membro/controle/{{ d.id }}/">{{ d.obs|default_if_none:"" }}</a></td>
+    </tr>
 {% endfor %}
-
+{% endfor %}
+    <tr class="tr-last-line">
+        <td colspan="4"><strong>Total</strong></td>
+        <td><strong>{{ m.total }}</strong></td>
+    </tr>
+</table>
 <p>
-	<div><strong>Total do mês = </strong>{{ m.total_horas_periodo }}</div>
-	<div><strong>Total a realizar = </strong>{{ m.total_horas_restante }}</div>
+	<div><strong>Total de horas úteis = </strong>{{ m.total_horas_periodo }}</div>
+	<div><strong>Total de horas de dispensas = </strong>{{ m.total_horas_dispensa }}</div>
+	<div><strong>Total de horas de ferias = </strong>{{ m.total_horas_ferias }}</div>
+	<div><strong>Total banco de horas = </strong>{{ m.total_banco_horas }}</div>
 </p>
-
- 
  
  {% endfor %}
+ 
+ <script type="text/javascript">
+function ajax_controle_mudar_almoco(id, almoco) {
+    //$("body").addClass("loading");
+     $.ajax({
+       url: "/membro/ajax_controle_mudar_almoco",
+       data: {'id': id, 'almoco':almoco},
+       dataType: "html",
+       success: function(data){
+            location.reload()
+       },
+       error: function(retorno, status, error){
+            alert('ERROR retorno=' + retorno + ' \nstatus=' + status + ' \nerror=' + error);
+       }
+     });
+}
+	function bindButtons() {
+	    $(".btn_al_0").click(function(){
+	        id = this.id.replace('btn_al_0_', '');
+	        ajax_controle_mudar_almoco(id, 0);
+	    });
+	    
+	    $(".btn_al_60").click(function(){
+	        id = this.id.replace('btn_al_60_', '');
+	        ajax_controle_mudar_almoco(id, 60);
+	    });
+	}
+	
+	$(document).ready(function() {
+	    bindButtons();
+	});
+ </script>
 {% endblock %}
