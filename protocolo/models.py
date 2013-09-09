@@ -10,8 +10,10 @@ from identificacao.models import Identificacao, Entidade
 from outorga.models import Termo
 from django.contrib.auth.models import User
 from django.db.models import Q
+import logging
 
-# Create your models here.
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
 
 
 class TipoDocumento(models.Model):
@@ -160,13 +162,29 @@ class Feriado(models.Model):
  
 
     # Define um método da classe que verifica se uma data é feriado.
-    @classmethod
-    def dia_de_feriado(cls,data):
+    def dia_de_feriado(self,data):
     #    dm = data in [f.feriado for f in cls.objects.filter(movel=True)]
     #    df = (data.month, data.day) in [(f.feriado.month, f.feriado.day) for f in cls.objects.filter(movel=False)]
     #    return (dm or df)
-        dm = data in [f.feriado for f in cls.objects.all()]
+        #dm = data in [f.feriado for f in cls.objects.all()]
+        dm = Feriado.objects.all().filter(feriado=data).exists()
+        
         return dm
+    
+    def get_dia_de_feriado(self,data):
+    #    dm = data in [f.feriado for f in cls.objects.filter(movel=True)]
+    #    df = (data.month, data.day) in [(f.feriado.month, f.feriado.day) for f in cls.objects.filter(movel=False)]
+    #    return (dm or df)
+        #dm = data in [f.feriado for f in cls.objects.all()]
+        
+        dm = Feriado.objects.filter(feriado=data)
+        if len(dm) > 1:
+            raise ValueError("Há mais de um feriado em um único dia.")
+        
+        if len(dm) == 1:
+            return dm.filter()[:1].get()
+        else:
+            return None 
 
 
     # Define a ordenação da visualização dos dados.
