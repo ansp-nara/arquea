@@ -9,10 +9,12 @@ from django.utils.translation import ugettext_lazy as _
 from protocolo.models import Feriado
 from utils.models import NARADateField
 import calendar
-import logging
 #from utils.models import CPFField
 #######
 from django.core.urlresolvers import reverse
+from dateutil.rrule import rrule, DAILY
+
+import logging
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -295,13 +297,17 @@ class Ferias(models.Model):
         return umano <= datetime.now().date()
     completo.boolean = True
     
+    
+    cachedFerias = None
     # Retorna o total de dias em aberto para o membro
+    @classmethod
     def total_dias_uteis_aberto(self, membro_id):
         total_dias_uteis_aberto = 0
         
-        
-        controleFerias = ControleFerias.objects.filter(ferias__membro=membro_id)
-        for c in controleFerias:
+        if self.cachedFerias == None:
+            self.cachedFerias = ControleFerias.objects.filter(ferias__membro=membro_id).select_related()
+            
+        for c in self.cachedFerias:
             
             if c.dias_uteis_aberto:
                 total_dias_uteis_aberto = total_dias_uteis_aberto + c.dias_uteis_aberto
@@ -311,13 +317,15 @@ class Ferias(models.Model):
 
         return total_dias_uteis_aberto * 8 * 60 * 60
     
+    @classmethod
     def dia_ferias(self, membro_id, dia):
-        ferias = ControleFerias.objects.filter(ferias__membro__id=membro_id)
+        if self.cachedFerias == None:
+            self.cachedFerias = ControleFerias.objects.filter(ferias__membro=membro_id).select_related()
 
         # verifica se tem algum período de férias com dias úteis tirados de fato
         # não deve entrar na conta se forem período de férias com venda de dias, ou somente marcação de vencimento de férias
         is_ferias = False
-        for controle_ferias in ferias:
+        for controle_ferias in self.cachedFerias:
             if controle_ferias.dias_uteis_fato > 0:
                 is_ferias =  is_ferias or (controle_ferias.inicio <= dia <= controle_ferias.termino)
                 if is_ferias:
@@ -382,16 +390,12 @@ class DispensaLegal(models.Model):
         Calcula a data de termino da dispensa, descontado o sábado e o domingo
         Leva em conta os feriados.
         """
-        feriados = Feriado.objects.all().filter(feriado__gte = date(self.inicio_realizada.year, self.inicio_realizada.month, 1))
-        
         soma_dias = 0
         for x in range(self.dias_uteis):
             d = self.inicio_realizada + timedelta(days=x)
             
             # verifica se o dia é feriado
-            tem_feriado = False
-            for feriado in feriados:
-                tem_feriado = tem_feriado or (d == feriado.feriado)
+            tem_feriado = Feriado.objects.filter(feriado=d).exists()
             
             # se for feriado ou final-de-semana, pula o dia
             if tem_feriado or d.weekday() >= 5:
@@ -411,13 +415,15 @@ class DispensaLegal(models.Model):
 
         dispensas = DispensaLegal.objects.filter(membro=membro_id)
         for dispensa in dispensas:
-            if dispensa.inicio_realizada == dispensa.termino_realizada:
-                is_dispensa = is_dispensa or (dia == dispensa.inicio_realizada)
-            else:
-                # gera um range de dias entre o período de início e final de dispensa
-                periodo_dispensa = (dispensa.inicio_realizada + timedelta(days=d_dispensa) for d_dispensa in range((dispensa.termino_realizada - dispensa.inicio_realizada).days + 1))
-                for dia_dispensa in periodo_dispensa:
-                    is_dispensa = is_dispensa or (dia == dia_dispensa)
+            if dia >= dispensa.inicio_realizada:
+                dTermino = dispensa.termino_realizada
+                if dispensa.inicio_realizada == dTermino:
+                    is_dispensa = is_dispensa or (dia == dispensa.inicio_realizada)
+                else:
+                    # gera um range de dias entre o período de início e final de dispensa
+                    periodo_dispensa = (dispensa.inicio_realizada + timedelta(days=d_dispensa) for d_dispensa in range((dTermino - dispensa.inicio_realizada).days + 1))
+                    for dia_dispensa in periodo_dispensa:
+                        is_dispensa = is_dispensa or (dia == dia_dispensa)
         
         if is_dispensa:
             # **** ALTERAR PARA HORAS
@@ -606,7 +612,7 @@ class Controle(models.Model):
             #### AJUSTE PARA O PYTHON < 2.7
             segundos_trabalhados = delta.seconds + delta.days * 24 * 3600
         
-        if self.almoco_devido:
+        if self.almoco_devido and self.almoco:
             segundos_trabalhados = segundos_trabalhados - (self.almoco * 60)
             
         return segundos_trabalhados
@@ -617,48 +623,48 @@ class Controle(models.Model):
         else:
             return 0
         
-    
     def total_analitico_horas(self, ano, mes):
+        controles = Controle.objects.filter(membro=self.membro_id).order_by('entrada')
         
-        controles = Controle.objects.all().filter(membro=self.membro.id)
-        
+        primeiroDiaFiltro = None
         if ano and ano.isdigit() and int(ano) > 0:
             controles = controles.filter(entrada__year=ano)
-            
+        
+        primeiroControle = controles[:1].get()
         if mes and mes.isdigit() and int(mes) > 0: 
             controles = controles.filter(entrada__month=mes)
+            primeiroDiaFiltro = datetime(primeiroControle.entrada.year, int(mes), 01)
+        else:
+            primeiroDiaFiltro = datetime(primeiroControle.entrada.year, primeiroControle.entrada.month, 01)
+            
+        ultimoControle = controles.order_by('-entrada')[:1].get()
+        ultimoDiaFiltro = datetime(ultimoControle.entrada.year, ultimoControle.entrada.month, calendar.monthrange(ultimoControle.entrada.year, ultimoControle.entrada.month)[1], 23,59,59)
+
+        controles = controles.order_by('-entrada')
             
         meses = []
         mes_anterior = date(1979, 01, 01)
         dia_anterior = date(1979, 01, 01)
-        
         if controles.count() > 0:
             controleAcumuladorDia = []
             
-            dias = []
-            
-            for i, c in enumerate(controles):
-                m = c.entrada
-                d = c.entrada
-                
-                if m.month != mes_anterior.month or m.year != mes_anterior.year:
+            for dt in rrule(DAILY, dtstart=primeiroDiaFiltro, until=ultimoDiaFiltro):
+    
+                if dt.month != mes_anterior.month or dt.year != mes_anterior.year:
                     dias = []
-                    meses.append({'mes':m.month, 'ano': m.year, 'dias':dias, 'total':0})
-                    mes_anterior = m
+                    meses.insert(0, ({'mes':dt.month, 'ano': dt.year, 'dias':dias, 'total':0}))
+                    mes_anterior = dt
                 
-                if d.day != dia_anterior.day or d.month != dia_anterior.month or d.year != dia_anterior.year:
-                    controleAcumuladorDia = [c]
-                    itemControle = ItemControle()
-                    itemControle.dia = date(d.year, d.month, d.day) 
-                    itemControle.controles = controleAcumuladorDia
-                    dias.append(itemControle)
-                    
-                    dia_anterior = d
-                else:
-                    controleAcumuladorDia.append(c)
+                itemControle = ItemControle()
+                itemControle.dia = date(dt.year, dt.month, dt.day) 
+                itemControle.controles = controles.filter(entrada__month=dt.month).filter(entrada__day=dt.day)
+#                 dias.append(itemControle)
+                dias.insert(0, itemControle)
                     
         total_banco_horas = 0;
-        
+        feriado = Feriado()
+        ferias = Ferias()
+        dispensaLegal = DispensaLegal()
         for m in meses:
             total_segundos_trabalhos_mes = 0
             # int com o total de dias de trabalho (business day) no mes
@@ -678,35 +684,44 @@ class Controle(models.Model):
                 total_segundos_trabalhos_mes = total_segundos_trabalhos_mes + sum([c.segundos() for c in d.controles])
             m.update({'total':total_segundos_trabalhos_mes})
                 
-            d = mes_corrente_ini
-            
-            while d < mes_corrente_fim:
+            for d in m['dias']:
                 # verifica se tem algum período de férias com dias úteis tirados de fato
                 # não deve entrar na conta se forem período de férias com venda de dias, ou somente marcação de vencimento de férias
-                is_ferias = Ferias().dia_ferias(self.membro.id, d)
-                      
+                d.is_ferias = ferias.dia_ferias(self.membro_id, d.dia)
+                if d.is_ferias:
+                    d.obs = d.obs + ' Férias'
+                
                 # é final de semana?
-                is_final_de_semana = d.weekday() >= 5;
-                  
+                d.is_final_de_semana = d.dia.weekday() >= 5;
+                if d.is_final_de_semana:
+                    if d.dia.weekday() == 5:
+                        d.obs = d.obs + ' Sábado'
+                    elif d.dia.weekday() == 6:
+                        d.obs = d.obs + ' Domingo'
+                
                 # é feriado?
-                is_feriado = Feriado().dia_de_feriado(d)
-  
+                
+                diaFeriado = feriado.get_dia_de_feriado(d.dia)
+                
+                if diaFeriado != None:
+                    d.is_feriado = True
+                    d.obs = d.obs + ' ' + diaFeriado.tipo.nome
+                
                 # é dispensa?
-                dia_dispensa = DispensaLegal().dia_dispensa(self.membro.id, d)
-                is_dispensa = dia_dispensa['is_dispensa']
+                dia_dispensa = dispensaLegal.dia_dispensa(self.membro_id, d.dia)
+                d.is_dispensa = dia_dispensa['is_dispensa']
                 horas_dispensa = dia_dispensa['horas']
-                                     
+
                 # soma os dias de trabalho
-                if not is_final_de_semana and not is_feriado:
+                if not d.is_final_de_semana and not d.is_feriado:
                     # conta as horas de dispensas 
-                    if is_dispensa:
-                        total_horas_dispensa += horas_dispensa * 60 * 60
+                    if d.is_dispensa:
+                        total_horas_dispensa += horas_dispensa * 3600
                     # conta as horas de ferias
-                    if is_ferias:
-                        total_horas_ferias += 8 * 60 * 60
+                    if d.is_ferias:
+                        # soma 8h
+                        total_horas_ferias += 28800
               
-                d += timedelta(days=1)
-                        
             # as horas totais do período são as horas do total de dias do mes menos os finais de semana, ferias e dispensas
             total_horas_periodo = self.total_horas_uteis(mes_corrente_ini, mes_corrente_fim)
             m.update({'total_horas_periodo':total_horas_periodo})
@@ -731,12 +746,13 @@ class Controle(models.Model):
         soma_dias_de_trabalho = 0
         
         d = data_ini
+        feriado = Feriado()
         while d < data_fim:
              # é final de semana?
              is_final_de_semana = d.weekday() >= 5;
                
              # é feriado?
-             is_feriado = Feriado().dia_de_feriado(d)
+             is_feriado = feriado.dia_de_feriado(d)
              
              # soma os dias de trabalho
              if not is_final_de_semana and not is_feriado:
@@ -746,7 +762,7 @@ class Controle(models.Model):
                      
         # as horas totais do período são as horas do total de dias do mes menos os finais de semana, ferias e dispensas
         total_horas_periodo = (soma_dias_de_trabalho * 8 * 60 * 60)
-             
+        
         return total_horas_periodo
 
     class Meta:
@@ -759,6 +775,14 @@ class Controle(models.Model):
 class ItemControle:
     dia = date(1979, 12, 12)
     controles = []
+    obs = ''
+    is_final_de_semana = False
+    is_feriado = False
+    is_dispensa = False
+    is_ferias = False
     
     def almoco(self):
        return 0
+   
+    def __unicode__(self):
+       return u'%s' % (self.dia)

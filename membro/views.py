@@ -105,9 +105,7 @@ def mensal_func(request):
         ano = request.GET.get('ano')
         mes = request.GET.get('mes')
         
-        
         c = Controle.objects.filter(membro=funcionario)[:1].get()
-#         
 
         # Contagem de total geral do funcionario
         total_meses = c.total_analitico_horas(0, 0)
@@ -158,7 +156,7 @@ def mensal_func(request):
             total_horas_dispensa += m['total_horas_dispensa']
             total_horas_dispensa_str = '%2dh %02dmin' % (m['total_horas_dispensa']/3600, m['total_horas_dispensa']/60%60)
             m.update({'total_horas_dispensa':total_horas_dispensa_str})
-                         # soma horas extras somente dos meses que não forem o mês em andamento
+            # soma horas extras somente dos meses que não forem o mês em andamento
             total_banco_horas += m['total_banco_horas']
             if m['total_banco_horas'] >= 0:
                 total_banco_horas_str = '%2dh %02dmin' % (m['total_banco_horas']/3600, m['total_banco_horas']/60%60)
@@ -232,3 +230,70 @@ def controle_mudar_almoco(request):
     return HttpResponse(json, mimetype="application/json")
 
 
+@login_required
+def controle_avancar_bloco(request):
+    controle_id = request.GET.get('id')
+    tempo = request.GET.get('tempo')
+    
+#     if request.user.is_superuser == False or not controle_id:
+    if not controle_id or not tempo: 
+        raise Http404
+    
+    controle = get_object_or_404(Controle, pk=controle_id)
+    controle.entrada = controle.entrada + timedelta(minutes=int(tempo))
+    controle.saida = controle.saida + timedelta(minutes=int(tempo)) 
+    controle.save()
+    
+    json = simplejson.dumps('ok')
+    return HttpResponse(json, mimetype="application/json")
+
+
+@login_required
+def controle_voltar_bloco(request):
+    controle_id = request.GET.get('id')
+    tempo = request.GET.get('tempo')
+    
+#     if request.user.is_superuser == False or not controle_id:
+    if not controle_id or not tempo: 
+        raise Http404
+    
+    controle = get_object_or_404(Controle, pk=controle_id)
+    controle.entrada = controle.entrada - timedelta(minutes=int(tempo))
+    controle.saida = controle.saida - timedelta(minutes=int(tempo)) 
+    controle.save()
+    
+    json = simplejson.dumps('ok')
+    return HttpResponse(json, mimetype="application/json")
+
+
+@login_required
+def controle_adicionar_tempo_final(request):
+    controle_id = request.GET.get('id')
+    tempo = request.GET.get('tempo')
+    
+#     if request.user.is_superuser == False or not controle_id:
+    if not controle_id or not tempo: 
+        raise Http404
+    
+    controle = get_object_or_404(Controle, pk=controle_id)
+    controle.saida = controle.saida + timedelta(minutes=int(tempo)) 
+    controle.save()
+    
+    json = simplejson.dumps('ok')
+    return HttpResponse(json, mimetype="application/json")
+
+@login_required
+def controle_adicionar_tempo_inicial(request):
+    controle_id = request.GET.get('id')
+    tempo = request.GET.get('tempo')
+    
+#     if request.user.is_superuser == False or not controle_id:
+    if not controle_id or not tempo: 
+        raise Http404
+    
+    controle = get_object_or_404(Controle, pk=controle_id)
+    controle.entrada = controle.entrada - timedelta(minutes=int(tempo)) 
+    controle.save()
+    
+    json = simplejson.dumps('ok')
+    return HttpResponse(json, mimetype="application/json")

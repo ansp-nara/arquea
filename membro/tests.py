@@ -86,6 +86,34 @@ class MembroControleTest(TestCase):
         
         #self.assertEquals(controle.segundos(), 48 * 60 * 60)
 
+    def test_controle_mover_bloco(self):
+        membro = Membro(id=1, nome='teste')
+        membro.save()
+        
+        controle = Controle(id=1, membro=membro, entrada=datetime(year=2000, month=01, day=01, hour=12), saida=datetime(year=2000, month=01, day=01, hour=18, minute=30), 
+                            almoco_devido=False, almoco=60)
+        controle.save()
+        controle = Controle.objects.get(id=1)
+        
+        tempo = 20
+
+        controle = Controle.objects.get(pk=1)
+        controle.entrada = controle.entrada + timedelta(minutes=tempo)
+        controle.saida = controle.saida + timedelta(minutes=tempo) 
+        controle.save()
+        
+        controle = Controle.objects.get(pk=1)
+        self.assertEquals(controle.entrada.month, 1)
+        self.assertEquals(controle.entrada.day, 1)
+        self.assertEquals(controle.entrada.hour, 12)
+        self.assertEquals(controle.entrada.minute, 20)
+        
+        self.assertEquals(controle.saida.month, 1)
+        self.assertEquals(controle.saida.day, 1)
+        self.assertEquals(controle.saida.hour, 18)
+        self.assertEquals(controle.saida.minute, 50)
+
+
 
 class MembroControleHorarioTest(TestCase):
     
