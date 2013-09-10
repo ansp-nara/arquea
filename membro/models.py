@@ -657,7 +657,7 @@ class Controle(models.Model):
                 
                 itemControle = ItemControle()
                 itemControle.dia = date(dt.year, dt.month, dt.day) 
-                itemControle.controles = controles.filter(entrada__month=dt.month).filter(entrada__day=dt.day)
+                itemControle.controles = controles.filter(entrada__year=dt.year).filter(entrada__month=dt.month).filter(entrada__day=dt.day)
 #                 dias.append(itemControle)
                 dias.insert(0, itemControle)
                     
