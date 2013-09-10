@@ -298,34 +298,34 @@ class Ferias(models.Model):
     completo.boolean = True
     
     
-    cachedFerias = None
     # Retorna o total de dias em aberto para o membro
     @classmethod
     def total_dias_uteis_aberto(self, membro_id):
         total_dias_uteis_aberto = 0
         
-        if self.cachedFerias == None:
-            self.cachedFerias = ControleFerias.objects.filter(ferias__membro=membro_id).select_related()
+        ferias = ControleFerias.objects.filter(ferias__membro=membro_id).select_related()
             
-        for c in self.cachedFerias:
-            
-            if c.dias_uteis_aberto:
+        for c in ferias:
+            # Total de dias em aberto
+            # Teoricamente, devem ter somente nos lançamentos 'oficiais'
+            if c.dias_uteis_aberto and c.dias_uteis_aberto > 0:
                 total_dias_uteis_aberto = total_dias_uteis_aberto + c.dias_uteis_aberto
                 
-            if c.dias_uteis_fato and not c.oficial:
+            # remove do total os dias tirados de fato, que nao sejam oficiais
+            # os dias tirados oficiais já vão ser refletidos nos dias em aberto
+            if c.dias_uteis_fato and (not c.oficial):
                 total_dias_uteis_aberto = total_dias_uteis_aberto - c.dias_uteis_fato
 
         return total_dias_uteis_aberto * 8 * 60 * 60
     
     @classmethod
     def dia_ferias(self, membro_id, dia):
-        if self.cachedFerias == None:
-            self.cachedFerias = ControleFerias.objects.filter(ferias__membro=membro_id).select_related()
+        ferias = ControleFerias.objects.filter(ferias__membro=membro_id).select_related()
 
         # verifica se tem algum período de férias com dias úteis tirados de fato
         # não deve entrar na conta se forem período de férias com venda de dias, ou somente marcação de vencimento de férias
         is_ferias = False
-        for controle_ferias in self.cachedFerias:
+        for controle_ferias in ferias:
             if controle_ferias.dias_uteis_fato > 0:
                 is_ferias =  is_ferias or (controle_ferias.inicio <= dia <= controle_ferias.termino)
                 if is_ferias:
