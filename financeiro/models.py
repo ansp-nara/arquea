@@ -38,7 +38,7 @@ class ExtratoCC(models.Model):
 	ordering = ('-data_oper',)
 	
     def __unicode__(self):
-	return '%s - %s - %s - %s' % (self.data_oper, self.cod_oper, self.historico, self.valor)
+	    return u'%s - %s - %s - %s' % (self.data_oper, self.cod_oper, self.historico, self.valor)
       
 
     @property
@@ -97,7 +97,7 @@ class ExtratoFinanceiro(models.Model):
 	ordering = ('-data_libera',)
 
     def __unicode__(self):
-	return '%s - %s - %s - %s' % (self.data_libera, self.cod, self.historico, self.valor)
+	    return u'%s - %s - %s - %s' % (self.data_libera, self.cod, self.historico, self.valor)
     
     def save(self, *args, **kwargs):
 	for (cod, hist) in CODIGO_FINANCEIRO:
@@ -128,15 +128,15 @@ class Pagamento(models.Model):
     def __unicode__(self):
     	if self.valor_patrocinio:
             valor = self.valor_fapesp+self.valor_patrocinio
-	else: valor = self.valor_fapesp
-	mod = ''
-	if self.origem_fapesp:
-	   mod = self.origem_fapesp.item_outorga.natureza_gasto.modalidade.sigla
-        a = self.auditoria_set.all()
-        if a:
-            a = a[0]
-            return "%s - %s - %s, parcial %s, página %s    ID: %s" % (self.protocolo.num_documento, valor, mod, a.parcial, a.pagina, self.pk)
-	return "%s - %s - %s    ID: %s" % (self.protocolo.num_documento, valor, mod, self.pk)
+    	else: valor = self.valor_fapesp
+    	mod = ''
+    	if self.origem_fapesp:
+    	   mod = self.origem_fapesp.item_outorga.natureza_gasto.modalidade.sigla
+           a = self.auditoria_set.all()
+           if a:
+               a = a[0]
+               return u"%s - %s - %s, parcial %s, página %s    ID: %s" % (self.protocolo.num_documento, valor, mod, a.parcial, a.pagina, self.pk)
+    	return u"%s - %s - %s    ID: %s" % (self.protocolo.num_documento, valor, mod, self.pk)
 
     def codigo_operacao(self):
     	return self.conta_corrente.cod_oper
@@ -205,11 +205,11 @@ class LocalizaPatrocinio(models.Model):
     consignado = models.CharField(max_length=50)
     
     class Meta:
-	verbose_name = _(u'Localização do patrocínio')
-	verbose_name_plural = _(u'Localização dos patrocínios')
+	    verbose_name = _(u'Localização do patrocínio')
+	    verbose_name_plural = _(u'Localização dos patrocínios')
 
     def __unicode__(self):
-	return self.consignado
+	    return self.consignado
 	
 class ExtratoPatrocinio(models.Model):
     localiza = models.ForeignKey('financeiro.LocalizaPatrocinio', verbose_name=_(u'Localização do patrocínio'))
@@ -220,17 +220,17 @@ class ExtratoPatrocinio(models.Model):
     obs = models.TextField()
     
     class Meta:
-	verbose_name = _(u'Extrato do patrocínio')
-	verbose_name_plural = _(u'Extratos dos patrocínios')
+	    verbose_name = _(u'Extrato do patrocínio')
+	    verbose_name_plural = _(u'Extratos dos patrocínios')
 
     def __unicode__(self):
-	return u'%s - %s - %s' % (self.localiza.consignado, self.data_oper, self.valor)
+	    return u'%s - %s - %s' % (self.localiza.consignado, self.data_oper, self.valor)
 	
 class Estado(models.Model):
     nome = models.CharField(max_length=30)
     
     def __unicode__(self):
-	return self.nome
+	    return self.nome
 	
 def ultimaparcial():
     from outorga.models import Termo
@@ -258,7 +258,7 @@ class Auditoria(models.Model):
     obs = models.TextField(null=True, blank=True)
     
     def __unicode__(self):
-	return 'Parcial: %s, página: %s' % (self.parcial, self.pagina)
+	    return u'Parcial: %s, página: %s' % (self.parcial, self.pagina)
 	 
 
 class TipoComprovante(models.Model):
@@ -270,7 +270,7 @@ class TipoComprovante(models.Model):
         ordering = ('nome',)
 
     def __unicode__(self):
-	return self.nome
+	    return self.nome
 
 
 
