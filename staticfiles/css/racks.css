@@ -11,3 +11,132 @@
 
 .tabela tr { height:5px; }
 
+
+.u {
+    background:white repeat-y;
+    display:inline-block;
+    width:7px;
+    height:798px;
+    vertical-align:top;
+}
+.u-n {
+    display:inline-block;
+    width:13px;
+    height:14px;
+    background:#d8d8d8;
+    color:#636363;
+    font:8px Verdana,Arial;
+    border-top:1px; 
+    border-left:1px;
+    border-bottom:0;
+    border-right:1px;
+    border-style:solid; 
+    border-color: #999a9a;
+    padding:2px;
+    font-size:9px;
+}
+.rack {
+	width:255px;
+	display:inline-table;
+	height:820px;
+	margin-right:10px;
+	margin-top:20px;
+	margin-bottom:30px;
+    font-size:0;
+}
+.rack h2 a:link,
+.rack h2  a:visited,
+.rack h2  a:hover,
+.rack h2  a:active {
+   color:#333;  
+} 
+.interno {
+    display:inline-block;
+    width:199px;
+    margin-left:1px;
+    margin-right:4px;
+}
+.interno a:link,
+.interno a:visited,
+.interno a:hover,
+.interno a:active {
+   color:#FFF;
+}
+.interno a img {
+    position:absolute;
+    z-index: 5;
+    width:100%;
+    height:100%;
+    opacity:0.7;
+    filter:alpha(opacity=70);
+    background-color:black;
+}
+.interno a div {
+    position:absolute;
+    z-index: 10;
+}
+.interno a div div div {
+    position:relative;
+    display: table-cell;
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black, -2px 0 1px black, 0 2px 1px black, 2px 0 1px black, 0 -2px 1px black;
+    font-size:10px;
+    vertical-align:middle;
+    line-height: 1.5em;
+    width: 199px;
+    text-align: center;
+}
+
+.equip {
+    display:inline-block;
+    background:#81878b;
+    width:199px;
+    border-bottom:1px solid #fff;
+    border-top:1px solid #fff;
+    padding-right:1px; 
+    padding-left:1px; ;
+    vertical-align:middle; 
+    line-height:1.5em;
+}
+.equip.conflito {
+	border:2px red solid;
+	width:195px
+}
+.equip-desc {
+    position:absolute;
+    top:0;
+    left:0;
+}
+.espaco {
+    width:100%;
+    display:none;
+    background:#fff;
+ }
+.dc {
+    margin-top:50px;
+}
+.bloco-n {
+    display:inline-block;
+	width:19px;
+	height:798px;
+	background-color:white;
+	margin-right:1px;
+	vertical-align:top;
+}
+.conflitos-title {
+    position:relative;
+    color: red;
+    cursor:pointer
+}
+.conflitos {
+    font-size:11px;	
+}
+.conflitos-content {
+	display:none;
+}
+
+@media print {
+	.page-break {
+		page-break-after:always;
+	}
+}
+

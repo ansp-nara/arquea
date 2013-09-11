@@ -1,100 +1,154 @@
 {% extends "admin/base_site.html" %}
 {% load proto_tags %}
 {% load url from future %}
+{% load i18n proto_tags admin_static %}
 {% block extrahead %}
+
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/racks.css" />
-<style type="text/css" media="screen">
-  .u {background:#ffffff url('{{ STATIC_URL }}img//1u.png') repeat-y;float:left;width:7px;height:798px;}
-  .rack {height:820px;float:left;margin-right:10px;margin-top:20px;margin-bottom:30px;width:255px;}
-  .dc {margin-top:50px;}
-  .roteador {width:100%;float:left;background:#81878b;display:block;border:1px dotted #fff;}
-  .espaco {width:100%;float:left;background:#fff;display:block;}
-  .interno {display:block;float:left;width:199px;}
-  .u-n {border:1px solid #999a9a;background:#d8d8d8;color:#636363;float:left;width:13px;height:13px;font:8px Verdana,Arial;padding:2px;}
-  .bloco-n {display:block;width:19px;float:left;margin-right:1px;}
-</style>
- 
-<style type="text/css" media="print">
-  .u {background:#ffffff url('{{ STATIC_URL }}img/1u.png') repeat-y !important;float:left;width:7px;height:798px;}
-  .rack {height:820px;float:left;margin-right:10px;margin-top:20px;width:255px;}
-  .roteador {width:100%;float:left;background:#81878b !important;display:block;border-bottom:1px solid #fff;}
-  .espaco {width:100%;float:left;background:#fff;display:block;}
-  .interno {display:block;float:left;width:199px;}
+<link rel="stylesheet" type="text/css" href="{% static "css/base-print.css" %}" />
+<style type="text/css">
+.u {
+    background-image: url('{{ STATIC_URL }}img/1u.png');
+}
+@media print {
+  .u,
+  .rack,
+  .roteador,
+  .interno,
+  .dc,
+  .u-n,
+  .bloco-n, .page-break {
+        -webkit-print-color-adjust: exact;
+  }
+  .u {}
+  .equip {}
+  .roteador {background:#81878b !important;}
+  .espaco {}
+  .interno {}
+  .dc {}
+  .u-n {}
+  .bloco-n {}
+}
 </style>
    <script type="text/javascript" src="{{ STATIC_URL }}js/racks.js"></script>
    <script type="text/javascript" src="{{ STATIC_URL }}js/admin/RelatedObjectLookups.js"></script>
 {% endblock %}
-
+{% block breadcrumbs %}
+	{% if not is_popup %}
+    <div class="breadcrumbs">Você está em: 
+      <a href="../../">
+        {% trans "Home" %}
+      </a>
+       &rsaquo;
+       <a href="/patrimonio/racks"> 
+        Diagrama de Racks Frontal
+      </a>
+    </div>
+	{% endif %}
+{% endblock %}
 {% block content %}
-{% for dc in dcs %}
-<div class="dc">
-<h1>{{ dc.nome }}</h1>
 
-
-{% for rack in dc.racks %}
-<div class="rack">
-    <h2>{{ rack.nome }} ({{ rack.vazio }} ocupado)</h2>
-    <div id="rack{{ dc.id }}_{{forloop.counter}}" class="bloco-n">
-    </div>
-    <script>
-        var lines = [];
-	    for(i={% widthratio rack.altura 3 1 %};i>0;i--){
-	        lines.push('<div class="u-n">'+i+'</div>');
-	    }
-	    $("#rack{{ dc.id }}_{{forloop.counter}}").append(lines.join(""));
-    </script>
-    <div class="u"></div>
-    <div class="interno">
-  {% for eq in rack.equipamentos %}
-       {% if eq.id %}
-	       <a href="{% url "admin:patrimonio_patrimonio_change" eq.id %}" onclick="return showAddAnotherPopup(this);">
-	   {% endif %}
-       <div class="{% if eq.descricao %}roteador" rel="tooltip" title="{{ eq.descricao }}"{% else %}espaco"{% endif %} style="height:{% widthratio eq.tamanho 3 19 %}px;">{% if eq.imagem %}<img src="{{ eq.imagem }}" />{% endif %}
-           {{ eq.id }}
-       </div>
-       {% if eq.id %}
-           </a>
-       {% endif %}
-  {% endfor %}
-    </div>
-   <div class="u"></div>
-</div>
+<h1>Diagrama de Racks Frontal</h1>
+<form id="form_racks" method="GET">
+Data Centers
+<select name="dc" onchange="this.form.submit();">
+    <option value="0">Todos</option>
+{% for dc in todos_dcs %}
+   <option value="{{ dc.id }}" {% if request.GET.dc == dc.id|lower %}selected{% endif %}>{{ dc.nome }}</option>
 {% endfor %}
-
-{% comment %}Testando modificar o desenho para position:absolute com margin-top{% endcomment %}
-
-{% comment %}
-{% for rack in dc.racks %}
-<div class="rack">
-    <h2>{{ rack.nome }} ({{ rack.vazio }} ocupado)</h2>
-    <div class="bloco-n">
-        {% for i in rack.altura_pts|get_range reversed %}
-            <div class="u-n">{{ i|add:"1" }}</div>
-        {% endfor %}
-    </div>
-    <div class="u"></div>
-    <div class="interno" style="position:relative;">
-  {% for eq in rack.equipamentos %}
-       {% if eq.id %}
-           <a href="{% url "admin:patrimonio_patrimonio_change" eq.id %}" onclick="return showAddAnotherPopup(this);">
-       {% endif %}
-       {% if eq.descricao %}
-           <div class="roteador" rel="tooltip" title="{{ eq.descricao }}" style="position:absolute; margin-top:{{ eq.eixoY }}px; height:{% widthratio eq.tamanho 3 19 %}px;">{% if eq.imagem %}<img src="{{ eq.imagem }}" />{% endif %}</div>
-       {% endif %}
-       {% if eq.id %}
-           </a>
-       {% endif %}
-  {% endfor %}
-
-
-    </div>
-   <div class="u" style="margin-left:199px; "></div>
-</div>
+</select>
+</form>
+{% if dcs %}
+	{% for dc in dcs %}
+	<div class="dc page-break">
+	<h1>{{ dc.nome }}</h1>
+	{% for rack in dc.racks %}
+		<div class="rack"  style="{% if forloop.counter|divisibleby:2 %}page-break-after:always;{% endif %}">
+		    <h2>
+		      <a href="{% url "admin:patrimonio_patrimonio_change" rack.id %}" onclick="return showAddAnotherPopup(this);">{{ rack.nome }} 
+		      ({{ rack.vazio }} ocupado)
+		      </a>
+		    </h2>
+		    <div id="rack{{ dc.id }}_{{forloop.counter}}" class="bloco-n">
+		        {% for i in rack.altura_pts|get_range reversed %}
+		            <div class="u-n">{{ i|add:"1" }}</div>
+		        {% endfor %}
+		    </div>
+		    <div class="u"></div>
+		    <div class="interno" style="position:relative;">
+		  {% for eq in rack.equipamentos %}
+		       {% if eq.id %}
+		           <a href="{% url "admin:patrimonio_patrimonio_change" eq.id %}" onclick="return showAddAnotherPopup(this);">
+		       {% endif %}
+		       <div class="{% if eq.conflito %}conflito{% endif %} {% if eq.descricao %}equip " rel="tooltip" title="{{ eq.descricao }}"{% else %}espaco"{% endif %} 
+		           style="margin-top:{{ eq.eixoY }}px; height:{{ eq.altura }}px;">
+	               <div>
+		               <div style="height:{{ eq.altura }}px;">
+			            {% if eq.tam >= 15 %}
+			                {{ eq.descricao|truncatechars:150 }}
+			            {% elif eq.tam >= 12 %}
+			                {{ eq.descricao|truncatechars:120 }}
+			            {% elif eq.tam >= 9 %}
+			                {{ eq.descricao|truncatechars:90 }}            
+			            {% elif eq.tam >= 6 %}
+			                {{ eq.descricao|truncatechars:60 }}
+			            {% else %}
+			                {{ eq.descricao|truncatechars:30 }}
+			            {% endif %}
+			            </div>
+		            </div>
+		            {% if eq.imagem %}<img src="{{ eq.imagem }}" />{% endif %}
+		       </div>
+		       {% if eq.id %}
+		           </a>
+		       {% endif %}
+		  {% endfor %}
+		    </div>
+		   <div class="u"></div>
+		{% if rack.conflitos %}
+	        <div class="conflitos"><span  class="conflitos-title">Conflito de equipamentos!</span>
+	            <div class="conflitos-content">
+	            <table>
+	                <tr>
+	                    <th>EQ</th>
+	                    <th>Pos</th>
+	                    <th>Alt</th>
+	                </tr>
+	                {% for conflito in rack.conflitos %}
+	                    <tr style="border-top:1px black solid;">
+	                        <td>
+	                           <a href="{% url "admin:patrimonio_patrimonio_change" conflito.eq1.id %}" onclick="return showAddAnotherPopup(this);">
+	                            {{ conflito.eq1.descricao }}
+	                            </a>
+	                        </td>
+	                        <td>{{ conflito.eq1.pos }}</td>
+	                        <td>{{ conflito.eq1.tam }}</td>
+	                    </tr>
+	                    <tr>
+	                        {% if conflito.eq2 %}
+	                        <td>
+	                            <a href="{% url "admin:patrimonio_patrimonio_change" conflito.eq2.id %}" onclick="return showAddAnotherPopup(this);">
+	                                {{ conflito.eq2.descricao }}
+	                            </a>
+	                        </td>
+	                        <td>{{ conflito.eq2.pos }}</td>
+	                        <td>{{ conflito.eq2.tam }}</td>
+	                        {% endif %}
+	                    </tr>
+	                {% endfor %}
+	            </table>
+	            </div>
+	        </div>
+	       {% endif %}
+		</div>
+	{% endfor %}
 {% endfor %}
-
-{% endcomment %}
+{% else %}
+    <button name="Buscar" onclick="document.getElementById('form_racks').submit();">Buscar</button>
+{% endif %}
 </div>
-<div style="clear:both;"></div>
-{% endfor %}
+
+
+
 {% endblock %}
 

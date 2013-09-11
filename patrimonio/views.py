@@ -14,7 +14,7 @@ from utils.functions import render_to_pdf
 from django.utils import simplejson
 #from models import FontePagadora, AuditoriaInterna, AuditoriaFapesp
 #from decimal import Decimal
-from django.db.models import Max
+from django.db.models import Max, Q
 from identificacao.models import Entidade, EnderecoDetalhe, Endereco
 from models import *
 from django.template import RequestContext
@@ -22,6 +22,10 @@ from django.contrib.auth.decorators import permission_required, login_required
 from django.template.response import TemplateResponse
 from django.db.models import Q
 import itertools
+import logging
+
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
 
 
 # Gera uma lista dos protocolos conforme o termo selecionado.
@@ -471,63 +475,102 @@ def por_termo(request, pdf=0):
 
 @login_required
 def racks(request):
+        
     # Busca patrimonios do tipo RACK com o estado ATIVO
     locais = Patrimonio.objects.filter(equipamento__tipo__nome='Rack', historicolocal__estado__id=Estado.PATRIMONIO_ATIVO).values_list('historicolocal__endereco', flat=True).order_by('historicolocal__endereco').distinct()
-    dcs = []
-    debugFile = open('/tmp/debug.txt', 'w')
+
+    todos_dcs = []
     for local in locais:
-        racks = []
-        for rack in Patrimonio.objects.filter(equipamento__tipo__nome='Rack', historicolocal__endereco__id=local):
-            altura = 127
-            vazio = 0
-            equipamentos = []
-            
-            eixoY = 0
-            
-            # ordena os equipamentos do rack conforme a posição no rack
-            pts = list(rack.contido.filter(historicolocal__posicao__isnull=False).order_by('-historicolocal__posicao').distinct('historicolocal__posicao'))
-            pts.sort(key=lambda x: x.historico_atual().posicao_int(), reverse=True)
+        dc = {'nome':EnderecoDetalhe.objects.get(id=local).complemento, 'id':local}
+        todos_dcs.append(dc)
 
-            for pt in pts:
-                pos = pt.historico_atual().posicao_int()
-                debugFile.write('     %s\n' % pos)
-
-                if pos == 1 or pt.tamanho is None: continue
-                
-                # calculando a altura do pt
-                if altura > pos+int(round(pt.tamanho*3)):
-                    tam = altura-(pos+int(round(pt.tamanho*3)))
-                    altura -= tam
-                    equipamentos.append({'tamanho':tam, 'range':range(tam-1)})
-                    vazio += tam
-                tam = int(round(pt.tamanho*3))
-                altura -= tam
-                
-                # Setando Imagem do equipamento
-                imagem = None
-                if pt.equipamento:
-                    if pt.equipamento.imagem:
-                        imagem = pt.equipamento.imagem.url
-
-                # calculo da posição em pixel do eixoY, top-down
-                eixoY = int(round(((126 - pos - tam) * 19)/3))
-                
-                # x a partir do topo do container
-                equipamentos.append({'id': pt.id, 'eixoY': eixoY, 'tamanho':tam, 'imagem':imagem, 'descricao':pt.descricao or u'Sem descrição', 'range':range(tam-1)})
-            
-            rack = {'nome':rack.apelido, 'altura':126, 'altura_pts': 126/3, 'equipamentos':equipamentos}
-            if altura > 1:
-                
-                equipamentos.append({'tamanho':altura-1, 'range':range(altura-2)})
-                vazio += altura-1
-                
-            rack['vazio'] = '%.2f%%'    % ((rack['altura']-vazio)*100.0/rack['altura'],)
-            racks.append(rack)
-        dc = {'nome':EnderecoDetalhe.objects.get(id=local).complemento, 'racks':racks, 'id':local}
-        dcs.append(dc)
+    p_dc = request.GET.get('dc')
+    
+    dcs = []
+    if p_dc != None:
+        if int(p_dc) > 0:
+            locais = locais.filter(historicolocal__endereco__id=p_dc)
+        debugFile = open('/tmp/debug.txt', 'w')
         
-    debugFile.close()
-    return TemplateResponse(request, 'patrimonio/racks.html', {'dcs':dcs})
+        for local in locais:
+            racks = []
+            for rack in Patrimonio.objects.filter(equipamento__tipo__nome='Rack', historicolocal__endereco__id=local):
+                altura = 127
+                vazio = 0
+                equipamentos = []
+                conflitos = []
+                
+                eixoY = 0
+                
+                # ordena os equipamentos do rack conforme a posição no rack
+                pts = list(rack.contido.filter(historicolocal__posicao__isnull=False).order_by('-historicolocal__posicao').distinct('historicolocal__posicao'))
+                pts.sort(key=lambda x: x.historico_atual().posicao_int(), reverse=True)
+    
+                ptAnterior = None
+                for pt in pts:
+                    pos = pt.historico_atual().posicao_int() -1 
+    
+                    if pos <= 0 or pt.tamanho is None: continue
+                    
+                    # calculando a altura do pt
+                    if altura > pos+int(round(pt.tamanho*3)):
+                        tam = altura-(pos+int(round(pt.tamanho*3)))
+                        altura -= tam
+                        equipamentos.append({'tamanho':tam, 'range':range(tam-1)})
+                        vazio += tam
+                    tam = int(round(pt.tamanho*3))
+                    altura -= tam
+                    
+                    # Setando Imagem do equipamento
+                    imagem = None
+                    if pt.equipamento:
+                        if pt.equipamento.imagem:
+                            imagem = pt.equipamento.imagem.url
+    
+                    # calculo da posição em pixel do eixoY, top-down
+                    eixoY = int(round(((126 - (pos) - tam) * 19)/3))
+                    
+                    # x a partir do topo do container
+                    equipamentos.append({'id': pt.id, 'pos':pos, 'tam': tam, 'eixoY': eixoY, 'altura':(tam*19/3), 'pos_original':pt.historico_atual().posicao_int(), 'imagem':imagem, 'descricao':pt.descricao or u'Sem descrição', 'range':range(tam-1), 'conflito':False})
+                    
+                    if pos + (tam) > 126:
+                        # Ocorre quando um equipamento está passando do limite máximo do rack
+                        obs = '{!s} + {!s} > {!s}'.format(pos, (tam), 126)
+                        conflitos.append({'obs': obs, 'eq1':equipamentos[-1]})
+                        equipamentos[-1]['conflito'] = True
+                
+                    elif len(equipamentos)>2 and eixoY:
+                        # Ocorre quando um equipamento sobrepoe o outro
+                        if ptAnterior['eixoY'] + ptAnterior['tam'] > eixoY:
+                            obs = '{!s} + {!s} > {!s}'.format(ptAnterior['eixoY'], ptAnterior['tam'], eixoY)
+                            conflitos.append({'obs': obs, 'eq1':ptAnterior, 'eq2':equipamentos[-1]})
+                            equipamentos[-1]['conflito'] = True
+                            equipamentos[-2]['conflito'] = True
+                    elif pos < 0:
+                        # Posição negativa
+                        # Ocorre quando o equipamento não tem uma posição válida
+                        obs = '{!s} < 0'.format(pt.historico_atual().posicao_int())
+                        conflitos.append({'obs': obs, 'eq1':equipamentos[-1]})
+                        equipamentos[-1]['conflito'] = True
+    
+                    ptAnterior = equipamentos[-1]
+                
+                rack = {'id':rack.id, 'nome':rack.apelido, 'altura':126, 'altura_pts': 126/3, 'equipamentos':equipamentos, 'conflitos':conflitos}
+                
+                # Calculo de uso do rack
+                if altura > 1:
+                    equipamentos.append({'tam':altura-1, 'range':range(altura-2)})
+                    vazio += altura-1
+                    
+                rack['vazio'] = '%.2f%%'    % ((rack['altura']-vazio)*100.0/rack['altura'],)
+                racks.append(rack)
+                
+            dc = {'nome':EnderecoDetalhe.objects.get(id=local).complemento, 'racks':racks, 'id':local}
+            dcs.append(dc)
+            
+        debugFile.close()
+        
+    return TemplateResponse(request, 'patrimonio/racks.html', {'dcs':dcs, 'todos_dcs':todos_dcs})
 
 @login_required
 def racks1(request):
