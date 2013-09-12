@@ -174,7 +174,7 @@ def por_estado(request):
 
             no_estado = []
             for p in Patrimonio.objects.filter(patrimonio__isnull=True):
-                ht = p.historico_atual()
+                ht = p.historico_atual
                 if ht and ht.estado == estado:
                     no_estado.append(ht.id)
 
@@ -222,7 +222,7 @@ def por_local(request, pdf=0):
     if request.GET.get('endereco') is not None:
         atuais = []
         for p in Patrimonio.objects.filter(patrimonio__isnull=True):
-            ht = p.historico_atual()
+            ht = p.historico_atual
             if ht:
                  atuais.append(ht.id)
 
@@ -278,9 +278,9 @@ def por_tipo_equipamento(request, pdf=0):
     estado_id = request.GET.get('estado')
     if estado_id != '0':
         for p in patrimonios_tipo:
-            if p.historico_atual() is None:
+            if p.historico_atual is None:
                 patrimonios_tipo = patrimonios_tipo.exclude(id=p.id)
-            elif p.historico_atual().estado.id != int(estado_id):
+            elif p.historico_atual.estado.id != int(estado_id):
                 patrimonios_tipo = patrimonios_tipo.exclude(id=p.id)
 
     part_number = request.GET.get('partnumber')
@@ -288,8 +288,8 @@ def por_tipo_equipamento(request, pdf=0):
         patrimonios_tipo = patrimonios_tipo.filter(equipamento__part_number=part_number)
 
     for p in patrimonios_tipo:
-        if p.historico_atual():
-            entidades.append({'entidade':p.historico_atual().endereco.end.entidade, 'local':p.historico_atual().endereco.complemento, 'patrimonio':p})
+        if p.historico_atual:
+            entidades.append({'entidade':p.historico_atual.endereco.end.entidade, 'local':p.historico_atual.endereco.complemento, 'patrimonio':p})
 
     entidades.sort(key=lambda x: x['local'])
     entidades.sort(key=lambda x: x['entidade'].sigla)
@@ -331,9 +331,9 @@ def por_tipo_equipamento_old(request, pdf=0):
     estado_id = request.GET.get('estado')
     if estado_id != '0':
         for p in patrimonios_tipo:
-            if p.historico_atual() is None:
+            if p.historico_atual is None:
                 patrimonios_tipo = patrimonios_tipo.exclude(id=p.id)
-            elif p.historico_atual().estado.id != int(estado_id):
+            elif p.historico_atual.estado.id != int(estado_id):
                 patrimonios_tipo = patrimonios_tipo.exclude(id=p.id)
 
     part_number = request.GET.get('partnumber')
@@ -344,19 +344,19 @@ def por_tipo_equipamento_old(request, pdf=0):
         patrimonios_entidade = patrimonios_tipo.all()
 
         for p in patrimonios_entidade:
-            if p.historico_atual() is None:
+            if p.historico_atual is None:
                 patrimonios_entidade = patrimonios_entidade.exclude(id=p.id)
-            elif p.historico_atual().endereco.end.entidade != e:
+            elif p.historico_atual.endereco.end.entidade != e:
                 patrimonios_entidade = patrimonios_entidade.exclude(id=p.id)
         if patrimonios_entidade.count() > 0:
             entidade = {'entidade':e}
             locais = []
-            for l in sorted(set([p.historico_atual().endereco.complemento for p in patrimonios_entidade])):
+            for l in sorted(set([p.historico_atual.endereco.complemento for p in patrimonios_entidade])):
                 patrimonios_local = patrimonios_entidade.all()
                 for p in patrimonios_local:
-                    if p.historico_atual() is None:
+                    if p.historico_atual is None:
                         patrimonios_local = patrimonios_local.exclude(id=p.id)
-                    elif p.historico_atual().endereco.complemento != l:
+                    elif p.historico_atual.endereco.complemento != l:
 			patrimonios_local = patrimonios_local.exclude(id=p.id)
                 local={'local':l, 'patrimonios':patrimonios_local}
 	        locais.append(local)
@@ -383,9 +383,9 @@ def filtra_pn_estado(request):
     for e in Estado.objects.all():
         patrimonios_estado = patrimonios.all()
         for p in patrimonios_estado:
-            if not p.historico_atual():
+            if not p.historico_atual:
                 patrimonios_estado = patrimonios_estado.exclude(id=p.id)
-            elif p.historico_atual().estado !=e:
+            elif p.historico_atual.estado !=e:
 		patrimonios_estado = patrimonios_estado.exclude(id=p.id)
 
         estados.append({'pk':e.id, 'value':'%s (%s)' % (e, patrimonios_estado.order_by('id').distinct().count())})
@@ -476,7 +476,7 @@ def por_termo(request, pdf=0):
 def racks(request):
         
     # Busca patrimonios do tipo RACK com o estado ATIVO
-    locais = Patrimonio.objects.filter(equipamento__tipo__nome='Rack', historicolocal__estado__id=Estado.PATRIMONIO_ATIVO).values_list('historicolocal__endereco', flat=True).order_by('historicolocal__endereco').distinct()
+    locais = Patrimonio.objects.filter(equipamento__tipo__nome='Rack', historicolocal__estado__id=Estado.PATRIMONIO_ATIVO).values_list('historicolocal__endereco', flat=True).order_by('historicolocal__endereco').distinct().only('id')
 
     todos_dcs = []
     for local in locais:
@@ -489,11 +489,11 @@ def racks(request):
     if p_dc != None:
         if int(p_dc) > 0:
             locais = locais.filter(historicolocal__endereco__id=p_dc)
-        debugFile = open('/tmp/debug.txt', 'w')
         
         for local in locais:
             racks = []
-            for rack in Patrimonio.objects.filter(equipamento__tipo__nome='Rack', historicolocal__endereco__id=local):
+            patrimonio_racks = Patrimonio.objects.filter(equipamento__tipo__nome='Rack', historicolocal__endereco__id=local).select_related('equipamento', 'equipamento__imagem', 'historicolocal', 'contido')
+            for rack in patrimonio_racks:
                 altura = 127
                 vazio = 0
                 equipamentos = []
@@ -503,11 +503,12 @@ def racks(request):
                 
                 # ordena os equipamentos do rack conforme a posição no rack
                 pts = list(rack.contido.filter(historicolocal__posicao__isnull=False).order_by('-historicolocal__posicao').distinct('historicolocal__posicao'))
-                pts.sort(key=lambda x: x.historico_atual().posicao_int(), reverse=True)
+                pts.sort(key=lambda x: x.historico_atual.posicao_int, reverse=True)
     
                 ptAnterior = None
                 for pt in pts:
-                    pos = pt.historico_atual().posicao_int() -1 
+                    pt_historico_atual = pt.historico_atual
+                    pos = pt_historico_atual.posicao_int -1 
     
                     if pos <= 0 or pt.tamanho is None: continue
                     
@@ -515,22 +516,21 @@ def racks(request):
                     if altura > pos+int(round(pt.tamanho*3)):
                         tam = altura-(pos+int(round(pt.tamanho*3)))
                         altura -= tam
-                        equipamentos.append({'tamanho':tam, 'range':range(tam-1)})
+                        #equipamentos.append({'tamanho':tam, 'range':range(tam-1)})
                         vazio += tam
                     tam = int(round(pt.tamanho*3))
                     altura -= tam
                     
                     # Setando Imagem do equipamento
                     imagem = None
-                    if pt.equipamento:
-                        if pt.equipamento.imagem:
-                            imagem = pt.equipamento.imagem.url
+                    if pt.equipamento and pt.equipamento.imagem:
+                        imagem = pt.equipamento.imagem.url
     
                     # calculo da posição em pixel do eixoY, top-down
                     eixoY = int(round(((126 - (pos) - tam) * 19)/3))
                     
                     # x a partir do topo do container
-                    equipamentos.append({'id': pt.id, 'pos':pos, 'tam': tam, 'eixoY': eixoY, 'altura':(tam*19/3), 'pos_original':pt.historico_atual().posicao_int(), 'imagem':imagem, 'descricao':pt.descricao or u'Sem descrição', 'range':range(tam-1), 'conflito':False})
+                    equipamentos.append({'id': pt.id, 'pos':pos, 'tam': tam, 'eixoY': eixoY, 'altura':(tam*19/3), 'pos_original':pt_historico_atual.posicao_int, 'imagem':imagem, 'descricao':pt.descricao or u'Sem descrição', 'range':range(tam-1), 'conflito':False})
                     
                     if pos + (tam) > 126:
                         # Ocorre quando um equipamento está passando do limite máximo do rack
@@ -548,7 +548,7 @@ def racks(request):
                     elif pos < 0:
                         # Posição negativa
                         # Ocorre quando o equipamento não tem uma posição válida
-                        obs = '{!s} < 0'.format(pt.historico_atual().posicao_int())
+                        obs = '{!s} < 0'.format(pt_historico_atual.posicao_int)
                         conflitos.append({'obs': obs, 'eq1':equipamentos[-1]})
                         equipamentos[-1]['conflito'] = True
     
@@ -567,8 +567,6 @@ def racks(request):
             dc = {'nome':EnderecoDetalhe.objects.get(id=local).complemento, 'racks':racks, 'id':local}
             dcs.append(dc)
             
-        debugFile.close()
-        
     return TemplateResponse(request, 'patrimonio/racks.html', {'dcs':dcs, 'todos_dcs':todos_dcs})
 
 @login_required
@@ -670,11 +668,11 @@ def abre_arvore_tipo(request):
         elif model == 'equipamento':
             patrimonios = list(Equipamento.objects.get(id=id).patrimonio_set.all())
             try:
-                patrimonios.sort(key=lambda x:x.historico_atual().endereco.end.entidade.sigla)
+                patrimonios.sort(key=lambda x:x.historico_atual.endereco.end.entidade.sigla)
             except:
 		pass
             for p in patrimonios:
-                ha = p.historico_atual()
+                ha = p.historico_atual
 		ret.append({'data':'<div><div class="col1"></div><div class="col2"><div class="medio">%s</div><div class="maior">%s</div><div class="menor">%s</div><div class="medio">%s</div><div class="medio">%s</div><div class="medio">%s</div><div class="medio">%s</div><div class="menor">%s</div></div><div style="clear:both;"></div></div>' % (ha.endereco.end.entidade if ha else 'ND' , ha.endereco.complemento if ha else 'ND', ha.posicao if ha and ha.posicao else 'ND', p.equipamento.marca, p.equipamento.modelo, p.equipamento.part_number, p.ns, ha.estado if ha else 'ND'), 'attr':{'style':'padding-top:4px;'}})
     else:
         for tp in TipoEquipamento.objects.all():

@@ -22,19 +22,19 @@ class HistoricoLocalTest(TestCase):
         Teste de permanencia para um dia com almoço normal de uma hora
         """
         historico = HistoricoLocal(posicao="R042.F085")
-        self.assertEquals(historico.posicao_int(), 85)
+        self.assertEquals(historico.posicao_int, 85)
         
         historico = HistoricoLocal(posicao="P042.F017")
-        self.assertEquals(historico.posicao_int(), 17)
+        self.assertEquals(historico.posicao_int, 17)
         
         historico = HistoricoLocal(posicao="S042.F040")
-        self.assertEquals(historico.posicao_int(), 40)
+        self.assertEquals(historico.posicao_int, 40)
         
         historico = HistoricoLocal(posicao="S042.F049")
-        self.assertEquals(historico.posicao_int(), 49)
+        self.assertEquals(historico.posicao_int, 49)
         
         historico = HistoricoLocal(posicao="60")
-        self.assertEquals(historico.posicao_int(), 60)
+        self.assertEquals(historico.posicao_int, 60)
         
         
         
