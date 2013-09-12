@@ -534,21 +534,24 @@ def racks(request):
                     
                     if pos + (tam) > 126:
                         # Ocorre quando um equipamento está passando do limite máximo do rack
-                        obs = '{!s} + {!s} > {!s}'.format(pos, (tam), 126)
+                        #obs = '{!s} + {!s} > {!s}'.format(pos, (tam), 126)
+                        obs = '%s + %s > %s' % (pos, tam, 125)
                         conflitos.append({'obs': obs, 'eq1':equipamentos[-1]})
                         equipamentos[-1]['conflito'] = True
                 
                     elif len(equipamentos)>2 and eixoY:
                         # Ocorre quando um equipamento sobrepoe o outro
                         if ptAnterior['eixoY'] + ptAnterior['tam'] > eixoY:
-                            obs = '{!s} + {!s} > {!s}'.format(ptAnterior['eixoY'], ptAnterior['tam'], eixoY)
+                            #obs = '{!s} + {!s} > {!s}'.format(ptAnterior['eixoY'], ptAnterior['tam'], eixoY)
+                            obs = '%s + %s > %s' % (ptAnterior['eixoY'], ptAnterior['tam'], eixoY)
                             conflitos.append({'obs': obs, 'eq1':ptAnterior, 'eq2':equipamentos[-1]})
                             equipamentos[-1]['conflito'] = True
                             equipamentos[-2]['conflito'] = True
                     elif pos < 0:
                         # Posição negativa
                         # Ocorre quando o equipamento não tem uma posição válida
-                        obs = '{!s} < 0'.format(pt_historico_atual.posicao_int)
+                        #obs = '{!s} < 0'.format(pt.historico_atual().posicao_int())
+                        obs = '%s < 0' % pt.historico_atual().posicao_int()
                         conflitos.append({'obs': obs, 'eq1':equipamentos[-1]})
                         equipamentos[-1]['conflito'] = True
     
