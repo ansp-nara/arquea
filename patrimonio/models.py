@@ -4,11 +4,14 @@
 from django.db import models
 from utils.models import NARADateField
 from django.utils.translation import ugettext_lazy as _
+from django.utils.functional import cached_property
 from django.db.models import Q
 import datetime
+import logging
 
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
 
-# Create your models here.
 
 
 
@@ -118,6 +121,7 @@ class Patrimonio(models.Model):
         else:
             return '%s - %s - %s' % (self.apelido, self.ns, self.descricao)
 
+    @cached_property
     def historico_atual(self):
         ht = self.historicolocal_set.order_by('-data')
         if not ht: return None
@@ -125,7 +129,7 @@ class Patrimonio(models.Model):
    
 
     def posicao(self):
-        ht = self.historico_atual()
+        ht = self.historico_atual
         if not ht: return ''
         return '%s - %s' % (ht.endereco.complemento, ht.posicao)
 
@@ -231,8 +235,6 @@ class HistoricoLocal(models.Model):
     def __unicode__(self):
         return u'%s - %s | %s' % (self.data.strftime('%d/%m/%Y'), self.patrimonio, self.endereco or '')
 
-
-
     # Define a descrição do modelo e a ordenação dos dados pelo campo 'nome'.
     class Meta:
         verbose_name = _(u'Histórico Local')
@@ -240,7 +242,7 @@ class HistoricoLocal(models.Model):
         ordering = ('-data', )
         unique_together = (('patrimonio', 'endereco', 'descricao', 'data'), )
 
-
+    @cached_property
     def posicao_int(self):
         try:
             return int(self.posicao)
