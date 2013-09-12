@@ -81,7 +81,7 @@ def mensal(request, ano=2012, mes=7):
         linha = [m.nome]
         controles = Controle.objects.filter(entrada__year=ano, entrada__month=mes, membro=m, saida__isnull=False)
         for dia in dias:
-            min = sum([c.segundos() for c in controles.filter(entrada__day=dia)], 0)/60
+            min = sum([c.segundos for c in controles.filter(entrada__day=dia)], 0)/60
             linha.append('%02d:%02d' % (min/60, min%60))
         dados.append(linha)
 
@@ -129,7 +129,7 @@ def mensal_func(request):
         total_horas_restante = 0
         total_horas_dispensa = 0
         total_horas_ferias = 0
-         
+
         for m in meses:
                         
             # total de horas trabalhadas

@@ -44,7 +44,7 @@ class MembroControleTest(TestCase):
         membro = Membro(nome='teste')
         controle = Controle(membro=membro, entrada=timezone.now(), saida=timezone.now()+timedelta(hours=9), 
                             almoco_devido=True, almoco=60)
-        self.assertEquals(controle.segundos(), 8 * 60 * 60, 'Deveria ser 28800 mas e ' + str(controle.segundos()))
+        self.assertEquals(controle.segundos, 8 * 60 * 60, 'Deveria ser 28800 mas e ' + str(controle.segundos))
 
     def test_controle_permanencia_um_dia_almoco_menor(self):
         """
@@ -53,7 +53,7 @@ class MembroControleTest(TestCase):
         membro = Membro(nome='teste')
         controle = Controle(membro=membro, entrada=timezone.now(), saida=timezone.now()+timedelta(hours=9), 
                             almoco_devido=True, almoco=30)
-        self.assertEquals(controle.segundos(), 8.5 * 60 * 60, 'Deveria ser 28800 mas e ' + str(controle.segundos()))
+        self.assertEquals(controle.segundos, 8.5 * 60 * 60, 'Deveria ser 28800 mas e ' + str(controle.segundos))
 
 
     def test_controle_permanencia_sem_almoco(self):
@@ -63,7 +63,7 @@ class MembroControleTest(TestCase):
         membro = Membro(nome='teste')
         controle = Controle(membro=membro, entrada=timezone.now(), saida=timezone.now()+timedelta(hours=9), 
                             almoco_devido=False, almoco=60)
-        self.assertEquals(controle.segundos(), 9 * 60 * 60, 'Deveria ser 32400 mas e ' + str(controle.segundos()))
+        self.assertEquals(controle.segundos, 9 * 60 * 60, 'Deveria ser 32400 mas e ' + str(controle.segundos))
         
 
     def test_controle_permanencia_sem_almoco(self):
@@ -84,7 +84,7 @@ class MembroControleTest(TestCase):
         print controle.saida-controle.entrada
         print (controle.saida-controle.entrada).total_seconds()
         
-        #self.assertEquals(controle.segundos(), 48 * 60 * 60)
+        #self.assertEquals(controle.segundos, 48 * 60 * 60)
 
     def test_controle_mover_bloco(self):
         membro = Membro(id=1, nome='teste')
