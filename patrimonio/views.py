@@ -551,7 +551,7 @@ def racks(request):
                         # Posição negativa
                         # Ocorre quando o equipamento não tem uma posição válida
                         #obs = '{!s} < 0'.format(pt.historico_atual().posicao_int())
-                        obs = '%s < 0' % pt.historico_atual().posicao_int()
+                        obs = '%s < 0' % pt.historico_atual.posicao_int()
                         conflitos.append({'obs': obs, 'eq1':equipamentos[-1]})
                         equipamentos[-1]['conflito'] = True
     
