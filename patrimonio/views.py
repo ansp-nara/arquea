@@ -502,13 +502,14 @@ def racks(request):
                 eixoY = 0
                 
                 # ordena os equipamentos do rack conforme a posição no rack
-                pts = list(rack.contido.filter(historicolocal__posicao__isnull=False).order_by('-historicolocal__posicao').distinct('historicolocal__posicao'))
+#                 pts = list(rack.contido.filter(historicolocal__posicao__isnull=False).values('historicolocal__data').aggregate(Max('historicolocal__data')))
+                hist = rack.contido.annotate(hist=Max('historicolocal__data')).values_list('pk')
+                pts = list(rack.contido.filter(pk__in=hist))
                 pts.sort(key=lambda x: x.historico_atual.posicao_int, reverse=True)
     
                 ptAnterior = None
                 for pt in pts:
-                    pt_historico_atual = pt.historico_atual
-                    pos = pt_historico_atual.posicao_int -1 
+                    pos = pt.historico_atual.posicao_int -1 
     
                     if pos <= 0 or pt.tamanho is None: continue
                     
@@ -530,7 +531,7 @@ def racks(request):
                     eixoY = int(round(((126 - (pos) - tam) * 19)/3))
                     
                     # x a partir do topo do container
-                    equipamentos.append({'id': pt.id, 'pos':pos, 'tam': tam, 'eixoY': eixoY, 'altura':(tam*19/3), 'pos_original':pt_historico_atual.posicao_int, 'imagem':imagem, 'descricao':pt.descricao or u'Sem descrição', 'range':range(tam-1), 'conflito':False})
+                    equipamentos.append({'id': pt.id, 'pos':pos, 'tam': tam, 'eixoY': eixoY, 'altura':(tam*19/3), 'pos_original':pt.historico_atual.posicao_int, 'imagem':imagem, 'descricao':pt.descricao or u'Sem descrição', 'range':range(tam-1), 'conflito':False})
                     
                     if pos + (tam) > 126:
                         # Ocorre quando um equipamento está passando do limite máximo do rack
