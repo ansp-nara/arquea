@@ -89,6 +89,7 @@ class EnderecoDetalhe(models.Model):
     complemento = models.TextField()
     detalhe = models.ForeignKey('identificacao.EnderecoDetalhe', verbose_name=u'ou Detalhe pai', null=True, blank=True)
     ordena = models.CharField(editable=False, max_length=1000, null=True)
+    mostra_bayface = models.BooleanField(_(u'Mostra no bayface'), help_text=_(u''))
 
     def save(self, *args, **kwargs):
         if self.endereco == None and self.detalhe == None:

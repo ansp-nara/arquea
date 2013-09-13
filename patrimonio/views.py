@@ -475,8 +475,9 @@ def por_termo(request, pdf=0):
 @login_required
 def racks(request):
         
+        
     # Busca patrimonios do tipo RACK com o estado ATIVO
-    locais = Patrimonio.objects.filter(equipamento__tipo__nome='Rack', historicolocal__estado__id=Estado.PATRIMONIO_ATIVO).values_list('historicolocal__endereco', flat=True).order_by('historicolocal__endereco').distinct().only('id')
+    locais = Patrimonio.objects.filter(equipamento__tipo__nome='Rack', historicolocal__estado__id=Estado.PATRIMONIO_ATIVO, historicolocal__endereco__mostra_bayface=True).values_list('historicolocal__endereco', flat=True).order_by('historicolocal__endereco').distinct().only('id')
 
     todos_dcs = []
     for local in locais:
