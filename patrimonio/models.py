@@ -243,15 +243,51 @@ class HistoricoLocal(models.Model):
         unique_together = (('patrimonio', 'endereco', 'descricao', 'data'), )
 
     @cached_property
-    def posicao_int(self):
-        try:
-            return int(self.posicao)
-        except:
-            try:
-                return int(self.posicao.split('.F')[1].split('.')[0])
-            except:
-		return -1
+    def posicao_furo(self):
+        retorno = -1
+        if self.posicao:
+            # verifica se possui a posição já configurada
+            if self.posicao.isdigit():
+                retorno = int(self.posicao)
+            else:
+                # verifica se é possível recuperar a posição de furo de uma string como R042.F085.TD
+                furo_str = self.posicao.split('.F')
+                if len(furo_str) >= 2:
+                    pos_str = furo_str[1].split('.')
+                    if len(pos_str) >= 1:
+                        retorno = int(pos_str[0])
+        
+        return retorno
 
+    @cached_property
+    def posicao_colocacao(self):
+        retorno = None
+        if self.posicao:
+            # verifica se é possível recuperar a posição TD de uma string como R042.F085.TD ou R042.F085-TD 
+            furo_str = self.posicao.split('.F')
+            if len(furo_str) >= 2:
+                pos_str = furo_str[1].split('.')
+                if len(pos_str) >= 2:
+                    retorno = pos_str[1]
+                else:
+                    pos_str = furo_str[1].split('-')
+                    if len(pos_str) > 1:
+                        retorno = pos_str[1]
+                        
+            else:
+                # verifica se é possível recuperar a posição piso de uma string como R042.piso
+                pos_str = self.posicao.split('.')
+                if len(pos_str) == 2:
+                    retorno = pos_str[1]
+                else:
+                    # verifica se é possível recuperar a posição piso de uma string como R042-piso
+                    pos_str = self.posicao.split('-')
+                    if len(pos_str) == 2:
+                        retorno = pos_str[1]
+            
+        return retorno
+
+    
 class Direcao(models.Model):
 	origem = models.CharField(max_length=15)
 	destino = models.CharField(max_length=15)

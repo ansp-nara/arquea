@@ -16,29 +16,48 @@
     background:white repeat-y;
     display:inline-block;
     width:7px;
+    /*
     height:798px;
+    */
     vertical-align:top;
+
 }
-.u-n {
+.bloco-n {
     display:inline-block;
-    width:13px;
-    height:14px;
+    width:20px;
+    /*
+    height:798px;
+    */
+    background-color:white;
+    margin-right:7px;
+    vertical-align:top;
+    border-bottom:1px solid;
+    border-color: #999a9a;
+    
+}
+
+.bloco-n .u-n {
+    width:19px;
+    height:19px;
     background:#d8d8d8;
     color:#636363;
     font:8px Verdana,Arial;
-    border-top:1px; 
-    border-left:1px;
-    border-bottom:0;
+    border-top:0;
     border-right:1px;
+    border-bottom:0;
+    border-left:1px; 
     border-style:solid; 
-    border-color: #999a9a;
-    padding:2px;
     font-size:9px;
 }
+.bloco-n .u-n div {
+	border-top: 1px solid;
+	vertical-align: middle;
+	text-align: center;
+	line-height: 18px;
+	}
 .rack {
 	width:255px;
 	display:inline-table;
-	height:820px;
 	margin-right:10px;
 	margin-top:20px;
 	margin-bottom:30px;
@@ -51,10 +70,13 @@
    color:#333;  
 } 
 .interno {
+	position:relative;
     display:inline-block;
     width:199px;
     margin-left:1px;
     margin-right:4px;
+    font-size:10px;
+    
 }
 .interno a:link,
 .interno a:visited,
@@ -67,9 +89,6 @@
     z-index: 5;
     width:100%;
     height:100%;
-    opacity:0.7;
-    filter:alpha(opacity=70);
-    background-color:black;
 }
 .interno a div {
     position:absolute;
@@ -78,14 +97,16 @@
 .interno a div div div {
     position:relative;
     display: table-cell;
-    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black, -2px 0 1px black, 0 2px 1px black, 2px 0 1px black, 0 -2px 1px black;
-    font-size:10px;
     vertical-align:middle;
     line-height: 1.5em;
     width: 199px;
     text-align: center;
 }
-
+@media screen {
+	.interno a div div div {
+        text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black, -2px 0 1px black, 0 2px 1px black, 2px 0 1px black, 0 -2px 1px black;
+	}
+}
 .equip {
     display:inline-block;
     background:#81878b;
@@ -96,6 +117,20 @@
     padding-left:1px; ;
     vertical-align:middle; 
     line-height:1.5em;
+}
+.equip.pos_01 {
+	width:97px;
+	font-size: 9px;
+}
+.equip.pos_02 {
+	right:0;
+	width:97px;
+	padding-right: 0;
+	margin-right: 0;
+	font-size: 9px;
+}
+.equip.pos_03 {
+	
 }
 .equip.conflito {
 	border:2px red solid;
@@ -114,14 +149,6 @@
 .dc {
     margin-top:50px;
 }
-.bloco-n {
-    display:inline-block;
-	width:19px;
-	height:798px;
-	background-color:white;
-	margin-right:1px;
-	vertical-align:top;
-}
 .conflitos-title {
     position:relative;
     color: red;
@@ -133,10 +160,48 @@
 .conflitos-content {
 	display:none;
 }
+.conflitos .conflito-tbl-obs {
+	 border-top:1px black solid; 
+	 font-weight:bold;
+}
 
+.outros caption {
+	display:block;
+	text-align: left;
+	font-size: 12px;
+	font-weight: bold;
+}
+.outros table {
+	margin-left:0;
+	margin-right:0;
+	margin-bottom:10px;
+	margin-top:10px;
+	width:100%;
+}
+.outros th,
+.outros td {
+	border: 1px dotted;
+}
 @media print {
 	.page-break {
 		page-break-after:always;
 	}
+	/* escurece a imagem para dar contraste com a cor branca da fonte */
+	.interno a img {
+	    opacity:0.6;
+	    filter:alpha(opacity=60);
+	    background-color:black;
+	}
+	.conflitos-title {
+	   display:none;
+	  
+	}
+	.equip.conflito {
+	   border: 0;
+	   width:199px;
+	}
+	.interno a div div div {
+        font-weight:bold;
+    }
 }
 
