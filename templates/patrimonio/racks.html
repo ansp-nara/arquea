@@ -60,41 +60,58 @@ Data Centers
 </form>
 {% if dcs %}
 	{% for dc in dcs %}
-	<div class="dc page-break">
+	   {% if not forloop.first %}
+	       <div class="page-break"></div>
+	   {% endif %}
+	<div class="dc">
 	<h1>{{ dc.nome }}</h1>
 	{% for rack in dc.racks %}
 		<div class="rack"  style="{% if forloop.counter|divisibleby:2 %}page-break-after:always;{% endif %}">
 		    <h2>
-		      <a href="{% url "admin:patrimonio_patrimonio_change" rack.id %}" onclick="return showAddAnotherPopup(this);">{{ rack.nome }} 
-		      ({{ rack.vazio }} ocupado)
+		      <a href="{% url "admin:patrimonio_patrimonio_change" rack.id %}" onclick="return showAddAnotherPopup(this);">
+		      {{ rack.nome }} ({{ rack.vazio }} ocupado)
 		      </a>
 		    </h2>
-		    <div id="rack{{ dc.id }}_{{forloop.counter}}" class="bloco-n">
+		    <div id="rack{{ dc.id }}_{{forloop.counter}}" class="bloco-n" style="height: {{ rack.altura_pxs }}px;">
 		        {% for i in rack.altura_pts|get_range reversed %}
-		            <div class="u-n">{{ i|add:"1" }}</div>
+		            <div class="u-n"><div>{{ i|add:"1" }}</div></div>
 		        {% endfor %}
 		    </div>
-		    <div class="u"></div>
-		    <div class="interno" style="position:relative;">
+		    <div class="u" style="height: {{ rack.altura_pxs }}px;"></div>
+		    <div class="interno">
 		  {% for eq in rack.equipamentos %}
 		       {% if eq.id %}
 		           <a href="{% url "admin:patrimonio_patrimonio_change" eq.id %}" onclick="return showAddAnotherPopup(this);">
 		       {% endif %}
-		       <div class="{% if eq.conflito %}conflito{% endif %} {% if eq.descricao %}equip " rel="tooltip" title="{{ eq.descricao }}"{% else %}espaco"{% endif %} 
+		       <div class="{% if eq.pos_col %} pos_{{eq.pos_col}} {% endif %} {% if eq.conflito %}conflito{% endif %} {% if eq.descricao %}equip " rel="tooltip" title="{{ eq.descricao }}"{% else %}espaco"{% endif %} 
 		           style="margin-top:{{ eq.eixoY }}px; height:{{ eq.altura }}px;">
 	               <div>
 		               <div style="height:{{ eq.altura }}px;">
-			            {% if eq.tam >= 15 %}
-			                {{ eq.descricao|truncatechars:150 }}
-			            {% elif eq.tam >= 12 %}
-			                {{ eq.descricao|truncatechars:120 }}
-			            {% elif eq.tam >= 9 %}
-			                {{ eq.descricao|truncatechars:90 }}            
-			            {% elif eq.tam >= 6 %}
-			                {{ eq.descricao|truncatechars:60 }}
-			            {% else %}
-			                {{ eq.descricao|truncatechars:30 }}
-			            {% endif %}
+		                {% if eq.pos_col %}
+		                    {% if eq.tam >= 15 %}
+                                {{ eq.descricao|truncatechars:80 }}
+                            {% elif eq.tam >= 12 %}
+                                {{ eq.descricao|truncatechars:65 }}
+                            {% elif eq.tam >= 9 %}
+                                {{ eq.descricao|truncatechars:50 }}            
+                            {% elif eq.tam >= 6 %}
+                                {{ eq.descricao|truncatechars:35 }}
+                            {% else %}
+                                {{ eq.descricao|truncatechars:20 }}
+                            {% endif %}
+				        {% else %}
+				            {% if eq.tam >= 15 %}
+				                {{ eq.descricao|truncatechars:150 }}
+				            {% elif eq.tam >= 12 %}
+				                {{ eq.descricao|truncatechars:120 }}
+				            {% elif eq.tam >= 9 %}
+				                {{ eq.descricao|truncatechars:90 }}            
+				            {% elif eq.tam >= 6 %}
+				                {{ eq.descricao|truncatechars:60 }}
+				            {% else %}
+				                {{ eq.descricao|truncatechars:30 }}
+				            {% endif %}
+                        {% endif %}
 			            </div>
 		            </div>
 		            {% if eq.imagem %}<img src="{{ eq.imagem }}" />{% endif %}
@@ -104,9 +121,35 @@ Data Centers
 		       {% endif %}
 		  {% endfor %}
 		    </div>
-		   <div class="u"></div>
+		   <div class="u" style="height: {{ rack.altura_pxs }}px;"></div>
+		{% if rack.equipamentos_fora_visao %}
+            <div class="outros">
+                <div class="outros-content">
+                <table>
+                    <caption class="outros-title">Outros equipamentos.</caption>
+                    <tr>
+                        <th>Desc</th>
+                        <th>Tam</th>
+                        <th>Pos</th>
+                        <th>Col</th>
+                    </tr>
+                    {% for eq in rack.equipamentos_fora_visao %}
+                        <tr>
+	                        <td>
+	    	                    <a href="{% url "admin:patrimonio_patrimonio_change" eq.id %}" onclick="return showAddAnotherPopup(this);">{{ eq.descricao|truncatechars:45 }}</a>
+	    	                </td>
+	                        <td>{{ eq.tam }}</td>
+	                        <td>{{ eq.pos }}</td>
+	                        <td>{{ eq.pos_col }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+                </div>
+            </div>
+           {% endif %}
 		{% if rack.conflitos %}
-	        <div class="conflitos"><span  class="conflitos-title">Conflito de equipamentos!</span>
+	        <div class="conflitos">
+	            <span class="conflitos-title">Avisos!</span>
 	            <div class="conflitos-content">
 	            <table>
 	                <tr>
@@ -115,7 +158,11 @@ Data Centers
 	                    <th>Alt</th>
 	                </tr>
 	                {% for conflito in rack.conflitos %}
-	                    <tr style="border-top:1px black solid;">
+	                    <tr class="conflito-tbl-obs">
+	                       <td colspan=3>{{ conflito.obs }}</td>
+	                    </tr>
+	                    <tr>
+	                       {% if conflito.eq1 %}
 	                        <td>
 	                           <a href="{% url "admin:patrimonio_patrimonio_change" conflito.eq1.id %}" onclick="return showAddAnotherPopup(this);">
 	                            {{ conflito.eq1.descricao }}
@@ -123,6 +170,7 @@ Data Centers
 	                        </td>
 	                        <td>{{ conflito.eq1.pos }}</td>
 	                        <td>{{ conflito.eq1.tam }}</td>
+	                        {% endif %}
 	                    </tr>
 	                    <tr>
 	                        {% if conflito.eq2 %}
@@ -148,7 +196,4 @@ Data Centers
 {% endif %}
 </div>
 
-
-
 {% endblock %}
-

@@ -494,78 +494,96 @@ def racks(request):
             racks = []
             patrimonio_racks = Patrimonio.objects.filter(equipamento__tipo__nome='Rack', historicolocal__endereco__id=local).select_related('equipamento', 'equipamento__imagem', 'historicolocal', 'contido')
             for rack in patrimonio_racks:
-                altura = 127
-                vazio = 0
+                espaco_ocupado = 0
                 equipamentos = []
+                equipamentos_fora_visao = []
                 conflitos = []
                 
                 eixoY = 0
+                if rack.tamanho:
+                    rack_altura = int(rack.tamanho) * 3
+                else:
+                    # ISSO É UM PROBLEMA DE DADOS INVÁLIDOS. PRECISA SER TRATADO
+                    rack_altura = 126
+                    rack.tamanho = 42
+                    
+                    obs = 'Rack não possui tamanho.'
+                    conflitos.append({'obs': obs})
+                
                 
                 # ordena os equipamentos do rack conforme a posição no rack
 #                 pts = list(rack.contido.filter(historicolocal__posicao__isnull=False).values('historicolocal__data').aggregate(Max('historicolocal__data')))
                 hist = rack.contido.annotate(hist=Max('historicolocal__data')).values_list('pk')
                 pts = list(rack.contido.filter(pk__in=hist))
-                pts.sort(key=lambda x: x.historico_atual.posicao_int, reverse=True)
+                pts.sort(key=lambda x: x.historico_atual.posicao_furo, reverse=True)
     
                 ptAnterior = None
                 for pt in pts:
-                    pos = pt.historico_atual.posicao_int -1 
+                    pos = pt.historico_atual.posicao_furo -1 
     
                     if pos <= 0 or pt.tamanho is None: continue
                     
-                    # calculando a altura do pt
-                    if altura > pos+int(round(pt.tamanho*3)):
-                        tam = altura-(pos+int(round(pt.tamanho*3)))
-                        altura -= tam
-                        #equipamentos.append({'tamanho':tam, 'range':range(tam-1)})
-                        vazio += tam
-                    tam = int(round(pt.tamanho*3))
-                    altura -= tam
+                    # calculando a altura em furos
+                    tam = int(round(pt.tamanho * 3))
+    
+                    # calculo da posição em pixel do eixoY, top-down
+                    eixoY = int(round(((rack_altura - (pos) - tam) * 19)/3))
                     
                     # Setando Imagem do equipamento
                     imagem = None
                     if pt.equipamento and pt.equipamento.imagem:
                         imagem = pt.equipamento.imagem.url
-    
-                    # calculo da posição em pixel do eixoY, top-down
-                    eixoY = int(round(((126 - (pos) - tam) * 19)/3))
+                        
+                    if pt.historico_atual.posicao_colocacao in ('T', 'TD', 'TE', 'piso', 'lD', 'lE'):
+                        equipamentos_fora_visao.append({'id': pt.id, 'pos':pos, 'tam': tam, 'eixoY': eixoY, 'altura':(tam*19/3),
+                                          'pos_original':pt.historico_atual.posicao_furo, 'imagem':imagem, 'descricao':pt.descricao or u'Sem descrição', 
+                                          'conflito':False, 'pos_col':pt.historico_atual.posicao_colocacao})
+                        continue
+                    else :
+                        # x a partir do topo do container
+                        equipamentos.append({'id': pt.id, 'pos':pos, 'tam': tam, 'eixoY': eixoY, 'altura':(tam*19/3),
+                                              'pos_original':pt.historico_atual.posicao_furo, 'imagem':imagem, 'descricao':pt.descricao or u'Sem descrição', 
+                                              'conflito':False, 'pos_col':pt.historico_atual.posicao_colocacao})
+                        espaco_ocupado += tam
                     
-                    # x a partir do topo do container
-                    equipamentos.append({'id': pt.id, 'pos':pos, 'tam': tam, 'eixoY': eixoY, 'altura':(tam*19/3), 'pos_original':pt.historico_atual.posicao_int, 'imagem':imagem, 'descricao':pt.descricao or u'Sem descrição', 'range':range(tam-1), 'conflito':False})
-                    
-                    if pos + (tam) > 126:
+                    ## CHECAGEM DE PROBLEMAS
+                    if pos + (tam) > rack_altura:
                         # Ocorre quando um equipamento está passando do limite máximo do rack
                         #obs = '{!s} + {!s} > {!s}'.format(pos, (tam), 126)
-                        obs = '%s + %s > %s' % (pos, tam, 125)
+                        obs = 'Equip. acima do limite do rack.'
                         conflitos.append({'obs': obs, 'eq1':equipamentos[-1]})
                         equipamentos[-1]['conflito'] = True
                 
                     elif len(equipamentos)>2 and eixoY:
                         # Ocorre quando um equipamento sobrepoe o outro
-                        if ptAnterior['eixoY'] + ptAnterior['tam'] > eixoY:
-                            #obs = '{!s} + {!s} > {!s}'.format(ptAnterior['eixoY'], ptAnterior['tam'], eixoY)
-                            obs = '%s + %s > %s' % (ptAnterior['eixoY'], ptAnterior['tam'], eixoY)
+                        # Caso estejam na mesma posição 01 ou 02, ou então, haja um equipamento que ocupe toda largura do rack
+                        # Não ocorre quando os equipamentos estiverem lado a lado (marcados no attr pos_col, por exemplo, 01 com 02)
+                        
+                        if ptAnterior['eixoY'] + ptAnterior['tam'] > eixoY and (ptAnterior['pos_col'] == equipamentos[-1]['pos_col'] or not ptAnterior['pos_col'] or not equipamentos[-1]['pos_col']):
+                            obs = 'Equipamentos sobrepostos.'
                             conflitos.append({'obs': obs, 'eq1':ptAnterior, 'eq2':equipamentos[-1]})
                             equipamentos[-1]['conflito'] = True
                             equipamentos[-2]['conflito'] = True
                     elif pos < 0:
                         # Posição negativa
                         # Ocorre quando o equipamento não tem uma posição válida
-                        #obs = '{!s} < 0'.format(pt.historico_atual().posicao_int())
-                        obs = '%s < 0' % pt.historico_atual.posicao_int()
+                        obs = 'Equip. abaixo do limite do rack.'
                         conflitos.append({'obs': obs, 'eq1':equipamentos[-1]})
                         equipamentos[-1]['conflito'] = True
-    
+                    elif equipamentos[-1]['pos_col'] and equipamentos[-1]['pos_col'] not in ('01','02','T', 'TD', 'TE', 'piso', 'lD', 'lE'):
+                        obs = 'Posicao inválida %s' % pt.historico_atual.posicao_colocacao
+                        conflitos.append({'obs': obs, 'eq1':equipamentos[-1]}, )
+                        equipamentos[-1]['conflito'] = True
+                        
                     ptAnterior = equipamentos[-1]
+
                 
-                rack = {'id':rack.id, 'nome':rack.apelido, 'altura':126, 'altura_pts': 126/3, 'equipamentos':equipamentos, 'conflitos':conflitos}
+                rack = {'id':rack.id, 'nome':rack.apelido, 'marca': rack.marca,  
+                        'altura':int(rack.tamanho) * 3.0, 'altura_pts': rack.tamanho, 'altura_pxs': int(rack.tamanho) * 19.0,  
+                        'equipamentos':equipamentos, 'equipamentos_fora_visao':equipamentos_fora_visao, 'conflitos':conflitos}
                 
-                # Calculo de uso do rack
-                if altura > 1:
-                    equipamentos.append({'tam':altura-1, 'range':range(altura-2)})
-                    vazio += altura-1
-                    
-                rack['vazio'] = '%.2f%%'    % ((rack['altura']-vazio)*100.0/rack['altura'],)
+                # Calculo de uso do rack                
+                rack['vazio'] = '%.2f%%'  % ( (espaco_ocupado * 100.0) / (rack['altura'])) 
                 racks.append(rack)
                 
             dc = {'nome':EnderecoDetalhe.objects.get(id=local).complemento, 'racks':racks, 'id':local}

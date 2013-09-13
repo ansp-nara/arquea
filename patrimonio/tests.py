@@ -17,24 +17,57 @@ logger = logging.getLogger(__name__)
 
 
 class HistoricoLocalTest(TestCase):
-    def test_posicao_int(self):
+    def test_posicao_furo(self):
         """
-        Teste de permanencia para um dia com almoço normal de uma hora
+        Teste de posicionamento de um equipamento em um furo de um rack
         """
         historico = HistoricoLocal(posicao="R042.F085")
-        self.assertEquals(historico.posicao_int, 85)
+        self.assertEquals(historico.posicao_furo, 85)
         
         historico = HistoricoLocal(posicao="P042.F017")
-        self.assertEquals(historico.posicao_int, 17)
+        self.assertEquals(historico.posicao_furo, 17)
         
         historico = HistoricoLocal(posicao="S042.F040")
-        self.assertEquals(historico.posicao_int, 40)
+        self.assertEquals(historico.posicao_furo, 40)
         
         historico = HistoricoLocal(posicao="S042.F049")
-        self.assertEquals(historico.posicao_int, 49)
+        self.assertEquals(historico.posicao_furo, 49)
         
         historico = HistoricoLocal(posicao="60")
-        self.assertEquals(historico.posicao_int, 60)
+        self.assertEquals(historico.posicao_furo, 60)
         
+        historico = HistoricoLocal(posicao="")
+        self.assertEquals(historico.posicao_furo, -1)
         
+        historico = HistoricoLocal()
+        self.assertEquals(historico.posicao_furo, -1)
+        
+    def test_posicao_colocacao(self):
+        """
+        Teste de colocaçao de um equipamento relativo ao furo
+        Pode ser traseiro, lateral, piso
+        """
+        historico = HistoricoLocal(posicao="R042.F085.TD")
+        self.assertEquals(historico.posicao_colocacao, 'TD')
+        
+        historico = HistoricoLocal(posicao="P042.F017-TD")
+        self.assertEquals(historico.posicao_colocacao, 'TD')
+        
+        historico = HistoricoLocal(posicao="S042.piso")
+        self.assertEquals(historico.posicao_colocacao, 'piso')
+        
+        historico = HistoricoLocal(posicao="S042-piso")
+        self.assertEquals(historico.posicao_colocacao, 'piso')
+        
+        historico = HistoricoLocal(posicao="60")
+        self.assertEquals(historico.posicao_colocacao, None)
+                
+        historico = HistoricoLocal(posicao="S042.F049")
+        self.assertEquals(historico.posicao_colocacao, None)
+        
+        historico = HistoricoLocal(posicao="")
+        self.assertEquals(historico.posicao_colocacao, None)
+        
+        historico = HistoricoLocal()
+        self.assertEquals(historico.posicao_colocacao, None)
         
