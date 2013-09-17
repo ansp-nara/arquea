@@ -34,7 +34,7 @@ class Estado(models.Model):
 
     # Retorna o nome.
     def __unicode__(self):
-        return "%s" % self.nome
+        return self.nome
 
 
     # Define a ordenação dos dados pelo nome.
@@ -68,7 +68,7 @@ class Pergunta(models.Model):
     questao = models.TextField(_(u'Questão'))
 
     def __unicode__(self):
-        return '%s - pergunta %s' % (self.memorando, self.numero)
+        return u'%s - pergunta %s' % (self.memorando, self.numero)
 
     class Meta:
         ordering = ('numero',)
@@ -90,7 +90,7 @@ class MemorandoResposta(models.Model):
     #classificacao = models.ForeignKey('financeiro.TipoComprovante', verbose_name=_(u'Classificação'))
 
     def __unicode__(self):
-        return '%s/%s' % (self.data.year, self.numero)
+        return u'%s/%s' % (self.data.year, self.numero)
 
     '''
     O método para salvar uma instância é sobrescrito para que o número sequencial
@@ -119,7 +119,7 @@ class Corpo(models.Model):
     concluido = models.BooleanField('Ok')
 
     def __unicode__(self):
-        return '%s' % self.pergunta.numero
+        return u'%s' % self.pergunta.numero
 
     class Meta:
         ordering = ('pergunta__numero', 'memorando__data')
@@ -141,7 +141,7 @@ class MemorandoSimples(models.Model):
     pai = models.ForeignKey('memorando.MemorandoSimples', verbose_name=u'Memorando pai', null=True, blank=True)
 
     def __unicode__(self):
-        return '%s/%s' % (self.data.year, self.numero)
+        return u'%s/%s' % (self.data.year, self.numero)
     __unicode__.admin_order_field = 'data'
         
     class Meta:

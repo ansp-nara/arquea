@@ -32,7 +32,7 @@ class Macroprocesso(models.Model):
     grupo = models.ForeignKey('processo.Grupo')
 
     def __unicode__(self):
-        return '%s - %s' % (self.grupo, self.nome)
+        return u'%s - %s' % (self.grupo, self.nome)
 
     def area(self):
 	return self.grupo.area
@@ -98,7 +98,7 @@ class Processo(models.Model):
     area.admin_order_field='macroprocesso__grupo__area'
 
     def procedimentos(self):
-	return ', '.join(self.procedimento_set.all())
+	return u', '.join(self.procedimento_set.all())
 
     class Meta:
 	ordering = ('macroprocesso', 'nome')
@@ -125,7 +125,7 @@ class Atribuicao(models.Model):
     papel = models.ForeignKey('processo.Papel')
 
     def __unicode__(self):
-        return '%s - %s' % (self.equipe, self.processo)
+        return u'%s - %s' % (self.equipe, self.processo)
 
     class Meta:
         verbose_name = u'Atribuição'

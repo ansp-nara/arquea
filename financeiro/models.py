@@ -139,7 +139,10 @@ class Pagamento(models.Model):
     	return u"%s - %s - %s    ID: %s" % (self.protocolo.num_documento, valor, mod, self.pk)
 
     def codigo_operacao(self):
-    	return self.conta_corrente.cod_oper
+        if self.conta_corrente:
+	    return self.conta_corrente.cod_oper
+        else:
+            return ''
     codigo_operacao.short_description = 'Operação Bancária'
     codigo_operacao.admin_order_field = 'conta_corrente__cod_oper'
 
@@ -160,11 +163,11 @@ class Pagamento(models.Model):
 	super(Pagamento, self).save(*args, **kwargs)
 
     def termo(self):
-    	return '%s' % self.protocolo.termo.__unicode__()
+    	return u'%s' % self.protocolo.termo.__unicode__()
 
     def item(self):
         if self.origem_fapesp:
-	   return '%s' % self.origem_fapesp.item_outorga.__unicode__()
+	   return u'%s' % self.origem_fapesp.item_outorga.__unicode__()
 	else: return u'Não é Fapesp'
     item.short_description = u'Item do orçamento'	
 
@@ -181,7 +184,7 @@ class Pagamento(models.Model):
         moeda = 'R$'
         if self.origem_fapesp and self.origem_fapesp.item_outorga.natureza_gasto.modalidade.moeda_nacional == False:
 	    moeda = 'US$'
-        return '%s %s' % (moeda, formata_moeda(self.valor_fapesp, ','))
+        return u'%s %s' % (moeda, formata_moeda(self.valor_fapesp, ','))
     formata_valor_fapesp.short_description = 'Valor Fapesp'
     formata_valor_fapesp.admin_order_field = 'valor_fapesp'
 

@@ -317,7 +317,7 @@ class Protocolo(models.Model):
         #    return '%s - %s - %s - %s %s - %s' % (self.termo.__unicode__(), self.descricao2.__unicode__(), dt.strftime("%d/%m"), self.tipo_documento, self.num_documento, self.mostra_valor())
         #else:
         #    return '%s - %s - %s - %s %s - %s' % (self.termo.__unicode__(), self.entidade(), dt.strftime("%d/%m"), self.tipo_documento, self.num_documento, self.mostra_valor())
-        return '%s - %s %s - %s' % (dt.strftime("%d/%m"), self.tipo_documento, self.num_documento, self.mostra_valor())
+        return u'%s - %s %s - %s' % (dt.strftime("%d/%m"), self.tipo_documento, self.num_documento, self.mostra_valor())
 
     # Caso seja um pedido, exibe um link para as cotações
     def cotacoes(self):
@@ -360,7 +360,7 @@ class Protocolo(models.Model):
 	try:
 	    self.cotacao
 	except Cotacao.DoesNotExist:
-	    return '%s %s' % (self.tipo_documento.nome, self.num_documento)
+	    return u'%s %s' % (self.tipo_documento.nome, self.num_documento)
         return ''
     doc_num.short_description = _(u'Documento')
 
@@ -542,7 +542,7 @@ class Cotacao(Protocolo):
  
     # Retorna a entidade e a descrição.
     def __unicode__(self):
-        return '%s - %s' % (self.entidade(), self.descricao)
+        return u'%s - %s' % (self.entidade(), self.descricao)
 
 
     # Retorna o campo 'entrega' se existir.
@@ -628,7 +628,7 @@ class ItemProtocolo(models.Model):
     # Retorna o protocolo e a descrição
     def __unicode__(self):
         if self.descricao:
-            return '%s | %s' % (self.protocolo, self.descricao)
+            return u'%s | %s' % (self.protocolo, self.descricao)
     
 
     # Define um atributo que calcula o valor total do item.
