@@ -182,6 +182,14 @@
 .outros td {
 	border: 1px dotted;
 }
+#chk_stencil+span,
+#chk_legenda+span {
+	cursor:pointer;
+}
+#icons img {
+	width:30px;
+	height:35px;
+}
 @media print {
 	.page-break {
 		page-break-after:always;

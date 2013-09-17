@@ -1,15 +1,18 @@
 {% load proto_tags %}
 {% load url from future %}
 {% load i18n proto_tags admin_static %}
-<html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+{% load static %}
+{% get_static_prefix as STATIC_PREFIX %}
+
 <style type="text/css">
 h1 {
     font-size: 16px;
     color:#134089;
     font-family: Arial, Verdana, Helvetica, sans-serif;
     font-weight: bold;
+    postion:relative;
+    margin:0;
+    display:block;
 }
 h2 {
     font-size: 16px;
@@ -24,7 +27,7 @@ h2 {
     display:inline-block;
     width:7px;
     vertical-align:top;
-    background-image: url('/media/img/1u.png');
+    background-image: url('{{ STATIC_PREFIX }}img/1u.png');
 }
 .bloco-n {
     display:inline-block;
@@ -155,16 +158,28 @@ h2 {
     display: block;
     clear: both;
 }
-
+/**
+    Exibe ou esconde as imagens dos stencils 
+*/
+ {% if chk_stencil == "0" %}
+    .interno img { display:none; }
+ {% endif %}
+/**
+    Exibe ou esconde as legendas dos equipamentos 
+*/
+ {% if chk_legenda == "0" %}
+    .interno div div div { display:none; }
+ {% endif %}
 </style>
-</head>
-<body>
 <h1>Diagrama de Racks Frontal</h1>
     {% for dc in dcs %}
+    {% if not forloop.first %}
+        <div class="page-break"></div>
+    {% endif %}
     <div class="dc">
     <h1>{{ dc.nome }}</h1>
     {% for rack in dc.racks %}
-       {% if not forloop.first and forloop.counter0|divisibleby:"4" %}
+       {% if not forloop.first and forloop.counter0|divisibleby:"6" %}
            <div class="page-break"></div>
        {% endif %}
         <div class="rack">
@@ -245,6 +260,3 @@ h2 {
 {% endfor %}
 </div>
 
-
-</body>
-</html>

@@ -8,10 +8,19 @@ from sx.pisa3.pisa_pdf import *
 import cStringIO as StringIO
 import cgi
 from django.template import Context, loader, RequestContext
+from django.template.loader import render_to_string
 from django.http import HttpResponse
 import settings
 from datetime import date, timedelta
 import calendar
+from django.conf import settings
+import logging
+from wkhtmltopdf.views import PDFTemplateResponse
+
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
+
+
 
 def render_to_pdf(template_src, context_dict, context_instance=None, filename='file.pdf', attachments=[]):
     template = loader.get_template(template_src)
@@ -33,6 +42,34 @@ def render_to_pdf(template_src, context_dict, context_instance=None, filename='f
         response['Content-Disposition'] = 'attachment; filename=%s' % filename
         return response
     return HttpResponse('We had some errors<pre>%s</pre>' % cgi.escape(html))
+
+def render_wk_to_pdf(template_src, context_dict, context_instance=None, filename='file.pdf', attachments=[], request=None, header_template=None, footer_template=None):
+    """
+    Renderiza o HTML utilizando o wkHTMLtoPDF, por linha de comando, utilizando a engine QT com webkit
+    """
+    context = context_instance or Context()
+    context.update(context_dict)
+    context_dict.update({'request': request})
+    
+    result = StringIO.StringIO()
+    
+    if header_template == None:
+        header_template = 'wkhtmltopdf_header_template.html'
+    
+    if footer_template == None:
+        footer_template = 'wkhtmltopdf_footer_template.html'
+     
+     
+    cmd_options = {'orientation': 'landscape'}
+     
+    response = PDFTemplateResponse(request=request,
+                                   template=template_src,
+                                   context=context,
+                                   footer_template=footer_template,
+                                   header_template=header_template,
+                                   show_content_in_browser=False, cmd_options=cmd_options)
+
+    return response
 
 def fetch_resources(uri, rel):
     path = os.path.join(settings.MEDIA_ROOT, uri.replace(settings.MEDIA_URL, ""))
