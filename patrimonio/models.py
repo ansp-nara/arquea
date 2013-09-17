@@ -117,9 +117,9 @@ class Patrimonio(models.Model):
 
     def __unicode__(self):
         if self.pagamento:
-            return '%s - %s  - %s - %s' % (self.pagamento.protocolo.num_documento, self.apelido, self.ns, self.descricao)
+            return u'%s - %s  - %s - %s' % (self.pagamento.protocolo.num_documento, self.apelido, self.ns, self.descricao)
         else:
-            return '%s - %s - %s' % (self.apelido, self.ns, self.descricao)
+            return u'%s - %s - %s' % (self.apelido, self.ns, self.descricao)
 
     @cached_property
     def historico_atual(self):
@@ -130,8 +130,8 @@ class Patrimonio(models.Model):
 
     def posicao(self):
         ht = self.historico_atual
-        if not ht: return ''
-        return '%s - %s' % (ht.endereco.complemento, ht.posicao)
+        if not ht: return u''
+        return u'%s - %s' % (ht.endereco.complemento, ht.posicao)
 
     # Retorna os patrimônios de um termo.
     @classmethod
@@ -140,7 +140,7 @@ class Patrimonio(models.Model):
 
     def nf(self):
         if self.pagamento is not None and self.pagamento.protocolo is not None:
-            return '%s' % self.pagamento.protocolo.num_documento
+            return u'%s' % self.pagamento.protocolo.num_documento
         else:
             return ''
     nf.short_description = u'NF'
@@ -158,7 +158,7 @@ class Patrimonio(models.Model):
         if not self.pagamento.origem_fapesp:
             return ''
         modalidade = self.pagamento.origem_fapesp.item_outorga.natureza_gasto.modalidade.sigla
-        return '%s (%s/%s)' % (modalidade, self.pagamento.parcial(), self.pagamento.pagina())
+        return u'%s (%s/%s)' % (modalidade, self.pagamento.parcial(), self.pagamento.pagina())
     auditoria.short_description = u'Material (par/pág)'
 
 
@@ -293,7 +293,7 @@ class Direcao(models.Model):
 	destino = models.CharField(max_length=15)
 	
 	def __unicode__(self):
-		return '%s - %s' % (self.origem, self.destino)
+		return u'%s - %s' % (self.origem, self.destino)
 		
 	class Meta:
 		verbose_name = u'Direção'
@@ -347,7 +347,7 @@ class TipoEquipamento(models.Model):
     nome = models.CharField(max_length=45)
 
     def __unicode__(self):
-        return '%s' % self.nome
+        return u'%s' % self.nome
 
     class Meta:
 	ordering = ('nome',)

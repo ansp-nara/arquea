@@ -16,7 +16,7 @@ class BlocoIP(models.Model):
     obs = models.TextField(null=True, blank=True)
 
     def __unicode__(self):
-        return '%s/%s' % (self.ip, self.mask)
+        return u'%s/%s' % (self.ip, self.mask)
 
     def cidr(self):
         return self.__unicode__()
@@ -86,7 +86,7 @@ class Rota(models.Model):
     historico = models.ForeignKey('rede.Historico')
 
     def __unicode__(self):
-        return '%s %s' % (self.historico, self.blocoip)
+        return u'%s %s' % (self.historico, self.blocoip)
 
 class Historico(models.Model):
     arquivo = models.FileField(upload_to='rede')
@@ -112,7 +112,7 @@ class Banda(models.Model):
     unidade = models.IntegerField(choices=UNIDADES)
 
     def __unicode__(self):
-        return '%s %s' % (self.velocidade, self.get_unidade_display())
+        return u'%s %s' % (self.velocidade, self.get_unidade_display())
 
     class Meta:
         ordering = ('unidade', 'velocidade')
@@ -121,7 +121,7 @@ class Operadora(models.Model):
     nome = models.CharField(max_length=40)
 
     def __unicode__(self):
-        return '%s' % self.nome
+        return u'%s' % self.nome
 
     class Meta:
         ordering = ('nome',)
@@ -130,7 +130,7 @@ class IPBorda(models.Model):
     ip = models.IPAddressField('IP de borda')
 	
     def __unicode__(self):
-        return '%s' % self.ip
+        return u'%s' % self.ip
 	
 class Enlace(models.Model):
     participante = models.ForeignKey('identificacao.Endereco')
@@ -139,11 +139,11 @@ class Enlace(models.Model):
     obs = models.TextField(null=True, blank=True)
 
     def participante_display(self):
-        return '%s' % self.participante.entidade.sigla
+        return u'%s' % self.participante.entidade.sigla
     participante_display.short_description = u'Participante'
 
     def entrada_display(self):
-        return '%s' % self.entrada_ansp.entidade.sigla
+        return u'%s' % self.entrada_ansp.entidade.sigla
     entrada_display.short_description = u'Ponto de entrada na ANSP'
 
     def __unicode__(self):
@@ -163,7 +163,7 @@ class EnlaceOperadora(models.Model):
     obs = models.TextField(null=True, blank=True)
 	
     def __unicode__(self):
-        return '%s - (Operadora %s)' % (self.enlace, self.operadora)
+        return u'%s - (Operadora %s)' % (self.enlace, self.operadora)
 
 class Segmento(models.Model):
     enlace = models.ForeignKey('rede.Enlace')
@@ -181,7 +181,7 @@ class Segmento(models.Model):
     interfaces = models.ManyToManyField('rede.Interface', null=True, blank=True)
 
     def __unicode__(self):
-        return '%s - (Operadora %s)' % (self.enlace, self.operadora)
+        return u'%s - (Operadora %s)' % (self.enlace, self.operadora)
 
 class Interface(models.Model):
     nome = models.CharField(max_length=100)
@@ -225,7 +225,7 @@ class TipoServico(models.Model):
     nome = models.CharField(max_length=200)
 
     def __unicode__(self):
-        return '%s' % self.nome
+        return u'%s' % self.nome
 
     class Meta:
 	ordering = ('nome',)
@@ -234,13 +234,13 @@ class Projeto(models.Model):
     nome = models.CharField(max_length=200)
 
     def __unicode__(self):
-        return '%s' % self.nome
+        return u'%s' % self.nome
 
 class Unidade(models.Model):
     nome = models.CharField(max_length=30)
 
     def __unicode__(self):
-        return '%s' % self.nome
+        return u'%s' % self.nome
 
 class PlanejaAquisicaoRecurso(models.Model):
     os = models.ForeignKey('outorga.OrdemDeServico', null=True, blank=True, verbose_name=u'Alteração de contrato')
@@ -258,7 +258,7 @@ class PlanejaAquisicaoRecurso(models.Model):
     banda = models.ForeignKey('rede.Banda', null=True, blank=True)
 
     def __unicode__(self):
-        return '%s - %s - %s - %s - %s (%s)' % (self.os, self.projeto, self.tipo, self.quantidade, self.valor_unitario, self.referente)
+        return u'%s - %s - %s - %s - %s (%s)' % (self.os, self.projeto, self.tipo, self.quantidade, self.valor_unitario, self.referente)
 
     @property
     def valor_total(self):
@@ -277,7 +277,7 @@ class Beneficiado(models.Model):
     estado = models.ForeignKey('rede.Estado')
 
     def __unicode__(self):
-	return '%s' % self.entidade
+	return u'%s' % self.entidade
 
     def porcentagem(self):
 	if not self.quantidade: return 100.0
@@ -292,7 +292,7 @@ class Recurso(models.Model):
     obs = models.TextField(null=True, blank=True)
 
     def __unicode__(self):
-        return '%s - %s - %s' % (self.planejamento.os, self.planejamento.tipo, self.quantidade)
+        return u'%s - %s - %s' % (self.planejamento.os, self.planejamento.tipo, self.quantidade)
 
     def save(self, *args, **kwargs):
 	if self.valor_mensal_sem_imposto is None:
@@ -345,7 +345,7 @@ class Estado(models.Model):
     nome = models.CharField(max_length=45)
 
     def __unicode__(self):
-	return '%s' % self.nome
+	return u'%s' % self.nome
 
     class Meta:
 	ordering = ('nome',)

@@ -110,7 +110,7 @@ class EnderecoDetalhe(models.Model):
 	if self.endereco:
 	    return self.complemento
 	else:
-	    return '%s - %s' % (self.detalhe.detalhes(), self.complemento)
+	    return u'%s - %s' % (self.detalhe.detalhes(), self.complemento)
 
     @property
     def end(self):
