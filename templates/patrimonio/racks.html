@@ -3,12 +3,14 @@
 {% load url from future %}
 {% load i18n proto_tags admin_static %}
 {% block extrahead %}
+{% load static %}
+{% get_static_prefix as STATIC_PREFIX %}
 
-<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/racks.css" />
+<link rel="stylesheet" type="text/css" href="{{ STATIC_PREFIX }}css/racks.css" />
 <link rel="stylesheet" type="text/css" href="{% static "css/base-print.css" %}" />
 <style type="text/css">
 .u {
-    background-image: url('{{ STATIC_URL }}img/1u.png');
+    background-image: url('{{ STATIC_PREFIX }}img/1u.png');
 }
 @media print {
   .u,
@@ -29,9 +31,34 @@
   .u-n {}
   .bloco-n {}
 }
+
+ #wrap-form {
+    width: 250px;
+	height: 35px;
+	position: relative;
+	display: inline-block;
+ }
+ #icons {
+    display: inline-block;
+ }
+ #icons img {
+    margin:-10px;
+ }
+/**
+    Exibe ou esconde as imagens dos stencils 
+*/
+ {% if chk_stencil == "0" %}
+    .interno a img { display:none; }
+ {% endif %}
+/**
+    Exibe ou esconde as legendas dos equipamentos 
+*/
+ {% if chk_legenda == "0" %}
+    .interno a div div div { display:none; }
+ {% endif %}
 </style>
-   <script type="text/javascript" src="{{ STATIC_URL }}js/racks.js"></script>
-   <script type="text/javascript" src="{{ STATIC_URL }}js/admin/RelatedObjectLookups.js"></script>
+   <script type="text/javascript" src="{{ STATIC_PREFIX }}js/racks.js"></script>
+   <script type="text/javascript" src="{{ STATIC_PREFIX }}js/admin/RelatedObjectLookups.js"></script>
 {% endblock %}
 {% block breadcrumbs %}
 	{% if not is_popup %}
@@ -49,16 +76,26 @@
 {% block content %}
 
 <h1>Diagrama de Racks Frontal</h1>
-<form id="form_racks" method="GET">
-Data Centers
-<select name="dc" onchange="this.form.submit();">
-    <option value="0">Todos</option>
-{% for dc in todos_dcs %}
-   <option value="{{ dc.id }}" {% if request.GET.dc == dc.id|lower %}selected{% endif %}>{{ dc.nome }}</option>
-{% endfor %}
-</select>
-</form>
+<div id="wrap-form">
+	<form id="form_racks" method="GET">
+	Data Centers
+	<select name="dc" onchange="this.form.submit();">
+	    <option value="0">Todos</option>
+	{% for dc in todos_dcs %}
+	   <option value="{{ dc.id }}" {% if request.GET.dc == dc.id|lower %}selected{% endif %}>{{ dc.nome }}</option>
+	{% endfor %}
+	</select>
+	</form>
+</div>
 {% if dcs %}
+<div id="icons">
+    <a href="{{ request.get_full_path  }}&pdf=2" class="printlink"><img src="{{ STATIC_URL }}img/icon-pdf.png" title="Exportar para PDF." /></a>
+</div>
+<form>
+<input type="checkbox" id="chk_stencil" name="chk_stencil" value="1" {% if chk_stencil = 1 %}checked{% endif %}><span>&nbsp;Mostrar stencils</span><br>
+<input type="checkbox" id="chk_legenda" name="chk_legenda" value="1" {% if chk_legenda = 1 %}checked{% endif %}><span>&nbsp;Mostrar legendas</span>
+</form>
+    
 	{% for dc in dcs %}
 	   {% if not forloop.first %}
 	       <div class="page-break"></div>

@@ -10,7 +10,7 @@ from django.core.exceptions import PermissionDenied
 from django.contrib.auth.models import Group
 from django.contrib import admin
 from django.http import Http404, HttpResponse
-from utils.functions import render_to_pdf
+from utils.functions import render_to_pdf, render_wk_to_pdf
 from django.utils import simplejson
 #from models import FontePagadora, AuditoriaInterna, AuditoriaFapesp
 #from decimal import Decimal
@@ -475,7 +475,6 @@ def por_termo(request, pdf=0):
 @login_required
 def racks(request):
         
-        
     # Busca patrimonios do tipo RACK com o estado ATIVO
     locais = Patrimonio.objects.filter(equipamento__tipo__nome='Rack', historicolocal__estado__id=Estado.PATRIMONIO_ATIVO, historicolocal__endereco__mostra_bayface=True).values_list('historicolocal__endereco', flat=True).order_by('historicolocal__endereco').distinct().only('id')
 
@@ -589,8 +588,23 @@ def racks(request):
                 
             dc = {'nome':EnderecoDetalhe.objects.get(id=local).complemento, 'racks':racks, 'id':local}
             dcs.append(dc)
+    
+    if request.GET.get('chk_stencil'):
+        chk_stencil = request.GET.get('chk_stencil')
+    else:
+        chk_stencil = 1
+        
+    if request.GET.get('chk_legenda'):
+        chk_legenda = request.GET.get('chk_legenda')
+    else:
+        chk_legenda = 1
             
-    return TemplateResponse(request, 'patrimonio/racks.html', {'dcs':dcs, 'todos_dcs':todos_dcs})
+    if request.GET.get('pdf') == "2":
+        return render_wk_to_pdf('patrimonio/racks-wk.pdf', {'dcs':dcs, 'todos_dcs':todos_dcs, 'filename':'diagrama_de_racks.pdf', 'chk_legenda':chk_legenda, 'chk_stencil':chk_stencil}, request=request)
+    elif request.GET.get('pdf'):
+        return TemplateResponse(request, 'patrimonio/racks-wk.pdf', {'dcs':dcs, 'todos_dcs':todos_dcs, 'chk_legenda':chk_legenda, 'chk_stencil':chk_stencil})
+    else:
+        return TemplateResponse(request, 'patrimonio/racks.html', {'dcs':dcs, 'todos_dcs':todos_dcs, 'chk_legenda':chk_legenda, 'chk_stencil':chk_stencil})
 
 @login_required
 def racks1(request):
