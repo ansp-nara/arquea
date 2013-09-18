@@ -1,0 +1,19 @@
+{% extends "admin/base_site.html" %}
+{% load proto_tags %}
+{% block content %}
+<h1 repeat="1">Inventário da outorga {{ t }}</h1>
+<h4><a href="{% url patrimonio.views.por_termo 1 %}?termo={{ t.id }}&modalidade={{ m }}&agilis={{ a }}&doado={{ d }}&localizado={{ l }}&numero_fmusp={{ numero_fmusp }}">Imprimir</a></h4>
+
+    <h4>Patrimônio por termo de outorga</h4>
+
+    <table border="0" repeat="1" cellpadding="5">
+    <tr><th>Patrimônio FMUSP</th><th>NF</th><th colspan="2">Descrição - complemento</th><th>Valor</th><th>Marca</th><th>NS</th><th>Estado</th><th>Localização</th><th>Posição</th></tr>
+    {% for t in termos %}
+        {% for p in t.patrimonios %}
+                 <tr><td>{{ p.numero_fmusp|default_if_none:"" }}</td><td>{{ p.pagamento.protocolo.num_documento }}</td><td colspan="2">{% if p.equipamento %}[{{ p.equipamento.tipo }}] {% endif %}{{ p.descricao }} - {{ p.complemento|default:"" }}</td><td>{{ p.valor }}</td><td>{{ p.marca }}</td><td>{{ p.ns }}</td><td>{{ p.historico_atual.estado }}</td><td>{{ p.historico_atual.endereco }}</td><td>{{ p.historico_atual.posicao|default_if_none:"" }}</td></tr>
+        {% endfor %}
+    {% endfor %}
+    </table>
+
+{% endblock %}
+
