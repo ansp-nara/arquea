@@ -15,8 +15,10 @@ h1 {
     display:block;
 }
 h2 {
-    font-size: 16px;
-    color:#333;   
+    font-family: Arial, Verdana, Helvetica, sans-serif;
+    font-size: 15px;
+    font-weight: bold;
+    color:#333;
 } 
 
 
@@ -50,6 +52,7 @@ h2 {
     border-left:1px; 
     border-style:solid; 
     font-size:9px;
+    min-height:19px;
 }
 .bloco-n .u-n div {
     border-top: 1px solid;
