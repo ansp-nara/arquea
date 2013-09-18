@@ -676,23 +676,23 @@ class Controle(models.Model):
                 for data_ferias in ferias:
                     d.is_ferias = data_ferias.dia_ferias(d.dia)
                     if d.is_ferias:
-                        d.obs = d.obs + ' Férias'
+                        d.obs = u'%s Férias' % d.obs
                         break;
                 
                 # é final de semana?
                 d.is_final_de_semana = d.dia.weekday() >= 5;
                 if d.is_final_de_semana:
                     if d.dia.weekday() == 5:
-                        d.obs = d.obs + ' Sábado'
+                        d.obs = u'%s Sábado' % d.obs
                     elif d.dia.weekday() == 6:
-                        d.obs = d.obs + ' Domingo'
+                        d.obs = u'%s Domingo' % d.obs
                 
                 # é feriado?
                 diaFeriado = feriado.get_dia_de_feriado(d.dia)
                 
                 if diaFeriado != None:
                     d.is_feriado = True
-                    d.obs = d.obs + ' ' + diaFeriado.tipo.nome
+                    d.obs = u'%s %s' % (d.obs, diaFeriado.tipo.nome)
                 
                 # é dispensa?
                 d.is_dispensa = False
