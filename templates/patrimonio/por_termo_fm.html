@@ -2,7 +2,7 @@
 {% load proto_tags %}
 {% block content %}
 <h1 repeat="1">Inventário da outorga {{ t }}</h1>
-<h4><a href="{% url patrimonio.views.por_termo 1 %}?termo={{ t.id }}&modalidade={{ m }}&agilis={{ a }}&doado={{ d }}&localizado={{ l }}&numero_fmusp={{ numero_fmusp }}">Imprimir</a></h4>
+<h4><a href="{% url 'patrimonio.views.por_termo' 1 %}?termo={{ t.id }}&modalidade={{ m }}&agilis={{ a }}&doado={{ d }}&localizado={{ l }}&numero_fmusp={{ numero_fmusp }}">Imprimir</a></h4>
 
     <h4>Patrimônio por termo de outorga</h4>
 
