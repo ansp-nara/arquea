@@ -3,7 +3,7 @@
 {% block content %}
 <h1 repeat="1">Prestação de contas do processo {{ termo }}</h1>
 
-    <form action="{% url financeiro.views.presta_contas 1 %}" method="GET">
+    <form action="{% url 'financeiro.views.presta_contas' 1 %}" method="GET">
        <input type="hidden" value="{{ termo.id }}" name="termo" />
        <input type="submit" value="Versão para impressão" />
     </form>

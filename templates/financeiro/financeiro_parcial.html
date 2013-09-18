@@ -2,8 +2,8 @@
 {% load proto_tags %}
 {% block content %}
 <h1 repeat="1" style="text-align:center;">Extrato do financeiro do processo {{ termo }}</h1>
-<h4><a href="{% url financeiro.views.financeiro_parciais 3 %}?termo={{ termo.id }}">Imprimir em A3</a></h4>
-<h4><a href="{% url financeiro.views.financeiro_parciais 4 %}?termo={{ termo.id }}">Imprimir em A4</a></h4>
+<h4><a href="{% url 'financeiro.views.financeiro_parciais' 3 %}?termo={{ termo.id }}">Imprimir em A3</a></h4>
+<h4><a href="{% url 'financeiro.views.financeiro_parciais' 4 %}?termo={{ termo.id }}">Imprimir em A4</a></h4>
 
    {% for p in parciais %}
    <h2 style="color:blue;">{% if p.parcial %}Parcial {{ p.parcial }}{% else %}Totais do processo{% endif %}</h2>

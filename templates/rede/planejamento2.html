@@ -12,7 +12,7 @@ table tr td {
 {% endblock %}
 {% block content %}
 <h1>Realizado de terceiros</h1>
-    <form action="{% url rede.views.planejamento2 1 %}" method="GET">
+    <form action="{% url 'rede.views.planejamento2' 1 %}" method="GET">
        <input type="hidden" value="{{ entidade.id }}" name="entidade" />
        <input type="hidden" value="{{ termo.id }}" name="termo" />
        {% if beneficiado %}

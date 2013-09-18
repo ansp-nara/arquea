@@ -31,7 +31,7 @@ table tr td {
 	<td>{{ i.info.participante.rua }}, {{ i.info.participante.num }}. {{ i.info.participante.bairro }}.</td>
 	<td>{{ i.info.participante.cidade }}</td>
 	<td>{{ i.info.participante.cep }}</td>
-	<td><a href="{% url admin:rede_enlace_change i.info %}">{{ i.info.entrada_ansp }}</a></td>
+	<td><a href="{% url 'admin:rede_enlace_change' i.info %}">{{ i.info.entrada_ansp }}</a></td>
 </tr>
 <tr><td></td><td colspan="5">      
 <table border="1">
@@ -60,7 +60,7 @@ table tr td {
 	</td>
 	{% for o in i.operadoras %}
 		{% if forloop.counter != 1 %} </tr> <tr> {% endif %}
-		<td><a href="{% url admin:rede_enlaceoperadora_change o.id %}">{{ o.operadora|default:"Operadora não cadastrada" }}</a></td>
+		<td><a href="{% url 'admin:rede_enlaceoperadora_change' o.id %}">{{ o.operadora|default:"Operadora não cadastrada" }}</a></td>
 		<td>{{ o.banda|default:"Banda não cadastrada" }}</td>
 		<td>
 		   {% for ib in o.ip_borda.all %}

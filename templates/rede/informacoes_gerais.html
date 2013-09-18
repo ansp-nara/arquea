@@ -1,11 +1,11 @@
 {% extends "admin/base_site.html" %}
 {% block content %}
 <h2>Entidades ligadas à ANSP</h2>
-<form action="{% url rede.views.imprime_informacoes_gerais %}" method="GET">
+<form action="{% url 'rede.views.imprime_informacoes_gerais' %}" method="GET">
        <input type="hidden" value="1" name="contatos" />
        <input type="submit" value="Versão para impressão com contatos" />
     </form>
-<form action="{% url rede.views.imprime_informacoes_gerais %}" method="GET">
+<form action="{% url 'rede.views.imprime_informacoes_gerais' %}" method="GET">
        <input type="submit" value="Versão para impressão sem contatos" />
     </form>
 <table>
@@ -26,8 +26,8 @@
 	<td>{{ e.participante.rua }}, {{ e.participante.num }}. {{ e.participante.bairro }}.</td>
 	<td>{{ e.participante.cidade }}</td>
 	<td>{{ e.participante.cep }}</td>
-	<td><a href="{% url admin:rede_enlace_change e.id %}">{{ e.entrada_ansp }}</a></td>
-	<td><a href="{% url rede.views.planilha_informacoes_tecnicas e.id %}">Ver</a></td>
+	<td><a href="{% url 'admin:rede_enlace_change' e.id %}">{{ e.entrada_ansp }}</a></td>
+	<td><a href="{% url 'rede.views.planilha_informacoes_tecnicas' e.id %}">Ver</a></td>
 </tr>
 {% endfor %}
 </table>

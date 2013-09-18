@@ -2,7 +2,7 @@
 {% load proto_tags %}
 {% block content %}
 <h1 repeat="1">Extrato da conta corrente do projeto em {{ ano }}</h1>
-<h4><a href="{% url financeiro.views.extrato 1 %}?ano={{ ano }}">Imprimir em A3</a></h4>
+<h4><a href="{% url 'financeiro.views.extrato' 1 %}?ano={{ ano }}">Imprimir em A3</a></h4>
 
     <table border="0" repeat="1" cellpadding="5">
     <tr><th>Data</th><th>Documento</th><th>Histórico</th><th>Valor</th><th>Liberação do financeiro</th><th>Pagamento</th><th>Imagem do cheque</th><th>Processo</th></tr>

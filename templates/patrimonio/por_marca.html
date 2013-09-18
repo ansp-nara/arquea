@@ -2,7 +2,7 @@
 {% load proto_tags %}
 {% block content %}
 <h1 repeat="1">Inventário por marca</h1>
-<h4><a href="{% url patrimonio.views.por_marca 1 %}?marca={{ marca }}">Imprimir</a></h4>
+<h4><a href="{% url 'patrimonio.views.por_marca' 1 %}?marca={{ marca }}">Imprimir</a></h4>
 
 <h4>Patrimonios da marca {{ marca }}</h4>
  
