@@ -43,6 +43,9 @@ h2 {
     border-color: #999a9a;
     
 }
+.bloco-n>div {
+    position:relative;
+}
 
 .bloco-n .u-n {
     background:#d8d8d8;
@@ -62,6 +65,48 @@ h2 {
     text-align: center;
     line-height: 18px;
 }
+/**
+Coluna de furos do rack
+*/
+.u-n-left {
+    width:5px; 
+    display:block; 
+    background-color:#eee; 
+    position:absolute; 
+    left:23px; 
+    height: 19px; 
+    top:0; 
+    border-left:#aaa 2px solid; 
+    border-right: #888 2px solid;
+}
+.u-n-right {
+    width:5px; 
+    display:block; 
+    background-color:#eee; 
+    position:absolute; 
+    left:235px; 
+    height: 19px; 
+    top:0; 
+    border-left:#aaa 2px solid; 
+    border-right: #888 2px solid;
+}
+.u-n-f {
+    background:black; 
+    position:absolute; 
+    width:3px; 
+    height:3px; 
+    left:1px; 
+}
+.f1 {
+    top:3px;
+}
+.f2 {
+    top:9px;
+}
+.f3 {
+    top:15px;
+}
+
 .rack {
     width:255px;
     display:inline-block;
@@ -75,7 +120,7 @@ h2 {
     position:relative;
     display:inline-block;
     width:199px;
-    margin-left:1px;
+    margin-left:6px;
     margin-right:4px;
     font-size:10px;
     
@@ -83,7 +128,7 @@ h2 {
 .interno img {
     position:absolute;
     z-index: 5;
-    width:100%;
+    width:199px;
     height:100%;
 }
 .interno div {
@@ -191,12 +236,28 @@ h2 {
             <h2>
               {{ rack.nome }} ({{ rack.vazio }} ocupado)
             </h2>
-            <div id="rack{{ dc.id }}_{{forloop.counter}}" class="bloco-n" style="height: {{ rack.altura_pxs }}px;">
-                {% for i in rack.altura_pts|get_range reversed %}
-                    <div class="u-n"><div>{{ i|add:"1" }}</div></div>
-                {% endfor %}
+            <div id="rack{{ dc.id }}_{{forloop.counter}}" class="bloco-n" style="position:relative; height: {{ rack.altura_pxs }}px;">
+                <script>
+                var content = '';
+                for(i={{rack.altura_pts}};i>0;i--){
+                    content += '<div>';
+                    content += '<div class="u-n"><div>'+i+'</div></div>';
+                    content += '<div class="u-n-left">';
+                    content += '<div class="u-n-f  f1"></div>';
+                    content += '<div class="u-n-f  f2"></div>';
+                    content += '<div class="u-n-f  f3"></div>';
+                    content += '</div>';
+                    content += '<div class="u-n-right">';
+                    content += '<div class="u-n-f  f1"></div>';
+                    content += '<div class="u-n-f  f2"></div>';
+                    content += '<div class="u-n-f  f3"></div>';
+                    content += '</div>';
+                    content += '</div>';
+                }
+                document.write(content);
+                </script>
             </div>
-            <div class="u" style="height: {{ rack.altura_pxs }}px;"></div>
+            
             <div class="interno">
           {% for eq in rack.equipamentos %}
                <div class="{% if eq.pos_col %} pos_{{eq.pos_col}} {% endif %}  {% if eq.descricao %}equip"{% endif %} 
@@ -234,7 +295,6 @@ h2 {
                </div>
           {% endfor %}
             </div>
-           <div class="u" style="height: {{ rack.altura_pxs }}px;"></div>
         {% if rack.equipamentos_fora_visao %}
             <div class="outros">
                 <div class="outros-content">
