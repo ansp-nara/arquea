@@ -3,6 +3,7 @@
 {% load i18n proto_tags admin_static %}
 {% load static %}
 {% get_static_prefix as STATIC_PREFIX %}
+
 <style type="text/css">
 h1 {
     font-size: 16px;
@@ -52,12 +53,14 @@ h2 {
     border-bottom:0;
     border-left:1px; 
     border-style:solid; 
+    font-size:9px;
     min-height:19px;
 }
 .bloco-n .u-n div {
     border-top: 1px solid;
+    vertical-align: middle;
     text-align: center;
-    line-height: inherit;
+    line-height: 18px;
 }
 .rack {
     width:255px;
@@ -173,8 +176,6 @@ h2 {
     .interno div div div { display:none; }
  {% endif %}
 </style>
-</head>
-<body>
 <h1>Diagrama de Racks Frontal</h1>
     {% for dc in dcs %}
     {% if not forloop.first %}
@@ -190,7 +191,7 @@ h2 {
             <h2>
               {{ rack.nome }} ({{ rack.vazio }} ocupado)
             </h2>
-            <div id="rack{{ dc.id }}_{{forloop.counter}}" class="bloco-n">
+            <div id="rack{{ dc.id }}_{{forloop.counter}}" class="bloco-n" style="height: {{ rack.altura_pxs }}px;">
                 {% for i in rack.altura_pts|get_range reversed %}
                     <div class="u-n"><div>{{ i|add:"1" }}</div></div>
                 {% endfor %}
@@ -263,3 +264,4 @@ h2 {
     {% endfor %}
 {% endfor %}
 </div>
+
