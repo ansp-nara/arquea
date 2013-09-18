@@ -30,7 +30,7 @@
 	</td>
 	{% for o in e.operadoras %}
 		{% if forloop.counter != 1 %} </tr> <tr> {% endif %}
-		<td><a href="{% url admin:rede_enlaceoperadora_change o.id %}">{{ o.operadora|default:"Operadora não cadastrada" }}</a></td>
+		<td><a href="{% url 'admin:rede_enlaceoperadora_change' o.id %}">{{ o.operadora|default:"Operadora não cadastrada" }}</a></td>
 		<td>{{ o.banda|default:"Banda não cadastrada" }}</td>
 		<td>
 		   {% for ib in o.ip_borda.all %}

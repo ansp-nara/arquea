@@ -59,7 +59,7 @@
       {% if has_add_permission %}
         <ul class="object-tools">
           <li>
-          <a href="{% url rede.views.blocos_texto %}" class="printlink">Em texto</a>
+          <a href="{% url 'rede.views.blocos_texto' %}" class="printlink">Em texto</a>
           </li>
           <li>
             <a href="add/{% if is_popup %}?_popup=1{% endif %}" class="addlink">

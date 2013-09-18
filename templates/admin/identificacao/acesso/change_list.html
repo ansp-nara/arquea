@@ -5,7 +5,7 @@
       {% if has_add_permission %}
         <ul class="object-tools">
           <li>
-            <a href="{% url identificacao.views.acessos_terremark %}" class="addlink">Acesso à Terremark (em .csv)</a>
+            <a href="{% url 'identificacao.views.acessos_terremark' %}" class="addlink">Acesso à Terremark (em .csv)</a>
           </li>
           <li>
             <a href="add/{% if is_popup %}?_popup=1{% endif %}" class="addlink">

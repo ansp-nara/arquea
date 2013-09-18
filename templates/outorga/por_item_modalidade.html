@@ -2,7 +2,7 @@
 {% load proto_tags %}
 {% block content %}
 <h1 repeat="1">Pagamentos por item de outorga do processo {{ termo }} e modalidade {{ modalidade }}</h1>
-<h4><a href="{% url outorga.views.item_modalidade 1 %}?termo={{ termo.id }}&modalidade={{ modalidade.id }}{% if entidade %}&entidade={{ entidade }}{% endif %}">Imprimir</a></h4>
+<h4><a href="{% url 'outorga.views.item_modalidade' 1 %}?termo={{ termo.id }}&modalidade={{ modalidade.id }}{% if entidade %}&entidade={{ entidade }}{% endif %}">Imprimir</a></h4>
 
     <table border="0" repeat="1" cellpadding="5">
     {% for it in itens %}

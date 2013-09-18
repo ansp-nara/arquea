@@ -56,11 +56,11 @@
 </style>
 {% endblock %}
 {% block content %}
-  <a href="{% url identificacao.views.agenda 'pdf' tipo %}?agenda={{ agenda }}">Versão para impressão</a>
+  <a href="{% url 'identificacao.views.agenda' 'pdf' tipo %}?agenda={{ agenda }}">Versão para impressão</a>
   <div class="tabnav">
     <ul>
         {% for t in tipos %}
-        <li>{% if t.id == tipo %}<span>{{ t.nome }}</span>{% else %}<a href="{% url identificacao.views.agenda t.id %}?agenda={{ agenda }}">{{ t.nome }}</a>{% endif %}</li>
+        <li>{% if t.id == tipo %}<span>{{ t.nome }}</span>{% else %}<a href="{% url 'identificacao.views.agenda' t.id %}?agenda={{ agenda }}">{{ t.nome }}</a>{% endif %}</li>
         {% endfor %}
     </ul>
   </div>

@@ -3,13 +3,13 @@
 {% block content %}
 <h1 repeat="1">Processos</h1>
 
-    <form action="{% url processo.views.processos 3 %}" method="GET">
+    <form action="{% url 'processo.views.processos' 3 %}" method="GET">
        <input type="submit" value="Versão para impressão em A3" />
     </form> 
-    <form action="{% url processo.views.processos 4 %}" method="GET">
+    <form action="{% url 'processo.views.processos' 4 %}" method="GET">
        <input type="submit" value="Versão para impressão em A4" />
     </form>
-    <form action="{% url processo.views.processos 2 %}" method="GET">
+    <form action="{% url 'processo.views.processos' 2 %}" method="GET">
        <input type="submit" value="Versão para impressão com as linhas completas em A3" />
     </form>
 

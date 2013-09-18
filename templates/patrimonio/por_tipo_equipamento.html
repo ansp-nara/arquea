@@ -4,7 +4,7 @@
 <h1 repeat="1">Inventário por tipo de equipamento</h1>
 
 {% comment %}
-    <form action="{% url patrimonio.views.por_tipo_equipamento 1 %}" method="GET">
+    <form action="{% url 'patrimonio.views.por_tipo_equipamento' 1 %}" method="GET">
        <input type="hidden" value="{{ termo.id }}" name="termo" />
        <input type="submit" value="Versão para impressão" />
     </form> {% endcomment %}
