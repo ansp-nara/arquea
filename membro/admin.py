@@ -133,7 +133,7 @@ class FeriasAdmin(admin.ModelAdmin):
     inlines = [ControleFeriasInline, ]
     list_per_page = 10
 
-    search_fields = ['membro__nome', 'membro__cargo']
+    search_fields = ['membro__nome']#, 'membro__cargo']
 
 admin.site.register(Ferias, FeriasAdmin)
 
