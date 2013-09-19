@@ -218,7 +218,7 @@ def relatorio_gerencial(request, pdf=False):
     if request.method == 'GET':
 	if request.GET.get('termo'):
 	    import locale
-	    locale.setlocale(locale.LC_ALL, 'pt_BR')
+	    locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
 	    id = int(request.GET.get('termo'))
 	    t = get_object_or_404(Termo,id=id)
 	    retorno = []
