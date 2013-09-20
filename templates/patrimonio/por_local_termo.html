@@ -1,0 +1,171 @@
+{% extends "admin/base_site.html" %}
+{% load proto_tags %}
+{% block content %}
+<style>
+ .patr a:link,
+ .patr a:visited,
+ .patr a:hover,
+ .patr a:active {
+   color:inherit;
+   line-height:inherit;  
+} 
+ .level1 {
+    color:#102BB2; 
+ }
+ .level1 .level_btn {
+    display:list-item;
+    list-style:square inside;
+ }
+ .level2 {
+     color:#FF6500; 
+ }
+ .level2 .level_btn {
+    display:list-item;
+    list-style:circle inside;
+    padding-left:15px;
+ }
+ .level3 {
+    color:#56B209; 
+ }
+ .level3 .level_btn {
+    display:list-item;
+    list-style:disc inside;
+    padding-left:30px;
+ }
+ .level0.tr_border {
+    border-top:1px darkgray solid;
+ }
+ .level0 {
+ }
+ /*
+ .level1.tr_border .clickable {
+    border-bottom:1px #102BB2 solid;
+ }
+ .level2.tr_border .clickable {
+    border-bottom:1px #FF6500 solid;
+ }
+ .level3.tr_border .clickable {
+    border-bottom:1px #56B209 solid;
+ }
+ */
+ td:nth-child(2),
+ td:nth-child(4),
+ td:nth-child(6),
+ td:nth-child(7) {
+    white-space:nowrap;
+ }
+</style>
+<h1 repeat="1">Inventário por local</h1>
+<h4><a href="{% url 'patrimonio.views.por_local_termo' 1 %}?entidade={{request.GET.entidade}}&endereco={{request.GET.endereco}}&detalhe={{request.GET.detalhe}}">Imprimir</a></h4>
+
+{% comment %}
+    <form action="{% url 'patrimonio.views.por_estado' 1 %}" method="GET">
+       <input type="hidden" value="{{ termo.id }}" name="termo" />
+       <input type="submit" value="Versão para impressão" />
+    </form> 
+{% endcomment %}
+
+ 
+{% for end in enderecos %}
+    <h4>
+        {% if end.endereco %}
+            {{ end.endereco }}
+        {% else %}
+            {{ end.detalhe }}
+        {% endif %}
+    </h4>
+    <table border="0" repeat="1" cellpadding="5">
+    {% comment %}
+    <tr class="patr" id="" style="background-color:lightgray;font-weight:bold; border:1px black solid;">
+        <td colspan='10'>{{ end.endereco }}</td>
+    </tr>
+    {% endcomment %}
+    {% if end.detalhes %}
+	    <tr style="background-color:lightgray;font-weight:bold; border:1px black solid;">
+	        <th>ID</th>
+	        <th>Processo</th>
+	        <th>N.FMUSP</th>
+	        <th>NF</th>
+	        <th>Marca</th>
+	        <th>Modelo</th>
+	        <th>Part number</th>
+	        <th>Descrição</th>
+	        <th>NS</th>
+	        <th>Estado</th>
+	    </tr>    
+	{% endif %}
+    {% for d in end.detalhes %}
+           {% for p in d.patrimonio %}
+              <tr class="patr level0 tr_border" id="tr_{{p.id}}">
+                <td><div class="level_btn"></div><a href="{% url 'admin:patrimonio_patrimonio_change' p.id %}">{{ p.id }}</a></td>
+                <td class="clickable">{{ p.termo }}</td>
+                <td class="clickable">{{ p.fmusp|default:'' }}</td>
+                <td class="clickable">{{ p.num_documento }}</td>
+                <td class="clickable">{{ p.marca }}</td>
+                <td class="clickable">{{ p.modelo }}</td>
+                <td class="clickable">{{ p.part_number }}</td>
+                <td class="clickable">{{ p.descricao }} - {{ p.complemento }}</td>
+                <td class="clickable">{{ p.ns }}</td>
+                <td class="clickable">{{ p.estado }}</td>
+              </tr>
+              {% for f in p.contido %}
+                 <tr class="patr level1 {% if forloop.last %} tr_border{% endif %}" id="tr_{{f.id}}">
+                    <td><div class="level_btn"></div><a href="{% url 'admin:patrimonio_patrimonio_change' f.id %}"></a></td>
+	                <td class="clickable">{{ f.termo }}</td>
+	                <td class="clickable">{{ f.fmusp|default:'' }}</td>
+                    <td class="clickable">{{ f.num_documento }}</td>
+                    <td class="clickable">{{ f.marca }}</td>
+                    <td class="clickable">{{ f.modelo }}</td>
+                    <td class="clickable">{{ f.part_number }}</td>
+                    <td class="clickable">{{ f.descricao }}</td>
+                    <td class="clickable">{{ f.ns }}</td>
+                    <td class="clickable">{{ f.estado }}</td>
+                  </tr>
+                  {% for g in f.contido %}
+                     <tr class="patr level2 {% if forloop.last %} tr_border{% endif %}" id="tr_{{g.id}}">
+                        <td><div class="level_btn"></div><a href="{% url 'admin:patrimonio_patrimonio_change' g.id %}"></a></td>
+	                    <td class="clickable">{{ g.termo }}</td>
+	                    <td class="clickable">{{ g.fmusp|default:'' }}</td>
+                        <td class="clickable">{{ g.num_documento }}</td>
+                        <td class="clickable">{{ g.marca }}</td>
+                        <td class="clickable">{{ g.modelo }}</td>
+                        <td class="clickable">{{ g.part_number }}</td>
+                        <td class="clickable">{{ g.descricao }}</td>
+                        <td class="clickable">{{ g.ns }}</td>
+                        <td class="clickable">{{ g.estado }}</td>
+                      </tr>
+                     {% for h in g.contido %}
+                        <tr class="patr level3 {% if forloop.last %} tr_border{% endif %}" id="tr_{{h.id}}">
+                            <td><div class="level_btn"></div><a href="{% url 'admin:patrimonio_patrimonio_change' h.id %}"></a></td>
+		                    <td class="clickable">{{ h.termo }}</td>
+		                    <td class="clickable">{{ h.fmusp|default:'' }}</td>
+                            <td class="clickable">{{ h.num_documento }}</td>
+                            <td class="clickable">{{ h.marca }}</td>
+                            <td class="clickable">{{ h.modelo }}</td>
+                            <td class="clickable">{{ h.part_number }}</td>
+                            <td class="clickable">{{ h.descricao }}</td>
+                            <td class="clickable">{{ h.ns }}</td>
+                            <td class="clickable">{{ h.estado }}</td>
+                         </tr>
+                     {% endfor %}
+                 {% endfor %}
+              {% endfor %}
+           {% endfor %}
+    {% endfor %}
+    </table>
+{% endfor %}
+
+<script>
+$('.patr').each(function(i, v) {
+    var href = $(this).find("a").attr("href");
+    $(this).find(".clickable").each(function(i, v) {
+        v = $(v);
+        var txt = v.html();
+        txt = '<a href="' + href + '">' + txt + '</a>';
+        v.html(txt);
+    });
+
+});
+
+</script>
+{% endblock %}

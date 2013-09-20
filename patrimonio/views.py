@@ -258,6 +258,112 @@ def por_local(request, pdf=0):
     else:
         return render_to_response('patrimonio/sel_local.html', {'entidades':Entidade.objects.filter(entidade__isnull=True)}, context_instance=RequestContext(request))
 
+
+@login_required
+def por_local_termo(request, pdf=0):
+    if request.GET.get('endereco') is not None:
+        atuais = []
+        # Buscando os históricos atuais de patrimonios de primeiro nível
+        for p in Patrimonio.objects.filter(patrimonio__isnull=True):
+            ht = p.historico_atual
+            if ht:
+                 atuais.append(ht.id)
+        
+        detalhe_id = request.GET.get('detalhe2')
+        if not detalhe_id:
+           detalhe_id = request.GET.get('detalhe1')
+        if not detalhe_id:
+           detalhe_id = request.GET.get('detalhe')
+           
+        endereco_id = request.GET.get('endereco')
+        entidade_id = request.GET.get('entidade')
+        if detalhe_id:
+            detalhe = get_object_or_404(EnderecoDetalhe, pk=detalhe_id)
+            detalhes = [detalhe]
+            
+            i = 0
+            while i < len(detalhes):
+                for ed in detalhes[i].enderecodetalhe_set.all():
+                    detalhes.append(ed)
+                i += 1
+            
+            historicos = HistoricoLocal.objects.filter(id__in=atuais, endereco__in=detalhes)
+            
+            ps = Patrimonio.objects.filter(historicolocal__in=historicos)
+            
+            endereco = get_object_or_404(Endereco, pk=endereco_id)
+            enderecos = []
+            enderecos.append({'endereco':endereco, 'end':endereco_id, 'detalhes':[{'patrimonio':iterate_patrimonio(ps)}]})
+            context = {'detalhe':detalhe, 'det':detalhe_id, 'enderecos': enderecos}
+            
+        elif endereco_id and endereco_id != "":
+            endereco_id = request.GET.get('endereco')
+            
+            enderecos = []
+            endereco = find_endereco(atuais, endereco_id)
+            enderecos.append(endereco)
+            context = {'enderecos': enderecos}
+            
+        else:
+            entidade  = Entidade.objects.get(pk=entidade_id)
+            enderecos = []
+            for endereco in Endereco.objects.filter(entidade=entidade_id):    
+                endereco = find_endereco(atuais, endereco.id)
+                if endereco:
+                    enderecos.append(endereco)
+            context = {'entidade': entidade, 'ent':entidade_id, 'enderecos': enderecos}
+            
+        if pdf:
+            return render_to_pdf('patrimonio/por_local_termo.pdf', context, filename='inventario_por_local.pdf')
+        else:
+            return render_to_response('patrimonio/por_local_termo.html', context,  RequestContext(request,context))
+    else:
+        entidades = Entidade.objects.filter(entidade__isnull=True, endereco__isnull=False, endereco__enderecodetalhe__isnull=False ).distinct()
+        return render_to_response('patrimonio/sel_local.html', {'entidades':entidades}, context_instance=RequestContext(request))
+
+# Usado no disparo da view por_local_termo
+# Busca patrimonios de um endereco
+def find_endereco(atuais, endereco_id):
+    endereco = get_object_or_404(Endereco, pk=endereco_id)
+    historicos = HistoricoLocal.objects.filter(id__in=atuais, endereco__endereco=endereco)
+    detalhes = []
+    detalhes_ids = historicos.values_list('endereco', flat=True).filter(endereco__endereco=endereco)
+    enderecoDetalhes = EnderecoDetalhe.objects.filter(id__in=detalhes_ids)
+    for d in enderecoDetalhes:
+        ps = Patrimonio.objects.filter(historicolocal__in=historicos.filter(endereco=d))
+        detalhes.append({'detalhe':d, 'patrimonio':iterate_patrimonio(ps)})
+    
+    context = None
+    if len(detalhes) > 0:
+        context = {'endereco':endereco, 'end':endereco_id, 'detalhes':detalhes}
+    return context
+        
+def iterate_patrimonio(p_pts, nivel=0):
+    if nivel == 4 or len(p_pts) == 0:
+        return
+    
+    patrimonios = []
+    pts = p_pts.select_related('pagamento__protocolo'
+                ).order_by('-pagamento__protocolo__termo', '-numero_fmusp', 'pagamento__protocolo__num_documento', 'descricao',
+                )
+    
+    for p in pts:
+        patrimonio = {}
+        patrimonio.update({'id':p.id, 'termo':'', 'fmusp':p.numero_fmusp, 'num_documento':'',
+                            'marcar':p.marca, 'modelo':p.modelo, 'part_number':p.part_number, 'descricao':p.descricao,
+                            'ns':p.ns, 'estado':'', 'contido':[]})
+        if p.pagamento and p.pagamento.protocolo:
+            patrimonio.update({'termo': p.pagamento.protocolo.termo})
+            patrimonio.update({'num_documento': p.pagamento.protocolo.num_documento})
+            
+        if p.historico_atual:
+            patrimonio.update({'estado': p.historico_atual.estado})
+        
+        contido = iterate_patrimonio(p.contido.all(), nivel+1)
+        patrimonio.update({'contido': contido})
+        patrimonios.append(patrimonio)
+    return patrimonios
+
 @login_required
 def por_tipo_equipamento(request, pdf=0):
     if request.method != 'GET':
@@ -423,6 +529,7 @@ def por_termo(request, pdf=0):
         patrimonios = Patrimonio.objects.all()
 
     if doado == '0':
+        # Exclui a FUSSESP (id=1372)
         patrimonios = patrimonios.exclude(historicolocal__endereco__id=1372, historicolocal__estado__id=1)
     elif doado == '1':
 	patrimonios = patrimonios.filter(historicolocal__endereco__id=1372, historicolocal__estado__id=1)
