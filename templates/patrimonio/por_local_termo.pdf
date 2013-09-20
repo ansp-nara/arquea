@@ -1,0 +1,159 @@
+{% load proto_tags %}
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style>
+@import url('/var/www/media/css/pdf.css');
+
+
+@page {
+  size:a4 landscape;
+          background-image: url('/var/www/media/img/papel_timbrado_paisagem.jpg');
+  top: 3.6cm;
+  left: 1.5cm;
+  right: 1.5cm;
+  bottom: 2cm;
+  @frame footer {
+                -pdf-frame-content: footerContent;
+                bottom: 0.5cm;
+                margin-right: 1cm;
+                height: 1cm;
+                left: -2.3cm;
+                }
+}
+th {text-align: left;}
+tr, th, td {
+    page-break-inside: avoid;
+}
+ .level1 {
+    color:#102BB2; 
+ }
+ .level1 .level_btn {
+    display:list-item;
+    list-style:square inside;
+ }
+ .level2 {
+     color:#FF6500; 
+ }
+ .level2 .level_btn {
+    display:list-item;
+    list-style:circle inside;
+    padding-left:15px;
+ }
+ .level3 {
+    color:#56B209; 
+ }
+ .level3 .level_btn {
+    display:list-item;
+    list-style:disc inside;
+    padding-left:30px;
+ }
+ .level0.tr_border {
+    border-top:1px darkgray solid;
+ }
+ .level0 {
+ }
+ td:nth-child(2),
+ td:nth-child(6),
+ td:nth-child(7) {
+ width:1px;
+    white-space:nowrap;
+ }
+ 
+</style>
+
+</head>
+<body>
+<h1 repeat="1">Inventário por local</h1>
+
+{% for end in enderecos %}
+    <h4>
+        {% if end.endereco %}
+            {{ end.endereco }}
+        {% else %}
+            {{ end.detalhe }}
+        {% endif %}
+    </h4>
+    <table border="0" repeat="1" cellpadding="5" width="100%">
+    {% comment %}
+    <tr class="patr" id="" style="background-color:lightgray;font-weight:bold; border:1px black solid;">
+        <td colspan='10'>{{ end.endereco }}</td>
+    </tr>
+    {% endcomment %}
+    {% if end.detalhes %}
+        <tr style="background-color:lightgray;font-weight:bold; border:1px black solid;">
+            <th width="3%">ID</th>
+            <th width="5%">Processo</th>
+            <th width="4%">N.FMUSP</th>
+            <th width="10%">NF</th>
+            <th width="3%">Marca</th>
+            <th width="15%">Modelo</th>
+            <th width="10%">Part number</th>
+            <th width="39%">Descrição</th>
+            <th width="8%">NS</th>
+            <th width="3%">Estado</th>
+        </tr>    
+    {% endif %}
+    {% for d in end.detalhes %}
+           {% for p in d.patrimonio %}
+              <tr class="patr level0 tr_border" id="tr_{{p.id}}">
+                <td><div class="level_btn"></div>{{ p.id }}</td>
+                <td>{{ p.termo }}</td>
+                <td>{{ p.fmusp|default:'' }}</td>
+                <td>{{ p.num_documento }}</td>
+                <td>{{ p.marca }}</td>
+                <td>{{ p.modelo }}</td>
+                <td>{{ p.part_number }}</td>
+                <td>{{ p.descricao }} - {{ p.complemento }}</td>
+                <td>{{ p.ns }}</td>
+                <td>{{ p.estado }}</td>
+              </tr>
+              {% for f in p.contido %}
+                 <tr class="patr level1 {% if forloop.last %} tr_border{% endif %}" id="tr_{{f.id}}">
+                    <td><div class="level_btn"></div></td>
+                    <td>{{ f.termo }}</td>
+                    <td>{{ f.fmusp|default:'' }}</td>
+                    <td>{{ f.num_documento }}</td>
+                    <td>{{ f.marca }}</td>
+                    <td>{{ f.modelo }}</td>
+                    <td>{{ f.part_number }}</td>
+                    <td>{{ f.descricao }}</td>
+                    <td>{{ f.ns }}</td>
+                    <td>{{ f.estado }}</td>
+                  </tr>
+                  {% for g in f.contido %}
+                     <tr class="patr level2 {% if forloop.last %} tr_border{% endif %}" id="tr_{{g.id}}">
+                        <td><div class="level_btn"></div></td>
+                        <td>{{ g.termo }}</td>
+                        <td>{{ g.fmusp|default:'' }}</td>
+                        <td>{{ g.num_documento }}</td>
+                        <td>{{ g.marca }}</td>
+                        <td>{{ g.modelo }}</td>
+                        <td>{{ g.part_number }}</td>
+                        <td>{{ g.descricao }}</td>
+                        <td>{{ g.ns }}</td>
+                        <td>{{ g.estado }}</td>
+                      </tr>
+                     {% for h in g.contido %}
+                        <tr class="patr level3 {% if forloop.last %} tr_border{% endif %}" id="tr_{{h.id}}">
+                            <td><div class="level_btn"></div></td>
+                            <td>{{ h.termo }}</td>
+                            <td>{{ h.fmusp|default:'' }}</td>
+                            <td>{{ h.num_documento }}</td>
+                            <td>{{ h.marca }}</td>
+                            <td>{{ h.modelo }}</td>
+                            <td>{{ h.part_number }}</td>
+                            <td>{{ h.descricao }}</td>
+                            <td>{{ h.ns }}</td>
+                            <td>{{ h.estado }}</td>
+                         </tr>
+                     {% endfor %}
+                 {% endfor %}
+              {% endfor %}
+           {% endfor %}
+    {% endfor %}
+    </table>
+{% endfor %}
+
+</body>
+</html>
