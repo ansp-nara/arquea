@@ -93,7 +93,8 @@
 </div>
 <form>
 <input type="checkbox" id="chk_stencil" name="chk_stencil" value="1" {% if chk_stencil = 1 %}checked{% endif %}><span>&nbsp;Mostrar stencils</span><br>
-<input type="checkbox" id="chk_legenda" name="chk_legenda" value="1" {% if chk_legenda = 1 %}checked{% endif %}><span>&nbsp;Mostrar legendas</span>
+<input type="checkbox" id="chk_legenda" name="chk_legenda" value="1" {% if chk_legenda = 1 %}checked{% endif %}><span>&nbsp;Mostrar legendas</span><br>
+<input type="checkbox" id="chk_legenda_desc" name="chk_legenda_desc" value="1" {% if chk_legenda_desc = 1 %}checked{% endif %}><span>&nbsp;Mostrar descrição.</span>
 </form>
     
 	{% for dc in dcs %}
@@ -101,9 +102,11 @@
 	       <div class="page-break"></div>
 	   {% endif %}
 	<div class="dc">
-	<h1>{{ dc.nome }}</h1>
-	{% for rack in dc.racks %}
-		<div class="rack"  style="{% if forloop.counter|divisibleby:2 %}page-break-after:always;{% endif %}">
+	<h1>{{ dc.entidade }} - {{ dc.nome }}</h1>
+	{% for fileira in dc.fileiras %}
+	<p></p>
+	{% for rack in fileira.racks %}
+		<div class="rack">
 		    <h2>
 		      <a href="{% url "admin:patrimonio_patrimonio_change" rack.id %}" onclick="return showAddAnotherPopup(this);">
 		      {{ rack.nome }} ({{ rack.vazio }} ocupado)
@@ -120,12 +123,31 @@
 		       {% if eq.id %}
 		           <a href="{% url "admin:patrimonio_patrimonio_change" eq.id %}" onclick="return showAddAnotherPopup(this);">
 		       {% endif %}
-		       <div class="{% if eq.pos_col %} pos_{{eq.pos_col}} {% endif %} {% if eq.conflito %}conflito{% endif %} {% if eq.descricao %}equip " rel="tooltip" title="{{ eq.descricao }}"{% else %}espaco"{% endif %} 
+		       <div class="{% if eq.pos_col %} pos_{{eq.pos_col}} {% endif %} {% if eq.conflito %}conflito{% endif %} equip " rel="tooltip" title="{{ eq.descricao }}" 
 		           style="margin-top:{{ eq.eixoY }}px; height:{{ eq.altura }}px;">
 	               <div>
-		               <div style="height:{{ eq.altura }}px;">
+		               <div class="{% if eq.pos_col %} pos_{{eq.pos_col}} {% endif %}" style="height:{{ eq.altura }}px;">
 		                {% if eq.pos_col %}
-		                    {% if eq.tam >= 15 %}
+                            {% if eq.tam >= 9 %}
+                                {{ eq.nome|default:""|truncatechars:50 }}            
+                            {% elif eq.tam >= 6 %}
+                                {{ eq.nome|default:""|truncatechars:35 }}
+                            {% else %}
+                                {{ eq.nome|default:""|truncatechars:20 }}
+                            {% endif %}
+				        {% else %}
+				            {% if eq.tam >= 9 %}
+				                {{ eq.nome|default:""|truncatechars:90 }}            
+				            {% elif eq.tam >= 6 %}
+				                {{ eq.nome|default:""|truncatechars:60 }}
+				            {% else %}
+				                {{ eq.nome|default:""|truncatechars:30 }}
+				            {% endif %}
+                        {% endif %}
+			            </div>
+                       <div class="{% if eq.pos_col %} pos_{{eq.pos_col}} {% endif %}" style="height:{{ eq.altura }}px;" style="position:absolute">
+                        {% if eq.pos_col %}
+                            {% if eq.tam >= 15 %}
                                 {{ eq.descricao|truncatechars:80 }}
                             {% elif eq.tam >= 12 %}
                                 {{ eq.descricao|truncatechars:65 }}
@@ -136,23 +158,24 @@
                             {% else %}
                                 {{ eq.descricao|truncatechars:20 }}
                             {% endif %}
-				        {% else %}
-				            {% if eq.tam >= 15 %}
-				                {{ eq.descricao|truncatechars:150 }}
-				            {% elif eq.tam >= 12 %}
-				                {{ eq.descricao|truncatechars:120 }}
-				            {% elif eq.tam >= 9 %}
-				                {{ eq.descricao|truncatechars:90 }}            
-				            {% elif eq.tam >= 6 %}
-				                {{ eq.descricao|truncatechars:60 }}
-				            {% else %}
-				                {{ eq.descricao|truncatechars:30 }}
-				            {% endif %}
+                        {% else %}
+                            {% if eq.tam >= 15 %}
+                                {{ eq.descricao|truncatechars:150 }}
+                            {% elif eq.tam >= 12 %}
+                                {{ eq.descricao|truncatechars:120 }}
+                            {% elif eq.tam >= 9 %}
+                                {{ eq.descricao|truncatechars:90 }}            
+                            {% elif eq.tam >= 6 %}
+                                {{ eq.descricao|truncatechars:60 }}
+                            {% else %}
+                                {{ eq.descricao|truncatechars:30 }}
+                            {% endif %}
                         {% endif %}
-			            </div>
+                        </div>
 		            </div>
 		            {% if eq.imagem %}<img src="{{ eq.imagem }}" />{% endif %}
 		       </div>
+		       
 		       {% if eq.id %}
 		           </a>
 		       {% endif %}
@@ -173,7 +196,7 @@
                     {% for eq in rack.equipamentos_fora_visao %}
                         <tr>
 	                        <td>
-	    	                    <a href="{% url "admin:patrimonio_patrimonio_change" eq.id %}" onclick="return showAddAnotherPopup(this);">{{ eq.descricao|truncatechars:45 }}</a>
+	    	                    <a href="{% url "admin:patrimonio_patrimonio_change" eq.id %}" onclick="return showAddAnotherPopup(this);">{{ eq.nome|truncatechars:45 }}</a>
 	    	                </td>
 	                        <td>{{ eq.tam }}</td>
 	                        <td>{{ eq.pos }}</td>
@@ -202,7 +225,7 @@
 	                       {% if conflito.eq1 %}
 	                        <td>
 	                           <a href="{% url "admin:patrimonio_patrimonio_change" conflito.eq1.id %}" onclick="return showAddAnotherPopup(this);">
-	                            {{ conflito.eq1.descricao }}
+	                            {{ conflito.eq1.nome }}
 	                            </a>
 	                        </td>
 	                        <td>{{ conflito.eq1.pos }}</td>
@@ -213,7 +236,7 @@
 	                        {% if conflito.eq2 %}
 	                        <td>
 	                            <a href="{% url "admin:patrimonio_patrimonio_change" conflito.eq2.id %}" onclick="return showAddAnotherPopup(this);">
-	                                {{ conflito.eq2.descricao }}
+	                                {{ conflito.eq2.nome }}
 	                            </a>
 	                        </td>
 	                        <td>{{ conflito.eq2.pos }}</td>
@@ -227,7 +250,9 @@
 	       {% endif %}
 		</div>
 	{% endfor %}
+	{% endfor %}
 {% endfor %}
+
 {% else %}
     <button name="Buscar" onclick="document.getElementById('form_racks').submit();">Buscar</button>
 {% endif %}
