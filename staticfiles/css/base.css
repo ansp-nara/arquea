@@ -957,6 +957,7 @@ table#change-history tbody th {
 
 #header {
     width:100%;
+    min-width:1200px;
 	background: #fff url(../img/admin/bg-header.jpg) repeat-x top left;
     color: #464646;
     overflow: hidden;
@@ -1067,6 +1068,8 @@ table#change-history tbody th {
 
 #footer {
     clear: both;
+    width:100%;
+    min-width:1200px;
     padding: 10px;
 	border:solid 1px #ccc;
 	height:180px;
