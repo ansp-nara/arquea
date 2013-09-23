@@ -294,7 +294,7 @@ def por_local_termo(request, pdf=0):
             
             endereco = get_object_or_404(Endereco, pk=endereco_id)
             enderecos = []
-            enderecos.append({'endereco':endereco, 'end':endereco_id, 'detalhes':[{'patrimonio':iterate_patrimonio(ps)}]})
+            enderecos.append({'endereco':endereco, 'end':endereco_id, 'detalhes':[{'detalhe':detalhe, 'det':detalhe_id, 'patrimonio':iterate_patrimonio(ps)}]})
             context = {'detalhe':detalhe, 'det':detalhe_id, 'enderecos': enderecos}
             
         elif endereco_id and endereco_id != "":
