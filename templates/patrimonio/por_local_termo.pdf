@@ -74,27 +74,22 @@ tr, th, td {
             {{ end.detalhe }}
         {% endif %}
     </h4>
-    <table border="0" repeat="1" cellpadding="5" width="100%">
-    {% comment %}
-    <tr class="patr" id="" style="background-color:lightgray;font-weight:bold; border:1px black solid;">
-        <td colspan='10'>{{ end.endereco }}</td>
-    </tr>
-    {% endcomment %}
-    {% if end.detalhes %}
-        <tr style="background-color:lightgray;font-weight:bold; border:1px black solid;">
-            <th style="width:5%">ID</th>
-            <th style="width:7%">Processo</th>
-            <th style="width:6%">N.FMUSP</th>
-            <th style="width:10%">NF</th>
-            <th style="width:5%">Marca</th>
-            <th style="width:15%">Modelo</th>
-            <th style="width:10%">Part number</th>
-            <th style="width:29%">Descrição</th>
-            <th style="width:8%">NS</th>
-            <th style="width:5%">Estado</th>
-        </tr>    
-    {% endif %}
     {% for d in end.detalhes %}
+            <p></p>
+            <table style="border:1px black solid; padding:3px;"><tr><td><strong>{{ d.detalhe }}</strong></td></tr></table>
+            <table border="0" repeat="1" cellpadding="5" width="100%">
+            <tr style="background-color:lightgray;font-weight:bold; border:1px black solid;">
+                <th style="width:5%">ID</th>
+                <th style="width:7%">Processo</th>
+                <th style="width:6%">N.FMUSP</th>
+                <th style="width:10%">NF</th>
+                <th style="width:5%">Marca</th>
+                <th style="width:15%">Modelo</th>
+                <th style="width:10%">Part number</th>
+                <th style="width:29%">Descrição</th>
+                <th style="width:8%">NS</th>
+                <th style="width:5%">Estado</th>
+            </tr>
            {% for p in d.patrimonio %}
               <tr class="patr level0 tr_border" id="tr_{{p.id}}">
                 <td style="width:5%"><div class="level_btn"></div>{{ p.id }}</td>
