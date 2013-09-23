@@ -94,7 +94,7 @@
     position:absolute;
     z-index: 10;
 }
-.interno a div div div {
+.interno a div div div:nth-child(1) {
     position:relative;
     display: table-cell;
     vertical-align:middle;
@@ -102,6 +102,18 @@
     width: 199px;
     text-align: center;
 }
+
+.interno a div div div:nth-child(2) {
+    position: absolute;
+	top: 0;
+	left: 0;
+    vertical-align:middle;
+    line-height: 1.5em;
+    width: 199px;
+    text-align: center;
+    display:none;
+}
+	
 @media screen {
 	.interno a div div div {
         text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black, -2px 0 1px black, 0 2px 1px black, 2px 0 1px black, 0 -2px 1px black;
@@ -118,10 +130,14 @@
     vertical-align:middle; 
     line-height:1.5em;
 }
+.interno a div div div:nth-child(1).pos_01,
+.interno a div div div:nth-child(2).pos_01,
 .equip.pos_01 {
 	width:97px;
 	font-size: 9px;
 }
+.interno a div div div:nth-child(1).pos_02,
+.interno a div div div:nth-child(2).pos_02,
 .equip.pos_02 {
 	right:0;
 	width:97px;
@@ -129,17 +145,14 @@
 	margin-right: 0;
 	font-size: 9px;
 }
+.interno a div div div:nth-child(1).pos_03,
+.interno a div div div:nth-child(2).pos_03,
 .equip.pos_03 {
 	
 }
 .equip.conflito {
 	border:2px red solid;
 	width:195px
-}
-.equip-desc {
-    position:absolute;
-    top:0;
-    left:0;
 }
 .espaco {
     width:100%;

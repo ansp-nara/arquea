@@ -51,7 +51,7 @@ $(function(){
     * Os disparos ocorrem no checkbox e no label do checkbox
     */
    $("#chk_legenda").click(function(e){
-	   $(".equip div div").toggle();
+	   $(".equip div div:nth-child(1)").toggle();
 	   
 	   var showOrHide = ($('#chk_legenda').prop('checked'));
 	   var newUrl = updateQueryString('chk_legenda', showOrHide?1:0, $('#icons a').attr('href'));
@@ -60,10 +60,31 @@ $(function(){
    $("#chk_legenda + span").click(function(e){
 	   var showOrHide = !($('#chk_legenda').prop('checked'));
 	   
-	   $(".equip div div").toggle(showOrHide);
+	   $(".equip div div:nth-child(1)").toggle(showOrHide);
 	   $('#chk_legenda').prop('checked', showOrHide);
 	   
 	   var newUrl = updateQueryString('chk_legenda', showOrHide?1:0, $('#icons a').attr('href'));
+	   $('#icons a').attr('href', newUrl);
+   });
+   
+   /**
+    * Exibe ou esconde as legendas dos equipamentos.
+    * Os disparos ocorrem no checkbox e no label do checkbox
+    */
+   $("#chk_legenda_desc").click(function(e){
+	   $(".equip div div:nth-child(2)").toggle();
+	   
+	   var showOrHide = ($('#chk_legenda_desc').prop('checked'));
+	   var newUrl = updateQueryString('chk_legenda_desc', showOrHide?1:0, $('#icons a').attr('href'));
+	   $('#icons a').attr('href', newUrl);
+   });
+   $("#chk_legenda_desc + span").click(function(e){
+	   var showOrHide = !($('#chk_legenda_desc').prop('checked'));
+	   
+	   $(".equip div div:nth-child(2)").toggle(showOrHide);
+	   $('#chk_legenda_desc').prop('checked', showOrHide);
+	   
+	   var newUrl = updateQueryString('chk_legenda_desc', showOrHide?1:0, $('#icons a').attr('href'));
 	   $('#icons a').attr('href', newUrl);
    });
    
