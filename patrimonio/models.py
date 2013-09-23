@@ -8,6 +8,7 @@ from django.utils.functional import cached_property
 from django.db.models import Q
 import datetime
 import logging
+import re
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -242,6 +243,39 @@ class HistoricoLocal(models.Model):
         ordering = ('-data', )
         unique_together = (('patrimonio', 'endereco', 'descricao', 'data'), )
 
+    @cached_property
+    def posicao_rack_letra(self):
+        retorno = None
+        if self.posicao:
+            # verifica se é possível recuperar a posição de furo de uma string como R042.F085.TD
+            rack_str = self.posicao.split('.')
+            
+            if len(rack_str) == 1:
+                rack_str = self.posicao.split('-')
+
+            if len(rack_str) >= 2:
+                eixoLetra = re.findall(r'[a-zA-Z]+', rack_str[0])
+                print eixoLetra
+                if len(eixoLetra) == 1:
+                    retorno = eixoLetra[0]
+                    
+        return retorno
+    
+    @cached_property
+    def posicao_rack_numero(self):
+        retorno = None
+        if self.posicao:
+            # verifica se é possível recuperar a posição de furo de uma string como R042.F085.TD
+            rack_str = self.posicao.split('.')
+            if len(rack_str) == 1:
+                rack_str = self.posicao.split('-')
+                
+            if len(rack_str) >= 2:
+                eixoNumero = re.findall(r'\d+', rack_str[0])
+                if len(eixoNumero) == 1:
+                    retorno = eixoNumero[0]
+        return retorno
+        
     @cached_property
     def posicao_furo(self):
         retorno = -1

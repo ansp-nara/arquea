@@ -8,13 +8,15 @@
 <select name="entidade" id="id_entidade" onchange="ajax_filter_enderecos(this.id);">
      <option value="">----</option>
   {% for e in entidades %}
-     <option value="{{ e.id }}">{{ e }}</option>
+     <option value="{{ e.entidade.id }}">{{ e.entidade }}</option>
+      {% for e1 in e.filhas %}
+         <option value="{{ e1.entidade.id }}">&nbsp;&nbsp;&nbsp;&nbsp;{{ e1.entidade }}</option>
+            {% for e2 in e1.filhas %}
+                 <option value="{{ e2.entidade.id }}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ e2.entidade }}</option>
+            {% endfor %}
+      {% endfor %}
+      
   {% endfor %}
-</select>
-<br />
-<span id="filhos" style="display:none;">
-<label for="id_entidade1">Entidade "filha":</label>:
-<select name="entidade1" id="id_entidade1" onchange="ajax_filter_enderecos(this.id);">
 </select>
 <br />
 </span>

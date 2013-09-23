@@ -10,6 +10,7 @@ Replace these with more appropriate tests for your application.
 from django.test import TestCase
 from patrimonio.models import HistoricoLocal 
 
+import re
 import logging
 
 # Get an instance of a logger
@@ -71,3 +72,35 @@ class HistoricoLocalTest(TestCase):
         historico = HistoricoLocal()
         self.assertEquals(historico.posicao_colocacao, None)
         
+    def test_posicao_rac(self):
+        historico = HistoricoLocal(posicao="R042.F085.TD")
+        self.assertEquals(historico.posicao_rack_letra, 'R')
+        self.assertEquals(historico.posicao_rack_numero, '042')
+        
+        historico = HistoricoLocal(posicao="P042.F017-TD")
+        self.assertEquals(historico.posicao_rack_letra, 'P')
+        self.assertEquals(historico.posicao_rack_numero, '042')
+        
+        historico = HistoricoLocal(posicao="S042.piso")
+        self.assertEquals(historico.posicao_rack_letra, 'S')
+        self.assertEquals(historico.posicao_rack_numero, '042')
+        
+        historico = HistoricoLocal(posicao="S042-piso")
+        self.assertEquals(historico.posicao_rack_letra, 'S')
+        self.assertEquals(historico.posicao_rack_numero, '042')
+        
+        historico = HistoricoLocal(posicao="60")
+        self.assertEquals(historico.posicao_rack_letra, None)
+        self.assertEquals(historico.posicao_rack_numero, None)
+                
+        historico = HistoricoLocal(posicao="S042.F049")
+        self.assertEquals(historico.posicao_rack_letra, 'S')
+        self.assertEquals(historico.posicao_rack_numero, '042')                
+
+        historico = HistoricoLocal(posicao="AB42.F049")
+        self.assertEquals(historico.posicao_rack_letra, 'AB')
+        self.assertEquals(historico.posicao_rack_numero, '42')      
+        
+        historico = HistoricoLocal(posicao="ABC42.F049")
+        self.assertEquals(historico.posicao_rack_letra, 'ABC')
+        self.assertEquals(historico.posicao_rack_numero, '42')
