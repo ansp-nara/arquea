@@ -256,7 +256,8 @@ def por_local(request, pdf=0):
             return render_to_pdf('patrimonio/por_local.pdf', context, filename='inventario_por_local.pdf')
         return render_to_response('patrimonio/por_local.html', context)
     else:
-        return render_to_response('patrimonio/sel_local.html', {'entidades':Entidade.objects.filter(entidade__isnull=True)}, context_instance=RequestContext(request))
+        entidades = find_entidades_filhas(None)
+        return render_to_response('patrimonio/sel_local.html', {'entidades':entidades}, context_instance=RequestContext(request))
 
 
 @login_required
@@ -276,7 +277,7 @@ def por_local_termo(request, pdf=0):
            detalhe_id = request.GET.get('detalhe')
            
         endereco_id = request.GET.get('endereco')
-        entidade_id = request.GET.get('entidade')
+        
         if detalhe_id:
             detalhe = get_object_or_404(EnderecoDetalhe, pk=detalhe_id)
             detalhes = [detalhe]
@@ -305,9 +306,17 @@ def por_local_termo(request, pdf=0):
             context = {'enderecos': enderecos}
             
         else:
-            entidade  = Entidade.objects.get(pk=entidade_id)
+            entidade_id = request.GET.get('entidade')
+            entidade_filha_id = request.GET.get('entidade1')
+            
+            if entidade_filha_id:
+                # Se for selecionada a entidade de segundo nível, podemos utiliza-la como filtro
+                entidade  = Entidade.objects.filter(pk=entidade_filha_id)
+            else:
+                # Se for selecionada a entidade de primeiro nível, devemos fazer a busca incluindo todas as suas entidades de segundo nível
+                entidade  = Entidade.objects.filter(pk=entidade_id) | Entidade.objects.filter(entidade=entidade_id)
             enderecos = []
-            for endereco in Endereco.objects.filter(entidade=entidade_id):    
+            for endereco in Endereco.objects.filter(entidade__in=entidade):    
                 endereco = find_endereco(atuais, endereco.id)
                 if endereco:
                     enderecos.append(endereco)
@@ -318,8 +327,34 @@ def por_local_termo(request, pdf=0):
         else:
             return render_to_response('patrimonio/por_local_termo.html', context,  RequestContext(request,context))
     else:
-        entidades = Entidade.objects.filter(entidade__isnull=True, endereco__isnull=False, endereco__enderecodetalhe__isnull=False ).distinct()
+        # Cria a lista para o SELECT de filtro de Entidades, buscando as Entidades que possuem EnderecoDetalhe
+        entidades = find_entidades_filhas(None)
         return render_to_response('patrimonio/sel_local.html', {'entidades':entidades}, context_instance=RequestContext(request))
+
+# Usado para criar o filtro de entidades.
+# Caso o parametro seja None, busca todas as entidades de primeiro nível, seguidas pela busca de todas as entidades abaixo.
+# Somente são consideradas Entidades válidas para a exibição no filtro as que possuirem EnderecoDetalhe, de qualquer nível de Entidade
+def find_entidades_filhas(entidade_id):
+    if entidade_id:
+        entidades = Entidade.objects.filter(entidade=entidade_id)
+    else:
+        entidades = Entidade.objects.filter(entidade__isnull=True)
+        
+    entidades_retorno = []
+    for entidade in entidades:
+        entidades_filhas = find_entidades_filhas(entidade.id)
+        entidade_valida = Entidade.objects.filter(id=entidade.id, endereco__isnull=False, endereco__enderecodetalhe__isnull=False, )
+        
+        if len(entidades_filhas) > 0:
+            logger.debug('TEM FILHA: %s', entidades_filhas)
+        if entidade_valida:
+            logger.debug('É VÁLIDA %s:', entidade)
+        
+        if entidade_valida or len(entidades_filhas) > 0:
+            entidades_retorno.append({"entidade": entidade, "filhas":entidades_filhas})
+    
+    return entidades_retorno
+
 
 # Usado no disparo da view por_local_termo
 # Busca patrimonios de um endereco
@@ -600,7 +635,19 @@ def racks(request):
         for local in locais:
             racks = []
             patrimonio_racks = Patrimonio.objects.filter(equipamento__tipo__nome='Rack', historicolocal__endereco__id=local).select_related('equipamento', 'equipamento__imagem', 'historicolocal', 'contido')
+            patrimonio_racks = list(patrimonio_racks)
+            # Ordena os racks pela posição. Ex: R042 - ordena pela fila 042 e depois pela posição R
+            patrimonio_racks.sort(key=lambda x: x.historico_atual.posicao_rack_letra, reverse=False)
+            patrimonio_racks.sort(key=lambda x: x.historico_atual.posicao_rack_numero, reverse=True)
+                
+            fileiras = []
+            rack_anterior = None
             for rack in patrimonio_racks:
+                if not rack_anterior or rack.historico_atual.posicao_rack_numero != rack_anterior.historico_atual.posicao_rack_numero:
+                    racks = []
+                    fileiras.append({'racks': racks})
+                    rack_anterior = rack
+                    
                 espaco_ocupado = 0
                 equipamentos = []
                 equipamentos_fora_visao = []
@@ -642,14 +689,16 @@ def racks(request):
                         imagem = pt.equipamento.imagem.url
                         
                     if pt.historico_atual.posicao_colocacao in ('T', 'TD', 'TE', 'piso', 'lD', 'lE'):
-                        equipamentos_fora_visao.append({'id': pt.id, 'pos':pos, 'tam': tam, 'eixoY': eixoY, 'altura':(tam*19/3),
-                                          'pos_original':pt.historico_atual.posicao_furo, 'imagem':imagem, 'descricao':pt.descricao or u'Sem descrição', 
+                        equipamentos_fora_visao.append({'id': pt.id, 'pos':pos, 'tam': tam, 'eixoY': eixoY, 'altura':(tam*19/3), 
+                                          'pos_original':pt.historico_atual.posicao_furo, 'imagem':imagem, 
+                                          'nome':pt.apelido, 'descricao':pt.descricao or u'Sem descrição', 
                                           'conflito':False, 'pos_col':pt.historico_atual.posicao_colocacao})
                         continue
                     else :
                         # x a partir do topo do container
-                        equipamentos.append({'id': pt.id, 'pos':pos, 'tam': tam, 'eixoY': eixoY, 'altura':(tam*19/3),
-                                              'pos_original':pt.historico_atual.posicao_furo, 'imagem':imagem, 'descricao':pt.descricao or u'Sem descrição', 
+                        equipamentos.append({'id': pt.id, 'pos':pos, 'tam': tam, 'eixoY': eixoY, 'altura':(tam*19/3), 
+                                              'pos_original':pt.historico_atual.posicao_furo, 'imagem':imagem, 
+                                              'nome':pt.apelido, 'descricao':pt.descricao or u'Sem descrição',  
                                               'conflito':False, 'pos_col':pt.historico_atual.posicao_colocacao})
                         espaco_ocupado += tam
                     
@@ -685,33 +734,30 @@ def racks(request):
                     ptAnterior = equipamentos[-1]
 
                 
-                rack = {'id':rack.id, 'nome':rack.apelido, 'marca': rack.marca,  
-                        'altura':int(rack.tamanho) * 3.0, 'altura_pts': rack.tamanho, 'altura_pxs': int(rack.tamanho) * 19.0,  
+                rack = {'id':rack.id,   
+                        'altura':int(rack.tamanho) * 3.0, 'altura_pts': rack.tamanho, 'altura_pxs': int(rack.tamanho) * 19.0,
+                        'nome':rack.apelido, 'marca': rack.marca, 'local': pt.historico_atual.posicao,  
                         'equipamentos':equipamentos, 'equipamentos_fora_visao':equipamentos_fora_visao, 'conflitos':conflitos}
                 
                 # Calculo de uso do rack                
                 rack['vazio'] = '%.2f%%'  % ( (espaco_ocupado * 100.0) / (rack['altura'])) 
                 racks.append(rack)
                 
-            dc = {'nome':EnderecoDetalhe.objects.get(id=local).complemento, 'racks':racks, 'id':local}
+            dcEntidade = Entidade.objects.filter(endereco__enderecodetalhe=local)
+            
+            dc = {'nome':EnderecoDetalhe.objects.get(id=local).complemento, 'fileiras':fileiras, 'id':local, 'entidade': dcEntidade[0].sigla,}
             dcs.append(dc)
     
-    if request.GET.get('chk_stencil'):
-        chk_stencil = request.GET.get('chk_stencil')
-    else:
-        chk_stencil = 1
-        
-    if request.GET.get('chk_legenda'):
-        chk_legenda = request.GET.get('chk_legenda')
-    else:
-        chk_legenda = 1
+    chk_stencil = request.GET.get('chk_stencil') if request.GET.get('chk_stencil') else 1
+    chk_legenda = request.GET.get('chk_legenda') if request.GET.get('chk_legenda') else 1
+    chk_legenda_desc = request.GET.get('chk_legenda_desc') if request.GET.get('chk_legenda_desc') else 0
             
     if request.GET.get('pdf') == "2":
-        return render_wk_to_pdf('patrimonio/racks-wk.pdf', {'dcs':dcs, 'todos_dcs':todos_dcs, 'filename':'diagrama_de_racks.pdf', 'chk_legenda':chk_legenda, 'chk_stencil':chk_stencil}, request=request)
+        return render_wk_to_pdf('patrimonio/racks-wk.pdf', {'dcs':dcs, 'todos_dcs':todos_dcs, 'filename':'diagrama_de_racks.pdf', 'chk_legenda':chk_legenda, 'chk_legenda_desc':chk_legenda, 'chk_legenda_desc':chk_legenda_desc, 'chk_stencil':chk_stencil}, request=request)
     elif request.GET.get('pdf'):
-        return TemplateResponse(request, 'patrimonio/racks-wk.pdf', {'dcs':dcs, 'todos_dcs':todos_dcs, 'chk_legenda':chk_legenda, 'chk_stencil':chk_stencil})
+        return TemplateResponse(request, 'patrimonio/racks-wk.pdf', {'dcs':dcs, 'todos_dcs':todos_dcs, 'chk_legenda':chk_legenda, 'chk_legenda_desc':chk_legenda_desc, 'chk_stencil':chk_stencil})
     else:
-        return TemplateResponse(request, 'patrimonio/racks.html', {'dcs':dcs, 'todos_dcs':todos_dcs, 'chk_legenda':chk_legenda, 'chk_stencil':chk_stencil})
+        return TemplateResponse(request, 'patrimonio/racks.html', {'dcs':dcs, 'todos_dcs':todos_dcs, 'chk_legenda':chk_legenda, 'chk_legenda_desc':chk_legenda_desc, 'chk_stencil':chk_stencil})
 
 @login_required
 def racks1(request):

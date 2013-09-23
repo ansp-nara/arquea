@@ -82,31 +82,31 @@ tr, th, td {
     {% endcomment %}
     {% if end.detalhes %}
         <tr style="background-color:lightgray;font-weight:bold; border:1px black solid;">
-            <th width="3%">ID</th>
-            <th width="5%">Processo</th>
-            <th width="4%">N.FMUSP</th>
-            <th width="10%">NF</th>
-            <th width="3%">Marca</th>
-            <th width="15%">Modelo</th>
-            <th width="10%">Part number</th>
-            <th width="39%">Descrição</th>
-            <th width="8%">NS</th>
-            <th width="3%">Estado</th>
+            <th style="width:5%">ID</th>
+            <th style="width:7%">Processo</th>
+            <th style="width:6%">N.FMUSP</th>
+            <th style="width:10%">NF</th>
+            <th style="width:5%">Marca</th>
+            <th style="width:15%">Modelo</th>
+            <th style="width:10%">Part number</th>
+            <th style="width:29%">Descrição</th>
+            <th style="width:8%">NS</th>
+            <th style="width:5%">Estado</th>
         </tr>    
     {% endif %}
     {% for d in end.detalhes %}
            {% for p in d.patrimonio %}
               <tr class="patr level0 tr_border" id="tr_{{p.id}}">
-                <td><div class="level_btn"></div>{{ p.id }}</td>
-                <td>{{ p.termo }}</td>
-                <td>{{ p.fmusp|default:'' }}</td>
-                <td>{{ p.num_documento }}</td>
-                <td>{{ p.marca }}</td>
-                <td>{{ p.modelo }}</td>
-                <td>{{ p.part_number }}</td>
-                <td>{{ p.descricao }} - {{ p.complemento }}</td>
-                <td>{{ p.ns }}</td>
-                <td>{{ p.estado }}</td>
+                <td style="width:5%"><div class="level_btn"></div>{{ p.id }}</td>
+                <td style="width:7%">{{ p.termo }}</td>
+                <td style="width:6%">{{ p.fmusp|default:'' }}</td>
+                <td style="width:10%">{{ p.num_documento }}</td>
+                <td style="width:5%">{{ p.marca }}</td>
+                <td style="width:15%">{{ p.modelo }}</td>
+                <td style="width:10%">{{ p.part_number }}</td>
+                <td style="width:29%">{{ p.descricao }} - {{ p.complemento }}</td>
+                <td style="width:8%">{{ p.ns }}</td>
+                <td style="width:5%">{{ p.estado }}</td>
               </tr>
               {% for f in p.contido %}
                  <tr class="patr level1 {% if forloop.last %} tr_border{% endif %}" id="tr_{{f.id}}">
