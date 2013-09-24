@@ -385,7 +385,7 @@ def iterate_patrimonio(p_pts, nivel=0):
     for p in pts:
         patrimonio = {}
         patrimonio.update({'id':p.id, 'termo':'', 'fmusp':p.numero_fmusp, 'num_documento':'',
-                            'marcar':p.marca, 'modelo':p.modelo, 'part_number':p.part_number, 'descricao':p.descricao,
+                            'apelido':p.apelido, 'modelo':p.modelo, 'part_number':p.part_number, 'descricao':p.descricao,
                             'ns':p.ns, 'estado':'', 'posicao':'','contido':[]})
         if p.pagamento and p.pagamento.protocolo:
             patrimonio.update({'termo': p.pagamento.protocolo.termo})
