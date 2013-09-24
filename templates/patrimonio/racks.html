@@ -82,7 +82,7 @@
 	<select name="dc" onchange="this.form.submit();">
 	    <option value="0">Todos</option>
 	{% for dc in todos_dcs %}
-	   <option value="{{ dc.id }}" {% if request.GET.dc == dc.id|lower %}selected{% endif %}>{{ dc.nome }}</option>
+	   <option value="{{ dc.id }}" {% if request.GET.dc == dc.id|lower %}selected{% endif %}>{{ dc.nome|default:'' }}</option>
 	{% endfor %}
 	</select>
 	</form>
@@ -102,14 +102,14 @@
 	       <div class="page-break"></div>
 	   {% endif %}
 	<div class="dc">
-	<h1>{{ dc.entidade }} - {{ dc.nome }}</h1>
+	<h1>{{ dc.entidade }} - {{ dc.nome|default:'' }}</h1>
 	{% for fileira in dc.fileiras %}
 	<p></p>
 	{% for rack in fileira.racks %}
 		<div class="rack">
 		    <h2>
 		      <a href="{% url "admin:patrimonio_patrimonio_change" rack.id %}" onclick="return showAddAnotherPopup(this);">
-		      {{ rack.nome }} ({{ rack.vazio }} ocupado)
+		      {{ rack.nome|default:'' }} ({{ rack.vazio }} ocupado)
 		      </a>
 		    </h2>
 		    <div id="rack{{ dc.id }}_{{forloop.counter}}" class="bloco-n" style="height: {{ rack.altura_pxs }}px;">
@@ -123,7 +123,7 @@
 		       {% if eq.id %}
 		           <a href="{% url "admin:patrimonio_patrimonio_change" eq.id %}" onclick="return showAddAnotherPopup(this);">
 		       {% endif %}
-		       <div class="{% if eq.pos_col %} pos_{{eq.pos_col}} {% endif %} {% if eq.conflito %}conflito{% endif %} equip " rel="tooltip" title="{{ eq.nome }} - {{ eq.descricao }}" 
+		       <div class="{% if eq.pos_col %} pos_{{eq.pos_col}} {% endif %} {% if eq.conflito %}conflito{% endif %} equip " rel="tooltip" title="{% if eq.nome %}{{ eq.nome|default:'' }} - {% endif %}{{ eq.descricao }}" 
 		           style="margin-top:{{ eq.eixoY }}px; height:{{ eq.altura }}px;">
 	               <div>
 		               <div class="{% if eq.pos_col %} pos_{{eq.pos_col}} {% endif %}" style="height:{{ eq.altura }}px;">
@@ -196,7 +196,7 @@
                     {% for eq in rack.equipamentos_fora_visao %}
                         <tr>
 	                        <td>
-	    	                    <a href="{% url "admin:patrimonio_patrimonio_change" eq.id %}" onclick="return showAddAnotherPopup(this);">{{ eq.nome }}{{ eq.descricao|truncatechars:45 }}</a>
+	    	                    <a href="{% url "admin:patrimonio_patrimonio_change" eq.id %}" onclick="return showAddAnotherPopup(this);">{{ eq.nome|default:'' }}{{ eq.descricao|truncatechars:45 }}</a>
 	    	                </td>
 	                        <td>{{ eq.tam }}</td>
 	                        <td>{{ eq.pos }}</td>
