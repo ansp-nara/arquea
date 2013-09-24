@@ -486,6 +486,7 @@ input[type=text], input[type=password], textarea, select, .vTextField {
 	-webkit-border-radius:10px;
 	border-radius:10px;
 	min-width:430px;
+	display:none;
 }
 
 .modal-call{
@@ -1019,7 +1020,7 @@ table#change-history tbody th {
 	}
 	
 
-/* BARRA DO USUARIO - INÍCIO */
+/* BARRA DO USUARIO - INï¿½CIO */
 
 #user-tools {
 	float:right;
