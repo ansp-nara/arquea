@@ -789,7 +789,7 @@ function ajax_patrimonio_existente(pn)
 
 function ajax_filter_enderecos() {
      ent_id = $("#id_entidade").val();
-     $("#id_endereco").html('<option value="0">Carregando...</option>');
+     $("#id_endereco").html('<option value="">Carregando...</option>');
 
      $.ajax({
        type: "POST",
@@ -808,7 +808,7 @@ function ajax_filter_enderecos() {
 
 function ajax_filter_locais() {
      end_id = $("#id_endereco").val();
-     $("#id_detalhe").html('<option value="0">Carregando...</option>');
+     $("#id_detalhe").html('<option value="">Carregando...</option>');
 
      $.ajax({
        type: "POST",
