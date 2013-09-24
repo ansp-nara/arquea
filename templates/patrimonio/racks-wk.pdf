@@ -127,6 +127,7 @@ Coluna de furos do rack
     width:199px;
     margin-left:8px;
     margin-right:4px;
+    margin-top:3px;
     font-size:10px;
     top:-5px;
 }
@@ -213,6 +214,7 @@ Coluna de furos do rack
     margin-top:10px;
     width:100%;
     border-spacing:0;
+    border-collapse: collapse;
 }
 .outros th,
 .outros td {
