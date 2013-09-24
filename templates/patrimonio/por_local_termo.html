@@ -48,10 +48,14 @@
     border-bottom:1px #56B209 solid;
  }
  */
- td:nth-child(2),
- td:nth-child(4),
- td:nth-child(6),
- td:nth-child(7) {
+ #tbl_content {
+    margin: 0;
+    width: 100%;
+ }
+ #tbl_content td:nth-child(2),
+ #tbl_content td:nth-child(4),
+ #tbl_contenttd:nth-child(6),
+ #tbl_contenttd:nth-child(7) {
     white-space:nowrap;
  }
 </style>
@@ -77,19 +81,19 @@
     {% if end.detalhes %}
 	{% endif %}
     {% for d in end.detalhes %}
-    <table border="0" repeat="1" cellpadding="5">
+    <table border="0" repeat="1" cellpadding="5" id="tbl_content">
 	    <tr class="" id="" style="background-color:;font-weight:bold; border:1px black solid;">
 	        <td colspan='10'>{{ d.detalhe }}</td>
 	    </tr>
 	    <tr style="background-color:lightgray;font-weight:bold; border:1px black solid;">
 	        <th>ID</th>
 	        <th>Processo</th>
-	        <th>N.FMUSP</th>
+	        <th>FMUSP</th>
 	        <th>NF</th>
-	        <th>Marca</th>
 	        <th>Modelo</th>
 	        <th>Part number</th>
 	        <th>NS</th>
+	        <th>Apelido</th>
 	        <th>Descrição</th>
 	        <th>Posição</th>
 	        <th>Estado</th>
@@ -100,10 +104,10 @@
                 <td class="clickable">{{ p.termo }}</td>
                 <td class="clickable">{{ p.fmusp|default:'' }}</td>
                 <td class="clickable">{{ p.num_documento }}</td>
-                <td class="clickable">{{ p.marca }}</td>
                 <td class="clickable">{{ p.modelo }}</td>
                 <td class="clickable">{{ p.part_number }}</td>
                 <td class="clickable">{{ p.ns }}</td>
+                <td class="clickable">{{ p.apelido|default:'' }}</td>
                 <td class="clickable">{{ p.descricao }} - {{ p.complemento }}</td>
                 <td class="clickable">{{ p.posicao|default:'' }}</td>
                 <td class="clickable">{{ p.estado }}</td>
@@ -114,10 +118,10 @@
 	                <td class="clickable">{{ f.termo }}</td>
 	                <td class="clickable">{{ f.fmusp|default:'' }}</td>
                     <td class="clickable">{{ f.num_documento }}</td>
-                    <td class="clickable">{{ f.marca }}</td>
                     <td class="clickable">{{ f.modelo }}</td>
                     <td class="clickable">{{ f.part_number }}</td>
                     <td class="clickable">{{ f.ns }}</td>
+                    <td class="clickable">{{ f.apelido|default:'' }}</td>
                     <td class="clickable">{{ f.descricao }}</td>
                     <td class="clickable">{{ f.posicao|default:'' }}</td>
                     <td class="clickable">{{ f.estado }}</td>
@@ -128,10 +132,10 @@
 	                    <td class="clickable">{{ g.termo }}</td>
 	                    <td class="clickable">{{ g.fmusp|default:'' }}</td>
                         <td class="clickable">{{ g.num_documento }}</td>
-                        <td class="clickable">{{ g.marca }}</td>
                         <td class="clickable">{{ g.modelo }}</td>
                         <td class="clickable">{{ g.part_number }}</td>
                         <td class="clickable">{{ g.ns }}</td>
+                        <td class="clickable">{{ g.apelido|default:'' }}</td>
                         <td class="clickable">{{ g.descricao }}</td>
                         <td class="clickable">{{ g.posicao|default:'' }}</td>
                         <td class="clickable">{{ g.estado }}</td>
@@ -142,10 +146,10 @@
 		                    <td class="clickable">{{ h.termo }}</td>
 		                    <td class="clickable">{{ h.fmusp|default:'' }}</td>
                             <td class="clickable">{{ h.num_documento }}</td>
-                            <td class="clickable">{{ h.marca }}</td>
                             <td class="clickable">{{ h.modelo }}</td>
                             <td class="clickable">{{ h.part_number }}</td>
                             <td class="clickable">{{ h.ns }}</td>
+                            <td class="clickable">{{ h.apelido|default:'' }}</td>
                             <td class="clickable">{{ h.descricao }}</td>
                             <td class="clickable">{{ h.posicao|default:'' }}</td>
                             <td class="clickable">{{ h.estado }}</td>
