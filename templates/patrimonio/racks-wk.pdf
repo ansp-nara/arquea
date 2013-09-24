@@ -254,7 +254,7 @@ Coluna de furos do rack
         <div class="page-break"></div>
     {% endif %}
     <div class="dc">
-    <h1>{{ dc.entidade }} - {{ dc.nome }}</h1>
+    <h1>{{ dc.entidade }} - {{ dc.nome|default:'' }}</h1>
     {% for fileira in dc.fileiras %}
         {% if not forloop.first %}
             <p class="page-break"></p>
@@ -265,7 +265,7 @@ Coluna de furos do rack
            {% endif %}
             <div class="rack">
                 <h2>
-                  {{ rack.nome }} ({{ rack.vazio }} ocupado)
+                  {{ rack.nome|default:'' }} ({{ rack.vazio }} ocupado)
                 </h2>
                 <div id="rack{{ dc.id }}_{{forloop.counter}}" class="bloco-n" style="position:relative; height: {{ rack.altura_pxs }}px;">
                     <script>
