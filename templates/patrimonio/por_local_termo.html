@@ -89,8 +89,9 @@
 	        <th>Marca</th>
 	        <th>Modelo</th>
 	        <th>Part number</th>
-	        <th>Descrição</th>
 	        <th>NS</th>
+	        <th>Descrição</th>
+	        <th>Posição</th>
 	        <th>Estado</th>
 	    </tr>    
            {% for p in d.patrimonio %}
@@ -102,8 +103,9 @@
                 <td class="clickable">{{ p.marca }}</td>
                 <td class="clickable">{{ p.modelo }}</td>
                 <td class="clickable">{{ p.part_number }}</td>
-                <td class="clickable">{{ p.descricao }} - {{ p.complemento }}</td>
                 <td class="clickable">{{ p.ns }}</td>
+                <td class="clickable">{{ p.descricao }} - {{ p.complemento }}</td>
+                <td class="clickable">{{ p.posicao|default:'' }}</td>
                 <td class="clickable">{{ p.estado }}</td>
               </tr>
               {% for f in p.contido %}
@@ -115,8 +117,9 @@
                     <td class="clickable">{{ f.marca }}</td>
                     <td class="clickable">{{ f.modelo }}</td>
                     <td class="clickable">{{ f.part_number }}</td>
-                    <td class="clickable">{{ f.descricao }}</td>
                     <td class="clickable">{{ f.ns }}</td>
+                    <td class="clickable">{{ f.descricao }}</td>
+                    <td class="clickable">{{ f.posicao|default:'' }}</td>
                     <td class="clickable">{{ f.estado }}</td>
                   </tr>
                   {% for g in f.contido %}
@@ -128,8 +131,9 @@
                         <td class="clickable">{{ g.marca }}</td>
                         <td class="clickable">{{ g.modelo }}</td>
                         <td class="clickable">{{ g.part_number }}</td>
-                        <td class="clickable">{{ g.descricao }}</td>
                         <td class="clickable">{{ g.ns }}</td>
+                        <td class="clickable">{{ g.descricao }}</td>
+                        <td class="clickable">{{ g.posicao|default:'' }}</td>
                         <td class="clickable">{{ g.estado }}</td>
                       </tr>
                      {% for h in g.contido %}
@@ -141,8 +145,9 @@
                             <td class="clickable">{{ h.marca }}</td>
                             <td class="clickable">{{ h.modelo }}</td>
                             <td class="clickable">{{ h.part_number }}</td>
-                            <td class="clickable">{{ h.descricao }}</td>
                             <td class="clickable">{{ h.ns }}</td>
+                            <td class="clickable">{{ h.descricao }}</td>
+                            <td class="clickable">{{ h.posicao|default:'' }}</td>
                             <td class="clickable">{{ h.estado }}</td>
                          </tr>
                      {% endfor %}
