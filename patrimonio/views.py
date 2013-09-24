@@ -379,20 +379,22 @@ def iterate_patrimonio(p_pts, nivel=0):
     
     patrimonios = []
     pts = p_pts.select_related('pagamento__protocolo'
-                ).order_by('-pagamento__protocolo__termo', '-numero_fmusp', 'pagamento__protocolo__num_documento', 'descricao',
+                ).order_by('-pagamento__protocolo__termo', '-numero_fmusp', 'historicolocal__posicao',
                 )
     
     for p in pts:
         patrimonio = {}
         patrimonio.update({'id':p.id, 'termo':'', 'fmusp':p.numero_fmusp, 'num_documento':'',
                             'marcar':p.marca, 'modelo':p.modelo, 'part_number':p.part_number, 'descricao':p.descricao,
-                            'ns':p.ns, 'estado':'', 'contido':[]})
+                            'ns':p.ns, 'estado':'', 'posicao':'','contido':[]})
         if p.pagamento and p.pagamento.protocolo:
             patrimonio.update({'termo': p.pagamento.protocolo.termo})
             patrimonio.update({'num_documento': p.pagamento.protocolo.num_documento})
             
         if p.historico_atual:
             patrimonio.update({'estado': p.historico_atual.estado})
+            patrimonio.update({'posicao': p.historico_atual.posicao})
+            
         
         contido = iterate_patrimonio(p.contido.all(), nivel+1)
         patrimonio.update({'contido': contido})

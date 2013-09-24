@@ -82,12 +82,13 @@ tr, th, td {
                 <th style="width:5%">ID</th>
                 <th style="width:7%">Processo</th>
                 <th style="width:6%">N.FMUSP</th>
-                <th style="width:10%">NF</th>
+                <th style="width:9%">NF</th>
                 <th style="width:5%">Marca</th>
                 <th style="width:15%">Modelo</th>
                 <th style="width:10%">Part number</th>
-                <th style="width:29%">Descrição</th>
-                <th style="width:8%">NS</th>
+                <th style="width:7%">NS</th>
+                <th style="width:24%">Descrição</th>
+                <th style="width:7%">Posição</th>
                 <th style="width:5%">Estado</th>
             </tr>
            {% for p in d.patrimonio %}
@@ -95,12 +96,13 @@ tr, th, td {
                 <td style="width:5%"><div class="level_btn"></div>{{ p.id }}</td>
                 <td style="width:7%">{{ p.termo }}</td>
                 <td style="width:6%">{{ p.fmusp|default:'' }}</td>
-                <td style="width:10%">{{ p.num_documento }}</td>
+                <td style="width:9%">{{ p.num_documento }}</td>
                 <td style="width:5%">{{ p.marca }}</td>
                 <td style="width:15%">{{ p.modelo }}</td>
                 <td style="width:10%">{{ p.part_number }}</td>
-                <td style="width:29%">{{ p.descricao }} - {{ p.complemento }}</td>
-                <td style="width:8%">{{ p.ns }}</td>
+                <td style="width:7%">{{ p.ns }}</td>
+                <td style="width:24%">{{ p.descricao }} - {{ p.complemento }}</td>
+                <td style="width:7%">{{ p.posicao|default:'' }}</td>
                 <td style="width:5%">{{ p.estado }}</td>
               </tr>
               {% for f in p.contido %}
@@ -112,8 +114,9 @@ tr, th, td {
                     <td>{{ f.marca }}</td>
                     <td>{{ f.modelo }}</td>
                     <td>{{ f.part_number }}</td>
-                    <td>{{ f.descricao }}</td>
                     <td>{{ f.ns }}</td>
+                    <td>{{ f.descricao }}</td>
+                    <td>{{ f.posicao|default:'' }}</td>
                     <td>{{ f.estado }}</td>
                   </tr>
                   {% for g in f.contido %}
@@ -125,8 +128,9 @@ tr, th, td {
                         <td>{{ g.marca }}</td>
                         <td>{{ g.modelo }}</td>
                         <td>{{ g.part_number }}</td>
-                        <td>{{ g.descricao }}</td>
                         <td>{{ g.ns }}</td>
+                        <td>{{ g.descricao }}</td>
+                        <td>{{ g.posicao|default:'' }}</td>
                         <td>{{ g.estado }}</td>
                       </tr>
                      {% for h in g.contido %}
@@ -138,8 +142,9 @@ tr, th, td {
                             <td>{{ h.marca }}</td>
                             <td>{{ h.modelo }}</td>
                             <td>{{ h.part_number }}</td>
-                            <td>{{ h.descricao }}</td>
                             <td>{{ h.ns }}</td>
+                            <td>{{ h.descricao }}</td>
+                            <td>{{ h.posicao|default:'' }}</td>
                             <td>{{ h.estado }}</td>
                          </tr>
                      {% endfor %}
