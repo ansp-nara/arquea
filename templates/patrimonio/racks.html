@@ -123,7 +123,7 @@
 		       {% if eq.id %}
 		           <a href="{% url "admin:patrimonio_patrimonio_change" eq.id %}" onclick="return showAddAnotherPopup(this);">
 		       {% endif %}
-		       <div class="{% if eq.pos_col %} pos_{{eq.pos_col}} {% endif %} {% if eq.conflito %}conflito{% endif %} equip " rel="tooltip" title="{{ eq.descricao }}" 
+		       <div class="{% if eq.pos_col %} pos_{{eq.pos_col}} {% endif %} {% if eq.conflito %}conflito{% endif %} equip " rel="tooltip" title="{{ eq.nome }} - {{ eq.descricao }}" 
 		           style="margin-top:{{ eq.eixoY }}px; height:{{ eq.altura }}px;">
 	               <div>
 		               <div class="{% if eq.pos_col %} pos_{{eq.pos_col}} {% endif %}" style="height:{{ eq.altura }}px;">
@@ -196,7 +196,7 @@
                     {% for eq in rack.equipamentos_fora_visao %}
                         <tr>
 	                        <td>
-	    	                    <a href="{% url "admin:patrimonio_patrimonio_change" eq.id %}" onclick="return showAddAnotherPopup(this);">{{ eq.nome|truncatechars:45 }}</a>
+	    	                    <a href="{% url "admin:patrimonio_patrimonio_change" eq.id %}" onclick="return showAddAnotherPopup(this);">{{ eq.nome }}{{ eq.descricao|truncatechars:45 }}</a>
 	    	                </td>
 	                        <td>{{ eq.tam }}</td>
 	                        <td>{{ eq.pos }}</td>

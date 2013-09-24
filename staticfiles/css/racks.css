@@ -170,6 +170,9 @@
 .conflitos {
     font-size:11px;	
 }
+.conflitos table {
+    border-collapse: collapse; 
+}
 .conflitos-content {
 	display:none;
 }
@@ -190,6 +193,7 @@
 	margin-bottom:10px;
 	margin-top:10px;
 	width:100%;
+	border-collapse: collapse;
 }
 .outros th,
 .outros td {
