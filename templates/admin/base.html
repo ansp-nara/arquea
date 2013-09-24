@@ -183,7 +183,7 @@ $(document).ajaxSend(function(event, xhr, settings) {
 					
 						<a href="#" class="modal-call-header {{app.name}}" app="{{app.name}}">{% blocktrans with app.verbose_name as name %}{{ name }}{% endblocktrans %}</a>
 				
-						<div class="modal-box" id="mod-{{app.name}}">
+						<div class="modal-box" id="mod-{{app.name}}" style="display:none;">
 							<h2>{{app.verbose_name}}</h2><a class="modal-close" title="Fechar" name="fechar" >fechar</a>
 							<table summary="{% blocktrans with app.name as name %}Models available in the {{ name }} application.{% endblocktrans %}">
 								{% for model in app.models %}
