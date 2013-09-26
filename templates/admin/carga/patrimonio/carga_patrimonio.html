@@ -1,0 +1,39 @@
+{% extends "admin/base_site.html" %}
+{% load proto_tags %}
+{% block content %}
+<style>
+    table {
+        width: 350px;
+    }
+	form {
+		width: 350px;
+	}
+	input {
+		border: 1px lightgray solid;
+	}
+</style>
+<h1 repeat="1">Carga de patrimonio</h1>
+
+<br>
+<form method="POST" enctype="multipart/form-data">{% csrf_token %}
+{{ form }}
+<br>
+<br>
+<input type="submit" value="Enviar">
+</form>
+{% if success %}
+<table>
+    <tr>
+        <th>Novos Patrimonios</th>
+        <th>Com patrimonio</th>
+        <th>Sem patrimonio</th>
+    </tr>
+    <tr>
+        <th><a href="list_planilha_patrimonio">{{novos_patrimonios}}</a></th>
+        <th><a href="list_planilha_patrimonio">{{com_patrimonio}}</a></th>
+        <th><a href="list_planilha_patrimonio">{{sem_patrimonio}}</a></th>
+    </tr>
+
+</table>
+{% endif %}
+{% endblock %}
