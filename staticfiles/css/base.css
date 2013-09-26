@@ -486,6 +486,7 @@ input[type=text], input[type=password], textarea, select, .vTextField {
 	-webkit-border-radius:10px;
 	border-radius:10px;
 	min-width:380px;
+	display:none;
 }
 
 .modal-call{

@@ -482,11 +482,11 @@ input[type=text], input[type=password], textarea, select, .vTextField {
 .modal-close:hover{background-position:top center;}	
 
 .modal-box{
-	-moz-border-radius:10px;
-	-webkit-border-radius:10px;
-	border-radius:10px;
-	min-width:430px;
-	display:none;
+    -moz-border-radius:10px;
+    -webkit-border-radius:10px;
+    border-radius:10px;
+    min-width:380px;
+    display:none;
 }
 
 .modal-call{
