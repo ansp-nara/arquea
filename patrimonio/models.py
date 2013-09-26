@@ -244,10 +244,22 @@ class HistoricoLocal(models.Model):
         unique_together = (('patrimonio', 'endereco', 'descricao', 'data'), )
 
     @cached_property
+    def posicao_rack(self):
+        retorno = None
+        if self.posicao:
+            rack_str = self.posicao.split('.')
+            
+            if len(rack_str) == 1:
+                rack_str = self.posicao.split('-')
+
+            if len(rack_str) >= 2:
+                retorno = rack_str[0]
+        return retorno
+
+    @cached_property
     def posicao_rack_letra(self):
         retorno = None
         if self.posicao:
-            # verifica se é possível recuperar a posição de furo de uma string como R042.F085.TD
             rack_str = self.posicao.split('.')
             
             if len(rack_str) == 1:
@@ -265,7 +277,6 @@ class HistoricoLocal(models.Model):
     def posicao_rack_numero(self):
         retorno = None
         if self.posicao:
-            # verifica se é possível recuperar a posição de furo de uma string como R042.F085.TD
             rack_str = self.posicao.split('.')
             if len(rack_str) == 1:
                 rack_str = self.posicao.split('-')
@@ -286,10 +297,14 @@ class HistoricoLocal(models.Model):
             else:
                 # verifica se é possível recuperar a posição de furo de uma string como R042.F085.TD
                 furo_str = self.posicao.split('.F')
-                if len(furo_str) >= 2:
+                if len(furo_str) > 1:
                     pos_str = furo_str[1].split('.')
-                    if len(pos_str) >= 1:
+                    if len(pos_str) >= 1 and pos_str[0].isdigit():
                         retorno = int(pos_str[0])
+                    else:
+                        pos_str = furo_str[1].split('-')
+                        if len(pos_str) > 1:
+                            retorno = int(pos_str[0])
         
         return retorno
 

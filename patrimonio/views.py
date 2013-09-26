@@ -345,11 +345,6 @@ def find_entidades_filhas(entidade_id):
         entidades_filhas = find_entidades_filhas(entidade.id)
         entidade_valida = Entidade.objects.filter(id=entidade.id, endereco__isnull=False, endereco__enderecodetalhe__isnull=False, )
         
-        if len(entidades_filhas) > 0:
-            logger.debug('TEM FILHA: %s', entidades_filhas)
-        if entidade_valida:
-            logger.debug('É VÁLIDA %s:', entidade)
-        
         if entidade_valida or len(entidades_filhas) > 0:
             entidades_retorno.append({"entidade": entidade, "filhas":entidades_filhas})
     

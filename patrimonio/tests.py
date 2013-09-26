@@ -43,6 +43,16 @@ class HistoricoLocalTest(TestCase):
         historico = HistoricoLocal()
         self.assertEquals(historico.posicao_furo, -1)
         
+        historico = HistoricoLocal(posicao="S042.F049-TD")
+        self.assertEquals(historico.posicao_furo, 49)
+
+        historico = HistoricoLocal(posicao="S042.F049.TD")
+        self.assertEquals(historico.posicao_furo, 49)
+        
+        historico = HistoricoLocal(posicao="S042.piso")
+        self.assertEquals(historico.posicao_furo, -1)
+
+        
     def test_posicao_colocacao(self):
         """
         Teste de colocaçao de um equipamento relativo ao furo
@@ -71,6 +81,8 @@ class HistoricoLocalTest(TestCase):
         
         historico = HistoricoLocal()
         self.assertEquals(historico.posicao_colocacao, None)
+        
+
         
     def test_posicao_rac(self):
         historico = HistoricoLocal(posicao="R042.F085.TD")
