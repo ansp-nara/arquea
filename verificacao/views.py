@@ -239,8 +239,6 @@ def patrimonio_equipamento_ncm_diferente(request):
     ajax = request.GET.get('ajax')
     filtros_entrada = {'filtro_tipo_patrimonio':request.GET.get('filtro_tipo_patrimonio')}
     
-    logger.debug(filtros_entrada)
-    
     retorno = []
     verficacao = VerificacaoPatrimonioEquipamento()
     retorno = verficacao.ncmDiferente(filtros_entrada)
@@ -267,12 +265,9 @@ def patrimonio_equipamento_tamanho_diferente(request):
     ajax = request.GET.get('ajax')
     filtros_entrada = {'filtro_tipo_patrimonio':request.GET.get('filtro_tipo_patrimonio')}
     
-    logger.debug(filtros_entrada)
-    
     retorno = []
     verficacao = VerificacaoPatrimonioEquipamento()
     retorno = verficacao.tamanhoDiferente(filtros_entrada)
-    
 
     filtros_saida = []
     if len(retorno) > 0:

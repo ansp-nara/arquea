@@ -30,12 +30,8 @@ class VerificacaoEquipamento():
         for pn_item in part_numbers:
             num_modelos = Equipamento.objects.filter(part_number=pn_item['part_number']).values("modelo").annotate(c=Count("modelo")).order_by().count()
             
-            logger.debug(num_modelos)
-                         
             if num_modelos != 1:
                 equipamentos = Equipamento.objects.filter(part_number=pn_item['part_number']).order_by("id")
-                
-                logger.debug(equipamentos)
                 
                 retorno.append(equipamentos)
 
