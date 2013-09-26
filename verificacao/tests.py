@@ -354,7 +354,6 @@ class TestPatrimonioComEquipamentpoVazio(TestCase):
             verficacao.copy_attribute('equipamento', 2, 'descricao')
             patr_retrieve = Patrimonio.objects.get(pk=2)
             eq_retrieve = Equipamento.objects.get(pk=1)
-            logger.debug(eq_retrieve)
             self.assertEqual(patr_retrieve.descricao, eq_retrieve.descricao)
             self.assertEqual(eq_retrieve.descricao, 'descricao1')
             
