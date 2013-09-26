@@ -1,0 +1,115 @@
+{% extends "admin/base_site.html" %}
+{% load url from future %}
+{% load i18n proto_tags admin_static %}
+{% block content %}
+<style>
+ table {
+    width:200px;
+    white-space:nowrap;
+ }
+ th {
+    background-color:#efefef;
+ }
+ td {
+    border: 1px dotted gray;
+    
+ }
+ .ok {
+    background-color:lightgreen;
+ }
+ .nok {
+    background-color:lightpink;
+ }
+</style>
+<script type="text/javascript">
+$(function(){
+   /**
+    * Eventos para abrir ou esconder a tabela de conflito de equipamentos
+    */
+   $("#filtros button").click(function(){
+        var filtroColunas = $("#slct_colunas option:selected").val() || [];
+        
+        var selO = document.getElementById('slct_colunas');
+	    var selValues = [];
+	    for(i=0; i < selO.length; i++){
+	        if(selO.options[i].selected){
+	           $('.td_'+selO.options[i].value).hide();
+	        } else {
+	           $('.td_'+selO.options[i].value).show();
+	        }
+	    }
+   });
+});   
+
+</script>
+<h1 repeat="1">Lista de dados da carga de patrimonio</h1>
+<a href="upload_planilha_patrimonio">Enviar arquivo de carga.</a>
+<div id="filtros">
+<h4>Filtro</h4>
+<select id="slct_colunas" name="colunas" multiple size="5">
+    <option value="patrimonio">Patrimonio</option>
+    <option value="marca">Marca</option>
+    <option value="modelo">Modelo</option>
+    <option value="pn">Part Number</option>
+    <option value="sn">Serial Number</option>
+    <option value="rack">Rack</option>
+    <option value="furo">Furo</option>
+    <option value="posicao">Posição</option>
+</select>
+<button>Esconder colunas</button>
+</div>
+
+<br>
+<table>
+    <tr>
+        <th><a href="?&ord=">Linha</a></th>
+        
+        <th class="td_marca">Marca</th>
+        <th class="td_modelo">Modelo</th>
+        <th class="td_pn">Part Number</th>
+        <th class="td_sn">Serial Number</th>
+        
+        <th class="td_rack"><a href="?&ord=rack">Rack</a></th>
+        <th class="td_furo">Furo</th>
+        <th class="td_posicao">Posição</th>
+        
+        <th class="td_marca">Marca</th>
+        <th class="td_modelo">Modelo</th>
+        <th class="td_pn">Part Number</th>
+        <th class="td_sn">Serial Number</th>
+        
+        <th class="td_rack">Rack</th>
+        <th class="td_furo">Furo</th>
+        <th class="td_posicao">Posição</th>
+
+        <th class="td_patrimonio">Patrimonio</th>
+    </tr>
+    {% for p in inventario %}
+	    <tr>
+	       <td>{{ p.planilha_linha }}</td>
+	       
+	       <td class="td_marca">{{ p.fabricante|default:"" }}</td>
+	       <td class="td_modelo">{{ p.model_number|default:"" }}</td>
+	       <td class="td_pn">{{ p.part_number|default:"" }}</td>
+	       <td class="td_sn">{{ p.serial_number|default:"" }}</td>
+	       
+	       <td class="td_rack">{{ p.rack|default:"" }}</td>
+	       <td class="td_furo">{{ p.furo|default:"" }}</td>
+	       <td class="td_posicao">{{ p.posicao|default:"" }}</td>
+	       
+	       <td class="td_marca {% if p.fabricante == p.patrimonio_model.marca %} ok {% else %} nok {% endif %}"><a href="{% url "admin:patrimonio_patrimonio_change" p.patrimonio_model_id %}" onclick="return showAddAnotherPopup(this);">{{ p.patrimonio_model.marca }}</a></td>
+	       <td class="td_modelo {% if p.model_number == p.patrimonio_model.modelo %} ok {% else %} nok {% endif %}"><a href="{% url "admin:patrimonio_patrimonio_change" p.patrimonio_model_id %}" onclick="return showAddAnotherPopup(this);">{{ p.patrimonio_model.modelo }}</a></td>
+	       <td class="td_pn {% if p.part_number == p.patrimonio_model.part_number %} ok {% else %} nok {% endif %}"><a href="{% url "admin:patrimonio_patrimonio_change" p.patrimonio_model_id %}" onclick="return showAddAnotherPopup(this);">{{ p.patrimonio_model.part_number }}</a></td>
+	       <td class="td_sn {% if p.serial_number == p.patrimonio_model.ns %} ok {% else %} nok {% endif %}"><a href="{% url "admin:patrimonio_patrimonio_change" p.patrimonio_model_id %}" onclick="return showAddAnotherPopup(this);">{{ p.patrimonio_model.ns }}</a></td>
+
+           <td class="td_rack {% if p.rack == p.patrimonio_model.historico_atual.posicao_rack %} ok {% else %} nok {% endif %}"><a href="{% url "admin:patrimonio_patrimonio_change" p.patrimonio_model_id %}" onclick="return showAddAnotherPopup(this);">{{ p.patrimonio_model.historico_atual.posicao_rack|default:"" }}</a></td>
+           <td class="td_furo {% if p.furo|add:"0" == p.patrimonio_model.historico_atual.posicao_furo|add:"0" %} ok {% else %} nok {% endif %}"><a href="{% url "admin:patrimonio_patrimonio_change" p.patrimonio_model_id %}" onclick="return showAddAnotherPopup(this);">{{ p.patrimonio_model.historico_atual.posicao_furo|default:"" }}</a></td>
+           <td class="td_posicao {% if p.posicao == p.patrimonio_model.historico_atual.posicao_colocacao %} ok {% else %} nok {% endif %}"><a href="{% url "admin:patrimonio_patrimonio_change" p.patrimonio_model_id %}" onclick="return showAddAnotherPopup(this);">{{ p.patrimonio_model.historico_atual.posicao_colocacao|default:"" }}</a></td>
+
+	       <td class="td_patrimonio"><a href="{% url "admin:patrimonio_patrimonio_change" p.patrimonio_model_id %}" onclick="return showAddAnotherPopup(this);">{{ p.patrimonio_model.id }}</a></td>
+	       
+	    </tr>
+    {% endfor %}
+
+</table>
+{% endblock %}
