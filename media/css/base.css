@@ -255,7 +255,7 @@ td, th {
     padding: 3px 5px;
 }
 
-td a, th a {display:block; color:#134089; line-height:22px;}
+td a, th a {/*display:block;*/ color:#134089; line-height:22px;}
 td a:hover, th a:hover {color:#ff9900;}
 
 th {
@@ -482,11 +482,11 @@ input[type=text], input[type=password], textarea, select, .vTextField {
 .modal-close:hover{background-position:top center;}	
 
 .modal-box{
-    -moz-border-radius:10px;
-    -webkit-border-radius:10px;
-    border-radius:10px;
-    min-width:380px;
-    display:none;
+	-moz-border-radius:10px;
+	-webkit-border-radius:10px;
+	border-radius:10px;
+	min-width:380px;
+	display:none;
 }
 
 .modal-call{
@@ -563,6 +563,7 @@ input[type=text], input[type=password], textarea, select, .vTextField {
 	-webkit-border-radius:10px;
 	border-radius:10px;
 	padding:5px;
+	min-width: 380px;
 	background:url(../img/admin/bg-modalbox.jpg) repeat-x top center;}
 
 /* MODULES - HEADER */
@@ -689,7 +690,7 @@ div.system-message p.system-message-title {
 	line-height:20px;
 	outline:none;
 	cursor:pointer;
-	background:url(../img/admin/bg-btn-show.png) no-repeat bottom left;
+	background:url(../img/admin/bg-btn-edit.png) no-repeat bottom left;
 	color:rgba(0,112,158,1);
 	font-weight:bold;
 	}
@@ -957,6 +958,7 @@ table#change-history tbody th {
 
 #header {
     width:100%;
+    min-width:1200px;
 	background: #fff url(../img/admin/bg-header.jpg) repeat-x top left;
     color: #464646;
     overflow: hidden;
@@ -1067,6 +1069,8 @@ table#change-history tbody th {
 
 #footer {
     clear: both;
+    width:100%;
+    min-width:1200px;
     padding: 10px;
 	border:solid 1px #ccc;
 	height:180px;
