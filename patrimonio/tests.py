@@ -84,7 +84,7 @@ class HistoricoLocalTest(TestCase):
         
 
         
-    def test_posicao_rac(self):
+    def test_posicao_rack(self):
         historico = HistoricoLocal(posicao="R042.F085.TD")
         self.assertEquals(historico.posicao_rack_letra, 'R')
         self.assertEquals(historico.posicao_rack_numero, '042')
@@ -116,3 +116,28 @@ class HistoricoLocalTest(TestCase):
         historico = HistoricoLocal(posicao="ABC42.F049")
         self.assertEquals(historico.posicao_rack_letra, 'ABC')
         self.assertEquals(historico.posicao_rack_numero, '42')
+        
+    def test_posicao_rack(self):
+        historico = HistoricoLocal(posicao="R042.F085.TD")
+        self.assertEquals(historico.posicao_rack, 'R042')
+        
+        historico = HistoricoLocal(posicao="P042.F017-TD")
+        self.assertEquals(historico.posicao_rack, 'P042')
+        
+        historico = HistoricoLocal(posicao="S042.piso")
+        self.assertEquals(historico.posicao_rack, 'S042')
+        
+        historico = HistoricoLocal(posicao="S042-piso")
+        self.assertEquals(historico.posicao_rack, 'S042')
+        
+        historico = HistoricoLocal(posicao="60")
+        self.assertEquals(historico.posicao_rack, None)
+                
+        historico = HistoricoLocal(posicao="S042.F049")
+        self.assertEquals(historico.posicao_rack, 'S042')
+
+        historico = HistoricoLocal(posicao="AB42.F049")
+        self.assertEquals(historico.posicao_rack, 'AB42')
+        
+        historico = HistoricoLocal(posicao="ABC42.F049")
+        self.assertEquals(historico.posicao_rack, 'ABC42')

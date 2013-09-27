@@ -99,6 +99,7 @@ class Carga_inventario(models.Model):
     chk_pn = models.BooleanField(_(u'Part Number ok?'))
     chk_model = models.BooleanField(_(u'Modelo ok?'))
     
+    tipo_carga = models.DecimalField(_(u'tipo_carga'), max_digits=2, decimal_places=0, null=True, blank=True)
  
      
     def __unicode__(self):
