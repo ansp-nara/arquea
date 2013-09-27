@@ -9,11 +9,17 @@
  }
  th {
     background-color:#efefef;
+    vertical-align:middle;
  }
  td {
     border: 1px dotted gray;
-    
  }
+ 
+ .td_descricao {
+    min-width:350px;
+    white-space:normal;
+ }
+ 
  .ok {
     background-color:lightgreen;
  }
@@ -55,11 +61,24 @@ $(function(){
     <option value="rack">Rack</option>
     <option value="furo">Furo</option>
     <option value="posicao">Posição</option>
+    <option value="descricao">Descrição</option>
 </select>
 <button>Esconder colunas</button>
 </div>
 
 <br>
+<table>
+    <tr>
+        <th>Com patrimonio</th>
+        <th>Sem patrimonio</th>
+        <th>Total</th>
+    </tr>
+    <tr>
+        <td><a href="list_planilha_patrimonio?chk_patrimonio_vazio=0">{{com_patrimonio}}</a></td>
+        <td><a href="list_planilha_patrimonio?chk_patrimonio_vazio=1">{{sem_patrimonio}}</a></td>
+        <td><a href="list_planilha_patrimonio">{{com_patrimonio|add:sem_patrimonio}}</a></td>
+    </tr>
+</table>
 <table>
     <tr>
         <th><a href="?&ord=">Linha</a></th>
@@ -69,9 +88,11 @@ $(function(){
         <th class="td_pn">Part Number</th>
         <th class="td_sn">Serial Number</th>
         
-        <th class="td_rack"><a href="?&ord=rack">Rack</a></th>
+        <th class="td_rack"><a href="?&ord=rack&chk_patrimonio_vazio={{chk_patrimonio_vazio}}">Rack</a></th>
         <th class="td_furo">Furo</th>
         <th class="td_posicao">Posição</th>
+        <th class="td_descricao">Descrição</th>
+        
         
         <th class="td_marca">Marca</th>
         <th class="td_modelo">Modelo</th>
@@ -81,8 +102,9 @@ $(function(){
         <th class="td_rack">Rack</th>
         <th class="td_furo">Furo</th>
         <th class="td_posicao">Posição</th>
+        <th class="td_descricao">Descrição</th>
 
-        <th class="td_patrimonio">Patrimonio</th>
+        <th class="td_patrimonio"><a href="?&ord=patrimonio&chk_patrimonio_vazio={{chk_patrimonio_vazio}}">Patrimonio</a></th>
     </tr>
     {% for p in inventario %}
 	    <tr>
@@ -96,15 +118,17 @@ $(function(){
 	       <td class="td_rack">{{ p.rack|default:"" }}</td>
 	       <td class="td_furo">{{ p.furo|default:"" }}</td>
 	       <td class="td_posicao">{{ p.posicao|default:"" }}</td>
+	       <td class="td_descricao">{{ p.descricao|default:"" }}</td>
 	       
-	       <td class="td_marca {% if p.fabricante == p.patrimonio_model.marca %} ok {% else %} nok {% endif %}"><a href="{% url "admin:patrimonio_patrimonio_change" p.patrimonio_model_id %}" onclick="return showAddAnotherPopup(this);">{{ p.patrimonio_model.marca }}</a></td>
-	       <td class="td_modelo {% if p.model_number == p.patrimonio_model.modelo %} ok {% else %} nok {% endif %}"><a href="{% url "admin:patrimonio_patrimonio_change" p.patrimonio_model_id %}" onclick="return showAddAnotherPopup(this);">{{ p.patrimonio_model.modelo }}</a></td>
-	       <td class="td_pn {% if p.part_number == p.patrimonio_model.part_number %} ok {% else %} nok {% endif %}"><a href="{% url "admin:patrimonio_patrimonio_change" p.patrimonio_model_id %}" onclick="return showAddAnotherPopup(this);">{{ p.patrimonio_model.part_number }}</a></td>
-	       <td class="td_sn {% if p.serial_number == p.patrimonio_model.ns %} ok {% else %} nok {% endif %}"><a href="{% url "admin:patrimonio_patrimonio_change" p.patrimonio_model_id %}" onclick="return showAddAnotherPopup(this);">{{ p.patrimonio_model.ns }}</a></td>
+	       <td class="td_marca {% if p.patrimonio_model and p.fabricante|default:"" == p.patrimonio_model.marca|default:"" %} ok {% else %} nok {% endif %}"><a href="{% url "admin:patrimonio_patrimonio_change" p.patrimonio_model_id %}" onclick="return showAddAnotherPopup(this);">{{ p.patrimonio_model.marca }}</a></td>
+	       <td class="td_modelo {% if p.patrimonio_model and p.model_number|default:"" == p.patrimonio_model.modelo|default:"" %} ok {% else %} nok {% endif %}"><a href="{% url "admin:patrimonio_patrimonio_change" p.patrimonio_model_id %}" onclick="return showAddAnotherPopup(this);">{{ p.patrimonio_model.modelo }}</a></td>
+	       <td class="td_pn {% if p.patrimonio_model and p.part_number|default:"" == p.patrimonio_model.part_number|default:"" %} ok {% else %} nok {% endif %}"><a href="{% url "admin:patrimonio_patrimonio_change" p.patrimonio_model_id %}" onclick="return showAddAnotherPopup(this);">{{ p.patrimonio_model.part_number }}</a></td>
+	       <td class="td_sn {% if p.patrimonio_model and p.serial_number|default:"" == p.patrimonio_model.ns|default:"" %} ok {% else %} nok {% endif %}"><a href="{% url "admin:patrimonio_patrimonio_change" p.patrimonio_model_id %}" onclick="return showAddAnotherPopup(this);">{{ p.patrimonio_model.ns }}</a></td>
 
-           <td class="td_rack {% if p.rack == p.patrimonio_model.historico_atual.posicao_rack %} ok {% else %} nok {% endif %}"><a href="{% url "admin:patrimonio_patrimonio_change" p.patrimonio_model_id %}" onclick="return showAddAnotherPopup(this);">{{ p.patrimonio_model.historico_atual.posicao_rack|default:"" }}</a></td>
-           <td class="td_furo {% if p.furo|add:"0" == p.patrimonio_model.historico_atual.posicao_furo|add:"0" %} ok {% else %} nok {% endif %}"><a href="{% url "admin:patrimonio_patrimonio_change" p.patrimonio_model_id %}" onclick="return showAddAnotherPopup(this);">{{ p.patrimonio_model.historico_atual.posicao_furo|default:"" }}</a></td>
-           <td class="td_posicao {% if p.posicao == p.patrimonio_model.historico_atual.posicao_colocacao %} ok {% else %} nok {% endif %}"><a href="{% url "admin:patrimonio_patrimonio_change" p.patrimonio_model_id %}" onclick="return showAddAnotherPopup(this);">{{ p.patrimonio_model.historico_atual.posicao_colocacao|default:"" }}</a></td>
+           <td class="td_rack {% if p.patrimonio_model and p.rack == p.patrimonio_model.historico_atual.posicao_rack %} ok {% else %} nok {% endif %}"><a href="{% url "admin:patrimonio_patrimonio_change" p.patrimonio_model_id %}" onclick="return showAddAnotherPopup(this);">{{ p.patrimonio_model.historico_atual.posicao_rack|default:"" }}</a></td>
+           <td class="td_furo {% if p.patrimonio_model and p.furo|default:"-1"|add:"0" == p.patrimonio_model.historico_atual.posicao_furo|add:"0" %} ok {% else %} nok {% endif %}"><a href="{% url "admin:patrimonio_patrimonio_change" p.patrimonio_model_id %}" onclick="return showAddAnotherPopup(this);">{{ p.patrimonio_model.historico_atual.posicao_furo|default:"" }}</a></td>
+           <td class="td_posicao {% if p.patrimonio_model and p.posicao == p.patrimonio_model.historico_atual.posicao_colocacao %} ok {% else %} nok {% endif %}"><a href="{% url "admin:patrimonio_patrimonio_change" p.patrimonio_model_id %}" onclick="return showAddAnotherPopup(this);">{{ p.patrimonio_model.historico_atual.posicao_colocacao|default:"" }}</a></td>
+           <td class="td_descricao {% if p.patrimonio_model and p.descricao|default:"" == p.patrimonio_model.descricao|default:"" %} ok {% else %} nok {% endif %}"><a href="{% url "admin:patrimonio_patrimonio_change" p.patrimonio_model_id %}" onclick="return showAddAnotherPopup(this);">{{p.patrimonio_model.descricao|default:"" }}</a></td>
 
 	       <td class="td_patrimonio"><a href="{% url "admin:patrimonio_patrimonio_change" p.patrimonio_model_id %}" onclick="return showAddAnotherPopup(this);">{{ p.patrimonio_model.id }}</a></td>
 	       

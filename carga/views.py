@@ -40,20 +40,27 @@ logger = logging.getLogger(__name__)
 def list_planilha_patrimonio(request):
     chk_patrimonio_vazio = request.GET.get('chk_patrimonio_vazio')
     
-    logger.debug(chk_patrimonio_vazio)
-    if chk_patrimonio_vazio:
+    if chk_patrimonio_vazio == '1':
         inventario = Carga_inventario.objects.filter(patrimonio_model__isnull=True)
-        logger.debug('chk_patrimonio_vazio')
+    elif chk_patrimonio_vazio == '0':
+        inventario = Carga_inventario.objects.filter(patrimonio_model__isnull=False)
     else:
         inventario = Carga_inventario.objects.all()
         
     ordenacao = request.GET.get('ord')
     if ordenacao == 'rack':
         inventario = inventario.order_by('rack', 'furo', )
+    elif ordenacao == 'patrimonio':
+        inventario = inventario.order_by('patrimonio_model', 'planilha_linha')
     else:
         inventario = inventario.order_by('planilha_linha')
-    
-    return render_to_response('admin/carga/patrimonio/lista_carga_patrimonio.html', {'inventario':inventario})
+        
+    c = {'inventario':inventario}
+    c.update({'chk_patrimonio_vazio':chk_patrimonio_vazio})
+    c.update({'com_patrimonio':Carga_inventario.objects.filter(patrimonio_model__isnull=False).count()})
+    c.update({'sem_patrimonio':Carga_inventario.objects.filter(patrimonio_model__isnull=True).count()})
+        
+    return render_to_response('admin/carga/patrimonio/lista_carga_patrimonio.html', c)
             
 
 
@@ -67,7 +74,6 @@ def upload_planilha_patrimonio(request):
         form = UploadFileForm(request.POST, request.FILES)
         c.update({'form': form})
         
-        #logger.debug('request.files %s', request.FILES)
         logger.debug('Carregando arquivo')
         handle_uploaded_file(request.FILES['file'])
         
@@ -189,10 +195,115 @@ def handle_uploaded_file(file):
 #                 if inventario.quantidade and inventario.quantidade != 1:
 #                     raise Exception('Quantidade deve ser 1. Verificar dados de importação.')
         
-            #logger.debug('%s %s', count, inventario.descricao)
         
             inventario.save()
+
+def buscaPatrimonioPorSN(item):
+    patr = None
+    # Verificar o match pelo serial number. 
+    if item.serial_number and item.serial_number != '' and item.serial_number != ' ':
+        p = Patrimonio.objects.filter(ns=item.serial_number)
+
+        if len(p) == 1:  
+            patr = p.filter()[:1].get()
+            patr.tipo_carga = 1
+    return patr
+
+def buscaPatrimonioPorModeloPNPosicao(item):
+    patr = None
+    
+    if item.model_number and item.model_number != '' and item.model_number != ' ' and item.part_number and item.part_number != '' and item.part_number != ' ' and item.cage and item.rack:
+                
+        pts_pn = Patrimonio.objects.filter(part_number=item.part_number, modelo=item.model_number, historicolocal__endereco__ordena__contains=item.cage, historicolocal__posicao__startswith=item.rack)
+                
+        if item.furo and item.furo.isdigit():
+            pts_pn = pts_pn.filter(historicolocal__posicao__contains=item.furo)
+
+        if pts_pn:
+            for pt in pts_pn:
+                if pt.historico_atual:
+                    rack = pt.historico_atual.posicao_rack
+                    furo = pt.historico_atual.posicao_furo
+                    posicao = pt.historico_atual.posicao_colocacao
+                    
+                    chk_rack = False
+                    if rack and item.rack:
+                        chk_rack = item.rack == rack
+                    chk_furo = False    
+                    if furo and item.furo:
+                        chk_furo = int(item.furo) == furo
+                    chk_posicao = True
+                    if posicao or item.posicao:
+                        chk_posicao = item.posicao == posicao
             
+                    if chk_rack and chk_furo and chk_posicao:
+                        if patr:
+                            # se houver mais de um patrimonio com mesmo modelo e part-number na mesma posição
+                            # aborta a procura pois não é possível descobrir qual que é o correto
+                            patr = None
+                            break;
+                        else:
+                            patr = pt
+                            patr.tipo_carga = 2
+
+    return patr
+
+def buscaPatrimonioSemSNPorPosicao(item):
+    patr = None
+    
+    if (item.rack and item.cage) and item.quantidade == 1:
+                
+        pts_pn = Patrimonio.objects.filter(historicolocal__endereco__ordena__contains=item.cage, historicolocal__posicao__startswith=item.rack)
+        
+        if item.furo and item.furo.isdigit():
+            pts_pn = pts_pn.filter(historicolocal__posicao__contains=item.furo)
+        
+        
+        if pts_pn:
+            for pt in pts_pn:
+                if pt.historico_atual:
+                    
+                    rack = pt.historico_atual.posicao_rack
+                    furo = pt.historico_atual.posicao_furo
+                    posicao = pt.historico_atual.posicao_colocacao
+                    
+                    chk_modelo = True
+                    if pt.modelo or item.model_number:
+                        chk_modelo = item.model_number == pt.modelo
+                        
+                    chk_part_number = True
+                    if pt.part_number or item.part_number:
+                        chk_part_number = item.part_number == pt.part_number
+                        
+                    chk_ns = True
+                    if pt.ns or item.serial_number:
+                        chk_ns = item.serial_number == pt.ns
+                     
+                    chk_rack = False
+                    if rack and item.rack:
+                        chk_rack = item.rack == rack
+                        
+                    chk_furo = False    
+                    if furo == -1:
+                        chk_furo = item.furo == None
+                    elif item.furo and item.furo.isdigit():
+                            chk_furo = int(item.furo) == furo
+                        
+                    chk_posicao = True
+                    if posicao or item.posicao:
+                        chk_posicao = item.posicao == posicao
+
+                    if chk_rack and chk_furo and chk_posicao and chk_modelo and chk_part_number and chk_ns:
+                        if patr:
+                            # se houver mais de um patrimonio com mesmo modelo e part-number na mesma posição
+                            # aborta a procura pois não é possível descobrir qual que é o correto
+                            patr = None
+                            break;
+                        else:
+                            patr = pt
+                            patr.tipo_carga = 3
+
+    return patr
 
 def checkPatrimonio():
     count = 0
@@ -201,51 +312,13 @@ def checkPatrimonio():
     inventario = Carga_inventario.objects.all()
     for item in inventario:
         if not item.patrimonio_model:
-            patr = None
-            # Verificar o match pelo serial number. 
-            if item.serial_number and item.serial_number != '' and item.serial_number != ' ':
-                p = Patrimonio.objects.filter(ns=item.serial_number)
-                if len(p) == 0:
-                    p = Patrimonio.objects.filter(ns=(item.serial_number + ' '))
-                    if len(p) == 0:
-                        p = Patrimonio.objects.filter(ns=(' ' + item.serial_number))
-                        if len(p) == 0:
-                            p = Patrimonio.objects.filter(ns=(' ' + item.serial_number + ' '))
-    
-                if len(p) == 1:  
-                    patr = p.filter()[:1].get()
-            
+            patr = buscaPatrimonioPorSN(item)
+             
             if not patr:
-                if item.model_number and item.model_number != '' and item.model_number != ' ' and item.part_number and item.part_number != '' and item.part_number != ' ':
-                
-                    pts_pn = Patrimonio.objects.filter(part_number=item.part_number, modelo=item.model_number)
-                    if pts_pn:
-                        for pt in pts_pn:
-                            if pt.historico_atual:
-                                rack = pt.historico_atual.posicao_rack
-                                furo = pt.historico_atual.posicao_furo
-                                posicao = pt.historico_atual.posicao_colocacao
-                                
-                                chk_rack = False
-                                if rack and item.rack:
-                                    chk_rack = item.rack == rack
-                                chk_furo = False    
-                                if furo and item.furo:
-                                    chk_furo = int(item.furo) == furo
-                                chk_posicao = True
-                                if posicao or item.posicao:
-                                    chk_posicao = item.posicao == posicao
-                        
-                                logger.debug('%s %s %s', chk_rack, chk_furo, chk_posicao)
-                                if chk_rack and chk_furo and chk_posicao:
-                                    if patr:
-                                        # se houver mais de um patrimonio com mesmo modelo e part-number na mesma posição
-                                        # aborta a procura pois não é possível descobrir qual que é o correto
-                                        patr = None
-                                        break;
-                                    else:
-                                        patr = pt
-                                
+                patr = buscaPatrimonioPorModeloPNPosicao(item)
+                 
+            if not patr:
+                patr = buscaPatrimonioSemSNPorPosicao(item)
                      
                
             if patr: 
