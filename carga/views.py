@@ -291,7 +291,10 @@ def buscaPatrimonioSemSNPorPosicao(item):
                         
                     chk_posicao = True
                     if posicao or item.posicao:
-                        chk_posicao = item.posicao == posicao
+                        if posicao and posicao.isdigit() and item.posicao and item.posicao.isdigit():
+                            chk_posicao = int(item.posicao) == int(posicao)
+                        else:
+                            chk_posicao = item.posicao == posicao
 
                     if chk_rack and chk_furo and chk_posicao and chk_modelo and chk_part_number and chk_ns:
                         if patr:
