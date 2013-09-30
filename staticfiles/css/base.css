@@ -539,7 +539,7 @@ input[type=text], input[type=password], textarea, select, .vTextField {
 	height:30px;
 	line-height:30px;
 	text-align:center; 
-	padding:0 10px; 
+	padding:0 8px; 
 	margin:5px 0; 
 	font-size:12px;
 	font-weight:bold;
@@ -824,7 +824,7 @@ table#change-history tbody th {
 }
 
 #content {
-    margin: 10px 0;
+    margin: 0;
 	width:1200px;
 	height:100%;
 	background:#fff;
@@ -837,7 +837,7 @@ table#change-history tbody th {
 	display:block;
 	background: url(../img/admin/bg-actions.jpg) bottom left repeat-x;
 	min-height:40px; 
-	margin:10px 0; 
+	margin:10px 0 0 0; 
 	overflow-y:hidden; 
 	border:solid 1px #ccc; 
 	border-radius:10px;
