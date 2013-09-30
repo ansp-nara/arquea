@@ -1,34 +1,22 @@
 # -* coding: utf-8 -*-
 
-# Create your views here.
-
-from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import render_to_response
 from django.core.exceptions import PermissionDenied
-from django.contrib.auth.models import Group
 from django.contrib import admin
-from django.http import Http404, HttpResponse
 from models import *
 from django.db.models import Q, Max
 from django.contrib.auth.decorators import permission_required, login_required
-from django.db.models import Sum
-from django.template import Context, loader, RequestContext
 from django.db import connection
-
-from django.db import transaction
+from django.template.response import TemplateResponse
 
 from django.core.context_processors import csrf
 from django.views.decorators.csrf import csrf_protect
-from django.shortcuts import render_to_response
-
-from django.views.generic.list import ListView
-from django.utils import timezone
-
 
 import csv
 import datetime
 
 from carga.forms import UploadFileForm
-from carga.models import MyError, Carga_inventario
+from carga.models import Carga_inventario
 from patrimonio.models import Equipamento, Patrimonio
 
 import logging
@@ -60,7 +48,7 @@ def list_planilha_patrimonio(request):
     c.update({'com_patrimonio':Carga_inventario.objects.filter(patrimonio_model__isnull=False).count()})
     c.update({'sem_patrimonio':Carga_inventario.objects.filter(patrimonio_model__isnull=True).count()})
         
-    return render_to_response('admin/carga/patrimonio/lista_carga_patrimonio.html', c)
+    return TemplateResponse(request, 'admin/carga/patrimonio/lista_carga_patrimonio.html', c)
             
 
 
@@ -87,16 +75,15 @@ def upload_planilha_patrimonio(request):
         c.update({'sem_patrimonio':Carga_inventario.objects.filter(patrimonio_model__isnull=True).count()})
         
         
-        return render_to_response('admin/carga/patrimonio/carga_patrimonio.html', c)
+        return TemplateResponse(request, 'admin/carga/patrimonio/carga_patrimonio.html', c)
     else:
         form = UploadFileForm()
         c.update({'form': form})
 
-    return render_to_response('admin/carga/patrimonio/carga_patrimonio.html', c)
+    return TemplateResponse(request, 'admin/carga/patrimonio/carga_patrimonio.html', c)
 
 def handle_uploaded_file(file):
     planilha = csv.reader(file, delimiter=';', quotechar='"')
-    
     
     cursor = connection.cursor()
     cursor.execute('TRUNCATE TABLE "{0}"'.format(Carga_inventario._meta.db_table))

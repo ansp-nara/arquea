@@ -5,12 +5,6 @@ from django.utils.translation import ugettext_lazy as _
 from utils.models import NARADateField
 # Create your models here.
 
-class MyError(Exception):
-    def __init__(self, value):
-        self.value = value
-    def __str__(self):
-        return repr(self.value)
-
     
 class Carga_inventario(models.Model):
     #[0] 
@@ -91,6 +85,7 @@ class Carga_inventario(models.Model):
     planilha_aba = models.CharField(_(u'planilha_aba'), null=True, blank=True, max_length=50)
     planilha_linha = models.DecimalField(_(u'planilha_linha'), max_digits=5, decimal_places=0, null=True, blank=True)
     
+    #[35] 
     patrimonio_model = models.ForeignKey('patrimonio.Patrimonio', null=True, blank=True)
     equipamento_model = models.ForeignKey('patrimonio.Equipamento', null=True, blank=True)
     

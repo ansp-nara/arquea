@@ -91,7 +91,8 @@ def lista_relatorios():
     tecnicos.append({'url':'/patrimonio/relatorio/por_tipo_equipamento', 'nome':u'Busca por tipo de equipamento'})
     
     verificacoes.append({'url':'/verificacao/relatorio/equipamento_consolidado', 'nome':u'Verificação de equipamentos'})
-    verificacoes.append({'url':'/verificacao/relatorio/patrimonio_consolidado', 'nome':u'Verificação de patrimonios'})
+    verificacoes.append({'url':'/verificacao/relatorio/patrimonio_consolidado', 'nome':u'Verificação de patrimônio'})
+    verificacoes.append({'url':'/carga/', 'nome':u'Carga de planilha de patrimônio'})
 
     gerenciais.sort(key=lambda x: x['nome'])
     administrativos.sort(key=lambda x: x['nome'])
@@ -101,7 +102,7 @@ def lista_relatorios():
     return {'relatorios':[{'nome':u'gerenciais', 'rel':gerenciais}, 
                           {'nome':u'administrativos', 'rel':administrativos}, 
                           {'nome':u'técnicos', 'rel':tecnicos},
-                          {'nome':u'verificacoes', 'rel':verificacoes}], 
+                          {'nome':u'de verificações (Acesso restrito)', 'rel':verificacoes}], 
             }
 
 
