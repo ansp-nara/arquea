@@ -174,7 +174,11 @@ def handle_uploaded_file(file):
             inventario.atualizado =       item[34]
             if item[35].isdigit():
                 
-                p = Patrimonio.objects.get(pk=int(item[35]))
+                try:
+                    p = Patrimonio.objects.get(pk=int(item[35]))
+                except Patrimonio.DoesNotExist:
+                    raise Exception("Patrimonio.DoesNotExist. Lookup id = %s ." % int(item[35]))
+                    
                 inventario.patrimonio_model = p
         #     website_part_number = item[34].decode('iso-8859-1').encode('utf-8')
         #     website_fabricante =  item[35].decode('iso-8859-1').encode('utf-8')
