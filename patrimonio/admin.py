@@ -28,21 +28,6 @@ class HistoricoLocalInline(admin.StackedInline):
     extra = 1
 
 class PatrimonioAdmin(admin.ModelAdmin):
-    """ 
-    fieldsets = (
-                 ('Pagamento', {
-		      'fields': (('termo', 'npgto'), ('pagamento', 'valor')),
-                      'classes': ('wide',)
-                 }),
-	         ('Geral', {
-		      'fields': (('checado', 'apelido', 'tipo', 'numero_fmusp'), ('equipamento', 'ean', 'agilis'), ('nf', 'patrimonio'), ('complemento', 'procedencia'))
-                 }),
- 	         ('Extras', {
-		      'fields': ('obs',),
-		      'classes': ('collapse',)
-                 }),
-    )
-    """
     fieldsets = (
                  ('Pagamento', {
                       'fields': (('termo', 'npgto'), ('pagamento', 'valor')),

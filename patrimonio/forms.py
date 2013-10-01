@@ -7,6 +7,23 @@ from outorga.models import Termo
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.forms.util import ErrorList
+from django.core.urlresolvers import reverse
+from django.utils.html import mark_safe
+
+
+
+class EquipamentoModelChoiceField(forms.ModelChoiceField):
+    """
+    Classe para exibição de Equipamentos.
+    Restringe a exibição da descrição em 150 caracteres com a adição de reticências para não exceder a largura da tela
+    """
+    def __init__(self, *args, **kwargs):
+        super(EquipamentoModelChoiceField, self).__init__(*args, **kwargs)
+        
+    def label_from_instance(self, obj):
+        info = (obj.descricao[:150] + '..') if len(obj.descricao) > 150 else obj.descricao
+        return u'%s - %s' % (info, obj.part_number)
+
 
 
 class PatrimonioAdminForm(forms.ModelForm):
@@ -21,8 +38,6 @@ class PatrimonioAdminForm(forms.ModelForm):
     A class 'Media'		Define os arquivos .js que serão utilizados.
     """
 
-
-
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=':',
                  empty_permitted=False, instance=None):
@@ -30,12 +45,16 @@ class PatrimonioAdminForm(forms.ModelForm):
         if instance and instance.pagamento: 
             if initial:
                 initial.update({'termo':instance.pagamento.protocolo.termo})
+                initial.update({'equipamento':instance.equipamento})
             else:
                 initial = {'termo':instance.pagamento.protocolo.termo}
+                initial.update({'equipamento':instance.equipamento})
+                
         super(PatrimonioAdminForm, self).__init__(data, files, auto_id, prefix, initial,
                                             error_class, label_suffix, empty_permitted, instance)
 
         pg = self.fields['pagamento']
+        
 	pt = self.fields['patrimonio']
 	if data and data['termo']:
 	    t = data['termo']
@@ -66,6 +85,12 @@ class PatrimonioAdminForm(forms.ModelForm):
     tem_numero_fmusp = forms.BooleanField(label=u'Tem número de patrimônio FMUSP?', required=False, 
             widget=forms.CheckboxInput(attrs={'onchange':'ajax_numero_fmusp();'}))
 
+    # Uso de Model específico para a adição de reticências na descrição
+    # e javascript para adição de link no label para a página do Equipamento selecionado 
+    equipamento = EquipamentoModelChoiceField(Equipamento.objects.all(), 
+                                     required=False,
+                                     label=mark_safe('<a href="javascript:window.open(\'/patrimonio/equipamento/\'+$(\'#id_equipamento\').val() + \'/\', \'_blank\');">Equipamento</a>'))
+     
     
     class Meta:
         model = Patrimonio
@@ -73,8 +98,6 @@ class PatrimonioAdminForm(forms.ModelForm):
 
     class Media:
         js = ('/media/js/selects.js', '/media/js/patrimonio.js')
-
-
 
 
 class HistoricoLocalAdminForm(forms.ModelForm):
