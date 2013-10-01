@@ -117,7 +117,7 @@ def handle_uploaded_file(file):
             
             
             inventario.model_number =        item[1].decode('iso-8859-1').encode('utf-8').strip() if item[1] is not "" else None
-            inventario.part_number =         item[2].decode('iso-8859-1').encode('utf-8').strip(' =') if item[2] is not "" else None
+            inventario.part_number =         item[2].decode('iso-8859-1').encode('utf-8').strip(' ') if item[2] is not "" else None
             inventario.revision =            str(item[3]).strip() if item[3] is not "" else None
             
             inventario.version =             str(item[4]).strip() if item[4] is not "" else None
