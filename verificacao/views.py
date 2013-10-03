@@ -7,6 +7,7 @@ from django.db.models import Q, Max, Sum, Count
 from django.http import Http404, HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import Context, loader, RequestContext
+from django.template.response import TemplateResponse
 
 from models import *
 from verificacao.models import VerificacaoEquipamento
@@ -17,7 +18,7 @@ import os
 
 
 import logging
-from patrimonio.models import Equipamento
+from patrimonio.models import Equipamento, Patrimonio
 from django.db.models import Q, Max, Sum, Count
 
 # Get an instance of a logger
@@ -81,7 +82,26 @@ def equipamento_part_number_modelo_vazio(request, json=False):
                               context_instance=RequestContext(request))
     
 
+@login_required
+def check_patrimonio_equipamento(request):
 
+   
+    patrimonios = Patrimonio.objects.filter(equipamento_id__isnull=False).select_related('equipamento')
+    
+    patrimonios = patrimonios.filter(~Q(equipamento__part_number=F('part_number'))|
+                                     ~Q(equipamento__modelo=F('modelo'))|
+                                     ~Q(equipamento__marca=F('marca'))|
+                                     #~Q(equipamento__descricao=F('descricao')) |
+                                     Q(~Q(equipamento__ean=F('ean')), Q(equipamento__ean__isnull=False), Q(ean__isnull=False)) |
+                                     Q(~Q(equipamento__ncm=F('ncm')), Q(equipamento__ncm__isnull=False), Q(ncm__isnull=False)) |
+                                     Q(~Q(equipamento__tamanho=F('tamanho')), Q(equipamento__tamanho__isnull=False), Q(tamanho__isnull=False)) 
+                                     )
+    c = {}
+    c.update({'patrimonios': patrimonios})
+    
+    return TemplateResponse(request, 'verificacao/check_patrimonio_equipamento.html', c)
+    
+    
 @login_required
 def patrimonio_consolidado(request):
     retorno = []
@@ -118,6 +138,8 @@ def patrimonio_consolidado(request):
     tamanhoDiferente = verificacaoPatrimonioEquipamento.tamanhoDiferente(filtros_entrada)
     count = sum([len(patrimonios) for patrimonios in tamanhoDiferente])
     retorno.append({'desc':u'Patrimonio e Equipamento com Tamanho diferente', 'url':'patrimonio_equipamento_tamanho_diferente', 'qtd':count})
+    
+    retorno.append({'desc':u'Verificação de Patrimônios e Equipamentos', 'url':'check_patrimonio_equipamento', 'qtd':None})
     
     filtros = {"tipos":Tipo.objects.all()}
     

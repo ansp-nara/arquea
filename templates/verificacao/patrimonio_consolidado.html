@@ -33,7 +33,7 @@
 	    {% for v in verificacoes %}
 		   <tr class="{% if v.qtd != 0 %}tr_warning{% endif %}">
 		       <td><a href="{{ model.admin_url }}{{ v.url }}?filtro_tipo_patrimonio={{request.GET.filtro_tipo_patrimonio}}"</a>{{ v.desc }}</td>
-		       <td style="text-align: center;">{{ v.qtd }}</td>
+		       <td style="text-align: center;">{{ v.qtd|default:"" }}</td>
 		  </tr>
 	    {% endfor %}
 	{% endif %}

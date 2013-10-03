@@ -1,0 +1,141 @@
+{% extends "admin/base_site.html" %}
+{% load url from future %}
+{% load i18n proto_tags admin_static %}
+{% block content %}
+<style>
+ #tbl_content {
+    width:200px;
+    white-space:nowrap;
+ }
+ #tbl_content th {
+    background-color:#efefef;
+    vertical-align:middle;
+ }
+ #tbl_content td {
+    border: 1px dotted gray;
+ }
+ 
+ .td_descricao {
+    min-width:350px;
+    white-space:normal;
+ }
+ 
+ .ok {
+    background-color:lightgreen;
+ }
+ .nok {
+    background-color:lightpink;
+ }
+ 
+ .equip,
+ .patr {
+    cursor:pointer;
+ }
+ /* Sobrescreve o pointer para none para as linhas que não tiverem o patrimonio */
+ #tr_None .patr {
+    cursor:default;
+ }
+</style>
+<script type="text/javascript">
+$(function(){
+   /**
+    * Eventos para esconder as colunas de patrimonio
+    */
+   $("#filtros button").click(function(){
+        var filtroColunas = $("#slct_colunas option:selected").val() || [];
+        
+        var selO = document.getElementById('slct_colunas');
+	    var selValues = [];
+	    for(i=0; i < selO.length; i++){
+	        if(selO.options[i].selected){
+	           $('.td_'+selO.options[i].value).hide();
+	        } else {
+	           $('.td_'+selO.options[i].value).show();
+	        }
+	    }
+   });
+   
+   /**
+    * Eventos para colocar link nas células de patrimonio
+    */
+   $(".patr").click(function () {
+        id = $(this).attr('id');
+        if (id != 'None') {
+            window.open('/patrimonio/patrimonio/'+id, '_blank');
+        }
+   });
+   /**
+    * Eventos para colocar link nas células de equipamento
+    */
+   $(".equip").click(function () {
+        id = $(this).attr('id');
+        if (id != 'None') {
+            window.open('/patrimonio/equipamento/'+id, '_blank');
+        }
+   });
+   
+    
+});
+
+
+
+</script>
+<h1 repeat="1">Checagem de dados de Patrimônio e Equipamento</h1>
+<div id="filtros">
+<h4>Filtro</h4>
+<select id="slct_colunas" name="colunas" multiple size="5">
+    <option value="marca">Marca</option>
+    <option value="modelo">Modelo</option>
+    <option value="pn">Part Number</option>
+    <option value="descricao">Descrição</option>
+    
+    <option value="ncm">NCM</option>
+    <option value="ean">EAN</option>
+    <option value="tamanho">Tamanho</option>
+</select>
+<button>Esconder colunas</button>
+</div>
+
+<br>
+<table id="tbl_content">
+    <tr>
+        <th class="td_marca">Patr. Marca</th>
+        <th class="td_modelo">Patr. Modelo</th>
+        <th class="td_pn">Patr. Part Number</th>
+        <th class="td_descricao">Patr. Descrição</th>
+        <th class="td_ncm">Patr. NCM</th>
+        <th class="td_ean">Patr. EAN</th>
+        <th class="td_tamanho">Patr. Tamanho</th>
+        <th></th>
+        <th class="td_marca">Eq. Marca</th>
+        <th class="td_modelo">Eq. Modelo</th>
+        <th class="td_pn">Eq. Part Number</th>
+        <th class="td_descricao">Eq. Descrição</th>
+        <th class="td_ncm">Eq. NCM</th>
+        <th class="td_ean">Eq. EAN</th>
+        <th class="td_tamanho">Eq. Tamanho</th>
+    </tr>
+    {% for p in patrimonios %}
+	    <tr>
+	       <td id="{{ p.id }}" class="patr td_marca {% if p.equipamento and p.equipamento.marca|default:"" == p.marca|default:"" %} ok {% else %} nok {% endif %}">{{ p.marca }}</td>
+	       <td id="{{ p.id }}" class="patr td_modelo {% if p.equipamento and p.equipamento.modelo|default:"" == p.modelo|default:"" %} ok {% else %} nok {% endif %}">{{ p.modelo }}</td>
+	       <td id="{{ p.id }}" class="patr td_pn {% if p.equipamento and p.equipamento.part_number|default:"" == p.part_number|default:"" %} ok {% else %} nok {% endif %}">{{ p.part_number }}</td>
+           <td id="{{ p.id }}" class="patr td_descricao {% if p.equipamento and p.equipamento.descricao|default:"" == p.descricao|default:"" %} ok {% else %} nok {% endif %}">{{p.descricao|default:"" }}</td>
+           <td id="{{ p.id }}" class="patr td_ncm {% if p.equipamento and p.equipamento.ncm|default:"" == p.ncm|default:"" %} ok {% else %} nok {% endif %}">{{p.ncm|default:"" }}</td>
+           <td id="{{ p.id }}" class="patr td_ean {% if p.equipamento and p.equipamento.ean|default:"" == p.ean|default:"" %} ok {% else %} nok {% endif %}">{{p.ean|default:"" }}</td>
+           <td id="{{ p.id }}" class="patr td_tamanho {% if p.equipamento and p.equipamento.tamanho|default:"" == p.tamanho|default:"" %} ok {% else %} nok {% endif %}">{{p.tamanho|default:"" }}</td>
+           
+           <td></td>   
+           <td id="{{ p.equipamento.id }}" class="equip td_marca {% if p.equipamento and p.equipamento.marca|default:"" == p.marca|default:"" %} ok {% else %} nok {% endif %}">{{ p.equipamento.marca }}</td>
+           <td id="{{ p.equipamento.id }}" class="equip td_modelo {% if p.equipamento and p.equipamento.modelo|default:"" == p.modelo|default:"" %} ok {% else %} nok {% endif %}">{{ p.equipamento.modelo }}</td>
+           <td id="{{ p.equipamento.id }}" class="equip td_pn {% if p.equipamento and p.equipamento.part_number|default:"" == p.part_number|default:"" %} ok {% else %} nok {% endif %}">{{ p.equipamento.part_number }}</td>
+           <td id="{{ p.equipamento.id }}" class="equip td_descricao {% if p.equipamento and p.equipamento.descricao|default:"" == p.descricao|default:"" %} ok {% else %} nok {% endif %}">{{p.equipamento.descricao|default:"" }}</td>
+           <td id="{{ p.equipamento.id }}" class="equip td_ncm {% if p.equipamento and p.equipamento.ncm|default:"" == p.ncm|default:"" %} ok {% else %} nok {% endif %}">{{p.equipamento.ncm|default:"" }}</td>
+           <td id="{{ p.equipamento.id }}" class="equip td_ean {% if p.equipamento and p.equipamento.ean|default:"" == p.ean|default:"" %} ok {% else %} nok {% endif %}">{{p.equipamento.ean|default:"" }}</td>
+           <td id="{{ p.equipamento.id }}" class="equip td_tamanho {% if p.equipamento and p.equipamento.tamanho|default:"" == p.tamanho|default:"" %} ok {% else %} nok {% endif %}">{{p.equipamento.tamanho|default:"" }}</td>
+           
+	    </tr>
+    {% endfor %}
+
+</table>
+{% endblock %}
