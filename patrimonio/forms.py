@@ -1,14 +1,18 @@
 # -*- coding: utf-8 -*-
 
-from models import *
-from financeiro.models import Pagamento
-from identificacao.models import Identificacao, Entidade, Endereco, EnderecoDetalhe
-from outorga.models import Termo
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.forms.util import ErrorList
 from django.core.urlresolvers import reverse
 from django.utils.html import mark_safe
+from django.contrib.admin.widgets import FilteredSelectMultiple, RelatedFieldWidgetWrapper
+from django.db.models.fields.related import ManyToOneRel
+
+from models import *
+from financeiro.models import Pagamento
+from identificacao.models import Identificacao, Entidade, Endereco, EnderecoDetalhe
+from outorga.models import Termo
+from patrimonio.models import Equipamento, Patrimonio
 
 
 
@@ -17,14 +21,9 @@ class EquipamentoModelChoiceField(forms.ModelChoiceField):
     Classe para exibição de Equipamentos.
     Restringe a exibição da descrição em 150 caracteres com a adição de reticências para não exceder a largura da tela
     """
-    def __init__(self, *args, **kwargs):
-        super(EquipamentoModelChoiceField, self).__init__(*args, **kwargs)
-        
     def label_from_instance(self, obj):
         info = (obj.descricao[:150] + '..') if len(obj.descricao) > 150 else obj.descricao
         return u'%s - %s' % (info, obj.part_number)
-
-
 
 class PatrimonioAdminForm(forms.ModelForm):
 
@@ -49,28 +48,32 @@ class PatrimonioAdminForm(forms.ModelForm):
             else:
                 initial = {'termo':instance.pagamento.protocolo.termo}
                 initial.update({'equipamento':instance.equipamento})
-                
+                                                     
         super(PatrimonioAdminForm, self).__init__(data, files, auto_id, prefix, initial,
                                             error_class, label_suffix, empty_permitted, instance)
 
+    	pt = self.fields['patrimonio']
         pg = self.fields['pagamento']
         
-	pt = self.fields['patrimonio']
-	if data and data['termo']:
-	    t = data['termo']
-	    t = Termo.objects.get(id=t)
-	    pg.queryset = Pagamento.objects.filter(protocolo__termo=t)
+        if data and data['termo']:
+    	    t = data['termo']
+    	    t = Termo.objects.get(id=t)
+    	    pg.queryset = Pagamento.objects.filter(protocolo__termo=t)
         elif instance and instance.pagamento:
             pg.choices = [(p.id, p.__unicode__()) for p in Pagamento.objects.filter(id=instance.pagamento.id)]
-	else:
-            pg.queryset = Pagamento.objects.filter(id__lte=0)
-
-        if instance and instance.patrimonio:
-            pt.choices = [(p.id, p.__unicode__()) for p in Patrimonio.objects.filter(id=instance.patrimonio.id)]
-        elif data:
-            pt.queryset = Patrimonio.objects.all()
         else:
-            pt.queryset = Patrimonio.objects.filter(id__lte=0)
+            pg.queryset = Pagamento.objects.filter(id__lte=0)
+    
+            if instance and instance.patrimonio:
+                pt.choices = [(p.id, p.__unicode__()) for p in Patrimonio.objects.filter(id=instance.patrimonio.id)]
+            elif data:
+                pt.queryset = Patrimonio.objects.all()
+            else:
+                pt.queryset = Patrimonio.objects.filter(id__lte=0)
+                
+        # Configurando a relação entre Patrimonio e Equipamento para aparecer o botão de +                
+        rel = ManyToOneRel(Equipamento, 'id')
+        self.fields['equipamento'].widget = RelatedFieldWidgetWrapper(self.fields['equipamento'].widget, rel, self.admin_site)
         
     termo = forms.ModelChoiceField(Termo.objects.all(), label=_(u'Termo de outorga'), required=False)
 
@@ -85,12 +88,13 @@ class PatrimonioAdminForm(forms.ModelForm):
     tem_numero_fmusp = forms.BooleanField(label=u'Tem número de patrimônio FMUSP?', required=False, 
             widget=forms.CheckboxInput(attrs={'onchange':'ajax_numero_fmusp();'}))
 
+    descricao = forms.CharField(required=False, widget=forms.Textarea(attrs={'class' : 'textDuplaLinhaClass'}))
+    
     # Uso de Model específico para a adição de reticências na descrição
     # e javascript para adição de link no label para a página do Equipamento selecionado 
-    equipamento = EquipamentoModelChoiceField(Equipamento.objects.all(), 
+    equipamento = EquipamentoModelChoiceField(queryset=Equipamento.objects.all(), 
                                      required=False,
-                                     label=mark_safe('<a href="javascript:window.open(\'/patrimonio/equipamento/\'+$(\'#id_equipamento\').val() + \'/\', \'_blank\');">Equipamento</a>'))
-     
+                                     label=mark_safe('<a href="#" onclick="window.open(\'/patrimonio/equipamento/\'+$(\'#id_equipamento\').val() + \'/\', \'_blank\');return true;">Equipamento</a>'),)
     
     class Meta:
         model = Patrimonio
@@ -111,6 +115,8 @@ class HistoricoLocalAdminForm(forms.ModelForm):
 
     entidade = forms.ModelChoiceField(Entidade.objects.all(), required=False,
                 widget=forms.Select(attrs={'onchange': 'ajax_select_endereco(this.id);'}))
+    
+    descricao = forms.CharField(required=False, widget=forms.Textarea(attrs={'class' : 'textDuplaLinhaClass'}))    
 
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=':',

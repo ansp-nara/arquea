@@ -1210,4 +1210,7 @@ table#change-history tbody th {
 
 .question a{color:#ff0000;}
 
-
+.textDuplaLinhaClass {
+	height:2.5em;
+	width:870px;
+}
