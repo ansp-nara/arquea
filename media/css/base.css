@@ -1209,3 +1209,7 @@ table#change-history tbody th {
 .edit-alert{padding:4px 0 4px 25px; color:#ff9900; font-size:11px; font-weight:bold; background:url(../img/admin/alert-icon.png) no-repeat center left;} 
 
 .question a{color:#ff0000;}
+
+.textDuplaLinhaClass {
+    height:2.5em;
+}
