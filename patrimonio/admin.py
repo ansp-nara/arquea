@@ -41,7 +41,6 @@ class PatrimonioAdmin(admin.ModelAdmin):
                       'classes': ('collapse',)
                  }),
     )
-
     form = PatrimonioAdminForm
     list_display = ('tipo', 'descricao', 'complemento', 'posicao', 'agilis', 'marca', 'modelo', 'ns', 'nf', 'valor', 'checado')
     list_filter = ('tipo', 'pagamento__protocolo__termo',)
@@ -49,6 +48,13 @@ class PatrimonioAdmin(admin.ModelAdmin):
     search_fields = ('descricao', 'ns', 'pagamento__protocolo__num_documento', 'ncm', 'historicolocal__descricao', 'marca', 'part_number', 'modelo', 'historicolocal__posicao', 'apelido')
     actions = ['action_mark_agilis', 'action_unmark_agilis', 'action_mark_checado', 'action_clone']
 
+    def __init__(self, model, admin_site):
+        """
+        Utilizado para setar o admin_site para o forms
+        """
+        self.form.admin_site = admin_site
+        super(PatrimonioAdmin, self).__init__(model, admin_site)
+        
     def action_clone(self, request, queryset):
         objs = clone_objects(queryset)
         total = queryset.count()

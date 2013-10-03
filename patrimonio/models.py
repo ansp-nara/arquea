@@ -7,8 +7,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import cached_property
 from django.db.models import Q
 import datetime
-import logging
 import re
+import logging
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
