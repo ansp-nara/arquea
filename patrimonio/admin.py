@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from django.contrib import admin
-from models import *
 from django.utils.translation import ugettext_lazy as _
-from forms import *
-from django.utils.encoding import smart_unicode
 from utils.functions import clone_objects
-
+from models import *
+from forms import *
 
 admin.site.register(Estado)
 admin.site.register(Tipo)
@@ -17,28 +15,32 @@ admin.site.register(UnidadeDimensao)
 admin.site.register(Direcao)
 admin.site.register(TipoEquipamento)
 
+
+
 class HistoricoLocalInline(admin.StackedInline):
     fieldsets = (('', {
-                   'fields':(('entidade'), ('endereco', 'posicao'), ('descricao', 'data', 'estado', 'memorando'))
+                   'fields':(('entidade',), ('endereco', 'posicao'), ('descricao', 'data', 'estado', 'memorando'))
                 }),)
     model = HistoricoLocal
-    form = HistoricoLocalAdminForm
     fk_name = 'patrimonio'
+    formset = HistoricoLocalAdminFormSet
+    form = HistoricoLocalAdminForm
     choices = 1
     extra = 1
+
 
 class PatrimonioAdmin(admin.ModelAdmin):
     fieldsets = (
                  ('Pagamento', {
                       'fields': (('termo', 'npgto'), ('pagamento', 'valor')),
-                      'classes': ('wide',)
+                      'classes': ('wide')
                  }),
                  ('Geral', {
                       'fields': (('checado', 'tipo', 'apelido', 'tem_numero_fmusp', 'numero_fmusp'), ('part_number', 'ns', 'ncm', 'ean', 'agilis'), ('nf', 'patrimonio'), 'descricao', ('complemento', 'tamanho'), ('marca', 'modelo', 'procedencia'), 'equipamento')
                  }),
                  ('Extras', {
+                      'classes': ('collapse',),
                       'fields': ('imagem', 'especificacao', 'obs', 'titulo_autor', 'isbn'),
-                      'classes': ('collapse',)
                  }),
     )
     form = PatrimonioAdminForm
@@ -78,6 +80,7 @@ class PatrimonioAdmin(admin.ModelAdmin):
         queryset.update(checado=True)
     action_mark_checado.short_description = _(u'Marcar como checado')
 
+
 admin.site.register(Patrimonio,PatrimonioAdmin)
 
 class HistoricoLocalAdmin(admin.ModelAdmin):
@@ -98,7 +101,7 @@ class HistoricoLocalAdmin(admin.ModelAdmin):
                      'classes': ('wide',)
                  }),
     )
-
+    
     list_display = ('data', 'patrimonio', 'endereco', 'descricao')
 
     search_fields = ['endereco__identificacao____entidade__nome', 'endereco__identificacao__entidade__sigla', 'endereco__identificacao__contato__nome', 'endereco__identificacao__funcao', 'endereco__identificacao__area', 'endereco__rua', 'endereco__complemento', 'endereco__bairro', 'endereco__cidade', 'endereco__estado', 'endereco__cep', 'endereco__pais', 'descrica', 'data', 'patrimonio__itemprotocolo__descricao', 'patrimonio__itemprotocolo__protocolo__num_documento', 'patrimonio__itemprotocolo__protocolo__descricao']
@@ -110,3 +113,6 @@ class EquipamentoAdmin(admin.ModelAdmin):
     list_display = ('descricao', 'part_number', 'tipo')
 
 admin.site.register(Equipamento, EquipamentoAdmin)
+
+
+
