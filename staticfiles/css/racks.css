@@ -152,7 +152,10 @@
 }
 .equip.conflito {
 	border:2px red solid;
-	width:195px
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	margin: 1px;
 }
 .espaco {
     width:100%;
@@ -219,11 +222,9 @@
 	}
 	.conflitos-title {
 	   display:none;
-	  
 	}
 	.equip.conflito {
 	   border: 0;
-	   width:199px;
 	}
 	.interno a div div div {
         font-weight:bold;

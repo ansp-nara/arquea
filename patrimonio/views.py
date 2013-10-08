@@ -657,9 +657,7 @@ def racks(request):
                     # ISSO É UM PROBLEMA DE DADOS INVÁLIDOS. PRECISA SER TRATADO
                     rack_altura = 126
                     rack.tamanho = 42
-                    
-                    obs = 'Rack não possui tamanho.'
-                    conflitos.append({'obs': obs})
+                    conflitos.append({'obs': 'Rack não possui tamanho.'})
                 
                 
                 # ordena os equipamentos do rack conforme a posição no rack
