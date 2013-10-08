@@ -823,7 +823,10 @@ class Arquivo(models.Model):
 
     # Retorna a sigla da entidade.
     def mostra_entidade(self):
-        return self.protocolo.identificacao.entidade.sigla
+        if self.protocolo.identificacao:
+	    return self.protocolo.identificacao.entidade.sigla
+        else:
+	    return ''
     mostra_entidade.short_description = _(u'Entidade')
 
 
