@@ -225,7 +225,7 @@
 	                       {% if conflito.eq1 %}
 	                        <td>
 	                           <a href="{% url "admin:patrimonio_patrimonio_change" conflito.eq1.id %}" onclick="return showAddAnotherPopup(this);">
-	                            {{ conflito.eq1.nome }}
+	                            {{ conflito.eq1.descricao }}
 	                            </a>
 	                        </td>
 	                        <td>{{ conflito.eq1.pos }}</td>
@@ -236,7 +236,7 @@
 	                        {% if conflito.eq2 %}
 	                        <td>
 	                            <a href="{% url "admin:patrimonio_patrimonio_change" conflito.eq2.id %}" onclick="return showAddAnotherPopup(this);">
-	                                {{ conflito.eq2.nome }}
+	                                {{ conflito.eq2.descricao }}
 	                            </a>
 	                        </td>
 	                        <td>{{ conflito.eq2.pos }}</td>
