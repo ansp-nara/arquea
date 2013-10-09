@@ -42,6 +42,10 @@ class PatrimonioAdmin(admin.ModelAdmin):
                       'classes': ('collapse',),
                       'fields': ('imagem', 'especificacao', 'obs', 'titulo_autor', 'isbn'),
                  }),
+                 ('Patrimônios contidos', {
+                      'classes': ('collapse',),
+                      'fields': ('form_filhos',),
+                 }),
     )
     form = PatrimonioAdminForm
     list_display = ('tipo', 'descricao', 'complemento', 'posicao', 'agilis', 'marca', 'modelo', 'ns', 'nf', 'valor', 'checado')

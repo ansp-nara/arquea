@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from django.conf import settings
 from django.contrib import admin
 from django.utils.safestring import mark_safe
@@ -42,3 +44,13 @@ def applist(request):
         for app in app_list:
             app['models'].sort(lambda x,y : cmp(x['name'], y['name']))
 	return {'adm_app_list': app_list}
+
+
+def debug(context):
+   """
+	Disponibiliza a variável de DEBUG para o template
+   """
+   return {'DEBUG': settings.DEBUG}
+   
+   
+   

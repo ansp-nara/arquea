@@ -4,6 +4,9 @@
 {% block title %}{{ title }} | {% trans 'Django site admin' %}{% endblock %}
 
 {% block branding %}
+{% if DEBUG %}
+<div style="width:1170px; background-color:orange;text-align: center; font-weight: bold; padding: 5px; height: 15px; position: absolute;top:140px;">SISTEMA EM AMBIENTE DE DESENVOLVIMENTO.</div>
+{% endif %}
 <h1><a href="/admin">ANSP - Sistema administrativo - página inicial</a></h1>
 {% endblock %}
 
