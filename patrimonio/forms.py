@@ -31,9 +31,9 @@ class PatrimonioReadOnlyWidget(forms.Widget):
                 for v in value:        
                     id = v[0] or ''
                     retorno += "<tr>"
-                    retorno += "<td style='white-space:nowrap;'><a href='/patrimonio/patrimonio/%s/'>%s</td>" % (id, v[1])
-                    retorno += "<td style='white-space:nowrap;'><a href='/patrimonio/patrimonio/%s/'>%s</td>" % (id, v[2])
-                    retorno += "<td><a href='/patrimonio/patrimonio/%s/'>%s</td>" % (id, v[3])
+                    retorno += "<td style='white-space:nowrap;'><a href='/patrimonio/patrimonio/%s/'>%s</td>" % (id, v[1] or '')
+                    retorno += "<td style='white-space:nowrap;'><a href='/patrimonio/patrimonio/%s/'>%s</td>" % (id, v[2] or '')
+                    retorno += "<td><a href='/patrimonio/patrimonio/%s/'>%s</td>" % (id, v[3] or '')
                     retorno += "</tr>"
             retorno += "</table>" 
         return mark_safe(retorno)
