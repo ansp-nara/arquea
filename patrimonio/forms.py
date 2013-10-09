@@ -17,6 +17,41 @@ from outorga.models import Termo
 from patrimonio.models import Equipamento, Patrimonio
 
 
+from django.forms import widgets
+from django.forms.util import flatatt
+
+# Exibição de patrimonios filhos em forma de tabela, dentro do form de Patrimonio
+class PatrimonioReadOnlyWidget(forms.Widget):
+    def render(self, name, value, attrs):
+        retorno = ''
+        if value and len(value) > 0:
+            retorno += u'<table>'
+            retorno += "<tr><th>Nome</th><th>NS</th><th>Desc</th></tr>"
+            if value:
+                for v in value:        
+                    id = v[0] or ''
+                    retorno += "<tr>"
+                    retorno += "<td style='white-space:nowrap;'><a href='/patrimonio/patrimonio/%s/'>%s</td>" % (id, v[1])
+                    retorno += "<td style='white-space:nowrap;'><a href='/patrimonio/patrimonio/%s/'>%s</td>" % (id, v[2])
+                    retorno += "<td><a href='/patrimonio/patrimonio/%s/'>%s</td>" % (id, v[3])
+                    retorno += "</tr>"
+            retorno += "</table>" 
+        return mark_safe(retorno)
+
+    def _has_changed(self, initial, data):
+        return False
+    
+class PatrimonioReadOnlyField(forms.FileField):
+    widget = PatrimonioReadOnlyWidget
+    def __init__(self, widget=None, label=None, initial=None, help_text=None):
+        forms.Field.__init__(self, label=label, initial=initial,
+            help_text=help_text, widget=widget)
+
+    def clean(self, value, initial):
+        self.widget.initial = initial
+        return initial
+
+        
 class EquipamentoContidoModelChoiceField(forms.ModelChoiceField):
     """
     Classe para exibição de Equipamentos - contidos em.
@@ -75,20 +110,23 @@ class PatrimonioAdminForm(forms.ModelForm):
                                      widget=forms.Select(attrs={'style':'width:800px'}),
                                      empty_label='---'
                                      )
+
+    form_filhos = PatrimonioReadOnlyField()
     
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=':',
                  empty_permitted=False, instance=None):
 
-        if instance and instance.pagamento: 
+        if instance: 
             if initial:
-                initial.update({'termo':instance.pagamento.protocolo.termo})
                 initial.update({'equipamento':instance.equipamento})
-                initial.update({'patrimonio':instance.patrimonio})
             else:
-                initial = {'termo':instance.pagamento.protocolo.termo}
-                initial.update({'equipamento':instance.equipamento})
-                initial.update({'patrimonio':instance.patrimonio})
+                initial = {'equipamento':instance.equipamento}
+                
+            initial.update({'patrimonio':instance.patrimonio})
+            initial.update({'form_filhos': [(p.id, p.apelido, p.ns, p.descricao) for p in Patrimonio.objects.filter(patrimonio=instance)]})
+            if instance.pagamento:
+                initial.update({'termo':instance.pagamento.protocolo.termo})
                                                      
         super(PatrimonioAdminForm, self).__init__(data, files, auto_id, prefix, initial,
                                             error_class, label_suffix, empty_permitted, instance)
@@ -115,6 +153,10 @@ class PatrimonioAdminForm(forms.ModelForm):
         # O self.admin_site foi declarado no admin.py                
         rel = ManyToOneRel(Equipamento, 'id')
         self.fields['equipamento'].widget = RelatedFieldWidgetWrapper(self.fields['equipamento'].widget, rel, self.admin_site)
+
+        # Exibe a quantidade de patrimonios filhos no label
+        self.fields['form_filhos'].label = u'Patrimônios contidos (%s)' % Patrimonio.objects.filter(patrimonio=instance).count()
+         
                 
     class Meta:
         model = Patrimonio
@@ -146,7 +188,7 @@ class HistoricoLocalAdminForm(forms.ModelForm):
                  initial=None, error_class=ErrorList, label_suffix=':',
                  empty_permitted=False, instance=None):
 
-        if instance and instance.endereco.endereco.entidade: 
+        if instance and instance.endereco and instance.endereco.endereco and instance.endereco.endereco.entidade: 
             if initial:
                 initial.update({'entidade':instance.endereco.endereco.entidade})
             else:
