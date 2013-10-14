@@ -1,12 +1,26 @@
 {% extends "admin/base_site.html" %}
 {% load proto_tags %}
 {% block content %}
+<style>
+    #tbl_consolidado td {
+        white-space:nowrap;
+    }
+    #tbl_consolidado td:nth-child(4),
+    #tbl_consolidado td:nth-child(5),
+    #tbl_consolidado td:nth-child(6) {
+        white-space:nowrap;
+    }
+    
+    .tbl_acordos td:nth-child(1) {
+        white-space:nowrap;
+    }
+</style>
 <h1 repeat="1"></h1>
 
-    <table border="0" repeat="1" cellpadding="5">
+    <table id="tbl_consolidado" border="0" repeat="1" cellpadding="5">
     <tr><th colspan="2"></th>
     {% for t in termos %}
-       <th>Processo {{ t }}<br />{{ t.inicio|date:"d/m/Y" }} a {{ t.termino|date:"d/m/Y" }}</th>
+       <th>Processo {{ t }}<br />{{ t.inicio|date:"d/m/Y" }}<br />a<br />{{ t.termino|date:"d/m/Y" }}</th>
     {% endfor %}
     </tr>
     {% for a in acordos %}
@@ -25,8 +39,15 @@
 
     {% for a in acordos %}
     <h4>{{ a.nome }}</h4>
-    <table border="0">
-       <tr><th>Termo</th><th>Item da outorga</th><th>Entidade</th><th>Concedido</th><th>Realizado</th><th>Saldo</th</tr>
+    <table border="0" class="tbl_acordos">
+       <tr>
+        <th width="6%">Termo</th>
+        <th width="54%">Item da outorga</th>
+        <th width="10%">Entidade</th>
+        <th width="10%">Concedido</th>
+        <th width="10%">Realizado</th>
+        <th width="10%">Saldo</th>
+       </tr>
        {% for t in a.termos %}
           {% for item in t.itens %}
              <tr><td>{% if forloop.counter == 1 %}{{ t.termo }}{% endif %}</td>
