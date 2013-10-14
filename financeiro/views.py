@@ -337,7 +337,7 @@ def relatorio_acordos(request, pdf=False):
                     totalReal = Decimal('0.0')
                     totalDolar = Decimal('0.0')
                     pg = []
-                    for p in o.pagamento_set.order_by('conta_corrente__data_oper').select_related('conta_corrente', 'protocolo', 'protocolo__descricao2', 'protocolo__tipo_documento', 'origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional'):
+                    for p in o.pagamento_set.order_by('conta_corrente__data_oper', 'id').select_related('conta_corrente', 'protocolo', 'protocolo__descricao2', 'protocolo__tipo_documento', 'origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional'):
                         pags = {'p':p, 'docs':p.auditoria_set.select_related('tipo')}
                         pg.append(pags)
                     
