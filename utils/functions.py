@@ -11,7 +11,7 @@ from django.template import Context, loader, RequestContext
 from django.template.loader import render_to_string
 from django.http import HttpResponse
 import settings
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 import calendar
 from django.conf import settings
 import logging
@@ -43,7 +43,7 @@ def render_to_pdf(template_src, context_dict, context_instance=None, filename='f
         return response
     return HttpResponse('We had some errors<pre>%s</pre>' % cgi.escape(html))
 
-def render_wk_to_pdf(template_src, context_dict, context_instance=None, filename='file.pdf', attachments=[], request=None, header_template=None, footer_template=None):
+def render_wk_to_pdf(template_src, context_dict, context_instance=None, filename=None, attachments=[], request=None, header_template=None, footer_template=None):
     """
     Renderiza o HTML utilizando o wkHTMLtoPDF, por linha de comando, utilizando a engine QT com webkit
     """
@@ -58,13 +58,22 @@ def render_wk_to_pdf(template_src, context_dict, context_instance=None, filename
     
     if footer_template == None:
         footer_template = 'wkhtmltopdf_footer_template.html'
-     
-     
+    
+    today = datetime.today()
+    fileDate = "%s-%s-%s." % (today.year, today.month, today.day)
+    
+    if not filename:
+        localFilename = 'file.pdf'
+    else:
+        localFilename = filename
+    localFilename = localFilename.replace('.', fileDate, 1)
+             
     cmd_options = {'orientation': 'landscape'}
      
     response = PDFTemplateResponse(request=request,
                                    template=template_src,
                                    context=context,
+                                   filename=localFilename,
                                    footer_template=footer_template,
                                    header_template=header_template,
                                    show_content_in_browser=False, cmd_options=cmd_options)
