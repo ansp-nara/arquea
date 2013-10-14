@@ -62,12 +62,9 @@ def upload_planilha_patrimonio(request):
         form = UploadFileForm(request.POST, request.FILES)
         c.update({'form': form})
         
-        logger.debug('Carregando arquivo')
         handle_uploaded_file(request.FILES['file'])
         
-        logger.debug('Checando patrimonio')
         retornoCheckPatrimonio = checkPatrimonio()
-        
         
         c.update({'success':True})
         c.update({'novos_patrimonios':retornoCheckPatrimonio['count']})
