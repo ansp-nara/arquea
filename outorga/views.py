@@ -15,6 +15,10 @@ from django.contrib.auth.decorators import permission_required, login_required
 from django.template import RequestContext
 from django.template.response import TemplateResponse
 from django.db.models import Sum
+import logging
+
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
 
 def termo(request, termo_id):
 
@@ -340,45 +344,83 @@ def item_modalidade(request, pdf=False):
 
 def acordo_progressivo(request, pdf=False):
     acordos = []
+    
+    totalAcordoRealizadoReal = 0 
+    totalAcordoConcedidoReal = 0
+    totalAcordoSaldoReal = 0
+    totalAcordoRealizadoDolar = 0 
+    totalAcordoConcedidoDolar = 0
+    totalAcordoSaldoDolar = 0
+    
     for a in Acordo.objects.all():
         acordo = {'nome':a.descricao}
         termos = []
-        for t in Termo.objects.all().order_by('ano'):
+        
+        totalTermoRealizadoReal = Decimal('0.0') 
+        totalTermoConcedidoReal = Decimal('0.0')
+        totalTermoSaldoReal = Decimal('0.0')
+        totalTermoRealizadoDolar = Decimal('0.0')
+        totalTermoConcedidoDolar = Decimal('0.0')
+        totalTermoSaldoDolar = Decimal('0.0')
+        
+        for t in Termo.objects.order_by('ano').only('ano', 'processo', 'digito'):
             concedido_real = a.itens_outorga.filter(natureza_gasto__termo=t, natureza_gasto__modalidade__moeda_nacional=True).aggregate(Sum('valor'))
-            realizado_real = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__termo=t, origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional=True, origem_fapesp__acordo=a).aggregate(Sum('valor_fapesp'))
             concedido_real = concedido_real['valor__sum'] or Decimal('0.0')
-            realizado_real = realizado_real['valor_fapesp__sum'] or Decimal('0.0')
-            saldo_real = concedido_real - realizado_real
-            concedido_dolar = a.itens_outorga.filter(natureza_gasto__termo=t, natureza_gasto__modalidade__moeda_nacional=False).aggregate(Sum('valor'))
-            realizado_dolar = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__termo=t, origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional=False, origem_fapesp__acordo=a).aggregate(Sum('valor_fapesp'))
-            concedido_dolar = concedido_dolar['valor__sum'] or Decimal('0.0')
-            realizado_dolar = realizado_dolar['valor_fapesp__sum'] or Decimal('0.0')
-            saldo_dolar = concedido_dolar - realizado_dolar
-            tem_real = concedido_real or realizado_real
-	    tem_dolar = concedido_dolar or realizado_dolar
 
+            realizado_real = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__termo=t, origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional=True, origem_fapesp__acordo=a).aggregate(Sum('valor_fapesp'))
+            realizado_real = realizado_real['valor_fapesp__sum'] or Decimal('0.0')
+            
+            saldo_real = concedido_real - realizado_real
+            
+            concedido_dolar = a.itens_outorga.filter(natureza_gasto__termo=t, natureza_gasto__modalidade__moeda_nacional=False).aggregate(Sum('valor'))
+            concedido_dolar = concedido_dolar['valor__sum'] or Decimal('0.0')
+
+            realizado_dolar = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__termo=t, origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional=False, origem_fapesp__acordo=a).aggregate(Sum('valor_fapesp'))
+            realizado_dolar = realizado_dolar['valor_fapesp__sum'] or Decimal('0.0')
+            
+            saldo_dolar = concedido_dolar - realizado_dolar
+            
+            tem_real = concedido_real or realizado_real
+            tem_dolar = concedido_dolar or realizado_dolar
             itens = []
-            for item in a.itens_outorga.filter(natureza_gasto__termo=t):
+            
+            itensOutorga = a.itens_outorga.filter(natureza_gasto__termo=t).select_related('natureza_gasto__modalidade', 'entidade').defer('justificativa', 'obs')
+            for item in itensOutorga:
                 realiz = Pagamento.objects.filter(origem_fapesp__item_outorga=item, origem_fapesp__acordo=a).aggregate(Sum('valor_fapesp'))
                 realiz = realiz['valor_fapesp__sum'] or Decimal('0.0')
                 concede = item.valor or Decimal('0.0')
                 itens.append({'item':item, 'concedido':concede, 'realizado':realiz, 'saldo':concede-realiz})
+            
             if tem_real:
-		valores_real = {'tem_real':1, 'concedido_real':concedido_real, 'realizado_real':realizado_real, 'saldo_real':saldo_real}
-	    else: valores_real = {'tem_real':0}
+                valores_real = {'tem_real':1, 'concedido_real':concedido_real, 'realizado_real':realizado_real, 'saldo_real':saldo_real}
+                totalTermoRealizadoReal += concedido_real 
+                totalTermoConcedidoReal += realizado_real
+                totalTermoSaldoReal += saldo_real
+            else: valores_real = {'tem_real':0}
+            
             if tem_dolar:
                 valores_dolar = {'tem_dolar':1, 'concedido_dolar':concedido_dolar, 'realizado_dolar':realizado_dolar, 'saldo_dolar':saldo_dolar}
+                totalTermoRealizadoDolar += concedido_dolar
+                totalTermoConcedidoDolar += realizado_dolar
+                totalTermoSaldoDolar += saldo_dolar
             else: valores_dolar = {'tem_dolar':0}
 
             valores = valores_real
             valores.update(valores_dolar)
-            valores.update({'termo':t, 'itens':itens})
-
+                
+            valores.update({'termo':t, 'itens':itens, 
+                            })
             termos.append(valores)
-        acordo.update({'termos':termos})
+        
+        tem_real = (totalTermoConcedidoReal and totalTermoConcedidoReal != 0.0) or (totalTermoRealizadoReal and totalTermoRealizadoReal != 0.0)
+        tem_dolar = (totalTermoConcedidoDolar and totalTermoConcedidoDolar != 0.0) or (totalTermoRealizadoDolar and totalTermoRealizadoDolar != 0.0)
+        acordo.update({'termos':termos,
+                       'tem_real':tem_real, 'tem_dolar':tem_dolar,
+                       'totalTermoRealizadoReal':totalTermoRealizadoReal,'totalTermoConcedidoReal':totalTermoConcedidoReal, 'totalTermoSaldoReal':totalTermoSaldoReal,
+                        'totalTermoRealizadoDolar':totalTermoRealizadoDolar,'totalTermoConcedidoDolar':totalTermoConcedidoDolar, 'totalTermoSaldoDolar':totalTermoSaldoDolar,
+                        })
         acordos.append(acordo)
-
     if pdf:
-	return render_to_pdf('outorga/acordo_progressivo.pdf', {'acordos':acordos, 'termos':Termo.objects.all().order_by('ano')}, filename='acordo_progressivo.pdf')
+        return render_to_pdf('outorga/acordo_progressivo.pdf', {'acordos':acordos, 'termos':Termo.objects.all().order_by('ano')}, filename='acordo_progressivo.pdf')
     else:
         return TemplateResponse(request, 'outorga/acordo_progressivo.html', {'acordos':acordos, 'termos':Termo.objects.all().order_by('ano')})
