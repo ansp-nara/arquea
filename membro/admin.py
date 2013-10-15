@@ -144,13 +144,14 @@ class DispensaLegalAdmin(admin.ModelAdmin):
 
     fieldsets = (
                  (None, {
-                     'fields': (('membro', 'tipo'), ('inicio_direito', 'dias_uteis'), 'justificativa')
+                     'fields': (('membro', 'tipo'), ('inicio_direito', 'dias_corridos', 'horas', 'minutos'), ('dias_uteis',), 'justificativa')
                  }),
                  (None, {
                      'fields': (('inicio_realizada', 'realizada'), ('atestado', 'arquivo'))
                  }),
     )
     list_display = ('membro', 'tipo', 'inicio_direito', 'realizada')
+    form = DispensaLegalAdminForms
 
 admin.site.register(DispensaLegal, DispensaLegalAdmin)
 

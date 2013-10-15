@@ -200,50 +200,135 @@ class DispensaLegalTest(TestCase):
         tipo = TipoDispensa()
         tipo.save()
         # a data é uma sexta-feira
-        dispensaLegal = DispensaLegal(membro=membro, tipo=tipo, dias_uteis=1, inicio_realizada=date(2013,07,19), inicio_direito=date(2013,07,19))
+        dispensaLegal = DispensaLegal(membro=membro, tipo=tipo, dias_corridos=1, horas=0, minutos=0, inicio_realizada=date(2013,07,19), realizada=True, inicio_direito=date(2013,07,19))
         dispensaLegal.save()
         
-        dispensa = DispensaLegal().dia_dispensa(1, date(2013,07,19))
+        dispensa = DispensaLegal.objects.get(pk=1).dia_dispensa(date(2013,07,19))
         
         self.assertEqual(dispensa['is_dispensa'], True)
         self.assertEqual(dispensa['horas'], 8)
+
+    def test_dia_dispensa_mesmo_dia_meio_periodo(self):
+        membro = Membro(id=1)
+        membro.save()
         
+        tipo = TipoDispensa()
+        tipo.save()
+        # a data é uma sexta-feira
+        dispensaLegal = DispensaLegal(membro=membro, tipo=tipo, dias_corridos=0, horas=4, minutos=0, inicio_realizada=date(2013,07,19), realizada=True, inicio_direito=date(2013,07,19))
+        dispensaLegal.save()
+        
+        dispensa = DispensaLegal.objects.get(pk=1).dia_dispensa(date(2013,07,19))
+        
+        self.assertEqual(dispensa['is_dispensa'], True)
+        self.assertEqual(dispensa['horas'], 4)
+    
+    def test_dia_dispensa_mesmo_dia_meio_periodo_e_meio(self):
+        membro = Membro(id=1)
+        membro.save()
+        
+        tipo = TipoDispensa()
+        tipo.save()
+        # a data é uma sexta-feira
+        dispensaLegal = DispensaLegal(membro=membro, tipo=tipo, dias_corridos=0, horas=4, minutos=30, inicio_realizada=date(2013,07,19), realizada=True, inicio_direito=date(2013,07,19))
+        dispensaLegal.save()
+        
+        dispensa = DispensaLegal.objects.get(pk=1).dia_dispensa(date(2013,07,19))
+        
+        self.assertEqual(dispensa['is_dispensa'], True)
+        self.assertEqual(dispensa['horas'], 4.5)
+    
+    def test_dia_dispensa_dois_dias_meio_periodo_e_meio(self):
+        membro = Membro(id=1)
+        membro.save()
+        
+        tipo = TipoDispensa()
+        tipo.save()
+        # a data é uma sexta-feira
+        dispensaLegal = DispensaLegal(membro=membro, tipo=tipo, dias_corridos=2, horas=4, minutos=30, inicio_realizada=date(2013,07,19), realizada=True, inicio_direito=date(2013,07,19))
+        dispensaLegal.save()
+        
+        dispensa = DispensaLegal.objects.get(pk=1).dia_dispensa(date(2013,07,19))
+        self.assertEqual(dispensa['is_dispensa'], True)
+        self.assertEqual(dispensa['horas'], 8)
+        
+        dispensa = DispensaLegal.objects.get(pk=1).dia_dispensa(date(2013,07,20))
+        self.assertEqual(dispensa['is_dispensa'], True)
+        self.assertEqual(dispensa['horas'], 8)
+        
+        dispensa = DispensaLegal.objects.get(pk=1).dia_dispensa(date(2013,07,21))
+        self.assertEqual(dispensa['is_dispensa'], True)
+        self.assertEqual(dispensa['horas'], 4.5)
+
+    def test_dia_dispensa_dois_dias(self):
+        membro = Membro(id=1)
+        membro.save()
+        
+        tipo = TipoDispensa()
+        tipo.save()
+        # a data é uma sexta-feira
+        dispensaLegal = DispensaLegal(membro=membro, tipo=tipo, dias_corridos=2, inicio_realizada=date(2013,07,19), realizada=True, inicio_direito=date(2013,07,19))
+        dispensaLegal.save()
+        
+        dispensa = DispensaLegal.objects.get(pk=1).dia_dispensa(date(2013,07,18))
+        self.assertEqual(dispensa['is_dispensa'], False)
+        self.assertEqual(dispensa['horas'], 0)
+        
+        dispensa = DispensaLegal.objects.get(pk=1).dia_dispensa(date(2013,07,19))
+        self.assertEqual(dispensa['is_dispensa'], True)
+        self.assertEqual(dispensa['horas'], 8)
+        
+        dispensa = DispensaLegal.objects.get(pk=1).dia_dispensa(date(2013,07,20))
+        self.assertEqual(dispensa['is_dispensa'], True)
+        self.assertEqual(dispensa['horas'], 8)
+        
+        dispensa = DispensaLegal.objects.get(pk=1).dia_dispensa(date(2013,07,21))
+        self.assertEqual(dispensa['is_dispensa'], False)
+        self.assertEqual(dispensa['horas'], 0)
         
     def test_dia_dispensa_dia_diferente(self):
         # a data é uma sexta-feira
-        dispensaLegal = DispensaLegal(dias_uteis=3, inicio_realizada=date(2013,07,19))
+        dispensaLegal = DispensaLegal(dias_corridos=5, inicio_realizada=date(2013,07,19), realizada=True, )
         # dispensa para sexta, segunda, terca
         self.assertEqual(dispensaLegal.termino_realizada.weekday(), 1)
 
 
     def test_data_termino_realizada_fim_semana(self):
         # a data é uma sexta-feira
-        dispensaLegal = DispensaLegal(dias_uteis=3, inicio_realizada=date(2013,07,19))
+        dispensaLegal = DispensaLegal(dias_corridos=5, inicio_realizada=date(2013,07,19), realizada=True, )
         # dispensa para sexta, segunda, terca
         self.assertEqual(dispensaLegal.termino_realizada.weekday(), 1)
         
     def test_data_termino_realizada_sexta(self):
         # a data é uma sexta
-        dispensaLegal = DispensaLegal(dias_uteis=1, inicio_realizada=date(2013,07,19))
+        dispensaLegal = DispensaLegal(dias_corridos=1, inicio_realizada=date(2013,07,19), realizada=True, )
         # dispensa para sexta
         self.assertEqual(dispensaLegal.termino_realizada.weekday(), 4)
         
     def test_data_termino_realizada_meio_da_semana(self):
         # a data é uma segunda
-        dispensaLegal = DispensaLegal(dias_uteis=3, inicio_realizada=date(2013,07,15))
+        dispensaLegal = DispensaLegal(dias_corridos=3, inicio_realizada=date(2013,07,15), realizada=True, )
         # dispensa para segunda, terca, quarta
         self.assertEqual(dispensaLegal.termino_realizada.weekday(), 2)
         
     def test_data_termino_realizada_um_dia(self):
         # a data é uma segunda
-        dispensaLegal = DispensaLegal(dias_uteis=1, inicio_realizada=date(2013,07,15))
+        dispensaLegal = DispensaLegal(dias_corridos=1, inicio_realizada=date(2013,07,15), realizada=True, )
+        
+        self.assertEqual(dispensaLegal.termino_realizada.year, 2013)
+        self.assertEqual(dispensaLegal.termino_realizada.month, 07)
+        self.assertEqual(dispensaLegal.termino_realizada.day, 15)
         # dispensa para segunda
         self.assertEqual(dispensaLegal.termino_realizada.weekday(), 0)
         
     def test_data_termino_realizada_zero_dia(self):
         # a data é uma sexta-feira
-        dispensaLegal = DispensaLegal(dias_uteis=0, inicio_realizada=date(2013,07,15))
-        # dispensa para sexta, segunda, terca
+        dispensaLegal = DispensaLegal(dias_corridos=0, inicio_realizada=date(2013,07,15), realizada=True, )
+        
+        self.assertEqual(dispensaLegal.termino_realizada.year, 2013)
+        self.assertEqual(dispensaLegal.termino_realizada.month, 07)
+        self.assertEqual(dispensaLegal.termino_realizada.day, 15)
+        
         self.assertEqual(dispensaLegal.termino_realizada.weekday(), 0)
         self.assertEqual(dispensaLegal.inicio_realizada.weekday(), 0)
         
@@ -252,18 +337,27 @@ class DispensaLegalTest(TestCase):
         f.save()
         
         # a data é uma segunda
-        dispensaLegal = DispensaLegal(dias_uteis=3, inicio_realizada=date(2013,07,15))
+        dispensaLegal = DispensaLegal(dias_corridos=3, inicio_realizada=date(2013,07,15), realizada=True, )
+        
+        self.assertEqual(dispensaLegal.termino_realizada.year, 2013)
+        self.assertEqual(dispensaLegal.termino_realizada.month, 07)
+        self.assertEqual(dispensaLegal.termino_realizada.day, 17)
+        
         # dispensa para segunda, terca, quarta
-        self.assertEqual(dispensaLegal.termino_realizada.weekday(), 3)
+        self.assertEqual(dispensaLegal.termino_realizada.weekday(), 2)
         
     def test_data_termino_realizada_fim_semana_com_feriado_no_sabado(self):
         f = Feriado(feriado=date(2013,07,20))
         f.save()
         
         # a data é uma sexta-feira
-        dispensaLegal = DispensaLegal(dias_uteis=3, inicio_realizada=date(2013,07,19))
+        dispensaLegal = DispensaLegal(dias_corridos=3, inicio_realizada=date(2013,07,19), realizada=True, )
         # dispensa para sexta, segunda, terca
-        self.assertEqual(dispensaLegal.termino_realizada.weekday(), 1)
+        self.assertEqual(dispensaLegal.termino_realizada.year, 2013)
+        self.assertEqual(dispensaLegal.termino_realizada.month, 07)
+        self.assertEqual(dispensaLegal.termino_realizada.day, 21)
+        
+        self.assertEqual(dispensaLegal.termino_realizada.weekday(), 6)
         
         
 class FeriasTest(TestCase):
