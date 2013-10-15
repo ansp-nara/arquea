@@ -19,21 +19,100 @@
 		left: -2.3cm;
                 } 
 } 
-</style> 
+
+ td p {
+    line-height:inherit;
+    margin:0;
+ }
+ .nivel1, .nivel2{
+    font-weight: bold;
+ }
+ .nivel1 {
+    border-top:2px black solid;
+    border-bottom:1px gray solid;
+ }
+ .nivel2 td {
+    border-collapse:separate;
+    border-bottom:1px lightgray solid;
+ }
+ .nivel2 td-1, .nivel3 td-1, .nivel4 td-1 {
+    border-bottom:1px white solid;
+ }
+ 
+ .nivel3 td {
+    border-top:1px lightgray solid;
+ }
+ .nivel3 td-2 {
+    border-top:1px white solid;
+ }
+ .nivel4 td-2, .nivel4 td-3, .nivel4 td-4 {
+    border-top:1px white solid;
+ }
+
+ .nivel3 td {
+    border-collapse:separate;
+ }
+ 
+</style>
 </head>
 <body>
 <h1 repeat="1">Relatório de acordos da outorga {{ termo }}</h1>
 
     <table border="0" cellpadding="5">
+    <tr>
+       <td width="4%"></td>
+       <td width="5%"></td>
+       <td width="3%"></td>
+       <td width="3%"></td>
+       <td width="22%"></td>
+       <td width="35%"></td>
+       <td width="9%"></td>
+       <td width="18%"></td>
+    </tr>
     {% for ac in acordos %}
-	<tr><td colspan="7">{{ ac.desc }} ({{ ac.total|moeda }})</td></tr>
+	<tr class="nivel1">
+		<td colspan="6">{{ ac.desc }}</td>
+		<td colspan="2">
+		       {% if ac.totalGeralReal %}<p>{{ ac.totalGeralReal|moeda }}</p>{% endif %}
+	           {% if ac.totalGeralDolar %}<p>{{ ac.totalGeralDolar|moeda:0 }}</p>{% endif %}
+	    </td>
+	</tr>
 	{% for it in ac.itens %}
-	  <tr><td width="5%"></td><td colspan="6">{{ it.desc }} ({{ it.total|moeda }})</td></tr>
+	  <tr class="nivel2">
+	  	<td class="td1"></td>
+	  	<td colspan="5" class="td2">{{ it.desc }}</td>
+	  	<td colspan="2">
+			      {% if it.totalReal %}<p>{{ it.totalReal|moeda }}</p>{% endif %}
+			      {% if it.totalDolar %}<p>{{ it.totalDolar|moeda:0 }}</p>{% endif %}
+	  	</td>
+	  </tr>
 	  {% for pg in it.pg %}
-	      <tr><td width="5%"></td><td width="5%"></td><td width="5%">{{ pg.p.conta_corrente.cod_oper }}</td><td width="5%">{{ pg.p.conta_corrente.data_oper|date:"d/m" }}</td><td width="20%">{{ pg.p.protocolo.descricao2 }}</td><td>{{ pg.p.protocolo.referente }}</td><td width="10%">{{ pg.p.valor_fapesp|moeda }}</td><td width="10%">[{{ pg.p.protocolo.tipo_documento.nome }} - {{ pg.p.protocolo.num_documento }}]</td></tr>
+	      <tr class="{% cycle 'z1' 'z2' %} nivel3 tr_1_{{forloop.parentloop.parentloop.counter}} tr_2_{{forloop.parentloop.parentloop.counter}}_{{forloop.parentloop.counter}}" id="tr_3_{{forloop.parentloop.parentloop.counter}}_{{forloop.parentloop.counter}}_{{forloop.counter}}">
+			      <td class="td1">&nbsp;</td>
+			      <td class="td2">&nbsp;</td>
+			      <td class="td3">{{ pg.p.conta_corrente.cod_oper|default:"-" }}</td>
+			      <td class="td4">{{ pg.p.conta_corrente.data_oper|date:"d/m"|default:"-" }}</td>
+			      <td>{{ pg.p.protocolo.descricao2 }}</td><td>{{ pg.p.protocolo.referente }}</td>
+			      <td>{% if pg.p.origem_fapesp and pg.p.origem_fapesp.item_outorga.natureza_gasto.modalidade.moeda_nacional == False %}
+			              {{ pg.p.valor_fapesp|moeda:0 }}
+			          {% else %}
+			              {{ pg.p.valor_fapesp|moeda }}
+			          {% endif %}
+			      </td>
+			      <td>[{{ pg.p.protocolo.tipo_documento.nome }} - {{ pg.p.protocolo.num_documento }}]</td>
+		      </tr>
               {% for a in pg.docs %}
-                 <tr><td colspan="5"></td><td>{{ a.tipo.nome }}</td><td>parc. {{ a.parcial }}/pag. {{ a.pagina }}</td><td>{% if a.arquivo %}<a href="{{ a.arquivo.url }}">arquivo</a>{% endif %}</td></tr> 
-	      {% endfor %}
+              <tr class="nivel4">
+                 <td class="td1">&nbsp;</td>
+                 <td class="td2">&nbsp;</td>
+                 <td class="td3" {% if forloop.first %}style="border:inherit"{% endif %}>&nbsp;</td>
+                 <td class="td4" {% if forloop.first %}style="border:inherit"{% endif %}>&nbsp;</td>
+                 <td>parc. {{ a.parcial }}/pag. {{ a.pagina }}</td>
+                 <td>{{ a.tipo.nome }}</td>
+                 <td>&nbsp;</td>
+                 <td>&nbsp;</td>
+              </tr>
+	          {% endfor %}
           {% endfor %}
 	{% endfor %}
     {% endfor %}
