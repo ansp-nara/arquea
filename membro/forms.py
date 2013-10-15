@@ -224,5 +224,38 @@ class ControleAdminForms(forms.ModelForm):
         return cleaned_data
         
         
+class DispensaLegalAdminForms(forms.ModelForm):
+    
+    def clean(self):
+        cleaned_data = super(DispensaLegalAdminForms, self).clean()
+        
+        dias_uteis = cleaned_data.get("dias_uteis")
+        if dias_uteis and dias_uteis != 0: 
+            msg = _(u"Dias úteis não é mais um campo válido. Remover o valor e atualizar o campo de dias corridos.")
+            self._errors["dias_uteis"] = self.error_class([msg])
+            del cleaned_data["dias_uteis"]
+        
+        horas = cleaned_data.get("horas")
+        if horas and horas >= 8:
+            msg = _(u"Campo de horas deve ser menor que 8h")
+            self._errors["horas"] = self.error_class([msg])
+            del cleaned_data["horas"]
+        
+        minutos = cleaned_data.get("minutos")
+        if minutos and minutos >= 60:
+            msg = _(u"Campo de minutos deve ser menor que 60min")
+            self._errors["minutos"] = self.error_class([msg])
+            del cleaned_data["minutos"] 
+            
+        dias_corridos = cleaned_data.get("dias_corridos")
+        if (not dias_corridos or dias_corridos == 0) and (not horas or horas == 0) and (not minutos or minutos == 0):
+            msg = _(u"Deve haver ao menos um lançamento de duração da dispensa.")
+            self._errors["dias_corridos"] = self.error_class([msg])
+            self._errors["horas"] = self.error_class([msg])
+            self._errors["minutos"] = self.error_class([msg]) 
+        
+        return cleaned_data
+        
+        
     
     

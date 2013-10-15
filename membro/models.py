@@ -371,11 +371,15 @@ class DispensaLegal(models.Model):
     tipo = models.ForeignKey('membro.TipoDispensa', verbose_name=_('Tipo de dispensa'))
     justificativa = models.TextField()
     inicio_direito = NARADateField(_(u'Início do direito'))
-    dias_uteis = models.IntegerField(_(u'Duração em dias úteis'))
+    dias_uteis = models.IntegerField(_(u'Dias úteis.'), help_text='*mover para dias corridos', null=True, default=0)
     inicio_realizada = NARADateField(_(u'Início da realização da dispensa'), blank=True, null=True)
     realizada = models.BooleanField(_(u'Já realizada?'))
     atestado = models.BooleanField(_(u'Há atestado?'))
     arquivo = models.FileField(upload_to='dispensas/', null=True, blank=True)
+    
+    dias_corridos = models.IntegerField(_(u'Duração em dias corridos'), null=True, default=0)
+    horas = models.IntegerField(_(u'Horas'), null=True, default=0)
+    minutos = models.IntegerField(_(u'Minutos'), null=True, default=0)
 
     def __unicode__(self):
         return u"%s - %s" % (self.membro, self.justificativa)
@@ -387,33 +391,43 @@ class DispensaLegal(models.Model):
         Leva em conta os feriados.
         """
         soma_dias = 0
-        for x in range(self.dias_uteis):
-            d = self.inicio_realizada + timedelta(days=x)
+        
+        if self.realizada and self.inicio_realizada:
+        
+            if self.dias_corridos:
+                soma_dias += self.dias_corridos
+            if self.horas:
+                soma_dias += self.horas / 8.0
+            if self.minutos:
+                soma_dias += self.minutos / 60.0
             
-            # verifica se o dia é feriado
-            tem_feriado = Feriado.objects.filter(feriado=d).exists()
+            if self.dias_corridos >= 1:
+                return self.inicio_realizada + timedelta(soma_dias - 1)
             
-            # se for feriado ou final-de-semana, pula o dia
-            if tem_feriado or d.weekday() >= 5:
-                soma_dias = soma_dias + 2
-            else:
-                soma_dias = soma_dias + 1
-            
-        if soma_dias > 0:
-            return self.inicio_realizada + timedelta(soma_dias-1)
-        else:
-            return self.inicio_realizada
+        return self.inicio_realizada
+   
 
     def dia_dispensa(self, dia):
         is_dispensa = False
         horas_dispensa = 0
 
-        if dia >= self.inicio_realizada:
-            is_dispensa = (self.inicio_realizada <= dia and  dia <= self.termino_realizada) 
-        
-        if is_dispensa:
-            # **** ALTERAR PARA HORAS
-            horas_dispensa = 8
+        if self.realizada and self.inicio_realizada:
+    
+            is_dispensa = (self.inicio_realizada <= dia and  dia <= self.termino_realizada)
+            
+            if is_dispensa:
+                if self.termino_realizada == dia:
+                    if self.horas or self.minutos:
+                        if self.horas:
+                            horas_dispensa += self.horas % 8.0
+                        if self.minutos:
+                            horas_dispensa += (self.minutos % 60.0)/60
+                    elif self.dias_corridos:
+                        horas_dispensa = 8.0
+                elif dia < self.termino_realizada:
+                    horas_dispensa = 8.0
+                elif dia > self.termino_realizada:
+                    horas_dispensa = 0
                 
         return {'is_dispensa':is_dispensa, 'horas':horas_dispensa}
 
@@ -702,6 +716,7 @@ class Controle(models.Model):
                     if dia_dispensa['is_dispensa']:
                         d.is_dispensa = dia_dispensa['is_dispensa']
                         horas_dispensa = dia_dispensa['horas']
+                        d.obs = u'%s Dispensa %s' % (d.obs, dispensa.tipo.nome)
                         break;
 
                 # soma os dias de trabalho
