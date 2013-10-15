@@ -4,7 +4,7 @@
 <style>
     #container {
         margin: 0 auto;
-        width: 1920px;
+        width: 1680px;
     }
     #footer {
        width:inherit;
@@ -16,6 +16,10 @@
     }
     #tbl_consolidado th:nth-child(1) {
         border-right:1px black solid;
+    }
+    #tbl_consolidado th:nth-child(1) span {
+        width: 190px;
+        display: block;
     }
     #tbl_consolidado th:last-child,
     #tbl_consolidado td:last-child,
@@ -33,8 +37,8 @@
     #tbl_consolidado td:nth-child(2) {
         border-right:1px black solid;
     }
-    
-    #tbl_consolidado td {
+    /* deve quebar a coluna de titulos*/
+    #tbl_consolidado td:not(:nth-child(1)) {
         white-space:nowrap;
         border:1px gray dotted;
     }
@@ -48,9 +52,6 @@
         background-color:lightgray;
         border-bottom:1px black solid;
     }
-    .tbl_acordos td:nth-child(1) {
-        white-space:nowrap;
-    }
     .cons-dolar {
         display:block;
         border-top:1px darkgray dotted;
@@ -59,7 +60,7 @@
 <h1 repeat="1"></h1>
 
     <table id="tbl_consolidado" border="0" repeat="1" cellpadding="5">
-    <tr><th colspan="2"></th>
+    <tr><th colspan="2"><span>&nbsp;</span></th>
     {% for t in termos %}
        <th>Processo {{ t }}<br />{{ t.inicio|date:"d/m/Y" }}<br />a<br />{{ t.termino|date:"d/m/Y" }}</th>
     {% endfor %}
