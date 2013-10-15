@@ -2,8 +2,41 @@
 {% load proto_tags %}
 {% block content %}
 <style>
+    #container {
+        margin: 0 auto;
+        width: 1680px;
+    }
+    #footer {
+       width:inherit;
+    }
+
+    #tbl_consolidado th {
+        background-color:lightgray;
+        border-bottom:1px black solid;
+    }
+    #tbl_consolidado th:nth-child(1) {
+        border-right:1px black solid;
+    }
+    #tbl_consolidado th:last-child,
+    #tbl_consolidado td:last-child,
+    #tbl_consolidado td:nth-child(1),
+    #tbl_consolidado td:nth-child(2) {
+        font-weight:bold;
+    }
+    
+    #tbl_consolidado th:last-child,
+    #tbl_consolidado td:last-child {
+        border-left:1px black solid;
+    }
+    
+    #tbl_consolidado td:nth-child(1),
+    #tbl_consolidado td:nth-child(2) {
+        border-right:1px black solid;
+    }
+    
     #tbl_consolidado td {
         white-space:nowrap;
+        border:1px gray dotted;
     }
     #tbl_consolidado td:nth-child(4),
     #tbl_consolidado td:nth-child(5),
@@ -11,8 +44,16 @@
         white-space:nowrap;
     }
     
+    .tbl_acordos th {
+        background-color:lightgray;
+        border-bottom:1px black solid;
+    }
     .tbl_acordos td:nth-child(1) {
         white-space:nowrap;
+    }
+    .cons-dolar {
+        display:block;
+        border-top:1px darkgray dotted;
     }
 </style>
 <h1 repeat="1"></h1>
@@ -22,6 +63,7 @@
     {% for t in termos %}
        <th>Processo {{ t }}<br />{{ t.inicio|date:"d/m/Y" }}<br />a<br />{{ t.termino|date:"d/m/Y" }}</th>
     {% endfor %}
+    <th>Total</th>
     </tr>
     {% for a in acordos %}
     <tr>
@@ -29,10 +71,14 @@
        <td>Concedido<br />Realizado<br />Saldo</td>
        {% for t in a.termos %}
           <td>
-          {% if t.tem_real %}{{ t.concedido_real|moeda }}<br />{{ t.realizado_real|moeda }}<br />{{ t.saldo_real|moeda }}<br />{% endif %}
-          {% if t.tem_dolar %}{{ t.concedido_dolar|moeda:0 }}<br />{{ t.realizado_dolar|moeda:0 }}<br />{{ t.saldo_dolar|moeda:0 }}<br />{% endif %}
+          {% if t.tem_real %}{{ t.concedido_real|moeda }}<br />{{ t.realizado_real|moeda }}<br />{{ t.saldo_real|moeda }}<br />{% else %}<br /><br /><br />{% endif %}
+          {% if t.tem_dolar %}<span class="cons-dolar">{{ t.concedido_dolar|moeda:0 }}<br />{{ t.realizado_dolar|moeda:0 }}<br />{{ t.saldo_dolar|moeda:0 }}<br /></span>{% endif %}
           </td>
        {% endfor %}
+       <td>
+            {% if a.tem_real %}{{a.totalTermoRealizadoReal|moeda}}<br/>{{a.totalTermoConcedidoReal|moeda}}<br/>{{a.totalTermoSaldoReal|moeda}}<br/>{% else %}<br /><br /><br />{% endif %}
+            {% if a.tem_dolar %}<span class="cons-dolar">{{a.totalTermoRealizadoDolar|moeda:0}}<br/>{{a.totalTermoConcedidoDolar|moeda:0}}<br/>{{a.totalTermoSaldoDolar|moeda:0}}<br/></span>{% endif %}
+       </td>
     </tr>
     {% endfor %}
     </table>
@@ -54,9 +100,10 @@
                  <td>{{ item.item.descricao }}</td><td>{{ item.item.entidade }}</td>
                  {% if item.item.natureza_gasto.modalidade.moeda_nacional %}
                      <td>{{ item.concedido|moeda }}</td><td>{{ item.realizado|moeda }}</td><td>{{ item.saldo|moeda }}</td>
-		 {% else %}
-		     <td>{{ item.concedido|moeda:0 }}</td><td>{{ item.realizado|moeda:0 }}</td><td>{{ item.saldo|moeda:0 }}</td>
-		 {% endif %}</tr>
+                 {% else %}
+		             <td>{{ item.concedido|moeda:0 }}</td><td>{{ item.realizado|moeda:0 }}</td><td>{{ item.saldo|moeda:0 }}</td>
+		         {% endif %}
+		     </tr>
           {% endfor %}
        {% endfor %}
     </table>

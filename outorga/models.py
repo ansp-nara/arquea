@@ -2,6 +2,7 @@
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.utils.functional import cached_property
 from utils.functions import formata_moeda
 from utils.models import NARADateField
 from django.db.models import Q, Sum
@@ -326,7 +327,7 @@ class Termo(models.Model):
 
     
     # Retorna a soma das naturezas (moeda nacional) de um termo.
-    @ property
+    @property
     def real(self):
         total = Decimal('0.00')
         for ng in self.natureza_gasto_set.all():
@@ -345,7 +346,7 @@ class Termo(models.Model):
 
 
     # Retorna a soma das naturezas (dolar) de um termo.
-    @ property
+    @property
     def dolar(self):
         total = Decimal('0.00')
         for ng in self.natureza_gasto_set.all():
@@ -420,7 +421,7 @@ class Termo(models.Model):
 
 
     # Calcula total de despesas ($) realizadas durante o termo.
-    @ property
+    @property
     def total_realizado_dolar(self):
         total = Decimal('0.00')
 	for n in self.natureza_gasto_set.all():
@@ -441,7 +442,7 @@ class Termo(models.Model):
     formata_realizado_dolar.allow_tags = True
     formata_realizado_dolar.short_description=_(u'Realizado')
 
-
+    
     def saldo_real(self):
 	return self.real - self.total_realizado_real
 
@@ -1148,19 +1149,18 @@ class Item(models.Model):
     def calcula_realizado_mes(self, dt, after=False):
         total = Decimal('0.00')
         if hasattr(self, 'origemfapesp_set'):
-	    for of in self.origemfapesp_set.all():
-	        if after:
-		    if self.natureza_gasto.modalidade.moeda_nacional:
-   		        pgs = of.pagamento_set.filter(conta_corrente__data_oper__gte=dt)
-                    else:
-			pgs = of.pagamento_set.filter(protocolo__data_vencimento__gte=dt)
-		else:
+            for of in self.origemfapesp_set.all():
+                if after:
                     if self.natureza_gasto.modalidade.moeda_nacional:
-    		        pgs = of.pagamento_set.filter(conta_corrente__data_oper__month=dt.strftime('%m'), conta_corrente__data_oper__year=dt.strftime('%Y'))
+                        sumFapesp = of.pagamento_set.filter(conta_corrente__data_oper__gte=dt).aggregate(Sum('valor_fapesp'))
                     else:
-                        pgs = of.pagamento_set.filter(protocolo__data_vencimento__month=dt.strftime('%m'), protocolo__data_vencimento__year=dt.strftime('%Y'))
-		for fp in pgs:
-		       total += fp.valor_fapesp
+                        sumFapesp = of.pagamento_set.filter(protocolo__data_vencimento__gte=dt).aggregate(Sum('valor_fapesp'))
+                else:
+                    if self.natureza_gasto.modalidade.moeda_nacional:
+                        sumFapesp = of.pagamento_set.filter(conta_corrente__data_oper__month=dt.strftime('%m'), conta_corrente__data_oper__year=dt.strftime('%Y')).aggregate(Sum('valor_fapesp'))
+                    else:
+                        sumFapesp = of.pagamento_set.filter(protocolo__data_vencimento__month=dt.strftime('%m'), protocolo__data_vencimento__year=dt.strftime('%Y')).aggregate(Sum('valor_fapesp'))
+                total += sumFapesp['valor_fapesp__sum'] or Decimal('0.0')
         return total
 
     # Mostra o valor realizado acumulado formatado conforme a moeda da modalidade
