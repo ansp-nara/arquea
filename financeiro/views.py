@@ -219,103 +219,121 @@ def pagamentos_parciais(request, pdf=False):
 @login_required
 def relatorio_gerencial(request, pdf=False):
     if request.method == 'GET':
-	if request.GET.get('termo'):
-	    import locale
-	    locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
-	    id = int(request.GET.get('termo'))
-	    t = get_object_or_404(Termo,id=id)
-	    retorno = []
-	    meses = []
-	    totalizador = []
-	    ano = t.inicio.year                                                              
-	    afinal = (t.inicio+t.duracao()).year
-	    mes = t.inicio.month
-	    mfinal = (t.inicio+t.duracao()).month
+        if request.GET.get('termo'):
+            try:
+                import locale
+                locale.setlocale(locale.LC_ALL, 'pt_BR')
+            except Exception:
+                print ''
+                
+    	    id = int(request.GET.get('termo'))
+    	    t = get_object_or_404(Termo,id=id)
+            
+    	    retorno = []
+    	    meses = []
+    	    totalizador = []
+            
+    	    ano = t.inicio.year
+    	    afinal = (t.inicio+t.duracao()).year
+    	    mes = t.inicio.month
+    	    mfinal = (t.inicio+t.duracao()).month
+            
             ultimo = Pagamento.objects.filter(protocolo__termo=t).aggregate(ultimo=Max('conta_corrente__data_oper'))
             ultimo = ultimo['ultimo']
-	    while ano < afinal or (ano <= afinal and mes <= mfinal):
-		dt = datetime.date(ano,mes,1)
-		meses.append(dt.strftime('%B de %Y').decode('latin1'))
-		if ano == afinal and mes == mfinal:
-		    dt2 = datetime.date(ano+5,mes,1)
-		    total_real = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__termo=t,origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional=True, conta_corrente__data_oper__range=(dt,dt2)).aggregate(Sum('valor_fapesp'))
-		    total_dolar = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__termo=t,origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional=False, protocolo__data_vencimento__range=(dt,dt2)).aggregate(Sum('valor_fapesp'))
-		else:
-		    total_real = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__termo=t,origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional=True, conta_corrente__data_oper__year=ano,conta_corrente__data_oper__month=mes).aggregate(Sum('valor_fapesp'))
-		    total_dolar = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__termo=t,origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional=False, protocolo__data_vencimento__year=ano,protocolo__data_vencimento__month=mes).aggregate(Sum('valor_fapesp'))
-		totalizador.append({'ord':dt.strftime('%Y%m'), 'total_real':total_real['valor_fapesp__sum'] or Decimal('0.0'), 'total_dolar':total_dolar['valor_fapesp__sum'] or Decimal('0.0')})
-		mes += 1
-		if mes > 12:
-		  mes = 1
-		  ano += 1
-
-	    cr = Natureza_gasto.objects.filter(termo=t, modalidade__moeda_nacional=True).exclude(modalidade__sigla='REI').aggregate(Sum('valor_concedido'))
-	    cr = cr['valor_concedido__sum'] or Decimal('0.0')
+            
+            while ano < afinal or (ano <= afinal and mes <= mfinal):
+                dt = datetime.date(ano,mes,1)
+                meses.append(dt.strftime('%B de %Y').decode('latin1'))
+                if ano == afinal and mes == mfinal:
+        		    dt2 = datetime.date(ano+5,mes,1)
+        		    total_real = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__termo=t,origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional=True, conta_corrente__data_oper__range=(dt,dt2)).aggregate(Sum('valor_fapesp'))
+        		    total_dolar = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__termo=t,origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional=False, protocolo__data_vencimento__range=(dt,dt2)).aggregate(Sum('valor_fapesp'))
+                else:
+        		    total_real = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__termo=t,origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional=True, conta_corrente__data_oper__year=ano,conta_corrente__data_oper__month=mes).aggregate(Sum('valor_fapesp'))
+        		    total_dolar = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__termo=t,origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional=False, protocolo__data_vencimento__year=ano,protocolo__data_vencimento__month=mes).aggregate(Sum('valor_fapesp'))
+                
+                totalizador.append({'ord':dt.strftime('%Y%m'), 'total_real':total_real['valor_fapesp__sum'] or Decimal('0.0'), 'total_dolar':total_dolar['valor_fapesp__sum'] or Decimal('0.0')})
+                
+                mes += 1
+                if mes > 12:
+                    mes = 1
+                    ano += 1
+    
+    	    cr = Natureza_gasto.objects.filter(termo=t, modalidade__moeda_nacional=True).exclude(modalidade__sigla='REI').aggregate(Sum('valor_concedido'))
+    	    cr = cr['valor_concedido__sum'] or Decimal('0.0')
+            
             cd = Natureza_gasto.objects.filter(termo=t, modalidade__moeda_nacional=False).exclude(modalidade__sigla='REI').aggregate(Sum('valor_concedido'))
-	    cd = cd ['valor_concedido__sum'] or Decimal('0.0')
+            cd = cd ['valor_concedido__sum'] or Decimal('0.0')
+            
             gr = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__termo=t,origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional=True).aggregate(Sum('valor_fapesp'))
-	    gr = gr['valor_fapesp__sum']  or Decimal('0.0')
-	    gd = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__termo=t,origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional=False).aggregate(Sum('valor_fapesp'))
-	    gd = gd['valor_fapesp__sum']  or Decimal('0.0')
-	    gerais = {'concedido_real': cr, 'concedido_dolar': cd, 'gasto_real': gr, 'gasto_dolar': gd, 'saldo_real': cr-gr, 'saldo_dolar': cd-gd}
+            gr = gr['valor_fapesp__sum']  or Decimal('0.0')
+    	    
+            gd = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__termo=t,origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional=False).aggregate(Sum('valor_fapesp'))
+            gd = gd['valor_fapesp__sum']  or Decimal('0.0')
+            
+            gerais = {'concedido_real': cr, 'concedido_dolar': cd, 'gasto_real': gr, 'gasto_dolar': gd, 'saldo_real': cr-gr, 'saldo_dolar': cd-gd}
             treal = {}
-	    tdolar = {}
-	    for ng in Natureza_gasto.objects.filter(termo=t).exclude(modalidade__sigla='REI'):
-		separador = '.'
-		moeda = 'US$'
-		if ng.modalidade.moeda_nacional: 
-		  separador = ','
-		  moeda = 'R$'
-		item = {'modalidade':ng.modalidade, 'concedido':ng.v_concedido(), 'realizado':ng.formata_total_realizado(), 'saldo':ng.saldo(), 'meses':[], 'itens':{}}
-		for it in ng.item_set.all():
-		    item['itens'].update({it:[]})
-		ano = t.inicio.year                                                              
-		afinal = (t.inicio+t.duracao()).year
-		mes = t.inicio.month
-		mfinal = (t.inicio+t.duracao()).month
-		while ano < afinal or (ano <= afinal and mes <= mfinal):
-		    total = Decimal('0.0')
-		
-                    if moeda == 'R$':	 
-    		        for p in Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto=ng, conta_corrente__data_oper__year=ano, conta_corrente__data_oper__month=mes):
-		            total += p.valor_fapesp
-		    else:
-                        for p in Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto=ng, protocolo__data_vencimento__year=ano, protocolo__data_vencimento__month=mes):
-                            total += p.valor_fapesp
-   
+            tdolar = {}
+            
+            for ng in Natureza_gasto.objects.filter(termo=t).exclude(modalidade__sigla='REI').select_related('modalidade__moeda_nacional'):
+                separador = '.'
+                moeda = 'US$'
+                if ng.modalidade.moeda_nacional: 
+    		        separador = ','
+    		        moeda = 'R$'
+
+                item = {'modalidade':ng.modalidade, 'concedido':ng.v_concedido(), 'realizado':ng.formata_total_realizado(), 'saldo':ng.saldo(), 'meses':[], 'itens':{}}
+                for it in ng.item_set.all():
+                    item['itens'].update({it:[]})
+
+                ano = t.inicio.year
+                afinal = (t.inicio+t.duracao()).year
+                mes = t.inicio.month
+                mfinal = (t.inicio+t.duracao()).month
+                
+                while ano < afinal or (ano <= afinal and mes <= mfinal):
+                    total = Decimal('0.0')
+
+                    if moeda == 'R$':
+                        sumFapesp = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto=ng, conta_corrente__data_oper__year=ano, conta_corrente__data_oper__month=mes).aggregate(Sum('valor_fapesp'))
+                        total += sumFapesp['valor_fapesp__sum'] or Decimal('0.0')
+                    else:
+                        sumFapesp = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto=ng, protocolo__data_vencimento__year=ano, protocolo__data_vencimento__month=mes).aggregate(Sum('valor_fapesp'))
+                        total += sumFapesp['valor_fapesp__sum'] or Decimal('0.0')
+           
                     try:
-		        dt = datetime.date(ano,mes+1,1)
-		    except:
-		        dt = datetime.date(ano+1, 1,1)
-		    dt2 = datetime.date(ano+5,1,1)
-	            if ano == afinal and mes == mfinal:
+		                dt = datetime.date(ano,mes+1,1)
+                    except:
+		                dt = datetime.date(ano+1, 1,1)
+                    dt2 = datetime.date(ano+5,1,1)
+                    if ano == afinal and mes == mfinal:
                         if moeda == 'R$':
-                            for p in Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto=ng, conta_corrente__data_oper__range=(dt,dt2)):
-                                total += p.valor_fapesp
+                            sumFapesp = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto=ng, conta_corrente__data_oper__range=(dt,dt2)).aggregate(Sum('valor_fapesp'))
+                            total += sumFapesp['valor_fapesp__sum'] or Decimal('0.0')
                         else:
-                            for p in Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto=ng, protocolo__data_vencimento__range=(dt,dt2)):
-                                total += p.valor_fapesp
+                            sumFapesp = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto=ng, protocolo__data_vencimento__range=(dt,dt2)).aggregate(Sum('valor_fapesp'))
+                            total += sumFapesp['valor_fapesp__sum'] or Decimal('0.0')
+                    dt = datetime.date(ano,mes,1)
+                    item['meses'].append({'ord':dt.strftime('%Y%m'), 'data':dt.strftime('%B de %Y'),'valor':'%s %s' % (moeda, formata_moeda(total,separador))})
+                    for it in item['itens'].keys():
+                        after = False
+                        if ano == afinal and mes == mfinal: after = True
 
-		    dt = datetime.date(ano,mes,1)
-		    item['meses'].append({'ord':dt.strftime('%Y%m'), 'data':dt.strftime('%B de %Y'),'valor':'%s %s' % (moeda, formata_moeda(total,separador))})
-		    for it in item['itens'].keys():
-		        after = False
-		        if ano == afinal and mes == mfinal: after = True
-			total = it.calcula_realizado_mes(dt, after)
-			item['itens'][it].append({'ord':dt.strftime('%Y%m'), 'valor': '%s %s' % (moeda, formata_moeda(total,separador))})
-		    mes += 1
-		    if mes > 12:
-			mes = 1
-			ano += 1
+                        total = it.calcula_realizado_mes(dt, after)
+                        item['itens'][it].append({'ord':dt.strftime('%Y%m'), 'valor': '%s %s' % (moeda, formata_moeda(total,separador))})
+                    mes += 1
+                    if mes > 12:
+                        mes = 1
+                        ano += 1
 
-		retorno.append(item)
-
+                retorno.append(item)
+    
             if pdf:
-	        return render_to_pdf('financeiro/gerencial.pdf', {'atualizado':ultimo, 'termo':t, 'meses':meses, 'modalidades':retorno, 'totais':totalizador, 'gerais':gerais}, context_instance=RequestContext(request))
+	            return render_to_pdf('financeiro/gerencial.pdf', {'atualizado':ultimo, 'termo':t, 'meses':meses, 'modalidades':retorno, 'totais':totalizador, 'gerais':gerais}, context_instance=RequestContext(request))
             else:
                 return render_to_response('financeiro/gerencial.html', {'atualizado':ultimo, 'termo':t, 'meses':meses, 'modalidades':retorno, 'totais':totalizador, 'gerais':gerais}, context_instance=RequestContext(request))
-	else:
-	   return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all()}, context_instance=RequestContext(request))
+        else:
+            return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all()}, context_instance=RequestContext(request))
 
 @login_required
 def relatorio_acordos(request, pdf=False):
