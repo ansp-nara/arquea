@@ -19,36 +19,56 @@
 		left: -2.3cm;
                 } 
 } 
+    th {
+        background-color:lightgray;
+    }
+    td {
+        white-space:nowrap;
+        font-size:5pt;
+    }
 </style> 
 </head>
 <body>
 <h1 repeat="1">Relatório gerencial do processo {{ termo }}, atualizado em {{ atualizado|date:"d/m/Y" }}</h1>
 
     <table border="1" repeat="1" cellpadding="5">
-    <tr><th>Modalidade</th><th>Concessão</th>
-    {% for m in meses %}
-      <th>{{ m }}</th>
-    {% endfor %}
-    <th>Total realizado</th><th>Saldo</th></tr>
-    {% for m in modalidades %}
-	<tr><td class="peq">{{ m.modalidade }}</td><td class="num peq">{{ m.concedido }}</td>
-	{% for v in m.meses|dictsort:"ord" %}
-	  <td>{{ v.valor }}</td>
-	{% endfor %}
-        <td>{{ m.realizado|safe }}</td><td>{{ m.saldo|safe }}</td></tr>
-    {% endfor %}
-    <tr><td>Total (R$)</td><td>{{ gerais.concedido_real|moeda }}</td>
-    {% for t in totais|dictsort:"ord" %}
-        <td>{{ t.total_real|moeda }}</td>
-    {% endfor %}
-    <td>{{ gerais.gasto_real|moeda }}</td><td>{{ gerais.saldo_real|moeda }}<td>
-    </tr>
-    <tr><td>Total (US$)</td><td>{{ gerais.concedido_dolar|moeda:0 }}</td>
-    {% for t in totais|dictsort:"ord" %}
-        <td>{{ t.total_dolar|moeda:0 }}</td>
-    {% endfor %}
-    <td>{{ gerais.gasto_dolar|moeda:0 }}</td><td>{{ gerais.saldo_dolar|moeda:0 }}<td>
-    </tr>
+        <tr>
+            <th>Modalidade</th><th>Concessão</th>
+            {% for m in meses %}
+              <th>{{ m }}</th>
+            {% endfor %}
+            <th>Total realizado</th>
+            <th>Saldo</th>
+        </tr>
+        {% for m in modalidades %}
+    	   <tr>
+    	   <td class="peq"><span>{{ m.modalidade }}</span></td>
+    	   <td class="num peq"><span>{{ m.concedido }}</span></td>
+           {% for v in m.meses|dictsort:"ord" %}
+        	  <td><span>{{ v.valor }}</span></td>
+           {% endfor %}
+           <td><span>{{ m.realizado|safe }}</span></td>
+           <td><span>{{ m.saldo|safe }}</span></td>
+           </tr>
+        {% endfor %}
+        <tr>
+            <td>Total (R$)</td>
+            <td><span>{{ gerais.concedido_real|moeda }}</span></td>
+            {% for t in totais|dictsort:"ord" %}
+                <td><span>{{ t.total_real|moeda }}</span></td>
+            {% endfor %}
+            <td><span>{{ gerais.gasto_real|moeda }}</span></td>
+            <td><span>{{ gerais.saldo_real|moeda }}</span></td>
+        </tr>
+        <tr>
+            <td><span>Total (US$)</span></td>
+            <td><span>{{ gerais.concedido_dolar|moeda:0 }}</span></td>
+            {% for t in totais|dictsort:"ord" %}
+                <td><span>{{ t.total_dolar|moeda:0 }}</span></td>
+            {% endfor %}
+            <td><span>{{ gerais.gasto_dolar|moeda:0 }}</span></td>
+            <td><span>{{ gerais.saldo_dolar|moeda:0 }}</span></td>
+        </tr>
     </table>
 
 {% for m in modalidades %}
