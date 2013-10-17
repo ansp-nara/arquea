@@ -8,7 +8,10 @@ from utils.models import NARADateField
 from django.db.models import Q, Sum
 from decimal import Decimal
 import datetime
-#import copy
+import logging
+
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
 
 
 # Retorna o caminho para onde o arquivo será feito upload.
@@ -1134,13 +1137,10 @@ class Item(models.Model):
        
         total = Decimal('0.00')
         if hasattr(self, 'origemfapesp_set'):
-	    for of in self.origemfapesp_set.all():
-    		for fp in of.pagamento_set.all():
-		    #if fp.extrato:
-		       total += fp.valor_fapesp
+            for of in self.origemfapesp_set.all():
+                sumFapesp = of.pagamento_set.all().aggregate(Sum('valor_fapesp'))
+                total += sumFapesp['valor_fapesp__sum'] or Decimal('0.0')
         return total
-
-
     # Define um atributo com o valor total realizado
     valor_realizado_acumulado = property(calcula_total_despesas)
 

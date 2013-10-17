@@ -7,6 +7,12 @@ from django.utils.safestring import mark_safe
 from decimal import Decimal
 from django.shortcuts import get_object_or_404
 from membro.models import Membro
+import math
+import logging
+
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
+
 
 register = Library()
 
@@ -106,8 +112,15 @@ def lista_relatorios():
             }
 
 
+@register.filter(name='moeda_valor')
+def moeda_valor(value, nac=1):
+    """
+    Novo metodo para formatar o valor em moeda, mas remover o prefixo da moeda (ex: R$)
+    """
+    return moeda(value, nac, True)
+    
 @register.filter(name='moeda')
-def moeda(value, nac=1):
+def moeda(value, nac=1, nosep=False):
     if nac:
         sep = ','
     else:
@@ -120,9 +133,9 @@ def moeda(value, nac=1):
 
     i, d = str(value).split('.')
     if len(d) > 2: d = d[:2]
-    s = '%s %s'
+    s = '%s'
     if i[0] == '-':
-       s = '%s (%s)'
+       s = '(%s)'
        i = i[1:len(i)]
 
     res = []
@@ -140,7 +153,14 @@ def moeda(value, nac=1):
 	m = 'US$'
     res.reverse()
     i = si.join(res)
-    return s % (m, sep.join((i,d)))
+    
+    if nosep:
+        return s % (sep.join((i,d)))
+    else:
+        s = '%s ' + s
+        return s % (m, sep.join((i,d)))
+    
+    
 
 @register.inclusion_tag('membro/controle.html')
 def controle_horario(user):
