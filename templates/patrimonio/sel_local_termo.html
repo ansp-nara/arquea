@@ -1,0 +1,38 @@
+{% extends "admin/base_site.html" %}
+{% block extrahead %}
+<script type="text/javascript" src="/media/js/selects.js"></script>
+{% endblock %}
+{% block content %}
+<form method="GET">
+<label for="id_entidade">Entidade</label>:
+<select name="entidade" id="id_entidade" onchange="ajax_filter_enderecos(this.id);">
+     <option value="">----</option>
+  {% for e in entidades %}
+     <option value="{{ e.entidade.id }}">{{ e.entidade }}</option>
+      {% for e1 in e.filhas %}
+         <option value="{{ e1.entidade.id }}">&nbsp;&nbsp;&nbsp;&nbsp;{{ e1.entidade }}</option>
+            {% for e2 in e1.filhas %}
+                 <option value="{{ e2.entidade.id }}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ e2.entidade }}</option>
+            {% endfor %}
+      {% endfor %}
+      
+  {% endfor %}
+</select>
+<br />
+</span>
+<label for="id_endereco">Endereço</label>:
+<select name="endereco" id="id_endereco" onchange="ajax_filter_locais();">
+     <option value="">----</option>
+</select>
+<br />
+<label for="id_detalhe">Localização</label>:
+<select name="detalhe" id="id_detalhe">
+     <option value="">----</option>
+</select>
+<br />
+<label for="com_fmusp">Exibir somente com N. FMUSP</label>
+<input type="checkbox" name="com_fmusp">
+<br />
+<input type="submit" value="Enviar">
+</form>
+{% endblock %}

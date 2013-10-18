@@ -275,6 +275,9 @@ def por_local_termo(request, pdf=0):
            detalhe_id = request.GET.get('detalhe')
            
         endereco_id = request.GET.get('endereco')
+        filtro_com_fmusp = request.GET.get('com_fmusp') or False
+
+        
         
         if detalhe_id:
             detalhe = get_object_or_404(EnderecoDetalhe, pk=detalhe_id)
@@ -289,17 +292,19 @@ def por_local_termo(request, pdf=0):
             historicos = HistoricoLocal.objects.filter(id__in=atuais, endereco__in=detalhes)
             
             ps = Patrimonio.objects.filter(historicolocal__in=historicos)
+            if filtro_com_fmusp:
+                ps = ps.filter(numero_fmusp__isnull=False)
             
             endereco = get_object_or_404(Endereco, pk=endereco_id)
             enderecos = []
-            enderecos.append({'endereco':endereco, 'end':endereco_id, 'detalhes':[{'detalhe':detalhe, 'det':detalhe_id, 'patrimonio':iterate_patrimonio(ps)}]})
+            enderecos.append({'endereco':endereco, 'end':endereco_id, 'detalhes':[{'detalhe':detalhe, 'det':detalhe_id, 'patrimonio':iterate_patrimonio(ps, 0, filtro_com_fmusp)}]})
             context = {'detalhe':detalhe, 'det':detalhe_id, 'enderecos': enderecos}
             
         elif endereco_id and endereco_id != "":
             endereco_id = request.GET.get('endereco')
             
             enderecos = []
-            endereco = find_endereco(atuais, endereco_id)
+            endereco = find_endereco(atuais, endereco_id, filtro_com_fmusp)
             enderecos.append(endereco)
             context = {'enderecos': enderecos}
             
@@ -315,7 +320,7 @@ def por_local_termo(request, pdf=0):
                 entidade  = Entidade.objects.filter(pk=entidade_id) | Entidade.objects.filter(entidade=entidade_id)
             enderecos = []
             for endereco in Endereco.objects.filter(entidade__in=entidade):    
-                endereco = find_endereco(atuais, endereco.id)
+                endereco = find_endereco(atuais, endereco.id, filtro_com_fmusp)
                 if endereco:
                     enderecos.append(endereco)
             context = {'entidade': entidade, 'ent':entidade_id, 'enderecos': enderecos}
@@ -327,7 +332,7 @@ def por_local_termo(request, pdf=0):
     else:
         # Cria a lista para o SELECT de filtro de Entidades, buscando as Entidades que possuem EnderecoDetalhe
         entidades = find_entidades_filhas(None)
-        return render_to_response('patrimonio/sel_local.html', {'entidades':entidades}, context_instance=RequestContext(request))
+        return render_to_response('patrimonio/sel_local_termo.html', {'entidades':entidades}, context_instance=RequestContext(request))
 
 # Usado para criar o filtro de entidades.
 # Caso o parametro seja None, busca todas as entidades de primeiro nível, seguidas pela busca de todas as entidades abaixo.
@@ -351,7 +356,7 @@ def find_entidades_filhas(entidade_id):
 
 # Usado no disparo da view por_local_termo
 # Busca patrimonios de um endereco
-def find_endereco(atuais, endereco_id):
+def find_endereco(atuais, endereco_id, filtro_com_fmusp=False):
     endereco = get_object_or_404(Endereco, pk=endereco_id)
     historicos = HistoricoLocal.objects.filter(id__in=atuais, endereco__endereco=endereco)
     detalhes = []
@@ -359,14 +364,16 @@ def find_endereco(atuais, endereco_id):
     enderecoDetalhes = EnderecoDetalhe.objects.filter(id__in=detalhes_ids)
     for d in enderecoDetalhes:
         ps = Patrimonio.objects.filter(historicolocal__in=historicos.filter(endereco=d))
-        detalhes.append({'detalhe':d, 'patrimonio':iterate_patrimonio(ps)})
+        if filtro_com_fmusp:
+            ps = ps.filter(numero_fmusp__isnull=False)
+        detalhes.append({'detalhe':d, 'patrimonio':iterate_patrimonio(ps, 0, filtro_com_fmusp)})
     
     context = None
     if len(detalhes) > 0:
         context = {'endereco':endereco, 'end':endereco_id, 'detalhes':detalhes}
     return context
         
-def iterate_patrimonio(p_pts, nivel=0):
+def iterate_patrimonio(p_pts, nivel=0, filtro_com_fmusp=False):
     if nivel == 4 or len(p_pts) == 0:
         return
     
@@ -374,7 +381,12 @@ def iterate_patrimonio(p_pts, nivel=0):
     pts = p_pts.select_related('pagamento__protocolo'
                 ).order_by('-pagamento__protocolo__termo', '-numero_fmusp', 'historicolocal__posicao',
                 )
+                
+    logger.debug('filtro_com_fmusp %s', filtro_com_fmusp)
+    if filtro_com_fmusp:
+        pts = pts.filter(numero_fmusp__isnull=False)
     
+            
     for p in pts:
         patrimonio = {}
         patrimonio.update({'id':p.id, 'termo':'', 'fmusp':p.numero_fmusp, 'num_documento':'',
@@ -389,7 +401,7 @@ def iterate_patrimonio(p_pts, nivel=0):
             patrimonio.update({'posicao': p.historico_atual.posicao})
             
         
-        contido = iterate_patrimonio(p.contido.all(), nivel+1)
+        contido = iterate_patrimonio(p.contido.all(), nivel+1, filtro_com_fmusp)
         patrimonio.update({'contido': contido})
         patrimonios.append(patrimonio)
     return patrimonios
