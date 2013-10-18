@@ -2,26 +2,24 @@
 
 # Create your views here.
 
+from django.contrib import admin
+from django.contrib.auth.decorators import permission_required, login_required
+from django.core.urlresolvers import reverse
+from django.db.models import Max, Q
+from django.db.models import Q
+from django.http import Http404, HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404
+from django.template import RequestContext
+from django.template.response import TemplateResponse
+from django.utils import simplejson
+from utils.functions import render_to_pdf, render_wk_to_pdf
+import itertools
+
+from models import *
+from identificacao.models import Entidade, EnderecoDetalhe, Endereco
 from outorga.models import Termo, Modalidade, Natureza_gasto, Item
 from protocolo.models import Protocolo, ItemProtocolo
 from financeiro.models import Pagamento
-from django.core.exceptions import PermissionDenied
-from django.contrib.auth.models import Group
-from django.contrib import admin
-from django.http import Http404, HttpResponse
-from utils.functions import render_to_pdf, render_wk_to_pdf
-from django.utils import simplejson
-#from models import FontePagadora, AuditoriaInterna, AuditoriaFapesp
-#from decimal import Decimal
-from django.db.models import Max, Q
-from identificacao.models import Entidade, EnderecoDetalhe, Endereco
-from models import *
-from django.template import RequestContext
-from django.contrib.auth.decorators import permission_required, login_required
-from django.template.response import TemplateResponse
-from django.db.models import Q
-import itertools
 import logging
 
 # Get an instance of a logger
@@ -856,13 +854,31 @@ def abre_arvore_tipo(request):
                 patrimonios.sort(key=lambda x:x.historico_atual.endereco.end.entidade.sigla)
             except:
 		pass
-            for p in patrimonios:
-                ha = p.historico_atual
-		ret.append({'data':'<div><div class="col1"></div><div class="col2"><div class="medio">%s</div><div class="maior">%s</div><div class="menor">%s</div><div class="medio">%s</div><div class="medio">%s</div><div class="medio">%s</div><div class="medio">%s</div><div class="menor">%s</div></div><div style="clear:both;"></div></div>' % (ha.endereco.end.entidade if ha else 'ND' , ha.endereco.complemento if ha else 'ND', ha.posicao if ha and ha.posicao else 'ND', p.equipamento.marca, p.equipamento.modelo, p.equipamento.part_number, p.ns, ha.estado if ha else 'ND'), 'attr':{'style':'padding-top:4px;'}})
+
+            if patrimonios and len(patrimonios):
+                retPatrimonio = u'<div><div class="col1"></div><div class="col2">'
+                retPatrimonio += u'<table><tr class="col2"><th class="th_1"><div>Entidade</div></th><th class="th_2"><div>Local</div></th>'
+                retPatrimonio += u'<th class="th_3"><div>Posição</div></th><th class="th_4"><div>Marca</div></th>'
+                retPatrimonio += u'<th class="th_5"><div>Modelo</div></th><th class="th_6"><div>Part number</div></th>'
+                retPatrimonio += u'<th class="th_7"><div>NS</div></th><th class="th_8"><div>Estado</div></th></tr>' 
+                for p in patrimonios:
+                    ha = p.historico_atual
+                    pUrl = reverse('admin:patrimonio_patrimonio_change', args=(p.id,))
+                    r = u'<tr class=""><td class="td_1"><div><a href="%s" target="_blank">%s</a></div></td>' % (pUrl, ha.endereco.end.entidade if ha else 'ND') 
+                    r += u'<td class="td_2"><a href="%s" target="_blank"><div>%s</a></div></td>' % (pUrl, ha.endereco.complemento if ha else 'ND')
+                    r += u'<td class="td_3"><a href="%s" target="_blank"><div>%s</a></div></td>' % (pUrl, ha.posicao if ha and ha.posicao else 'ND')
+                    r += u'<td class="td_4"><a href="%s" target="_blank"><div>%s</a></div></td>' % (pUrl, p.equipamento.marca)
+                    r += u'<td class="td_5"><a href="%s" target="_blank"><div>%s</a></div></td>' % (pUrl, p.equipamento.modelo)
+                    r += u'<td class="td_6"><a href="%s" target="_blank"><div>%s</a></div></td>' % (pUrl, p.equipamento.part_number)
+                    r += u'<td class="td_7"><a href="%s" target="_blank"><div>%s</a></div></td>' % (pUrl, p.ns)
+                    r += u'<td class="td_8"><a href="%s" target="_blank"><div>%s</a></div></td>' % (pUrl, ha.estado if ha else 'ND')
+                    retPatrimonio = '%s %s' % (retPatrimonio, r) 
+                retPatrimonio += '</table></div><div style="clear:both;"></div></div>'
+                ret.append({'data':retPatrimonio, 'attr':{'style':'padding-top:4px; height:%spx'%((1 + len(patrimonios)) * 20)}})
     else:
         for tp in TipoEquipamento.objects.all():
             #ret.append({'data':'%s <a onclick="$(\'#blocos\').jstree(\'open_all\', \'#%s-%s\')" style="color:#0000aa;">Abrir tudo</a>' % (tp.__unicode__(), tp._meta.module_name, tp.id), 'attr':{'id':'%s-%s'% (tp._meta.module_name, tp.id), 'style':'padding-top:6px;', 'o_id':tp.id, 'o_model': tp._meta.module_name}})
-            ret.append({'data':'%s <a onclick="abre_fecha(\'%s-%s\', \'blocos\')" id="a-%s-%s" style="color:#0000aa;">Abrir tudo</a>' % (tp.__unicode__(), tp._meta.module_name, tp.id, tp._meta.module_name, tp.id), 'attr':{'id':'%s-%s'% (tp._meta.module_name, tp.id), 'style':'padding-top:6px;', 'o_id':tp.id, 'o_model': tp._meta.module_name}})
+            ret.append({'data':'%s <a onclick="abre_fecha(\'%s-%s\', \'blocos\'); return false;" id="a-%s-%s" style="color:#0000aa;">Abrir tudo</a>' % (tp.__unicode__(), tp._meta.module_name, tp.id, tp._meta.module_name, tp.id), 'attr':{'id':'%s-%s'% (tp._meta.module_name, tp.id), 'style':'padding-top:6px;', 'o_id':tp.id, 'o_model': tp._meta.module_name}})
 
 
 
