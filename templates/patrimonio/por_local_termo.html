@@ -1,6 +1,8 @@
 {% extends "admin/base_site.html" %}
 {% load proto_tags %}
+{% load i18n admin_modify admin_static %}
 {% block content %}
+<link rel="stylesheet" type="text/css" href="{% static "css/base-print.css" %}" />
 <style>
  .patr a:link,
  .patr a:visited,
@@ -59,6 +61,7 @@
     white-space:nowrap;
  }
 </style>
+
 <h1 repeat="1">Inventário por local</h1>
 <h4><a href="{% url 'patrimonio.views.por_local_termo' 1 %}?entidade={{request.GET.entidade}}&endereco={{request.GET.endereco}}&detalhe={{request.GET.detalhe}}">Imprimir</a></h4>
 
