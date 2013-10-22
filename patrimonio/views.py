@@ -243,9 +243,12 @@ def por_local(request, pdf=0):
             endereco_id = request.GET.get('endereco')
             endereco = get_object_or_404(Endereco, pk=endereco_id)
 
-            historicos = HistoricoLocal.objects.filter(id__in=atuais, endereco__endereco=endereco)
+            historicos = HistoricoLocal.objects.filter(id__in=atuais, endereco__endereco=endereco
+                                           ) | HistoricoLocal.objects.filter(id__in=atuais, endereco__detalhe__endereco=endereco
+                                           ) | HistoricoLocal.objects.filter(id__in=atuais, endereco__detalhe__detalhe__endereco=endereco)
+            
             detalhes = []
-            detalhes_ids = historicos.values_list('endereco', flat=True).filter(endereco__endereco=endereco)
+            detalhes_ids = historicos.values_list('endereco', flat=True)
             for d in EnderecoDetalhe.objects.filter(id__in=detalhes_ids):
                 detalhes.append({'detalhe':d, 'patrimonio':Patrimonio.objects.filter(historicolocal__in=historicos.filter(endereco=d)).order_by('descricao', 'complemento')})
             context = {'endereco':endereco, 'end':endereco_id, 'detalhes':detalhes}
@@ -358,9 +361,14 @@ def find_entidades_filhas(entidade_id):
 # Busca patrimonios de um endereco
 def find_endereco(atuais, endereco_id, filtro_com_fmusp=False):
     endereco = get_object_or_404(Endereco, pk=endereco_id)
-    historicos = HistoricoLocal.objects.filter(id__in=atuais, endereco__endereco=endereco)
+
+    # busca os historicos de localizacao de patrimonio baseado no endereco
+    # busca os que estiverem no endereço, ou localidades abaixo deste endereco
+    historicos = HistoricoLocal.objects.filter(id__in=atuais, endereco__endereco=endereco
+                                               ) | HistoricoLocal.objects.filter(id__in=atuais, endereco__detalhe__endereco=endereco
+                                               ) | HistoricoLocal.objects.filter(id__in=atuais, endereco__detalhe__detalhe__endereco=endereco)
     detalhes = []
-    detalhes_ids = historicos.values_list('endereco', flat=True).filter(endereco__endereco=endereco)
+    detalhes_ids = historicos.values_list('endereco', flat=True)
     enderecoDetalhes = EnderecoDetalhe.objects.filter(id__in=detalhes_ids)
     for d in enderecoDetalhes:
         ps = Patrimonio.objects.filter(historicolocal__in=historicos.filter(endereco=d))
