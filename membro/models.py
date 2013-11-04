@@ -151,6 +151,10 @@ class Membro(models.Model):
     def ativo(self):
         return Historico.ativos.filter(membro=self).count() > 0
 
+    @cached_property
+    def data_inicio(self):
+        return Historico.objects.filter(membro=self).order_by('inicio').values_list('inicio')[0][0]
+    
     # Define a ordenação e unicidade dos dados.
     class Meta:
         ordering = ('nome', )
@@ -678,7 +682,7 @@ class Controle(models.Model):
 #                 dias.append(itemControle)
                 dias.insert(0, itemControle)
                     
-        total_banco_horas = 0;
+        total_banco_horas = 0
         feriado = Feriado()
         ferias = ControleFerias.objects.filter(ferias__membro = self.membro_id)
         dispensas = DispensaLegal.objects.filter(membro = self.membro_id)
@@ -689,7 +693,6 @@ class Controle(models.Model):
             soma_dias_de_trabalho = 0
             # total de horas de dispensas
             total_horas_dispensa = 0
-            
             # total de horas de ferias
             total_horas_ferias = 0
             
@@ -706,10 +709,10 @@ class Controle(models.Model):
                     d.is_ferias = data_ferias.dia_ferias(d.dia)
                     if d.is_ferias:
                         d.obs = u'%s Férias' % d.obs
-                        break;
+                        break
                 
                 # é final de semana?
-                d.is_final_de_semana = d.dia.weekday() >= 5;
+                d.is_final_de_semana = d.dia.weekday() >= 5
                 if d.is_final_de_semana:
                     if d.dia.weekday() == 5:
                         d.obs = u'%s Sábado' % d.obs
@@ -732,7 +735,7 @@ class Controle(models.Model):
                         d.is_dispensa = dia_dispensa['is_dispensa']
                         horas_dispensa = dia_dispensa['horas']
                         d.obs = u'%s Dispensa %s' % (d.obs, dispensa.tipo.nome)
-                        break;
+                        break
 
                 # soma os dias de trabalho
                 if not d.is_final_de_semana and not d.is_feriado:
@@ -745,11 +748,15 @@ class Controle(models.Model):
                         total_horas_ferias += 28800
             
             m.update({'total':total_segundos_trabalhos_mes})
-            # as horas totais do período são as horas do total de dias do mes menos os finais de semana, ferias e dispensas
-            total_horas_periodo = self.total_horas_uteis(mes_corrente_ini, mes_corrente_fim)
+            if self.membro.data_inicio > mes_corrente_ini:
+                # Leva em conta a data de admissão do membro para a contagem das horas úteis do período
+                total_horas_periodo = self.total_horas_uteis(self.membro.data_inicio, mes_corrente_fim)
+            else:
+                # as horas totais do período são as horas do total de dias do mes menos os finais de semana, ferias e dispensas
+                total_horas_periodo = self.total_horas_uteis(mes_corrente_ini, mes_corrente_fim)
             m.update({'total_horas_periodo':total_horas_periodo})
             
-            total_horas_restante = total_horas_periodo -total_horas_dispensa -total_horas_ferias - total_segundos_trabalhos_mes;
+            total_horas_restante = total_horas_periodo -total_horas_dispensa -total_horas_ferias - total_segundos_trabalhos_mes
              
             m.update({'total_horas_restante':total_horas_restante})
             m.update({'total_horas_dispensa':total_horas_dispensa})
@@ -772,7 +779,7 @@ class Controle(models.Model):
         feriado = Feriado()
         while d < data_fim:
              # é final de semana?
-             is_final_de_semana = d.weekday() >= 5;
+             is_final_de_semana = d.weekday() >= 5
                
              # é feriado?
              is_feriado = feriado.dia_de_feriado(d)
