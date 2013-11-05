@@ -77,10 +77,12 @@ class OutorgaInline(admin.StackedInline):
 class OrigemFapespInline(admin.TabularInline):
     model = OrigemFapesp
     extra = 2
-    fields = ('termo', 'item_outorga')
-    readonly_fields = ('termo',)
     ordering = ('item_outorga__natureza_gasto__termo', 'item_outorga__descricao')
     form = OrigemFapespForm
+
+class OrigemFapespInlineA(OrigemFapespInline):
+    fields = ('termo', 'item_outorga')
+    readonly_fields = ('termo',)
 
 class OrdemDeServicoInline(admin.StackedInline):
 
@@ -109,7 +111,7 @@ class AcordoAdmin(admin.ModelAdmin):
     list_display = ('descricao', 'estado', )
     search_fields = ('descricao', 'estado_nome', )
     list_per_page = 10
-    inlines = [OrigemFapespInline]
+    inlines = [OrigemFapespInlineA]
 
 admin.site.register(Acordo,AcordoAdmin)
 
