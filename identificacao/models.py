@@ -342,7 +342,7 @@ class ArquivoEntidade(models.Model):
         ordering = ('tipo', '-data')
 
 class TipoEntidade(models.Model):
-    nome = models.CharField(max_length=20)
+    nome = models.CharField(max_length=100)
     
     def __unicode__(self):
 	return self.nome
