@@ -315,26 +315,11 @@ class Ferias(models.Model):
             
             flagPrimeiroControle = False
             for c in controles:
-                # Quando for o primeiro controle de férias (oficial ou não)
-                # Que tenha lançamento de dias (ou seja, não conta os lançamentos de venda de férias)
-                # Faz a soma dos dias úteis em aberto 
-                if (not flagPrimeiroControle) and ((c.dias_uteis_aberto and c.dias_uteis_aberto > 0) or (c.dias_uteis_fato and c.dias_uteis_fato > 0)):
-                    flagPrimeiroControle = True
-                    if c.dias_uteis_aberto and c.dias_uteis_aberto > 0:
-                        total_dias_uteis_aberto = total_dias_uteis_aberto + c.dias_uteis_aberto
-                else:
-                    # Depois do primeiro controle de férias
-                    # Faz a soma dos dias em aberto, e remove os dias úteis já tirados de férias
+                if c.dias_uteis_aberto and c.dias_uteis_aberto > 0:
+                    total_dias_uteis_aberto = total_dias_uteis_aberto + c.dias_uteis_aberto
                     
-                    # Total de dias em aberto
-                    # Teoricamente, devem ter somente nos lançamentos 'oficiais'
-                    if c.dias_uteis_aberto and c.dias_uteis_aberto > 0:
-                        total_dias_uteis_aberto = total_dias_uteis_aberto + c.dias_uteis_aberto
-                        
-                    # remove do total os dias tirados de fato, que nao sejam oficiais
-                    # os dias tirados oficiais já vão ser refletidos nos dias em aberto
-                    if c.dias_uteis_fato:
-                        total_dias_uteis_aberto = total_dias_uteis_aberto - c.dias_uteis_fato
+                if c.dias_uteis_fato:
+                    total_dias_uteis_aberto = total_dias_uteis_aberto - c.dias_uteis_fato
 
         return total_dias_uteis_aberto * 8 * 60 * 60
     

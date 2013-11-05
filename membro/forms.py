@@ -151,6 +151,10 @@ class ControleFeriasAdminForm(forms.ModelForm):
         if oficial and dias_uteis_fato:
             raise forms.ValidationError(u'Não marcar os "Dias úteis tirados de fato" em férias oficiais. Criar um novo "Controle de Férias" para especificar o período de férias tirados de fato.')
         
+        dias_uteis_aberto = self.cleaned_data.get('dias_uteis_aberto')
+        if not oficial and dias_uteis_aberto:
+            raise forms.ValidationError(u'Marcar os "Dias úteis em aberto" somente nas férias oficiais.')
+        
         return self.cleaned_data
 
 
