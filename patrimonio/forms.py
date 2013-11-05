@@ -111,7 +111,8 @@ class PatrimonioAdminForm(forms.ModelForm):
                                      empty_label='---'
                                      )
     
-    entidade_procedencia = forms.ModelChoiceField(queryset=Entidade.objects.all(), 
+    entidade_procedencia = forms.ModelChoiceField(queryset=Entidade.objects.all(),
+                                                 required=False, 
                                                  label=mark_safe('<a href="#" onclick="window.open(\'/identificacao/entidade/\'+$(\'#id_entidade_procedencia\').val() + \'/\', \'_blank\');return true;">Fornecedor</a>'),)
 
 
@@ -163,10 +164,10 @@ class PatrimonioAdminForm(forms.ModelForm):
         rel = ManyToOneRel(Entidade, 'id')
         self.fields['entidade_procedencia'].widget = RelatedFieldWidgetWrapper(self.fields['entidade_procedencia'].widget, rel, self.admin_site)
 
+        """
         et = self.fields['entidade_procedencia']
         if data and data['entidade_procedencia']:
             t = data['entidade_procedencia']
-            t = Entidade.objects.get(id=t)
             et.queryset = Entidade.objects.filter(pk=t)
         elif instance and instance.entidade_procedencia:
             et.choices = [(p.id, p.__unicode__()) for p in Entidade.objects.filter(id=instance.entidade_procedencia.id)]
@@ -175,7 +176,7 @@ class PatrimonioAdminForm(forms.ModelForm):
             #entidadeHistoricoList = EntidadeHistorico.objects.filter(tipo__nome= 'Fabricante').values_list('entidade_id', flat=True)
             #et.queryset = Entidade.objects.filter(id__in=entidadeHistoricoList)
             et.queryset = Entidade.objects.all()
-
+        """
         # Exibe a quantidade de patrimonios filhos no label
         self.fields['form_filhos'].label = u'Patrimônios contidos (%s)' % Patrimonio.objects.filter(patrimonio=instance).count()
          
@@ -285,8 +286,10 @@ HistoricoLocalAdminFormSet = inlineformset_factory(Patrimonio, HistoricoLocal, f
 
 
 
+
 class EquipamentoAdminForm(forms.ModelForm):
-    entidade_fabricante = forms.ModelChoiceField(queryset=Entidade.objects.all(), 
+    entidade_fabricante = forms.ModelChoiceField(queryset=Entidade.objects.all(),
+                                                 required=False, 
                                                  label=mark_safe('<a href="#" onclick="window.open(\'/identificacao/entidade/\'+$(\'#id_entidade_fabricante\').val() + \'/\', \'_blank\');return true;">Marca</a>'),)
 
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
