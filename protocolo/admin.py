@@ -12,6 +12,8 @@ from utils.admin import AutoCompleteAdmin
 from financeiro.models import Estado as EstadoDespesa
 from utils.functions import clone_objects
 
+from forms import *
+
 admin.site.register(TipoDocumento)
 admin.site.register(Estado)
 admin.site.register(Origem)
@@ -315,19 +317,35 @@ class FeriadoAdmin(admin.ModelAdmin):
 
     fieldsets = (
                 (None, {
-                    'fields': (('feriado', 'descricao'), 'tipo')
+                    'fields': (('feriado', 'obs'), 'tipo')
                  }),
     )
 
-    list_display = ('__unicode__', 'descricao', 'tipo')
+    list_display = ('__unicode__', 'tipo', 'obs', 'get_movel', 'get_subtrai', )
 
-    search_fields = ('descricao', )
+    search_fields = ('obs', )
 
     list_filter = ['tipo']
 
     list_per_page = 10
+    
+    form = FeriadoAdminForm
+    
 
 admin.site.register(Feriado,FeriadoAdmin)
+
+
+class TipoFeriadoAdmin(admin.ModelAdmin):
+    fieldsets = (
+                (None, {
+                    'fields': ('nome', ('movel', 'subtrai_banco_hrs'), ('dia', 'mes'))
+                 }),
+    )
+    list_display = ('__unicode__', 'movel', 'subtrai_banco_hrs', 'dia', 'mes')
+    
+    form = TipoFeriadoAdminForm
+
+admin.site.register(TipoFeriado, TipoFeriadoAdmin)
 
 
 
@@ -417,4 +435,4 @@ class DescricaoAdmin(admin.ModelAdmin):
      search_fields = ('entidade', 'descricao')
 
 admin.site.register(Descricao, DescricaoAdmin)
-admin.site.register(TipoFeriado)
+
