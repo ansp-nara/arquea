@@ -7,6 +7,10 @@ from django import forms
 from django.forms.util import ErrorList
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ObjectDoesNotExist
+import logging
+
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
 
 
 
@@ -208,3 +212,34 @@ class ItemAdminForm(forms.ModelForm):
       marca = forms.CharField(max_length=100, required=False, label=_('Marca'))
       modelo = forms.CharField(max_length=100, required=False, label=_('Modelo'))
       ns = forms.CharField(max_length=30, required=False, label=_(u'Número de série'))
+
+
+class FeriadoAdminForm(forms.ModelForm):
+    def clean(self):
+
+        feriado = self.cleaned_data.get('feriado')
+        
+        tipo = self.cleaned_data.get('tipo')
+        
+        # Verifica se um feriado fixo ocorre na data especificada do tipo de feriado
+        if not tipo.movel and (tipo.dia != feriado.day or tipo.mes != feriado.month):
+            raise forms.ValidationError(u"Feriado fixo deve ser no mesmo dia/mês especificado no tipo do feriado. Este feriado ocorre no dia %s/%s" % (tipo.dia, tipo.mes))
+
+        return self.cleaned_data
+    
+    
+class TipoFeriadoAdminForm(forms.ModelForm):
+    def clean(self):
+
+        movel = self.cleaned_data.get('movel')
+        dia = self.cleaned_data.get('dia')
+        mes = self.cleaned_data.get('mes')
+        
+        # Verifica se um feriado fixo ocorre na data especificada do tipo de feriado
+        if not movel and (not dia or not mes):
+            raise forms.ValidationError(u"Feriado fixo deve ter o dia/mês especificado")
+
+        return self.cleaned_data
+    
+    
+    

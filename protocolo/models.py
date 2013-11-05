@@ -110,6 +110,10 @@ class Origem(models.Model):
 class TipoFeriado(models.Model):
     nome = models.CharField(max_length=45)
     movel = models.BooleanField(u'Móvel')
+    dia = models.IntegerField(_(u'Dia'), null=True, blank=True)
+    mes = models.IntegerField(_(u'Mes'), null=True, blank=True)
+    subtrai_banco_hrs = models.BooleanField(_(u'Subtrai do banco de horas?'))
+    
 
     def __unicode__(self):
         return self.nome
@@ -151,7 +155,7 @@ class Feriado(models.Model):
 
 
     feriado = models.DateField(_('Feriado'))
-    descricao = models.CharField(_(u'Descrição'), max_length=80, blank=True, help_text='ex. Natal')
+    obs = models.CharField(_(u'Observação'), max_length=100, blank=True)
     tipo = models.ForeignKey('protocolo.TipoFeriado', null=True, blank=True)
     #movel = models.BooleanField(_(u'Este feriado é móvel?'))
 
@@ -186,6 +190,17 @@ class Feriado(models.Model):
         else:
             return None 
 
+    def get_movel(self):
+        return self.tipo.movel
+    get_movel.short_description = 'Móvel?'
+    get_movel.admin_order_field = 'tipo__movel'
+    get_movel.boolean = True
+    
+    def get_subtrai(self):
+        return self.tipo.subtrai_banco_hrs
+    get_subtrai.short_description = 'Subtrai horas?'
+    get_subtrai.admin_order_field = 'tipo__subtrai_banco_hrs'
+    get_subtrai.boolean = True
 
     # Define a ordenação da visualização dos dados.
     class Meta:
