@@ -12,7 +12,7 @@ from django.forms.models import BaseInlineFormSet, inlineformset_factory
 
 from models import *
 from financeiro.models import Pagamento
-from identificacao.models import Identificacao, Entidade, Endereco, EnderecoDetalhe
+from identificacao.models import Identificacao, Entidade, Endereco, EnderecoDetalhe, EntidadeHistorico
 from outorga.models import Termo
 from patrimonio.models import Equipamento, Patrimonio
 
@@ -110,6 +110,10 @@ class PatrimonioAdminForm(forms.ModelForm):
                                      widget=forms.Select(attrs={'style':'width:800px'}),
                                      empty_label='---'
                                      )
+    
+    entidade_procedencia = forms.ModelChoiceField(queryset=Entidade.objects.all(), 
+                                                 label=mark_safe('<a href="#" onclick="window.open(\'/identificacao/entidade/\'+$(\'#id_entidade_procedencia\').val() + \'/\', \'_blank\');return true;">Fornecedor</a>'),)
+
 
     form_filhos = PatrimonioReadOnlyField()
     
@@ -130,9 +134,8 @@ class PatrimonioAdminForm(forms.ModelForm):
                                                      
         super(PatrimonioAdminForm, self).__init__(data, files, auto_id, prefix, initial,
                                             error_class, label_suffix, empty_permitted, instance)
-        pt = self.fields['patrimonio']
-        pg = self.fields['pagamento']
         
+        pg = self.fields['pagamento']
         if data and data['termo']:
             t = data['termo']
             t = Termo.objects.get(id=t)
@@ -142,6 +145,7 @@ class PatrimonioAdminForm(forms.ModelForm):
         else:
             pg.queryset = Pagamento.objects.filter(id__lte=0)
 
+        pt = self.fields['patrimonio']
         if data and data['patrimonio']:
             pt.choices = [(p.id, p.__unicode__()) for p in Patrimonio.objects.filter(id=data['patrimonio'])]
         elif instance and instance.patrimonio:
@@ -153,6 +157,24 @@ class PatrimonioAdminForm(forms.ModelForm):
         # O self.admin_site foi declarado no admin.py                
         rel = ManyToOneRel(Equipamento, 'id')
         self.fields['equipamento'].widget = RelatedFieldWidgetWrapper(self.fields['equipamento'].widget, rel, self.admin_site)
+        
+        # Configurando a relação entre Equipamento e Entidade para aparecer o botão de +
+        # O self.admin_site foi declarado no admin.py
+        rel = ManyToOneRel(Entidade, 'id')
+        self.fields['entidade_procedencia'].widget = RelatedFieldWidgetWrapper(self.fields['entidade_procedencia'].widget, rel, self.admin_site)
+
+        et = self.fields['entidade_procedencia']
+        if data and data['entidade_procedencia']:
+            t = data['entidade_procedencia']
+            t = Entidade.objects.get(id=t)
+            et.queryset = Entidade.objects.filter(pk=t)
+        elif instance and instance.entidade_procedencia:
+            et.choices = [(p.id, p.__unicode__()) for p in Entidade.objects.filter(id=instance.entidade_procedencia.id)]
+        else:
+            # ************ROGERIO: MODIFICAR PARA UM FILTRO POR ATRIBUTO/ FLAG
+            #entidadeHistoricoList = EntidadeHistorico.objects.filter(tipo__nome= 'Fabricante').values_list('entidade_id', flat=True)
+            #et.queryset = Entidade.objects.filter(id__in=entidadeHistoricoList)
+            et.queryset = Entidade.objects.all()
 
         # Exibe a quantidade de patrimonios filhos no label
         self.fields['form_filhos'].label = u'Patrimônios contidos (%s)' % Patrimonio.objects.filter(patrimonio=instance).count()
@@ -263,3 +285,24 @@ HistoricoLocalAdminFormSet = inlineformset_factory(Patrimonio, HistoricoLocal, f
 
 
 
+class EquipamentoAdminForm(forms.ModelForm):
+    entidade_fabricante = forms.ModelChoiceField(queryset=Entidade.objects.all(), 
+                                                 label=mark_safe('<a href="#" onclick="window.open(\'/identificacao/entidade/\'+$(\'#id_entidade_fabricante\').val() + \'/\', \'_blank\');return true;">Marca</a>'),)
+
+    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
+                 initial=None, error_class=ErrorList, label_suffix=':',
+                 empty_permitted=False, instance=None):
+
+        super(EquipamentoAdminForm, self).__init__(data, files, auto_id, prefix, initial,
+                                            error_class, label_suffix, empty_permitted, instance)
+        
+        # Configurando a relação entre Equipamento e Entidade para aparecer o botão de +
+        # O self.admin_site foi declarado no admin.py                
+        rel = ManyToOneRel(Entidade, 'id')
+        self.fields['entidade_fabricante'].widget = RelatedFieldWidgetWrapper(self.fields['entidade_fabricante'].widget, rel, self.admin_site)
+        
+        
+    def clean(self):
+        cleaned_data = super(EquipamentoAdminForm, self).clean()
+        
+        return cleaned_data

@@ -16,6 +16,16 @@ logger = logging.getLogger(__name__)
 class VerificacaoEquipamento():
 
     equipamentos = []
+    
+    def marcaVazia(self):
+        """
+        Verifica o equipamento com marca/fabricante/editora vazia
+        """
+        
+        retorno = []
+        retorno = Equipamento.objects.filter(entidade_fabricante__isnull=True).exclude(marca = 'IMPORTADO').order_by('marca')
+        
+        return retorno
 
     def partNumberVSModeloDiferente(self):
         """
@@ -68,6 +78,21 @@ class VerificacaoEquipamento():
     
     
 class VerificacaoPatrimonio:
+
+    def procedenciaVazia(self, filtros=None):
+        """
+        Verifica o patrimonio com procedencia vazia
+        """
+        
+        retorno = []
+        patrimonios = Patrimonio.objects.filter(entidade_procedencia__isnull=True).order_by("procedencia")
+        
+        if filtros and filtros["filtro_tipo_patrimonio"]:
+            patrimonios = patrimonios.filter(tipo=filtros["filtro_tipo_patrimonio"])
+        
+        retorno.append(patrimonios)
+        return retorno
+    
     def equipamentoVazio(self, filtros=None):
         """
         Verifica patrimonio sem equipamento 

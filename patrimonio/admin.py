@@ -36,7 +36,8 @@ class PatrimonioAdmin(admin.ModelAdmin):
                       'classes': ('wide')
                  }),
                  ('Geral', {
-                      'fields': (('checado', 'tipo', 'apelido', 'tem_numero_fmusp', 'numero_fmusp'), ('part_number', 'ns', 'ncm', 'ean', 'agilis'), ('nf', 'patrimonio'), 'descricao', ('complemento', 'tamanho'), ('marca', 'modelo', 'procedencia'), 'equipamento')
+                      'fields': (('checado', 'tipo', 'apelido', 'tem_numero_fmusp', 'numero_fmusp'), ('part_number', 'ns', 'ncm', 'ean', 'agilis'), 
+                                 ('nf', 'patrimonio'), 'descricao', ('complemento', 'tamanho'), ('marca', 'modelo'), ('procedencia', 'entidade_procedencia',),'equipamento')
                  }),
                  ('Extras', {
                       'classes': ('collapse',),
@@ -115,6 +116,15 @@ admin.site.register(HistoricoLocal, HistoricoLocalAdmin)
 class EquipamentoAdmin(admin.ModelAdmin):
     search_fields = ['part_number', 'descricao']
     list_display = ('descricao', 'part_number', 'tipo')
+    
+    form = EquipamentoAdminForm
+    
+    def __init__(self, model, admin_site):
+        """
+        Utilizado para setar o admin_site para o forms
+        """
+        self.form.admin_site = admin_site
+        super(EquipamentoAdmin, self).__init__(model, admin_site)
 
 admin.site.register(Equipamento, EquipamentoAdmin)
 

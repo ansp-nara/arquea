@@ -43,7 +43,23 @@ def equipamento_consolidado(request):
     count = sum([len(equipamentos) for equipamentos in partNumberVazioModeloVazio])
     retorno.append({'desc':u'Part Numbers e Modelos vazios', 'url':'equipamento_part_number_modelo_vazio', 'qtd':count})
     
+    marcaVazia = verificacaoEquipamento.marcaVazia()
+    count = len(marcaVazia)
+    retorno.append({'desc':u'Marca/Entidade vazia', 'url':'equipamento_marca_vazia', 'qtd':count})
+    
     return render_to_response('verificacao/equipamento_consolidado.html', {'verificacoes':retorno}, context_instance=RequestContext(request))
+
+@login_required
+def equipamento_marca_vazia(request, json=False):
+
+    retorno = []
+    verficacao = VerificacaoEquipamento()
+    retorno = verficacao.marcaVazia()
+    
+    return render_to_response('verificacao/equipamento_marca.html', 
+                              {'desc':'Marca/Entidade vazia', 'equipamentos':retorno}, 
+                              context_instance=RequestContext(request))
+
 
 @login_required
 def equipamento_part_number_modelo_diferente(request, json=False):
@@ -139,11 +155,33 @@ def patrimonio_consolidado(request):
     count = sum([len(patrimonios) for patrimonios in tamanhoDiferente])
     retorno.append({'desc':u'Patrimonio e Equipamento com Tamanho diferente', 'url':'patrimonio_equipamento_tamanho_diferente', 'qtd':count})
     
+    tamanhoDiferente = verificacaoPatrimonio.procedenciaVazia(filtros_entrada)
+    count = sum([len(patrimonios) for patrimonios in tamanhoDiferente])
+    retorno.append({'desc':u'Patrimonio com procedecia vazia', 'url':'patrimonio_procedencia_vazia', 'qtd':count})
+    
     retorno.append({'desc':u'Verificação de Patrimônios e Equipamentos', 'url':'check_patrimonio_equipamento', 'qtd':None})
     
     filtros = {"tipos":Tipo.objects.all()}
     
     return render_to_response('verificacao/patrimonio_consolidado.html', {'verificacoes':retorno, 'filtros':filtros}, context_instance=RequestContext(request))
+
+
+@login_required
+def patrimonio_procedencia_vazia(request):
+    filtros_entrada = {'filtro_tipo_patrimonio':request.GET.get('filtro_tipo_patrimonio')}
+    
+    retorno = []
+    verficacao = VerificacaoPatrimonio()
+    retorno = verficacao.procedenciaVazia(filtros_entrada)
+    
+    filtros_saida = []
+    if len(retorno) > 0:
+        filtros_saida = {"tipos":VerificacaoPatrimonioEquipamento().listaFiltroTipoPatrimonio(verficacao.equipamentoVazio()[0])}
+    
+    return render_to_response('verificacao/patrimonio_procedencia.html', 
+                              {'desc':'Patrimonios sem Equipamento', 'patrimonios':retorno, 'filtros':filtros_saida}, 
+                              context_instance=RequestContext(request))
+
 
 @login_required
 def patrimonio_equipamento_vazio(request):
