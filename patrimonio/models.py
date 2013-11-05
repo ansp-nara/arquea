@@ -102,6 +102,7 @@ class Patrimonio(models.Model):
     ean = models.CharField(u'EAN', max_length=45, null=True, blank=True)
     tem_numero_fmusp = models.BooleanField('Tem número de patrimônio FMUSP?', default=False)
     numero_fmusp = models.IntegerField('Número de patrimônio FMUSP', null=True, blank=True)
+    entidade_procedencia = models.ForeignKey('identificacao.Entidade', verbose_name=_(u'Procedência'), null=True, blank=True, help_text=u"Representa a Entidade que fornece este patrimônio.")
 
 # Campos duplicados que existem no Model de Equipamento
     tipo = models.ForeignKey('patrimonio.Tipo')
@@ -402,20 +403,24 @@ class TipoEquipamento(models.Model):
 	ordering = ('nome',)
 
 class Equipamento(models.Model):
+    tipo = models.ForeignKey('patrimonio.TipoEquipamento', null=True, blank=True)
     descricao = models.TextField(_(u'Descrição'))
     part_number = models.CharField(null=True, blank=True, max_length=50)
+    
+    # TERMINADA A ASSOCIAÇÃO COM A ENTIDADE, DESABILITAR O CAMPO MARCA(CHARFIELD)
     marca = models.CharField(_(u'Marca ou Editora'), null=True, blank=True, max_length=100)
+    entidade_fabricante = models.ForeignKey('identificacao.Entidade', verbose_name=_(u'Marca/Editora'), null=True, blank=True, help_text=u"Representa a Entidade que fabrica este equipamento.")
+    
     modelo = models.CharField(null=True, blank=True, max_length=100)
-    imagem = models.ImageField(u'Imagem do equipamento', upload_to='patrimonio', null=True, blank=True)
-    isbn = models.CharField(_(u'ISBN'), null=True, blank=True, max_length=20)
     ncm = models.CharField(u'NCM/SH', null=True, blank=True, max_length=30)
     ean = models.CharField(u'EAN', max_length=45, null=True, blank=True)
-    titulo_autor = models.CharField(_(u'Título e autor'), null=True, blank=True, max_length=100)
     tamanho = models.DecimalField(u'Tamanho (em U)', max_digits=5, decimal_places=2, null=True, blank=True)
     dimensao = models.ForeignKey('patrimonio.Dimensao', null=True, blank=True)
     especificacao = models.FileField(u'Especificação', upload_to='patrimonio', null=True, blank=True)
-    tipo = models.ForeignKey('patrimonio.TipoEquipamento', null=True, blank=True)
+    imagem = models.ImageField(u'Imagem do equipamento', upload_to='patrimonio', null=True, blank=True)
     convencoes = models.ManyToManyField('patrimonio.Distribuicao', verbose_name=u'Convenções')
+    titulo_autor = models.CharField(_(u'Título e autor'), null=True, blank=True, max_length=100)
+    isbn = models.CharField(_(u'ISBN'), null=True, blank=True, max_length=20)
 
     def __unicode__(self):
         return u'%s - %s' % (self.descricao, self.part_number)

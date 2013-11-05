@@ -1,0 +1,43 @@
+{% extends "admin/base_site.html" %}
+{% load proto_tags %}
+{% block breadcrumbs %}<div class="breadcrumbs">Você está em: <a href="/verificacao/relatorio/equipamento_consolidado">Relatório de verificação de equipamentos</a></div>{% endblock %}
+{% block content %}
+<style>
+ #table-data th {
+    background-color: lightgray;
+    border: 1px #aaa dotted;
+}
+
+ #table-data td {
+    border:1px;
+    border-color: lightgray;
+    border-style: dotted;
+}
+</style>
+<h1 repeat="1">Relatório de verificação de Patrimonio - {{ desc }}</h1>
+
+    <table id="table-data" border="0" cellpadding="5">
+      <tr>
+           <th>ID</th>
+           <th>Desc</th>
+           <th>Part Number</th>
+           <th>Model</th>
+           <th>Marca</th>
+           <th>Procedencia</th>
+           <th>Procedencia/Entidade</th>
+      </tr>
+     {% for pt_group in patrimonios %}
+       {% for pt in pt_group %}
+       <tr>
+           <td><a href="{{ model.admin_url }}/admin/patrimonio/patrimonio/{{ pt.id }}/">{{ pt.id }}</a></td>
+           <td><a href="{{ model.admin_url }}/admin/patrimonio/patrimonio/{{ pt.id }}/">{{ pt.descricao }}</a></td>
+           <td>{{ pt.part_number }}</td>
+           <td>{{ pt.modelo }}</td>
+           <td>{{ pt.marca }}</td>
+           <td>{{ pt.procedencia }}</td>
+           <td>{{ pt.entidade_procedencia|default:'' }}</td>
+      </tr>
+      {% endfor %}
+    {% endfor %}
+    </table>
+{% endblock %}
