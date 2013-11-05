@@ -721,10 +721,11 @@ class Controle(models.Model):
                 
                 # é feriado?
                 diaFeriado = feriado.get_dia_de_feriado(d.dia)
-                
                 if diaFeriado != None:
-                    d.is_feriado = True
                     d.obs = u'%s %s' % (d.obs, diaFeriado.tipo.nome)
+                    # este feriado é facultativo ou não?
+                    if not diaFeriado.tipo.subtrai_banco_hrs:
+                        d.is_feriado = True
                 
                 # é dispensa?
                 d.is_dispensa = False
@@ -782,7 +783,12 @@ class Controle(models.Model):
              is_final_de_semana = d.weekday() >= 5
                
              # é feriado?
-             is_feriado = feriado.dia_de_feriado(d)
+             is_feriado = False
+             diaFeriado = feriado.get_dia_de_feriado(d)
+             
+             # verifica se o feriado é facultativo, ou seja, com desconto de banco de horas.
+             if diaFeriado != None and  not diaFeriado.tipo.subtrai_banco_hrs:
+                 is_feriado = True
              
              # soma os dias de trabalho
              if not is_final_de_semana and not is_feriado:

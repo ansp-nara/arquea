@@ -145,6 +145,12 @@ class ControleFeriasAdminForm(forms.ModelForm):
         if oficial and dias.days != 19 and dias.days != 29:
             raise forms.ValidationError(u'Férias oficiais devem durar 20 ou 30 dias')
         
+        # Restrição para termos um melhor controle do período de férias tirado de fato para conta no relatório de controle de horas trabalhadas.
+        # A marcação de oficial fica para a 'configuração' das férias, adiantamento, venda de dias e período oficial.
+        dias_uteis_fato = self.cleaned_data.get('dias_uteis_fato')
+        if oficial and dias_uteis_fato:
+            raise forms.ValidationError(u'Não marcar os dias úteis de fato em férias oficiais. Criar um novo controle para especificar o período de férias tirados de fato.')
+        
         return self.cleaned_data
 
 
