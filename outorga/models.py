@@ -1327,6 +1327,8 @@ class OrigemFapesp(models.Model):
           g = self.pagamento_set.all().aggregate(Sum('valor_fapesp'))
 	  return g['valor_fapesp__sum'] or Decimal('0.0')
 
+      def termo(self):
+	  return self.item_outorga.natureza_gasto.termo
 
 class Contrato(models.Model):
 
