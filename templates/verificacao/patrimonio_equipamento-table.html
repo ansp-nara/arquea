@@ -37,7 +37,7 @@
                <td class="td_modelo"><a href="{{ model.admin_url }}/admin/patrimonio/equipamento/{{ pt.equipamento.id }}/">{{ pt.equipamento.modelo }}</a></td>
            {% endif %}
            {% if atributo == 'marca' %}
-               <td class="td_marca"><a href="{{ model.admin_url }}/admin/patrimonio/equipamento/{{ pt.equipamento.id }}/">{{ pt.equipamento.marca }}</a></td>
+               <td class="td_marca"><a href="{{ model.admin_url }}/admin/patrimonio/equipamento/{{ pt.equipamento.id }}/">{{ pt.equipamento.entidade_fabricante.sigla }}</a></td>
            {% endif %}
            {% if atributo == 'ncm' %}
                <td class="td_ncm"><a href="{{ model.admin_url }}/admin/patrimonio/equipamento/{{ pt.equipamento.id }}/">{{ pt.equipamento.ncm }}</a></td>

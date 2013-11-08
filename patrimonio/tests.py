@@ -13,8 +13,15 @@ from django.test import Client
 from django.http import HttpRequest
 from datetime import date, timedelta, datetime
 
-from patrimonio.models import HistoricoLocal 
+from patrimonio.models import HistoricoLocal, Tipo, Patrimonio, Equipamento, Estado
 from patrimonio.views import *
+
+from protocolo.models import TipoDocumento, Origem, Protocolo, ItemProtocolo
+from protocolo.models import Estado as EstadoProtocolo
+from identificacao.models import Entidade, Contato, Endereco, Identificacao, TipoDetalhe
+from membro.models import Membro
+from outorga.models import Termo
+
 
 import re
 import logging
@@ -24,6 +31,36 @@ logger = logging.getLogger(__name__)
 
 
 class HistoricoLocalTest(TestCase):
+    def test_criacao_historico_local(self):
+        ent= Entidade(sigla='SAC', nome='Global Crossing', cnpj='00.000.000/0000-00', fisco=True, url='')
+        ent.save()
+        
+        end = Endereco(entidade=ent, rua='Dr. Ovidio', num=215, bairro='Cerqueira Cesar', cep='05403010', estado='SP', pais='Brasil')
+        end.save()
+        
+        tipoDetalhe = TipoDetalhe()
+        tipoDetalhe.save()
+        
+        endDet = EnderecoDetalhe(endereco=end, tipo=tipoDetalhe)
+        endDet.save()
+
+        tipoPatr = Tipo(nome='roteador')
+        tipoPatr.save()
+
+        rt = Patrimonio(ns='AF345678GB3489X', modelo='NetIron400', tipo=tipoPatr, apelido="NetIron400")
+        rt.save()
+
+        est = Estado()
+        est.save()
+
+        hl = HistoricoLocal(patrimonio=rt, endereco= endDet, descricao='Emprestimo', data= datetime.date(2009,2,5), estado=est)
+        hl.save()
+
+        self.assertEquals(u'05/02/2009 - NetIron400 - AF345678GB3489X -  | SAC - Dr. Ovidio, 215 - ', hl.__unicode__())
+
+    
+    
+    
     def test_posicao_furo(self):
         """
         Teste de posicionamento de um equipamento em um furo de um rack

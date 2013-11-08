@@ -32,22 +32,24 @@ class HistoricoLocalInline(admin.StackedInline):
 class PatrimonioAdmin(admin.ModelAdmin):
     fieldsets = (
                  ('Pagamento', {
-                      'fields': (('termo', 'npgto'), ('pagamento', 'valor')),
-                      'classes': ('wide')
+                      'fields': (('termo', 'npgto',), ('pagamento', 'valor',)),
+                      'classes': ('wide',)
                  }),
                  ('Geral', {
                       'fields': (('checado', 'tipo', 'apelido', 'tem_numero_fmusp', 'numero_fmusp'), ('part_number', 'ns', 'ncm', 'ean', 'agilis'), 
-                                 ('nf', 'patrimonio'), 'descricao', ('complemento', 'tamanho'), ('marca', 'modelo'), ('procedencia', 'entidade_procedencia',),'equipamento')
+                                 ('nf', 'patrimonio'), 'descricao', ('complemento', 'tamanho'), ('modelo',), ('procedencia', 'entidade_procedencia',),'equipamento')
                  }),
                  ('Extras', {
                       'classes': ('collapse',),
-                      'fields': ('imagem', 'especificacao', 'obs', 'titulo_autor', 'isbn'),
+                      'fields': ('imagem', 'especificacao', 'obs', 'titulo_autor', 'isbn',),
                  }),
                  ('Patrimônios contidos', {
                       'classes': ('collapse',),
                       'fields': ('form_filhos',),
                  }),
+
     )
+    #readonly_fields = ('equipamento__entidade_fabricante',)
     form = PatrimonioAdminForm
     list_display = ('tipo', 'descricao', 'complemento', 'posicao', 'agilis', 'marca', 'modelo', 'ns', 'nf', 'valor', 'checado')
     list_filter = ('tipo', 'pagamento__protocolo__termo',)

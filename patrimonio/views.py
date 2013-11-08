@@ -32,12 +32,13 @@ def escolhe_termo(request):
         retorno = []
          
         t = request.POST.get('id')
-        termo = Termo.objects.get(pk=int(t))
-        protocolos = Protocolo.objects.filter(termo=termo)
-
-        for p in protocolos:
-            descricao = '%s: %s - %s' % (p.doc_num(), p.descricao2.__unicode__(), p.mostra_valor())
-            retorno.append({'pk':p.pk, 'valor':descricao})
+        if t:
+            termo = Termo.objects.get(pk=int(t))
+            protocolos = Protocolo.objects.filter(termo=termo)
+    
+            for p in protocolos:
+                descricao = '%s: %s - %s' % (p.doc_num(), p.descricao2.__unicode__(), p.mostra_valor())
+                retorno.append({'pk':p.pk, 'valor':descricao})
         
         if not retorno:
             retorno = [{"pk":"0","valor":"Nenhum registro"}]
@@ -134,15 +135,28 @@ def escolhe_entidade(request):
         raise Http404
     return HttpResponse(json, mimetype="application/json")
 
+
 def escolhe_patrimonio(request):
+    """
+    Faz a busca de patrimonios que estao relacionados a NFs.
+    Utilizado para fazer o filtro de "Patrimonios Contidos em" durante a tela de cadastro/modificação de patrimonio. 
+    """
+    
+    retorno = []
     if request.method == 'POST':
         num_doc = request.POST.get('num_doc')
+        
+        if num_doc:
+            retorno = [{'pk':p.pk, 'valor':p.__unicode__()} for p in Patrimonio.objects.filter(Q(pagamento__protocolo__num_documento__icontains=num_doc)|Q(ns__icontains=num_doc))] or [{"pk":"0","valor":"Nenhum registro"}]
+            json = simplejson.dumps(retorno)
 
-        retorno = [{'pk':p.pk, 'valor':p.__unicode__()} for p in Patrimonio.objects.filter(Q(pagamento__protocolo__num_documento__icontains=num_doc)|Q(ns__icontains=num_doc))] or [{"pk":"0","valor":"Nenhum registro"}]
-        json = simplejson.dumps(retorno)
+        if not retorno:
+            retorno = [{"pk":"0","valor":"Nenhum registro"}]
 
     else:
         raise Http404
+    
+    json = simplejson.dumps(retorno)
     return HttpResponse(json, mimetype="application/json")
 
 
@@ -887,7 +901,7 @@ def abre_arvore_tipo(request):
                     r = u'<tr class=""><td class="td_1"><div><a href="%s" target="_blank">%s</a></div></td>' % (pUrl, ha.endereco.end.entidade if ha else 'ND') 
                     r += u'<td class="td_2"><a href="%s" target="_blank"><div>%s</a></div></td>' % (pUrl, ha.endereco.complemento if ha else 'ND')
                     r += u'<td class="td_3"><a href="%s" target="_blank"><div>%s</a></div></td>' % (pUrl, ha.posicao if ha and ha.posicao else 'ND')
-                    r += u'<td class="td_4"><a href="%s" target="_blank"><div>%s</a></div></td>' % (pUrl, p.equipamento.marca)
+                    r += u'<td class="td_4"><a href="%s" target="_blank"><div>%s</a></div></td>' % (pUrl, p.equipamento.entidade_fabricante.sigla)
                     r += u'<td class="td_5"><a href="%s" target="_blank"><div>%s</a></div></td>' % (pUrl, p.equipamento.modelo)
                     r += u'<td class="td_6"><a href="%s" target="_blank"><div>%s</a></div></td>' % (pUrl, p.equipamento.part_number)
                     r += u'<td class="td_7"><a href="%s" target="_blank"><div>%s</a></div></td>' % (pUrl, p.ns)
