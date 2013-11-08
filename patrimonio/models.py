@@ -108,7 +108,7 @@ class Patrimonio(models.Model):
     tipo = models.ForeignKey('patrimonio.Tipo')
     descricao_tecnica = models.TextField(u'Descrição técnica', null=True, blank=True)
     part_number = models.CharField(null=True, blank=True, max_length=50)
-    marca = models.CharField(_(u'Marca/Editora'), null=True, blank=True, max_length=100)
+    #marca = models.CharField(_(u'Marca/Editora'), null=True, blank=True, max_length=100)
     modelo = models.CharField(null=True, blank=True, max_length=100)
     imagem = models.ImageField(upload_to='patrimonio', null=True, blank=True)
     isbn = models.CharField(_(u'ISBN'), null=True, blank=True, max_length=20)
@@ -123,6 +123,10 @@ class Patrimonio(models.Model):
         else:
             return u'%s - %s - %s' % (self.apelido, self.ns, self.descricao)
 
+    def marca(self):
+        return equipamento.entidade_fabricante.sigla
+    marca.short_description = u'Marca'
+    
     @cached_property
     def historico_atual(self):
         ht = self.historicolocal_set.order_by('-data')
@@ -173,56 +177,7 @@ class HistoricoLocal(models.Model):
     A class 'Meta' 		Define a descrição do modelo (singular e plural), a ordenação dos dados pelo campo 'data' e a unicidade
     				dos dados pelos campos 'patrimonio', 'endereco', 'descricao' e 'data'.
 
-    >>> from protocolo.models import TipoDocumento, Origem, Protocolo, ItemProtocolo
-    >>> from protocolo.models import Estado as EstadoProtocolo
-    >>> from identificacao.models import Entidade, Contato, Endereco, Identificacao
-    >>> from membro.models import Membro
-    >>> from outorga.models import Termo
-
-    >>> ent, created = Entidade.objects.get_or_create(sigla='SAC', defaults={'nome': 'Global Crossing', 'cnpj': '00.000.000/0000-00', 'ativo': False, 'fisco': True, 'url': '', 'asn': 123})
-
-    >>> c, created = Contato.objects.get_or_create(nome='Joao', defaults={'email': 'joao@joao.com.br', 'tel': '', 'ativo': True})
-
-    >>> iden, created = Identificacao.objects.get_or_create(entidade=ent, contato=c, defaults={'funcao': 'Tecnico', 'area': '', 'ativo': True})
-
-    >>> end, created = Endereco.objects.get_or_create(identificacao=iden, rua='Dr. Ovidio', num=215, bairro='Cerqueira Cesar', cep='05403010', estado='SP', pais='Brasil')
-
-
-    >>> tp, created = Tipo.objects.get_or_create(nome='Free')
-
-    >>> td, created = TipoDocumento.objects.get_or_create(nome='Fatura')
-
-    >>> e, created = Estado.objects.get_or_create(nome='Vigente')
-
-    >>> ep, created = EstadoProtocolo.objects.get_or_create(nome='Pago')
-
-    >>> ent1, created = Entidade.objects.get_or_create(sigla='ANSP', defaults={'nome': 'Academic Network at São Paulo', 'cnpj': '', 'ativo': True, 'fisco': True })
-
-    >>> og, created = Origem.objects.get_or_create(nome='Sedex')
-
-    >>> mb, created = Membro.objects.get_or_create(nome='Gerson Gomes', funcionario=True, defaults={'cargo': 'Outorgado', 'email': 'gerson@gomes.com', 'cpf': '000.000.000-00'})
-
-    >>> t, created = Termo.objects.get_or_create(ano=2008, processo=52885, digito=8, defaults={'data_concessao': datetime.date(2008,1,1), 'data_assinatura': datetime.date(2009,1,15), 'membro': mb})
-
-    >>> p = Protocolo(termo=t, tipo_documento=td, num_documento=2008, estado=ep, identificacao=iden, data_chegada=datetime.datetime(2008,9,30,10,10), data_validade=datetime.date(2009,8,25), data_vencimento=datetime.date(2008,9,30), descricao="Aditivo Material Permanente", origem=og)
-    >>> p.save()
-
-    >>> ip = ItemProtocolo(protocolo=p, descricao='Hardware para rede', quantidade=1, valor_unitario='2358.90')
-    >>> ip.save()
-
-    >>> bb, created = Biblioteca.objects.get_or_create(obs='Codigo XXX')
-
-    >>> rt, created = Roteador.objects.get_or_create(ns='AF345678GB3489X', marca='Foundry', modelo='NetIron400', community= 'ANSP', defaults={'itemprotocolo': ip, 'estado': e, 'part_number': ' ', 'nome': 'Roteador'})
-
-    >>> hl, created = HistoricoLocal.objects.get_or_create(patrimonio=rt, endereco= end, descricao='Emprestimo', data= datetime.date(2009,2,5))
-
-    >>> hl.__unicode__()
-    u'05/02/09 - NetIron400_AF345678GB3489X | Community: ANSP | Dr. Ovidio, 215'
-
-    >>> HistoricoLocal.historico_patrimonio(rt)
-    [<HistoricoLocal: 05/02/09 - Equipamento: Roteador | Foundry_NetIron400 - AF345678GB3489X | Dr. Ovidio, 215>]
     """
-
 
     memorando = models.ForeignKey('memorando.MemorandoSimples', null=True, blank=True)
     patrimonio = models.ForeignKey(Patrimonio, verbose_name=_(u'Patrimônio'))
@@ -235,6 +190,7 @@ class HistoricoLocal(models.Model):
 
     # Retorna a data o patrimônio e o endereco.
     def __unicode__(self):
+        
         return u'%s - %s | %s' % (self.data.strftime('%d/%m/%Y'), self.patrimonio, self.endereco or '')
 
     # Define a descrição do modelo e a ordenação dos dados pelo campo 'nome'.
@@ -408,7 +364,7 @@ class Equipamento(models.Model):
     part_number = models.CharField(null=True, blank=True, max_length=50)
     
     # TERMINADA A ASSOCIAÇÃO COM A ENTIDADE, DESABILITAR O CAMPO MARCA(CHARFIELD)
-    marca = models.CharField(_(u'Marca ou Editora'), null=True, blank=True, max_length=100)
+    #marca = models.CharField(_(u'Marca ou Editora'), null=True, blank=True, max_length=100)
     entidade_fabricante = models.ForeignKey('identificacao.Entidade', verbose_name=_(u'Marca/Editora'), null=True, blank=True, help_text=u"Representa a Entidade que fabrica este equipamento.")
     
     modelo = models.CharField(null=True, blank=True, max_length=100)

@@ -106,7 +106,7 @@ def check_patrimonio_equipamento(request):
     
     patrimonios = patrimonios.filter(~Q(equipamento__part_number=F('part_number'))|
                                      ~Q(equipamento__modelo=F('modelo'))|
-                                     ~Q(equipamento__marca=F('marca'))|
+                                     ~Q(equipamento__entidade_fabricante__sigla=F('marca'))|
                                      #~Q(equipamento__descricao=F('descricao')) |
                                      Q(~Q(equipamento__ean=F('ean')), Q(equipamento__ean__isnull=False), Q(ean__isnull=False)) |
                                      Q(~Q(equipamento__ncm=F('ncm')), Q(equipamento__ncm__isnull=False), Q(ncm__isnull=False)) |

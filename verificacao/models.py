@@ -23,7 +23,7 @@ class VerificacaoEquipamento():
         """
         
         retorno = []
-        retorno = Equipamento.objects.filter(entidade_fabricante__isnull=True).exclude(marca = 'IMPORTADO').order_by('marca')
+        retorno = Equipamento.objects.filter(entidade_fabricante__isnull=True).order_by('entidade_fabricante__sigla')
         
         return retorno
 
@@ -153,7 +153,7 @@ class VerificacaoPatrimonioEquipamento():
     def marcaDiferente(self, filtros=None):
         retorno = []
         
-        patrimonios = Patrimonio.objects.filter(equipamento_id__isnull=False).filter(equipamento__marca__isnull=False).exclude(equipamento__marca=F('marca')).select_related("equipamento").order_by("id")
+        patrimonios = Patrimonio.objects.filter(equipamento_id__isnull=False).filter(equipamento__entidade_fabricante__isnull=False).exclude(equipamento__entidade_fabricante__sigla=F('marca')).select_related("equipamento").order_by("id")
 
         if filtros and filtros["filtro_tipo_patrimonio"]:
             patrimonios = patrimonios.filter(tipo=filtros["filtro_tipo_patrimonio"])
