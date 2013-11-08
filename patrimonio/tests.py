@@ -7,8 +7,14 @@ unittest). These will both pass when you run "manage.py test".
 Replace these with more appropriate tests for your application.
 """
 
+from django.core.urlresolvers import resolve
 from django.test import TestCase
+from django.test import Client
+from django.http import HttpRequest
+from datetime import date, timedelta, datetime
+
 from patrimonio.models import HistoricoLocal 
+from patrimonio.views import *
 
 import re
 import logging
@@ -141,3 +147,54 @@ class HistoricoLocalTest(TestCase):
         
         historico = HistoricoLocal(posicao="ABC42.F049")
         self.assertEquals(historico.posicao_rack, 'ABC42')
+
+class ViewTest(TestCase):
+    def setUpPatrimonio(self, num_documento='', ns=''):
+        protocolo = Protocolo(id=1, num_documento=num_documento, tipo_documento_id=0, estado_id=0, termo_id=0, data_chegada=date(year=2000, month=01, day=01))
+        protocolo.save()
+        pagamento = Pagamento(id=1, protocolo=protocolo, valor_fapesp=0)
+        pagamento.save()
+        tipoPatr = Tipo(id=1)
+        tipoPatr.save()
+        patrimonio = Patrimonio(id=1, pagamento=pagamento, tipo=tipoPatr)
+        patrimonio.save()
+        
+        patrimonio = Patrimonio(id=2, ns=ns, tipo=tipoPatr)
+        patrimonio.save()
+        
+    def test_escolhe_patrimonio_ajax_empty(self):
+        """
+        Verifica chamanda do escolhe_patrimonio com a base vazia
+        """
+        url = reverse("patrimonio.views.escolhe_patrimonio")
+        response = self.client.post(url)
+        self.assertIn(b'Nenhum registro', response.content)
+
+    def test_escolhe_patrimonio_ajax_not_found(self):
+        """
+        Verifica chamanda do escolhe_patrimonio sem encontrar registro
+        """
+        self.setUpPatrimonio('1134', '')
+        url = reverse("patrimonio.views.escolhe_patrimonio")
+        response = self.client.post(url, {'num_doc': '789'})
+        self.assertIn(b'Nenhum registro', response.content)
+
+    def test_escolhe_patrimonio_ajax_nf_pagamento(self):
+        """
+        Verifica chamanda do escolhe_patrimonio encontrando registro pelo num_documento do Protocolo
+        """
+        self.setUpPatrimonio('1234', '')
+        url = reverse("patrimonio.views.escolhe_patrimonio")
+        response = self.client.post(url, {'num_doc': '1234'})
+        self.assertIn(b'"pk": 1', response.content)
+
+    def test_escolhe_patrimonio_ajax_ns_patrimonio(self):
+        """
+        Verifica chamanda do escolhe_patrimonio encontrando registro pelo numero de serie do Patrimonio
+        """
+        self.setUpPatrimonio('', '7890')
+        url = reverse("patrimonio.views.escolhe_patrimonio")
+        response = self.client.post(url, {'num_doc': '789'})
+        self.assertIn(b'"pk": 2', response.content)
+        
+
