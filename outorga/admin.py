@@ -70,8 +70,6 @@ class OutorgaInline(admin.StackedInline):
 
     model = Outorga
     extra = 1
-    verbose_name = _('termo', 'item_outorga')
-    verbose_name_plural = _('Pedidos de Concessão')
     ordering = ('-data_solicitacao',)
 
 class OrigemFapespInline(admin.TabularInline):
