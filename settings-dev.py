@@ -9,6 +9,7 @@ TEMPLATE_DEBUG = DEBUG
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
 MEDIA_URL = '/files/'
+MEDIA_ROOT = '/var/www/files/'
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
@@ -16,7 +17,7 @@ MEDIA_URL = '/files/'
 ADMIN_MEDIA_PREFIX = '/media/'
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = 'r(^k*hs*17sjna7i*(fs75=^_r$3(i!r*yok$(n6g61*3s_x3j'
+SECRET_KEY = 'blablabla'
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
@@ -31,10 +32,17 @@ CKEDITOR_UPLOAD_PATH='/tmp/ckeditor'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'HOST': 'localhost',
-        'NAME': 'sistema',
+        'HOST': '127.0.0.1',
+        'NAME': 'sistema-bak-20130927',
+#         'NAME': 'sistema',
         'USER': 'sistema-user',
         'PASSWORD': '1234'
+        
+#         'HOST': '10.0.0.97',
+#         'NAME': 'rogerio',
+#         'USER': 'rogerio',
+#         'PASSWORD': 'sistema'
+
     }
 }
           
@@ -45,13 +53,16 @@ EMAIL_HOST_PASSWORD='1234'
 EMAIL_USE_TLS=True
 
 STATICFILES_DIRS = (
-     'C:/projetos/workspace/sistema/staticfiles/',
+     '/projetos/workspace/sistema/staticfiles/',
+     '/var/www/files/',
 )
-STATIC_ROOT = '/var/www/media/'
+
+STATIC_ROOT = '/projetos/workspace/sistema/media/'
 STATIC_URL = '/media/'
 
 
 INSTALLED_APPS += (
+    'django_jenkins',
 )
 
 
@@ -93,3 +104,22 @@ LOGGING = {
 }
 
 
+JENKINS_TASKS = (
+    'django_jenkins.tasks.with_coverage',
+    'django_jenkins.tasks.django_tests',   # select one django or
+    #'django_jenkins.tasks.dir_tests'      # directory tests discovery
+#    'django_jenkins.tasks.run_pep8',
+    'django_jenkins.tasks.run_pyflakes',
+#    'django_jenkins.tasks.run_jslint',
+#    'django_jenkins.tasks.run_csslint',    
+    'django_jenkins.tasks.run_sloccount',    
+#    'django_jenkins.tasks.lettuce_tests',
+)
+
+
+WKHTMLTOPDF_CMD = 'C:/Program Files (x86)/wkhtmltopdf/wkhtmltopdf.exe'
+WKHTMLTOPDF_CMD_OPTIONS = {
+    'quiet': True,
+    # Para o Linux, descomentar esta linha
+    # 'zoom':0.63,
+}
