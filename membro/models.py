@@ -619,7 +619,7 @@ class Controle(models.Model):
                         d.obs = u'%s Domingo' % d.obs
                 
                 # é feriado?
-                diaFeriado = feriado.get_dia_de_feriado(d.dia)
+                diaFeriado = Feriado.get_dia_de_feriado(d.dia)
                 if diaFeriado != None:
                     d.obs = u'%s %s' % (d.obs, diaFeriado.tipo.nome)
                     # este feriado é facultativo ou não?
@@ -683,7 +683,7 @@ class Controle(models.Model):
                
              # é feriado?
              is_feriado = False
-             diaFeriado = feriado.get_dia_de_feriado(d)
+             diaFeriado = Feriado.get_dia_de_feriado(d)
              
              # verifica se o feriado é facultativo, ou seja, com desconto de banco de horas.
              if diaFeriado != None and  not diaFeriado.tipo.subtrai_banco_hrs:

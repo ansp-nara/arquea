@@ -17,30 +17,21 @@ logger = logging.getLogger(__name__)
 
 
 class TipoDocumento(models.Model):
-
     """
     Uma instância dessa classe representa um tipo de protocolo que pode ser: nota fiscal, fatura, cotação, entre outros.
 
     O método '__unicode__'	Retorna o nome quando um objeto dessa classe for solicitado.
     A class 'Meta' 		Define a descrição do modelo (singular e plural) e a ordenação da visualização dos dados pelo nome.
-
-    >>> td, created = TipoDocumento.objects.get_or_create(nome='Oficio')
-
-    >>> td.__unicode__()
-    'Oficio'
     """
-
 
     nome = models.CharField(_('Nome'), max_length=100, help_text='ex. Nota Fiscal', unique=True)
     sigla = models.CharField(max_length=10)
-
 
     # Define a descrição do modelo (singular e plural) e a ordenação dos dados.
     class Meta:
         verbose_name = _('Tipo de documento')
         verbose_name_plural = _('Tipos de documento')
         ordering = ('nome', )
-
 
     # Retorna o nome    
     def __unicode__(self):
@@ -49,19 +40,12 @@ class TipoDocumento(models.Model):
 
 
 class Estado(models.Model):
-
     """
     Uma instância dessa classe representa um estado de um objeto que pode ser: pago, pendente, arquivado entre outros.
 
     O método '__unicode__'	Retorna o nome quando um objeto dessa classe for solicitado.
     A classe 'Meta' 		Define a ordenação da visualização dos dados pelo campo 'nome'.
-
-    >>> e, created = Estado.objects.get_or_create(nome='Vencido')
-
-    >>> e.__unicode__()
-    'Vencido'
     """
-
 
     nome = models.CharField(_('Nome'), max_length=30, help_text='ex. Pendente', unique=True)
 
@@ -90,7 +74,6 @@ class Origem(models.Model):
     >>> og.__unicode__()
     'E-mail'
     """
-
 
     nome = models.CharField(_('Nome'), max_length=20, help_text='ex. Correio', unique=True)
 
@@ -128,31 +111,7 @@ class Feriado(models.Model):
     O método '__unicode__' 		Retorna a data do feriado nos formatos dd/mm/aa ou dd/mm dependendo do campo 'movel'.
     O método da classe 'dia_de_feriado'	Verifica se uma data é feriado.
     A classe 'Meta' 			Define a ordenação dos dados pelo campo 'feriado'.
-
-    >>> import datetime
-
-    >>> f = Feriado(feriado=datetime.date(2008,10,8), movel=True)
-    >>> f.save()
-    >>> f = Feriado(feriado=datetime.date(2008,5,18), movel=False)
-    >>> f.save()
-    >>> f = Feriado(feriado=datetime.date(2008,2,22), movel=False)
-    >>> f.save()
-
-    >>> Feriado.dia_de_feriado(datetime.date(2007,10,8))
-    False
-    >>> Feriado.dia_de_feriado(datetime.date(2007,2,22))
-    True
-    >>> Feriado.dia_de_feriado(datetime.date(2008,10,8))
-    True
-    >>> Feriado.dia_de_feriado(datetime.date(2008,9,23))
-    False
-    >>> Feriado.dia_de_feriado(datetime.date(2009,5,18))
-    True
-
-    >>> f.__unicode__()
-    '22/02'
     """
-
 
     feriado = models.DateField(_('Feriado'))
     obs = models.CharField(_(u'Observação'), max_length=100, blank=True)
@@ -166,7 +125,8 @@ class Feriado(models.Model):
  
 
     # Define um método da classe que verifica se uma data é feriado.
-    def dia_de_feriado(self,data):
+    @staticmethod
+    def dia_de_feriado(data):
     #    dm = data in [f.feriado for f in cls.objects.filter(movel=True)]
     #    df = (data.month, data.day) in [(f.feriado.month, f.feriado.day) for f in cls.objects.filter(movel=False)]
     #    return (dm or df)
@@ -175,7 +135,8 @@ class Feriado(models.Model):
         
         return dm
     
-    def get_dia_de_feriado(self,data):
+    @staticmethod
+    def get_dia_de_feriado(data):
     #    dm = data in [f.feriado for f in cls.objects.filter(movel=True)]
     #    df = (data.month, data.day) in [(f.feriado.month, f.feriado.day) for f in cls.objects.filter(movel=False)]
     #    return (dm or df)
@@ -235,75 +196,7 @@ class Protocolo(models.Model):
     O método 'mostra valor' 		Formata o atributo 'valor' no formato de moeda conforme o campo 'moeda_estrangeira'.
     O método 'existe_arquivo' 		Retorna um ícone indicando que existe arquivo para o protocolo.
     O método 'Meta' 			Define a ordenação da visualização dos dados pelos campos 'descricao' e 'data_chegada'.
-
-    >>> from identificacao.models import Identificacao, Contato, Entidade
-    >>> from outorga.models import Termo
-    >>> from membro.models import Membro
-
-    >>> mb, created = Membro.objects.get_or_create(nome='Gerson Gomes', funcionario=True, defaults={'cargo': 'Outorgado', 'email': 'gerson@gomes.com', 'cpf': '000.000.000-00'})
-
-    >>> t, created = Termo.objects.get_or_create(ano=2008, processo=52885, digito=8, defaults={'data_concessao': datetime.date(2008,1,1), 'data_assinatura': datetime.date(2009,1,15), 'membro': mb})
-
-    >>> td, created = TipoDocumento.objects.get_or_create(nome='Nota Fiscal')
-
-    >>> e, created = Estado.objects.get_or_create(nome='Pendente')
-
-    >>> c, created = Contato.objects.get_or_create(nome='Joao', defaults={'email': 'joao@joao.com.br', 'tel': ''})
-
-    >>> og, created = Origem.objects.get_or_create(nome='Motoboy')
-
-    >>> ent, created = Entidade.objects.get_or_create(sigla='NEXTEL', defaults={'nome': 'Nextel', 'cnpj': '', 'ativo': True, 'fisco': True, 'url': ''})
-
-    >>> iden, created = Identificacao.objects.get_or_create(entidade=ent, contato=c, defaults={'funcao': 'Tecnico', 'area': '', 'ativo': True})
-
-    >>> p = Protocolo(termo=t, tipo_documento=td, num_documento=2008, estado=e, identificacao=iden, data_chegada=datetime.datetime(2008,9,30,10,10), data_validade=datetime.date(2009,8,25), data_vencimento=datetime.date(2008,9,30), descricao="Conta mensal", origem=og, valor_total=None)
-    >>> p.save()
-
-    >>> ip = ItemProtocolo(protocolo=p, descricao='Folha de pagamento', quantidade=2, valor_unitario=10000)
-    >>> ip.save()
-
-    >>> p.doc_num()
-    'Nota Fiscal 2008'
-
-    >>> p.recebimento()
-    '30/09/08 10:10'
-
-    >>> p.vencimento()
-    '30/09/08'
-
-    >>> p.validade()
-    '25/08/09'
-
-    >>> p.colorir()
-    'Pendente'
-
-    >>> p.pagamentos_amanha()
-    True
-
-    >>> p.valor
-    Decimal("20000.00")
-
-    >>> p.mostra_valor()
-    'R$  20.000,00'
-
-    >>> p.entidade()
-    u'NEXTEL'
-
-    >>> p.__unicode__()
-    u'08/52885-8_NEXTEL - Conta mensal'
-
-    >>> p.existe_arquivo()
-    ' '
-
-    >>> Protocolo.protocolos_termo(t)
-    [<Protocolo: 08/52885-8_NEXTEL - Conta mensal>]
-
-    >>> Protocolo.protocolos_em_aberto()
-    []
-
     """
-
-
     tipo_documento = models.ForeignKey('protocolo.TipoDocumento', verbose_name=_(u'Documento'),
         limit_choices_to=~Q(nome=u'Contrato') & ~Q(nome=u'Cotação')& ~Q(nome=u'Ordem de Serviço'))
     origem = models.ForeignKey('protocolo.Origem', verbose_name=_(u'Origem'), null=True, blank=True)
@@ -494,7 +387,6 @@ class Protocolo(models.Model):
         return prot
 
 
-
     # Retorna os protocolos diferentes de 'Contrato', 'Cotação' que não estão relacionadas ao modelo 'Despesa'.
     @classmethod
     def protocolos_termo(cls, t):
@@ -508,7 +400,6 @@ class Protocolo(models.Model):
 
 
 class Cotacao(Protocolo):
-
     """
     Subclasse de protocolo, com espaço para que seja colocado o parecer técnico para a aceitação ou
     rejeição da cotação.
@@ -516,48 +407,16 @@ class Cotacao(Protocolo):
     O método '__unicode__' 	Retorna a entidade e a descrição.
     O método 'existe_entrega'	Retorna o campo 'entrega' se ele estiver preenchido.
     A classe 'Meta' 		Define a descrição do modelo (singular e plural) a ordenação dos dados pela data de chegada.
-
-    >>> from outorga.models import Termo
-    >>> from identificacao.models import Contato, Entidade, Identificacao
-    >>> from membro.models import Membro
-
-    >>> import datetime
-
-    >>> td, created = TipoDocumento.objects.get_or_create(nome='Fatura/NF')
-
-    >>> e, created = Estado.objects.get_or_create(nome='Reprovada')
-
-    >>> c, created = Contato.objects.get_or_create(nome='Andre', defaults={'email': 'andre@andre.com', 'tel': ''})
-
-    >>> og, created = Origem.objects.get_or_create(nome='Correio')
-
-    >>> mb, created = Membro.objects.get_or_create(nome='Gerson Gomes', funcionario=True, defaults={'cargo': 'Outorgado', 'email': 'gerson@gomes.com', 'cpf': '000.000.000-00'})
-
-    >>> t, created = Termo.objects.get_or_create(ano=2008, processo=52885, digito=8, defaults={'data_concessao': datetime.date(2008,1,1), 'data_assinatura': datetime.date(2009,1,15), 'membro': mb})
-
-    >>> ent, created = Entidade.objects.get_or_create(sigla='NEXTEL', defaults={'nome': 'Nextel', 'cnpj': '', 'ativo': True, 'fisco': True, 'url': ''})
-
-    >>> iden, created = Identificacao.objects.get_or_create(entidade=ent, contato=c, defaults={'funcao': 'Gerente Administrativo', 'area': ''})
-
-    >>> cot = Cotacao(termo=t, tipo_documento=td, estado=e, identificacao=iden, data_chegada=datetime.datetime(2008,12,12,9,10), data_validade=datetime.date(2009,12,13), descricao='Compra de Aparelhos', origem=og, parecer='custo alto', aceito=False, entrega='confirmada')
-    >>> cot.save()
-
-    >>> cot.__unicode__()
-    'NEXTEL - Compra de Aparelhos'
-
-    >>> cot.existe_entrega()
-    'confirmada'
     """
-
-
+    
     parecer = models.TextField(_(u'Parecer Técnico'), help_text=_(u'Justificativa para aceitar ou rejeitar esta cotação'), blank=True)
     aceito = models.BooleanField(_(u'Aceito?'), help_text=_(u'Essa cotação foi aceita?'))
     entrega = models.CharField(_(u'Entrega'), max_length=20, help_text=_(u' '), blank=True)
 
- 
+
     # Retorna a entidade e a descrição.
     def __unicode__(self):
-        return u'%s - %s' % (self.entidade(), self.descricao)
+        return u'%s - %s' % (self.identificacao.endereco.entidade, self.descricao)
 
 
     # Retorna o campo 'entrega' se existir.
@@ -578,7 +437,6 @@ class Cotacao(Protocolo):
 
 
 class ItemProtocolo(models.Model):
-
     """
     Uma instância dessa classe representa um item de um protocolo.
 
@@ -587,45 +445,7 @@ class ItemProtocolo(models.Model):
     A classe 'Meta' 		Define a descrição do modelo (singular e plural) e a ordenação dos dados pelo 'id'.
     O método '__unicode__'	Retorna o protocolo e a descrição.
     O atributo 'valor' 		Calcula o valor de cada item (quantidade * valor unitário).
-
-    >>> import datetime
-
-    >>> from outorga.models import Termo
-    >>> from identificacao.models import Contato, Entidade, Identificacao
-    >>> from membro.models import Membro
-
-    >>> td, created = TipoDocumento.objects.get_or_create(nome='Anexo 9')
-
-    >>> e, created = Estado.objects.get_or_create(nome='Pago')
-
-    >>> c, created = Contato.objects.get_or_create(nome='Joao', defaults={'email': 'joao@joao.com.br', 'tel': ''})
-
-    >>> og, created = Origem.objects.get_or_create(nome='Sedex')
-
-    >>> mb, created = Membro.objects.get_or_create(nome='Gerson Gomes', funcionario=True, defaults={'cargo': 'Outorgado', 'email': 'gerson@gomes.com', 'cpf': '000.000.000-00'})
-
-    >>> t, created = Termo.objects.get_or_create(ano=2008, processo=52885, digito=8, defaults={'data_concessao': datetime.date(2008,1,1), 'data_assinatura': datetime.date(2009,1,15), 'membro' :mb})
-
-    >>> ent, created = Entidade.objects.get_or_create(sigla='UNIEMP', defaults={'nome': 'Instituto Uniemp', 'cnpj': '', 'ativo': True, 'fisco': True, 'url': ''})
-
-    >>> iden, created = Identificacao.objects.get_or_create(entidade=ent, contato=c, defaults={'funcao': 'Tecnico', 'area': '', 'ativo': True})
-
-    >>> p = Protocolo(termo=t, tipo_documento=td, num_documento=2008, estado=e, identificacao=iden, data_chegada=datetime.datetime(2008,9,30,10,10), data_validade=datetime.date(2009,8,25), data_vencimento=datetime.date(2008,9,30), descricao="Aditivo Uniemp", origem=og)
-    >>> p.save()
-
-    >>> ip = ItemProtocolo(protocolo=p, descricao='Servico de conexao', quantidade=1, valor_unitario='59613.59')
-    >>> ip.save()
-
-    >>> ip.__unicode__()
-    '08/52885-8_UNIEMP - Aditivo Uniemp | Servico de conexao'
-
-    >>> ip.valor
-    Decimal("59613.59")
-
-    >>> ip.mostra_valor()
-    'R$ 59.613,59'
     """
-
 
     protocolo = models.ForeignKey('protocolo.Protocolo', verbose_name=_(u'Protocolo'))
     descricao = models.TextField(_(u'Descrição'), help_text=_(u'ex. Despesas da linha 3087-1500 ref. 10/2008'))
