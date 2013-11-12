@@ -35,7 +35,7 @@ th {text-align: left;}
     <tr><th>Patrimônio FMUSP</th><th width="8%">NF</th><th width="30%"   >Descrição - complemento</th><th>Valor</th><th>Marca</th><th width="10%">NS</th><th>Estado</th><th width="30%">Localização</th><th>Posição</th></tr>
     {% for t in termos %}
         {% for p in t.patrimonios %}
-                 <tr><td>{{ p.numero_fmusp|default_if_none:"" }}</td><td>{{ p.pagamento.protocolo.num_documento }}</td><td>{% if p.equipamento %}[{{ p.equipamento.tipo }}] {% endif %}{{ p.descricao }} - {{ p.complemento|default:"" }}</td><td>{{ p.valor|moeda }}</td><td>{{ p.marca }}</td><td>{{ p.ns }}</td><td>{{ p.historico_atual.estado }}</td><td>{{ p.historico_atual.endereco }}</td><td>{{ p.historico_atual.posicao|default_if_none:"" }}</td></tr>
+                 <tr><td>{{ p.numero_fmusp|default_if_none:"" }}</td><td>{{ p.pagamento.protocolo.num_documento }}</td><td>{% if p.equipamento %}[{{ p.equipamento.tipo }}] {% endif %}{{ p.descricao }} - {{ p.complemento|default:"" }}</td><td>{{ p.valor|moeda }}</td><td>{{ p.equipamento.entidade_fabricante.sigla }}</td><td>{{ p.ns }}</td><td>{{ p.historico_atual.estado }}</td><td>{{ p.historico_atual.endereco }}</td><td>{{ p.historico_atual.posicao|default_if_none:"" }}</td></tr>
         {% endfor %}
     {% endfor %}
     </table>

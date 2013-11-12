@@ -17,13 +17,13 @@
     {% for d in detalhes %}
         <tr><td></td>{% if endereco %}<td>{{ d.detalhe }}</td>{% endif %}<td colspan="9"></td></tr>
            {% for p in d.patrimonio %}
-              <tr><td>{{ p.id }}</td>{% if endereco %}<td></td>{% endif %}<td>{{ p.procedencia }}</td><td>{{ p.pagamento.protocolo.num_documento }}</td><td>{{ p.marca }}</td><td>{{ p.modelo }}</td><td>{{ p.part_number }}</td><td>{{ p.descricao }} - {{ p.complemento }}</td><td>{{ p.ns }}</td><td>{{ p.historico_atual.estado }}</td></tr>
+              <tr><td>{{ p.id }}</td>{% if endereco %}<td></td>{% endif %}<td>{{ p.procedencia }}</td><td>{{ p.pagamento.protocolo.num_documento }}</td><td>{{ p.equipamento.entidade_fabricante.sigla }}</td><td>{{ p.modelo }}</td><td>{{ p.part_number }}</td><td>{{ p.descricao }} - {{ p.complemento }}</td><td>{{ p.ns }}</td><td>{{ p.historico_atual.estado }}</td></tr>
               {% for f in p.contido.all %}
-                 <tr style="color:#0000ff;"><td></td><td>{{ f.procedencia }}</td><td>{{ f.pagamento.protocolo.num_documento }}</td><td>{{ f.marca }}</td><td>{{ f.modelo }}</td><td>{{ f.part_number }}</td><td>{{ f.descricao }}</td><td>{{ f.ns }}</td><td>{{ f.historico_atual.estado }}</td></tr>
+                 <tr style="color:#0000ff;"><td></td><td>{{ f.procedencia }}</td><td>{{ f.pagamento.protocolo.num_documento }}</td><td>{{ f.equipamento.entidade_fabricante.sigla }}</td><td>{{ f.modelo }}</td><td>{{ f.part_number }}</td><td>{{ f.descricao }}</td><td>{{ f.ns }}</td><td>{{ f.historico_atual.estado }}</td></tr>
                   {% for g in f.contido.all %}
-                     <tr style="color:#ff0000;"><td></td><td>{{ g.procedencia }}</td><td>{{ g.pagamento.protocolo.num_documento }}</td><td>{{ g.marca }}</td><td>{{ g.modelo }}</td><td>{{ g.part_number }}</td><td>{{ g.descricao }}</td><td>{{ g.ns }}</td><td>{{ g.historico_atual.estado }}</td></tr>
+                     <tr style="color:#ff0000;"><td></td><td>{{ g.procedencia }}</td><td>{{ g.pagamento.protocolo.num_documento }}</td><td>{{ g.equipamento.entidade_fabricante.sigla }}</td><td>{{ g.modelo }}</td><td>{{ g.part_number }}</td><td>{{ g.descricao }}</td><td>{{ g.ns }}</td><td>{{ g.historico_atual.estado }}</td></tr>
                      {% for h in g.contido.all %}
-                        <tr style="color:#00ff00;"><td></td><td>{{ h.procedencia }}</td><td>{{ h.pagamento.protocolo.num_documento }}</td><td>{{ h.marca }}</td><td>{{ h.modelo }}</td><td>{{ h.part_number }}</td><td>{{ h.descricao }}</td><td>{{ h.ns }}</td><td>{{ h.historico_atual.estado }}</td></tr>
+                        <tr style="color:#00ff00;"><td></td><td>{{ h.procedencia }}</td><td>{{ h.pagamento.protocolo.num_documento }}</td><td>{{ h.equipamento.entidade_fabricante.sigla }}</td><td>{{ h.modelo }}</td><td>{{ h.part_number }}</td><td>{{ h.descricao }}</td><td>{{ h.ns }}</td><td>{{ h.historico_atual.estado }}</td></tr>
                      {% endfor %}
                  {% endfor %}
               {% endfor %}

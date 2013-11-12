@@ -18,9 +18,9 @@
         {% for d in e.detalhes %}
            <tr><td></td><td>{{ d.detalhe.detalhes }}</td><td colspan="6"></td></tr>
            {% for p in d.patrimonio %}
-              <tr {% if not p.patrimonio %}style="font-weight:bold;"{% endif %}><td></td><td></td><td>{{ p.procedencia }}</td><td>{{ p.marca }}</td><td>{{ p.modelo }}</td><td>{{ p.part_number }}</td><td><a href="{% url 'admin:patrimonio_patrimonio_change' p.id %}">{{ p.descricao }}</a></td><td>{{ p.ns }}</td></tr>
+              <tr {% if not p.patrimonio %}style="font-weight:bold;"{% endif %}><td></td><td></td><td>{{ p.procedencia }}</td><td>{{ p.equipamento.entidade_fabricante.sigla }}</td><td>{{ p.modelo }}</td><td>{{ p.part_number }}</td><td><a href="{% url 'admin:patrimonio_patrimonio_change' p.id %}">{{ p.descricao }}</a></td><td>{{ p.ns }}</td></tr>
               {% for f in p.patrimonio_set.all %}
-                 <tr><td></td><td></td><td></td><td>{{ f.procedencia }}</td><td>{{ f.marca }}</td><td>{{ f.modelo }}</td><td>{{ f.part_number }}</td><td>{{ p.descricao }}</td><td>{{ f.ns }}</td></tr>
+                 <tr><td></td><td></td><td></td><td>{{ f.procedencia }}</td><td>{{ f.equipamento.entidade_fabricante.sigla }}</td><td>{{ f.modelo }}</td><td>{{ f.part_number }}</td><td>{{ p.descricao }}</td><td>{{ f.ns }}</td></tr>
               {% endfor %}
            {% endfor %}
         {% endfor %}

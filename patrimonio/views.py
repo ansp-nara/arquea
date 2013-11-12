@@ -224,10 +224,10 @@ def por_marca(request, pdf=0):
     if request.method == 'GET' and request.GET.get('marca'):
         marca = request.GET.get('marca')
         if pdf:
-	    return render_to_pdf('patrimonio/por_marca.pdf', {'marca':marca, 'patrimonios':Patrimonio.objects.filter(marca=marca), 'filename':'inventario_por_marca.pdf'})
-        return TemplateResponse(request, 'patrimonio/por_marca.html', {'marca':marca, 'patrimonios':Patrimonio.objects.filter(marca=marca)})
+	           return render_to_pdf('patrimonio/por_marca.pdf', {'marca':marca, 'patrimonios':Patrimonio.objects.filter(equipamento__entidade_fabricante__sigla=marca), 'filename':'inventario_por_marca.pdf'})
+        return TemplateResponse(request, 'patrimonio/por_marca.html', {'marca':marca, 'patrimonios':Patrimonio.objects.filter(equipamento__entidade_fabricante__sigla=marca)})
     else:
-        return TemplateResponse(request, 'patrimonio/sel_marca.html', {'marcas':Patrimonio.objects.values_list('marca', flat=True).order_by('marca').distinct()})
+        return TemplateResponse(request, 'patrimonio/sel_marca.html', {'marcas':Patrimonio.objects.values_list('equipamento__entidade_fabricante__sigla', flat=True).order_by('equipamento__entidade_fabricante__sigla').distinct()})
 
 @login_required
 def por_local(request, pdf=0):
