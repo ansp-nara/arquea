@@ -124,7 +124,10 @@ class Patrimonio(models.Model):
             return u'%s - %s - %s' % (self.apelido, self.ns, self.descricao)
 
     def marca(self):
-        return equipamento.entidade_fabricante.sigla
+        retorno = ''
+        if self.equipamento and self.equipamento.entidade_fabricante and self.equipamento.entidade_fabricante.sigla:
+            retorno = self.equipamento.entidade_fabricante.sigla
+        return retorno
     marca.short_description = u'Marca'
     
     @cached_property
