@@ -314,7 +314,7 @@ class Termo(models.Model):
 
 
     # Não permite fazer alteração no número do processo.
-    def save(self, force_insert=False, force_update=False):
+    def save(self, force_insert=False, force_update=False, using=None):
         pk = self.pk
         try:
             antigo = Termo.objects.get(pk=pk)
@@ -1325,10 +1325,10 @@ class OrigemFapesp(models.Model):
 
       def gasto(self):
           g = self.pagamento_set.all().aggregate(Sum('valor_fapesp'))
-	  return g['valor_fapesp__sum'] or Decimal('0.0')
+          return g['valor_fapesp__sum'] or Decimal('0.0')
 
       def termo(self):
-	  return self.item_outorga.natureza_gasto.termo
+          return self.item_outorga.natureza_gasto.termo
 
 class Contrato(models.Model):
 

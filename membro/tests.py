@@ -41,7 +41,7 @@ class MembroTest(TestCase):
     def setUp(self):
         ent, created = Entidade.objects.get_or_create(sigla='ANSP', defaults={'nome':'Academic Network at São Paulo', 'cnpj':'', 'fisco':True})
 
-        mb = Membro(nome='Joice Gomes', funcionario=True, email='soraya@gomes.com', cpf='000.000.000-00', ramal=23)
+        mb = Membro(nome='Joice Gomes', email='soraya@gomes.com', cpf='000.000.000-00', ramal=23)
         mb.save()
         
         cg = Cargo(nome='Secretaria')
