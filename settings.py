@@ -88,7 +88,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.static', 
     'django.core.context_processors.request',
     'django.contrib.messages.context_processors.messages', 
-    'sistema.utils.context_processors.applist',)
+    'sistema.utils.context_processors.applist',
+    'sistema.utils.context_processors.debug',)
 
 INSTALLED_APPS = (
     'django.contrib.auth',
@@ -112,6 +113,8 @@ INSTALLED_APPS = (
     'sistema.rede',
     'sistema.evento',
     'sistema.processo',
+    'sistema.verificacao',
+    'sistema.carga',
     'tinymce',
     'ckeditor',
 )
