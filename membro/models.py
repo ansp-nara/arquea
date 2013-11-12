@@ -1,19 +1,15 @@
 # -*- coding: utf-8 -*-
-
-
 from datetime import timedelta, datetime, date
 from dateutil.relativedelta import *
 from django.db import models
 from django.db.models import Q, Sum
 from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import cached_property
-from protocolo.models import Feriado
-from utils.models import NARADateField
-import calendar
-#from utils.models import CPFField
-#######
 from django.core.urlresolvers import reverse
 from dateutil.rrule import rrule, DAILY
+import calendar
+from protocolo.models import Feriado
+from utils.models import NARADateField
 
 import logging
 
@@ -41,22 +37,14 @@ class CPFField(models.CharField):
 
 
 class TipoAssinatura(models.Model):
-
     """
     Uma instância dessa classe é um tipo de assinatura.
 
     O método '__unicode__'	Retorna o nome.
     A 'class Meta'		Define a descrição (singular e plural) do modelo e a ordenação  dos dados pelo nome.
-
-    >>> ta, created = TipoAssinatura.objects.get_or_create(nome='Cheque')
-
-    >>> ta.__unicode__()
-    u'Cheque'
     """
 
-
     nome = models.CharField(_(u'Nome'), max_length=20, help_text=_(u' '), unique=True)
-
 
     # Retorna o nome
     def __unicode__(self):
@@ -80,26 +68,7 @@ class Membro(models.Model):
     O método 'existe_curriculo' Retorna um ícone com link para o currículo lattes se o campo 'url_lattes' se estiver preenchido.
     A class 'Meta' 		Define a ordenação dos dados pelos campos 'equipe' e 'membro' e define que um membro deve ser único
     				pelos campos 'equipe', 'nome' e 'funcao'.
-
-    >>> from identificacao.models import Entidade
-
-    >>> ent, created = Entidade.objects.get_or_create(sigla='ANSP', defaults={'nome': 'Academic Network at São Paulo', 'cnpj': '', 'ativo': True, 'fisco': True })
-
-    >>> ep, created = Equipe.objects.get_or_create(entidade=ent, area='NARA')
-
-    >>> mb, created = Membro.objects.get_or_create(nome='Joice Gomes', funcionario=True, defaults={'cargo': 'Secretaria', 'email': 'soraya@gomes.com', 'cpf': '000.000.000-00', 'data_admissao': datetime.date(2008,1,1), 'data_demissao': datetime.date(2009,1,1), 'ramal': 23})
-
-    >>> mb.__unicode__()
-    'Joice Gomes (Secretaria)' 
-
-    >>> mb.existe_curriculo()
-    ''
-
-    >>> mb.existe_ramal()
-    23
     """
-
-
     nome = models.CharField(_(u'Nome'), max_length=50, help_text=_(u'ex. Caio Andrade'))
     rg = models.CharField(_(u'RG'), max_length=12, help_text=_(u'ex. 00.000.000-0'), blank=True, null=True)
     cpf = CPFField(_(u'CPF'), blank=True, null=True, help_text=_(u'ex. 000.000.000-00'))
@@ -162,7 +131,6 @@ class Membro(models.Model):
 
 
 class Usuario(models.Model):
-
     """
     Uma instância dessa classe representa um usuário de um sistema.
 
@@ -170,28 +138,10 @@ class Usuario(models.Model):
     A classmethod 'usuarios_sistema'	Retorna os usuários de um sistema.
     A class 'Meta' 			Define a descrição do modelo (singuar e plural), ordena os dados pelos campos 'username' e 
 					a unicidade de um usuário pelos campos 'membro', 'username' e 'sistema'.
-
-    >>> from identificacao.models import Entidade
-
-    >>> ent, created = Entidade.objects.get_or_create(sigla='ANSP', defaults={'nome': 'Academic Network at São Paulo', 'cnpj': '', 'ativo': True, 'fisco': True })
-
-    >>> ep, created = Equipe.objects.get_or_create(entidade=ent, area='NARA')
-
-    >>> mb, created = Membro.objects.get_or_create(nome='Soraya Gomes', funcionario=True, defaults={'cargo': 'Secretaria', 'email': 'soraya@gomes.com', 'cpf': '000.000.000-00'})
-
-    >>> usr, created = Usuario.objects.get_or_create(membro=mb, username='soraya', sistema='Administrativo')
-
-    >>> usr.__unicode__()
-    'soraya'
-
-    >>> Usuario.usuarios_sistema(usr.sistema)
-    [<Usuario: soraya>]
     """
-
     membro = models.ForeignKey('membro.Membro', verbose_name=_(u'Membro'))#, limit_choices_to=Q(funcionario=True))
     username = models.CharField(_(u'Usuário'), max_length=20, help_text=_(u'Nome de usuário no sistema'))
     sistema = models.CharField(_(u'Sistema'), max_length=50, help_text=_(u'Nome do Sistema'))
-
 
     # Retorna o usuário.
     def __unicode__(self):
@@ -215,24 +165,6 @@ class Assinatura(models.Model):
     O método '__unicode__'		Retorna os campos 'membro' e 'tipo_assinatura'.
     A classmethod 'assinaturas_membro'	Retorna as assinaturas de um membro específico.
     A class 'Meta'			Define a ordenação dos dados pelo 'nome' e unicidade pelos campos 'tipo_assinatura' e 'membro'.
-
-    >>> from identificacao.models import Entidade
-
-    >>> ent, created = Entidade.objects.get_or_create(sigla='ANSP', defaults={'nome': 'Academic Network at São Paulo', 'cnpj': '', 'ativo': True, 'fisco': True })
-
-    >>> ep, created = Equipe.objects.get_or_create(entidade=ent, area='NARA')
-
-    >>> mb, created = Membro.objects.get_or_create(nome='Soraya Gomes', funcionario=True, defaults={'cargo': 'Secretaria', 'email': 'soraya@gomes.com', 'cpf': '312.617.028-00'})
-
-    >>> ta, created = TipoAssinatura.objects.get_or_create(nome='Cheque')
-
-    >>> a, created = Assinatura.objects.get_or_create(membro=mb, tipo_assinatura=ta)
-
-    >>> a.__unicode__()
-    u'Soraya Gomes | Cheque'
-
-    >>> Assinatura.assinaturas_membro(a.membro)
-    [<Assinatura: Soraya Gomes | Cheque>]
     """
 
     membro = models.ForeignKey('membro.Membro', verbose_name=_(u'Membro'))#, limit_choices_to=Q(funcionario=True))
@@ -252,7 +184,6 @@ class Assinatura(models.Model):
 
 
 class Ferias(models.Model):
-
     """
     Controle de período aquisitivo para as férias
     """
@@ -305,7 +236,7 @@ class Ferias(models.Model):
     
     @classmethod
     def total_dias_uteis_aberto(self, membro_id):
-    # Retorna o total de dias em aberto para o membro
+    # Retorna o total de dias em aberto para o membro, em segundos
         total_dias_uteis_aberto = 0
         
         ferias = Ferias.objects.filter(membro=membro_id)
@@ -440,7 +371,6 @@ class DispensaLegal(models.Model):
         verbose_name_plural = _(u'Dispensas')
 
 class Banco(models.Model):
-
     """
     Tabela para guardar os números e nomes dos bancos, com atualização automática periódica.
 
@@ -470,7 +400,6 @@ class Banco(models.Model):
 
 
 class DadoBancario(models.Model):
-
     """
     Uma instância dessa classe representa os dados bancários de uma entidade ou um contato.
 
@@ -479,22 +408,7 @@ class DadoBancario(models.Model):
     O método 'conta_digito'	Retorna o número da conta + o dígito.
     A class 'Meta'		Define a descrição do modelo (singular e plural), a ordenação dos dados pelo 'banco' e a unicidade dos
 				dados pelos campos 'banco', 'agencia', 'ag_digito', 'conta', 'cc_digito'.
-
-    >>> mb, created = Membro.objects.get_or_create(nome='Soraya Gomes', funcionario=True, defaults={'cargo': 'Secretaria', 'email': 'soraya@gomes.com', 'cpf': '000.000.000-00'})
-
-    >>> b = Banco(numero=151, nome='Nossa Caixa')
-    >>> b.save()
-
-    >>> db, created = DadoBancario.objects.get_or_create(membro=mb, banco=b, agencia=1690, ag_digito=4, conta=123439, cc_digito='x')
-
-    >>> db.agencia_digito()
-    '1690-4'
-
-    >>> db.conta_digito()
-    '123439-x'
     """
-
-
     membro = models.OneToOneField('membro.Membro', verbose_name=_(u'Membro'))
     banco = models.ForeignKey('membro.Banco', verbose_name=_(u'Banco'))
     agencia = models.IntegerField(_(u'Ag.'), help_text=_(u'ex. 0909'))

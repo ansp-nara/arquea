@@ -11,30 +11,114 @@ from datetime import date, timedelta, datetime
 from django.db.models import Q
 from django.test import TestCase
 from django.utils import timezone
-from membro.models import Controle, Membro, Ferias, ControleFerias, \
-    DispensaLegal, TipoDispensa
-from protocolo.models import Feriado
 import calendar
+from membro.models import Controle, Membro, Ferias, ControleFerias, \
+    DispensaLegal, TipoDispensa, Usuario, Historico, Cargo, Banco, DadoBancario, Assinatura, TipoAssinatura
+from protocolo.models import Feriado
+from identificacao.models import Entidade
 
 import logging
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
-class SimpleTest(TestCase):
-    def test_basic_addition(self):
-        """
-        Tests that 1 + 1 always equals 2.
-        """
-        self.failUnlessEqual(1 + 1, 2)
 
-__test__ = {"doctest": """
-Another way to test that 1 + 1 is equal to 2.
+class TipoAssinaturaTest(TestCase):
+    def test_unicode (self):
+        ta, created = TipoAssinatura.objects.get_or_create(nome='Cheque')
+        self.assertEquals(u'Cheque', ta.__unicode__())
 
->>> 1 + 1 == 2
-True
-"""}
+class UsuarioTest(TestCase):
+    def test_unicode(self):
+        ent = Entidade(sigla='ANSP', nome='Academic Network at São Paulo', cnpj='', fisco=True )
+        ent.save()
+        mb, created = Membro.objects.get_or_create(nome='Soraya Gomes', defaults={'email': 'soraya@gomes.com', 'cpf': '000.000.000-00'})
+        usr, created = Usuario.objects.get_or_create(membro=mb, username='soraya', sistema='Administrativo')
 
+        self.assertEquals('soraya', usr.__unicode__())
+
+class MembroTest(TestCase):
+    def setUp(self):
+        ent, created = Entidade.objects.get_or_create(sigla='ANSP', defaults={'nome':'Academic Network at São Paulo', 'cnpj':'', 'fisco':True})
+
+        mb = Membro(nome='Joice Gomes', funcionario=True, email='soraya@gomes.com', cpf='000.000.000-00', ramal=23)
+        mb.save()
+        
+        cg = Cargo(nome='Secretaria')
+        cg.save()
+
+        ht = Historico(inicio=datetime(2008,1,1), cargo=cg, membro=mb)
+        ht.save()
+    
+    def test_cargo_atual(self):
+        mb = Membro.objects.get(email='soraya@gomes.com')
+        self.assertEquals('Secretaria', mb.cargo_atual())
+    
+    
+    def test_cargo_atual_depois_do_desligamento(self):
+        mb = Membro.objects.get(email='soraya@gomes.com')
+        ht = Historico.objects.get(pk=1)
+        ht.termino=datetime(2008,1,2)
+        ht.save()
+        
+        self.assertEquals('', mb.cargo_atual())
+
+    def test_ramal(self):
+        mb = Membro.objects.get(email='soraya@gomes.com')
+        self.assertEquals(23, mb.existe_ramal())
+    
+    def test_curriculo_vazio(self):
+        mb = Membro.objects.get(email='soraya@gomes.com')
+        self.assertEquals('', mb.existe_curriculo())
+
+    def test_unicode(self):
+        mb = Membro.objects.get(email='soraya@gomes.com')
+        self.assertEquals('Joice Gomes (Secretaria)', mb.__unicode__())
+        
+    def test_unicode_depois_do_desligamento(self):
+        mb = Membro.objects.get(email='soraya@gomes.com')
+        ht = Historico.objects.get(pk=1)
+        ht.termino=datetime(2008,1,2)
+        ht.save()
+        
+        self.assertEquals('Joice Gomes', mb.__unicode__())
+
+
+class DadoBancarioTest(TestCase):
+    def setUp(self):
+        mb = Membro(nome='Joice Gomes', funcionario=True, email='soraya@gomes.com', cpf='000.000.000-00', ramal=23)
+        mb.save()
+        
+        cg = Cargo(nome='Secretaria')
+        cg.save()
+
+        ht = Historico(inicio=datetime(2008,1,1), cargo=cg, membro=mb)
+        ht.save()
+
+        b = Banco(numero=151, nome='Nossa Caixa')
+        b.save()
+
+        db, created = DadoBancario.objects.get_or_create(membro=mb, banco=b, agencia=1690, ag_digito=4, conta=123439, cc_digito='x')
+        
+        
+    def test_agencia_digito(self):
+        db = DadoBancario.objects.get(agencia=1690)
+        self.assertEquals('1690-4',db.agencia_digito())
+
+    def test_conta_digito(self):
+        db = DadoBancario.objects.get(agencia=1690)
+        self.assertEquals('123439-x', db.conta_digito())
+
+
+class AssinaturaTest(TestCase):
+    def setUp(self):
+        mb, created = Membro.objects.get_or_create(nome='Soraya Gomes', defaults={'email': 'soraya@gomes.com', 'cpf': '312.617.028-00'})
+        ta, created = TipoAssinatura.objects.get_or_create(nome='Cheque')
+        a, created = Assinatura.objects.get_or_create(membro=mb, tipo_assinatura=ta)
+
+    def test_unicode(self):
+        assinatura = Assinatura.objects.get(pk=1)
+        self.assertEquals(u'Soraya Gomes | Cheque', assinatura.__unicode__())
 
 class MembroControleTest(TestCase):
     def test_controle_permanencia_um_dia(self):
@@ -380,5 +464,5 @@ class FeriasTest(TestCase):
         controleFerias = ControleFerias(ferias=ferias, termino=datetime.now(), inicio=datetime.now(), dias_uteis_fato=30, dias_uteis_aberto=0)
         controleFerias.save()
         
-        self.assertEquals(Ferias().total_dias_uteis_aberto(1), 20)
+        self.assertEquals(Ferias().total_dias_uteis_aberto(1), 20 * 8 * 60 * 60)
 
