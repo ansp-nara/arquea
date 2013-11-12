@@ -240,7 +240,7 @@ class Entidade(models.Model):
 
 
     # Grava o CNPJ no banco de dados com as devidas pontuações e converte a sigla em letras maiúsculas.
-    def save(self, force_insert=False, force_update=False):
+    def save(self, force_insert=False, force_update=False, using=None):
         if self.cnpj and len(self.cnpj) < 18:
             a = list(self.cnpj)
             p = [(2,'.'), (6,'.'), (10,'/'), (15,'-')]
