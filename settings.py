@@ -100,24 +100,27 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_cas',
-    'sistema.protocolo',
+    'tinymce',
+    'ckeditor'
+)
+PROJECT_APPS = (
+    'sistema.carga',
+    'sistema.evento',
+    'sistema.financeiro',
     'sistema.identificacao',
     'sistema.membro',
-    'sistema.outorga',
-    'sistema.financeiro',
-    'sistema.patrimonio',
     'sistema.memorando',
-    'sistema.pesquisa',
-    'sistema.questionario',
     'sistema.monitor',
-    'sistema.rede',
-    'sistema.evento',
+    'sistema.outorga',
+    'sistema.patrimonio',
+    'sistema.pesquisa',
     'sistema.processo',
-    'sistema.verificacao',
-    'sistema.carga',
-    'tinymce',
-    'ckeditor',
+    'sistema.protocolo',
+    'sistema.questionario',
+    'sistema.rede',
+    'sistema.verificacao'
 )
+INSTALLED_APPS += PROJECT_APPS
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
