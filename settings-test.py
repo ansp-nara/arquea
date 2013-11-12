@@ -70,23 +70,7 @@ LOGGING = {
 
 
 # start JENKINS CONFIGURATION
-PROJECT_APPS = (
-    'sistema.carga',
-    'sistema.evento',
-    'sistema.financeiro',
-    'sistema.identificacao',
-    'sistema.membro',
-    'sistema.memorando',
-    'sistema.monitor',
-    'sistema.outorga',
-    'sistema.patrimonio',
-    'sistema.pesquisa',
-    'sistema.processo',
-    'sistema.protocolo',
-    'sistema.questionario',
-    'sistema.rede',
-    'sistema.verificacao',
-)
+
 
 JENKINS_TASKS = (
     'django_jenkins.tasks.with_coverage',
