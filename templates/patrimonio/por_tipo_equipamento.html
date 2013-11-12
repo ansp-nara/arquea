@@ -14,7 +14,7 @@
     <table border="0" repeat="1" cellpadding="5">
     <tr><th>Entidade</th><th>Local</th><th>Posição</th><th>Marca</th><th>Modelo</th><th>Part number</th><th>Descrição</th><th>NS</th><th>Estado</th></tr>
     {% for e in entidades %}
-        <tr {% if not e.patrimonio %}style="font-weight:bold;"{% endif %}><td>{{ e.entidade }}</td><td>{{ e.local }}</td><td>{{ e.patrimonio.historico_atual.posicao|default_if_none:'' }}</td><td>{{ e.patrimonio.marca }}</td><td>{{ e.patrimonio.modelo }}</td><td>{{ e.patrimonio.part_number }}</td><td><a href="{% url "admin:patrimonio_patrimonio_change" e.patrimonio.id %}">{{ e.patrimonio.descricao }}</a></td><td>{{ e.patrimonio.ns }}</td><td>{{ e.patrimonio.historico_atual.estado }}</td></tr>
+        <tr {% if not e.patrimonio %}style="font-weight:bold;"{% endif %}><td>{{ e.entidade }}</td><td>{{ e.local }}</td><td>{{ e.patrimonio.historico_atual.posicao|default_if_none:'' }}</td><td>{{ e.patrimonio.equipamento.entidade_fabricante.sigla }}</td><td>{{ e.patrimonio.modelo }}</td><td>{{ e.patrimonio.part_number }}</td><td><a href="{% url "admin:patrimonio_patrimonio_change" e.patrimonio.id %}">{{ e.patrimonio.descricao }}</a></td><td>{{ e.patrimonio.ns }}</td><td>{{ e.patrimonio.historico_atual.estado }}</td></tr>
     {% endfor %}
     </table>
 
