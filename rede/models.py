@@ -35,7 +35,10 @@ class BlocoIP(models.Model):
     prop.short_description = u'Proprietário'
 
     def usu(self):
-	return self.usuario.sigla
+        if self.usuario:
+            return self.usuario.sigla
+        else:
+            return None
     usu.admin_order_field = 'usuario__sigla'
     usu.short_description = u'Usado por'
 
