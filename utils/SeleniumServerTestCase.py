@@ -43,7 +43,7 @@ class SeleniumServerTestCase(LiveServerTestCase):
         
         self.browser.find_element_by_id("login-form").submit();
 
-    def test_404(self):
+    def is_http_404(self):
         elemHeader = None
         
         try:
@@ -63,7 +63,7 @@ class SeleniumServerTestCase(LiveServerTestCase):
         elif elemHeader and elemHeader.text.find(u"não existe no sistema.") >=0:
             return True
                 
-    def test_500(self):
+    def is_http_500(self):
         elemHeaderDesenv = None
         elemHeaderProd = None
         

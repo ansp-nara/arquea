@@ -22,13 +22,13 @@ class PollsTest(SeleniumServerTestCase):
         
     def test_controle_500(self):
         req = self.browser.get(self.sistema_url + '/membro/mensalf?ano=2012&mes=1&')
-        self.assertTrue(self.test_500())
-        self.assertFalse(self.test_404())
+        self.assertTrue(self.is_http_500())
+        self.assertFalse(self.is_http_404())
         
     def test_controle_404(self):
         self.browser.get(self.sistema_url + '/admin/asdfasdfasdf/')
-        self.assertTrue(self.test_404())
-        self.assertFalse(self.test_500())
+        self.assertTrue(self.is_http_404())
+        self.assertFalse(self.is_http_500())
 
 
 
