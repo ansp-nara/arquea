@@ -11,6 +11,26 @@ import logging
 logger = logging.getLogger(__name__)
 
 class SeleniumServerTestCase(LiveServerTestCase):
+    """
+    Classe para utilização em testes de Selenium.
+    Possui setup para conectar em um Selenium Server, e fazer login no Sistema via CAS.
+    
+    A configuração deve ser feita no settings-selenium
+    
+    Exemplo:
+        class HomeTest(SeleniumServerTestCase):
+        
+            def setUp(self):
+                super(HomeTest, self).setUp()
+                
+            def tearDown(self):
+                super(HomeTest, self).tearDown()
+            
+            def test_controle_500(self):
+                req = self.browser.get(self.sistema_url + '/pagina/')
+                self.assertTrue(self.is_http_500(), u'Requisicao retornou HTTP (500)')
+                self.assertFalse(self.is_http_404(), u'Requisicao retornou HTTP (404)')
+    """
     def setUp(self):
         # Only display possible problems
         selenium_logger = logging.getLogger('selenium.webdriver.remote.remote_connection')
@@ -27,6 +47,7 @@ class SeleniumServerTestCase(LiveServerTestCase):
         self.login()
 
     def tearDown(self):
+        self.logout()
         self.browser.quit()
         
     def login(self):
@@ -42,6 +63,10 @@ class SeleniumServerTestCase(LiveServerTestCase):
         elem = self.browser.find_element_by_id("id_password").send_keys(settings.SELENIUM_SISTEMA_PASS)
         
         self.browser.find_element_by_id("login-form").submit();
+
+    def logout(self):
+        self.browser.get('http://' + settings.SELENIUM_SISTEMA_HOST + '/accounts/logout/')
+        
 
     def is_http_404(self):
         elemHeader = None
