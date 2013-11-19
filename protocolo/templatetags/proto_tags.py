@@ -8,10 +8,10 @@ from decimal import Decimal
 from django.shortcuts import get_object_or_404
 from membro.models import Membro
 import math
+
+
 import logging
 
-# Get an instance of a logger
-logger = logging.getLogger(__name__)
 
 
 register = Library()
@@ -112,15 +112,34 @@ def lista_relatorios():
             }
 
 
+
+@register.filter(name='moeda_css')
+def moeda_css(value, nac=1):
+    """
+    Novo metodo para formatar o valor em moeda, com valor negativo em cor vermelha em css 
+    """
+    return moeda(value, nac, False, True)
+
 @register.filter(name='moeda_valor')
 def moeda_valor(value, nac=1):
     """
     Novo metodo para formatar o valor em moeda, mas remover o prefixo da moeda (ex: R$)
     """
-    return moeda(value, nac, True)
+    return moeda(value, nac, True, False)
+
+@register.filter(name='moeda_valor_css')
+def moeda_valor_css(value, nac=1):
+    """
+    Novo metodo para formatar o valor em moeda, mas remover o prefixo da moeda (ex: R$), com valor negativo em cor vermelha em css
+    """
+    return moeda(value, nac, True, True)
     
 @register.filter(name='moeda')
-def moeda(value, nac=1, nosep=False):
+def moeda(value, nac=True, nosep=False, css=False):
+    logger = logging.getLogger('prototags')
+    
+
+
     if nac:
         sep = ','
     else:
@@ -132,11 +151,16 @@ def moeda(value, nac=1, nosep=False):
         return value
 
     i, d = str(value).split('.')
+    
+    # Corrigindo o tamanho da decimal para 2 dígitos
     if len(d) > 2: d = d[:2]
+    if len(d) == 1: d = d[:1] + '0'
+    
     s = '%s'
+    ## Verifica se adiciona () para números negativos
+    ## Se for especificado como CSS, o tratamento ocorre no final
     if i[0] == '-':
-       s = '(%s)'
-       i = i[1:len(i)]
+        i = i[1:len(i)]
 
     res = []
     p = len(i)
@@ -149,16 +173,35 @@ def moeda(value, nac=1, nosep=False):
     si = '.'
     m = 'R$'
     if sep == '.':
-    	si = ','
-	m = 'US$'
+        si = ','
+        m = 'US$'
+        
     res.reverse()
     i = si.join(res)
     
+    # valor com os separadores
+    valor = s % (sep.join((i,d)))
+    
+    # tratamento de negativos
+    if v < 0:
+        if css == False:
+            valor = '(%s)'%valor
+        else:
+            valor = '-%s'%valor
+
+    # Juntando o número, separador de dígito, e digitos
+    # Adiciona, ou não, o valor de moeda
+    retorno = None
     if nosep:
-        return s % (sep.join((i,d)))
+        retorno = valor
     else:
-        s = '%s ' + s
-        return s % (m, sep.join((i,d)))
+        retorno = '%s %s' % (m, valor)
+    
+    # Faz o tratamento de negativo utilizando CSS com cor vermelha
+    if css and v < 0:
+        retorno = '<span style="color: red">%s</span>' % (retorno) 
+    
+    return mark_safe(retorno)
     
     
 

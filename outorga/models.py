@@ -905,7 +905,6 @@ class Natureza_gasto(models.Model):
         return Item.objects.filter(natureza_gasto__modalidade=self.modalidade,
                                    natureza_gasto__termo=self.termo)
 
-
     # Retorna a soma do valor total de todos os itens de uma modalidade considerando todas as concessões de um Termo.
     def soma_geral(self):
         total = Decimal('0.00')
@@ -941,6 +940,9 @@ class Natureza_gasto(models.Model):
             return '<span style="color: red">%s</span>' % self.formata_valor(self.valor_concedido - self.total_realizado)
         return self.formata_valor(self.valor_concedido - self.total_realizado)
     saldo.allow_tags = True
+    
+    def valor_saldo(self):
+        return self.valor_concedido - self.total_realizado
 	
     # Define a descrição e a ordenação dos dados pelo Termo de Outorga.
     class Meta:
