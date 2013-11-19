@@ -13,11 +13,58 @@ from protocolo.models import Estado as ProtocoloEstado
 from identificacao.models import Identificacao, Contato, Entidade, Endereco
 from outorga.models import Termo, Outorga, Categoria, Modalidade, Natureza_gasto
 from outorga.models import Estado as OutorgaEstado
+from protocolo.templatetags import proto_tags
+
 
 import logging
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
+
+# Testes do arquivo com funções localizado em protocolo.templatetags.proto_tags que é utilizado nos templates HTML
+class PrototagTest(TestCase):
+    def test_moeda_real(self):
+        value = 1000.00
+        retorno = proto_tags.moeda(value, 1, False, False)
+        
+        self.assertEquals(retorno, 'R$ 1.000,00')
+        
+    def test_moeda_dolar(self):
+        value = 1000.00
+        retorno = proto_tags.moeda(value, 0, False, False)
+        
+        self.assertEquals(retorno, 'US$ 1,000.00')
+        
+    def test_moeda_real_sem_valor_monetario(self):
+        value = 1000.00
+        retorno = proto_tags.moeda(value, 1, True, False)
+        
+        self.assertEquals(retorno, '1.000,00')
+
+    def test_moeda_real_negativo(self):
+        value = -300000000.00
+        retorno = proto_tags.moeda(value, 1, False, False)
+        
+        self.assertEquals(retorno, 'R$ (300.000.000,00)')
+        
+    def test_moeda_dolar_negativo(self):
+        value = -300000000.00
+        retorno = proto_tags.moeda(value, 0, False, False)
+        
+        self.assertEquals(retorno, 'US$ (300,000,000.00)')
+
+    def test_moeda_dolar_sem_valor_monetario(self):
+        value = -300000000.00
+        retorno = proto_tags.moeda(value, 0, True, False)
+        
+        self.assertEquals(retorno, '(300,000,000.00)')
+
+    def test_moeda_negativo_css(self):
+        value = -300000000.00
+        retorno = proto_tags.moeda(value, 1, False, True)
+        
+        self.assertEquals(retorno, '<span style="color: red">R$ -300.000.000,00</span>')
+
 
 class ProtocoloTest(TestCase):
     def setUp(self):
