@@ -118,21 +118,21 @@ def moeda_css(value, nac=1):
     """
     Novo metodo para formatar o valor em moeda, com valor negativo em cor vermelha em css 
     """
-    return moeda(value, nac, False, True)
+    return mark_safe(moeda(value, nac, False, True))
 
 @register.filter(name='moeda_valor')
 def moeda_valor(value, nac=1):
     """
     Novo metodo para formatar o valor em moeda, mas remover o prefixo da moeda (ex: R$)
     """
-    return moeda(value, nac, True, False)
+    return mark_safe(moeda(value, nac, True, False))
 
 @register.filter(name='moeda_valor_css')
 def moeda_valor_css(value, nac=1):
     """
     Novo metodo para formatar o valor em moeda, mas remover o prefixo da moeda (ex: R$), com valor negativo em cor vermelha em css
     """
-    return moeda(value, nac, True, True)
+    return mark_safe(moeda(value, nac, True, True))
     
 @register.filter(name='moeda')
 def moeda(value, nac=True, nosep=False, css=False):
