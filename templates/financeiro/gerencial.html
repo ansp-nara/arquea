@@ -170,7 +170,7 @@
      <tr>
         <td>{{ it.quantidade }}</td>
         <td class="span_desc"><span>{{ it.descricao }}</span></td>
-        <td class="sp_conc"><b><span>{{ it.valor|moeda_css:m.modalidade.moeda_nacional }}</span></b></td>
+        <td class="sp_conc"><b><span>{{ it.valor|default:0.00|moeda_css:m.modalidade.moeda_nacional }}</span></b></td>
 	     {% for v in valores|dictsort:"ord" %}
 	        <td>{{ v.valor|moeda_valor_css:m.modalidade.moeda_nacional }}</td>
 	     {% endfor %}

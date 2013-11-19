@@ -7,6 +7,7 @@ from utils.functions import formata_moeda
 from utils.models import NARADateField
 from django.db.models import Q, Sum
 from decimal import Decimal
+from datetime import date
 import datetime
 import logging
 
@@ -976,122 +977,6 @@ class Item(models.Model):
     O método 'mostra_valor_realizado'		Retorna o atributo 'valor_realizado_acumulado' em formato moeda.
     A class 'Meta'				Define a descrição do modelo (singular e plural) e a ordenação dos dados pela data de solicitação 
 						do pedido de concessão.
-
-    Cria Termo
-    >>> e, created = Estado.objects.get_or_create(nome='Vigente')
-    >>> t, create = Termo.objects.get_or_create(ano=2008, processo=22222, digito=2, defaults={'inicio': datetime.date(2008,1,1), 'estado'= e})
-
-
-    Cria Outorga
-    >>> c1, created = Categoria.objects.get_or_create(nome='Inicial')
-    >>> c2, created = Categoria.objects.get_or_create(nome='Aditivo')
-
-    >>> o1, created = Outorga.objects.get_or_create(termo=t, categoria=c1, data_solicitacao=datetime.date(2007,12,1), defaults={'termino': datetime.date(2008,12,31), 'data_presta_contas': datetime.date(2008,2,28)})
-    >>> o2, created = Outorga.objects.get_or_create(termo=t, categoria=c2, data_solicitacao=datetime.date(2008,4,1), defaults={'termino': datetime.date(2008,12,31), 'data_presta_contas': datetime.date(2008,2,28)})
-
-
-    Cria Natureza de gasto
-    >>> m1, created = Modalidade.objects.get_or_create(sigla='STE', defaults={'nome': 'Servicos de Terceiro no Exterior', 'moeda_nacional': False})
-
-    >>> n1, created = Natureza_gasto.objects.get_or_create(modalidade=m1, outorga=o1)
-    >>> n2, created = Natureza_gasto.objects.get_or_create(modalidade=m1, outorga=o2)
-
-
-    Cria Item de Outorga
-     from identificacao.models import Entidade, Contato, Identificacao
-
-    >>> ent1, created = Entidade.objects.get_or_create(sigla='SAC', defaults={'nome': 'SAC do Brasil', 'cnpj': '00.000.000/0000-00', 'ativo': True, 'fisco': True, 'url': ''})
-
-    >>> i1, created = Item.objects.get_or_create(entidade=ent1, natureza_gasto=n1, descricao='Serviço de Conexão Internacional', defaults={'justificativa': 'Link Internacional', 'quantidade': 12, 'valor_unit': 250000})
-    >>> i2, created = Item.objects.get_or_create(entidade=ent1, natureza_gasto=n2, descricao='Serviço de Conexão Internacional', defaults={'justificativa': 'Ajuste na cobrança do Link Internacional', 'quantidade': 6, 'valor_unit': 50000, 'item: i2})
-
-
-    Cria Protocolo
-    from protocolo.models import Protocolo, ItemProtocolo, TipoDocumento, Origem, Estado as EstadoProtocolo
-
-    >>> ep, created = EstadoProtocolo.objects.get_or_create(nome='Aprovado')
-    >>> td, created = TipoDocumento.objects.get_or_create(nome='Nota Fiscal')
-    >>> og, created = Origem.objects.get_or_create(nome='Motoboy')
-
-    >>> cot1, created = Contato.objects.get_or_create(nome='Alex', defaults={'email': 'alex@alex.com.br', 'tel': ''})
-
-    >>> iden1, created = Identificacao.objects.get_or_create(entidade=ent1, contato=cot1, defaults={'funcao': 'Gerente', 'area': 'Redes', 'ativo': True})
-
-    >>> p1, created = Protocolo.objects.get_or_create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime.datetime(2008,9,30,10,10), defaults={'origem': og, 'estado': ep, 'num_documento': 7777, 'data_vencimento': datetime.date(2008,10,10), 'descricao': 'Serviço de Conexão Internacional - 09/2009', 'valor_total': None})
-    >>> p2, created = Protocolo.objects.get_or_create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime.datetime(2008,10,30,10,10), defaults={'origem': og, 'estado': ep, 'num_documento': 5555, 'data_vencimento': datetime.date(2008,11,10), 'descricao': 'Serviço de Conexão Internacional - 10/2009', 'valor_total': None})
-
-
-    Cria Item do Protocolo
-    >>> ip1 = ItemProtocolo.objects.get_or_create(protocolo=p1, descricao='Conexão Internacional - 09/2009', quantidade=1, valor_unitario=250000)
-    >>> ip2 = ItemProtocolo.objects.get_or_create(protocolo=p1, descricao='Reajuste do serviço de Conexão Internacional - 09/2009', quantidade=1, valor_unitario=50000)
-    >>> ip3 = ItemProtocolo.objects.get_or_create(protocolo=p2, descricao='Conexão Internacional - 10/2009', quantidade=1, valor_unitario=250000)
-    >>> ip4 = ItemProtocolo.objects.get_or_create(protocolo=p2, descricao='Reajuste do serviço de Conexão Internacional - 10/2009', quantidade=1, valor_unitario=50000)
-
-
-    Criar Fonte Pagadora
-     from financeiro.models import OrigemOutrasVerbas, FontePagadora, OrigemFapesp, ExtratoCC, Estato as EstadoFinanceiro
-
-    >>> ef1, created = EstadoFinanceiro.objects.get_or_create(nome='Aprovado')
-    >>> ef2, created = EstadoFinanceiro.objects.get_or_create(nome='Concluído')
-
-    >>> ex1, created = ExtratoCC.objects.get_or_create(data_extrato=datetime.date(2008,10,30), data_oper=datetime.date(2008,10,10), cod_oper=333333, valor='300000', historico='TED')
-    >>> ex2, created = ExtratoCC.objects.get_or_create(data_extrato=datetime.date(2008,11,30), data_oper=datetime.date(2008,11,10), cod_oper=444444, valor='300000', historico='TED')
-
-    >>> a1, created = Acordo.objects.get_or_create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e SAC')
-
-    >>> of1, created = OrigemFapesp.objects.get_or_create(acordo=a1, item_outorga=i1)
-
-    >>> fp1 = FontePagadora.objects.get_or_create(protocolo=p1, extrato=ex1, origem_fapesp=of1, estado=ef2, valor='300000')
-    >>> fp2 = FontePagadora.objects.get_or_create(protocolo=p2, extrato=ex2, origem_fapesp=of1, estado=ef2, valor='300000')
-
-
-    >>> i1.__unicode__()
-    'Serviço de Conexão Internacional'
-
-    >>> i1.mostra_termo()
-    '08/22222-2'
-
-    >>> i1.mostra_descricao()
-    'Serviço de Conexão Internacional'
-
-    >>> i1.mostra_concessao()
-    'Inicial'
-
-    >>> i1.mostra_modalidade()
-    'STE'
-
-    >>> i1.mostra_solicitacao()
-    '01/12/07'
-
-    >>> i1.mostra_termino()
-    '31/12/08'
-
-    >>> i1.valor
-    Decimal('3000000')
-
-    >>> i1.mostra_valor()
-    '$ 3,000,000.00'
-
-    >>> i1.mostra_valor_unit()
-    '$ 250,000.00'
-
-    >>> i1.mostra_quantidade()
-    12
-
-    >>> i1.valor_total()
-    Decimal('3600000')
-
-    >>> i1.mostra_valor_total()
-    '$ 3,600,000.00'
-
-    >>> i1.calcula_total_despesas()
-    Decimal('600000')
-
-    >>> i1.valor_realizado_acumulado
-    Decimal('600000')
-
-    >>> i1.mostra_valor_realizado()
-    '$ 600,000.00'
     """
 
 
@@ -1148,6 +1033,8 @@ class Item(models.Model):
 
 
     # Valor realizado por mês
+    # dt = mes/ano para o filtro inicial
+    # after = flag que especifica se o dt deve levar em conta a data cheia (dia/mes/ano) 
     def calcula_realizado_mes(self, dt, after=False):
         total = Decimal('0.00')
         if hasattr(self, 'origemfapesp_set'):
@@ -1178,7 +1065,13 @@ class Item(models.Model):
     mostra_valor_realizado.short_description=_(u'Total Realizado')
 
     def saldo(self):
-        return self.valor - self.valor_realizado_acumulado
+        if self.valor:
+            if self.valor_realizado_acumulado:
+                return self.valor - self.valor_realizado_acumulado
+            else:
+                return self.valor
+        else:
+            return - self.valor_realizado_acumulado
 
     # Pagina com todos os protocolos ligados a este item
     def protocolos_pagina(self):
