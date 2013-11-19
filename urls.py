@@ -17,7 +17,7 @@ urlpatterns = patterns('',
 
     # Uncomment the next line to enable the admin:
     (r'^admin/', include(admin.site.urls)),
-
+    (r'^files/(?P<filename>.*)', 'utils.views.serve_files'),
     (r'^protocolo/', include('sistema.protocolo.urls')),
     (r'^patrimonio/', include('sistema.patrimonio.urls')),
     (r'^financeiro/', include('sistema.financeiro.urls')),
