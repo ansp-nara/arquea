@@ -126,30 +126,30 @@
 	    {% for m in modalidades %}
 		<tr>
 		    <td class="sp_moda"><span>{{ m.modalidade }}</span></td>
-		    <td class="sp_conc"><span>{{ m.concedido }}</span></td>
+		    <td class="sp_conc"><span>{{ m.concedido|moeda:m.modalidade.moeda_nacional }}</span></td>
 			{% for v in m.meses|dictsort:"ord" %}
-			  <td>{{ v.valor|moeda_valor }}</td>
+			  <td>{{ v.valor|moeda_valor:m.modalidade.moeda_nacional }}</td>
 			{% endfor %}
-	        <td class="sp_real"><span>{{ m.realizado|safe }}</span></b></td>
-	        <td class="sp_sald"><span>{{ m.saldo|safe }}</span></td></tr>
+	        <td class="sp_real"><span>{{ m.realizado|moeda_css:m.modalidade.moeda_nacional}}</span></b></td>
+	        <td class="sp_sald"><span>{{ m.saldo|moeda_css:m.modalidade.moeda_nacional }}</span></td></tr>
 	    {% endfor %}
 	    <tr>
 	        <td class="sp_moda"><span>Total (R$)</span></td>
-	        <td class="sp_conc"><span>{{ gerais.concedido_real|moeda }}</span></td>
+	        <td class="sp_conc"><span>{{ gerais.concedido_real|moeda_css }}</span></td>
 		    {% for t in totais|dictsort:"ord" %}
-		        <td><b>{{ t.total_real|moeda_valor }}</b></td>
+		        <td><b>{{ t.total_real|moeda_valor_css }}</b></td>
 		    {% endfor %}
-		    <td class="sp_real"><span>{{ gerais.gasto_real|moeda }}</span></td>
-		    <td class="sp_sald"><span>{{ gerais.saldo_real|moeda }}</span></td>
+		    <td class="sp_real"><span>{{ gerais.gasto_real|moeda_css }}</span></td>
+		    <td class="sp_sald"><span>{{ gerais.saldo_real|moeda_css }}</span></td>
 	    </tr>
 	    <tr>
 	        <td class="sp_moda"><span>Total (US$)</span></td>
-	        <td class="sp_conc"><span>{{ gerais.concedido_dolar|moeda:0 }}</span></td>
+	        <td class="sp_conc"><span>{{ gerais.concedido_dolar|moeda_css:0 }}</span></td>
 		    {% for t in totais|dictsort:"ord" %}
-		        <td><b>{{ t.total_dolar|moeda_valor:0 }}</b></td>
+		        <td><b>{{ t.total_dolar|moeda_valor_css:0 }}</b></td>
 		    {% endfor %}
-		    <td class="sp_real"><span>{{ gerais.gasto_dolar|moeda:0 }}</span></td>
-		    <td class="sp_sald"><span>{{ gerais.saldo_dolar|moeda:0 }}</span></td>
+		    <td class="sp_real"><span>{{ gerais.gasto_dolar|moeda_css:0 }}</span></td>
+		    <td class="sp_sald"><span>{{ gerais.saldo_dolar|moeda_css:0 }}</span></td>
 	    </tr>
     </table>
 
@@ -170,12 +170,12 @@
      <tr>
         <td>{{ it.quantidade }}</td>
         <td class="span_desc"><span>{{ it.descricao }}</span></td>
-        <td class="sp_conc"><b><span>{{ it.valor|moeda:m.modalidade.moeda_nacional }}</span></b></td>
+        <td class="sp_conc"><b><span>{{ it.valor|moeda_css:m.modalidade.moeda_nacional }}</span></b></td>
 	     {% for v in valores|dictsort:"ord" %}
-	        <td>{{ v.valor|moeda_valor }}</td>
+	        <td>{{ v.valor|moeda_valor_css:m.modalidade.moeda_nacional }}</td>
 	     {% endfor %}
-	     <td class="sp_real"><span>{{ it.mostra_valor_realizado }}</span</td>
-	     <td class="sp_sald"><span>{{ it.saldo|moeda:m.modalidade.moeda_nacional }}</span></td>
+	     <td class="sp_real"><span>{{ it.valor_realizado_acumulado|moeda_css:m.modalidade.moeda_nacional }}</span</td>
+	     <td class="sp_sald"><span>{{ it.saldo|moeda_css:m.modalidade.moeda_nacional }}</span></td>
      </tr>
   {% endfor %}
   </table>
