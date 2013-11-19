@@ -49,7 +49,10 @@ class Contato(models.Model):
 
     @property
     def nome(self):
-	return '%s %s' % (self.primeiro_nome, self.ultimo_nome or '')
+        if self.ultimo_nome:
+            return '%s %s' % (self.primeiro_nome, self.ultimo_nome or '')
+        else:
+            return self.primeiro_nome
 
     # Retorna o nome.
     def __unicode__(self):
@@ -277,17 +280,7 @@ class Identificacao(models.Model):
     O método '__unicode__'		Retorna sigla da entidade e o nome do contato.
     A 'class Meta'			Define a descrição do modelo (singular e plural), a ordenação dos dados pela entidade e a unicidade dos
     					dados pelos campos contato, entidade.
-
-    >>> ent, created = Entidade.objects.get_or_create(sigla='SAC', defaults={'nome': 'Global Crossing', 'cnpj': '00.000.000/0000-00', 'ativo': False, 'fisco': True, 'url': '', 'asn': 123})
-
-    >>> c, created = Contato.objects.get_or_create(nome='Joao', defaults={'email': 'joao@joao.com.br', 'tel': '', 'ativo': True})
-
-    >>> iden, created = Identificacao.objects.get_or_create(entidade=ent, contato=c, defaults={'funcao':'Tecnico', 'area':'', 'ativo': True})
-
-    >>> iden.__unicode__()
-    u'SAC_Joao'
     """
-
 
 #    monitor = models.ForeignKey('rede.Monitor', verbose_name=_(u'Monitor'))
     # entidade = models.ForeignKey('identificacao.Entidade', null=True, blank=True)
@@ -305,7 +298,6 @@ class Identificacao(models.Model):
         verbose_name_plural = _(u'Identificações')
         ordering = ('endereco', 'contato')
         unique_together = (('endereco', 'contato'),)
-
 
     # Retorna a sigla da entidade e o nome do contato.
     def __unicode__(self):
