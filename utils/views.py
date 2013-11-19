@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from membro.models import Membro
 from django.template.response import TemplateResponse
 from django.contrib.auth.decorators import permission_required, login_required
+from django.conf import settings
 import datetime
 import logging
 import magic
