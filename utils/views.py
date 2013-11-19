@@ -7,7 +7,7 @@ from django.template.response import TemplateResponse
 from django.contrib.auth.decorators import permission_required, login_required
 import datetime
 import logging
-
+import magic
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -55,3 +55,24 @@ def uso_admin(request):
         returned.append(user_return)
         
     return TemplateResponse(request, 'admin/logs.html', {'users':returned})
+
+@login_required
+def serve_files(request, filename):
+ 
+    # evita que o usuario tente acessar qualquer arquivo do sistema
+    filename = filename.replace('..','')
+
+    path = '%s/%s' % (settings.MEDIA_ROOT, filename)
+
+    # descobre o mime type
+    try:
+        mime = magic.from_file(path, mime=True)
+    except:
+        raise Http404
+
+    # monta a resposta sem conteúdo, apenas com o header do x-sendfile
+    response = HttpResponse(mimetype=mime)
+    response['X-Sendfile'] = path
+    response['Content-length'] = os.path.getsize(path)
+
+    return response
