@@ -24,33 +24,13 @@ def upload_dir_os(instance, filename):
 
 # Create your models here.
 class Modalidade(models.Model):
-
     """
     Uma instância dessa classe é uma das modalidades de gasto autorizadas pelo Departamento de Auditoria da FAPESP.
 
     O método '__unicode__' 		Retorna a sigla e o nome da modalidade.
     A classmethod 'modalidades_termo'	Retorna as modalidades de um termo que possuem itens de outorga com o campo 'item=None'.
     A class 'Meta'			Define a ordenação dos dados pela sigla.
-
-
-    Cria Modalidade
-    >>> e, created = Estado.objects.get_or_create(nome='Vigente')
-    >>> c, created = Categoria.objects.get_or_create(nome='Inicial')
-    >>> m, created = Modalidade.objects.get_or_create(sigla='OUT', defaults={'nome': 'Outros', 'moeda_nacional': True})
-
-
-    Cria Natureza de Gasto
-    >>> t, created = Termo.objects.get_or_create(ano=2008, processo=51885, digito=8, defaults={'inicio': datetime.date(2008,1,1), 'estado': e})
-    >>> o, created = Outorga.objects.get_or_create(termo=t, categoria=c, data_solicitacao=datetime.date(2007,12,1), termino=datetime.date(2008,12,31), data_presta_contas=datetime.date(2009,1,31))
-    >>> n, created = Natureza_gasto.objects.get_or_create(modalidade=m, outorga=o)
-
-    >>> m.__unicode__()
-    u'OUT - Outros'
-
-    >>> Modalidade.modalidades_termo(t)
-    [<Modalidade: OUT - Outros>]
     """
-
 
     sigla = models.CharField(_(u'Sigla'), max_length=10, blank=True, help_text=_(u'ex. STB'), unique=True)
     nome = models.CharField(_(u'Nome'), max_length=40, blank=True, help_text=_(u'ex. Serviços de Terceiros no Brasil'))
@@ -86,21 +66,12 @@ class Modalidade(models.Model):
 
 
 class Estado(models.Model):
-
     """
     Uma instância dessa classe representa um estado (ex. Quitado, Vigente).
 
     O método '__unicode__'	Retorna o nome do estado.
     A class 'Meta'		Define a ordenação dos dados pelo nome.
-
-
-    Cria Estado
-    >>> e, created = Estado.objects.get_or_create(nome='Vigente')
-
-    >>> e.__unicode__()
-    u'Vigente'
     """
-
 
     nome = models.CharField(_(u'Nome'), max_length=30, blank=True, help_text=_(u'ex. Vigente'), unique=True)
 
@@ -1093,7 +1064,6 @@ class Item(models.Model):
 
 
 class Arquivo(models.Model):
-
     """
     Uma instância dessa classe representa um arquivo de um pedido de concessão.
 
@@ -1101,7 +1071,6 @@ class Arquivo(models.Model):
     O método 'concessao'	Retorna o método '__unicode__' do modelo Outorga.
     A class 'Meta'		Define a ordenação dos dados pelo 'id' e a unicidade dos dados pelos campos 'arquivo' e 'outorga'.
     """
-
 
     arquivo = models.FileField(upload_to=upload_dir)
     outorga = models.ForeignKey('outorga.Outorga', related_name='arquivos')
@@ -1135,30 +1104,22 @@ class Arquivo(models.Model):
 
 
 class Acordo(models.Model):
-
       """
       Acordos como, por exemplo, entre a ANSP e a Telefônica.
 
       O método '__unicode__'	Retorna a descrição do acordo.
-
-      >>> a, created = Acordo.objects.get_or_create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e SAC')
-
-      >>> a.__unicode__()
-      'Acordo entre Instituto UNIEMP e SAC'
-
       """
-
+      
       estado = models.ForeignKey('outorga.Estado')
       descricao = models.TextField(verbose_name=_(u'Descrição'))
       itens_outorga = models.ManyToManyField('outorga.Item', through='outorga.OrigemFapesp')
 
-
       # Retorna a descrição.
       def __unicode__(self):
-	  return u"%s" % self.descricao
+          return u"%s" % self.descricao
 
       class Meta:
-      	  ordering = ('descricao',)
+          ordering = ('descricao',)
 
 class OrigemFapesp(models.Model):
       """

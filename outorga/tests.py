@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 from datetime import date, timedelta, datetime
 from django.test import TestCase
 from outorga.models import Termo, Item, OrigemFapesp, Estado as EstadoOutorga, Categoria, Outorga, Modalidade, Natureza_gasto, Acordo
@@ -12,7 +11,6 @@ import logging
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
-# Testes do arquivo com funções localizado em protocolo.templatetags.proto_tags que é utilizado nos templates HTML
 class ItemTest(TestCase):
     def setUp(self):
         #Cria Termo
@@ -47,7 +45,7 @@ class ItemTest(TestCase):
         ep, created = EstadoProtocolo.objects.get_or_create(nome='Aprovado')
         td, created = TipoDocumento.objects.get_or_create(nome='Nota Fiscal')
         og, created = Origem.objects.get_or_create(nome='Motoboy')
-
+        
         cot1, created = Contato.objects.get_or_create(primeiro_nome='Alex', defaults={'email': 'alex@alex.com.br', 'tel': ''})
         
 
@@ -149,4 +147,47 @@ class ItemTest(TestCase):
         item = Item.objects.get(pk=1)
         dt = date(2008,11,11)
         self.assertEquals(item.calcula_realizado_mes(dt, True), 10.00)
+
+
+class AcordoTest(TestCase):
+    def setUp(self):
+        eo1, created = EstadoOutorga.objects.get_or_create(nome='Vigente')
+        a, created = Acordo.objects.get_or_create(estado=eo1, descricao='Acordo entre Instituto UNIEMP e SAC')
+
+    def test_unicode(self):
+        a = Acordo.objects.get(pk=1)
+        self.assertEquals(a.__unicode__(), 'Acordo entre Instituto UNIEMP e SAC')
+
+
+class ModalidadeTest(TestCase):
+    def setUp(self):
+        #Cria Modalidade
+        e, created = Estado.objects.get_or_create(nome='Vigente')
+        c, created = Categoria.objects.get_or_create(nome='Inicial')
+        m, created = Modalidade.objects.get_or_create(sigla='OUT', defaults={'nome': 'Outros', 'moeda_nacional': True})
+
+        #Cria Natureza de Gasto
+        t, created = Termo.objects.get_or_create(ano=2008, processo=51885, digito=8, defaults={'inicio': datetime.date(2008,1,1), 'estado': e})
+        o, created = Outorga.objects.get_or_create(termo=t, categoria=c, data_solicitacao=datetime.date(2007,12,1), termino=datetime.date(2008,12,31), data_presta_contas=datetime.date(2009,1,31))
+        n, created = Natureza_gasto.objects.get_or_create(modalidade=m, outorga=o)
+
+        def test_unicode(self):
+            m = Modalidade.objects.get(pk=1)
+            self.assertEquals(m.__unicode__(), u'OUT - Outros')
+
+        def test_modalidades_termo(self):
+            modalidade = Modalidade.objects.get(pk=1)
+            termo = Termo.objects.get(pk=1)
+            self.assertEquals(modalidade.modalidades_termo(termo), ['<Modalidade: OUT - Outros>'])
+
+
+class EstadoTest(TestCase):
+    def setUp(self):
+        #Cria Estado
+        e, created = EstadoOutorga.objects.get_or_create(nome='Vigente')
+        
+    def test_unicode(self):
+        e = EstadoOutorga.objects.get(pk=1)
+        self.assertEquals(e.__unicode__(), u'Vigente')
+    
 
