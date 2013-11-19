@@ -123,13 +123,13 @@
            
            {% for t in a.termos %}
               <td class="td_termo">
-              {% if t.tem_real %}{{ t.concedido_real|moeda }}<br />{{ t.realizado_real|moeda }}<br />{{ t.saldo_real|moeda }}{% else %}<br /><br /><br />{% endif %}
-              {% if t.tem_dolar %}<span class="cons-dolar">{{ t.concedido_dolar|moeda:0 }}<br />{{ t.realizado_dolar|moeda:0 }}<br />{{ t.saldo_dolar|moeda:0 }}</span>{% endif %}
+              {% if t.tem_real %}{{ t.concedido_real|moeda }}<br />{{ t.realizado_real|moeda }}<br />{{ t.saldo_real|moeda_css }}{% else %}<br /><br /><br />{% endif %}
+              {% if t.tem_dolar %}<span class="cons-dolar">{{ t.concedido_dolar|moeda:0 }}<br />{{ t.realizado_dolar|moeda:0 }}<br />{{ t.saldo_dolar|moeda_css:0 }}</span>{% endif %}
               </td>
            {% endfor %}
            <td class="td_total">
-                {% if a.tem_real %}{{a.totalTermoRealizadoReal|moeda}}<br/>{{a.totalTermoConcedidoReal|moeda}}<br/>{{a.totalTermoSaldoReal|moeda}}{% else %}<br /><br /><br />{% endif %}
-                {% if a.tem_dolar %}<span class="cons-dolar">{{a.totalTermoRealizadoDolar|moeda:0}}<br/>{{a.totalTermoConcedidoDolar|moeda:0}}<br/>{{a.totalTermoSaldoDolar|moeda:0}}</span>{% endif %}
+                {% if a.tem_real %}{{a.totalTermoRealizadoReal|moeda}}<br/>{{a.totalTermoConcedidoReal|moeda}}<br/>{{a.totalTermoSaldoReal|moeda_css}}{% else %}<br /><br /><br />{% endif %}
+                {% if a.tem_dolar %}<span class="cons-dolar">{{a.totalTermoRealizadoDolar|moeda:0}}<br/>{{a.totalTermoConcedidoDolar|moeda:0}}<br/>{{a.totalTermoSaldoDolar|moeda_css:0}}</span>{% endif %}
            </td>
         {% endfor %}
         </tr>
@@ -155,9 +155,9 @@
                  <td>{% if forloop.counter == 1 %}{{ t.termo }}{% endif %}</td>
                  <td>{{ item.item.descricao }}</td><td>{{ item.item.entidade }}</td>
                  {% if item.item.natureza_gasto.modalidade.moeda_nacional %}
-                     <td>{{ item.concedido|moeda }}</td><td>{{ item.realizado|moeda }}</td><td>{{ item.saldo|moeda }}</td>
+                     <td>{{ item.concedido|moeda }}</td><td>{{ item.realizado|moeda }}</td><td>{{ item.saldo|moeda_css }}</td>
                  {% else %}
-                     <td>{{ item.concedido|moeda:0 }}</td><td>{{ item.realizado|moeda:0 }}</td><td>{{ item.saldo|moeda:0 }}</td>
+                     <td>{{ item.concedido|moeda:0 }}</td><td>{{ item.realizado|moeda:0 }}</td><td>{{ item.saldo|moeda_css:0 }}</td>
                  {% endif %}
              </tr>
           {% endfor %}
