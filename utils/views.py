@@ -10,6 +10,7 @@ from django.conf import settings
 import datetime
 import logging
 import magic
+import os
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
