@@ -45,13 +45,13 @@ class PrototagTest(TestCase):
         value = -300000000.00
         retorno = proto_tags.moeda(value, 1, False, False)
         
-        self.assertEquals(retorno, 'R$ (300.000.000,00)')
+        self.assertEquals(retorno, '(R$ 300.000.000,00)')
         
     def test_moeda_dolar_negativo(self):
         value = -300000000.00
         retorno = proto_tags.moeda(value, 0, False, False)
         
-        self.assertEquals(retorno, 'US$ (300,000,000.00)')
+        self.assertEquals(retorno, '(US$ 300,000,000.00)')
 
     def test_moeda_dolar_sem_valor_monetario(self):
         value = -300000000.00
@@ -63,7 +63,7 @@ class PrototagTest(TestCase):
         value = -300000000.00
         retorno = proto_tags.moeda(value, 1, False, True)
         
-        self.assertEquals(retorno, '<span style="color: red">R$ -300.000.000,00</span>')
+        self.assertEquals(retorno, '<span style="color: red">-R$ 300.000.000,00</span>')
 
 
 class ProtocoloTest(TestCase):
