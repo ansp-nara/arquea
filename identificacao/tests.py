@@ -18,3 +18,33 @@ class IdentificacaoTest(TestCase):
         iden = Identificacao.objects.get(pk=1)
         iden.area = 'TI'
         self.assertEquals(iden.__unicode__(), u'SAC - TI - Joao')
+        
+        
+class ContatoTest(TestCase):
+    
+    def setUp(self):
+        ent1, created = Entidade.objects.get_or_create(sigla='SAC', defaults={'nome': 'Global Crossing', 'cnpj': '00.000.000/0000-00', 'fisco': True, 'url': ''})
+        ent2, created = Entidade.objects.get_or_create(sigla='GTECH', defaults={'nome': 'Graneiro Tech', 'cnpj': '00.000.000/0000-00', 'fisco': True, 'url': ''})
+        c, created = Contato.objects.get_or_create(primeiro_nome='Joao', ultimo_nome=u"José da Silva Xavier", defaults={'email':'joao@joao.com.br', 'tel': '', 'ativo': True})
+
+    def test_unicode(self):
+        c = Contato.objects.get(pk=1)
+        self.assertEquals(c.__unicode__(), u'Joao José da Silva Xavier')
+
+    def test_nome_sem_sobrenome(self):
+        c = Contato.objects.get(pk=1)
+        c.ultimo_nome = None
+        self.assertEquals(c.nome(), u'Joao')
+
+    def test_sem_nome(self):
+        c = Contato.objects.get(pk=1)
+        c.primeiro_nome = None
+        c.ultimo_nome = None
+        self.assertEquals(c.nome(), u'')
+
+    def test_contato_entidade(self):
+        iden = Identificacao.objects.get(pk=1)
+        iden.area = 'TI'
+        self.assertEquals(iden.contato_ent(), u'GTECH, SAC')
+
+

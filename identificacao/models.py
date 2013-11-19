@@ -8,37 +8,14 @@ from django.utils.translation import ugettext_lazy as _
 from datetime import datetime
 
 
-# Create your models here.
-
-
-
 class Contato(models.Model):
-
     """
     Uma instância dessa classe representa um contato.
 
     O método '__unicode__'	Retorna o nome.
     O método 'contato_ent'	Retorna as entidades do contato.
     A 'class Meta'		Ordena os dados pelo campo 'nome'.
-
-    >>> ent1, created = Entidade.objects.get_or_create(sigla='SAC', defaults={'nome': 'Global Crossing', 'cnpj': '00.000.000/0000-00', 'ativo': False, 'fisco': True, 'url': '', 'asn': 123})
-
-    >>> ent2, created = Entidade.objects.get_or_create(sigla='GTECH', defaults={'nome': 'Graneiro Tech', 'cnpj': '00.000.000/0000-00', 'ativo': False, 'fisco': True, 'url': '', 'asn': 321})
-
-    >>> c, created = Contato.objects.get_or_create(nome='Joao', defaults={'email':'joao@joao.com.br', 'tel': '', 'ativo': True})
-
-    >>> iden1, created = Identificacao.objects.get_or_create(entidade=ent1, contato=c, defaults={'funcao': 'Tecnico', 'area': '', 'ativo': True})
-
-    >>> iden2, created = Identificacao.objects.get_or_create(entidade=ent2, contato=c, defaults={'funcao': 'Gerente', 'area': '', 'ativo': True})
-
-    >>> c.__unicode__()
-    'Joao'
-
-    >>> c.contato_ent()
-    u'GTECH, SAC'
     """
-
-
     primeiro_nome = models.CharField(_(u'Primeiro nome'), max_length=100, help_text=_(u'ex. João Andrade'))
     ultimo_nome = models.CharField(_(u'Último nome'), max_length=45)
     email = models.CharField(_(u'E-mail'), max_length=100, blank=True, help_text=_(u'ex. joao@joao.br'))
@@ -58,7 +35,6 @@ class Contato(models.Model):
     def __unicode__(self):
         return self.nome
 
-
     # Retorna as entidades do contato.
     def contato_ent(self):
         ident = self.identificacao_set.all()
@@ -70,7 +46,6 @@ class Contato(models.Model):
         e = ', '.join(l)
         return u'%s' % (e)
     contato_ent.short_description = _(u'Entidade')
-
 
     # Define a ordenação dos dados pelo nome.
     class Meta:
