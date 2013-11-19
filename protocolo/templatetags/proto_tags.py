@@ -181,13 +181,6 @@ def moeda(value, nac=True, nosep=False, css=False):
     
     # valor com os separadores
     valor = s % (sep.join((i,d)))
-    
-    # tratamento de negativos
-    if v < 0:
-        if css == False:
-            valor = '(%s)'%valor
-        else:
-            valor = '-%s'%valor
 
     # Juntando o número, separador de dígito, e digitos
     # Adiciona, ou não, o valor de moeda
@@ -196,6 +189,13 @@ def moeda(value, nac=True, nosep=False, css=False):
         retorno = valor
     else:
         retorno = '%s %s' % (m, valor)
+    
+    # tratamento de negativos
+    if v < 0:
+        if css == False:
+            retorno = '(%s)'%retorno
+        else:
+            retorno = '-%s'%retorno
     
     # Faz o tratamento de negativo utilizando CSS com cor vermelha
     if css and v < 0:
