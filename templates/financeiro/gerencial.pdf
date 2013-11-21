@@ -119,6 +119,9 @@
     .tbl_modalidades td.span_desc {
         border-right: 1px black solid;
     }
+        .tbl_modalidades td.obs {
+            font-weight: bold;
+        }
 </style>
 </head>
 <body>
@@ -190,6 +193,7 @@
          <td class="sp_sald"><span>{{ it.saldo|moeda_css:m.modalidade.moeda_nacional }}</span></td>
      </tr>
   {% endfor %}
+     <tr><td class="obs" colspan="{{ meses|length|add:"6" }}">* {{ m.obs|linebreaksbr }}</td></tr>
   </table>
 {% endfor %}
 
