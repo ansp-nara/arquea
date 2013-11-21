@@ -338,21 +338,13 @@ class Termo(models.Model):
         return None
 
 class Categoria(models.Model):
-
     """
     Uma instância dessa classe representa um tipo de categoria de um pedido de concessão.
 
     O método '__unicode__'	Retorna o campo 'nome'.
     A class 'Meta'		Define a ordenação dos dados pelo nome.
 
-
-    Cria Categoria
-    >>> c, created = Categoria.objects.get_or_create(nome='Transposicao')
-    
-    >>> c.__unicode__()
-    u'Transposicao'
     """
-
 
     nome = models.CharField(_(u'Nome'), max_length=60, help_text=_(u'ex. Aditivo'), unique=True)
 
@@ -378,69 +370,8 @@ class Outorga(models.Model):
     O método 'mostra_categoria'		Retorna o nome da categoria.
     O método 'mostra_termo'		Retorna o termo.
     O método 'existe_arquivo'		Retorna um ícone com link para consulta dos arquivos anexados.
-    O atributo 'treal'			Retorna a soma de das naturezas de gasto com moeda nacional (Total Concedido em reais para o pedido de concessão).
-    O método 'total_real'		Retorna o atributo 'treal' em formato moeda (R$).
-    O atributo 'tdolar'			Retorna a soma das naturezas de gasto com moeda estrangeira (Total Concedido em dólares para o pedido de concessão).
-    O métodoo 'total_dolar' 		Retorna o atributo 'tdolar' em formato moeda ($).
     A class 'Meta'			Define a descrição do modelo (singular e plural) e a ordenação dos dados pela data de solicitação.
-
-
-    Cria Termo
-    >>> e, created = Estado.objects.get_or_create(nome='Vigente')
-    >>> t, create = Termo.objects.get_or_create(ano=2008, processo=22222, digito=2, defaults={'inicio': datetime.date(2008,1,1), 'estado'= e})
-
-
-    Cria Outorga
-    >>> c1, created = Categoria.objects.get_or_create(nome='Inicial')
-    >>> o1, created = Outorga.objects.get_or_create(termo=t, categoria=c1, data_solicitacao=datetime.date(2007,12,1), defaults={'termino': datetime.date(2008,12,31), 'data_presta_contas': datetime.date(2008,2,28)})
-
-
-    Cria Natureza de gasto
-    >>> m1, created = Modalidade.objects.get_or_create(sigla='STB', defaults={'nome': 'Servicos de Terceiro no Brasil', 'moeda_nacional': True})
-    >>> m2, created = Modalidade.objects.get_or_create(sigla='STE', defaults={'nome': 'Servicos de Terceiro no Exterior', 'moeda_nacional': False})
-
-    >>> n1, created = Natureza_gasto.objects.get_or_create(modalidade=m1, outorga=o1)
-    >>> n2, created = Natureza_gasto.objects.get_or_create(modalidade=m2, outorga=o1)
-
-
-    Cria Item de Outorga
-     from identificacao.models import Entidade, Contato, Identificacao
-
-    >>> ent1, created = Entidade.objects.get_or_create(sigla='GTECH', defaults={'nome': 'Granero Tech', 'cnpj': '00.000.000/0000-00', 'ativo': False, 'fisco': True, 'url': ''})
-    >>> ent2, created = Entidade.objects.get_or_create(sigla='SAC', defaults={'nome': 'SAC do Brasil', 'cnpj': '00.000.000/0000-00', 'ativo': True, 'fisco': True, 'url': ''})
-
-    >>> i1, created = Item.objects.get_or_create(entidade=ent1, natureza_gasto=n1, descricao='Armazenagem', defaults={'justificativa': 'Armazenagem de equipamentos', 'quantidade': 12, 'valor_unit': 2500})
-    >>> i2, created = Item.objects.get_or_create(entidade=ent2, natureza_gasto=n2, descricao='Serviço de Conexão Internacional', defaults={'justificativa': 'Link Internacional', 'quantidade': 12, 'valor_unit': 250000})
-
-
-    >>> o1.__unicode__()
-    '08/22222-2 - Inicial'
-
-    >>> o1.inicio()
-    '01/01/2008'
-
-    >>>.o1.mostra_categoria()
-    'Inicio'
-
-    >>> o1.mostra_termo()
-    '08/22222-2'
-
-    >>> o1.existe_arquivo()
-    ' '
-
-    >>> o1.treal
-    Decimal('2500')
-
-    >>> o1.total_real()
-    'R$ 2500,00'
-
-    >>> o1.tdolar
-    Decimal('250000')
-
-    >>> o1.total_dolar()
-    '$ 250,000.00'
     """
-
 
     categoria = models.ForeignKey('outorga.Categoria', verbose_name=_(u'Categoria'))
     termo = models.ForeignKey('outorga.Termo', verbose_name=_(u'Termo'))
@@ -479,7 +410,7 @@ class Outorga(models.Model):
     # Retorna um ícone se o pedido de concessão tiver arquivos.
     def existe_arquivo(self):
         a = '<center><a href="/admin/outorga/arquivo/?outorga__id__exact=%s"><img src="/media/img/arquivo.png" /></a></center>' % self.id
-        if self.arquivo_set.count() > 0:
+        if self.arquivo:
             return a
         return ' '
     existe_arquivo.allow_tags = True
@@ -538,126 +469,11 @@ class Natureza_gasto(models.Model):
 					valor_concedido.
     O método 'todos_itens'		Retorna os itens que não estão subordinados a outro item, considerando todos os pedidos de uma determinada
 					modalidade e termo.
-    O método 'soma_geral'		Retorna a soma das naturezas de gasto de uma determinada modalidade e termo.
-    O método 'formata_soma_geral'	Retorna o valor do método 'soma_geral' em formato moeda.
     O método 'v_concedido' 		Retorna o valor do campo 'valor_concedido' em formato de moeda e marca em vermelho se o valor concedido for 
 					diferente do total dos itens.
     A class 'Meta' 			Define a descrição do modelo (singular e plural) e a ordem de apresentação dos dados pela data de solicitação
 					do pedido de concessão.
-
-    Cria Termo
-    >>> e, created = Estado.objects.get_or_create(nome='Vigente')
-    >>> t, create = Termo.objects.get_or_create(ano=2008, processo=22222, digito=2, defaults={'inicio': datetime.date(2008,1,1), 'estado'= e})
-
-
-    Cria Outorga
-    >>> c1, created = Categoria.objects.get_or_create(nome='Inicial')
-    >>> c2, created = Categoria.objects.get_or_create(nome='Aditivo')
-
-    >>> o1, created = Outorga.objects.get_or_create(termo=t, categoria=c1, data_solicitacao=datetime.date(2007,12,1), defaults={'termino': datetime.date(2008,12,31), 'data_presta_contas': datetime.date(2008,2,28)})
-    >>> o2, created = Outorga.objects.get_or_create(termo=t, categoria=c2, data_solicitacao=datetime.date(2008,4,1), defaults={'termino': datetime.date(2008,12,31), 'data_presta_contas': datetime.date(2008,2,28)})
-
-
-    Cria Natureza de gasto
-    >>> m1, created = Modalidade.objects.get_or_create(sigla='STB', defaults={'nome': 'Servicos de Terceiro no Brasil', 'moeda_nacional': True})
-
-    >>> n1, created = Natureza_gasto.objects.get_or_create(modalidade=m1, outorga=o1, valor_concedido=Decimal('30000'))
-    >>> n2, created = Natureza_gasto.objects.get_or_create(modalidade=m1, outorga=o2, valor_concedido=Decimal('1000000'))
-
-
-    Cria Item de Outorga
-     from identificacao.models import Entidade, Contato, Identificacao
-
-    >>> ent1, created = Entidade.objects.get_or_create(sigla='GTECH', defaults={'nome': 'Granero Tech', 'cnpj': '00.000.000/0000-00', 'ativo': False, 'fisco': True, 'url': ''})
-    >>> ent2, created = Entidade.objects.get_or_create(sigla='TERREMARK', defaults={'nome': 'Terremark do Brasil', 'cnpj': '00.000.000/0000-00', 'ativo': True, 'fisco': True, 'url': ''})
-
-    >>> i1, created = Item.objects.get_or_create(entidade=ent1, natureza_gasto=n1, descricao='Armazenagem', defaults={'justificativa': 'Armazenagem de equipamentos', 'quantidade': 12, 'valor_unit': 2500})
-    >>> i2, created = Item.objects.get_or_create(entidade=ent2, natureza_gasto=n2, descricao='Servico de Conexao', defaults={'justificativa': 'Ligação SP-CPS', 'quantidade': 12, 'valor_unit': 100000})
-
-
-    Cria Protocolo
-     from protocolo.models import Protocolo, ItemProtocolo, TipoDocumento, Origem, Estado as EstadoProtocolo
-
-    >>> ep, created = EstadoProtocolo.objects.get_or_create(nome='Aprovado')
-    >>> td, created = TipoDocumento.objects.get_or_create(nome='Nota Fiscal')
-    >>> og, created = Origem.objects.get_or_create(nome='Motoboy')
-
-    >>> cot1, created = Contato.objects.get_or_create(nome='Joao', defaults={'email': 'joao@joao.com.br', 'tel': ''})
-    >>> cot2, created = Contato.objects.get_or_create(nome='Marcos', defaults={'email': 'alex@alex.com.br', 'tel': ''})
-
-    >>> iden1, created = Identificacao.objects.get_or_create(entidade=ent1, contato=cot1, defaults={'funcao': 'Tecnico', 'area': 'Estoque', 'ativo': True})
-    >>> iden2, created = Identificacao.objects.get_or_create(entidade=ent2, contato=cot2, defaults={'funcao': 'Diretor', 'area': 'Redes', 'ativo': True})
-
-    >>> p1, created = Protocolo.objects.get_or_create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime.datetime(2008,9,30,10,10), defaults={'origem': og, 'estado': ep, 'num_documento': 8888, 'data_vencimento': datetime.date(2008,10,5), 'descricao': 'Conta mensal - armazenagem 09/2008', 'valor_total': None})
-    >>> p2, created = Protocolo.objects.get_or_create(termo=t, identificacao=iden2, tipo_documento=td, data_chegada=datetime.datetime(2008,9,30,10,10), defaults={'origem': og, 'estado': ep, 'num_documento': 5555, 'data_vencimento': datetime.date(2008,10,15), 'descricao': 'Serviço de Conexão Local - 09/2009', 'valor_total': None})
-
-
-    Cria Item do Protocolo
-    >>> ip1 = ItemProtocolo.objects.get_or_create(protocolo=p1, descricao='Tarifa mensal - 09/2009', quantidade=1, valor_unitario=2500)
-    >>> ip2 = ItemProtocolo.objects.get_or_create(protocolo=p1, descricao='Reajuste tarifa mensal - 09/2009', quantidade=1, valor_unitario=150)
-    >>> ip3 = ItemProtocolo.objects.get_or_create(protocolo=p2, descricao='Conexão Local - 09/2009', quantidade=1, valor_unitario=85000)
-    >>> ip4 = ItemProtocolo.objects.get_or_create(protocolo=p2, descricao='Reajuste do serviço de Conexão Local - 09/2009', quantidade=1, valor_unitario=15000)
-
-
-    Criar Fonte Pagadora
-     from financeiro.models import OrigemOutrasVerbas, FontePagadora, OrigemFapesp, ExtratoCC, Estato as EstadoFinanceiro
-
-    >>> ef1, created = EstadoFinanceiro.objects.get_or_create(nome='Aprovado')
-    >>> ef2, created = EstadoFinanceiro.objects.get_or_create(nome='Concluído')
-
-    >>> ex1, created = ExtratoCC.objects.get_or_create(data_extrato=datetime.date(2008,10,30), data_oper=datetime.date(2008,10,5), cod_oper=333333, valor='2650', historico='TED')
-    >>> ex2, created = ExtratoCC.objects.get_or_create(data_extrato=datetime.date(2008,10,30), data_oper=datetime.date(2008,10,15), cod_oper=5555, valor='100000', historico='TED')
-
-    >>> a1, created = Acordo.objects.get_or_create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e GTech')
-    >>> a2, created = Acordo.objects.get_or_create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e Terremark')
-
-    >>> of1, created = OrigemFapesp.objects.get_or_create(acordo=a1, item_outorga=i1)
-    >>> of2, created = OrigemFapesp.objects.get_or_create(acordo=a2, item_outorga=i2)
-
-    >>> fp1 = FontePagadora.objects.get_or_create(protocolo=p1, extrato=ex1, origem_fapesp=of1, estado=ef2, valor='2650')
-    >>> fp2 = FontePagadora.objects.get_or_create(protocolo=p2, extrato=ex2, origem_fapesp=of2, estado=ef2, valor='100000')
-
-
-    >>> n1.__unicode__()
-    '08/22222-2_Inicial - STB'
-
-    >>> n1.mostra_termo()
-    '08/22222-2'
-
-    >>> n1.mostra_modalidade()
-    'STB'
-
-    >>> n1.get_absolute_url()
-    '/admin/outorga/natureza_gasto/8'
-
-    >>> n1.formata_valor(i3.valor)
-    'R$ 1.200.000,00'
-
-    >>> n1.total_realizado
-    Decimal('102650')
-
-    >>> n1.formata_total_realizado()
-    'R$ 102.650,00'
-
-    >>> n1.soma_itens()
-    'R$ 30.000,00'
-
-    >>> n2.soma_itens()
-    '<span style="color: red">R$ 1.200.000,00</span>'
-
-    >>> n1.todos_itens()
-    [<Item: 08/22222-2_STB - Armazenagem>, <Item: 08/22222-2_STB - Servico de conexao>]
-
-    >>> n1.soma_geral()
-    Decimal('1230000')
- 
-    >>> n1.formata_soma_geral()
-    'R$ 1.230.000,00'
-
-    >>> n1.v_concedido()
-    'R$ 30.000,00'
     """
-
 
     modalidade = models.ForeignKey('outorga.Modalidade', verbose_name=_(u'Modalidade'))
     termo = models.ForeignKey('outorga.Termo', verbose_name=_(u'Termo de outorga'))
@@ -740,14 +556,6 @@ class Natureza_gasto(models.Model):
         return Item.objects.filter(natureza_gasto__modalidade=self.modalidade,
                                    natureza_gasto__termo=self.termo)
 
-    # Retorna a soma do valor total de todos os itens de uma modalidade considerando todas as concessões de um Termo.
-    def soma_geral(self):
-        total = Decimal('0.00')
-        for item in self.todos_itens():
-            total += item.valor_total()
-        return total
-
-
     # Retorna a soma do valor total concedido considerando todas as naturezas de gasto de uma modalidade e Termo.
     def total_concedido_mod_termo(self):
         total = Decimal('0.00')
@@ -755,11 +563,6 @@ class Natureza_gasto(models.Model):
             total += ng.valor_concedido
         return self.formata_valor(total)
     total_concedido_mod_termo.short_description=_(u'Total concedido para a Modalidade')
-
-
-    # Retorna a soma geral em formato de moeda.
-    def formata_soma_geral(self):
-        return self.formata_valor(self.soma_geral())
 
 
     # Formata o valor do atributo 'valor_concedido'
@@ -804,8 +607,6 @@ class Item(models.Model):
     O método 'mostra_valor'			Retorna o atributo 'valor' em formato moeda.
     O método 'mostra_valor_unit'		Retorna o campo 'valor_unit' em formato moeda.
     O método 'mostra_quantidade'		Retorna o campo 'quantidade'.
-    O método 'mostra_valor_total'		Retorna o atributo o valor total em formato moeda.
-    O método 'valor_total'			Retorna a soma dos itens conectados entre si.
     O método 'calcula_total_despesas'		Retorna a soma das fontespagadoras 'fapesp' referentes a um item.
     O atributo 'valor_realizado_acumulado' 	Foi definido para retornar o método 'calcula_total_despesa'.
     O método 'mostra_valor_realizado'		Retorna o atributo 'valor_realizado_acumulado' em formato moeda.

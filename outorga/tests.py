@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from datetime import date, timedelta, datetime
 from django.test import TestCase
+from decimal import Decimal
+
 from outorga.models import Termo, Item, OrigemFapesp, Estado as EstadoOutorga, Categoria, Outorga, Modalidade, Natureza_gasto, Acordo
 from financeiro.models import Pagamento, ExtratoCC, Estado as EstadoFinanceiro
 from identificacao.models import Entidade, Contato, Identificacao, Endereco
@@ -109,45 +111,45 @@ class TermoTest(TestCase):
 
     def test_real(self):
         termo = Termo.objects.get(pk=1)
-        self.assertEquals(termoreal, Decimal('102500'))
+        self.assertEquals(termo.real, Decimal('102500'))
 
-    def test_real(self):
+    def test_termo_real(self):
         termo = Termo.objects.get(pk=1)
         self.assertEquals(termo.termo_real(), 'R$ 102.500,00')
 
-    def test_real(self):
+    def test_dolar(self):
         termo = Termo.objects.get(pk=1)
         self.assertEquals(termo.dolar, Decimal('300000'))
 
-    def test_real(self):
+    def test_termo_dolar(self):
         termo = Termo.objects.get(pk=1)
         self.assertEquals(termo.termo_dolar(), '$ 300,000.00')
 
-    def test_real(self):
+    def test_duracao_meses(self):
         termo = Termo.objects.get(pk=1)
         self.assertEquals(termo.duracao_meses(), '12 meses')
 
-    def test_real(self):
+    def test_total_realizado_real(self):
         termo = Termo.objects.get(pk=1)
         self.assertEquals(termo.total_realizado_real, Decimal('102650'))
 
-    def test_real(self):
+    def test_formata_realizado_real(self):
         termo = Termo.objects.get(pk=1)
         self.assertEquals(termo.formata_realizado_real(), 'R$ 102.650,00')
 
-    def test_real(self):
+    def test_total_realizado_dolar(self):
         termo = Termo.objects.get(pk=1)
         self.assertEquals(termo.total_realizado_dolar, Decimal('250000'))
 
-    def test_real(self):
+    def test_formata_realizado_dolar(self):
         termo = Termo.objects.get(pk=1)
         self.assertEquals(termo.formata_realizado_dolar(), '$ 250,000.00')
 
-    def test_real(self):
+    def test_num_processo(self):
         termo = Termo.objects.get(pk=1)
         self.assertEquals(termo.num_processo, '08/22222-2')
 
-    def test_real(self):
+    def test_vigencia(self):
         termo = Termo.objects.get(pk=1)
         self.assertEquals(termo.vigencia, '12 meses')
 
@@ -159,6 +161,187 @@ class TermoTest(TestCase):
 #         termo = Termo.objects.get(pk=1)
 #         self.assertEquals(Termo.termos_auditoria_interna_em_aberto(), ['<Termo: 08/22222-2>'])
 
+
+class CategoriaTest(TestCase):
+    def setUp(self):
+        super(CategoriaTest, self).tearDown()
+        c, created = Categoria.objects.get_or_create(nome='Transposicao')
+
+    def tearDown(self):
+        super(CategoriaTest, self).tearDown()
+
+    def test_unicode(self):
+        c = Categoria.objects.get(pk=1)
+        self.assertEquals(c.__unicode__(), u'Transposicao')
+
+
+class OutorgaTest(TestCase):
+    def setUp(self):
+        super(OutorgaTest, self).tearDown()
+        #Cria Termo
+        e, created = EstadoOutorga.objects.get_or_create(nome='Vigente')
+        t, create = Termo.objects.get_or_create(ano=2008, processo=22222, digito=2, defaults={'inicio': date(2008,1,1), 'estado':e})
+
+        #Cria Outorga
+        c1, created = Categoria.objects.get_or_create(nome='Inicial')
+        o1, created = Outorga.objects.get_or_create(termo=t, categoria=c1, data_solicitacao=date(2007,12,1), defaults={'termino': date(2008,12,31), 'data_presta_contas': date(2008,2,28)})
+
+        #Cria Natureza de gasto
+        m1, created = Modalidade.objects.get_or_create(sigla='STB', defaults={'nome': 'Servicos de Terceiro no Brasil', 'moeda_nacional': True})
+        m2, created = Modalidade.objects.get_or_create(sigla='STE', defaults={'nome': 'Servicos de Terceiro no Exterior', 'moeda_nacional': False})
+
+        n1, created = Natureza_gasto.objects.get_or_create(modalidade=m1, termo=t, valor_concedido='1500000.00')
+        n2, created = Natureza_gasto.objects.get_or_create(modalidade=m2, termo=t, valor_concedido='1500000.00')
+        
+        #Cria Item de Outorga
+        ent1, created = Entidade.objects.get_or_create(sigla='GTECH', defaults={'nome': 'Granero Tech', 'cnpj': '00.000.000/0000-00', 'fisco': True, 'url': ''})
+        ent2, created = Entidade.objects.get_or_create(sigla='SAC', defaults={'nome': 'SAC do Brasil', 'cnpj': '00.000.000/0000-00', 'fisco': True, 'url': ''})
+
+        i1, created = Item.objects.get_or_create(entidade=ent1, natureza_gasto=n1, descricao='Armazenagem', defaults={'justificativa': 'Armazenagem de equipamentos', 'quantidade': 12, 'valor': 2500})
+        i2, created = Item.objects.get_or_create(entidade=ent2, natureza_gasto=n2, descricao='Serviço de Conexão Internacional', defaults={'justificativa': 'Link Internacional', 'quantidade': 12, 'valor': 250000})
+
+    def tearDown(self):
+        super(OutorgaTest, self).tearDown()
+
+    def test_unicode(self):
+        o1 = Outorga.objects.get(pk=1)
+        self.assertEquals(o1.__unicode__(), '08/22222-2 - Inicial')
+
+    def test_inicio(self):
+        o1 = Outorga.objects.get(pk=1)
+        self.assertEquals(o1.inicio, '01/01/2008')
+
+    def test_mostra_categoria(self):
+        o1 = Outorga.objects.get(pk=1)
+        self.assertEquals(o1.mostra_categoria(), 'Inicial')
+
+    def test_mostra_termo(self):
+        o1 = Outorga.objects.get(pk=1)
+        self.assertEquals(o1.mostra_termo(), '08/22222-2')
+
+    def test_existe_arquivo(self):
+        o1 = Outorga.objects.get(pk=1)
+        self.assertEquals(o1.existe_arquivo(), ' ')
+
+
+
+class Natureza_gastoTest(TestCase):
+    def setUp(self):
+        super(Natureza_gastoTest, self).tearDown()
+        
+        #Cria Termo
+        e, created = EstadoOutorga.objects.get_or_create(nome='Vigente')
+        t, create = Termo.objects.get_or_create(ano=2008, processo=22222, digito=2, defaults={'inicio': date(2008,1,1), 'estado':e})
+
+        #Cria Outorga
+        c1, created = Categoria.objects.get_or_create(nome='Inicial')
+        c2, created = Categoria.objects.get_or_create(nome='Aditivo')
+
+        o1, created = Outorga.objects.get_or_create(termo=t, categoria=c1, data_solicitacao=date(2007,12,1), defaults={'termino': date(2008,12,31), 'data_presta_contas': date(2008,2,28)})
+        o2, created = Outorga.objects.get_or_create(termo=t, categoria=c2, data_solicitacao=date(2008,4,1), defaults={'termino': date(2008,12,31), 'data_presta_contas': date(2008,2,28)})
+
+        #Cria Natureza de gasto
+        m1, created = Modalidade.objects.get_or_create(sigla='STB', defaults={'nome': 'Servicos de Terceiro no Brasil', 'moeda_nacional': True})
+
+        n1, created = Natureza_gasto.objects.get_or_create(modalidade=m1, termo=t, valor_concedido=Decimal('30000'))
+        n2, created = Natureza_gasto.objects.get_or_create(modalidade=m1, termo=t, valor_concedido=Decimal('100000'))
+
+        #Cria Item de Outorga
+        ent1, created = Entidade.objects.get_or_create(sigla='GTECH', defaults={'nome': 'Granero Tech', 'cnpj': '00.000.000/0000-00', 'fisco': True, 'url': ''})
+        ent2, created = Entidade.objects.get_or_create(sigla='TERREMARK', defaults={'nome': 'Terremark do Brasil', 'cnpj': '00.000.000/0000-00', 'fisco': True, 'url': ''})
+
+        end1, created = Endereco.objects.get_or_create(entidade=ent1)
+        end2, created = Endereco.objects.get_or_create(entidade=ent2)
+
+        i1, created = Item.objects.get_or_create(entidade=ent1, natureza_gasto=n1, descricao='Armazenagem', defaults={'justificativa': 'Armazenagem de equipamentos', 'quantidade': 12, 'valor': 2500})
+        i2, created = Item.objects.get_or_create(entidade=ent2, natureza_gasto=n2, descricao='Servico de Conexao', defaults={'justificativa': 'Ligação SP-CPS', 'quantidade': 12, 'valor': 100000})
+
+        #Cria Protocolo
+        ep, created = EstadoProtocolo.objects.get_or_create(nome='Aprovado')
+        td, created = TipoDocumento.objects.get_or_create(nome='Nota Fiscal')
+        og, created = Origem.objects.get_or_create(nome='Motoboy')
+
+        cot1, created = Contato.objects.get_or_create(primeiro_nome='Joao', defaults={'email': 'joao@joao.com.br', 'tel': ''})
+        cot2, created = Contato.objects.get_or_create(primeiro_nome='Marcos', defaults={'email': 'alex@alex.com.br', 'tel': ''})
+
+        iden1, created = Identificacao.objects.get_or_create(endereco=end1, contato=cot1, defaults={'funcao': 'Tecnico', 'area': 'Estoque', 'ativo': True})
+        iden2, created = Identificacao.objects.get_or_create(endereco=end2, contato=cot2, defaults={'funcao': 'Diretor', 'area': 'Redes', 'ativo': True})
+
+        p1, created = Protocolo.objects.get_or_create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,9,30,10,10), defaults={'origem': og, 'estado': ep, 'num_documento': 8888, 'data_vencimento': date(2008,10,5), 'descricao': 'Conta mensal - armazenagem 09/2008', 'valor_total': None})
+        p2, created = Protocolo.objects.get_or_create(termo=t, identificacao=iden2, tipo_documento=td, data_chegada=datetime(2008,9,30,10,10), defaults={'origem': og, 'estado': ep, 'num_documento': 5555, 'data_vencimento': date(2008,10,15), 'descricao': 'Serviço de Conexão Local - 09/2009', 'valor_total': None})
+
+        #Cria Item do Protocolo
+        ip1 = ItemProtocolo.objects.get_or_create(protocolo=p1, descricao='Tarifa mensal - 09/2009', quantidade=1, valor_unitario=2500)
+        ip2 = ItemProtocolo.objects.get_or_create(protocolo=p1, descricao='Reajuste tarifa mensal - 09/2009', quantidade=1, valor_unitario=150)
+        ip3 = ItemProtocolo.objects.get_or_create(protocolo=p2, descricao='Conexão Local - 09/2009', quantidade=1, valor_unitario=85000)
+        ip4 = ItemProtocolo.objects.get_or_create(protocolo=p2, descricao='Reajuste do serviço de Conexão Local - 09/2009', quantidade=1, valor_unitario=15000)
+
+        #Criar Fonte Pagadora
+        ef1, created = EstadoOutorga.objects.get_or_create(nome='Aprovado')
+        ef2, created = EstadoOutorga.objects.get_or_create(nome='Concluído')
+
+        ex1, created = ExtratoCC.objects.get_or_create(data_extrato=date(2008,10,30), data_oper=date(2008,10,5), cod_oper=333333, valor='2650', historico='TED')
+        ex2, created = ExtratoCC.objects.get_or_create(data_extrato=date(2008,10,30), data_oper=date(2008,10,15), cod_oper=5555, valor='100000', historico='TED')
+
+        a1, created = Acordo.objects.get_or_create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e GTech')
+        a2, created = Acordo.objects.get_or_create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e Terremark')
+
+        of1, created = OrigemFapesp.objects.get_or_create(acordo=a1, item_outorga=i1)
+        of2, created = OrigemFapesp.objects.get_or_create(acordo=a2, item_outorga=i2)
+
+        fp1 = Pagamento.objects.get_or_create(protocolo=p1, conta_corrente=ex1, origem_fapesp=of1, valor_fapesp='2650')
+        fp2 = Pagamento.objects.get_or_create(protocolo=p2, conta_corrente=ex2, origem_fapesp=of2, valor_fapesp='100000')
+
+
+    def tearDown(self):
+        super(Natureza_gastoTest, self).tearDown()
+
+    def test_unicode(self):
+        n1 = Natureza_gasto.objects.get(pk=1)
+        self.assertEquals(n1.__unicode__(), u'08/22222-2 - STB')
+
+    def test_mostra_termo(self):
+        n1 = Natureza_gasto.objects.get(pk=1)
+        self.assertEquals(n1.mostra_termo(), u'08/22222-2')
+
+    def test_mostra_modalidade(self):
+        n1 = Natureza_gasto.objects.get(pk=1)
+        self.assertEquals(n1.mostra_modalidade(), u'STB')
+
+    def test_get_absolute_url(self):
+        n1 = Natureza_gasto.objects.get(pk=1)
+        self.assertEquals(n1.get_absolute_url(), u'/admin/outorga/natureza_gasto/1')
+
+    def test_formata_valor(self):
+        n1 = Natureza_gasto.objects.get(pk=1)
+        self.assertEquals(n1.formata_valor(1200000.00), u'R$ 1.200.000,00')
+
+    def test_total_realizado(self):
+        n1 = Natureza_gasto.objects.get(pk=1)
+        self.assertEquals(n1.total_realizado, Decimal('102650'))
+
+    def test_formata_total_realizado(self):
+        n1 = Natureza_gasto.objects.get(pk=1)
+        self.assertEquals(n1.formata_total_realizado(), '<span style="color: red">R$ 102.650,00</span>')
+
+    def test_soma_itens_menos_que_concedido(self):
+        n1 = Natureza_gasto.objects.get(pk=1)
+        self.assertEquals(n1.soma_itens(), '<span style="color: red">R$ 2.500,00</span>')
+
+    def test_soma_itens(self):
+        n2 = Natureza_gasto.objects.get(pk=2)
+        self.assertEquals(n2.soma_itens(), 'R$ 100.000,00')
+
+    def test_todos_itens(self):
+        n1 = Natureza_gasto.objects.get(pk=1)
+        r = n1.todos_itens()
+        self.assertTrue(len(r) == 2)
+        self.assertEquals(str(r[0]), u'Armazenagem')
+        self.assertEquals(str(r[1]), u'Servico de Conexao')
+
+    def test_v_concedido(self):
+        n1 = Natureza_gasto.objects.get(pk=1)
+        self.assertEquals(n1.v_concedido(), 'R$ 30.000,00')
 
 
 
