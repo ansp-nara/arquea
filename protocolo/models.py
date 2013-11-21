@@ -113,7 +113,7 @@ class Feriado(models.Model):
     A classe 'Meta' 			Define a ordenação dos dados pelo campo 'feriado'.
     """
 
-    feriado = models.DateField(_('Feriado'))
+    feriado = models.DateField(_('Feriado'), unique=True)
     obs = models.CharField(_(u'Observação'), max_length=100, blank=True)
     tipo = models.ForeignKey('protocolo.TipoFeriado', null=True, blank=True)
     #movel = models.BooleanField(_(u'Este feriado é móvel?'))

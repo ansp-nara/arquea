@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from models import Cotacao, TipoDocumento, Protocolo, Estado
-from outorga.models import Termo
-from identificacao.models import Entidade
 from django import forms
 from django.forms.util import ErrorList
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ObjectDoesNotExist
+from models import Cotacao, TipoDocumento, Protocolo, Estado, Feriado
+from outorga.models import Termo
+from identificacao.models import Entidade
 import logging
 
 # Get an instance of a logger
@@ -225,6 +225,10 @@ class FeriadoAdminForm(forms.ModelForm):
         if not tipo.movel and (tipo.dia != feriado.day or tipo.mes != feriado.month):
             raise forms.ValidationError(u"Feriado fixo deve ser no mesmo dia/mês especificado no tipo do feriado. Este feriado ocorre no dia %s/%s" % (tipo.dia, tipo.mes))
 
+        # Verifica se já há uma data de feriado cadastrada no mesmo dia
+        if Feriado.objects.get(feriado=feriado):
+            raise forms.ValidationError(u"O feriado nesta data já existe.")
+        
         return self.cleaned_data
     
     
