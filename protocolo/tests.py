@@ -3,6 +3,7 @@ from datetime import date, timedelta, datetime
 import calendar
 from decimal import Decimal
 from django.db.models import Q
+from django.db import IntegrityError
 from django.test import TestCase
 from django.utils import timezone
 from membro.models import Membro, Cargo, Historico
@@ -14,7 +15,6 @@ from identificacao.models import Identificacao, Contato, Entidade, Endereco
 from outorga.models import Termo, Outorga, Categoria, Modalidade, Natureza_gasto
 from outorga.models import Estado as OutorgaEstado
 from protocolo.templatetags import proto_tags
-
 
 import logging
 
@@ -246,6 +246,16 @@ class FeriadoTest(TestCase):
         
         self.assertEquals(Feriado.dia_de_feriado(date(2007,2,22)), False)
         self.assertEquals(Feriado.dia_de_feriado(date(2007,10,8)), False)
+        
+    def test_erro_para_feriado_unico(self):
+        f = Feriado(feriado=date(2008,10,8))
+        f.save()
+        f = Feriado(feriado=date(2008,10,8))
+        # deve disparar erro para feriado com data igual
+        self.assertRaises(IntegrityError, f.save)
+
+        
+        
         
 class CotacaoTest(TestCase):
     def setUp(self):
