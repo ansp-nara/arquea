@@ -19,7 +19,6 @@ class TermoTest(TestCase):
         #Cria Termo
         e, created = EstadoOutorga.objects.get_or_create(nome='Vigente')
         t, create = Termo.objects.get_or_create(ano=2008, processo=22222, digito=2, defaults={'inicio': date(2008,1,1), 'estado':e})
-
         #Cria Outorga
         c1, created = Categoria.objects.get_or_create(nome='Inicial')
         c2, created = Categoria.objects.get_or_create(nome='Aditivo')
@@ -27,16 +26,16 @@ class TermoTest(TestCase):
         o1, created = Outorga.objects.get_or_create(termo=t, categoria=c1, data_solicitacao=date(2007,12,1), defaults={'termino': date(2008,12,31), 'data_presta_contas': date(2008,2,28)})
         o2, created = Outorga.objects.get_or_create(termo=t, categoria=c2, data_solicitacao=date(2008,4,1), defaults={'termino': date(2008,12,31), 'data_presta_contas': date(2008,2,28)})
 
-
         #Cria Natureza de gasto
         m1, created = Modalidade.objects.get_or_create(sigla='STB', defaults={'nome': 'Servicos de Terceiro no Brasil', 'moeda_nacional': True})
+        m11, created = Modalidade.objects.get_or_create(sigla='STB1', defaults={'nome': 'Servicos de Terceiro no Brasil', 'moeda_nacional': True})
         m2, created = Modalidade.objects.get_or_create(sigla='STE', defaults={'nome': 'Servicos de Terceiro no Exterior', 'moeda_nacional': False})
+        m22, created = Modalidade.objects.get_or_create(sigla='STE1', defaults={'nome': 'Servicos de Terceiro no Exterior', 'moeda_nacional': False})
 
         n1, created = Natureza_gasto.objects.get_or_create(modalidade=m1, termo=t, valor_concedido='1500000.00')
-        n2, created = Natureza_gasto.objects.get_or_create(modalidade=m2, termo=t, valor_concedido='1500000.00')
-        n3, created = Natureza_gasto.objects.get_or_create(modalidade=m1, termo=t, valor_concedido='1500000.00')
-        n4, created = Natureza_gasto.objects.get_or_create(modalidade=m2, termo=t, valor_concedido='1500000.00')
-
+        n2, created = Natureza_gasto.objects.get_or_create(modalidade=m11, termo=t, valor_concedido='3000000.00')
+        n3, created = Natureza_gasto.objects.get_or_create(modalidade=m2, termo=t, valor_concedido='1000000.00')
+        n4, created = Natureza_gasto.objects.get_or_create(modalidade=m22, termo=t, valor_concedido='2000000.00')
 
         #Cria Item de Outorga
         ent1, created = Entidade.objects.get_or_create(sigla='GTECH', defaults={'nome': 'Granero Tech', 'cnpj': '00.000.000/0000-00', 'fisco': True, 'url': ''})
@@ -109,21 +108,21 @@ class TermoTest(TestCase):
         termo = Termo.objects.get(pk=1)
         self.assertEquals(termo.__unicode__(), u'08/22222-2')
 
-    def test_real(self):
+    def test_valor_concedido_real(self):
         termo = Termo.objects.get(pk=1)
-        self.assertEquals(termo.real, Decimal('102500'))
+        self.assertEquals(termo.real, Decimal('4500000'))
 
     def test_termo_real(self):
         termo = Termo.objects.get(pk=1)
-        self.assertEquals(termo.termo_real(), 'R$ 102.500,00')
+        self.assertEquals(termo.termo_real(), '<b>R$ 4.500.000,00</b>')
 
-    def test_dolar(self):
+    def test_valor_concedido_dolar(self):
         termo = Termo.objects.get(pk=1)
-        self.assertEquals(termo.dolar, Decimal('300000'))
+        self.assertEquals(termo.dolar, Decimal('3000000'))
 
     def test_termo_dolar(self):
         termo = Termo.objects.get(pk=1)
-        self.assertEquals(termo.termo_dolar(), '$ 300,000.00')
+        self.assertEquals(termo.termo_dolar(), '$ 3,000,000.00')
 
     def test_duracao_meses(self):
         termo = Termo.objects.get(pk=1)
@@ -131,19 +130,19 @@ class TermoTest(TestCase):
 
     def test_total_realizado_real(self):
         termo = Termo.objects.get(pk=1)
-        self.assertEquals(termo.total_realizado_real, Decimal('102650'))
+        self.assertEquals(termo.total_realizado_real, Decimal('252650.00'))
 
     def test_formata_realizado_real(self):
         termo = Termo.objects.get(pk=1)
-        self.assertEquals(termo.formata_realizado_real(), 'R$ 102.650,00')
+        self.assertEquals(termo.formata_realizado_real(), '<b>R$ 252.650,00</b>')
 
     def test_total_realizado_dolar(self):
         termo = Termo.objects.get(pk=1)
-        self.assertEquals(termo.total_realizado_dolar, Decimal('250000'))
+        self.assertEquals(termo.total_realizado_dolar, Decimal('100000.00'))
 
     def test_formata_realizado_dolar(self):
         termo = Termo.objects.get(pk=1)
-        self.assertEquals(termo.formata_realizado_dolar(), '$ 250,000.00')
+        self.assertEquals(termo.formata_realizado_dolar(), '$ 100,000.00')
 
     def test_num_processo(self):
         termo = Termo.objects.get(pk=1)
