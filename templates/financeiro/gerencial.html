@@ -80,6 +80,11 @@
         display: block;
         width: 150px;
     }
+    .tbl_modalidades th.sp_entidade span {
+        display: block;
+        width: 65px;
+    }
+    
 	/* dimensões das celulas de titulo horizontal */
 	.tbl_modalidades .tit_vert span {
 	    display: block;
@@ -106,8 +111,8 @@
 	}
 	.tbl_modalidades th.sp_conc,
 	.tbl_modalidades td.sp_conc,
-	.tbl_modalidades th.span_desc,
-	.tbl_modalidades td.span_desc {
+	.tbl_modalidades th.span_entidade,
+	.tbl_modalidades td.span_entidade {
 	    border-right: 1px black solid;
 	}
 </style>
@@ -159,6 +164,7 @@
   <tr>
 	  <th>Qtd.</th>
 	  <th class="span_desc"><span>Descrição</span></th>
+	  <th class="sp_entidade"><span>Entidade</span></th>
 	  <th class="sp_conc"><span>Concessão</span></th>
 	    {% for m in meses %}
 	      <th class="tit_vert"><span>{{ m }}</span></th>
@@ -170,6 +176,7 @@
      <tr>
         <td>{{ it.quantidade }}</td>
         <td class="span_desc"><span>{{ it.descricao }}</span></td>
+        <td class="sp_entidade"><span>{{ it.entidade.sigla }}</span></td>
         <td class="sp_conc"><b><span>{{ it.valor|default:0.00|moeda_css:m.modalidade.moeda_nacional }}</span></b></td>
 	     {% for v in valores|dictsort:"ord" %}
 	        <td>{{ v.valor|moeda_valor_css:m.modalidade.moeda_nacional }}</td>
