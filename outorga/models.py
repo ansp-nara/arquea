@@ -262,9 +262,9 @@ class Termo(models.Model):
     @property
     def total_realizado_dolar(self):
         total = Decimal('0.00')
-	for n in self.natureza_gasto_set.all():
-	    if not n.modalidade.moeda_nacional:
-		total += n.total_realizado
+        for n in self.natureza_gasto_set.all():
+            if not n.modalidade.moeda_nacional:
+                total += n.total_realizado
         return total
 
 
@@ -586,9 +586,9 @@ class Natureza_gasto(models.Model):
     class Meta:
         verbose_name = _(u'Pasta')
         verbose_name_plural = _(u'Pastas')
-	ordering = ('-termo__ano', )
+        ordering = ('-termo__ano', )
+        unique_together = ('modalidade', 'termo',)
         #ordering = ('-outorga__data_solicitacao', )
-
 
 
 class Item(models.Model):
