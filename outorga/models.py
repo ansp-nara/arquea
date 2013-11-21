@@ -788,44 +788,6 @@ class Acordo(models.Model):
 class OrigemFapesp(models.Model):
       """
       Uma instância dessa classe representa a associação de uma acordo a um item da Outorga
-
-
-      Cria Termo
-      >>> e, created = Estado.objects.get_or_create(nome='Vigente')
-      >>> t, create = Termo.objects.get_or_create(ano=2008, processo=22222, digito=2, defaults={'inicio': datetime.date(2008,1,1), 'estado'= e})
-
-
-      Cria Outorga
-      >>> c1, created = Categoria.objects.get_or_create(nome='Inicial')
-      >>> c2, created = Categoria.objects.get_or_create(nome='Aditivo')
-
-      >>> o1, created = Outorga.objects.get_or_create(termo=t, categoria=c1, data_solicitacao=datetime.date(2007,12,1), defaults={'termino': datetime.date(2008,12,31), 'data_presta_contas': datetime.date(2008,2,28)})
-      >>> o2, created = Outorga.objects.get_or_create(termo=t, categoria=c2, data_solicitacao=datetime.date(2008,4,1), defaults={'termino': datetime.date(2008,12,31), 'data_presta_contas': datetime.date(2008,2,28)})
-
-
-      Cria Natureza de gasto
-      >>> m1, created = Modalidade.objects.get_or_create(sigla='STE', defaults={'nome': 'Servicos de Terceiro no Exterior', 'moeda_nacional': False})
-
-      >>> n1, created = Natureza_gasto.objects.get_or_create(modalidade=m1, outorga=o1)
-      >>> n2, created = Natureza_gasto.objects.get_or_create(modalidade=m1, outorga=o2)
-
-
-      Cria Item de Outorga
-       from identificacao.models import Entidade, Contato, Identificacao
-
-      >>> ent1, created = Entidade.objects.get_or_create(sigla='SAC', defaults={'nome': 'SAC do Brasil', 'cnpj': '00.000.000/0000-00', 'ativo': True, 'fisco': True, 'url': ''})
-
-      >>> i1, created = Item.objects.get_or_create(entidade=ent1, natureza_gasto=n1, descricao='Serviço de Conexão Internacional', defaults={'justificativa': 'Link Internacional', 'quantidade': 12, 'valor_unit': 250000})
-      >>> i2, created = Item.objects.get_or_create(entidade=ent1, natureza_gasto=n2, descricao='Serviço de Conexão Internacional', defaults={'justificativa': 'Ajuste na cobrança do Link Internacional', 'quantidade': 6, 'valor_unit': 50000, 'item: i2})
-
-      >>> a, created = Acordo.objects.get_or_create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e SAC')
-
-      >>> of, created = OrigemFapesp.objects.get_or_create(acordo=a, item_outorga=i1)
-
-
-      >>> of.__unicode__()
-      'Acordo entre Instituto UNIEMP e SAC - Serviço de Conexão Internacional'
-
       """
 
       acordo = models.ForeignKey('outorga.Acordo')
@@ -851,23 +813,8 @@ class OrigemFapesp(models.Model):
           return self.item_outorga.natureza_gasto.termo
 
 class Contrato(models.Model):
-
       """
       Uma instância dessa classe representa um contrato. (Ex. Instituto Uniemp e Telefônica)
-
-
-      Cria um Contrato
-       from identificacao.models import Entidade, Contato, Identificacao
-
-      >>> ent, created = Entidade.objects.get_or_create(sigla='SAC', defaults={'nome': 'SAC do Brasil', 'cnpj': '00.000.000/0000-00', 'ativo': True, 'fisco': True, 'url': ''})
-
-      >>> ct, created = Contrato.objects.get_or_create(data_inicio=datetime.date(2008,1,1), auto_renova=True, limite_rescisao=datetime.date(2008,1,11), entidade=ent)
-
-      >>> ct.__unicode__()
-      'SAC - 01/01/2008'
-
-      >>> ct.existe_arquivo()
-      ' '
       """
 
       numero = models.CharField(_(u'Número'), max_length=20)
@@ -912,33 +859,8 @@ class TipoContrato(models.Model):
           ordering = ('nome',)
 
 class OrdemDeServico(models.Model):
-
       """
       Uma instância dessa classe representa uma ordem de serviço de um Contrato.
-
-    
-      Cria um Contrato
-       from identificacao.models import Entidade, Contato, Identificacao
-
-      >>> ent, created = Entidade.objects.get_or_create(sigla='SAC', defaults={'nome': 'SAC do Brasil', 'cnpj': '00.000.000/0000-00', 'ativo': True, 'fisco': True, 'url': ''})
-
-      >>> ct, created = Contrato.objects.get_or_create(data_inicio=datetime.date(2008,1,1), auto_renova=True, limite_rescisao=datetime.date(2008,1,11), entidade=ent)
-
-
-      Cria uma Ordem de Serviço
-      >>> a, created = Acordo.objects.get_or_create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e SAC')
-
-      >>> os, created = OrdemDeServico.objects.get_or_create(acordo=a, contrato=ct, data_inicio=datetime.date(2008,2,1), data_rescisao=datetime.date(2008,11,1), antes_rescisao=2, descricao='OS 34567 - Contratação de mais um link')
-
- 
-      >>> os.__unicode__()
-      'OS 34567 - Contratação de mais um link'
-
-      >>> os.mostra_prazo()
-      '2 meses'
-
-      >>> os.existe_arquivo()
-      ' '
       """
 
       numero = models.CharField(_(u'Número'), max_length=20)
@@ -970,11 +892,11 @@ class OrdemDeServico(models.Model):
 
       # Retorna um ícone se a ordem de serviço tiver anexo.
       def existe_arquivo(self):
-	  a = '<center><a href="/admin/outorga/arquivoos/?os__id__exact=%s"><img src="/media/img/arquivo.png" /></a></center>' % self.id
-	  if self.arquivos.count() > 0:
-	      return a
-	  else:
-	      return ' '
+          a = '<center><a href="/admin/outorga/arquivoos/?os__id__exact=%s"><img src="/media/img/arquivo.png" /></a></center>' % self.id
+          if self.arquivos.count() > 0:
+              return a
+          else:
+              return ' '
       existe_arquivo.allow_tags = True
       existe_arquivo.short_description = _(u'Arquivo')
 

@@ -3,7 +3,8 @@ from datetime import date, timedelta, datetime
 from django.test import TestCase
 from decimal import Decimal
 
-from outorga.models import Termo, Item, OrigemFapesp, Estado as EstadoOutorga, Categoria, Outorga, Modalidade, Natureza_gasto, Acordo
+from outorga.models import Termo, Item, OrigemFapesp, Estado as EstadoOutorga, Categoria, Outorga, Modalidade, Natureza_gasto, \
+                           Acordo, Contrato, OrdemDeServico, TipoContrato
 from financeiro.models import Pagamento, ExtratoCC, Estado as EstadoFinanceiro
 from identificacao.models import Entidade, Contato, Identificacao, Endereco
 from protocolo.models import Protocolo, ItemProtocolo, TipoDocumento, Origem, Estado as EstadoProtocolo
@@ -163,7 +164,7 @@ class TermoTest(TestCase):
 
 class CategoriaTest(TestCase):
     def setUp(self):
-        super(CategoriaTest, self).tearDown()
+        super(CategoriaTest, self).setUp()
         c, created = Categoria.objects.get_or_create(nome='Transposicao')
 
     def tearDown(self):
@@ -519,6 +520,7 @@ class ModalidadeTest(TestCase):
 
 class EstadoTest(TestCase):
     def setUp(self):
+        super(EstadoTest, self).setUp()
         #Cria Estado
         e, created = EstadoOutorga.objects.get_or_create(nome='Vigente')
         
@@ -526,4 +528,95 @@ class EstadoTest(TestCase):
         e = EstadoOutorga.objects.get(pk=1)
         self.assertEquals(e.__unicode__(), u'Vigente')
     
+class OrigemFapespTest(TestCase):
+    def setUp(self):
+        super(OrigemFapespTest, self).setUp()
+
+        #Cria Termo
+        e, created = EstadoOutorga.objects.get_or_create(nome='Vigente')
+        t, create = Termo.objects.get_or_create(ano=2008, processo=22222, digito=2, defaults={'inicio': date(2008,1,1), 'estado':e})
+        
+        #Cria Outorga
+        c1, created = Categoria.objects.get_or_create(nome='Inicial')
+        c2, created = Categoria.objects.get_or_create(nome='Aditivo')
+        
+        o1, created = Outorga.objects.get_or_create(termo=t, categoria=c1, data_solicitacao=date(2007,12,1), defaults={'termino': date(2008,12,31), 'data_presta_contas': date(2008,2,28)})
+        o2, created = Outorga.objects.get_or_create(termo=t, categoria=c2, data_solicitacao=date(2008,4,1), defaults={'termino': date(2008,12,31), 'data_presta_contas': date(2008,2,28)})
+        
+        #Cria Natureza de gasto
+        m1, created = Modalidade.objects.get_or_create(sigla='STE', defaults={'nome': 'Servicos de Terceiro no Exterior', 'moeda_nacional': False})
+        m2, created = Modalidade.objects.get_or_create(sigla='STA', defaults={'nome': 'Servicos de Terceiro no Exterior', 'moeda_nacional': False})
+        
+        n1, created = Natureza_gasto.objects.get_or_create(modalidade=m1, termo=t, valor_concedido='300000.00')
+        n2, created = Natureza_gasto.objects.get_or_create(modalidade=m2, termo=t, valor_concedido='100000.00')
+        
+        #Cria Item de Outorga
+        ent1, created = Entidade.objects.get_or_create(sigla='SAC', defaults={'nome': 'SAC do Brasil', 'cnpj': '00.000.000/0000-00', 'fisco': True, 'url': ''})
+        
+        i1, created = Item.objects.get_or_create(entidade=ent1, natureza_gasto=n1, descricao='Serviço de Conexão Internacional', defaults={'justificativa': 'Link Internacional', 'quantidade': 12, 'valor': 250000})
+        i2, created = Item.objects.get_or_create(entidade=ent1, natureza_gasto=n2, descricao='Serviço de Conexão Internacional', defaults={'justificativa': 'Ajuste na cobrança do Link Internacional', 'quantidade': 6, 'valor': 50000})
+        
+        a, created = Acordo.objects.get_or_create(estado=e, descricao='Acordo entre Instituto UNIEMP e SAC')
+        
+        of, created = OrigemFapesp.objects.get_or_create(acordo=a, item_outorga=i1)
+
+    def tearDown(self):
+        super(OrigemFapespTest, self).tearDown()
+
+    def test_unicode(self):
+        of = OrigemFapesp.objects.get(pk=1)
+        self.assertEquals(of.__unicode__(), u'Acordo entre Instituto UNIEMP e SAC - Serviço de Conexão Internacional')
+          
+
+
+class ContratoTest(TestCase):
+    def setUp(self):
+        super(ContratoTest, self).setUp()
+
+        #Cria um Contrato
+        ent, created = Entidade.objects.get_or_create(sigla='SAC', defaults={'nome': 'SAC do Brasil', 'cnpj': '00.000.000/0000-00', 'fisco': True, 'url': ''})
+        ct, created = Contrato.objects.get_or_create(data_inicio=date(2008,1,1), auto_renova=True, limite_rescisao=date(2008,1,11), entidade=ent)
+
+    def tearDown(self):
+        super(ContratoTest, self).tearDown()
+
+    def test_unicode(self):
+        ct = Contrato.objects.get(pk=1)
+        self.assertEquals(ct.__unicode__(), u'SAC - 01/01/2008')
+
+    def test_existe_arquivo(self):
+        ct = Contrato.objects.get(pk=1)
+        self.assertEquals(ct.existe_arquivo(), u' ')
+
+
+class OrdemDeServicoTest(TestCase):
+    def setUp(self):
+        super(OrdemDeServicoTest, self).setUp()
+        
+        #Cria um Contrato
+        ent, created = Entidade.objects.get_or_create(sigla='SAC', defaults={'nome': 'SAC do Brasil', 'cnpj': '00.000.000/0000-00', 'fisco': True, 'url': ''})
+        ct, created = Contrato.objects.get_or_create(data_inicio=date(2008,1,1), auto_renova=True, limite_rescisao=date(2008,1,11), entidade=ent)
+
+        ef1, created = EstadoOutorga.objects.get_or_create(nome='Aprovado')
+        tipo, create = TipoContrato.objects.get_or_create(nome='Tipo Fixo')
+        #Cria uma Ordem de Serviço
+        a, created = Acordo.objects.get_or_create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e SAC')
+        os, created = OrdemDeServico.objects.get_or_create(acordo=a, contrato=ct, tipo=tipo, 
+                                   data_inicio=date(2008,2,1), data_rescisao=date(2008,11,1), antes_rescisao=2, numero=66666, 
+                                   descricao='OS 34567 - Contratação de mais um link')
+
+    def tearDown(self):
+        super(OrdemDeServicoTest, self).tearDown()
+
+    def test_unicode(self):
+        os = OrdemDeServico.objects.get(pk=1)
+        self.assertEquals(os.__unicode__(), u'Tipo Fixo 66666')
+
+    def test_mostra_prazo(self):
+        os = OrdemDeServico.objects.get(pk=1)
+        self.assertEquals(os.mostra_prazo(), u'2 meses')
+
+    def existe_arquivo(self):
+        os = OrdemDeServico.objects.get(pk=1)
+        self.assertEquals(os.existe_arquivo(), u' ')
 
