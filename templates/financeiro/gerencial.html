@@ -115,6 +115,9 @@
 	.tbl_modalidades td.span_entidade {
 	    border-right: 1px black solid;
 	}
+        .tbl_modalidades td.obs {
+	    font-weight:bold;
+	}
 </style>
 <h1>Relatório gerencial do processo {{ termo }}, atualizado em {{ atualizado|date:"d/m/Y" }}</h1>
 <h4><a href="{% url 'financeiro.views.relatorio_gerencial' 1 %}?termo={{ termo.id }}">Imprimir</a></h4>
@@ -166,8 +169,8 @@
 	  <th class="span_desc"><span>Descrição</span></th>
 	  <th class="sp_entidade"><span>Entidade</span></th>
 	  <th class="sp_conc"><span>Concessão</span></th>
-	    {% for m in meses %}
-	      <th class="tit_vert"><span>{{ m }}</span></th>
+	    {% for mes in meses %}
+	      <th class="tit_vert"><span>{{ mes }}</span></th>
 	    {% endfor %}
 	  <th class="sp_real"><span>Total realizado</span></th>
 	  <th class="sp_sald"><span>Saldo</span></th>
@@ -185,6 +188,7 @@
 	     <td class="sp_sald"><span>{{ it.saldo|moeda_css:m.modalidade.moeda_nacional }}</span></td>
      </tr>
   {% endfor %}
+     <tr><td class="obs" colspan="{{ meses|length|add:"6" }}">* {{ m.obs|linebreaksbr }}</td></tr>
   </table>
 {% endfor %}
 {% endblock %}
