@@ -88,7 +88,6 @@ class Estado(models.Model):
 
 
 class Termo(models.Model):
-
     """
     Uma instância dessa classe representa um Termo de Outorga.
 
@@ -119,144 +118,8 @@ class Termo(models.Model):
                                                         modelo Auditoria Interna.
 
     A 'class Meta'					Define a descrição do modelo (singular e plural) e a ordenação dos dados pelo ano.
-
-
-    Cria Termo
-    >>> e, created = Estado.objects.get_or_create(nome='Vigente')
-    >>> t, create = Termo.objects.get_or_create(ano=2008, processo=22222, digito=2, defaults={'inicio': datetime.date(2008,1,1), 'estado'= e})
-
-
-    Cria Outorga
-    >>> c1, created = Categoria.objects.get_or_create(nome='Inicial')
-    >>> c2, created = Categoria.objects.get_or_create(nome='Aditivo')
-
-    >>> o1, created = Outorga.objects.get_or_create(termo=t, categoria=c1, data_solicitacao=datetime.date(2007,12,1), defaults={'termino': datetime.date(2008,12,31), 'data_presta_contas': datetime.date(2008,2,28)})
-    >>> o2, created = Outorga.objects.get_or_create(termo=t, categoria=c2, data_solicitacao=datetime.date(2008,4,1), defaults={'termino': datetime.date(2008,12,31), 'data_presta_contas': datetime.date(2008,2,28)})
-
-
-    Cria Natureza de gasto
-    >>> m1, created = Modalidade.objects.get_or_create(sigla='STB', defaults={'nome': 'Servicos de Terceiro no Brasil', 'moeda_nacional': True})
-    >>> m2, created = Modalidade.objects.get_or_create(sigla='STE', defaults={'nome': 'Servicos de Terceiro no Exterior', 'moeda_nacional': False})
-
-    >>> n1, created = Natureza_gasto.objects.get_or_create(modalidade=m1, outorga=o1)
-    >>> n2, created = Natureza_gasto.objects.get_or_create(modalidade=m2, outorga=o1)
-    >>> n3, created = Natureza_gasto.objects.get_or_create(modalidade=m1, outorga=o2)
-    >>> n4, created = Natureza_gasto.objects.get_or_create(modalidade=m2, outorga=o2)
-
-
-    Cria Item de Outorga
-     from identificacao.models import Entidade, Contato, Identificacao
-
-    >>> ent1, created = Entidade.objects.get_or_create(sigla='GTECH', defaults={'nome': 'Granero Tech', 'cnpj': '00.000.000/0000-00', 'ativo': False, 'fisco': True, 'url': ''})
-    >>> ent2, created = Entidade.objects.get_or_create(sigla='SAC', defaults={'nome': 'SAC do Brasil', 'cnpj': '00.000.000/0000-00', 'ativo': True, 'fisco': True, 'url': ''})
-    >>> ent3, created = Entidade.objects.get_or_create(sigla='TERREMARK', defaults={'nome': 'Terremark do Brasil', 'cnpj': '00.000.000/0000-00', 'ativo': True, 'fisco': True, 'url': ''})
-
-    >>> i1, created = Item.objects.get_or_create(entidade=ent1, natureza_gasto=n1, descricao='Armazenagem', defaults={'justificativa': 'Armazenagem de equipamentos', 'quantidade': 12, 'valor_unit': 2500})
-    >>> i2, created = Item.objects.get_or_create(entidade=ent2, natureza_gasto=n2, descricao='Serviço de Conexão Internacional', defaults={'justificativa': 'Link Internacional', 'quantidade': 12, 'valor_unit': 250000})
-    >>> i3, created = Item.objects.get_or_create(entidade=ent3, natureza_gasto=n3, descricao='Serviço de Conexão', defaults={'justificativa': 'Ligação SP-CPS', 'quantidade': 12, 'valor_unit': 100000})
-    >>> i4, created = Item.objects.get_or_create(entidade=ent3, natureza_gasto=n4, descricao='Serviço de Conexão Internacional', defaults={'justificativa': 'Ajuste na cobrança do Link Internacional', 'quantidade': 6, 'valor_unit': 50000, 'item: i2})
-
-
-    Cria Protocolo
-    from protocolo.models import Protocolo, ItemProtocolo, TipoDocumento, Origem, Estado as EstadoProtocolo
-
-    >>> ep, created = EstadoProtocolo.objects.get_or_create(nome='Aprovado')
-    >>> td, created = TipoDocumento.objects.get_or_create(nome='Nota Fiscal')
-    >>> og, created = Origem.objects.get_or_create(nome='Motoboy')
-
-    >>> cot1, created = Contato.objects.get_or_create(nome='Joao', defaults={'email': 'joao@joao.com.br', 'tel': ''})
-    >>> cot2, created = Contato.objects.get_or_create(nome='Alex', defaults={'email': 'alex@alex.com.br', 'tel': ''})
-    >>> cot3, created = Contato.objects.get_or_create(nome='Marcos', defaults={'email': 'alex@alex.com.br', 'tel': ''})
-
-    >>> iden1, created = Identificacao.objects.get_or_create(entidade=ent1, contato=cot1, defaults={'funcao': 'Tecnico', 'area': 'Estoque', 'ativo': True})
-    >>> iden2, created = Identificacao.objects.get_or_create(entidade=ent2, contato=cot2, defaults={'funcao': 'Gerente', 'area': 'Redes', 'ativo': True})
-    >>> iden3, created = Identificacao.objects.get_or_create(entidade=ent3, contato=cot3, defaults={'funcao': 'Diretor', 'area': 'Redes', 'ativo': True})
-
-    >>> p1, created = Protocolo.objects.get_or_create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime.datetime(2008,9,30,10,10), defaults={'origem': og, 'estado': ep, 'num_documento': 8888, 'data_vencimento': datetime.date(2008,10,5), 'descricao': 'Conta mensal - armazenagem 09/2008', 'valor_total': None})
-    >>> p2, created = Protocolo.objects.get_or_create(termo=t, identificacao=iden2, tipo_documento=td, data_chegada=datetime.datetime(2008,9,30,10,10), defaults={'origem': og, 'estado': ep, 'num_documento': 7777, 'data_vencimento': datetime.date(2008,10,10), 'descricao': 'Serviço de Conexão Internacional - 09/2009', 'valor_total': None})
-    >>> p3, created = Protocolo.objects.get_or_create(termo=t, identificacao=iden3, tipo_documento=td, data_chegada=datetime.datetime(2008,9,30,10,10), defaults={'origem': og, 'estado': ep, 'num_documento': 5555, 'data_vencimento': datetime.date(2008,10,15), 'descricao': 'Serviço de Conexão Local - 09/2009', 'valor_total': None})
-
-
-    Cria Item do Protocolo
-    >>> ip1 = ItemProtocolo.objects.get_or_create(protocolo=p1, descricao='Tarifa mensal - 09/2009', quantidade=1, valor_unitario=2500)
-    >>> ip2 = ItemProtocolo.objects.get_or_create(protocolo=p1, descricao='Reajuste tarifa mensal - 09/2009', quantidade=1, valor_unitario=150)
-    >>> ip3 = ItemProtocolo.objects.get_or_create(protocolo=p2, descricao='Conexão Internacional - 09/2009', quantidade=1, valor_unitario=250000)
-    >>> ip4 = ItemProtocolo.objects.get_or_create(protocolo=p2, descricao='Reajuste do serviço de Conexão Internacional - 09/2009', quantidade=1, valor_unitario=50000)
-    >>> ip5 = ItemProtocolo.objects.get_or_create(protocolo=p3, descricao='Conexão Local - 09/2009', quantidade=1, valor_unitario=85000)
-    >>> ip6 = ItemProtocolo.objects.get_or_create(protocolo=p3, descricao='Reajuste do serviço de Conexão Local - 09/2009', quantidade=1, valor_unitario=15000)
-
-    Criar Fonte Pagadora
-     from financeiro.models import OrigemOutrasVerbas, FontePagadora, OrigemFapesp, ExtratoCC, Estato as EstadoFinanceiro
-
-    >>> ef1, created = EstadoFinanceiro.objects.get_or_create(nome='Aprovado')
-    >>> ef2, created = EstadoFinanceiro.objects.get_or_create(nome='Concluído')
-
-    >>> ex1, created = ExtratoCC.objects.get_or_create(data_extrato=datetime.date(2008,10,30), data_oper=datetime.date(2008,10,5), cod_oper=333333, valor='2650', historico='TED')
-    >>> ex2, created = ExtratoCC.objects.get_or_create(data_extrato=datetime.date(2008,10,30), data_oper=datetime.date(2008,10,10), cod_oper=4444, valor='250000', historico='TED')
-    >>> ex3, created = ExtratoCC.objects.get_or_create(data_extrato=datetime.date(2008,10,30), data_oper=datetime.date(2008,10,10), cod_oper=4444, valor='50000', historico='TED')
-    >>> ex4, created = ExtratoCC.objects.get_or_create(data_extrato=datetime.date(2008,10,30), data_oper=datetime.date(2008,10,15), cod_oper=5555, valor='100000', historico='TED')
-
-    >>> a1, created = Acordo.objects.get_or_create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e GTech')
-    >>> a2, created = Acordo.objects.get_or_create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e SAC')
-    >>> a3, created = Acordo.objects.get_or_create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e Terremark')
-    >>> a4, created = Acordo.objects.get_or_create(estado=ef1, descricao='Acordo de patrocínio entre ANSP e Telefônica')
-
-    >>> of1, created = OrigemFapesp.objects.get_or_create(acordo=a1, item_outorga=i1)
-    >>> of2, created = OrigemFapesp.objects.get_or_create(acordo=a2, item_outorga=i2)
-    >>> of3, created = OrigemFapesp.objects.get_or_create(acordo=a3, item_outorga=i3)
-
-    >>> oov, created = OrigemOutrasVerbas.objects.get_or_create(acordo=a4, item_outorga=i2)
-
-    >>> fp1 = FontePagadora.objects.get_or_create(protocolo=p1, extrato=ex1, origem_fapesp=of1, estado=ef2, valor='2650')
-    >>> fp2 = FontePagadora.objects.get_or_create(protocolo=p2, extrato=ex2, origem_fapesp=of2, estado=ef2, valor='250000')
-    >>> fp3 = FontePagadora.objects.get_or_create(protocolo=p2, extrato=ex3, origem_outras_verbas=oov, estado=ef2, valor='50000')
-    >>> fp4 = FontePagadora.objects.get_or_create(protocolo=p3, extrato=ex4, origem_fapesp=of3, estado=ef2, valor='100000')
-
-
-    >>> t.__unicode__()
-    '08/22222-2'
-
-    >>> t.real
-    Decimal('102500')
-
-    >>> t.termo_real()
-    'R$ 102.500,00'
-
-    >>> t.dolar
-    Decimal('300000')
-
-    >>> t.termo_dolar()
-    '$ 300,000.00'
-
-    >>> t.duracao_meses()
-    '12 meses'
-
-    >>> t.total_realizado_real
-    Decimal('102650')
-
-    >>> t.formata_realizado_real()
-    'R$ 102.650,00'
-
-    >>> t.total_realizado_dolar
-    Decimal('250000')
-
-    >>> t.formata_realizado_dolar()
-    '$ 250,000.00'
-
-    >>> t.num_processo
-    '08/22222-2'
-
-    >>> t.vigencia
-    '12 meses'
-
-    >>> Termo.termos_auditoria_fapesp_em_aberto()
-    [<Termo: 08/22222-2>]
-
-    >>> Termo.termos_auditoria_interna_em_aberto()
-    [<Termo: 08/22222-2>]
     """
-
-
+    
     ano = models.IntegerField(_(u'Ano'), help_text=_(u'ex. 2008'), default=0)
     processo = models.IntegerField(_(u'Processo'), help_text=_(u'ex. 52885'), default=0)
     digito = models.IntegerField(_(u'Dígito'), help_text=_(u'ex. 8'), default=0)
@@ -439,24 +302,24 @@ class Termo(models.Model):
     num_processo = property(__unicode__)
 
 
-    # Retorna os termos que possuem fontes pagadoras não-fapesp sem registro de auditoriainterna.
-    @classmethod
-    def termos_auditoria_interna_em_aberto(cls, ai=None):
-        from financeiro.models import FontePagadora
-
-        termos = [fp.protocolo.termo.id for fp in FontePagadora.objects.filter((Q(origem_fapesp=None) & ~Q(origem_outras_verbas=None) & Q(auditoriainterna=None)) | Q(auditoriainterna=ai))]
-        t = list(set(termos))
-        return cls.objects.filter(id__in=t)
-
-
-    # Retorna os termos que possuem fontes pagadoras fapesp sem registro de auditoriafapesp.
-    @classmethod
-    def termos_auditoria_fapesp_em_aberto(cls, af=None):
-        from financeiro.models import FontePagadora
-
-        termos = [fp.protocolo.termo.id for fp in FontePagadora.objects.filter((~Q(origem_fapesp=None) & Q(origem_outras_verbas=None) & Q(auditoriafapesp=None)) | Q(auditoriafapesp=af))]
-        t = list(set(termos))
-        return cls.objects.filter(id__in=t)
+#     # Retorna os termos que possuem fontes pagadoras não-fapesp sem registro de auditoriainterna.
+#     @classmethod
+#     def termos_auditoria_interna_em_aberto(cls, ai=None):
+#         from financeiro.models import FontePagadora
+# 
+#         termos = [fp.protocolo.termo.id for fp in FontePagadora.objects.filter((Q(origem_fapesp=None) & ~Q(origem_outras_verbas=None) & Q(auditoriainterna=None)) | Q(auditoriainterna=ai))]
+#         t = list(set(termos))
+#         return cls.objects.filter(id__in=t)
+# 
+# 
+#     # Retorna os termos que possuem fontes pagadoras fapesp sem registro de auditoriafapesp.
+#     @classmethod
+#     def termos_auditoria_fapesp_em_aberto(cls, af=None):
+#         from financeiro.models import FontePagadora
+# 
+#         termos = [fp.protocolo.termo.id for fp in FontePagadora.objects.filter((~Q(origem_fapesp=None) & Q(origem_outras_verbas=None) & Q(auditoriafapesp=None)) | Q(auditoriafapesp=af))]
+#         t = list(set(termos))
+#         return cls.objects.filter(id__in=t)
 
 
     # Define a descrição do modelo (singular e plural), a ordenação dos dados pelo ano.
