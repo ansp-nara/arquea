@@ -241,9 +241,10 @@ class Natureza_gastoTest(TestCase):
 
         #Cria Natureza de gasto
         m1, created = Modalidade.objects.get_or_create(sigla='STB', defaults={'nome': 'Servicos de Terceiro no Brasil', 'moeda_nacional': True})
+        m2, created = Modalidade.objects.get_or_create(sigla='STB2', defaults={'nome': 'Servicos de Terceiro no Brasil', 'moeda_nacional': True})
 
         n1, created = Natureza_gasto.objects.get_or_create(modalidade=m1, termo=t, valor_concedido=Decimal('30000'))
-        n2, created = Natureza_gasto.objects.get_or_create(modalidade=m1, termo=t, valor_concedido=Decimal('100000'))
+        n2, created = Natureza_gasto.objects.get_or_create(modalidade=m2, termo=t, valor_concedido=Decimal('100000'))
 
         #Cria Item de Outorga
         ent1, created = Entidade.objects.get_or_create(sigla='GTECH', defaults={'nome': 'Granero Tech', 'cnpj': '00.000.000/0000-00', 'fisco': True, 'url': ''})
@@ -253,7 +254,8 @@ class Natureza_gastoTest(TestCase):
         end2, created = Endereco.objects.get_or_create(entidade=ent2)
 
         i1, created = Item.objects.get_or_create(entidade=ent1, natureza_gasto=n1, descricao='Armazenagem', defaults={'justificativa': 'Armazenagem de equipamentos', 'quantidade': 12, 'valor': 2500})
-        i2, created = Item.objects.get_or_create(entidade=ent2, natureza_gasto=n2, descricao='Servico de Conexao', defaults={'justificativa': 'Ligação SP-CPS', 'quantidade': 12, 'valor': 100000})
+        i2, created = Item.objects.get_or_create(entidade=ent2, natureza_gasto=n1, descricao='Servico de Conexao', defaults={'justificativa': 'Ligação SP-CPS', 'quantidade': 12, 'valor': 000000})
+        i3, created = Item.objects.get_or_create(entidade=ent2, natureza_gasto=n2, descricao='Servico de Conexao', defaults={'justificativa': 'Ligação SP-CPS', 'quantidade': 12, 'valor': 100000})
 
         #Cria Protocolo
         ep, created = EstadoProtocolo.objects.get_or_create(nome='Aprovado')
@@ -287,9 +289,11 @@ class Natureza_gastoTest(TestCase):
 
         of1, created = OrigemFapesp.objects.get_or_create(acordo=a1, item_outorga=i1)
         of2, created = OrigemFapesp.objects.get_or_create(acordo=a2, item_outorga=i2)
+        of3, created = OrigemFapesp.objects.get_or_create(acordo=a2, item_outorga=i3)
 
         fp1 = Pagamento.objects.get_or_create(protocolo=p1, conta_corrente=ex1, origem_fapesp=of1, valor_fapesp='2650')
         fp2 = Pagamento.objects.get_or_create(protocolo=p2, conta_corrente=ex2, origem_fapesp=of2, valor_fapesp='100000')
+        fp2 = Pagamento.objects.get_or_create(protocolo=p2, conta_corrente=ex2, origem_fapesp=of3, valor_fapesp='100000')
 
 
     def tearDown(self):
@@ -360,7 +364,7 @@ class ItemTest(TestCase):
 
         #Cria Natureza de gasto
         m1, created = Modalidade.objects.get_or_create(sigla='STE', defaults={'nome': 'Servicos de Terceiro no Exterior', 'moeda_nacional': False})
-        m2, created = Modalidade.objects.get_or_create(sigla='STE', defaults={'nome': 'Servicos de Terceiro no Brasil', 'moeda_nacional': True})
+        m2, created = Modalidade.objects.get_or_create(sigla='STF', defaults={'nome': 'Servicos de Terceiro no Brasil', 'moeda_nacional': True})
 
         n1, created = Natureza_gasto.objects.get_or_create(modalidade=m1, termo=t, valor_concedido='1500000.00')
         n2, created = Natureza_gasto.objects.get_or_create(modalidade=m2, termo=t, valor_concedido='300000.00')
