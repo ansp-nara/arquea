@@ -275,7 +275,8 @@ class ControleFerias(models.Model):
     antecipa13 = models.BooleanField(_(u'Antecipação de 13º salário?'))
     dias_uteis_fato = models.IntegerField(_(u'Dias úteis tirados de fato'))
     dias_uteis_aberto = models.IntegerField(_(u'Dias úteis em aberto'))
-
+    arquivo_oficial = models.FileField(upload_to='controleferias_arquivooficial', null=True, blank=True)
+    
     
     def dia_ferias(self, dia):
         # verifica se tem algum período de férias com dias úteis tirados de fato
