@@ -5,6 +5,7 @@ from django.conf import settings
 from selenium import webdriver, selenium
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+import inspect
 import logging
 
 # Get an instance of a logger
@@ -31,42 +32,49 @@ class SeleniumServerTestCase(LiveServerTestCase):
                 self.assertTrue(self.is_http_500(), u'Requisicao retornou HTTP (500)')
                 self.assertFalse(self.is_http_404(), u'Requisicao retornou HTTP (404)')
     """
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
+#         stack = inspect.stack()
+#         the_class = stack[1][0].f_locals["self"].__class__
+#         logger.debug("Testing {}".format(str(the_class)))
+        
         # Only display possible problems
         selenium_logger = logging.getLogger('selenium.webdriver.remote.remote_connection')
         selenium_logger.setLevel(logging.WARNING)
 
         # configura a url do sistema que vai ser testada
-        self.sistema_url = 'http://' + settings.SELENIUM_SISTEMA_HOST +''
+        cls.sistema_url = 'http://' + settings.SELENIUM_SISTEMA_HOST +''
         
         # iniciando conexão com o Selenium Server
         server_url = "http://%s:%s/wd/hub" % (settings.SELENIUM_HOST , settings.SELENIUM_PORT)
         dc = DesiredCapabilities.HTMLUNIT
-        self.browser = webdriver.Remote(server_url, dc)
+        cls.browser = webdriver.Remote(server_url, dc)
         
-        self.login()
+        cls.login()
 
-    def tearDown(self):
-        self.logout()
-        self.browser.quit()
+    @classmethod
+    def tearDownClass(cls):
+        cls.logout()
+        cls.browser.quit()
         
-    def login(self):
+    @classmethod
+    def login(cls):
         """
         Faz o handshake com o CAS para fazer o login no Sistema
         """
-        self.browser.get('https://cas.ansp.br/cas/login?service=http%3A%2F%2F' + settings.SELENIUM_SISTEMA_HOST + '%2Faccounts%2Flogin%2F%3Fnext%3D%252Fadmin%252F')
+        cls.browser.get('https://cas.ansp.br/cas/login?service=http%3A%2F%2F' + settings.SELENIUM_SISTEMA_HOST + '%2Faccounts%2Flogin%2F%3Fnext%3D%252Fadmin%252F')
 
         # She sees the familiar 'Django administration' heading
-        body = self.browser.find_element_by_tag_name('body')
+        body = cls.browser.find_element_by_tag_name('body')
         
-        elem = self.browser.find_element_by_id("id_username").send_keys(settings.SELENIUM_SISTEMA_USERNAME)
-        elem = self.browser.find_element_by_id("id_password").send_keys(settings.SELENIUM_SISTEMA_PASS)
+        elem = cls.browser.find_element_by_id("id_username").send_keys(settings.SELENIUM_SISTEMA_USERNAME)
+        elem = cls.browser.find_element_by_id("id_password").send_keys(settings.SELENIUM_SISTEMA_PASS)
         
-        self.browser.find_element_by_id("login-form").submit();
+        cls.browser.find_element_by_id("login-form").submit();
 
-    def logout(self):
-        self.browser.get('http://' + settings.SELENIUM_SISTEMA_HOST + '/accounts/logout/')
-        
+    @classmethod
+    def logout(cls):
+        cls.browser.get('http://' + settings.SELENIUM_SISTEMA_HOST + '/accounts/logout/')
 
     def is_http_404(self):
         elemHeader = None
