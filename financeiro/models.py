@@ -126,17 +126,29 @@ class Pagamento(models.Model):
     pergunta = models.ManyToManyField('memorando.Pergunta', null=True, blank=True)
     
     def __unicode__(self):
-    	if self.valor_patrocinio:
+        if self.valor_patrocinio:
             valor = self.valor_fapesp+self.valor_patrocinio
-    	else: valor = self.valor_fapesp
-    	mod = ''
-    	if self.origem_fapesp:
-    	   mod = self.origem_fapesp.item_outorga.natureza_gasto.modalidade.sigla
-           a = self.auditoria_set.all()
-           if a:
-               a = a[0]
-               return u"%s - %s - %s, parcial %s, página %s    ID: %s" % (self.protocolo.num_documento, valor, mod, a.parcial, a.pagina, self.pk)
-    	return u"%s - %s - %s    ID: %s" % (self.protocolo.num_documento, valor, mod, self.pk)
+        else: valor = self.valor_fapesp
+        mod = ''
+        if self.origem_fapesp:
+            mod = self.origem_fapesp.item_outorga.natureza_gasto.modalidade.sigla
+            if self.auditoria_set.exists():
+                a = self.auditoria_set.filter()[:1].get()
+                return u"%s - %s - %s, parcial %s, página %s    ID: %s" % (self.protocolo.num_documento, valor, mod, a.parcial, a.pagina, self.pk)
+        return u"%s - %s - %s    ID: %s" % (self.protocolo.num_documento, valor, mod, self.pk)
+
+    def unicode_para_auditoria(self):
+        """
+        Método para ser chamado de dentro da Auritoria.
+        Retorna um valor parecido com o unicode, mas removendo os valores de Auditoria, pois pertencem ao objeto Auditoria que está sendo chamado
+        """
+        if self.valor_patrocinio:
+            valor = self.valor_fapesp+self.valor_patrocinio
+        else: valor = self.valor_fapesp
+        mod = ''
+        if self.origem_fapesp:
+            mod = self.origem_fapesp.item_outorga.natureza_gasto.modalidade.sigla
+        return u"%s - %s - %s    ID: %s" % (self.protocolo.num_documento, valor, mod, self.pk)
 
     def codigo_operacao(self):
         if self.conta_corrente:

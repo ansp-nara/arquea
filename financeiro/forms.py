@@ -6,6 +6,9 @@ from django.utils.translation import ugettext_lazy as _
 from django.forms.util import ErrorList
 from protocolo.models import Protocolo
 from django.forms.models import inlineformset_factory, BaseInlineFormSet
+from django.contrib.admin.widgets import FilteredSelectMultiple, RelatedFieldWidgetWrapper
+from django.db.models.fields.related import ManyToOneRel
+from django.utils.html import mark_safe
 
 class PagamentoAdminForm(forms.ModelForm):
 
@@ -82,11 +85,33 @@ class ExtratoCCAdminForm(forms.ModelForm):
 
 
 
+class AuditoriaPagamentoChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return obj.unicode_para_auditoria()
+    
 class AuditoriaAdminForm(forms.ModelForm):
 
     parcial = forms.IntegerField(label=u'Parcial', widget=forms.TextInput(attrs={'onchange': 'ajax_nova_pagina(this);'}))
 
+    pagamento = AuditoriaPagamentoChoiceField(queryset=Pagamento.objects.all(),
+                                                 required=False, 
+                                                 label=mark_safe('<a href="#" onclick="window.open(\'/financeiro/pagamento/\'+$(\'#id_pagamento\').val() + \'/\', \'_blank\');return true;">Pagamento</a>'),)
+
+    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
+                 initial=None, error_class=ErrorList, label_suffix=':',
+                 empty_permitted=False, instance=None, widget=None, label=None, help_text=None):
+        
+        super(AuditoriaAdminForm, self).__init__(data, files, auto_id, prefix, initial,
+                                            error_class, label_suffix, empty_permitted, instance)
+
+        # Configurando a relação entre Equipamento e Entidade para aparecer o botão de +
+        # O self.admin_site foi declarado no admin.py
+        rel = ManyToOneRel(Pagamento, 'id')
+        self.fields['pagamento'].widget = RelatedFieldWidgetWrapper(self.fields['pagamento'].widget, rel, self.admin_site)
+
+
+            
     class Meta:
-	model = Auditoria
+        model = Auditoria
 
 
