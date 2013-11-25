@@ -44,6 +44,22 @@ class DadoBancarioInline(admin.TabularInline):
     
     extra = 1
     model = DadoBancario
+    
+
+class SindicatoArquivosInline(admin.TabularInline):
+    """
+    Modelo SindicatoArquivos relacionado ao Membro.
+    """
+    fieldsets = (
+                 (None, {
+                     'fields': ('ano', 'arquivo',),
+                     'classes': ('wide',)
+                 }),
+    )
+
+    extra = 1
+    model = SindicatoArquivo
+    
 
 class MembroAdmin(admin.ModelAdmin):
 
@@ -71,7 +87,7 @@ class MembroAdmin(admin.ModelAdmin):
     list_display_links = ('nome', )
 
     form = MembroAdminForm
-    inlines = [HistoricoInline, DadoBancarioInline, FeriasInline]
+    inlines = [HistoricoInline, DadoBancarioInline, FeriasInline, SindicatoArquivosInline]
 
     list_per_page = 10
 
@@ -167,3 +183,25 @@ class ControleAdmin(admin.ModelAdmin):
         return qs
 
 admin.site.register(Controle, ControleAdmin)
+
+
+
+class SindicatoArquivosAdmin(admin.ModelAdmin):
+    """
+    Permite consulta por 'ano' e 'arquivo' do modelo SindicatoArquivos relacionado ao Membro.
+    """
+    fieldsets = (
+                 (None, {
+                     'fields': ('membro', 'ano', 'arquivo',),
+                     'classes': ('wide',)
+                 }),
+    )
+
+    list_display = ('membro', 'ano', 'arquivo', )
+
+    search_fields = ['membro__nome', 'ano', 'arquivo', ]
+
+    list_per_page = 10
+
+admin.site.register(SindicatoArquivo, SindicatoArquivosAdmin)
+

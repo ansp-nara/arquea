@@ -12,7 +12,7 @@ from django.db.models import Q
 from django.test import TestCase
 from django.utils import timezone
 import calendar
-from membro.models import Controle, Membro, Ferias, ControleFerias, \
+from membro.models import Controle, Membro, Ferias, ControleFerias, SindicatoArquivo, \
     DispensaLegal, TipoDispensa, Usuario, Historico, Cargo, Banco, DadoBancario, Assinatura, TipoAssinatura
 from protocolo.models import Feriado
 from identificacao.models import Entidade
@@ -465,4 +465,22 @@ class FeriasTest(TestCase):
         controleFerias.save()
         
         self.assertEquals(Ferias().total_dias_uteis_aberto(1), 20 * 8 * 60 * 60)
+
+
+class MembroSindicatoArquivoTest(TestCase):
+    def setUp(self):
+        ent, created = Entidade.objects.get_or_create(sigla='ANSP', defaults={'nome':'Academic Network at São Paulo', 'cnpj':'', 'fisco':True})
+
+        mb = Membro(nome='Joice Gomes', email='soraya@gomes.com', cpf='000.000.000-00', ramal=23)
+        mb.save()
+        
+        arquivo = SindicatoArquivo(arquivo='/teste/arquivo.pdf', ano='2013', membro=mb)
+        arquivo.save()
+
+    def test_membro_sindicatoarquivo_unicode(self):
+        
+        arquivo = SindicatoArquivo.objects.get(pk=1)
+        
+        self.assertEquals(arquivo.__unicode__(), '2013 - /teste/arquivo.pdf')
+        
 
