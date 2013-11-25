@@ -58,6 +58,29 @@ class TipoAssinatura(models.Model):
         ordering = ("nome", )
 
 
+class SindicatoArquivo(models.Model):
+    """
+    Uma instância dessa classe é arquivo de sindicato de um mebro.
+    O arquivo deve ser enviado anualmente.
+
+    O método '__unicode__'    Retorna o nome.
+    A 'class Meta'        Define a descrição (singular e plural) do modelo e a ordenação  dos dados pelo nome.
+    """
+    membro = models.ForeignKey('membro.Membro', verbose_name=_(u'Membro'))
+    arquivo = models.FileField(upload_to='membro__sindicatoarquivo', null=True, blank=True)
+    ano = models.IntegerField(verbose_name=_(u'Ano'), blank=True, null=True)
+
+    # Retorna o nome
+    def __unicode__(self):
+        return u'%s - %s' % (self.ano, self.arquivo)
+
+    # Define a descrição do modelo e a ordenação dos dados pelo nome.
+    class Meta:
+        verbose_name = _(u'Arquivo do Sindicato')
+        verbose_name_plural = _(u'Arquivos do Sindicato')
+        ordering = ("ano", )
+
+
 class Membro(models.Model):
 
     """
@@ -80,7 +103,6 @@ class Membro(models.Model):
     data_nascimento = NARADateField(_(u'Nascimento'), help_text=_(u'Data de nascimento'), blank=True, null=True)
     site = models.BooleanField(_(u'Exibir no site?'))
     contato = models.ForeignKey('identificacao.Contato', null=True, blank=True)
-    arquivo_sindicato = models.FileField(upload_to='membro__arquivosindicato', null=True, blank=True) 
 
     # Retorna o nome e o cargo.
     def __unicode__(self):
