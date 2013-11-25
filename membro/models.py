@@ -80,6 +80,7 @@ class Membro(models.Model):
     data_nascimento = NARADateField(_(u'Nascimento'), help_text=_(u'Data de nascimento'), blank=True, null=True)
     site = models.BooleanField(_(u'Exibir no site?'))
     contato = models.ForeignKey('identificacao.Contato', null=True, blank=True)
+    arquivo_sindicato = models.FileField(upload_to='membro__arquivosindicato', null=True, blank=True) 
 
     # Retorna o nome e o cargo.
     def __unicode__(self):
@@ -275,7 +276,7 @@ class ControleFerias(models.Model):
     antecipa13 = models.BooleanField(_(u'Antecipação de 13º salário?'))
     dias_uteis_fato = models.IntegerField(_(u'Dias úteis tirados de fato'))
     dias_uteis_aberto = models.IntegerField(_(u'Dias úteis em aberto'))
-    arquivo_oficial = models.FileField(upload_to='controleferias_arquivooficial', null=True, blank=True)
+    arquivo_oficial = models.FileField(upload_to='controleferias__arquivooficial', null=True, blank=True)
     
     
     def dia_ferias(self, dia):
