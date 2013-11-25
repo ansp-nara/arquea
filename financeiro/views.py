@@ -684,13 +684,13 @@ def presta_contas(request, pdf=False):
 	    termo_id = request.GET.get('termo')
 	    termo = get_object_or_404(Termo, id=termo_id)
             m = []
-            for ng in Natureza_gasto.objects.filter(termo=termo):
+            for ng in Natureza_gasto.objects.filter(termo=termo).select_related('modalidade'):
                 mod = {'modalidade':ng.modalidade.nome}
                 parcs = []
                 for p in Auditoria.objects.filter(pagamento__origem_fapesp__item_outorga__natureza_gasto=ng).values_list('parcial', flat=True).distinct():
                     pgtos = []
                     pag = None
-                    for a in Auditoria.objects.filter(pagamento__origem_fapesp__item_outorga__natureza_gasto=ng, parcial=p).order_by('pagina'):
+                    for a in Auditoria.objects.filter(pagamento__origem_fapesp__item_outorga__natureza_gasto=ng, parcial=p).order_by('pagina').select_related('pagamento', 'pagamento__conta_corrente', 'pagamento__extrato_financeiro').prefetch_related('pagamento__auditoria_set', 'pagamento__auditoria_set__estado'):
                         if a.pagamento != pag:
                             pgtos.append({'pg':a.pagamento, 'pagina':a.pagina})
                             pag = a.pagamento
