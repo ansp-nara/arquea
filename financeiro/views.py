@@ -110,7 +110,7 @@ def estrutura_pagamentos(pagamentos):
 	    pass
 
     pg = []
-    for p in pagamentos.filter(conta_corrente__isnull=False).order_by('origem_fapesp__item_outorga__natureza_gasto__modalidade__sigla'):
+    for p in pagamentos.filter(conta_corrente__isnull=False).order_by('origem_fapesp__item_outorga__natureza_gasto__modalidade__sigla').select_related('conta_corrente', 'protocolo', 'protocolo__tipo_documento', 'origem_fapesp__item_outorga__natureza_gasto__modalidade'):
 	pp = {}
 	pp['data'] = p.conta_corrente.data_oper.strftime('%d/%m/%Y')
 	pp['termo'] = p.protocolo.termo.__unicode__()
@@ -126,7 +126,7 @@ def estrutura_pagamentos(pagamentos):
 	pag = 0
 	ane = 0
 	out = 0
-	for a in p.auditoria_set.all():
+	for a in p.auditoria_set.all().select_related('tipo'):
 	    if u'Comprovante de pag' in a.tipo.nome:
 	      pag = a
 	    elif u'Anexo' in a.tipo.nome:
