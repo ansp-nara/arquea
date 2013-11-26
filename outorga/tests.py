@@ -1,14 +1,18 @@
 # -*- coding: utf-8 -*-
 from datetime import date, timedelta, datetime
 from django.test import TestCase
+from django.db import models
 from decimal import Decimal
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 from outorga.models import Termo, Item, OrigemFapesp, Estado as EstadoOutorga, Categoria, Outorga, Modalidade, Natureza_gasto, \
-                           Acordo, Contrato, OrdemDeServico, TipoContrato
+                           Acordo, Contrato, OrdemDeServico, TipoContrato, ArquivoOS
 from financeiro.models import Pagamento, ExtratoCC, Estado as EstadoFinanceiro
 from identificacao.models import Entidade, Contato, Identificacao, Endereco
 from protocolo.models import Protocolo, ItemProtocolo, TipoDocumento, Origem, Estado as EstadoProtocolo
-     
+
+from StringIO import StringIO
+import os
 import logging
 
 # Get an instance of a logger
@@ -602,7 +606,7 @@ class OrdemDeServicoTest(TestCase):
         #Cria uma Ordem de Serviço
         a, created = Acordo.objects.get_or_create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e SAC')
         os, created = OrdemDeServico.objects.get_or_create(acordo=a, contrato=ct, tipo=tipo, 
-                                   data_inicio=date(2008,2,1), data_rescisao=date(2008,11,1), antes_rescisao=2, numero=66666, 
+                                   data_inicio=date(2008,2,1), data_rescisao=date(2008,11,1), antes_rescisao=2, numero=66666,   
                                    descricao='OS 34567 - Contratação de mais um link')
 
     def tearDown(self):
@@ -616,7 +620,70 @@ class OrdemDeServicoTest(TestCase):
         os = OrdemDeServico.objects.get(pk=1)
         self.assertEquals(os.mostra_prazo(), u'2 meses')
 
-    def existe_arquivo(self):
+    def test_existe_arquivo_vazio(self):
         os = OrdemDeServico.objects.get(pk=1)
         self.assertEquals(os.existe_arquivo(), u' ')
+        
+    def test_existe_arquivo(self):
+        os = OrdemDeServico.objects.get(pk=1)
+        arquivo = ArquivoOS(os=os)
+        arquivo.data = "2013-01-01"
+        arquivo.save()
+        
+        self.assertEquals(os.existe_arquivo(), u'<center><a href="/admin/outorga/arquivoos/?os__id__exact=%s"><img src="/media/img/arquivo.png" /></a></center>' % os.id)
+        
+        arquivo.delete()
 
+
+class ArquivoOSTest(TestCase):
+    def setUp(self):
+        super(ArquivoOSTest, self).setUp()
+        
+        #Cria um Contrato
+        ent, created = Entidade.objects.get_or_create(sigla='SAC', defaults={'nome': 'SAC do Brasil', 'cnpj': '00.000.000/0000-00', 'fisco': True, 'url': ''})
+        ct, created = Contrato.objects.get_or_create(data_inicio=date(2008,1,1), auto_renova=True, limite_rescisao=date(2008,1,11), entidade=ent)
+
+        ef1, created = EstadoOutorga.objects.get_or_create(nome='Aprovado')
+        tipo, create = TipoContrato.objects.get_or_create(nome='Tipo Fixo')
+        #Cria uma Ordem de Serviço
+        a, created = Acordo.objects.get_or_create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e SAC')
+        os, created = OrdemDeServico.objects.get_or_create(acordo=a, contrato=ct, tipo=tipo, 
+                                   data_inicio=date(2008,2,1), data_rescisao=date(2008,11,1), antes_rescisao=2, numero=66666,   
+                                   descricao='OS 34567 - Contratação de mais um link')
+
+    def tearDown(self):
+        super(ArquivoOSTest, self).tearDown()
+
+    def test_unicode(self):
+        orderServico = OrdemDeServico.objects.get(pk=1)
+        arquivo = ArquivoOS(os=orderServico)
+        arquivo.data = "2013-01-01"
+        # Criando um dirty Mock para o teste do arquivo 
+        arquivo.arquivo = ""
+        arquivo.arquivo.name = 'test_img_file.gif'
+        arquivo.arquivo._commited=True
+        arquivo.save()
+        
+        orderServico.arquivo = arquivo
+        
+        logger.debug(arquivo.arquivo.name)
+        
+        self.assertEquals(arquivo.__unicode__(), u'test_img_file.gif')
+        
+
+    def test_unicode_com_path(self):
+        orderServico = OrdemDeServico.objects.get(pk=1)
+        arquivo = ArquivoOS(os=orderServico)
+        arquivo.data = "2013-01-01"
+        # Criando um dirty Mock para o teste do arquivo 
+        arquivo.arquivo = ""
+        arquivo.arquivo.name = 'tmp/teste/test_img_file.gif'
+        arquivo.arquivo._commited=True
+        arquivo.save()
+        
+        orderServico.arquivo = arquivo
+        
+        logger.debug(arquivo.arquivo.name)
+        
+        self.assertEquals(arquivo.__unicode__(), u'test_img_file.gif')
+        
