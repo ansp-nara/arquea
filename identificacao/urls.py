@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import *
+from django.conf.urls import *
 
 urlpatterns = patterns('identificacao.views',
     (r'escolhe_entidade$', 'escolhe_entidade'),

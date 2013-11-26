@@ -1,8 +1,12 @@
-from django.conf.urls.defaults import *
+from django.conf.urls import *
 from django.views.generic import TemplateView
+
+from django.conf import settings
+from django.conf.urls.static import static
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
+
 admin.autodiscover()
 
 admin.site.root_path = "/admin/" # there is probably a bug in django...
@@ -38,6 +42,8 @@ urlpatterns = patterns('',
     (r'^sempermissao$', TemplateView.as_view(template_name="401.html")),
     (r'^ckeditor/', include('ckeditor.urls')),
     (r'^logs$', 'utils.views.uso_admin'),
+    
     (r'^', include(admin.site.urls)),
-)
+)# + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+ 
 
