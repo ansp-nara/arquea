@@ -388,18 +388,6 @@ class MemorandoTest(SeleniumServerTestCase):
         self.assertFalse(self.is_http_404(), u'Requisicao %s retornou HTTP (404)'%url)
         self.assertFalse(self.is_http_500(), u'Requisicao %s retornou HTTP (500)'%url)
 
-    def test__memorando_simples__registro_simples(self):
-        url = self.sistema_url + '/memorando/simples/257'
-        self.browser.get(url)
-        self.assertFalse(self.is_http_404(), u'Requisicao %s retornou HTTP (404)'%url)
-        self.assertFalse(self.is_http_500(), u'Requisicao %s retornou HTTP (500)'%url)
-
-    def test__memorando_simples__registro_simples(self):
-        url = self.sistema_url + '/memorando/simples/257'
-        self.browser.get(url)
-        self.assertFalse(self.is_http_404(), u'Requisicao %s retornou HTTP (404)'%url)
-        self.assertFalse(self.is_http_500(), u'Requisicao %s retornou HTTP (500)'%url)
-
     def test__memorando_simples__registro_simples_lista(self):
         url = self.sistema_url + '/admin/memorando/memorandosimples/?q=2013'
         self.browser.get(url)
@@ -711,8 +699,8 @@ class FinanceiroTest(SeleniumServerTestCase):
         elem = self.browser.find_element_by_css_selector('div#content.colM h1')
         self.assertTrue(elem.text.find('13/11711-5') >= 0)
         
-        elem = self.browser.find_element_by_css_selector('tr#tr_1_2.nivel1 td')
-        self.assertTrue(elem.text.find(u'Colaboração') >= 0)
+        #elem = self.browser.find_element_by_css_selector('tr#tr_1_2.nivel1 td')
+        #self.assertTrue(elem.text.find(u'Colaboração') >= 0)
         
         elem = self.browser.find_element_by_css_selector('.nivel3 td a')
 
