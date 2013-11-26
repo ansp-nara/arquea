@@ -310,7 +310,11 @@ class EquipamentoAdminForm(forms.ModelForm):
         
         # Configurando a relação entre Equipamento e Entidade para aparecer o botão de +
         # O self.admin_site foi declarado no admin.py                
-        rel = ManyToOneRel(Entidade, 'id')
+        if django.VERSION[0:2] >= (1, 6):
+            rel = ManyToOneRel(field=Patrimonio._meta.get_field('entidade_fabricante'), to=Entidade, field_name='id')
+        else:
+            rel = ManyToOneRel(Entidade, 'id')
+            
         self.fields['entidade_fabricante'].widget = RelatedFieldWidgetWrapper(self.fields['entidade_fabricante'].widget, rel, self.admin_site)
         
         

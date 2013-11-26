@@ -106,7 +106,11 @@ class AuditoriaAdminForm(forms.ModelForm):
 
         # Configurando a relação entre Equipamento e Entidade para aparecer o botão de +
         # O self.admin_site foi declarado no admin.py
-        rel = ManyToOneRel(Pagamento, 'id')
+        if django.VERSION[0:2] >= (1, 6):
+            rel = ManyToOneRel(field=Auditoria._meta.get_field('pagamento'), to=Pagamento, field_name='id')
+        else:
+            rel = ManyToOneRel(Pagamento, 'id')
+        
         self.fields['pagamento'].widget = RelatedFieldWidgetWrapper(self.fields['pagamento'].widget, rel, self.admin_site)
 
 
