@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import django
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.forms.util import ErrorList
@@ -155,13 +156,21 @@ class PatrimonioAdminForm(forms.ModelForm):
             pt.queryset = Patrimonio.objects.filter(id__lte=0)
         
         # Configurando a relação entre Patrimonio e Equipamento para aparecer o botão de +
-        # O self.admin_site foi declarado no admin.py                
-        rel = ManyToOneRel(Equipamento, 'id')
+        # O self.admin_site foi declarado no admin.py
+        if django.VERSION[0:2] >= (1, 6):
+            rel = ManyToOneRel(field=Patrimonio._meta.get_field('equipamento'), to=Equipamento, field_name='id')
+        else:
+            rel = ManyToOneRel(Equipamento, 'id')
+            
         self.fields['equipamento'].widget = RelatedFieldWidgetWrapper(self.fields['equipamento'].widget, rel, self.admin_site)
         
         # Configurando a relação entre Equipamento e Entidade para aparecer o botão de +
         # O self.admin_site foi declarado no admin.py
-        rel = ManyToOneRel(Entidade, 'id')
+        if django.VERSION[0:2] >= (1, 6):
+            rel = ManyToOneRel(field=Patrimonio._meta.get_field('entidade_procedencia'), to=Entidade, field_name='id')
+        else:
+            rel = ManyToOneRel(Entidade, 'id')
+            
         self.fields['entidade_procedencia'].widget = RelatedFieldWidgetWrapper(self.fields['entidade_procedencia'].widget, rel, self.admin_site)
 
         """
