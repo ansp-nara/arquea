@@ -1,5 +1,6 @@
 {% extends "admin/base_site.html" %}
 {% load proto_tags %}
+{% load static %}
 {% block content %}
 <style>
  td a, th a {
@@ -97,7 +98,13 @@ $(function(){
 		      <tr class="{% cycle 'z1' 'z2' %} nivel3 tr_1_{{forloop.parentloop.parentloop.counter}} tr_2_{{forloop.parentloop.parentloop.counter}}_{{forloop.parentloop.counter}}" id="tr_3_{{forloop.parentloop.parentloop.counter}}_{{forloop.parentloop.counter}}_{{forloop.counter}}">
 			      <td>&nbsp;</td>
 			      <td>&nbsp;</td>
-			      <td>{{ pg.p.conta_corrente.cod_oper|default:"-" }}</td>
+			      <td>
+			         {% if pg.p.conta_corrente.imagem %}
+			             <span style="white-space:nowrap"><a href="{% get_media_prefix %}{{ pg.p.conta_corrente.imagem }}">CHQ {{ pg.p.conta_corrente.cod_oper|default:"-" }}</a></span>
+			         {% else %}
+			             {{ pg.p.conta_corrente.cod_oper|default:"-" }}
+			         {% endif %}
+			      </td>
 			      <td>{{ pg.p.conta_corrente.data_oper|date:"d/m"|default:"-" }}</td>
 			      <td>{{ pg.p.protocolo.descricao2 }}</td><td>{{ pg.p.protocolo.referente }}</td>
 			      <td><a href="{% url 'admin:financeiro_pagamento_change' pg.p.id %}">

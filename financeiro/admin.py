@@ -98,7 +98,8 @@ class ExtratoPatrocinioAdmin(admin.ModelAdmin):
     list_display = ('localiza', 'cod_oper', 'data_oper', 'historico', 'valor')
     search_fields = ('cod_oper',)
     ordering = ('-data_oper',)
-    
+
+
 class AuditoriaAdmin(admin.ModelAdmin):
   
     fieldsets = (
@@ -111,9 +112,10 @@ class AuditoriaAdmin(admin.ModelAdmin):
     list_display = ('pagamento', 'tipo', 'parcial', 'pagina')
     search_fields = ('parcial', 'pagina')
     form = AuditoriaAdminForm
-    #list_select_related = True
+
     def queryset(self, request):
-        return super(AuditoriaAdmin, self).queryset(request).select_related('estado', 'pagamento', 'tipo', 'pagamento__protocolo', 'pagamento__origem_fapesp__item_outorga__natureza_gasto__modalidade__sigla')
+        queryset = super(AuditoriaAdmin, self).queryset(request)
+        return queryset
         
     def __init__(self, model, admin_site):
         """

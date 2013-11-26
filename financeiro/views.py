@@ -334,43 +334,44 @@ def relatorio_gerencial(request, pdf=False):
 def relatorio_acordos(request, pdf=False):
     if request.method == 'GET':
         if request.GET.get('termo'):
-    	    id = int(request.GET.get('termo'))
-    	    t = get_object_or_404(Termo,id=id)
-    	    retorno = []
+            id = int(request.GET.get('termo'))
+            t = get_object_or_404(Termo,id=id)
+            retorno = []
             
-    	    for a in  Acordo.objects.all():
+            for a in  Acordo.objects.all():
                 ac = {'desc':a.__unicode__()}
                 totalGeralReal = Decimal('0.0')
                 totalGeralDolar = Decimal('0.0')
                 itens = []
-                
-                
+
                 for o in  a.origemfapesp_set.filter(item_outorga__natureza_gasto__termo=t).select_related('item_outorga'):
                     it = {'desc':'%s - %s' % (o.item_outorga.entidade, o.item_outorga.descricao), 'id':o.id}
                     totalReal = Decimal('0.0')
                     totalDolar = Decimal('0.0')
                     pg = []
-                    for p in o.pagamento_set.order_by('conta_corrente__data_oper', 'id').select_related('conta_corrente', 'protocolo', 'protocolo__descricao2', 'protocolo__tipo_documento', 'origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional'):
+                    for p in o.pagamento_set.order_by('conta_corrente__data_oper', 'id') \
+                                            .select_related('conta_corrente', 'protocolo', 'protocolo__descricao2', 'protocolo__tipo_documento',\
+                                                            'origem_fapesp__item_outorga__natureza_gasto__modalidade'):
+                        
                         pags = {'p':p, 'docs':p.auditoria_set.select_related('tipo')}
                         pg.append(pags)
-                    
+
                         if p.origem_fapesp and p.origem_fapesp.item_outorga.natureza_gasto.modalidade.moeda_nacional == False:
                             totalDolar += p.valor_fapesp
                         else:
                             totalReal += p.valor_fapesp
-        			
+
                     it.update({'totalReal':totalReal, 'totalDolar':totalDolar, 'pg':pg})
-                    
+
                     totalGeralReal += totalReal
                     totalGeralDolar += totalDolar
                     itens.append(it)
-        		    
+
                 ac.update({'totalGeralReal':totalGeralReal, 'totalGeralDolar':totalGeralDolar, 'itens':itens})		
                 retorno.append(ac)
-    		
-            
+
             if pdf:
-    	        return render_to_pdf('financeiro/acordos.pdf', {'termo':t, 'acordos':retorno})
+                return render_to_pdf(template_src='financeiro/acordos.pdf', context_dict={'termo':t, 'acordos':retorno}, filename='relatorio_de_acordos_da_outorga_%s.pdf'%t,)
             else:
                 return render_to_response('financeiro/acordos.html', {'termo':t, 'acordos':retorno}, context_instance=RequestContext(request))
         else:
