@@ -218,5 +218,5 @@ def blocos_ip(request):
 def custo_terremark(request, pdf=0):
     recursos = Recurso.objects.order_by('planejamento__os', 'planejamento__tipo')
     if pdf:
-        return render_to_pdf('rede/tabela_terremark.pdf', {'recursos':recursos})
+        return render_to_pdf(template_src='rede/tabela_terremark.pdf', context_dict={'recursos':recursos, }, filename='custos_dos_recursos_contratados.pdf')
     return TemplateResponse(request, 'rede/tabela_terremark.html', {'recursos':recursos})
