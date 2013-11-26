@@ -85,18 +85,6 @@ class AuthTest(SeleniumServerTestCase):
     def tearDown(self):
         super(AuthTest, self).tearDown()
 
-    def test__auth_assinatura__lista(self):
-        url = self.sistema_url + '/admin/membro/assinatura/'
-        self.browser.get(url)
-        self.assertFalse(self.is_http_404(), u'Requisicao %s retornou HTTP (404)'%url)
-        self.assertFalse(self.is_http_500(), u'Requisicao %s retornou HTTP (500)'%url)
-
-    def test__auth_assinatura__registro(self):
-        url = self.sistema_url + '/admin/membro/assinatura/4/'
-        self.browser.get(url)
-        self.assertFalse(self.is_http_404(), u'Requisicao %s retornou HTTP (404)'%url)
-        self.assertFalse(self.is_http_500(), u'Requisicao %s retornou HTTP (500)'%url)
-
     def test__grupos__lista(self):
         url = self.sistema_url + '/admin/auth/group/'
         self.browser.get(url)
@@ -198,6 +186,19 @@ class MembroTest(SeleniumServerTestCase):
         
     def tearDown(self):
         super(MembroTest, self).tearDown()
+        
+
+    def test__auth_assinatura__lista(self):
+        url = self.sistema_url + '/admin/membro/assinatura/'
+        self.browser.get(url)
+        self.assertFalse(self.is_http_404(), u'Requisicao %s retornou HTTP (404)'%url)
+        self.assertFalse(self.is_http_500(), u'Requisicao %s retornou HTTP (500)'%url)
+
+    def test__auth_assinatura__registro(self):
+        url = self.sistema_url + '/admin/membro/assinatura/4/'
+        self.browser.get(url)
+        self.assertFalse(self.is_http_404(), u'Requisicao %s retornou HTTP (404)'%url)
+        self.assertFalse(self.is_http_500(), u'Requisicao %s retornou HTTP (500)'%url)
 
     def test__relatorios_administrativos__controle_de_horas__filtro(self):
         url = self.sistema_url + '/membro/mensalf'
@@ -320,6 +321,15 @@ class MembroTest(SeleniumServerTestCase):
         self.browser.get(url)
         self.assertFalse(self.is_http_404(), u'Requisicao %s retornou HTTP (404)'%url)
         self.assertFalse(self.is_http_500(), u'Requisicao %s retornou HTTP (500)'%url)
+
+    def test__sindicatoarquivo__lista(self):
+        url = self.sistema_url + '/admin/membro/sindicatoarquivo/'
+        self.browser.get(url)
+        self.assertFalse(self.is_http_404(), u'Requisicao %s retornou HTTP (404)'%url)
+        self.assertFalse(self.is_http_500(), u'Requisicao %s retornou HTTP (500)'%url)
+
+
+
 
 
 class MemorandoTest(SeleniumServerTestCase):
