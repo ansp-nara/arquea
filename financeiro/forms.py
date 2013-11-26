@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import django
 from models import *
 from django import forms
 from outorga.models import Termo, OrigemFapesp
