@@ -54,7 +54,7 @@ class PesquisaTest(SeleniumServerTestCase):
     def test__l2s__registro__save(self):
         url = self.sistema_url + '/admin/pesquisa/l2/1/'
         self.browser.get(url)
-        self.self.assertLoadPageAndSaveEdit(url)
+        self.assertLoadPageAndSaveEdit(url)
 
     def test__l3__lista(self):
         url = self.sistema_url + '/admin/pesquisa/l3/'
@@ -466,15 +466,10 @@ class MemorandoTest(SeleniumServerTestCase):
         self.browser.get(url)
         self.assertLoadPage(url)
 
-    def test__memorando_de_resposta_fapesp__registro(self):
+    def test__memorando_de_resposta_fapesp__registro_pdf(self):
         url = self.sistema_url + '/memorando/fapesp/11'
         self.browser.get(url)
         self.assertLoadPage(url)
-
-    def test__memorando_de_resposta_fapesp__registro__save(self):
-        url = self.sistema_url + '/memorando/fapesp/11'
-        self.browser.get(url)
-        self.assertLoadPageAndSaveEdit(url)
 
 
 
