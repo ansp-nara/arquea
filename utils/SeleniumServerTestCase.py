@@ -31,6 +31,9 @@ class SeleniumServerTestCase(LiveServerTestCase):
                 req = self.browser.get(self.sistema_url + '/pagina/')
                 self.assertTrue(self.is_http_500(), u'Requisicao retornou HTTP (500)')
                 self.assertFalse(self.is_http_404(), u'Requisicao retornou HTTP (404)')
+                
+                #get html contet
+                #browser.page_source
     """
     @classmethod
     def setUpClass(cls):
@@ -117,3 +120,14 @@ class SeleniumServerTestCase(LiveServerTestCase):
         elif elemHeaderProd and elemHeaderProd.text.find('Ocorreu um erro no sistema') >=0:
             return True
 
+    def assertLoadPage(self, url):
+        self.assertFalse(self.is_http_404(), u'Requisicao %s retornou HTTP (404)'%url)
+        self.assertFalse(self.is_http_500(), u'Requisicao %s retornou HTTP (500)'%url)
+
+
+    def assertLoadPageAndSaveEdit(self, url):
+        btnSaveEdit = self.browser.find_element_by_name('_continue')
+        btnSaveEdit.click()
+        self.assertFalse(self.is_http_404(), u'Requisicao %s retornou HTTP (404)'%url)
+        self.assertFalse(self.is_http_500(), u'Requisicao %s retornou HTTP (500)'%url)
+        self.assertTrue(u"modificado com sucesso. Você pode editá-lo novamente abaixo" in self.browser.page_source)

@@ -666,8 +666,6 @@ class ArquivoOSTest(TestCase):
         
         orderServico.arquivo = arquivo
         
-        logger.debug(arquivo.arquivo.name)
-        
         self.assertEquals(arquivo.__unicode__(), u'test_img_file.gif')
         
 
@@ -682,8 +680,6 @@ class ArquivoOSTest(TestCase):
         arquivo.save()
         
         orderServico.arquivo = arquivo
-        
-        logger.debug(arquivo.arquivo.name)
         
         self.assertEquals(arquivo.__unicode__(), u'test_img_file.gif')
         
