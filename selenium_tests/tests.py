@@ -308,7 +308,7 @@ class MembroTest(SeleniumServerTestCase):
         self.assertLoadPage(url)
 
     def test__ferias__registro__save(self):
-        url = self.sistema_url + '/admin/membro/ferias/12/'
+        url = self.sistema_url + '/admin/membro/ferias/12'
         self.browser.get(url)
         self.assertLoadPageAndSaveEdit(url)
 
@@ -612,7 +612,7 @@ class IdentificacaoTest(SeleniumServerTestCase):
         self.assertLoadPage(url)
 
     def test__endereco_detalhe__registro__save(self):
-        url = self.sistema_url + '/admin/identificacao/enderecodetalhe/14/'
+        url = self.sistema_url + '/admin/identificacao/enderecodetalhe/14'
         self.browser.get(url)
         self.assertLoadPageAndSaveEdit(url)
 
@@ -1502,7 +1502,7 @@ class RedeTest(SeleniumServerTestCase):
         self.assertLoadPage(url)
 
     def test__planeja_arquisicao__registro__save(self):
-        url = self.sistema_url + '/admin/rede/planejaaquisicaorecurso/135/'
+        url = self.sistema_url + '/admin/rede/planejaaquisicaorecurso/119/'
         self.browser.get(url)
         self.assertLoadPageAndSaveEdit(url)
 
@@ -1881,7 +1881,7 @@ class ProtocoloTest(SeleniumServerTestCase):
         self.assertLoadPage(url)
 
     def test__feriado__registro__save(self):
-        url = self.sistema_url + '/admin/protocolo/feriado/11/'
+        url = self.sistema_url + '/admin/protocolo/feriado/3/'
         self.browser.get(url)
         self.assertLoadPageAndSaveEdit(url)
 
@@ -1941,7 +1941,7 @@ class ProtocoloTest(SeleniumServerTestCase):
         self.assertLoadPage(url)
 
     def test__tipo_documento__registro__save(self):
-        url = self.sistema_url + '/admin/protocolo/tipodocumento/12/'
+        url = self.sistema_url + '/admin/protocolo/tipodocumento/1/'
         self.browser.get(url)
         self.assertLoadPageAndSaveEdit(url)
 
