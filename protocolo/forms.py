@@ -216,7 +216,8 @@ class ItemAdminForm(forms.ModelForm):
 
 class FeriadoAdminForm(forms.ModelForm):
     def clean(self):
-
+        cleaned_data = super(FeriadoAdminForm, self).clean()
+        
         feriado = self.cleaned_data.get('feriado')
         
         tipo = self.cleaned_data.get('tipo')
@@ -226,7 +227,8 @@ class FeriadoAdminForm(forms.ModelForm):
             raise forms.ValidationError(u"Feriado fixo deve ser no mesmo dia/mês especificado no tipo do feriado. Este feriado ocorre no dia %s/%s" % (tipo.dia, tipo.mes))
 
         # Verifica se já há uma data de feriado cadastrada no mesmo dia
-        if Feriado.objects.get(feriado=feriado):
+        f = Feriado.objects.get(feriado=feriado)
+        if f and self.instance and f.id != self.instance.id:
             raise forms.ValidationError(u"O feriado nesta data já existe.")
         
         return self.cleaned_data
@@ -234,7 +236,7 @@ class FeriadoAdminForm(forms.ModelForm):
     
 class TipoFeriadoAdminForm(forms.ModelForm):
     def clean(self):
-
+        cleaned_data = super(TipoFeriadoAdminForm, self).clean()
         movel = self.cleaned_data.get('movel')
         dia = self.cleaned_data.get('dia')
         mes = self.cleaned_data.get('mes')

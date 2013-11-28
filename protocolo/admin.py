@@ -323,7 +323,7 @@ class FeriadoAdmin(admin.ModelAdmin):
 
     list_display = ('__unicode__', 'tipo', 'obs', 'get_movel', 'get_subtrai', )
 
-    search_fields = ('obs', )
+    search_fields = ('obs', 'tipo__nome')
 
     list_filter = ['tipo']
 
