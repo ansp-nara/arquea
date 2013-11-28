@@ -83,10 +83,10 @@ class PesquisaTest(SeleniumServerTestCase):
 #         self.browser.get(url)
 #         self.assertLoadPage(url)
 
-    def test__kyatera__registro__save(self):
-        url = self.sistema_url + '/admin/pesquisa/pesquisa/23/'
-        self.browser.get(url)
-        self.assertLoadPageAndSaveEdit(url)
+#     def test__kyatera__registro__save(self):
+#         url = self.sistema_url + '/admin/pesquisa/pesquisa/23/'
+#         self.browser.get(url)
+#         self.assertLoadPageAndSaveEdit(url)
 
 
 class AuthTest(SeleniumServerTestCase):
@@ -614,7 +614,7 @@ class IdentificacaoTest(SeleniumServerTestCase):
         self.assertLoadPage(url)
 
     def test__endereco_detalhe__registro__save(self):
-        url = self.sistema_url + '/admin/identificacao/enderecodetalhe/14'
+        url = self.sistema_url + '/admin/identificacao/enderecodetalhe/14/'
         self.browser.get(url)
         self.assertLoadPageAndSaveEdit(url)
 
