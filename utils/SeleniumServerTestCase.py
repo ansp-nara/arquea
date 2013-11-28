@@ -134,6 +134,7 @@ class SeleniumServerTestCase(LiveServerTestCase):
     def assertLoadPageAndSaveEdit(self, url):
         btnSaveEdit = self.browser.find_element_by_name('_continue')
         btnSaveEdit.click()
+        #logger.debug(self.browser.page_source)
         self.assertFalse(self.is_http_404(), u'Requisicao %s retornou HTTP (404)'%url)
         self.assertFalse(self.is_http_500(), u'Requisicao %s retornou HTTP (500)'%url)
         self.assertTrue(u"modificado com sucesso. Você pode editá-lo novamente abaixo" in self.browser.page_source, 'Falha ao identificar mensagem de modificado com sucesso. url=%s'%url)

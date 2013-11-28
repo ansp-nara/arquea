@@ -614,7 +614,7 @@ class IdentificacaoTest(SeleniumServerTestCase):
         self.assertLoadPage(url)
 
     def test__endereco_detalhe__registro__save(self):
-        url = self.sistema_url + '/admin/identificacao/enderecodetalhe/14/'
+        url = self.sistema_url + '/admin/identificacao/enderecodetalhe/1432/'
         self.browser.get(url)
         self.assertLoadPageAndSaveEdit(url)
 
