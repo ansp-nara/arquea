@@ -254,7 +254,14 @@ class FeriadoTest(TestCase):
         # deve disparar erro para feriado com data igual
         self.assertRaises(IntegrityError, f.save)
 
+    def test_modificacao_de_feriado_unico(self):
+        f = Feriado(feriado=date(2008,10,8))
+        f.save()
         
+        f.obs = 'teste'
+        # não deve dar nenhum erro
+        f.save()
+
         
         
 class CotacaoTest(TestCase):
