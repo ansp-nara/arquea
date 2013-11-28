@@ -119,10 +119,16 @@ class SeleniumServerTestCase(LiveServerTestCase):
         # Teste de 500 para ambientes de produção
         elif elemHeaderProd and elemHeaderProd.text.find('Ocorreu um erro no sistema') >=0:
             return True
+        
+    def is_http_403(self):
+        return(u"403 Forbidden" in self.browser.page_source)
+
 
     def assertLoadPage(self, url):
         self.assertFalse(self.is_http_404(), u'Requisicao %s retornou HTTP (404)'%url)
         self.assertFalse(self.is_http_500(), u'Requisicao %s retornou HTTP (500)'%url)
+        self.assertFalse(self.is_http_403(), u'Requisicao %s retornou HTTP (403) Forbidden'%url)
+        
 
 
     def assertLoadPageAndSaveEdit(self, url):
