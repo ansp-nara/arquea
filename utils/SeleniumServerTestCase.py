@@ -57,9 +57,9 @@ class SeleniumServerTestCase(LiveServerTestCase):
 #         server_url = "http://%s:%s/wd/hub" % (settings.SELENIUM_HOST , settings.SELENIUM_PORT)
 #         dc = DesiredCapabilities.HTMLUNITWITHJS
 #         options = webdriver.ChromeOptions()
+#         cls.browser = webdriver.Remote(server_url, dc)
         
         
-        cls.browser = webdriver.Remote(server_url, dc)
         
         server_url = "http://%s:%s" % (settings.SELENIUM_HOST , settings.SELENIUM_PORT)
         options = webdriver.Firefox()
