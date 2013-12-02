@@ -62,8 +62,8 @@ class SeleniumServerTestCase(LiveServerTestCase):
         
         
         server_url = "http://%s:%s" % (settings.SELENIUM_HOST , settings.SELENIUM_PORT)
-        options = webdriver.Firefox()
-        cls.browser = webdriver.Remote(server_url, desired_capabilities=options.to_capabilities())
+        fp = webdriver.FirefoxProfile()
+        cls.browser = webdriver.Remote(desired_capabilities=webdriver.DesiredCapabilities.FIREFOX, browser_profile=fp)
 #         
         
         cls.login()
