@@ -5,6 +5,7 @@ from django.conf import settings
 from selenium import webdriver, selenium
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+import sys
 import inspect
 import logging
 
@@ -37,21 +38,33 @@ class SeleniumServerTestCase(LiveServerTestCase):
     """
     @classmethod
     def setUpClass(cls):
+#         reload(sys)
+#         sys.setdefaultencoding('utf-8')
+#         logger.debug(sys.getdefaultencoding())
+
 #         stack = inspect.stack()
 #         the_class = stack[1][0].f_locals["self"].__class__
 #         logger.debug("Testing {}".format(str(the_class)))
         
         # Only display possible problems
-        selenium_logger = logging.getLogger('selenium.webdriver.remote.remote_connection')
-        selenium_logger.setLevel(logging.WARNING)
+#         selenium_logger = logging.getLogger('selenium.webdriver.remote.remote_connection')
+#         selenium_logger.setLevel(logging.WARNING)
 
         # configura a url do sistema que vai ser testada
         cls.sistema_url = 'http://' + settings.SELENIUM_SISTEMA_HOST +''
         
         # iniciando conexão com o Selenium Server
-        server_url = "http://%s:%s/wd/hub" % (settings.SELENIUM_HOST , settings.SELENIUM_PORT)
-        dc = DesiredCapabilities.HTMLUNIT
+#         server_url = "http://%s:%s/wd/hub" % (settings.SELENIUM_HOST , settings.SELENIUM_PORT)
+#         dc = DesiredCapabilities.HTMLUNITWITHJS
+#         options = webdriver.ChromeOptions()
+        
+        
         cls.browser = webdriver.Remote(server_url, dc)
+        
+        server_url = "http://%s:%s" % (settings.SELENIUM_HOST , settings.SELENIUM_PORT)
+        options = webdriver.Firefox()
+        cls.browser = webdriver.Remote(server_url, desired_capabilities=options.to_capabilities())
+#         
         
         cls.login()
 
@@ -65,7 +78,10 @@ class SeleniumServerTestCase(LiveServerTestCase):
         """
         Faz o handshake com o CAS para fazer o login no Sistema
         """
-        cls.browser.get('https://cas.ansp.br/cas/login?service=http%3A%2F%2F' + settings.SELENIUM_SISTEMA_HOST + '%2Faccounts%2Flogin%2F%3Fnext%3D%252Fadmin%252F')
+        _request = cls.browser.get('https://cas.ansp.br/cas/login?service=http%3A%2F%2F' + settings.SELENIUM_SISTEMA_HOST + '%2Faccounts%2Flogin%2F%3Fnext%3D%252Fadmin%252F')
+        logger.debug(cls.browser.page_source)
+        #logger.debug(_request.value)
+
 
         # She sees the familiar 'Django administration' heading
         body = cls.browser.find_element_by_tag_name('body')
