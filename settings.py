@@ -1,7 +1,7 @@
 # Django settings for sistema project.
 
-DEBUG = False
-#DEBUG = True
+#DEBUG = False
+DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -13,10 +13,10 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'HOST': '10.0.1.137',
+        'HOST': 'localhost',
         'NAME': 'sistema',
-        'USER': 'djangonara',
-        'PASSWORD': 'WtodeJungle'
+        #'USER': 'sistema',
+        #'PASSWORD': 'sistema'
     }
 }
 
@@ -51,8 +51,6 @@ MEDIA_URL = '/files/'
 # Examples: "http://foo.com/media/", "/media/".
 ADMIN_MEDIA_PREFIX = '/media/'
 
-# Make this unique, and don't share it with anybody.
-SECRET_KEY = 'r(^k*hs*17sjna7i*(fs75=^_r$3(i!r*yok$(n6g61*3s_x3j'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -146,7 +144,7 @@ SERVER_EMAIL='sistema@ansp.br'
 EMAIL_HOST='smtp.gmail.com'
 EMAIL_PORT=587
 EMAIL_HOST_USER='nara@ansp.br'
-EMAIL_HOST_PASSWORD='Seg!@nsp'
+EMAIL_HOST_PASSWORD='1234'
 EMAIL_USE_TLS=True
 
 
@@ -157,7 +155,7 @@ STATIC_ROOT = '/var/www/media/'
 STATIC_URL = '/media/'
 
 TINYMCE_JS_URL='/media/js/tiny_mce/tiny_mce.js'
-TINYMCE_DEFAULT_CONFIG={'theme':'advanced', 'plugins': 'table,style', 'theme_advanced_buttons3_change_before' : 'styleprops,tablecontrols,separator', 'height':80}
+TINYMCE_DEFAULT_CONFIG={'theme':'advanced', 'plugins': 'table,style', 'theme_advanced_buttons3_add_before' : 'styleprops,tablecontrols,separator', 'height':80}
 
 
 CKEDITOR_UPLOAD_PATH='/var/www/files/ckeditor'
