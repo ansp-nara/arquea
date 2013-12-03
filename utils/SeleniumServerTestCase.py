@@ -38,34 +38,25 @@ class SeleniumServerTestCase(LiveServerTestCase):
     """
     @classmethod
     def setUpClass(cls):
-#         reload(sys)
-#         sys.setdefaultencoding('utf-8')
-#         logger.debug(sys.getdefaultencoding())
-
-#         stack = inspect.stack()
-#         the_class = stack[1][0].f_locals["self"].__class__
-#         logger.debug("Testing {}".format(str(the_class)))
-        
         # Only display possible problems
-#         selenium_logger = logging.getLogger('selenium.webdriver.remote.remote_connection')
-#         selenium_logger.setLevel(logging.WARNING)
+        selenium_logger = logging.getLogger('selenium.webdriver.remote.remote_connection')
+        selenium_logger.setLevel(logging.WARNING)
 
         # configura a url do sistema que vai ser testada
         cls.sistema_url = 'http://' + settings.SELENIUM_SISTEMA_HOST +''
         
-        # iniciando conexão com o Selenium Server
+        # iniciando conexão com o Selenium Server no modo HTMLUNIT
 #         server_url = "http://%s:%s/wd/hub" % (settings.SELENIUM_HOST , settings.SELENIUM_PORT)
 #         dc = DesiredCapabilities.HTMLUNITWITHJS
 #         options = webdriver.ChromeOptions()
 #         cls.browser = webdriver.Remote(server_url, dc)
         
         
-        
-        server_url = "http://%s:%s" % (settings.SELENIUM_HOST , settings.SELENIUM_PORT)
+        # iniciando conexão com o Selenium Server no modo FIREFOX
+        server_url = "http://%s:%s/wd/hub" % (settings.SELENIUM_HOST , settings.SELENIUM_PORT)
         fp = webdriver.FirefoxProfile()
-        cls.browser = webdriver.Remote(desired_capabilities=webdriver.DesiredCapabilities.FIREFOX, browser_profile=fp)
+        cls.browser = webdriver.Remote(server_url, desired_capabilities=webdriver.DesiredCapabilities.FIREFOX, browser_profile=fp)
 #         
-        
         cls.login()
 
     @classmethod
@@ -81,7 +72,6 @@ class SeleniumServerTestCase(LiveServerTestCase):
         _request = cls.browser.get('https://cas.ansp.br/cas/login?service=http%3A%2F%2F' + settings.SELENIUM_SISTEMA_HOST + '%2Faccounts%2Flogin%2F%3Fnext%3D%252Fadmin%252F')
         logger.debug(cls.browser.page_source)
         #logger.debug(_request.value)
-
 
         # She sees the familiar 'Django administration' heading
         body = cls.browser.find_element_by_tag_name('body')
