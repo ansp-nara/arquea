@@ -68,8 +68,6 @@ class SeleniumServerTestCase(LiveServerTestCase):
         Faz o handshake com o CAS para fazer o login no Sistema
         """
         _request = cls.browser.get('https://cas.ansp.br/cas/login?service=http%3A%2F%2F' + settings.SELENIUM_SISTEMA_HOST + '%2Faccounts%2Flogin%2F%3Fnext%3D%252Fadmin%252F')
-        logger.debug(cls.browser.page_source)
-        #logger.debug(_request.value)
 
         # She sees the familiar 'Django administration' heading
         body = cls.browser.find_element_by_tag_name('body')
@@ -138,7 +136,6 @@ class SeleniumServerTestCase(LiveServerTestCase):
     def assertLoadPageAndSaveEdit(self, url):
         btnSaveEdit = self.browser.find_element_by_name('_continue')
         btnSaveEdit.click()
-        #logger.debug(self.browser.page_source)
         self.assertFalse(self.is_http_404(), u'Requisicao %s retornou HTTP (404)'%url)
         self.assertFalse(self.is_http_500(), u'Requisicao %s retornou HTTP (500)'%url)
         self.assertTrue(u"modificado com sucesso. Você pode editá-lo novamente abaixo" in self.browser.page_source, 'Falha ao identificar mensagem de modificado com sucesso. url=%s'%url)
