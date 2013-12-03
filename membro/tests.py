@@ -163,11 +163,6 @@ class MembroControleTest(TestCase):
         
         controle = Controle.objects.get(id=1)
         
-        print controle.entrada
-        print controle.saida
-        print controle.saida-controle.entrada
-        print (controle.saida-controle.entrada).total_seconds()
-        
         #self.assertEquals(controle.segundos, 48 * 60 * 60)
 
     def test_controle_mover_bloco(self):

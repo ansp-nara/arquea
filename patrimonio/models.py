@@ -227,7 +227,6 @@ class HistoricoLocal(models.Model):
 
             if len(rack_str) >= 2:
                 eixoLetra = re.findall(r'[a-zA-Z]+', rack_str[0])
-                print eixoLetra
                 if len(eixoLetra) == 1:
                     retorno = eixoLetra[0]
                     
