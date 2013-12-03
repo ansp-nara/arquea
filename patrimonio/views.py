@@ -404,7 +404,6 @@ def iterate_patrimonio(p_pts, nivel=0, filtro_com_fmusp=False):
                 ).order_by('-pagamento__protocolo__termo', '-numero_fmusp', 'historicolocal__posicao',
                 )
                 
-    logger.debug('filtro_com_fmusp %s', filtro_com_fmusp)
     if filtro_com_fmusp:
         pts = pts.filter(numero_fmusp__isnull=False)
     
