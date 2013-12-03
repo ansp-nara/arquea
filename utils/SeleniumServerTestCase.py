@@ -46,17 +46,15 @@ class SeleniumServerTestCase(LiveServerTestCase):
         cls.sistema_url = 'http://' + settings.SELENIUM_SISTEMA_HOST +''
         
         # iniciando conexão com o Selenium Server no modo HTMLUNIT
-#         server_url = "http://%s:%s/wd/hub" % (settings.SELENIUM_HOST , settings.SELENIUM_PORT)
-#         dc = DesiredCapabilities.HTMLUNITWITHJS
-#         options = webdriver.ChromeOptions()
-#         cls.browser = webdriver.Remote(server_url, dc)
-        
+        # server_url = "http://%s:%s/wd/hub" % (settings.SELENIUM_HOST , settings.SELENIUM_PORT)
+        # dc = DesiredCapabilities.HTMLUNITWITHJS
+        # options = webdriver.ChromeOptions()
+        # cls.browser = webdriver.Remote(server_url, dc)
         
         # iniciando conexão com o Selenium Server no modo FIREFOX
         server_url = "http://%s:%s/wd/hub" % (settings.SELENIUM_HOST , settings.SELENIUM_PORT)
         fp = webdriver.FirefoxProfile()
         cls.browser = webdriver.Remote(server_url, desired_capabilities=webdriver.DesiredCapabilities.FIREFOX, browser_profile=fp)
-#         
         cls.login()
 
     @classmethod
