@@ -37,7 +37,8 @@ class PatrimonioAdmin(admin.ModelAdmin):
                  }),
                  ('Geral', {
                       'fields': (('checado', 'tipo', 'apelido', 'tem_numero_fmusp', 'numero_fmusp'), ('part_number', 'ns', 'ncm', 'ean', 'agilis'), 
-                                 ('nf', 'patrimonio'), 'descricao', ('complemento', 'tamanho'), ('modelo',), ('procedencia', 'entidade_procedencia',),'equipamento')
+                                 ('nf', 'patrimonio'), 'descricao', ('complemento', 'tamanho'), ('modelo',), 
+                                 ('procedencia', 'entidade_procedencia',),('filtro_equipamento', 'equipamento',))
                  }),
                  ('Extras', {
                       'classes': ('collapse',),

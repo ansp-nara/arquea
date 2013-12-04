@@ -136,6 +136,47 @@ def escolhe_entidade(request):
     return HttpResponse(json, mimetype="application/json")
 
 
+def escolhe_equipamento(request):
+    """
+    Faz a busca de equipamentos por diversos atributos.
+    Utilizado para fazer o filtro de "Equipamentos" durante a tela de cadastro/modificação de patrimonio. 
+    """
+    
+    retorno = []
+    if request.method == 'POST':
+        filtro = request.POST.get('num_doc')
+        id_patrimonio = request.POST.get('id_patrimonio')
+        id_equipamento = request.POST.get('id_equipamento')
+        
+        if filtro:
+            retorno = [{'pk':p.pk, 'valor':p.__unicode__(), 'selected':(str(p.pk)==id_equipamento)} \
+                            for p in Equipamento.objects.filter(\
+                                 Q(tipo__nome__icontains=filtro)\
+                                |Q(descricao__icontains=filtro)\
+                                |Q(part_number__icontains=filtro)\
+                                |Q(entidade_fabricante__sigla__icontains=filtro)\
+                                |Q(entidade_fabricante__nome__icontains=filtro)\
+                                |Q(modelo__icontains=filtro)\
+                                |Q(ncm__icontains=filtro)\
+                                |Q(ean__icontains=filtro)\
+                                |Q(titulo_autor__icontains=filtro)\
+                                |Q(isbn__icontains=filtro))] \
+                   or [{"pk":"0","valor":"Nenhum registro"}]
+            json = simplejson.dumps(retorno)
+        else:
+            retorno = [{'pk':p.pk, 'valor':p.__unicode__(), 'selected':(str(p.pk)==id_equipamento)} \
+                       for p in Equipamento.objects.all()]
+
+        if not retorno:
+            retorno = [{"pk":"0","valor":"Nenhum registro"}]
+
+    else:
+        raise Http404
+    
+    json = simplejson.dumps(retorno)
+    return HttpResponse(json, mimetype="application/json")
+
+
 def escolhe_patrimonio(request):
     """
     Faz a busca de patrimonios que estao relacionados a NFs.
