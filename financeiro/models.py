@@ -52,29 +52,30 @@ class ExtratoCC(models.Model):
 	return s['valor__sum']
 	
     def parciais(self):
-	mods = {}		    
-	for p in self.pagamento_set.all():
+        mods = {}
+        for p in self.pagamento_set.all():
             if p.origem_fapesp:
                 modalidade = p.origem_fapesp.item_outorga.natureza_gasto.modalidade.sigla
                 if modalidade not in mods.keys():
                     mods[modalidade] = {}
-    	            for a in p.auditoria_set.all():
-		        if not a.parcial in mods[modalidade].keys():
-		  	    mods[modalidade][a.parcial] = []
-                        if not a.pagina in mods[modalidade][a.parcial]:
-                            mods[modalidade][a.parcial].append(a.pagina)
-			
-	    
-	parc = ''
-	for modalidade in mods.keys():
-	    parc += '%s [parcial ' % modalidade
-	    for p in mods[modalidade].keys():
-		pags = mods[modalidade][p]
-		pags.sort()
-		parc += '%s (%s)' % (p, ','.join([str(k) for k in pags]))
+                    for a in p.auditoria_set.all():
+                        if not a.parcial in mods[modalidade].keys():
+                            mods[modalidade][a.parcial] = []
+                            if not a.pagina in mods[modalidade][a.parcial]:
+                                mods[modalidade][a.parcial].append(a.pagina)
+        parc = ''
+        for modalidade in mods.keys():
+            parc += '%s [parcial ' % modalidade
+            for p in mods[modalidade].keys():
+                pags = mods[modalidade][p]
+                pags.sort()
+                parc += '%s (%s)' % (p, ','.join([str(k) for k in pags]))
             parc += ']  '
 
-	return parc
+        return parc
+   
+   
+   
 class TipoComprovanteFinanceiro(models.Model):
     nome = models.CharField(max_length=50)
 
