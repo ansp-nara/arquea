@@ -983,6 +983,31 @@ function ajax_filter_pagamentos2(url)
        });
 
 }
+function ajax_filter_equipamento(num_doc, id_patrimonio, id_equipamento)
+{
+       p_id = "#id_equipamento";
+       $(p_id).html('Carregando...');
+       $.ajax({
+           type: "POST",
+           url: "/patrimonio/escolhe_equipamento",
+           dataType: "json",
+           data: {'num_doc':num_doc, 'id_patrimonio':id_patrimonio, 'id_equipamento':id_equipamento},
+           success: function(retorno) {
+              $(p_id).empty();
+              $(p_id).append('<option value="">-----</option>');
+              $.each(retorno, function(i, item){
+            	  if (item.selected) {
+                      $(p_id).append('<option value="'+item.pk+'" selected>'+ item.valor+'</option>');
+            	  } else {
+            		  $(p_id).append('<option value="'+item.pk+'">'+item.valor+'</option>');
+            	  }
+              });
+           },
+           error: function(erro) {
+              alert('Erro: Sem retorno de requisição.');
+           }
+       });
+}
 
 function ajax_filter_patrimonio(num_doc)
 {
