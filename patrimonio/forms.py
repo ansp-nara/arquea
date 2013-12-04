@@ -99,11 +99,16 @@ class PatrimonioAdminForm(forms.ModelForm):
 
     descricao = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows':'2', 'cols':'152'}))
     
+    filtro_equipamento = forms.CharField(label=_(u'Filtro para busca de Equipamento'), required=False,\
+        widget = forms.TextInput(attrs={'onchange': 'ajax_filter_equipamento(this.value);'}))
+    
     # Uso de Model específico para a adição de reticências na descrição
     # e javascript para adição de link no label para a página do Equipamento selecionado 
     equipamento = EquipamentoModelChoiceField(queryset=Equipamento.objects.all(), 
                                      required=False,
-                                     label=mark_safe('<a href="#" onclick="window.open(\'/patrimonio/equipamento/\'+$(\'#id_equipamento\').val() + \'/\', \'_blank\');return true;">Equipamento</a>'),)
+                                     label=mark_safe('<a href="#" onclick="window.open(\'/patrimonio/equipamento/\'+$(\'#id_equipamento\').val() + \'/\', \'_blank\');return true;">Equipamento</a>'),
+                                     widget=forms.Select(attrs={'style':'width:800px'}),
+                                     )
     
     patrimonio = EquipamentoContidoModelChoiceField(queryset=Patrimonio.objects.all(), 
                                      required=False,
@@ -188,7 +193,12 @@ class PatrimonioAdminForm(forms.ModelForm):
         """
         # Exibe a quantidade de patrimonios filhos no label
         self.fields['form_filhos'].label = u'Patrimônios contidos (%s)' % Patrimonio.objects.filter(patrimonio=instance).count()
-         
+
+        if instance:
+            if instance.equipamento:
+                self.fields['filtro_equipamento'].widget = widget=forms.TextInput(attrs={'onchange': 'ajax_filter_equipamento(this.value, "%s", "%s");'%(instance.id, instance.equipamento.id)})
+            else:
+                self.fields['filtro_equipamento'].widget = widget=forms.TextInput(attrs={'onchange': 'ajax_filter_equipamento(this.value, "%s");'%(instance.id)})
                 
     class Meta:
         model = Patrimonio
