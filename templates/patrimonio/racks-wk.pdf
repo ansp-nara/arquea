@@ -353,7 +353,24 @@ Coluna de furos do rack
                    </div>
               {% endfor %}
                 </div>
+            </div>
+        {% endfor %}
+    {% endfor %}
+{% endfor %}
+</div>
+
+<div class="page-break"></div>
+<h1>Lista de equipamentos fora de visão</h1>
+    {% for dc in dcs %}
+    <div class="dc">
+    <h1>{{ dc.entidade }} - {{ dc.nome|default:'' }}</h1>
+    {% for fileira in dc.fileiras %}
+        {% for rack in fileira.racks %}
             {% if rack.equipamentos_fora_visao %}
+            <div class="rack">
+                <h2>
+                  {{ rack.nome|default:'' }} ({{ rack.vazio }} ocupado)
+                </h2>
                 <div class="outros">
                     <div class="outros-content">
                     <table>
@@ -367,7 +384,7 @@ Coluna de furos do rack
                         {% for eq in rack.equipamentos_fora_visao %}
                             <tr>
                                 <td>
-                                    {{ eq.nome|truncatechars:45 }}
+                                    {{ eq.descricao|truncatechars:45 }}
                                 </td>
                                 <td>{{ eq.tam }}</td>
                                 <td>{{ eq.pos }}</td>
@@ -377,8 +394,8 @@ Coluna de furos do rack
                     </table>
                     </div>
                 </div>
-               {% endif %}
             </div>
+               {% endif %}
         {% endfor %}
     {% endfor %}
 {% endfor %}
