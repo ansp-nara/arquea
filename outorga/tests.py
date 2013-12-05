@@ -121,6 +121,15 @@ class TermoTest(TestCase):
         termo = Termo.objects.get(pk=1)
         self.assertEquals(termo.termo_real(), '<b>R$ 4.500.000,00</b>')
 
+    def test_termo_real_negativo(self):
+        termo = Termo.objects.get(pk=1)
+        
+        n1 = Natureza_gasto.objects.get(pk=1)
+        n1.valor_concedido = -5000000
+        n1.save()
+        
+        self.assertEquals(termo.termo_real(), '-')
+
     def test_valor_concedido_dolar(self):
         termo = Termo.objects.get(pk=1)
         self.assertEquals(termo.dolar, Decimal('3000000'))
@@ -129,9 +138,30 @@ class TermoTest(TestCase):
         termo = Termo.objects.get(pk=1)
         self.assertEquals(termo.termo_dolar(), '$ 3,000,000.00')
 
+    def test_termo_dolar_negativo(self):
+        termo = Termo.objects.get(pk=1)
+        
+        n1 = Natureza_gasto.objects.get(pk=3)
+        n1.valor_concedido = -9000000
+        n1.save()
+        
+        self.assertEquals(termo.termo_dolar(), '-')
+
     def test_duracao_meses(self):
         termo = Termo.objects.get(pk=1)
         self.assertEquals(termo.duracao_meses(), '12 meses')
+
+    def test_duracao_meses__menos_1_mes(self):
+        termo = Termo.objects.get(pk=1)
+        termo.inicio = date(2008,12,15)
+
+        self.assertEquals(termo.duracao_meses(), '-')
+
+    def test_duracao_meses__1_mes(self):
+        termo = Termo.objects.get(pk=1)
+        termo.inicio = date(2008,12,01)
+
+        self.assertEquals(termo.duracao_meses(), u'1 mês')
 
     def test_total_realizado_real(self):
         termo = Termo.objects.get(pk=1)
@@ -502,24 +532,45 @@ class AcordoTest(TestCase):
 
 class ModalidadeTest(TestCase):
     def setUp(self):
-        #Cria Modalidade
-        e, created = Estado.objects.get_or_create(nome='Vigente')
-        c, created = Categoria.objects.get_or_create(nome='Inicial')
-        m, created = Modalidade.objects.get_or_create(sigla='OUT', defaults={'nome': 'Outros', 'moeda_nacional': True})
+        eo1, created = EstadoOutorga.objects.get_or_create(nome='Vigente')
+        t, create = Termo.objects.get_or_create(ano=2008, defaults={'inicio': date(2008,1,1), 'estado':eo1, 'processo':22222, 'digito':2})
+        t2, create = Termo.objects.get_or_create(ano=2007, defaults={'inicio': date(2007,1,1), 'estado':eo1, 'processo':3333, 'digito':3})        
+
+        #Cria Outorga
+        c1, created = Categoria.objects.get_or_create(nome='Inicial')
+        c2, created = Categoria.objects.get_or_create(nome='Aditivo')
+
+        o1, created = Outorga.objects.get_or_create(termo=t, categoria=c1, data_solicitacao=date(2007,12,1), defaults={'termino': date(2008,12,31), 'data_presta_contas': date(2008,2,28)})
+        o2, created = Outorga.objects.get_or_create(termo=t, categoria=c2, data_solicitacao=date(2008,4,1), defaults={'termino': date(2008,12,31), 'data_presta_contas': date(2008,2,28)})
+
+
+        #Cria Natureza de gasto
+        m1, created = Modalidade.objects.get_or_create(sigla='STE', defaults={'nome': 'Servicos de Terceiro no Exterior', 'moeda_nacional': False})
+        m2, created = Modalidade.objects.get_or_create(sigla='STF', defaults={'nome': 'Servicos de Terceiro no Brasil', 'moeda_nacional': True})
+
+        n1, created = Natureza_gasto.objects.get_or_create(modalidade=m1, termo=t, valor_concedido='1500000.00')
+        n2, created = Natureza_gasto.objects.get_or_create(modalidade=m2, termo=t, valor_concedido='300000.00')
+
+         #Cria Item de Outorga
+        ent1, created = Entidade.objects.get_or_create(sigla='SAC', defaults={'nome': 'SAC do Brasil', 'cnpj': '00.000.000/0000-00', 'fisco': True, 'url': ''})
+        endereco, created = Endereco.objects.get_or_create(entidade=ent1)
+
+        i1, created = Item.objects.get_or_create(entidade=ent1, natureza_gasto=n1, descricao='Serviço de Conexão Internacional', defaults={'justificativa': 'Link Internacional', 'quantidade': 12, 'valor': 250000})
+
 
         #Cria Natureza de Gasto
-        t, created = Termo.objects.get_or_create(ano=2008, processo=51885, digito=8, defaults={'inicio': date(2008,1,1), 'estado': e})
-        o, created = Outorga.objects.get_or_create(termo=t, categoria=c, data_solicitacao=date(2007,12,1), termino=date(2008,12,31), data_presta_contas=date(2009,1,31))
-        n, created = Natureza_gasto.objects.get_or_create(modalidade=m, outorga=o)
+#         t, created = Termo.objects.get_or_create(ano=2008, processo=51885, digito=8, defaults={'inicio': date(2008,1,1), 'estado': e})
+#         o, created = Outorga.objects.get_or_create(termo=t, categoria=c, data_solicitacao=date(2007,12,1), termino=date(2008,12,31), data_presta_contas=date(2009,1,31))
+#         n, created = Natureza_gasto.objects.get_or_create(modalidade=m, outorga=o)
 
-        def test_unicode(self):
-            m = Modalidade.objects.get(pk=1)
-            self.assertEquals(m.__unicode__(), u'OUT - Outros')
+    def test_unicode(self):
+        m = Modalidade.objects.get(pk=1)
+        self.assertEquals(m.__unicode__(), u'STE - Servicos de Terceiro no Exterior')
 
-        def test_modalidades_termo(self):
-            modalidade = Modalidade.objects.get(pk=1)
-            termo = Termo.objects.get(pk=1)
-            self.assertEquals(modalidade.modalidades_termo(termo), ['<Modalidade: OUT - Outros>'])
+    def test_modalidades_termo(self):
+        modalidade = Modalidade.objects.get(pk=1)
+        termo = Termo.objects.get(pk=1)
+        self.assertEquals(str(modalidade.modalidades_termo(termo)), '[<Modalidade: STE - Servicos de Terceiro no Exterior>]')
 
 
 class EstadoTest(TestCase):
