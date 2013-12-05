@@ -221,11 +221,11 @@ class Termo(models.Model):
         if (dif.days) % 30 >= 28:
             meses = meses + 1
 
-	if meses > 0:
-	    if meses > 1:
-        	return "%s meses" % meses
-            return "%s mês" % meses
-	return '-'
+        if meses > 0:
+            if meses > 1:
+                return u"%s meses" % meses
+            return u"%s mês" % meses
+        return u'-'
     duracao_meses.short_description=_(u'Vigência')
 
 
