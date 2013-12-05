@@ -163,6 +163,12 @@ class TermoTest(TestCase):
 
         self.assertEquals(termo.duracao_meses(), u'1 mês')
 
+    def test_duracao_meses__2_meses(self):
+        termo = Termo.objects.get(pk=1)
+        termo.inicio = date(2008,10,4)
+
+        self.assertEquals(termo.duracao_meses(), '3 meses')
+
     def test_total_realizado_real(self):
         termo = Termo.objects.get(pk=1)
         self.assertEquals(termo.total_realizado_real, Decimal('252650.00'))
@@ -171,6 +177,28 @@ class TermoTest(TestCase):
         termo = Termo.objects.get(pk=1)
         self.assertEquals(termo.formata_realizado_real(), '<b>R$ 252.650,00</b>')
 
+    def test_formata_realizado_real__vazio(self):
+        termo = Termo.objects.get(pk=1)
+        
+        pg1 = Pagamento.objects.get(pk=1)
+        pg1.valor_fapesp = 0
+        pg1.save()
+        
+        pg2 = Pagamento.objects.get(pk=2)
+        pg2.valor_fapesp = 0
+        pg2.save()
+
+        self.assertEquals(termo.formata_realizado_real(), '-')
+
+    def test_formata_realizado_real__negativo(self):
+        termo = Termo.objects.get(pk=1)
+        
+        pg1 = Pagamento.objects.get(pk=1)
+        pg1.valor_fapesp = 9000000
+        pg1.save()
+        
+        self.assertEquals(termo.formata_realizado_real(), u'<span style="color: red"><b>R$ 9.250.000,00</b></span>')
+        
     def test_total_realizado_dolar(self):
         termo = Termo.objects.get(pk=1)
         self.assertEquals(termo.total_realizado_dolar, Decimal('100000.00'))
@@ -186,6 +214,37 @@ class TermoTest(TestCase):
     def test_vigencia(self):
         termo = Termo.objects.get(pk=1)
         self.assertEquals(termo.vigencia, '12 meses')
+
+    def test_saldo_real(self):
+        termo = Termo.objects.get(pk=1)
+        self.assertEquals(termo.saldo_real(), Decimal('4247350.00'))
+
+    def test_saldo_dolar(self):
+        termo = Termo.objects.get(pk=1)
+        self.assertEquals(termo.saldo_dolar(), Decimal('2900000.00'))
+
+    def test_formata_saldo_real(self):
+        termo = Termo.objects.get(pk=1)
+        self.assertEquals(termo.formata_saldo_real(), '<b>R$ 4.247.350,00</b>')
+
+    def test_formata_saldo_dolar(self):
+        termo = Termo.objects.get(pk=1)
+        self.assertEquals(termo.formata_saldo_dolar(), '$ 2,900,000.00')
+
+    def test_termo_ativo(self):
+        hoje = datetime.now().date()
+        
+        termo = Termo.objects.get(pk=1)
+        termo.inicio = hoje - timedelta(days=1)
+        termo.save()
+        
+        outorga = Outorga.objects.get(pk=1)
+        outorga.termino = hoje + timedelta(days=1)
+        outorga.save()
+        
+        termo = Termo.termo_ativo()
+        self.assertEquals(termo.id, 1)
+
 
 #     def test_real(self):
 #         termo = Termo.objects.get(pk=1)
@@ -256,6 +315,12 @@ class OutorgaTest(TestCase):
     def test_existe_arquivo(self):
         o1 = Outorga.objects.get(pk=1)
         self.assertEquals(o1.existe_arquivo(), ' ')
+
+    def test_existe_arquivo__com_arquivo(self):
+        o1 = Outorga.objects.get(pk=1)
+        o1.arquivo = 'teste.pdf'
+        
+        self.assertEquals(o1.existe_arquivo(), '<center><a href="/admin/outorga/arquivo/?outorga__id__exact=1"><img src="/media/img/arquivo.png" /></a></center>')
 
 
 
@@ -358,9 +423,14 @@ class Natureza_gastoTest(TestCase):
         n1 = Natureza_gasto.objects.get(pk=1)
         self.assertEquals(n1.total_realizado, Decimal('102650'))
 
-    def test_formata_total_realizado(self):
+    def test_formata_total_realizado__negativo(self):
         n1 = Natureza_gasto.objects.get(pk=1)
         self.assertEquals(n1.formata_total_realizado(), '<span style="color: red">R$ 102.650,00</span>')
+
+    def test_formata_total_realizado__positivo(self):
+        n1 = Natureza_gasto.objects.get(pk=1)
+        n1.valor_concedido = 9000000
+        self.assertEquals(n1.formata_total_realizado(), 'R$ 102.650,00')
 
     def test_soma_itens_menos_que_concedido(self):
         n1 = Natureza_gasto.objects.get(pk=1)
@@ -369,6 +439,28 @@ class Natureza_gastoTest(TestCase):
     def test_soma_itens(self):
         n2 = Natureza_gasto.objects.get(pk=2)
         self.assertEquals(n2.soma_itens(), 'R$ 100.000,00')
+
+    def test_soma_itens__diff_total(self):
+        n2 = Natureza_gasto.objects.get(pk=2)
+        n2.valor_concedido = n2.valor_concedido - 100000
+        self.assertEquals(n2.soma_itens(), '<span style="color: red">R$ 100.000,00</span>')
+
+    def test_soma_itens__zero(self):
+        n2 = Natureza_gasto.objects.get(pk=2)
+        n2.valor_concedido = 0
+        i1 = Item.objects.get(pk=1)
+        i1.valor=0
+        i1.save()
+        
+        i2 = Item.objects.get(pk=2)
+        i2.valor=0
+        i2.save()
+        
+        i3 = Item.objects.get(pk=3)
+        i3.valor=0
+        i3.save()
+        
+        self.assertEquals(n2.soma_itens(), '-')
 
     def test_todos_itens(self):
         n1 = Natureza_gasto.objects.get(pk=1)
