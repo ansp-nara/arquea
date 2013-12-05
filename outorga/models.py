@@ -514,7 +514,7 @@ class Natureza_gasto(models.Model):
 
 
     # Calcula o total de despesas realizadas de uma modalidade e termo.
-    @ property
+    @ cached_property
     def total_realizado(self):
         total = Decimal('0.00')
         for item in self.todos_itens():
