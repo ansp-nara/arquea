@@ -6,7 +6,7 @@ from decimal import Decimal
 from django.core.files.uploadedfile import SimpleUploadedFile
 
 from outorga.models import Termo, Item, OrigemFapesp, Estado as EstadoOutorga, Categoria, Outorga, Modalidade, Natureza_gasto, \
-                           Acordo, Contrato, OrdemDeServico, TipoContrato, ArquivoOS
+                           Acordo, Contrato, OrdemDeServico, TipoContrato, ArquivoOS, Arquivo
 from financeiro.models import Pagamento, ExtratoCC, Estado as EstadoFinanceiro
 from identificacao.models import Entidade, Contato, Identificacao, Endereco
 from protocolo.models import Protocolo, ItemProtocolo, TipoDocumento, Origem, Estado as EstadoProtocolo
@@ -647,10 +647,32 @@ class ItemTest(TestCase):
     def test_mostra_quantidade(self):
         item = Item.objects.get(pk=1)
         self.assertEquals(item.mostra_quantidade(), 12)
+
+    def test_mostra_quantidade__zero(self):
+        item = Item.objects.get(pk=1)
+        item.quantidade = 0
+        self.assertEquals(item.mostra_quantidade(), '-')
         
     def test_mostra_valor_realizado(self):
         item = Item.objects.get(pk=1)
         self.assertEquals(item.mostra_valor_realizado(), '$ 600,010.00')
+
+    def test_mostra_valor_realizado__vazio(self):
+        item = Item.objects.get(pk=1)
+
+        pg1 = Pagamento.objects.get(pk=1)
+        pg1.valor_fapesp = 0
+        pg1.save()
+        
+        pg2 = Pagamento.objects.get(pk=2)
+        pg2.valor_fapesp = 0
+        pg2.save()
+
+        pg3 = Pagamento.objects.get(pk=3)
+        pg3.valor_fapesp = 0
+        pg3.save()
+
+        self.assertEquals(item.mostra_valor_realizado(), '-')
 
     def test_valor(self):
         item = Item.objects.get(pk=1)
@@ -677,6 +699,15 @@ class ItemTest(TestCase):
     def test_calcula_total_despesas(self):
         item = Item.objects.get(pk=1)
         self.assertEquals(item.calcula_total_despesas(), 600010.00)
+        
+    def test_calcula_total_despesas__vazia(self):
+        item2 = Item.objects.get(pk=2)
+        of = OrigemFapesp.objects.get(pk=1)
+        of.item_outorga = item2
+        of.save()
+
+        item = Item.objects.get(pk=1)
+        self.assertEquals(item.calcula_total_despesas(), Decimal(0.00))
 
     def test_protocolos_pagina(self):
         item = Item.objects.get(pk=1)
@@ -691,7 +722,26 @@ class ItemTest(TestCase):
         dt = date(2008,11,11)
         self.assertEquals(item.calcula_realizado_mes(dt, False), 300010.00)
 
-    def test_calcula_realizado_mes_filtro_dias(self):
+    def test_calcula_realizado_mes__vazio(self):
+        item2 = Item.objects.get(pk=2)
+        of = OrigemFapesp.objects.get(pk=1)
+        of.item_outorga = item2
+        of.save()
+        
+        item = Item.objects.get(pk=1)
+        dt = date(2008,11,11)
+        self.assertEquals(item.calcula_realizado_mes(dt, False), Decimal(0.00))
+
+    def test_calcula_realizado_mes__vazio(self):
+        modalidade = Modalidade.objects.get(pk=1)
+        modalidade.moeda_nacional = True
+        modalidade.save()
+
+        item = Item.objects.get(pk=1)
+        dt = date(2008,11,11)
+        self.assertEquals(item.calcula_realizado_mes(dt, False), 300010.00)
+
+    def test_calcula_realizado_mes__filtro_dias(self):
         item = Item.objects.get(pk=1)
         dt = date(2008,11,11)
         self.assertEquals(item.calcula_realizado_mes(dt, True), 10.00)
@@ -861,6 +911,49 @@ class OrdemDeServicoTest(TestCase):
         self.assertEquals(os.existe_arquivo(), u'<center><a href="/admin/outorga/arquivoos/?os__id__exact=%s"><img src="/media/img/arquivo.png" /></a></center>' % os.id)
         
         arquivo.delete()
+
+
+class ArquivoTest(TestCase):
+    def setUp(self):
+        super(ArquivoTest, self).setUp()
+
+        #Cria Termo
+        e, created = EstadoOutorga.objects.get_or_create(nome='Vigente')
+        t, create = Termo.objects.get_or_create(ano=2008, processo=22222, digito=2, defaults={'inicio': date(2008,1,1), 'estado':e})
+        
+        #Cria Outorga
+        c1, created = Categoria.objects.get_or_create(nome='Inicial')
+        c2, created = Categoria.objects.get_or_create(nome='Aditivo')
+        
+        o1, created = Outorga.objects.get_or_create(termo=t, categoria=c1, data_solicitacao=date(2007,12,1), defaults={'termino': date(2008,12,31), 'data_presta_contas': date(2008,2,28)})
+        #Cria Arquivo
+
+        arq = Arquivo(outorga=o1)
+        arq.save()
+        # Criando um dirty Mock para o teste do arquivo 
+        arq.arquivo = ""
+        arq.arquivo.name = 'test_img_file.gif'
+        arq.arquivo._commited=True
+        arq.save()
+
+    def test_unicode(self):
+        arq = Arquivo.objects.get(pk=1)
+        self.assertEquals(arq.__unicode__(), u'test_img_file.gif')
+
+    def test_unicode__path(self):
+        arq = Arquivo.objects.get(pk=1)
+        arq.arquivo.name = 'teste/teste/test_img_file.gif'
+        arq.arquivo._commited=True
+        arq.save()
+        self.assertEquals(arq.__unicode__(), u'test_img_file.gif')
+
+    def test_concessao(self):
+        arq = Arquivo.objects.get(pk=1)
+        self.assertEquals(arq.concessao().id, 1)
+
+    def test_mostra_termo(self):
+        arq = Arquivo.objects.get(pk=1)
+        self.assertEquals(arq.mostra_termo(), '08/22222-2')
 
 
 class ArquivoOSTest(TestCase):
