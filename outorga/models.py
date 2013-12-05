@@ -230,13 +230,13 @@ class Termo(models.Model):
 
 
     # Calcula total de despesas (R$) realizadas durante o termo.
-    @ property
-    def total_realizado_real_old(self):
-        total = Decimal('0.00')
-	for n in self.natureza_gasto_set.all():
-	    if n.modalidade.moeda_nacional:
-		total += n.total_realizado
-        return total
+#     @ property
+#     def total_realizado_real_old(self):
+#         total = Decimal('0.00')
+# 	for n in self.natureza_gasto_set.all():
+# 	    if n.modalidade.moeda_nacional:
+# 		total += n.total_realizado
+#         return total
 
     @property
     def total_realizado_real(self):
@@ -250,9 +250,8 @@ class Termo(models.Model):
             return '-'
 
         valor = formata_moeda(self.total_realizado_real, ',')
-	if self.real < self.total_realizado_real:
+        if self.real < self.total_realizado_real:
             return '<span style="color: red"><b>R$ %s</b></span>' % valor
-
         return '<b>R$ %s</b>' % valor
     formata_realizado_real.allow_tags = True
     formata_realizado_real.short_description=_(u'Realizado')
