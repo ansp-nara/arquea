@@ -828,17 +828,13 @@ class Contrato(models.Model):
 
       # Retorna a entidade e a data de ínicio do Contrato.
       def __unicode__(self):
-	  inicio = self.data_inicio.strftime("%d/%m/%Y")
-	  if self.entidade:
-	      return u"%s - %s" % (self.entidade, inicio)
-	  else:
-	      return inicio
-
+          inicio = self.data_inicio.strftime("%d/%m/%Y")
+          return u"%s - %s" % (self.entidade, inicio)
 
       # Retorna um ícone se o contrato tiver anexo.
       def existe_arquivo(self):
           a = '<center><a href="/site-media/contrato/%s"><img src="/media/img/arquivo.png" /></a></center>'
-          if self.arquivo:
+          if self.arquivo and self.arquivo.name.find('/') >= 0:
               aq = str(self.arquivo).split('/')[1]
               return '<center>%s</center>' % (a % aq)
           return ' '
@@ -860,6 +856,8 @@ class TipoContrato(models.Model):
 class OrdemDeServico(models.Model):
       """
       Uma instância dessa classe representa uma ordem de serviço de um Contrato.
+      
+      arquivos: related_name para ArquivoOS
       """
 
       numero = models.CharField(_(u'Número'), max_length=20)
@@ -881,13 +879,12 @@ class OrdemDeServico(models.Model):
 
       # Retorna o prazo para solicitar recisão (campo 'antes_rescisao').
       def mostra_prazo(self):
-	  if self.antes_rescisao < 1:
-	      return '-'
-	  if self.antes_rescisao > 1:
+          if self.antes_rescisao < 1:
+              return '-'
+          if self.antes_rescisao > 1:
               return u'%s meses' % self.antes_rescisao
           return u'%s meses' % self.antes_rescisao
       mostra_prazo.short_description = _(u'Prazo p/ solicitar rescisão')
-
 
       # Retorna um ícone se a ordem de serviço tiver anexo.
       def existe_arquivo(self):

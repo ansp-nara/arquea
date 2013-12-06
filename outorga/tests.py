@@ -732,7 +732,7 @@ class ItemTest(TestCase):
         dt = date(2008,11,11)
         self.assertEquals(item.calcula_realizado_mes(dt, False), Decimal(0.00))
 
-    def test_calcula_realizado_mes__vazio(self):
+    def test_calcula_realizado_mes__dolar(self):
         modalidade = Modalidade.objects.get(pk=1)
         modalidade.moeda_nacional = True
         modalidade.save()
@@ -813,34 +813,71 @@ class EstadoTest(TestCase):
 class OrigemFapespTest(TestCase):
     def setUp(self):
         super(OrigemFapespTest, self).setUp()
-
         #Cria Termo
-        e, created = EstadoOutorga.objects.get_or_create(nome='Vigente')
-        t, create = Termo.objects.get_or_create(ano=2008, processo=22222, digito=2, defaults={'inicio': date(2008,1,1), 'estado':e})
-        
+        eo1, created = EstadoOutorga.objects.get_or_create(nome='Vigente')
+        t, create = Termo.objects.get_or_create(ano=2008, defaults={'inicio': date(2008,1,1), 'estado':eo1, 'processo':22222, 'digito':2})
+
         #Cria Outorga
         c1, created = Categoria.objects.get_or_create(nome='Inicial')
         c2, created = Categoria.objects.get_or_create(nome='Aditivo')
-        
+
         o1, created = Outorga.objects.get_or_create(termo=t, categoria=c1, data_solicitacao=date(2007,12,1), defaults={'termino': date(2008,12,31), 'data_presta_contas': date(2008,2,28)})
         o2, created = Outorga.objects.get_or_create(termo=t, categoria=c2, data_solicitacao=date(2008,4,1), defaults={'termino': date(2008,12,31), 'data_presta_contas': date(2008,2,28)})
-        
+
+
         #Cria Natureza de gasto
         m1, created = Modalidade.objects.get_or_create(sigla='STE', defaults={'nome': 'Servicos de Terceiro no Exterior', 'moeda_nacional': False})
-        m2, created = Modalidade.objects.get_or_create(sigla='STA', defaults={'nome': 'Servicos de Terceiro no Exterior', 'moeda_nacional': False})
-        
-        n1, created = Natureza_gasto.objects.get_or_create(modalidade=m1, termo=t, valor_concedido='300000.00')
-        n2, created = Natureza_gasto.objects.get_or_create(modalidade=m2, termo=t, valor_concedido='100000.00')
-        
-        #Cria Item de Outorga
+        m2, created = Modalidade.objects.get_or_create(sigla='STF', defaults={'nome': 'Servicos de Terceiro no Brasil', 'moeda_nacional': True})
+
+        n1, created = Natureza_gasto.objects.get_or_create(modalidade=m1, termo=t, valor_concedido='1500000.00')
+        n2, created = Natureza_gasto.objects.get_or_create(modalidade=m2, termo=t, valor_concedido='300000.00')
+
+
+         #Cria Item de Outorga
         ent1, created = Entidade.objects.get_or_create(sigla='SAC', defaults={'nome': 'SAC do Brasil', 'cnpj': '00.000.000/0000-00', 'fisco': True, 'url': ''})
-        
+        endereco, created = Endereco.objects.get_or_create(entidade=ent1)
+
+
         i1, created = Item.objects.get_or_create(entidade=ent1, natureza_gasto=n1, descricao='Serviço de Conexão Internacional', defaults={'justificativa': 'Link Internacional', 'quantidade': 12, 'valor': 250000})
         i2, created = Item.objects.get_or_create(entidade=ent1, natureza_gasto=n2, descricao='Serviço de Conexão Internacional', defaults={'justificativa': 'Ajuste na cobrança do Link Internacional', 'quantidade': 6, 'valor': 50000})
+
+         #Cria Protocolo
+        ep, created = EstadoProtocolo.objects.get_or_create(nome='Aprovado')
+        td, created = TipoDocumento.objects.get_or_create(nome='Nota Fiscal')
+        og, created = Origem.objects.get_or_create(nome='Motoboy')
         
-        a, created = Acordo.objects.get_or_create(estado=e, descricao='Acordo entre Instituto UNIEMP e SAC')
+        cot1, created = Contato.objects.get_or_create(primeiro_nome='Alex', defaults={'email': 'alex@alex.com.br', 'tel': ''})
         
-        of, created = OrigemFapesp.objects.get_or_create(acordo=a, item_outorga=i1)
+
+        iden1, created = Identificacao.objects.get_or_create(contato=cot1, defaults={'funcao': 'Gerente', 'area': 'Redes', 'ativo': True, 'endereco':endereco})
+
+        p1, created = Protocolo.objects.get_or_create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,9,30,10,10), defaults={'origem': og, 'estado': ep, 'num_documento': 7777, 'data_vencimento': date(2008,10,10), 'descricao': 'Serviço de Conexão Internacional - 09/2009', 'valor_total': None})
+        p2, created = Protocolo.objects.get_or_create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,10,30,10,10), defaults={'origem': og, 'estado': ep, 'num_documento': 5555, 'data_vencimento': date(2008,11,10), 'descricao': 'Serviço de Conexão Internacional - 10/2009', 'valor_total': None})
+        p3, created = Protocolo.objects.get_or_create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,10,31,10,10), defaults={'origem': og, 'estado': ep, 'num_documento': 666, 'data_vencimento': date(2008,11,12), 'descricao': 'Serviço de Conexão Internacional - 10/2009', 'valor_total': None})
+
+        #Cria Item do Protocolo
+        ip1 = ItemProtocolo.objects.get_or_create(protocolo=p1, descricao='Conexão Internacional - 09/2009', quantidade=1, valor_unitario=250000)
+        ip2 = ItemProtocolo.objects.get_or_create(protocolo=p1, descricao='Reajuste do serviço de Conexão Internacional - 09/2009', quantidade=1, valor_unitario=50000)
+        ip3 = ItemProtocolo.objects.get_or_create(protocolo=p2, descricao='Conexão Internacional - 10/2009', quantidade=1, valor_unitario=250000)
+        ip4 = ItemProtocolo.objects.get_or_create(protocolo=p2, descricao='Reajuste do serviço de Conexão Internacional - 10/2009', quantidade=1, valor_unitario=50000)
+
+
+        #Criar Fonte Pagadora
+        ef1, created = EstadoFinanceiro.objects.get_or_create(nome='Aprovado')
+        ef2, created = EstadoFinanceiro.objects.get_or_create(nome='Concluído')
+
+        ex1, created = ExtratoCC.objects.get_or_create(data_extrato=date(2008,10,30), data_oper=date(2008,10,10), cod_oper=333333, valor='300000', historico='TED')
+        ex2, created = ExtratoCC.objects.get_or_create(data_extrato=date(2008,11,30), data_oper=date(2008,11,10), cod_oper=444444, valor='300000', historico='TED')
+        ex3, created = ExtratoCC.objects.get_or_create(data_extrato=date(2008,11,30), data_oper=date(2008,11,12), cod_oper=555555, valor='10', historico='TED')
+
+        a1, created = Acordo.objects.get_or_create(estado=eo1, descricao='Acordo entre Instituto UNIEMP e SAC')
+
+        of1, created = OrigemFapesp.objects.get_or_create(acordo=a1, item_outorga=i1)
+
+        fp1 = Pagamento.objects.get_or_create(protocolo=p1, conta_corrente=ex1, origem_fapesp=of1, valor_fapesp='300000')
+        fp2 = Pagamento.objects.get_or_create(protocolo=p2, conta_corrente=ex2, origem_fapesp=of1, valor_fapesp='300000')
+        fp3 = Pagamento.objects.get_or_create(protocolo=p3, conta_corrente=ex3, origem_fapesp=of1, valor_fapesp='10')
+
 
     def tearDown(self):
         super(OrigemFapespTest, self).tearDown()
@@ -848,7 +885,31 @@ class OrigemFapespTest(TestCase):
     def test_unicode(self):
         of = OrigemFapesp.objects.get(pk=1)
         self.assertEquals(of.__unicode__(), u'Acordo entre Instituto UNIEMP e SAC - Serviço de Conexão Internacional')
-          
+
+    def test_gasto_zero(self):
+        pg1 = Pagamento.objects.get(pk=1)
+        pg1.valor_fapesp = 0
+        pg1.save()
+        
+        pg2 = Pagamento.objects.get(pk=2)
+        pg2.valor_fapesp = 0
+        pg2.save()
+        
+        pg3 = Pagamento.objects.get(pk=3)
+        pg3.valor_fapesp = 0
+        pg3.save()
+
+        of = OrigemFapesp.objects.get(pk=1)
+
+        self.assertEquals(of.gasto(), Decimal('0.0'))
+
+    def test_gasto(self):
+        of = OrigemFapesp.objects.get(pk=1)
+        self.assertEquals(of.gasto(), Decimal('600010.00'))
+
+    def test_termo(self):
+        of = OrigemFapesp.objects.get(pk=1)
+        self.assertEquals(str(of.termo()), u'08/22222-2')
 
 
 class ContratoTest(TestCase):
@@ -866,8 +927,31 @@ class ContratoTest(TestCase):
         ct = Contrato.objects.get(pk=1)
         self.assertEquals(ct.__unicode__(), u'SAC - 01/01/2008')
 
-    def test_existe_arquivo(self):
+    def test_existe_arquivo__com_arquivo(self):
         ct = Contrato.objects.get(pk=1)
+        
+        ct.arquivo = ""
+        ct.arquivo.name = 'test_img_file.gif'
+        ct.arquivo._commited=True
+        ct.save()
+
+        self.assertEquals(ct.existe_arquivo(), u' ')
+
+    def test_existe_arquivo__com_arquivo_e_path(self):
+        ct = Contrato.objects.get(pk=1)
+        
+        ct.arquivo = ""
+        ct.arquivo.name = 'teste/teste/test_img_file.gif'
+        ct.arquivo._commited=True
+        ct.save()
+
+        self.assertEquals(ct.existe_arquivo(), u'<center><center><a href="/site-media/contrato/teste"><img src="/media/img/arquivo.png" /></a></center></center>')
+
+    def test_existe_arquivo__nulo(self):
+        ct = Contrato.objects.get(pk=1)
+        ct.arquivo = None
+        
+        
         self.assertEquals(ct.existe_arquivo(), u' ')
 
 
@@ -894,23 +978,60 @@ class OrdemDeServicoTest(TestCase):
         os = OrdemDeServico.objects.get(pk=1)
         self.assertEquals(os.__unicode__(), u'Tipo Fixo 66666')
 
-    def test_mostra_prazo(self):
+    def test_mostra_prazo__positivo(self):
         os = OrdemDeServico.objects.get(pk=1)
         self.assertEquals(os.mostra_prazo(), u'2 meses')
+
+    def test_mostra_prazo__negativo(self):
+        os = OrdemDeServico.objects.get(pk=1)
+        os.antes_rescisao = -1
+        self.assertEquals(os.mostra_prazo(), u'-')
+
+    def test_mostra_prazo__um(self):
+        os = OrdemDeServico.objects.get(pk=1)
+        os.antes_rescisao = 1
+        self.assertEquals(os.mostra_prazo(), u'1 meses')
 
     def test_existe_arquivo_vazio(self):
         os = OrdemDeServico.objects.get(pk=1)
         self.assertEquals(os.existe_arquivo(), u' ')
-        
+
     def test_existe_arquivo(self):
         os = OrdemDeServico.objects.get(pk=1)
         arquivo = ArquivoOS(os=os)
         arquivo.data = "2013-01-01"
+        arquivo.arquivo = ""
+        arquivo.arquivo.name = 'test_img_file.gif'
+        
         arquivo.save()
         
         self.assertEquals(os.existe_arquivo(), u'<center><a href="/admin/outorga/arquivoos/?os__id__exact=%s"><img src="/media/img/arquivo.png" /></a></center>' % os.id)
         
+        arquivo.arquivo.delete()
         arquivo.delete()
+
+    def test_entidade(self):
+        os = OrdemDeServico.objects.get(pk=1)
+        self.assertEquals(str(os.entidade()), u'SAC')
+
+    def test_primeiro_arquivo__vazio(self):
+        os = OrdemDeServico.objects.get(pk=1)
+        self.assertIsNone(os.primeiro_arquivo())
+
+    def test_primeiro_arquivo(self):
+        os = OrdemDeServico.objects.get(pk=1)
+        
+        arquivo = ArquivoOS(os=os)
+        arquivo.data = "2013-01-01"
+        arquivo.arquivo = ""
+        arquivo.arquivo.name = 'test_img_file.gif'
+        arquivo.save()
+        
+        self.assertEquals(os.primeiro_arquivo(), 'test_img_file.gif')
+        
+        arquivo.arquivo.delete()
+        arquivo.delete()
+
 
 
 class ArquivoTest(TestCase):
@@ -989,6 +1110,7 @@ class ArquivoOSTest(TestCase):
         
         self.assertEquals(arquivo.__unicode__(), u'test_img_file.gif')
         
+        arquivo.delete()
 
     def test_unicode_com_path(self):
         orderServico = OrdemDeServico.objects.get(pk=1)
@@ -1004,3 +1126,4 @@ class ArquivoOSTest(TestCase):
         
         self.assertEquals(arquivo.__unicode__(), u'test_img_file.gif')
         
+        arquivo.delete()
