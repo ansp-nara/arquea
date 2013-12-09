@@ -25,21 +25,21 @@ logger = logging.getLogger(__name__)
 
 class TipoAssinaturaTest(TestCase):
     def test_unicode (self):
-        ta, created = TipoAssinatura.objects.get_or_create(nome='Cheque')
+        ta = TipoAssinatura.objects.create(nome='Cheque')
         self.assertEquals(u'Cheque', ta.__unicode__())
 
 class UsuarioTest(TestCase):
     def test_unicode(self):
         ent = Entidade(sigla='ANSP', nome='Academic Network at São Paulo', cnpj='', fisco=True )
         ent.save()
-        mb, created = Membro.objects.get_or_create(nome='Soraya Gomes', defaults={'email': 'soraya@gomes.com', 'cpf': '000.000.000-00'})
-        usr, created = Usuario.objects.get_or_create(membro=mb, username='soraya', sistema='Administrativo')
+        mb = Membro.objects.create(nome='Soraya Gomes', email= 'soraya@gomes.com', cpf= '000.000.000-00')
+        usr = Usuario.objects.create(membro=mb, username='soraya', sistema='Administrativo')
 
         self.assertEquals('soraya', usr.__unicode__())
 
 class MembroTest(TestCase):
     def setUp(self):
-        ent, created = Entidade.objects.get_or_create(sigla='ANSP', defaults={'nome':'Academic Network at São Paulo', 'cnpj':'', 'fisco':True})
+        ent = Entidade.objects.create(sigla='ANSP', nome='Academic Network at São Paulo', cnpj='', fisco=True)
 
         mb = Membro(nome='Joice Gomes', email='soraya@gomes.com', cpf='000.000.000-00', ramal=23)
         mb.save()
@@ -98,7 +98,7 @@ class DadoBancarioTest(TestCase):
         b = Banco(numero=151, nome='Nossa Caixa')
         b.save()
 
-        db, created = DadoBancario.objects.get_or_create(membro=mb, banco=b, agencia=1690, ag_digito=4, conta=123439, cc_digito='x')
+        db = DadoBancario.objects.create(membro=mb, banco=b, agencia=1690, ag_digito=4, conta=123439, cc_digito='x')
         
         
     def test_agencia_digito(self):
@@ -112,9 +112,9 @@ class DadoBancarioTest(TestCase):
 
 class AssinaturaTest(TestCase):
     def setUp(self):
-        mb, created = Membro.objects.get_or_create(nome='Soraya Gomes', defaults={'email': 'soraya@gomes.com', 'cpf': '312.617.028-00'})
-        ta, created = TipoAssinatura.objects.get_or_create(nome='Cheque')
-        a, created = Assinatura.objects.get_or_create(membro=mb, tipo_assinatura=ta)
+        mb = Membro.objects.create(nome='Soraya Gomes', email= 'soraya@gomes.com', cpf= '312.617.028-00')
+        ta = TipoAssinatura.objects.create(nome='Cheque')
+        a = Assinatura.objects.create(membro=mb, tipo_assinatura=ta)
 
     def test_unicode(self):
         assinatura = Assinatura.objects.get(pk=1)
@@ -464,7 +464,7 @@ class FeriasTest(TestCase):
 
 class MembroSindicatoArquivoTest(TestCase):
     def setUp(self):
-        ent, created = Entidade.objects.get_or_create(sigla='ANSP', defaults={'nome':'Academic Network at São Paulo', 'cnpj':'', 'fisco':True})
+        ent = Entidade.objects.create(sigla='ANSP', nome='Academic Network at São Paulo', cnpj='', fisco=True)
 
         mb = Membro(nome='Joice Gomes', email='soraya@gomes.com', cpf='000.000.000-00', ramal=23)
         mb.save()
