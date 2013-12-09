@@ -396,8 +396,9 @@ class OutorgaViewTest(UnitTestCase):
         os = OrdemDeServico.objects.create(acordo=acordo, contrato=cont1, tipo=tipo, 
                                    data_inicio=date(2008,2,1), data_rescisao=date(2008,11,1), antes_rescisao=2, numero=66666,   
                                    descricao='OS 34567 - Contratação de mais um link')
-
         
+        of1 = OrigemFapesp.objects.create(acordo=acordo, item_outorga=i1)
+
     def test_call__relatorio_contratos_por_entidade(self):
         mock_render_to_response = mock.MagicMock()
         with mock.patch.multiple('outorga.views',
@@ -417,7 +418,89 @@ class OutorgaViewTest(UnitTestCase):
             self.assertEquals(args[1]['entidades'][0]['contratos'][0]['termino'], date(2013,01,03))
 #             self.assertEquals(args[1]['entidades'][0]['contratos'][0]['arquivo'], '1111/11')
             self.assertEquals(args[1]['entidades'][0]['contratos'][0]['auto'], False)
+            self.assertEquals(args[1]['entidades'][0]['contratos'][0]['os'][0].tipo.nome, 'Tipo Fixo')
+            self.assertEquals(args[1]['entidades'][0]['contratos'][0]['os'][0].numero, u'66666')
+
+    def test_call__relatorio_contratos_por_entidade__sem_os(self):
+        os = OrdemDeServico.objects.get(pk=1)
+        os.delete()
         
+        mock_render_to_response = mock.MagicMock()
+        with mock.patch.multiple('outorga.views',
+            render_to_response=mock_render_to_response,
+            RequestContext=mock.MagicMock(),
+            login_required=lambda x: x):
+             
+            from outorga.views import contratos
+            mock_request = mock.Mock()
+            # call view
+            contratos(mock_request)
+            _, args, _ = mock_render_to_response.mock_calls[0]
+
+            self.assertFalse('os' in args[1]['entidades'][0]['contratos'][0], 'Ordemdeservico não deve estar na resposta da view.')
+
+
+    def test_call__relatorio_termos(self):
+        mock_render_to_response = mock.MagicMock()
+        with mock.patch.multiple('outorga.views',
+            render_to_response=mock_render_to_response,
+            RequestContext=mock.MagicMock(),
+            login_required=lambda x: x):
+             
+            from outorga.views import relatorio_termos
+            mock_request = mock.Mock()
+            mock_request.method = "GET"
+            # call view
+            relatorio_termos(mock_request)
+            _, args, _ = mock_render_to_response.mock_calls[0]
+
+            self.assertEquals(args[0], 'outorga/termos.html')
+            self.assertEquals(args[1]['termos'][0].processo, 22222)
+
+    def test_call__lista_acordos(self):
+        mock_render_to_response = mock.MagicMock()
+        with mock.patch.multiple('outorga.views',
+            render_to_response=mock_render_to_response,
+            RequestContext=mock.MagicMock(),
+            login_required=lambda x: x):
+             
+            from outorga.views import lista_acordos
+            mock_request = mock.Mock()
+            mock_request.method = "GET"
+            # call view
+            lista_acordos(mock_request)
+            _, args, _ = mock_render_to_response.mock_calls[0]
+
+            self.assertEquals(args[0], 'outorga/acordos.html')
+            
+            self.assertEquals(args[1]['processos'][0]['processo'].processo, 22222)
+            self.assertEquals(args[1]['processos'][0]['acordos'][0]['acordo'].__unicode__(), u'Acordo entre Instituto UNIEMP e SAC')
+            self.assertEquals(args[1]['processos'][0]['acordos'][0]['itens'][0]['modalidade'], u'STB')
+            self.assertEquals(args[1]['processos'][0]['acordos'][0]['itens'][0]['entidade'].sigla, u'GTECH')
+            self.assertEquals(args[1]['processos'][0]['acordos'][0]['itens'][0]['descricao'], u'Armazenagem')
+            
+
+    def test_call__lista_acordos__sem_origemfapesp(self):
+        origemFapesp = OrigemFapesp.objects.get(pk=1)
+        origemFapesp.delete()
+        
+        mock_render_to_response = mock.MagicMock()
+        with mock.patch.multiple('outorga.views',
+            render_to_response=mock_render_to_response,
+            RequestContext=mock.MagicMock(),
+            login_required=lambda x: x):
+             
+            from outorga.views import lista_acordos
+            mock_request = mock.Mock()
+            mock_request.method = "GET"
+            # call view
+            lista_acordos(mock_request)
+            _, args, _ = mock_render_to_response.mock_calls[0]
+
+            self.assertEquals(args[0], 'outorga/acordos.html')
+            
+            self.assertEquals(args[1]['processos'][0]['processo'].processo, 22222)
+            self.assertTrue(len(args[1]['processos'][0]['acordos']) == 0)
 
 class Natureza_gastoTest(UnitTestCase):
     def setUp(self):
