@@ -2,6 +2,8 @@
 from datetime import date, timedelta, datetime
 from decimal import Decimal
 from django.db import models
+from django.http import QueryDict
+from django.utils.datastructures import MultiValueDict
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from utils.UnitTestCase import UnitTestCase
@@ -457,6 +459,22 @@ class OutorgaViewTest(UnitTestCase):
             self.assertEquals(args[0], 'outorga/termos.html')
             self.assertEquals(args[1]['termos'][0].processo, 22222)
 
+
+    def test_call__relatorio_termos__request_post(self):
+        mock_render_to_response = mock.MagicMock()
+        with mock.patch.multiple('outorga.views',
+            render_to_response=mock_render_to_response,
+            RequestContext=mock.MagicMock(),
+            login_required=lambda x: x):
+             
+            from outorga.views import relatorio_termos
+            mock_request = mock.Mock()
+            mock_request.method = "POST"
+            # call view
+            relatorio_termos(mock_request)
+            self.assertTrue(len(mock_render_to_response.mock_calls) == 0, 'Não deve responder request com POST.')
+            
+            
     def test_call__lista_acordos(self):
         mock_render_to_response = mock.MagicMock()
         with mock.patch.multiple('outorga.views',
@@ -501,6 +519,98 @@ class OutorgaViewTest(UnitTestCase):
             
             self.assertEquals(args[1]['processos'][0]['processo'].processo, 22222)
             self.assertTrue(len(args[1]['processos'][0]['acordos']) == 0)
+
+    def test_call__lista_acordos__pdf(self):
+        mock_render_to_response = mock.MagicMock()
+        with mock.patch.multiple('outorga.views',
+            render_to_response=mock_render_to_response,
+            RequestContext=mock.MagicMock(),
+            login_required=lambda x: x):
+             
+            from outorga.views import lista_acordos
+            mock_request = mock.Mock()
+            mock_request.method = "GET"
+            # call view
+            response = lista_acordos(mock_request, pdf=True)
+            logger.debug("Content-Type: application/pdf" in str(response))
+            logger.debug("filename=file.pdf" in str(response))
+
+
+    def test_call__item_modalidade__pagina_filtro_inicial(self):
+        mock_render_to_response = mock.MagicMock()
+        with mock.patch.multiple('outorga.views',
+            render_to_response=mock_render_to_response,
+            RequestContext=mock.MagicMock(),
+            login_required=lambda x: x):
+             
+            from outorga.views import item_modalidade
+            mock_request = mock.Mock()
+            # mockin request GET parameters
+            mock_request.method = "GET"
+            mock_request.GET = QueryDict([])
+            # call view
+            item_modalidade(mock_request)
+            _, args, _ = mock_render_to_response.mock_calls[0]
+
+            self.assertEquals(args[0], 'outorga/termo_mod.html')
+            
+            self.assertIsNotNone(args[1]['termos'])
+            self.assertIsNotNone(args[1]['modalidades'])
+            self.assertIsNotNone(args[1]['entidades'])
+            # Verificando se não entrou no if errado dentro da view, buscando mais informações que deveria
+            self.assertFalse('itens' in args[1])
+            
+            
+
+    def test_call__item_modalidade__sem_entidade(self):
+        mock_render_to_response = mock.MagicMock()
+        with mock.patch.multiple('outorga.views',
+            render_to_response=mock_render_to_response,
+            RequestContext=mock.MagicMock(),
+            login_required=lambda x: x):
+             
+            from outorga.views import item_modalidade
+            mock_request = mock.Mock()
+            # mockin request GET parameters
+            mock_request.method = "GET"
+            mock_request.GET = QueryDict("&termo=1&modalidade=1")
+            # call view
+            item_modalidade(mock_request)
+            _, args, _ = mock_render_to_response.mock_calls[0]
+
+            self.assertEquals(args[0], 'outorga/por_item_modalidade.html')
+
+            self.assertIsNotNone(args[1]['termo'])
+            self.assertIsNotNone(args[1]['modalidade'])
+            self.assertIsNotNone(args[1]['itens'])
+            
+            self.assertIsNone(args[1]['entidade'])
+            
+            
+
+    def test_call__item_modalidade(self):
+        mock_render_to_response = mock.MagicMock()
+        with mock.patch.multiple('outorga.views',
+            render_to_response=mock_render_to_response,
+            RequestContext=mock.MagicMock(),
+            login_required=lambda x: x):
+             
+            from outorga.views import item_modalidade
+            mock_request = mock.Mock()
+            # mockin request GET parameters
+            mock_request.method = "GET"
+            mock_request.GET = QueryDict("&termo=1&modalidade=1&entidade=1")
+            # call view
+            item_modalidade(mock_request)
+            _, args, _ = mock_render_to_response.mock_calls[0]
+
+            self.assertEquals(args[0], 'outorga/por_item_modalidade.html')
+
+            self.assertIsNotNone(args[1]['termo'])
+            self.assertIsNotNone(args[1]['modalidade'])
+            self.assertIsNotNone(args[1]['itens'])
+            self.assertIsNotNone(args[1]['entidade'])
+
 
 class Natureza_gastoTest(UnitTestCase):
     def setUp(self):
