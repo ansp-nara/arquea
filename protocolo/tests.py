@@ -68,7 +68,7 @@ class PrototagTest(TestCase):
 
 class ProtocoloTest(TestCase):
     def setUp(self):
-        mb, created = Membro.objects.get_or_create(nome='Gerson Gomes', defaults={'email': 'gerson@gomes.com', 'cpf': '000.000.000-00'})
+        mb = Membro.objects.create(nome='Gerson Gomes', email='gerson@gomes.com', cpf='000.000.000-00')
         
         cg = Cargo(nome='Outorgado')
         cg.save()
@@ -88,12 +88,12 @@ class ProtocoloTest(TestCase):
         outorga = Outorga(data_solicitacao=datetime(2008,1,1), termino=datetime(2009,1,1), categoria=categoria, termo=t)
         outorga.save()
         
-        td, created = TipoDocumento.objects.get_or_create(nome='Nota Fiscal')
-        c, created = Contato.objects.get_or_create(primeiro_nome='Joao', defaults={'email': 'joao@joao.com.br', 'tel': ''})
-        og, created = Origem.objects.get_or_create(nome='Motoboy')
-        ent, created = Entidade.objects.get_or_create(sigla='NEXTEL', defaults={'nome': 'Nextel', 'cnpj': '', 'fisco': True, 'url': ''})
-        endereco, created = Endereco.objects.get_or_create(entidade=ent)
-        iden, created = Identificacao.objects.get_or_create(contato=c, defaults={'funcao': 'Tecnico', 'area': '', 'ativo': True, 'endereco':endereco})
+        td = TipoDocumento.objects.create(nome='Nota Fiscal')
+        c = Contato.objects.create(primeiro_nome='Joao', email='joao@joao.com.br', tel='')
+        og = Origem.objects.create(nome='Motoboy')
+        ent = Entidade.objects.create(sigla='NEXTEL', nome='Nextel', cnpj='', fisco= True, url='')
+        endereco = Endereco.objects.create(entidade=ent)
+        iden = Identificacao.objects.create(contato=c, funcao='Tecnico', area='', ativo= True, endereco=endereco)
         
         desc = Descricao(descricao='Descricao', entidade=ent)
         desc.save()
@@ -161,12 +161,12 @@ class ProtocoloTest(TestCase):
 
 class ItemProtocoloTest(TestCase):
     def setUp(self):
-        td, created = TipoDocumento.objects.get_or_create(nome='Anexo 9')
-        e, created = ProtocoloEstado.objects.get_or_create(nome='Pago')
-        c, created = Contato.objects.get_or_create(primeiro_nome='Joao', defaults={'email': 'joao@joao.com.br', 'tel': ''})
-        og, created = Origem.objects.get_or_create(nome='Sedex')
+        td = TipoDocumento.objects.create(nome='Anexo 9')
+        e = ProtocoloEstado.objects.create(nome='Pago')
+        c = Contato.objects.create(primeiro_nome='Joao', email='joao@joao.com.br', tel='')
+        og = Origem.objects.create(nome='Sedex')
 
-        mb, created = Membro.objects.get_or_create(nome='Gerson Gomes', defaults={'email': 'gerson@gomes.com', 'cpf': '000.000.000-00'})
+        mb = Membro.objects.create(nome='Gerson Gomes', email='gerson@gomes.com', cpf='000.000.000-00')
         
         cg = Cargo(nome='Outorgado')
         cg.save()
@@ -180,9 +180,9 @@ class ItemProtocoloTest(TestCase):
         t = Termo(ano=2008, processo=52885, digito=8, estado=outorgaEstado)
         t.save()
         
-        ent, created = Entidade.objects.get_or_create(sigla='UNIEMP', defaults={'nome': 'Instituto Uniemp', 'cnpj': '', 'fisco': True, 'url': ''})
-        endereco, created = Endereco.objects.get_or_create(entidade=ent)
-        iden, created = Identificacao.objects.get_or_create(contato=c, defaults={'funcao': 'Tecnico', 'area': '', 'ativo': True, 'endereco':endereco})
+        ent = Entidade.objects.create(sigla='UNIEMP', nome='Instituto Uniemp', cnpj='', fisco= True, url='')
+        endereco = Endereco.objects.create(entidade=ent)
+        iden = Identificacao.objects.create(contato=c, funcao='Tecnico', area='', ativo= True, endereco=endereco)
         
         desc = Descricao(descricao='Descricao', entidade=ent)
         desc.save()
@@ -210,13 +210,13 @@ class ItemProtocoloTest(TestCase):
 
 class EstadoTest(TestCase):
     def test_unicode(self):
-        e, created = ProtocoloEstado.objects.get_or_create(nome='Vencido')
+        e = ProtocoloEstado.objects.create(nome='Vencido')
         self.assertEquals('Vencido', e.__unicode__())
 
 
 class TipoDocumentoTest(TestCase):
     def test_unicode(self):
-        td, created = TipoDocumento.objects.get_or_create(nome='Oficio')
+        td = TipoDocumento.objects.create(nome='Oficio')
         self.assertEquals('Oficio', td.__unicode__())
 
 
@@ -258,7 +258,7 @@ class FeriadoTest(TestCase):
         f = Feriado(feriado=date(2008,10,8))
         f.save()
         
-        f.obs = 'teste'
+        f.obs ='teste'
         # não deve dar nenhum erro
         f.save()
 
@@ -266,7 +266,7 @@ class FeriadoTest(TestCase):
         
 class CotacaoTest(TestCase):
     def setUp(self):
-        mb, created = Membro.objects.get_or_create(nome='Gerson Gomes', defaults={'email': 'gerson@gomes.com', 'cpf': '000.000.000-00'})
+        mb = Membro.objects.create(nome='Gerson Gomes', email='gerson@gomes.com', cpf='000.000.000-00')
         
         cg = Cargo(nome='Outorgado')
         cg.save()
@@ -280,14 +280,14 @@ class CotacaoTest(TestCase):
         t = Termo(ano=2008, processo=52885, digito=8, estado=outorgaEstado)
         t.save()
         
-        ent, created = Entidade.objects.get_or_create(sigla='UNIEMP', defaults={'nome': 'Instituto Uniemp', 'cnpj': '', 'fisco': True, 'url': ''})
-        endereco, created = Endereco.objects.get_or_create(entidade=ent)
+        ent = Entidade.objects.create(sigla='UNIEMP', nome='Instituto Uniemp', cnpj='', fisco= True, url='')
+        endereco = Endereco.objects.create(entidade=ent)
         
-        td, created = TipoDocumento.objects.get_or_create(nome='Anexo 9')
-        e, created = ProtocoloEstado.objects.get_or_create(nome='Pago')
-        c, created = Contato.objects.get_or_create(primeiro_nome='Joao', defaults={'email': 'joao@joao.com.br', 'tel': ''})
-        og, created = Origem.objects.get_or_create(nome='Sedex')
-        iden, created = Identificacao.objects.get_or_create(contato=c, defaults={'funcao': 'Tecnico', 'area': '', 'ativo': True, 'endereco':endereco})
+        td = TipoDocumento.objects.create(nome='Anexo 9')
+        e = ProtocoloEstado.objects.create(nome='Pago')
+        c = Contato.objects.create(primeiro_nome='Joao', email='joao@joao.com.br', tel='')
+        og = Origem.objects.create(nome='Sedex')
+        iden = Identificacao.objects.create(contato=c, funcao='Tecnico', area='', ativo= True, endereco=endereco)
         
         cot = Cotacao(termo=t, tipo_documento=td, estado=e, identificacao=iden, data_chegada=datetime(2008,12,12,9,10), \
                       data_validade=date(2009,12,13), descricao='Compra de Aparelhos', origem=og, parecer='custo alto', aceito=False, entrega='confirmada')
