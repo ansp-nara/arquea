@@ -279,7 +279,6 @@ def buscaPatrimonioSemSNPorPosicao(item):
                     chk_ns = True
                     if pt.ns or item.serial_number:
                         chk_ns = item.serial_number == pt.ns
-                    #logger.debug('%s %s', pt.ns, item.serial_number)
                      
                     chk_rack = False
                     if rack and item.rack:
@@ -298,7 +297,6 @@ def buscaPatrimonioSemSNPorPosicao(item):
                         else:
                             chk_posicao = item.posicao == posicao
 
-                    #logger.debug('%s %s %s %s %s %s %s',item.planilha_linha,chk_rack, chk_furo, chk_posicao, chk_modelo, chk_part_number, chk_ns)
                     if chk_rack and chk_furo and chk_posicao and chk_modelo and chk_part_number and chk_ns:
                         if patr:
                             # se houver mais de um patrimonio com mesmo modelo e part-number na mesma posição
