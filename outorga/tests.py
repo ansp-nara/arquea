@@ -1,108 +1,113 @@
 # -*- coding: utf-8 -*-
 from datetime import date, timedelta, datetime
-from django.test import TestCase
-from django.db import models
 from decimal import Decimal
+from django.db import models
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import TestCase
+from utils.UnitTestCase import UnitTestCase
+from StringIO import StringIO
+import os
+import mock
 
+from outorga.views import *
 from outorga.models import Termo, Item, OrigemFapesp, Estado as EstadoOutorga, Categoria, Outorga, Modalidade, Natureza_gasto, \
                            Acordo, Contrato, OrdemDeServico, TipoContrato, ArquivoOS, Arquivo
 from financeiro.models import Pagamento, ExtratoCC, Estado as EstadoFinanceiro
 from identificacao.models import Entidade, Contato, Identificacao, Endereco
 from protocolo.models import Protocolo, ItemProtocolo, TipoDocumento, Origem, Estado as EstadoProtocolo
 
-from StringIO import StringIO
-import os
 import logging
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
 
-class TermoTest(TestCase):
+class TermoTest(UnitTestCase):
     def setUp(self):
-        #Cria Termo
-        e, created = EstadoOutorga.objects.get_or_create(nome='Vigente')
-        t, create = Termo.objects.get_or_create(ano=2008, processo=22222, digito=2, defaults={'inicio': date(2008,1,1), 'estado':e})
-        #Cria Outorga
-        c1, created = Categoria.objects.get_or_create(nome='Inicial')
-        c2, created = Categoria.objects.get_or_create(nome='Aditivo')
+        super(TermoTest, self).setUp()
 
-        o1, created = Outorga.objects.get_or_create(termo=t, categoria=c1, data_solicitacao=date(2007,12,1), defaults={'termino': date(2008,12,31), 'data_presta_contas': date(2008,2,28)})
-        o2, created = Outorga.objects.get_or_create(termo=t, categoria=c2, data_solicitacao=date(2008,4,1), defaults={'termino': date(2008,12,31), 'data_presta_contas': date(2008,2,28)})
+        #Cria Termo
+        e = EstadoOutorga.objects.create(nome='Vigente')
+        t = Termo.objects.create(ano=2008, processo=22222, digito=2, inicio=date(2008,1,1), estado=e)
+        #Cria Outorga
+        c1 = Categoria.objects.create(nome='Inicial')
+        c2 = Categoria.objects.create(nome='Aditivo')
+
+        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007,12,1), termino=date(2008,12,31), data_presta_contas=date(2008,2,28))
+        o2 = Outorga.objects.create(termo=t, categoria=c2, data_solicitacao=date(2008,4,1), termino=date(2008,12,31), data_presta_contas=date(2008,2,28))
 
         #Cria Natureza de gasto
-        m1, created = Modalidade.objects.get_or_create(sigla='STB', defaults={'nome': 'Servicos de Terceiro no Brasil', 'moeda_nacional': True})
-        m11, created = Modalidade.objects.get_or_create(sigla='STB1', defaults={'nome': 'Servicos de Terceiro no Brasil', 'moeda_nacional': True})
-        m2, created = Modalidade.objects.get_or_create(sigla='STE', defaults={'nome': 'Servicos de Terceiro no Exterior', 'moeda_nacional': False})
-        m22, created = Modalidade.objects.get_or_create(sigla='STE1', defaults={'nome': 'Servicos de Terceiro no Exterior', 'moeda_nacional': False})
+        m1 = Modalidade.objects.create(sigla='STB', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
+        m11 = Modalidade.objects.create(sigla='STB1', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
+        m2 = Modalidade.objects.create(sigla='STE', nome='Servicos de Terceiro no Exterior', moeda_nacional=False)
+        m22 = Modalidade.objects.create(sigla='STE1', nome='Servicos de Terceiro no Exterior', moeda_nacional=False)
 
-        n1, created = Natureza_gasto.objects.get_or_create(modalidade=m1, termo=t, valor_concedido='1500000.00')
-        n2, created = Natureza_gasto.objects.get_or_create(modalidade=m11, termo=t, valor_concedido='3000000.00')
-        n3, created = Natureza_gasto.objects.get_or_create(modalidade=m2, termo=t, valor_concedido='1000000.00')
-        n4, created = Natureza_gasto.objects.get_or_create(modalidade=m22, termo=t, valor_concedido='2000000.00')
+        n1 = Natureza_gasto.objects.create(modalidade=m1, termo=t, valor_concedido='1500000.00')
+        n2 = Natureza_gasto.objects.create(modalidade=m11, termo=t, valor_concedido='3000000.00')
+        n3 = Natureza_gasto.objects.create(modalidade=m2, termo=t, valor_concedido='1000000.00')
+        n4 = Natureza_gasto.objects.create(modalidade=m22, termo=t, valor_concedido='2000000.00')
 
         #Cria Item de Outorga
-        ent1, created = Entidade.objects.get_or_create(sigla='GTECH', defaults={'nome': 'Granero Tech', 'cnpj': '00.000.000/0000-00', 'fisco': True, 'url': ''})
-        ent2, created = Entidade.objects.get_or_create(sigla='SAC', defaults={'nome': 'SAC do Brasil', 'cnpj': '00.000.000/0000-00', 'fisco': True, 'url': ''})
-        ent3, created = Entidade.objects.get_or_create(sigla='TERREMARK', defaults={'nome': 'Terremark do Brasil', 'cnpj': '00.000.000/0000-00', 'fisco': True, 'url': ''})
+        ent1 = Entidade.objects.create(sigla='GTECH', nome='Granero Tech', cnpj='00.000.000/0000-00', fisco=True, url='')
+        ent2 = Entidade.objects.create(sigla='SAC', nome='SAC do Brasil', cnpj='00.000.000/0000-00', fisco=True, url='')
+        ent3 = Entidade.objects.create(sigla='TERREMARK', nome='Terremark do Brasil', cnpj='00.000.000/0000-00', fisco=True, url='')
         
-        end1, created = Endereco.objects.get_or_create(entidade=ent1)
-        end2, created = Endereco.objects.get_or_create(entidade=ent2)
-        end3, created = Endereco.objects.get_or_create(entidade=ent3)
+        end1 = Endereco.objects.create(entidade=ent1)
+        end2 = Endereco.objects.create(entidade=ent2)
+        end3 = Endereco.objects.create(entidade=ent3)
 
-        i1, created = Item.objects.get_or_create(entidade=ent1, natureza_gasto=n1, descricao='Armazenagem', defaults={'justificativa': 'Armazenagem de equipamentos', 'quantidade': 12, 'valor': 2500})
-        i2, created = Item.objects.get_or_create(entidade=ent2, natureza_gasto=n2, descricao='Serviço de Conexão Internacional', defaults={'justificativa': 'Link Internacional', 'quantidade': 12, 'valor': 250000})
-        i3, created = Item.objects.get_or_create(entidade=ent3, natureza_gasto=n3, descricao='Serviço de Conexão', defaults={'justificativa': 'Ligação SP-CPS', 'quantidade': 12, 'valor': 100000})
-        i4, created = Item.objects.get_or_create(entidade=ent3, natureza_gasto=n4, descricao='Serviço de Conexão Internacional', defaults={'justificativa': 'Ajuste na cobrança do Link Internacional', 'quantidade': 6, 'valor': 50000})
+        i1 = Item.objects.create(entidade=ent1, natureza_gasto=n1, descricao='Armazenagem', justificativa='Armazenagem de equipamentos', quantidade=12, valor=2500)
+        i2 = Item.objects.create(entidade=ent2, natureza_gasto=n2, descricao='Serviço de Conexão Internacional', justificativa='Link Internacional', quantidade=12, valor=250000)
+        i3 = Item.objects.create(entidade=ent3, natureza_gasto=n3, descricao='Serviço de Conexão', justificativa='Ligação SP-CPS', quantidade=12, valor=100000)
+        i4 = Item.objects.create(entidade=ent3, natureza_gasto=n4, descricao='Serviço de Conexão Internacional', justificativa='Ajuste na cobrança do Link Internacional', quantidade=6, valor=50000)
 
         #Cria Protocolo
-        ep, created = EstadoProtocolo.objects.get_or_create(nome='Aprovado')
-        td, created = TipoDocumento.objects.get_or_create(nome='Nota Fiscal')
-        og, created = Origem.objects.get_or_create(nome='Motoboy')
+        ep = EstadoProtocolo.objects.create(nome='Aprovado')
+        td = TipoDocumento.objects.create(nome='Nota Fiscal')
+        og = Origem.objects.create(nome='Motoboy')
 
-        cot1, created = Contato.objects.get_or_create(primeiro_nome='Joao', defaults={'email': 'joao@joao.com.br', 'tel': ''})
-        cot2, created = Contato.objects.get_or_create(primeiro_nome='Alex', defaults={'email': 'alex@alex.com.br', 'tel': ''})
-        cot3, created = Contato.objects.get_or_create(primeiro_nome='Marcos', defaults={'email': 'alex@alex.com.br', 'tel': ''})
+        cot1 = Contato.objects.create(primeiro_nome='Joao', email='joao@joao.com.br', tel='')
+        cot2 = Contato.objects.create(primeiro_nome='Alex', email='alex@alex.com.br', tel='')
+        cot3 = Contato.objects.create(primeiro_nome='Marcos', email='alex@alex.com.br', tel='')
 
-        iden1, created = Identificacao.objects.get_or_create(endereco=end1, contato=cot1, defaults={'funcao': 'Tecnico', 'area': 'Estoque', 'ativo': True})
-        iden2, created = Identificacao.objects.get_or_create(endereco=end2, contato=cot2, defaults={'funcao': 'Gerente', 'area': 'Redes', 'ativo': True})
-        iden3, created = Identificacao.objects.get_or_create(endereco=end3, contato=cot3, defaults={'funcao': 'Diretor', 'area': 'Redes', 'ativo': True})
+        iden1 = Identificacao.objects.create(endereco=end1, contato=cot1, funcao='Tecnico', area='Estoque', ativo=True)
+        iden2 = Identificacao.objects.create(endereco=end2, contato=cot2, funcao='Gerente', area='Redes', ativo=True)
+        iden3 = Identificacao.objects.create(endereco=end3, contato=cot3, funcao='Diretor', area='Redes', ativo=True)
 
-        p1, created = Protocolo.objects.get_or_create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,9,30,10,10), defaults={'origem': og, 'estado': ep, 'num_documento': 8888, 'data_vencimento': date(2008,10,5), 'descricao': 'Conta mensal - armazenagem 09/2008', 'valor_total': None})
-        p2, created = Protocolo.objects.get_or_create(termo=t, identificacao=iden2, tipo_documento=td, data_chegada=datetime(2008,9,30,10,10), defaults={'origem': og, 'estado': ep, 'num_documento': 7777, 'data_vencimento': date(2008,10,10), 'descricao': 'Serviço de Conexão Internacional - 09/2009', 'valor_total': None})
-        p3, created = Protocolo.objects.get_or_create(termo=t, identificacao=iden3, tipo_documento=td, data_chegada=datetime(2008,9,30,10,10), defaults={'origem': og, 'estado': ep, 'num_documento': 5555, 'data_vencimento': date(2008,10,15), 'descricao': 'Serviço de Conexão Local - 09/2009', 'valor_total': None})
+        p1 = Protocolo.objects.create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,9,30,10,10), origem=og, estado=ep, num_documento=8888, data_vencimento=date(2008,10,5), descricao='Conta mensal - armazenagem 09/2008', valor_total=None)
+        p2 = Protocolo.objects.create(termo=t, identificacao=iden2, tipo_documento=td, data_chegada=datetime(2008,9,30,10,10), origem=og, estado=ep, num_documento=7777, data_vencimento=date(2008,10,10), descricao='Serviço de Conexão Internacional - 09/2009', valor_total=None)
+        p3 = Protocolo.objects.create(termo=t, identificacao=iden3, tipo_documento=td, data_chegada=datetime(2008,9,30,10,10), origem=og, estado=ep, num_documento=5555, data_vencimento=date(2008,10,15), descricao='Serviço de Conexão Local - 09/2009', valor_total=None)
 
         #Cria Item do Protocolo
-        ip1 = ItemProtocolo.objects.get_or_create(protocolo=p1, descricao='Tarifa mensal - 09/2009', quantidade=1, valor_unitario=2500)
-        ip2 = ItemProtocolo.objects.get_or_create(protocolo=p1, descricao='Reajuste tarifa mensal - 09/2009', quantidade=1, valor_unitario=150)
-        ip3 = ItemProtocolo.objects.get_or_create(protocolo=p2, descricao='Conexão Internacional - 09/2009', quantidade=1, valor_unitario=250000)
-        ip4 = ItemProtocolo.objects.get_or_create(protocolo=p2, descricao='Reajuste do serviço de Conexão Internacional - 09/2009', quantidade=1, valor_unitario=50000)
-        ip5 = ItemProtocolo.objects.get_or_create(protocolo=p3, descricao='Conexão Local - 09/2009', quantidade=1, valor_unitario=85000)
-        ip6 = ItemProtocolo.objects.get_or_create(protocolo=p3, descricao='Reajuste do serviço de Conexão Local - 09/2009', quantidade=1, valor_unitario=15000)
+        ip1 = ItemProtocolo.objects.create(protocolo=p1, descricao='Tarifa mensal - 09/2009', quantidade=1, valor_unitario=2500)
+        ip2 = ItemProtocolo.objects.create(protocolo=p1, descricao='Reajuste tarifa mensal - 09/2009', quantidade=1, valor_unitario=150)
+        ip3 = ItemProtocolo.objects.create(protocolo=p2, descricao='Conexão Internacional - 09/2009', quantidade=1, valor_unitario=250000)
+        ip4 = ItemProtocolo.objects.create(protocolo=p2, descricao='Reajuste do serviço de Conexão Internacional - 09/2009', quantidade=1, valor_unitario=50000)
+        ip5 = ItemProtocolo.objects.create(protocolo=p3, descricao='Conexão Local - 09/2009', quantidade=1, valor_unitario=85000)
+        ip6 = ItemProtocolo.objects.create(protocolo=p3, descricao='Reajuste do serviço de Conexão Local - 09/2009', quantidade=1, valor_unitario=15000)
 
         #Criar Fonte Pagadora
-        ef1, created = EstadoOutorga.objects.get_or_create(nome='Aprovado')
-        ef2, created = EstadoOutorga.objects.get_or_create(nome='Concluído')
+        ef1 = EstadoOutorga.objects.create(nome='Aprovado')
+        ef2 = EstadoOutorga.objects.create(nome='Concluído')
 
-        ex1, created = ExtratoCC.objects.get_or_create(data_extrato=date(2008,10,30), data_oper=date(2008,10,5), cod_oper=333333, valor='2650', historico='TED')
-        ex2, created = ExtratoCC.objects.get_or_create(data_extrato=date(2008,10,30), data_oper=date(2008,10,10), cod_oper=4444, valor='250000', historico='TED')
-        ex3, created = ExtratoCC.objects.get_or_create(data_extrato=date(2008,10,30), data_oper=date(2008,10,10), cod_oper=4444, valor='50000', historico='TED')
-        ex4, created = ExtratoCC.objects.get_or_create(data_extrato=date(2008,10,30), data_oper=date(2008,10,15), cod_oper=5555, valor='100000', historico='TED')
+        ex1 = ExtratoCC.objects.create(data_extrato=date(2008,10,30), data_oper=date(2008,10,5), cod_oper=333333, valor='2650', historico='TED')
+        ex2 = ExtratoCC.objects.create(data_extrato=date(2008,10,30), data_oper=date(2008,10,10), cod_oper=4444, valor='250000', historico='TED')
+        ex3 = ExtratoCC.objects.create(data_extrato=date(2008,10,30), data_oper=date(2008,10,10), cod_oper=4444, valor='50000', historico='TED')
+        ex4 = ExtratoCC.objects.create(data_extrato=date(2008,10,30), data_oper=date(2008,10,15), cod_oper=5555, valor='100000', historico='TED')
 
-        a1, created = Acordo.objects.get_or_create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e GTech')
-        a2, created = Acordo.objects.get_or_create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e SAC')
-        a3, created = Acordo.objects.get_or_create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e Terremark')
-        a4, created = Acordo.objects.get_or_create(estado=ef1, descricao='Acordo de patrocínio entre ANSP e Telefônica')
+        a1 = Acordo.objects.create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e GTech')
+        a2 = Acordo.objects.create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e SAC')
+        a3 = Acordo.objects.create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e Terremark')
+        a4 = Acordo.objects.create(estado=ef1, descricao='Acordo de patrocínio entre ANSP e Telefônica')
 
-        of1, created = OrigemFapesp.objects.get_or_create(acordo=a1, item_outorga=i1)
-        of2, created = OrigemFapesp.objects.get_or_create(acordo=a2, item_outorga=i2)
-        of3, created = OrigemFapesp.objects.get_or_create(acordo=a3, item_outorga=i3)
+        of1 = OrigemFapesp.objects.create(acordo=a1, item_outorga=i1)
+        of2 = OrigemFapesp.objects.create(acordo=a2, item_outorga=i2)
+        of3 = OrigemFapesp.objects.create(acordo=a3, item_outorga=i3)
 
-        fp1 = Pagamento.objects.get_or_create(protocolo=p1, conta_corrente=ex1, origem_fapesp=of1, valor_fapesp='2650')
-        fp2 = Pagamento.objects.get_or_create(protocolo=p2, conta_corrente=ex2, origem_fapesp=of2, valor_fapesp='250000')
-        fp3 = Pagamento.objects.get_or_create(protocolo=p2, conta_corrente=ex3, valor_patrocinio='50000', valor_fapesp=0)
-        fp4 = Pagamento.objects.get_or_create(protocolo=p3, conta_corrente=ex4, origem_fapesp=of3, valor_fapesp='100000')
+        fp1 = Pagamento.objects.create(protocolo=p1, conta_corrente=ex1, origem_fapesp=of1, valor_fapesp='2650')
+        fp2 = Pagamento.objects.create(protocolo=p2, conta_corrente=ex2, origem_fapesp=of2, valor_fapesp='250000')
+        fp3 = Pagamento.objects.create(protocolo=p2, conta_corrente=ex3, valor_patrocinio='50000', valor_fapesp=0)
+        fp4 = Pagamento.objects.create(protocolo=p3, conta_corrente=ex4, origem_fapesp=of3, valor_fapesp='100000')
 
        
     def tearDown(self):
@@ -288,10 +293,10 @@ class TermoTest(TestCase):
 #         self.assertEquals(Termo.termos_auditoria_interna_em_aberto(), ['<Termo: 08/22222-2>'])
 
 
-class CategoriaTest(TestCase):
+class CategoriaTest(UnitTestCase):
     def setUp(self):
         super(CategoriaTest, self).setUp()
-        c, created = Categoria.objects.get_or_create(nome='Transposicao')
+        c = Categoria.objects.create(nome='Transposicao')
 
     def tearDown(self):
         super(CategoriaTest, self).tearDown()
@@ -301,30 +306,31 @@ class CategoriaTest(TestCase):
         self.assertEquals(c.__unicode__(), u'Transposicao')
 
 
-class OutorgaTest(TestCase):
+class OutorgaTest(UnitTestCase):
     def setUp(self):
-        super(OutorgaTest, self).tearDown()
+        super(OutorgaTest, self).setUp()
         #Cria Termo
-        e, created = EstadoOutorga.objects.get_or_create(nome='Vigente')
-        t, create = Termo.objects.get_or_create(ano=2008, processo=22222, digito=2, defaults={'inicio': date(2008,1,1), 'estado':e})
+        e = EstadoOutorga.objects.create(nome='Vigente')
+        t = Termo.objects.create(ano=2008, processo=22222, digito=2, inicio=date(2008,1,1), estado=e)
 
         #Cria Outorga
-        c1, created = Categoria.objects.get_or_create(nome='Inicial')
-        o1, created = Outorga.objects.get_or_create(termo=t, categoria=c1, data_solicitacao=date(2007,12,1), defaults={'termino': date(2008,12,31), 'data_presta_contas': date(2008,2,28)})
+        c1 = Categoria.objects.create(nome='Inicial')
+        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007,12,1), termino=date(2008,12,31), data_presta_contas=date(2008,2,28))
 
         #Cria Natureza de gasto
-        m1, created = Modalidade.objects.get_or_create(sigla='STB', defaults={'nome': 'Servicos de Terceiro no Brasil', 'moeda_nacional': True})
-        m2, created = Modalidade.objects.get_or_create(sigla='STE', defaults={'nome': 'Servicos de Terceiro no Exterior', 'moeda_nacional': False})
+        m1 = Modalidade.objects.create(sigla='STB', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
+        m2 = Modalidade.objects.create(sigla='STE', nome='Servicos de Terceiro no Exterior', moeda_nacional=False)
 
-        n1, created = Natureza_gasto.objects.get_or_create(modalidade=m1, termo=t, valor_concedido='1500000.00')
-        n2, created = Natureza_gasto.objects.get_or_create(modalidade=m2, termo=t, valor_concedido='1500000.00')
+        n1 = Natureza_gasto.objects.create(modalidade=m1, termo=t, valor_concedido='1500000.00')
+        n2 = Natureza_gasto.objects.create(modalidade=m2, termo=t, valor_concedido='1500000.00')
         
         #Cria Item de Outorga
-        ent1, created = Entidade.objects.get_or_create(sigla='GTECH', defaults={'nome': 'Granero Tech', 'cnpj': '00.000.000/0000-00', 'fisco': True, 'url': ''})
-        ent2, created = Entidade.objects.get_or_create(sigla='SAC', defaults={'nome': 'SAC do Brasil', 'cnpj': '00.000.000/0000-00', 'fisco': True, 'url': ''})
+        ent1 = Entidade.objects.create(sigla='GTECH', nome='Granero Tech', cnpj='00.000.000/0000-00', fisco=True, url='')
+        ent2 = Entidade.objects.create(sigla='SAC', nome='SAC do Brasil', cnpj='00.000.000/0000-00', fisco=True, url='')
 
-        i1, created = Item.objects.get_or_create(entidade=ent1, natureza_gasto=n1, descricao='Armazenagem', defaults={'justificativa': 'Armazenagem de equipamentos', 'quantidade': 12, 'valor': 2500})
-        i2, created = Item.objects.get_or_create(entidade=ent2, natureza_gasto=n2, descricao='Serviço de Conexão Internacional', defaults={'justificativa': 'Link Internacional', 'quantidade': 12, 'valor': 250000})
+        i1 = Item.objects.create(entidade=ent1, natureza_gasto=n1, descricao='Armazenagem', justificativa='Armazenagem de equipamentos', quantidade=12, valor=2500)
+        i2 = Item.objects.create(entidade=ent2, natureza_gasto=n2, descricao='Serviço de Conexão Internacional', justificativa='Link Internacional', quantidade=12, valor=250000)
+        
 
     def tearDown(self):
         super(OutorgaTest, self).tearDown()
@@ -355,78 +361,134 @@ class OutorgaTest(TestCase):
         
         self.assertEquals(o1.existe_arquivo(), '<center><a href="/admin/outorga/arquivo/?outorga__id__exact=1"><img src="/media/img/arquivo.png" /></a></center>')
 
-
-
-class Natureza_gastoTest(TestCase):
+class OutorgaViewTest(UnitTestCase):
     def setUp(self):
-        super(Natureza_gastoTest, self).tearDown()
-        
+        super(OutorgaViewTest, self).setUp()
         #Cria Termo
-        e, created = EstadoOutorga.objects.get_or_create(nome='Vigente')
-        t, create = Termo.objects.get_or_create(ano=2008, processo=22222, digito=2, defaults={'inicio': date(2008,1,1), 'estado':e})
+        e = EstadoOutorga.objects.create(nome='Vigente')
+        t = Termo.objects.create(ano=2008, processo=22222, digito=2, inicio=date(2008,1,1), estado=e)
 
         #Cria Outorga
-        c1, created = Categoria.objects.get_or_create(nome='Inicial')
-        c2, created = Categoria.objects.get_or_create(nome='Aditivo')
-
-        o1, created = Outorga.objects.get_or_create(termo=t, categoria=c1, data_solicitacao=date(2007,12,1), defaults={'termino': date(2008,12,31), 'data_presta_contas': date(2008,2,28)})
-        o2, created = Outorga.objects.get_or_create(termo=t, categoria=c2, data_solicitacao=date(2008,4,1), defaults={'termino': date(2008,12,31), 'data_presta_contas': date(2008,2,28)})
+        c1 = Categoria.objects.create(nome='Inicial')
+        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007,12,1), termino=date(2008,12,31), data_presta_contas=date(2008,2,28))
 
         #Cria Natureza de gasto
-        m1, created = Modalidade.objects.get_or_create(sigla='STB', defaults={'nome': 'Servicos de Terceiro no Brasil', 'moeda_nacional': True})
-        m2, created = Modalidade.objects.get_or_create(sigla='STB2', defaults={'nome': 'Servicos de Terceiro no Brasil', 'moeda_nacional': True})
+        m1 = Modalidade.objects.create(sigla='STB', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
+        m2 = Modalidade.objects.create(sigla='STE', nome='Servicos de Terceiro no Exterior', moeda_nacional=False)
 
-        n1, created = Natureza_gasto.objects.get_or_create(modalidade=m1, termo=t, valor_concedido=Decimal('30000'))
-        n2, created = Natureza_gasto.objects.get_or_create(modalidade=m2, termo=t, valor_concedido=Decimal('100000'))
+        n1 = Natureza_gasto.objects.create(modalidade=m1, termo=t, valor_concedido='1500000.00')
+        n2 = Natureza_gasto.objects.create(modalidade=m2, termo=t, valor_concedido='1500000.00')
+        
+        #Cria Item de Outorga
+        ent1 = Entidade.objects.create(sigla='GTECH', nome='Granero Tech', cnpj= '00.000.000/0000-00', fisco=True, url='')
+        ent2 = Entidade.objects.create(sigla='SAC', nome='SAC do Brasil', cnpj='00.000.000/0000-00', fisco=True, url='')
+
+        i1 = Item.objects.create(entidade=ent1, natureza_gasto=n1, descricao='Armazenagem', justificativa='Armazenagem de equipamentos', quantidade=12, valor=2500)
+        i2 = Item.objects.create(entidade=ent2, natureza_gasto=n2, descricao='Serviço de Conexão Internacional', justificativa='Link Internacional', quantidade=12, valor=250000)
+        
+        ### Entidades para o teste da View ###
+        cont1 = Contrato.objects.create(numero='1111/11', descricao='contrato1', entidade=ent1, data_inicio=date(2013, 01, 02), limite_rescisao=date(2013,01,03), auto_renova=False)
+        
+        #Cria uma Ordem de Serviço
+        tipo = TipoContrato.objects.create(nome='Tipo Fixo')
+        ef1 = EstadoOutorga.objects.create(nome='Aprovado')
+        acordo = Acordo.objects.create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e SAC')
+        os = OrdemDeServico.objects.create(acordo=acordo, contrato=cont1, tipo=tipo, 
+                                   data_inicio=date(2008,2,1), data_rescisao=date(2008,11,1), antes_rescisao=2, numero=66666,   
+                                   descricao='OS 34567 - Contratação de mais um link')
+
+        
+    def test_call__relatorio_contratos_por_entidade(self):
+        mock_render_to_response = mock.MagicMock()
+        with mock.patch.multiple('outorga.views',
+            render_to_response=mock_render_to_response,
+            RequestContext=mock.MagicMock(),
+            login_required=lambda x: x):
+             
+            from outorga.views import contratos
+            mock_request = mock.Mock()
+            contratos(mock_request)
+            _, args, _ = mock_render_to_response.mock_calls[0]
+
+            self.assertEquals(args[0], 'outorga/contratos.html', 'Template errado.')
+            self.assertEquals(args[1]['entidades'][0]['entidade'], 'GTECH')
+            self.assertEquals(args[1]['entidades'][0]['contratos'][0]['numero'], '1111/11')
+            self.assertEquals(args[1]['entidades'][0]['contratos'][0]['inicio'], date(2013, 1, 2))
+            self.assertEquals(args[1]['entidades'][0]['contratos'][0]['termino'], date(2013,01,03))
+#             self.assertEquals(args[1]['entidades'][0]['contratos'][0]['arquivo'], '1111/11')
+            self.assertEquals(args[1]['entidades'][0]['contratos'][0]['auto'], False)
+        
+
+class Natureza_gastoTest(UnitTestCase):
+    def setUp(self):
+        super(Natureza_gastoTest, self).setUp()
+        
+        #Cria Termo
+        e = EstadoOutorga.objects.create(nome='Vigente')
+        t = Termo.objects.create(ano=2008, processo=22222, digito=2, inicio=date(2008,1,1), estado=e)
+
+        #Cria Outorga
+        c1 = Categoria.objects.create(nome='Inicial')
+        c2 = Categoria.objects.create(nome='Aditivo')
+
+        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007,12,1), termino=date(2008,12,31), data_presta_contas=date(2008,2,28))
+        o2 = Outorga.objects.create(termo=t, categoria=c2, data_solicitacao=date(2008,4,1), termino=date(2008,12,31), data_presta_contas=date(2008,2,28))
+
+        #Cria Natureza de gasto
+        m1 = Modalidade.objects.create(sigla='STB', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
+        m2 = Modalidade.objects.create(sigla='STB2', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
+
+        n1 = Natureza_gasto.objects.create(modalidade=m1, termo=t, valor_concedido=Decimal('30000'))
+        n2 = Natureza_gasto.objects.create(modalidade=m2, termo=t, valor_concedido=Decimal('100000'))
 
         #Cria Item de Outorga
-        ent1, created = Entidade.objects.get_or_create(sigla='GTECH', defaults={'nome': 'Granero Tech', 'cnpj': '00.000.000/0000-00', 'fisco': True, 'url': ''})
-        ent2, created = Entidade.objects.get_or_create(sigla='TERREMARK', defaults={'nome': 'Terremark do Brasil', 'cnpj': '00.000.000/0000-00', 'fisco': True, 'url': ''})
+        ent1 = Entidade.objects.create(sigla='GTECH', nome='Granero Tech', cnpj='00.000.000/0000-00', fisco=True, url='')
+        ent2 = Entidade.objects.create(sigla='TERREMARK', nome='Terremark do Brasil', cnpj='00.000.000/0000-00', fisco=True, url='')
 
-        end1, created = Endereco.objects.get_or_create(entidade=ent1)
-        end2, created = Endereco.objects.get_or_create(entidade=ent2)
+        end1 = Endereco.objects.create(entidade=ent1)
+        end2 = Endereco.objects.create(entidade=ent2)
 
-        i1, created = Item.objects.get_or_create(entidade=ent1, natureza_gasto=n1, descricao='Armazenagem', defaults={'justificativa': 'Armazenagem de equipamentos', 'quantidade': 12, 'valor': 2500})
-        i2, created = Item.objects.get_or_create(entidade=ent2, natureza_gasto=n1, descricao='Servico de Conexao', defaults={'justificativa': 'Ligação SP-CPS', 'quantidade': 12, 'valor': 000000})
-        i3, created = Item.objects.get_or_create(entidade=ent2, natureza_gasto=n2, descricao='Servico de Conexao', defaults={'justificativa': 'Ligação SP-CPS', 'quantidade': 12, 'valor': 100000})
+        i1 = Item.objects.create(entidade=ent1, natureza_gasto=n1, descricao='Armazenagem', justificativa='Armazenagem de equipamentos', quantidade=12, valor=2500)
+        i2 = Item.objects.create(entidade=ent2, natureza_gasto=n1, descricao='Servico de Conexao', justificativa='Ligação SP-CPS', quantidade=12, valor=000000)
+        i3 = Item.objects.create(entidade=ent2, natureza_gasto=n2, descricao='Servico de Conexao', justificativa='Ligação SP-CPS', quantidade=12, valor=100000)
 
         #Cria Protocolo
-        ep, created = EstadoProtocolo.objects.get_or_create(nome='Aprovado')
-        td, created = TipoDocumento.objects.get_or_create(nome='Nota Fiscal')
-        og, created = Origem.objects.get_or_create(nome='Motoboy')
+        ep = EstadoProtocolo.objects.create(nome='Aprovado')
+        td = TipoDocumento.objects.create(nome='Nota Fiscal')
+        og = Origem.objects.create(nome='Motoboy')
 
-        cot1, created = Contato.objects.get_or_create(primeiro_nome='Joao', defaults={'email': 'joao@joao.com.br', 'tel': ''})
-        cot2, created = Contato.objects.get_or_create(primeiro_nome='Marcos', defaults={'email': 'alex@alex.com.br', 'tel': ''})
+        cot1 = Contato.objects.create(primeiro_nome='Joao', email='joao@joao.com.br', tel='')
+        cot2 = Contato.objects.create(primeiro_nome='Marcos', email='alex@alex.com.br', tel='')
 
-        iden1, created = Identificacao.objects.get_or_create(endereco=end1, contato=cot1, defaults={'funcao': 'Tecnico', 'area': 'Estoque', 'ativo': True})
-        iden2, created = Identificacao.objects.get_or_create(endereco=end2, contato=cot2, defaults={'funcao': 'Diretor', 'area': 'Redes', 'ativo': True})
+        iden1 = Identificacao.objects.create(endereco=end1, contato=cot1, funcao='Tecnico', area='Estoque', ativo=True)
+        iden2 = Identificacao.objects.create(endereco=end2, contato=cot2, funcao='Diretor', area='Redes', ativo=True)
 
-        p1, created = Protocolo.objects.get_or_create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,9,30,10,10), defaults={'origem': og, 'estado': ep, 'num_documento': 8888, 'data_vencimento': date(2008,10,5), 'descricao': 'Conta mensal - armazenagem 09/2008', 'valor_total': None})
-        p2, created = Protocolo.objects.get_or_create(termo=t, identificacao=iden2, tipo_documento=td, data_chegada=datetime(2008,9,30,10,10), defaults={'origem': og, 'estado': ep, 'num_documento': 5555, 'data_vencimento': date(2008,10,15), 'descricao': 'Serviço de Conexão Local - 09/2009', 'valor_total': None})
+        p1 = Protocolo.objects.create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,9,30,10,10), origem=og, estado=ep, num_documento=8888, data_vencimento=date(2008,10,5), descricao='Conta mensal - armazenagem 09/2008', valor_total=None)
+        p2 = Protocolo.objects.create(termo=t, identificacao=iden2, tipo_documento=td, data_chegada=datetime(2008,9,30,10,10), origem=og, estado=ep, num_documento=5555, data_vencimento=date(2008,10,15), descricao='Serviço de Conexão Local - 09/2009', valor_total=None)
 
         #Cria Item do Protocolo
-        ip1 = ItemProtocolo.objects.get_or_create(protocolo=p1, descricao='Tarifa mensal - 09/2009', quantidade=1, valor_unitario=2500)
-        ip2 = ItemProtocolo.objects.get_or_create(protocolo=p1, descricao='Reajuste tarifa mensal - 09/2009', quantidade=1, valor_unitario=150)
-        ip3 = ItemProtocolo.objects.get_or_create(protocolo=p2, descricao='Conexão Local - 09/2009', quantidade=1, valor_unitario=85000)
-        ip4 = ItemProtocolo.objects.get_or_create(protocolo=p2, descricao='Reajuste do serviço de Conexão Local - 09/2009', quantidade=1, valor_unitario=15000)
+        ip1 = ItemProtocolo.objects.create(protocolo=p1, descricao='Tarifa mensal - 09/2009', quantidade=1, valor_unitario=2500)
+        ip2 = ItemProtocolo.objects.create(protocolo=p1, descricao='Reajuste tarifa mensal - 09/2009', quantidade=1, valor_unitario=150)
+        ip3 = ItemProtocolo.objects.create(protocolo=p2, descricao='Conexão Local - 09/2009', quantidade=1, valor_unitario=85000)
+        ip4 = ItemProtocolo.objects.create(protocolo=p2, descricao='Reajuste do serviço de Conexão Local - 09/2009', quantidade=1, valor_unitario=15000)
 
         #Criar Fonte Pagadora
-        ef1, created = EstadoOutorga.objects.get_or_create(nome='Aprovado')
-        ef2, created = EstadoOutorga.objects.get_or_create(nome='Concluído')
+        ef1 = EstadoOutorga.objects.create(nome='Aprovado')
+        ef2 = EstadoOutorga.objects.create(nome='Concluído')
 
-        ex1, created = ExtratoCC.objects.get_or_create(data_extrato=date(2008,10,30), data_oper=date(2008,10,5), cod_oper=333333, valor='2650', historico='TED')
-        ex2, created = ExtratoCC.objects.get_or_create(data_extrato=date(2008,10,30), data_oper=date(2008,10,15), cod_oper=5555, valor='100000', historico='TED')
+        ex1 = ExtratoCC.objects.create(data_extrato=date(2008,10,30), data_oper=date(2008,10,5), cod_oper=333333, valor='2650', historico='TED')
+        ex2 = ExtratoCC.objects.create(data_extrato=date(2008,10,30), data_oper=date(2008,10,15), cod_oper=5555, valor='100000', historico='TED')
 
-        a1, created = Acordo.objects.get_or_create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e GTech')
-        a2, created = Acordo.objects.get_or_create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e Terremark')
+        a1 = Acordo.objects.create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e GTech')
+        a2 = Acordo.objects.create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e Terremark')
 
-        of1, created = OrigemFapesp.objects.get_or_create(acordo=a1, item_outorga=i1)
-        of2, created = OrigemFapesp.objects.get_or_create(acordo=a2, item_outorga=i2)
-        of3, created = OrigemFapesp.objects.get_or_create(acordo=a2, item_outorga=i3)
+        of1 = OrigemFapesp.objects.create(acordo=a1, item_outorga=i1)
+        of2 = OrigemFapesp.objects.create(acordo=a2, item_outorga=i2)
+        of3 = OrigemFapesp.objects.create(acordo=a2, item_outorga=i3)
 
-        fp1 = Pagamento.objects.get_or_create(protocolo=p1, conta_corrente=ex1, origem_fapesp=of1, valor_fapesp='2650')
-        fp2 = Pagamento.objects.get_or_create(protocolo=p2, conta_corrente=ex2, origem_fapesp=of2, valor_fapesp='100000')
-        fp2 = Pagamento.objects.get_or_create(protocolo=p2, conta_corrente=ex2, origem_fapesp=of3, valor_fapesp='100000')
+        fp1 = Pagamento.objects.create(protocolo=p1, conta_corrente=ex1, origem_fapesp=of1, valor_fapesp='2650')
+        fp2 = Pagamento.objects.create(protocolo=p2, conta_corrente=ex2, origem_fapesp=of2, valor_fapesp='100000')
+        fp2 = Pagamento.objects.create(protocolo=p2, conta_corrente=ex2, origem_fapesp=of3, valor_fapesp='100000')
 
 
     def tearDown(self):
@@ -466,16 +528,16 @@ class Natureza_gastoTest(TestCase):
         pg2.save()
 
         n1 = Natureza_gasto.objects.get(pk=1)
-        self.assertEquals(n1.formata_total_realizado(), '-')
+        self.assertEquals(n1.formata_total_realizado(), '-', 'Total realizado possui valor diferente de zero.')
 
     def test_formata_total_realizado__negativo(self):
         n1 = Natureza_gasto.objects.get(pk=1)
-        self.assertEquals(n1.formata_total_realizado(), '<span style="color: red">R$ 102.650,00</span>')
+        self.assertEquals(n1.formata_total_realizado(), '<span style="color: red">R$ 102.650,00</span>', 'Total realizado não possui valor negativo.')
 
     def test_formata_total_realizado__positivo(self):
         n1 = Natureza_gasto.objects.get(pk=1)
         n1.valor_concedido = 9000000
-        self.assertEquals(n1.formata_total_realizado(), 'R$ 102.650,00')
+        self.assertEquals(n1.formata_total_realizado(), 'R$ 102.650,00', 'Total realizado não possui valor positivo.')
 
     def test_soma_itens_menos_que_concedido(self):
         n1 = Natureza_gasto.objects.get(pk=1)
@@ -488,7 +550,7 @@ class Natureza_gastoTest(TestCase):
     def test_soma_itens__diff_total(self):
         n2 = Natureza_gasto.objects.get(pk=2)
         n2.valor_concedido = n2.valor_concedido - 100000
-        self.assertEquals(n2.soma_itens(), '<span style="color: red">R$ 100.000,00</span>')
+        self.assertEquals(n2.soma_itens(), '<span style="color: red">R$ 100.000,00</span>', 'Valor concedido é diferente do total dos itens.')
 
     def test_soma_itens__zero(self):
         n2 = Natureza_gasto.objects.get(pk=2)
@@ -505,7 +567,7 @@ class Natureza_gastoTest(TestCase):
         i3.valor=0
         i3.save()
         
-        self.assertEquals(n2.soma_itens(), '-')
+        self.assertEquals(n2.soma_itens(), '-', 'A soma dos valores dos itens não é zero.')
 
     def test_todos_itens(self):
         n1 = Natureza_gasto.objects.get(pk=1)
@@ -560,72 +622,73 @@ class Natureza_gastoTest(TestCase):
 
 
 
-class ItemTest(TestCase):
+class ItemTest(UnitTestCase):
     def setUp(self):
+        super(ItemTest, self).setUp()
         #Cria Termo
-        eo1, created = EstadoOutorga.objects.get_or_create(nome='Vigente')
-        t, create = Termo.objects.get_or_create(ano=2008, defaults={'inicio': date(2008,1,1), 'estado':eo1, 'processo':22222, 'digito':2})
+        eo1 = EstadoOutorga.objects.create(nome='Vigente')
+        t = Termo.objects.create(ano=2008, inicio=date(2008,1,1), estado=eo1, processo=22222, digito=2)
 
         #Cria Outorga
-        c1, created = Categoria.objects.get_or_create(nome='Inicial')
-        c2, created = Categoria.objects.get_or_create(nome='Aditivo')
+        c1 = Categoria.objects.create(nome='Inicial')
+        c2 = Categoria.objects.create(nome='Aditivo')
 
-        o1, created = Outorga.objects.get_or_create(termo=t, categoria=c1, data_solicitacao=date(2007,12,1), defaults={'termino': date(2008,12,31), 'data_presta_contas': date(2008,2,28)})
-        o2, created = Outorga.objects.get_or_create(termo=t, categoria=c2, data_solicitacao=date(2008,4,1), defaults={'termino': date(2008,12,31), 'data_presta_contas': date(2008,2,28)})
+        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007,12,1), termino=date(2008,12,31), data_presta_contas=date(2008,2,28))
+        o2 = Outorga.objects.create(termo=t, categoria=c2, data_solicitacao=date(2008,4,1), termino=date(2008,12,31), data_presta_contas=date(2008,2,28))
 
 
         #Cria Natureza de gasto
-        m1, created = Modalidade.objects.get_or_create(sigla='STE', defaults={'nome': 'Servicos de Terceiro no Exterior', 'moeda_nacional': False})
-        m2, created = Modalidade.objects.get_or_create(sigla='STF', defaults={'nome': 'Servicos de Terceiro no Brasil', 'moeda_nacional': True})
+        m1 = Modalidade.objects.create(sigla='STE', nome='Servicos de Terceiro no Exterior', moeda_nacional=False)
+        m2 = Modalidade.objects.create(sigla='STF', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
 
-        n1, created = Natureza_gasto.objects.get_or_create(modalidade=m1, termo=t, valor_concedido='1500000.00')
-        n2, created = Natureza_gasto.objects.get_or_create(modalidade=m2, termo=t, valor_concedido='300000.00')
+        n1 = Natureza_gasto.objects.create(modalidade=m1, termo=t, valor_concedido='1500000.00')
+        n2 = Natureza_gasto.objects.create(modalidade=m2, termo=t, valor_concedido='300000.00')
 
 
          #Cria Item de Outorga
-        ent1, created = Entidade.objects.get_or_create(sigla='SAC', defaults={'nome': 'SAC do Brasil', 'cnpj': '00.000.000/0000-00', 'fisco': True, 'url': ''})
-        endereco, created = Endereco.objects.get_or_create(entidade=ent1)
+        ent1 = Entidade.objects.create(sigla='SAC', nome='SAC do Brasil', cnpj='00.000.000/0000-00', fisco=True, url='')
+        endereco = Endereco.objects.create(entidade=ent1)
 
 
-        i1, created = Item.objects.get_or_create(entidade=ent1, natureza_gasto=n1, descricao='Serviço de Conexão Internacional', defaults={'justificativa': 'Link Internacional', 'quantidade': 12, 'valor': 250000})
-        i2, created = Item.objects.get_or_create(entidade=ent1, natureza_gasto=n2, descricao='Serviço de Conexão Internacional', defaults={'justificativa': 'Ajuste na cobrança do Link Internacional', 'quantidade': 6, 'valor': 50000})
+        i1 = Item.objects.create(entidade=ent1, natureza_gasto=n1, descricao='Serviço de Conexão Internacional', justificativa='Link Internacional', quantidade=12, valor=250000)
+        i2 = Item.objects.create(entidade=ent1, natureza_gasto=n2, descricao='Serviço de Conexão Internacional', justificativa='Ajuste na cobrança do Link Internacional', quantidade=6, valor=50000)
 
          #Cria Protocolo
-        ep, created = EstadoProtocolo.objects.get_or_create(nome='Aprovado')
-        td, created = TipoDocumento.objects.get_or_create(nome='Nota Fiscal')
-        og, created = Origem.objects.get_or_create(nome='Motoboy')
+        ep = EstadoProtocolo.objects.create(nome='Aprovado')
+        td = TipoDocumento.objects.create(nome='Nota Fiscal')
+        og = Origem.objects.create(nome='Motoboy')
         
-        cot1, created = Contato.objects.get_or_create(primeiro_nome='Alex', defaults={'email': 'alex@alex.com.br', 'tel': ''})
+        cot1 = Contato.objects.create(primeiro_nome='Alex', email='alex@alex.com.br', tel='')
         
 
-        iden1, created = Identificacao.objects.get_or_create(contato=cot1, defaults={'funcao': 'Gerente', 'area': 'Redes', 'ativo': True, 'endereco':endereco})
+        iden1 = Identificacao.objects.create(contato=cot1, funcao='Gerente', area='Redes', ativo=True, endereco=endereco)
 
-        p1, created = Protocolo.objects.get_or_create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,9,30,10,10), defaults={'origem': og, 'estado': ep, 'num_documento': 7777, 'data_vencimento': date(2008,10,10), 'descricao': 'Serviço de Conexão Internacional - 09/2009', 'valor_total': None})
-        p2, created = Protocolo.objects.get_or_create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,10,30,10,10), defaults={'origem': og, 'estado': ep, 'num_documento': 5555, 'data_vencimento': date(2008,11,10), 'descricao': 'Serviço de Conexão Internacional - 10/2009', 'valor_total': None})
-        p3, created = Protocolo.objects.get_or_create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,10,31,10,10), defaults={'origem': og, 'estado': ep, 'num_documento': 666, 'data_vencimento': date(2008,11,12), 'descricao': 'Serviço de Conexão Internacional - 10/2009', 'valor_total': None})
+        p1 = Protocolo.objects.create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,9,30,10,10), origem=og, estado=ep, num_documento=7777, data_vencimento=date(2008,10,10), descricao='Serviço de Conexão Internacional - 09/2009', valor_total=None)
+        p2 = Protocolo.objects.create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,10,30,10,10), origem=og, estado=ep, num_documento=5555, data_vencimento=date(2008,11,10), descricao='Serviço de Conexão Internacional - 10/2009', valor_total=None)
+        p3 = Protocolo.objects.create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,10,31,10,10), origem=og, estado=ep, num_documento=666, data_vencimento=date(2008,11,12), descricao='Serviço de Conexão Internacional - 10/2009', valor_total=None)
 
         #Cria Item do Protocolo
-        ip1 = ItemProtocolo.objects.get_or_create(protocolo=p1, descricao='Conexão Internacional - 09/2009', quantidade=1, valor_unitario=250000)
-        ip2 = ItemProtocolo.objects.get_or_create(protocolo=p1, descricao='Reajuste do serviço de Conexão Internacional - 09/2009', quantidade=1, valor_unitario=50000)
-        ip3 = ItemProtocolo.objects.get_or_create(protocolo=p2, descricao='Conexão Internacional - 10/2009', quantidade=1, valor_unitario=250000)
-        ip4 = ItemProtocolo.objects.get_or_create(protocolo=p2, descricao='Reajuste do serviço de Conexão Internacional - 10/2009', quantidade=1, valor_unitario=50000)
+        ip1 = ItemProtocolo.objects.create(protocolo=p1, descricao='Conexão Internacional - 09/2009', quantidade=1, valor_unitario=250000)
+        ip2 = ItemProtocolo.objects.create(protocolo=p1, descricao='Reajuste do serviço de Conexão Internacional - 09/2009', quantidade=1, valor_unitario=50000)
+        ip3 = ItemProtocolo.objects.create(protocolo=p2, descricao='Conexão Internacional - 10/2009', quantidade=1, valor_unitario=250000)
+        ip4 = ItemProtocolo.objects.create(protocolo=p2, descricao='Reajuste do serviço de Conexão Internacional - 10/2009', quantidade=1, valor_unitario=50000)
 
 
         #Criar Fonte Pagadora
-        ef1, created = EstadoFinanceiro.objects.get_or_create(nome='Aprovado')
-        ef2, created = EstadoFinanceiro.objects.get_or_create(nome='Concluído')
+        ef1 = EstadoFinanceiro.objects.create(nome='Aprovado')
+        ef2 = EstadoFinanceiro.objects.create(nome='Concluído')
 
-        ex1, created = ExtratoCC.objects.get_or_create(data_extrato=date(2008,10,30), data_oper=date(2008,10,10), cod_oper=333333, valor='300000', historico='TED')
-        ex2, created = ExtratoCC.objects.get_or_create(data_extrato=date(2008,11,30), data_oper=date(2008,11,10), cod_oper=444444, valor='300000', historico='TED')
-        ex3, created = ExtratoCC.objects.get_or_create(data_extrato=date(2008,11,30), data_oper=date(2008,11,12), cod_oper=555555, valor='10', historico='TED')
+        ex1 = ExtratoCC.objects.create(data_extrato=date(2008,10,30), data_oper=date(2008,10,10), cod_oper=333333, valor='300000', historico='TED')
+        ex2 = ExtratoCC.objects.create(data_extrato=date(2008,11,30), data_oper=date(2008,11,10), cod_oper=444444, valor='300000', historico='TED')
+        ex3 = ExtratoCC.objects.create(data_extrato=date(2008,11,30), data_oper=date(2008,11,12), cod_oper=555555, valor='10', historico='TED')
 
-        a1, created = Acordo.objects.get_or_create(estado=eo1, descricao='Acordo entre Instituto UNIEMP e SAC')
+        a1 = Acordo.objects.create(estado=eo1, descricao='Acordo entre Instituto UNIEMP e SAC')
 
-        of1, created = OrigemFapesp.objects.get_or_create(acordo=a1, item_outorga=i1)
+        of1 = OrigemFapesp.objects.create(acordo=a1, item_outorga=i1)
 
-        fp1 = Pagamento.objects.get_or_create(protocolo=p1, conta_corrente=ex1, origem_fapesp=of1, valor_fapesp='300000')
-        fp2 = Pagamento.objects.get_or_create(protocolo=p2, conta_corrente=ex2, origem_fapesp=of1, valor_fapesp='300000')
-        fp3 = Pagamento.objects.get_or_create(protocolo=p3, conta_corrente=ex3, origem_fapesp=of1, valor_fapesp='10')
+        fp1 = Pagamento.objects.create(protocolo=p1, conta_corrente=ex1, origem_fapesp=of1, valor_fapesp='300000')
+        fp2 = Pagamento.objects.create(protocolo=p2, conta_corrente=ex2, origem_fapesp=of1, valor_fapesp='300000')
+        fp3 = Pagamento.objects.create(protocolo=p3, conta_corrente=ex3, origem_fapesp=of1, valor_fapesp='10')
 
     
     def test_unicode(self):
@@ -747,48 +810,50 @@ class ItemTest(TestCase):
         self.assertEquals(item.calcula_realizado_mes(dt, True), 10.00)
 
 
-class AcordoTest(TestCase):
+class AcordoTest(UnitTestCase):
     def setUp(self):
-        eo1, created = EstadoOutorga.objects.get_or_create(nome='Vigente')
-        a, created = Acordo.objects.get_or_create(estado=eo1, descricao='Acordo entre Instituto UNIEMP e SAC')
+        super(AcordoTest, self).setUp()
+        eo1 = EstadoOutorga.objects.create(nome='Vigente')
+        a = Acordo.objects.create(estado=eo1, descricao='Acordo entre Instituto UNIEMP e SAC')
 
     def test_unicode(self):
         a = Acordo.objects.get(pk=1)
         self.assertEquals(a.__unicode__(), 'Acordo entre Instituto UNIEMP e SAC')
 
 
-class ModalidadeTest(TestCase):
+class ModalidadeTest(UnitTestCase):
     def setUp(self):
-        eo1, created = EstadoOutorga.objects.get_or_create(nome='Vigente')
-        t, create = Termo.objects.get_or_create(ano=2008, defaults={'inicio': date(2008,1,1), 'estado':eo1, 'processo':22222, 'digito':2})
-        t2, create = Termo.objects.get_or_create(ano=2007, defaults={'inicio': date(2007,1,1), 'estado':eo1, 'processo':3333, 'digito':3})        
+        super(ModalidadeTest, self).setUp()
+        eo1 = EstadoOutorga.objects.create(nome='Vigente')
+        t = Termo.objects.create(ano=2008, inicio=date(2008,1,1), estado=eo1, processo=22222, digito=2)
+        t2 = Termo.objects.create(ano=2007, inicio=date(2007,1,1), estado=eo1, processo=3333, digito=3)        
 
         #Cria Outorga
-        c1, created = Categoria.objects.get_or_create(nome='Inicial')
-        c2, created = Categoria.objects.get_or_create(nome='Aditivo')
+        c1 = Categoria.objects.create(nome='Inicial')
+        c2 = Categoria.objects.create(nome='Aditivo')
 
-        o1, created = Outorga.objects.get_or_create(termo=t, categoria=c1, data_solicitacao=date(2007,12,1), defaults={'termino': date(2008,12,31), 'data_presta_contas': date(2008,2,28)})
-        o2, created = Outorga.objects.get_or_create(termo=t, categoria=c2, data_solicitacao=date(2008,4,1), defaults={'termino': date(2008,12,31), 'data_presta_contas': date(2008,2,28)})
+        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007,12,1), termino=date(2008,12,31), data_presta_contas=date(2008,2,28))
+        o2 = Outorga.objects.create(termo=t, categoria=c2, data_solicitacao=date(2008,4,1), termino=date(2008,12,31), data_presta_contas=date(2008,2,28))
 
 
         #Cria Natureza de gasto
-        m1, created = Modalidade.objects.get_or_create(sigla='STE', defaults={'nome': 'Servicos de Terceiro no Exterior', 'moeda_nacional': False})
-        m2, created = Modalidade.objects.get_or_create(sigla='STF', defaults={'nome': 'Servicos de Terceiro no Brasil', 'moeda_nacional': True})
+        m1 = Modalidade.objects.create(sigla='STE', nome='Servicos de Terceiro no Exterior', moeda_nacional=False)
+        m2 = Modalidade.objects.create(sigla='STF', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
 
-        n1, created = Natureza_gasto.objects.get_or_create(modalidade=m1, termo=t, valor_concedido='1500000.00')
-        n2, created = Natureza_gasto.objects.get_or_create(modalidade=m2, termo=t, valor_concedido='300000.00')
+        n1 = Natureza_gasto.objects.create(modalidade=m1, termo=t, valor_concedido='1500000.00')
+        n2 = Natureza_gasto.objects.create(modalidade=m2, termo=t, valor_concedido='300000.00')
 
          #Cria Item de Outorga
-        ent1, created = Entidade.objects.get_or_create(sigla='SAC', defaults={'nome': 'SAC do Brasil', 'cnpj': '00.000.000/0000-00', 'fisco': True, 'url': ''})
-        endereco, created = Endereco.objects.get_or_create(entidade=ent1)
+        ent1 = Entidade.objects.create(sigla='SAC', nome='SAC do Brasil', cnpj='00.000.000/0000-00', fisco=True, url='')
+        endereco = Endereco.objects.create(entidade=ent1)
 
-        i1, created = Item.objects.get_or_create(entidade=ent1, natureza_gasto=n1, descricao='Serviço de Conexão Internacional', defaults={'justificativa': 'Link Internacional', 'quantidade': 12, 'valor': 250000})
+        i1 = Item.objects.create(entidade=ent1, natureza_gasto=n1, descricao='Serviço de Conexão Internacional', justificativa='Link Internacional', quantidade=12, valor=250000)
 
 
         #Cria Natureza de Gasto
-#         t, created = Termo.objects.get_or_create(ano=2008, processo=51885, digito=8, defaults={'inicio': date(2008,1,1), 'estado': e})
-#         o, created = Outorga.objects.get_or_create(termo=t, categoria=c, data_solicitacao=date(2007,12,1), termino=date(2008,12,31), data_presta_contas=date(2009,1,31))
-#         n, created = Natureza_gasto.objects.get_or_create(modalidade=m, outorga=o)
+#         t = Termo.objects.create(ano=2008, processo=51885, digito=8, inicio=date(2008,1,1), 'estado=e)
+#         o = Outorga.objects.create(termo=t, categoria=c, data_solicitacao=date(2007,12,1), termino=date(2008,12,31), data_presta_contas=date(2009,1,31))
+#         n = Natureza_gasto.objects.create(modalidade=m, outorga=o)
 
     def test_unicode(self):
         m = Modalidade.objects.get(pk=1)
@@ -800,83 +865,83 @@ class ModalidadeTest(TestCase):
         self.assertEquals(str(modalidade.modalidades_termo(termo)), '[<Modalidade: STE - Servicos de Terceiro no Exterior>]')
 
 
-class EstadoTest(TestCase):
+class EstadoTest(UnitTestCase):
     def setUp(self):
         super(EstadoTest, self).setUp()
         #Cria Estado
-        e, created = EstadoOutorga.objects.get_or_create(nome='Vigente')
+        e = EstadoOutorga.objects.create(nome='Vigente')
         
     def test_unicode(self):
         e = EstadoOutorga.objects.get(pk=1)
         self.assertEquals(e.__unicode__(), u'Vigente')
     
-class OrigemFapespTest(TestCase):
+class OrigemFapespTest(UnitTestCase):
     def setUp(self):
         super(OrigemFapespTest, self).setUp()
         #Cria Termo
-        eo1, created = EstadoOutorga.objects.get_or_create(nome='Vigente')
-        t, create = Termo.objects.get_or_create(ano=2008, defaults={'inicio': date(2008,1,1), 'estado':eo1, 'processo':22222, 'digito':2})
+        eo1 = EstadoOutorga.objects.create(nome='Vigente')
+        t = Termo.objects.create(ano=2008, inicio=date(2008,1,1), estado=eo1, processo=22222, digito=2)
 
         #Cria Outorga
-        c1, created = Categoria.objects.get_or_create(nome='Inicial')
-        c2, created = Categoria.objects.get_or_create(nome='Aditivo')
+        c1 = Categoria.objects.create(nome='Inicial')
+        c2 = Categoria.objects.create(nome='Aditivo')
 
-        o1, created = Outorga.objects.get_or_create(termo=t, categoria=c1, data_solicitacao=date(2007,12,1), defaults={'termino': date(2008,12,31), 'data_presta_contas': date(2008,2,28)})
-        o2, created = Outorga.objects.get_or_create(termo=t, categoria=c2, data_solicitacao=date(2008,4,1), defaults={'termino': date(2008,12,31), 'data_presta_contas': date(2008,2,28)})
+        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007,12,1), termino=date(2008,12,31), data_presta_contas=date(2008,2,28))
+        o2 = Outorga.objects.create(termo=t, categoria=c2, data_solicitacao=date(2008,4,1), termino=date(2008,12,31), data_presta_contas=date(2008,2,28))
 
 
         #Cria Natureza de gasto
-        m1, created = Modalidade.objects.get_or_create(sigla='STE', defaults={'nome': 'Servicos de Terceiro no Exterior', 'moeda_nacional': False})
-        m2, created = Modalidade.objects.get_or_create(sigla='STF', defaults={'nome': 'Servicos de Terceiro no Brasil', 'moeda_nacional': True})
+        m1 = Modalidade.objects.create(sigla='STE', nome='Servicos de Terceiro no Exterior', moeda_nacional=False)
+        m2 = Modalidade.objects.create(sigla='STF', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
 
-        n1, created = Natureza_gasto.objects.get_or_create(modalidade=m1, termo=t, valor_concedido='1500000.00')
-        n2, created = Natureza_gasto.objects.get_or_create(modalidade=m2, termo=t, valor_concedido='300000.00')
+        n1 = Natureza_gasto.objects.create(modalidade=m1, termo=t, valor_concedido='1500000.00')
+        n2 = Natureza_gasto.objects.create(modalidade=m2, termo=t, valor_concedido='300000.00')
 
 
          #Cria Item de Outorga
-        ent1, created = Entidade.objects.get_or_create(sigla='SAC', defaults={'nome': 'SAC do Brasil', 'cnpj': '00.000.000/0000-00', 'fisco': True, 'url': ''})
-        endereco, created = Endereco.objects.get_or_create(entidade=ent1)
+        ent1 = Entidade.objects.create(sigla='SAC', nome='SAC do Brasil', cnpj='00.000.000/0000-00', fisco=True, url='')
+        endereco = Endereco.objects.create(entidade=ent1)
 
 
-        i1, created = Item.objects.get_or_create(entidade=ent1, natureza_gasto=n1, descricao='Serviço de Conexão Internacional', defaults={'justificativa': 'Link Internacional', 'quantidade': 12, 'valor': 250000})
-        i2, created = Item.objects.get_or_create(entidade=ent1, natureza_gasto=n2, descricao='Serviço de Conexão Internacional', defaults={'justificativa': 'Ajuste na cobrança do Link Internacional', 'quantidade': 6, 'valor': 50000})
+        i1 = Item.objects.create(entidade=ent1, natureza_gasto=n1, descricao='Serviço de Conexão Internacional', justificativa='Link Internacional', quantidade=12, valor=250000)
+        i2 = Item.objects.create(entidade=ent1, natureza_gasto=n2, descricao='Serviço de Conexão Internacional', justificativa='Ajuste na cobrança do Link Internacional', quantidade=6, valor=50000)
 
          #Cria Protocolo
-        ep, created = EstadoProtocolo.objects.get_or_create(nome='Aprovado')
-        td, created = TipoDocumento.objects.get_or_create(nome='Nota Fiscal')
-        og, created = Origem.objects.get_or_create(nome='Motoboy')
+        ep = EstadoProtocolo.objects.create(nome='Aprovado')
+        td = TipoDocumento.objects.create(nome='Nota Fiscal')
+        og = Origem.objects.create(nome='Motoboy')
         
-        cot1, created = Contato.objects.get_or_create(primeiro_nome='Alex', defaults={'email': 'alex@alex.com.br', 'tel': ''})
+        cot1 = Contato.objects.create(primeiro_nome='Alex', email='alex@alex.com.br', tel='')
         
 
-        iden1, created = Identificacao.objects.get_or_create(contato=cot1, defaults={'funcao': 'Gerente', 'area': 'Redes', 'ativo': True, 'endereco':endereco})
+        iden1 = Identificacao.objects.create(contato=cot1, funcao='Gerente', area='Redes', ativo=True, endereco=endereco)
 
-        p1, created = Protocolo.objects.get_or_create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,9,30,10,10), defaults={'origem': og, 'estado': ep, 'num_documento': 7777, 'data_vencimento': date(2008,10,10), 'descricao': 'Serviço de Conexão Internacional - 09/2009', 'valor_total': None})
-        p2, created = Protocolo.objects.get_or_create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,10,30,10,10), defaults={'origem': og, 'estado': ep, 'num_documento': 5555, 'data_vencimento': date(2008,11,10), 'descricao': 'Serviço de Conexão Internacional - 10/2009', 'valor_total': None})
-        p3, created = Protocolo.objects.get_or_create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,10,31,10,10), defaults={'origem': og, 'estado': ep, 'num_documento': 666, 'data_vencimento': date(2008,11,12), 'descricao': 'Serviço de Conexão Internacional - 10/2009', 'valor_total': None})
+        p1 = Protocolo.objects.create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,9,30,10,10), origem=og, estado=ep, num_documento=7777, data_vencimento=date(2008,10,10), descricao='Serviço de Conexão Internacional - 09/2009', valor_total=None)
+        p2 = Protocolo.objects.create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,10,30,10,10), origem=og, estado=ep, num_documento=5555, data_vencimento=date(2008,11,10), descricao='Serviço de Conexão Internacional - 10/2009', valor_total=None)
+        p3 = Protocolo.objects.create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,10,31,10,10), origem=og, estado=ep, num_documento=666, data_vencimento=date(2008,11,12), descricao='Serviço de Conexão Internacional - 10/2009', valor_total=None)
 
         #Cria Item do Protocolo
-        ip1 = ItemProtocolo.objects.get_or_create(protocolo=p1, descricao='Conexão Internacional - 09/2009', quantidade=1, valor_unitario=250000)
-        ip2 = ItemProtocolo.objects.get_or_create(protocolo=p1, descricao='Reajuste do serviço de Conexão Internacional - 09/2009', quantidade=1, valor_unitario=50000)
-        ip3 = ItemProtocolo.objects.get_or_create(protocolo=p2, descricao='Conexão Internacional - 10/2009', quantidade=1, valor_unitario=250000)
-        ip4 = ItemProtocolo.objects.get_or_create(protocolo=p2, descricao='Reajuste do serviço de Conexão Internacional - 10/2009', quantidade=1, valor_unitario=50000)
+        ip1 = ItemProtocolo.objects.create(protocolo=p1, descricao='Conexão Internacional - 09/2009', quantidade=1, valor_unitario=250000)
+        ip2 = ItemProtocolo.objects.create(protocolo=p1, descricao='Reajuste do serviço de Conexão Internacional - 09/2009', quantidade=1, valor_unitario=50000)
+        ip3 = ItemProtocolo.objects.create(protocolo=p2, descricao='Conexão Internacional - 10/2009', quantidade=1, valor_unitario=250000)
+        ip4 = ItemProtocolo.objects.create(protocolo=p2, descricao='Reajuste do serviço de Conexão Internacional - 10/2009', quantidade=1, valor_unitario=50000)
 
 
         #Criar Fonte Pagadora
-        ef1, created = EstadoFinanceiro.objects.get_or_create(nome='Aprovado')
-        ef2, created = EstadoFinanceiro.objects.get_or_create(nome='Concluído')
+        ef1 = EstadoFinanceiro.objects.create(nome='Aprovado')
+        ef2 = EstadoFinanceiro.objects.create(nome='Concluído')
 
-        ex1, created = ExtratoCC.objects.get_or_create(data_extrato=date(2008,10,30), data_oper=date(2008,10,10), cod_oper=333333, valor='300000', historico='TED')
-        ex2, created = ExtratoCC.objects.get_or_create(data_extrato=date(2008,11,30), data_oper=date(2008,11,10), cod_oper=444444, valor='300000', historico='TED')
-        ex3, created = ExtratoCC.objects.get_or_create(data_extrato=date(2008,11,30), data_oper=date(2008,11,12), cod_oper=555555, valor='10', historico='TED')
+        ex1 = ExtratoCC.objects.create(data_extrato=date(2008,10,30), data_oper=date(2008,10,10), cod_oper=333333, valor='300000', historico='TED')
+        ex2 = ExtratoCC.objects.create(data_extrato=date(2008,11,30), data_oper=date(2008,11,10), cod_oper=444444, valor='300000', historico='TED')
+        ex3 = ExtratoCC.objects.create(data_extrato=date(2008,11,30), data_oper=date(2008,11,12), cod_oper=555555, valor='10', historico='TED')
 
-        a1, created = Acordo.objects.get_or_create(estado=eo1, descricao='Acordo entre Instituto UNIEMP e SAC')
+        a1 = Acordo.objects.create(estado=eo1, descricao='Acordo entre Instituto UNIEMP e SAC')
 
-        of1, created = OrigemFapesp.objects.get_or_create(acordo=a1, item_outorga=i1)
+        of1 = OrigemFapesp.objects.create(acordo=a1, item_outorga=i1)
 
-        fp1 = Pagamento.objects.get_or_create(protocolo=p1, conta_corrente=ex1, origem_fapesp=of1, valor_fapesp='300000')
-        fp2 = Pagamento.objects.get_or_create(protocolo=p2, conta_corrente=ex2, origem_fapesp=of1, valor_fapesp='300000')
-        fp3 = Pagamento.objects.get_or_create(protocolo=p3, conta_corrente=ex3, origem_fapesp=of1, valor_fapesp='10')
+        fp1 = Pagamento.objects.create(protocolo=p1, conta_corrente=ex1, origem_fapesp=of1, valor_fapesp='300000')
+        fp2 = Pagamento.objects.create(protocolo=p2, conta_corrente=ex2, origem_fapesp=of1, valor_fapesp='300000')
+        fp3 = Pagamento.objects.create(protocolo=p3, conta_corrente=ex3, origem_fapesp=of1, valor_fapesp='10')
 
 
     def tearDown(self):
@@ -912,13 +977,13 @@ class OrigemFapespTest(TestCase):
         self.assertEquals(str(of.termo()), u'08/22222-2')
 
 
-class ContratoTest(TestCase):
+class ContratoTest(UnitTestCase):
     def setUp(self):
         super(ContratoTest, self).setUp()
 
         #Cria um Contrato
-        ent, created = Entidade.objects.get_or_create(sigla='SAC', defaults={'nome': 'SAC do Brasil', 'cnpj': '00.000.000/0000-00', 'fisco': True, 'url': ''})
-        ct, created = Contrato.objects.get_or_create(data_inicio=date(2008,1,1), auto_renova=True, limite_rescisao=date(2008,1,11), entidade=ent)
+        ent = Entidade.objects.create(sigla='SAC', nome='SAC do Brasil', cnpj='00.000.000/0000-00', fisco=True, url='')
+        ct = Contrato.objects.create(data_inicio=date(2008,1,1), auto_renova=True, limite_rescisao=date(2008,1,11), entidade=ent)
 
     def tearDown(self):
         super(ContratoTest, self).tearDown()
@@ -955,19 +1020,19 @@ class ContratoTest(TestCase):
         self.assertEquals(ct.existe_arquivo(), u' ')
 
 
-class OrdemDeServicoTest(TestCase):
+class OrdemDeServicoTest(UnitTestCase):
     def setUp(self):
         super(OrdemDeServicoTest, self).setUp()
         
         #Cria um Contrato
-        ent, created = Entidade.objects.get_or_create(sigla='SAC', defaults={'nome': 'SAC do Brasil', 'cnpj': '00.000.000/0000-00', 'fisco': True, 'url': ''})
-        ct, created = Contrato.objects.get_or_create(data_inicio=date(2008,1,1), auto_renova=True, limite_rescisao=date(2008,1,11), entidade=ent)
+        ent = Entidade.objects.create(sigla='SAC', nome='SAC do Brasil', cnpj='00.000.000/0000-00', fisco=True, url='')
+        ct = Contrato.objects.create(data_inicio=date(2008,1,1), auto_renova=True, limite_rescisao=date(2008,1,11), entidade=ent)
 
-        ef1, created = EstadoOutorga.objects.get_or_create(nome='Aprovado')
-        tipo, create = TipoContrato.objects.get_or_create(nome='Tipo Fixo')
+        ef1 = EstadoOutorga.objects.create(nome='Aprovado')
+        tipo = TipoContrato.objects.create(nome='Tipo Fixo')
         #Cria uma Ordem de Serviço
-        a, created = Acordo.objects.get_or_create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e SAC')
-        os, created = OrdemDeServico.objects.get_or_create(acordo=a, contrato=ct, tipo=tipo, 
+        a = Acordo.objects.create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e SAC')
+        os = OrdemDeServico.objects.create(acordo=a, contrato=ct, tipo=tipo, 
                                    data_inicio=date(2008,2,1), data_rescisao=date(2008,11,1), antes_rescisao=2, numero=66666,   
                                    descricao='OS 34567 - Contratação de mais um link')
 
@@ -1034,19 +1099,19 @@ class OrdemDeServicoTest(TestCase):
 
 
 
-class ArquivoTest(TestCase):
+class ArquivoTest(UnitTestCase):
     def setUp(self):
         super(ArquivoTest, self).setUp()
 
         #Cria Termo
-        e, created = EstadoOutorga.objects.get_or_create(nome='Vigente')
-        t, create = Termo.objects.get_or_create(ano=2008, processo=22222, digito=2, defaults={'inicio': date(2008,1,1), 'estado':e})
+        e = EstadoOutorga.objects.create(nome='Vigente')
+        t = Termo.objects.create(ano=2008, processo=22222, digito=2, inicio=date(2008,1,1), estado=e)
         
         #Cria Outorga
-        c1, created = Categoria.objects.get_or_create(nome='Inicial')
-        c2, created = Categoria.objects.get_or_create(nome='Aditivo')
+        c1 = Categoria.objects.create(nome='Inicial')
+        c2 = Categoria.objects.create(nome='Aditivo')
         
-        o1, created = Outorga.objects.get_or_create(termo=t, categoria=c1, data_solicitacao=date(2007,12,1), defaults={'termino': date(2008,12,31), 'data_presta_contas': date(2008,2,28)})
+        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007,12,1), termino=date(2008,12,31), data_presta_contas=date(2008,2,28))
         #Cria Arquivo
 
         arq = Arquivo(outorga=o1)
@@ -1077,19 +1142,19 @@ class ArquivoTest(TestCase):
         self.assertEquals(arq.mostra_termo(), '08/22222-2')
 
 
-class ArquivoOSTest(TestCase):
+class ArquivoOSTest(UnitTestCase):
     def setUp(self):
         super(ArquivoOSTest, self).setUp()
         
         #Cria um Contrato
-        ent, created = Entidade.objects.get_or_create(sigla='SAC', defaults={'nome': 'SAC do Brasil', 'cnpj': '00.000.000/0000-00', 'fisco': True, 'url': ''})
-        ct, created = Contrato.objects.get_or_create(data_inicio=date(2008,1,1), auto_renova=True, limite_rescisao=date(2008,1,11), entidade=ent)
+        ent = Entidade.objects.create(sigla='SAC', nome='SAC do Brasil', cnpj='00.000.000/0000-00', fisco=True, url='')
+        ct = Contrato.objects.create(data_inicio=date(2008,1,1), auto_renova=True, limite_rescisao=date(2008,1,11), entidade=ent)
 
-        ef1, created = EstadoOutorga.objects.get_or_create(nome='Aprovado')
-        tipo, create = TipoContrato.objects.get_or_create(nome='Tipo Fixo')
+        ef1 = EstadoOutorga.objects.create(nome='Aprovado')
+        tipo = TipoContrato.objects.create(nome='Tipo Fixo')
         #Cria uma Ordem de Serviço
-        a, created = Acordo.objects.get_or_create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e SAC')
-        os, created = OrdemDeServico.objects.get_or_create(acordo=a, contrato=ct, tipo=tipo, 
+        a = Acordo.objects.create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e SAC')
+        os = OrdemDeServico.objects.create(acordo=a, contrato=ct, tipo=tipo, 
                                    data_inicio=date(2008,2,1), data_rescisao=date(2008,11,1), antes_rescisao=2, numero=66666,   
                                    descricao='OS 34567 - Contratação de mais um link')
 
@@ -1127,3 +1192,10 @@ class ArquivoOSTest(TestCase):
         self.assertEquals(arquivo.__unicode__(), u'test_img_file.gif')
         
         arquivo.delete()
+
+
+
+
+
+
+

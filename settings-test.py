@@ -23,6 +23,12 @@ STATICFILES_DIRS = (
      '/var/www/files/',
 )
 
+TEMPLATE_DIRS += (
+    '/projetos/workspace/sistema/templates/',
+    '/var/lib/sistema/templates/',
+    '/var/lib/sistema/templates',
+)
+
 STATIC_ROOT = '/projetos/workspace/sistema/media/'
 STATIC_URL = '/media/'
 MEDIA_URL = '/files/'
@@ -70,8 +76,6 @@ LOGGING = {
 
 
 # start JENKINS CONFIGURATION
-
-
 JENKINS_TASKS = (
     'django_jenkins.tasks.with_coverage',
     'django_jenkins.tasks.django_tests',   # select one django or
@@ -83,7 +87,4 @@ JENKINS_TASKS = (
  #    'django_jenkins.tasks.run_sloccount',    
  #    'django_jenkins.tasks.lettuce_tests',
 )
-
-
-
 # end JENKINS CONFIGURATION
