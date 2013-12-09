@@ -20,215 +20,217 @@ import logging
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
-def termo(request, termo_id):
-
-    """
-
-    """
-    
-    u = request.user
-    if not u.is_authenticated():
-        return admin.site.login(request)
-    
-    #if not u.has_perm('outorga.change_termo'):
-     #   raise PermissionDenied
-
-    t = get_object_or_404(Termo, pk=termo_id)
-    
-    r = []
-    for p in t.outorga_set.all():
-        r.append(p)
-            
-    return render_to_response('outorga/termo.html',
-                              {'termo' : t,
-                               'pedido' : r})
-
-                            
-             
-def pedido(request, pedido_id):
-
-    """
-
-    """
-
-    u = request.user
-    if not u.is_authenticated():
-        return admin.site.login(request)
-    
-    #if not u.has_perm('outorga.change_termo'):
-    #    raise PermissionDenied
-    
-    p = get_object_or_404(Outorga, pk=pedido_id)
-    
-    return render_to_response('outorga/pedido.html',
-                              {'pedido' : p})
+# def termo(request, termo_id):
+# 
+#     """
+# 
+#     """
+#     
+#     u = request.user
+#     if not u.is_authenticated():
+#         return admin.site.login(request)
+#     
+#     #if not u.has_perm('outorga.change_termo'):
+#      #   raise PermissionDenied
+# 
+#     t = get_object_or_404(Termo, pk=termo_id)
+#     
+#     r = []
+#     for p in t.outorga_set.all():
+#         r.append(p)
+#             
+#     return render_to_response('outorga/termo.html',
+#                               {'termo' : t,
+#                                'pedido' : r})
+# 
+#                             
+#              
+# def pedido(request, pedido_id):
+# 
+#     """
+# 
+#     """
+# 
+#     u = request.user
+#     if not u.is_authenticated():
+#         return admin.site.login(request)
+#     
+#     #if not u.has_perm('outorga.change_termo'):
+#     #    raise PermissionDenied
+#     
+#     p = get_object_or_404(Outorga, pk=pedido_id)
+#     
+#     return render_to_response('outorga/pedido.html',
+#                               {'pedido' : p})
 
 
 
 # Gera uma lista com as modalidades do termo selecionado.
-def escolhe_termo(request):
-    if request.method == 'POST':
-        termo = int(request.POST.get('id'))
-
-        retorno = {}
-
-        if termo:
-	    retorno['modalidade'] = []
-            retorno['item'] = []
-            
- 	    t = Termo.objects.get(pk=termo)
-            modalidades = Modalidade.modalidades_termo(t)
-            itens = Item.objects.filter(natureza_gasto__termo=t, item=None)
- 
-            for m in modalidades:
-                retorno['modalidade'].append({'pk':m.pk, 'valor':m.__unicode__()})
-            for i in itens:
-                retorno['item'].append({'pk':i.pk, 'valor':i.__unicode__()})
-
-            if not retorno['modalidade']:
-                retorno['modalidade'] = [{"pk":"0","valor":"Nenhum registro"}]
-            if not retorno['item']:
-                retorno['item'] = [{"pk":"0","valor":"Nenhum registro"}]
-	else:
-            retorno['modalidade'] = [{"pk":"0","valor":"Nenhum registro"}]
-            retorno['item'] = [{"pk":"0","valor":"Nenhum registro"}]
-
-        json = simplejson.dumps(retorno)
-    return HttpResponse(json,mimetype="application/json")
-
-
-
-# Gera uma lista dos itens de outorga conforme a modalidade selecionada.
-def escolhe_modalidade(request):
-    if request.method == 'POST':
-        retorno = []
-        id = request.POST.get('id')
-        previous = request.POST.get('previous')
-
-        if id and previous:
-            t = Termo.objects.get(pk=int(previous))
-            itens = Item.objects.filter(natureza_gasto__termo=t, natureza_gasto__modalidade=id, item=None)
-
-            for i in itens:
-                retorno.append({'pk':i.pk, 'valor':i.__unicode__()})
-
-            if not retorno:
-                retorno = [{"pk":"0","valor":"Nenhum registro"}]
-        else:
-            retorno = [{"pk":"0","valor":"Nenhum registro"}]
-
-        json = simplejson.dumps(retorno)
-    return HttpResponse(json,mimetype="application/json")
-
-
-def seleciona_termo_natureza(request):
-    if request.method == 'POST':
-        termo = int(request.POST.get('id'))
-
-        retorno = []
-
-        if termo:
-    
-            t = Termo.objects.get(pk=termo)
-            
-            naturezas = Natureza_gasto.objects.filter(termo=t)
-            
-            for n in naturezas:
-                retorno.append({'pk':n.pk, 'valor':n.modalidade.sigla})
-            if not retorno:
-                retorno = [{"pk":"0","valor":"Nenhum registro"}]
-        else:
-            retorno = [{"pk":"0","valor":"Nenhum registro"}]
-
-        json = simplejson.dumps(retorno)
-    return HttpResponse(json,mimetype="application/json")
-
-
-# Gera listas modalidade, item e natureza conforme termo selecionado.
-def seleciona_mod_item_natureza(request):
-    if request.method == 'POST':
-        termo = int(request.POST.get('id'))
-
-        retorno = {}
-
-        if termo:
-            retorno['modalidade'] = []
-            retorno['item'] = []
-            retorno['natureza'] = []
-	    
-            t = Termo.objects.get(pk=termo)
-            
-            modalidade = Modalidade.modalidades_termo(t)
-            itens = Item.objects.filter(natureza_gasto__termo=t, item=None)
-            naturezas = Natureza_gasto.objects.filter(termo=t)
-            
-            for m in modalidade:
-                retorno['modalidade'].append({'pk':m.pk, 'valor':m.__unicode__()})
-            for i in itens:
-                retorno['item'].append({'pk':i.pk, 'valor':i.__unicode__()})
-            for n in naturezas:
-                retorno['natureza'].append({'pk':n.pk, 'valor':n.__unicode__()})
-
-            
-            if not retorno['modalidade']:
-                retorno['modalidade'] = [{"pk":"0","valor":"Nenhum registro"}]
-            if not retorno['item']:
-                retorno['item'] = [{"pk":"0","valor":"Nenhum registro"}]
-            if not retorno['natureza']:
-                retorno['natureza'] = [{"pk":"0","valor":"Nenhum registro"}]
-        else:
-            retorno['modalidade'] = [{"pk":"0","valor":"Nenhum registro"}]
-            retorno['item'] = [{"pk":"0","valor":"Nenhum registro"}]
-            retorno['natureza'] = [{"pk":"0","valor":"Nenhum registro"}]
-
-        json = simplejson.dumps(retorno)
-    return HttpResponse(json,mimetype="application/json")
+# def escolhe_termo(request):
+#     if request.method == 'POST':
+#         termo = int(request.POST.get('id'))
+# 
+#         retorno = {}
+# 
+#         if termo:
+# 	    retorno['modalidade'] = []
+#             retorno['item'] = []
+#             
+#  	    t = Termo.objects.get(pk=termo)
+#             modalidades = Modalidade.modalidades_termo(t)
+#             itens = Item.objects.filter(natureza_gasto__termo=t, item=None)
+#  
+#             for m in modalidades:
+#                 retorno['modalidade'].append({'pk':m.pk, 'valor':m.__unicode__()})
+#             for i in itens:
+#                 retorno['item'].append({'pk':i.pk, 'valor':i.__unicode__()})
+# 
+#             if not retorno['modalidade']:
+#                 retorno['modalidade'] = [{"pk":"0","valor":"Nenhum registro"}]
+#             if not retorno['item']:
+#                 retorno['item'] = [{"pk":"0","valor":"Nenhum registro"}]
+# 	else:
+#             retorno['modalidade'] = [{"pk":"0","valor":"Nenhum registro"}]
+#             retorno['item'] = [{"pk":"0","valor":"Nenhum registro"}]
+# 
+#         json = simplejson.dumps(retorno)
+#     return HttpResponse(json,mimetype="application/json")
 
 
 
 # Gera uma lista dos itens de outorga conforme a modalidade selecionada.
-def seleciona_item_natureza(request):
-    if request.method == 'POST':
-        retorno = {}
-
-        id = request.POST.get('id')
-        previous = request.POST.get('previous')
-
-        if id and previous:
-            retorno['item'] = []
-            retorno['natureza'] = []
-
-            t = Termo.objects.get(pk=int(previous))
-            itens = Item.objects.filter(natureza_gasto__termo=t, natureza_gasto__modalidade=id, item=None)
-            naturezas = Natureza_gasto.objects.filter(termo=t, modalidade=id)
-
-            for i in itens:
-                retorno['item'].append({'pk':i.pk, 'valor':i.__unicode__()})
-            for n in naturezas:
-                retorno['natureza'].append({'pk':n.pk, 'valor':n.__unicode__()})
-
-
-            if not retorno['item']:
-                retorno['item'] = [{"pk":"0","valor":"Nenhum registro"}]
-            if not retorno['natureza']:
-                retorno['natureza'] = [{"pk":"0","valor":"Nenhum registro"}]
-        else:
-            retorno['item'] = [{"pk":"0","valor":"Nenhum registro"}]
-            retorno['natureza'] = [{"pk":"0","valor":"Nenhum registro"}]
-
-        json = simplejson.dumps(retorno)
-    return HttpResponse(json,mimetype="application/json")
+# def escolhe_modalidade(request):
+#     if request.method == 'POST':
+#         retorno = []
+#         id = request.POST.get('id')
+#         previous = request.POST.get('previous')
+# 
+#         if id and previous:
+#             t = Termo.objects.get(pk=int(previous))
+#             itens = Item.objects.filter(natureza_gasto__termo=t, natureza_gasto__modalidade=id, item=None)
+# 
+#             for i in itens:
+#                 retorno.append({'pk':i.pk, 'valor':i.__unicode__()})
+# 
+#             if not retorno:
+#                 retorno = [{"pk":"0","valor":"Nenhum registro"}]
+#         else:
+#             retorno = [{"pk":"0","valor":"Nenhum registro"}]
+# 
+#         json = simplejson.dumps(retorno)
+#     return HttpResponse(json,mimetype="application/json")
 
 
+# def seleciona_termo_natureza(request):
+#     if request.method == 'POST':
+#         termo = int(request.POST.get('id'))
+# 
+#         retorno = []
+# 
+#         if termo:
+#     
+#             t = Termo.objects.get(pk=termo)
+#             
+#             naturezas = Natureza_gasto.objects.filter(termo=t)
+#             
+#             for n in naturezas:
+#                 retorno.append({'pk':n.pk, 'valor':n.modalidade.sigla})
+#             if not retorno:
+#                 retorno = [{"pk":"0","valor":"Nenhum registro"}]
+#         else:
+#             retorno = [{"pk":"0","valor":"Nenhum registro"}]
+# 
+#         json = simplejson.dumps(retorno)
+#     return HttpResponse(json,mimetype="application/json")
+# 
+# 
+# # Gera listas modalidade, item e natureza conforme termo selecionado.
+# def seleciona_mod_item_natureza(request):
+#     if request.method == 'POST':
+#         termo = int(request.POST.get('id'))
+# 
+#         retorno = {}
+# 
+#         if termo:
+#             retorno['modalidade'] = []
+#             retorno['item'] = []
+#             retorno['natureza'] = []
+# 	    
+#             t = Termo.objects.get(pk=termo)
+#             
+#             modalidade = Modalidade.modalidades_termo(t)
+#             itens = Item.objects.filter(natureza_gasto__termo=t, item=None)
+#             naturezas = Natureza_gasto.objects.filter(termo=t)
+#             
+#             for m in modalidade:
+#                 retorno['modalidade'].append({'pk':m.pk, 'valor':m.__unicode__()})
+#             for i in itens:
+#                 retorno['item'].append({'pk':i.pk, 'valor':i.__unicode__()})
+#             for n in naturezas:
+#                 retorno['natureza'].append({'pk':n.pk, 'valor':n.__unicode__()})
+# 
+#             
+#             if not retorno['modalidade']:
+#                 retorno['modalidade'] = [{"pk":"0","valor":"Nenhum registro"}]
+#             if not retorno['item']:
+#                 retorno['item'] = [{"pk":"0","valor":"Nenhum registro"}]
+#             if not retorno['natureza']:
+#                 retorno['natureza'] = [{"pk":"0","valor":"Nenhum registro"}]
+#         else:
+#             retorno['modalidade'] = [{"pk":"0","valor":"Nenhum registro"}]
+#             retorno['item'] = [{"pk":"0","valor":"Nenhum registro"}]
+#             retorno['natureza'] = [{"pk":"0","valor":"Nenhum registro"}]
+# 
+#         json = simplejson.dumps(retorno)
+#     return HttpResponse(json,mimetype="application/json")
+# 
+# 
+# 
+# # Gera uma lista dos itens de outorga conforme a modalidade selecionada.
+# def seleciona_item_natureza(request):
+#     if request.method == 'POST':
+#         retorno = {}
+# 
+#         id = request.POST.get('id')
+#         previous = request.POST.get('previous')
+# 
+#         if id and previous:
+#             retorno['item'] = []
+#             retorno['natureza'] = []
+# 
+#             t = Termo.objects.get(pk=int(previous))
+#             itens = Item.objects.filter(natureza_gasto__termo=t, natureza_gasto__modalidade=id, item=None)
+#             naturezas = Natureza_gasto.objects.filter(termo=t, modalidade=id)
+# 
+#             for i in itens:
+#                 retorno['item'].append({'pk':i.pk, 'valor':i.__unicode__()})
+#             for n in naturezas:
+#                 retorno['natureza'].append({'pk':n.pk, 'valor':n.__unicode__()})
+# 
+# 
+#             if not retorno['item']:
+#                 retorno['item'] = [{"pk":"0","valor":"Nenhum registro"}]
+#             if not retorno['natureza']:
+#                 retorno['natureza'] = [{"pk":"0","valor":"Nenhum registro"}]
+#         else:
+#             retorno['item'] = [{"pk":"0","valor":"Nenhum registro"}]
+#             retorno['natureza'] = [{"pk":"0","valor":"Nenhum registro"}]
+# 
+#         json = simplejson.dumps(retorno)
+#     return HttpResponse(json,mimetype="application/json")
+
+
+#### ROGERIO: VERIFICAR SE EXISTE ALGUMA CHAMADA PARA ESTA VIEW
+####         PARA A SUA REMOÇÃO DO SISTEMA
 def gastos_acordos(request):
     acordos = []
     acordo = ['']
     for t in Termo.objects.filter(ano__gte=2005).order_by('ano'):
         acordo.append('%s (%s)' % (t.__unicode__(), t.duracao_meses()))
-        
+         
     acordos.append(acordo)
     for a in Acordo.objects.all():
- 
+  
         acordo = [a.descricao]
         for t in Termo.objects.filter(ano__gte=2005).order_by('ano'):
             total = Decimal('0.0')
@@ -236,7 +238,7 @@ def gastos_acordos(request):
                 total += o.gasto()
             acordo.append(total)
         acordos.append(acordo)
-
+ 
     return render_to_pdf('outorga/acordos.pdf', {'acordos':acordos})
 
 @login_required
