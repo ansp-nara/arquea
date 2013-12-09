@@ -88,15 +88,15 @@ class OrigemFapespAdminForm(forms.ModelForm):
             m = self.fields['modalidade']
             m.queryset = Modalidade.modalidades_termo(t=instance.item_outorga.natureza_gasto.termo)
 
-            self.fields['termo'].initial = instance.item_outorga.natureza_gasto.termo.id
-            self.fields['modalidade'].initial = instance.item_outorga.natureza_gasto.modalidade.id
+#             self.fields['termo'].initial = instance.item_outorga.natureza_gasto.termo.id
+#             self.fields['modalidade'].initial = instance.item_outorga.natureza_gasto.modalidade.id
 
 
-    termo = forms.ModelChoiceField(Termo.objects.all(), label=_(u'Termo'), required=False,
-            widget=forms.Select(attrs={'onchange': 'ajax_filter_modalidade_item_inline("/outorga/escolhe_termo", this.value, this.id);'}))
+#     termo = forms.ModelChoiceField(Termo.objects.all(), label=_(u'Termo'), required=False,
+#             widget=forms.Select(attrs={'onchange': 'ajax_filter_modalidade_item_inline("/outorga/escolhe_termo", this.value, this.id);'}))
 
-    modalidade = forms.ModelChoiceField(Modalidade.modalidades_termo(), label=_(u'Modalidade'), required=False,
-            widget=forms.Select(attrs={'onchange': 'ajax_filter_inline("/outorga/escolhe_modalidade", this.value, this.id);'}))
+#     modalidade = forms.ModelChoiceField(Modalidade.modalidades_termo(), label=_(u'Modalidade'), required=False,
+#             widget=forms.Select(attrs={'onchange': 'ajax_filter_inline("/outorga/escolhe_modalidade", this.value, this.id);'}))
 
     item_outorga = forms.ModelChoiceField(Item.objects.all(), label=_(u'Item'), required=True)
 
