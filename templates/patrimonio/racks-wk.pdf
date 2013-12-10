@@ -113,13 +113,18 @@ Coluna de furos do rack
 }
 
 .rack {
-    width:255px;
+#    width:255px;
     display:inline-block;
     margin-right:10px;
     margin-bottom:30px;
     font-size:0;
     top:20px;
     position:relative;
+}
+.outros,
+.conflitos {
+    float:left;
+    width:315px;
 }
 .interno {
     position:relative;
@@ -226,6 +231,9 @@ Coluna de furos do rack
     display: block;
     clear: both;
 }
+.conflitos {
+    float:left;
+}
 /**
     Exibe ou esconde as imagens dos stencils 
 */
@@ -245,7 +253,14 @@ Coluna de furos do rack
     .interno div div div:nth-child(2) { display:block; }
  {% endif %}
  
+ {% if chk_outros == "0" %}
+    .outros-content { display:none; }
+ {% endif %}
+ {% if chk_avisos == "0" %}
+    .conflitos { display:none; }
+ {% endif %}
  
+   
  
 </style>
 <h1>Diagrama de Racks Frontal</h1>
@@ -260,9 +275,15 @@ Coluna de furos do rack
             <p class="page-break"></p>
         {% endif %}
         {% for rack in fileira.racks %}
-           {% if not forloop.first and forloop.counter0|divisibleby:"6" %}
-               <div class="page-break"></div>
-           {% endif %}
+            {% if not forloop.first %}
+                {% if chk_avisos == '1' %}
+                    <div class="page-break"></div>
+                {% elif chk_outros == '1' and forloop.counter0|divisibleby:"2" %}
+                       <div class="page-break"></div>
+                {% elif forloop.counter0|divisibleby:"6" %}
+                       <div class="page-break"></div>
+                {% endif %}
+            {% endif %}
             <div class="rack">
                 <h2>
                   {{ rack.nome|default:'' }} ({{ rack.vazio }} ocupado)
@@ -354,27 +375,12 @@ Coluna de furos do rack
               {% endfor %}
                 </div>
             </div>
-        {% endfor %}
-    {% endfor %}
-{% endfor %}
-</div>
-
-<div class="page-break"></div>
-<h1>Lista de equipamentos fora de visão</h1>
-    {% for dc in dcs %}
-    <div class="dc">
-    <h1>{{ dc.entidade }} - {{ dc.nome|default:'' }}</h1>
-    {% for fileira in dc.fileiras %}
-        {% for rack in fileira.racks %}
-            {% if rack.equipamentos_fora_visao %}
-            <div class="rack">
-                <h2>
-                  {{ rack.nome|default:'' }} ({{ rack.vazio }} ocupado)
-                </h2>
+            <div class="rack outros-content">
+                {% if rack.equipamentos_fora_visao|length > 0 %}
+                <h2><caption class="outros-title">Outros equipamentos.</caption></h2>
                 <div class="outros">
                     <div class="outros-content">
                     <table>
-                        <caption class="outros-title">Outros equipamentos.</caption>
                         <tr>
                             <th>Desc</th>
                             <th>Tam</th>
@@ -388,14 +394,63 @@ Coluna de furos do rack
                                 </td>
                                 <td>{{ eq.tam }}</td>
                                 <td>{{ eq.pos }}</td>
-                                <td>{{ eq.pos_col }}</td>
+                                <td>{{ eq.pos_col|default:'' }}</td>
                             </tr>
                         {% endfor %}
                     </table>
                     </div>
                 </div>
-            </div>
+                {% endif %}
+                {% if rack.conflitos %}
+                <div class="conflitos">
+                    <span class="conflitos-title">Avisos!</span>
+                    <div class="conflitos-content">
+                    <table>
+                        <tr>
+                            <th>EQ</th>
+                            <th>Pos</th>
+                            <th>Alt</th>
+                        </tr>
+                        {% for conflito in rack.conflitos %}
+                           {% if not forloop.first and forloop.counter0|divisibleby:"8" %}
+                               </table>
+                               </div></div>
+                               <div class="conflitos">
+                                    <div class="conflitos-content">
+                                    <table>
+                           {% endif %}
+                            <tr class="conflito-tbl-obs">
+                               <td colspan=3>{{ conflito.obs }}</td>
+                            </tr>
+                            <tr>
+                               {% if conflito.eq1 %}
+                                <td>
+                                   <a href="{% url "admin:patrimonio_patrimonio_change" conflito.eq1.id %}" onclick="return showAddAnotherPopup(this);">
+                                    {{ conflito.eq1.descricao }}
+                                    </a>
+                                </td>
+                                <td>{{ conflito.eq1.pos }}</td>
+                                <td>{{ conflito.eq1.tam }}</td>
+                                {% endif %}
+                            </tr>
+                            <tr>
+                                {% if conflito.eq2 %}
+                                <td>
+                                    <a href="{% url "admin:patrimonio_patrimonio_change" conflito.eq2.id %}" onclick="return showAddAnotherPopup(this);">
+                                        {{ conflito.eq2.descricao }}
+                                    </a>
+                                </td>
+                                <td>{{ conflito.eq2.pos }}</td>
+                                <td>{{ conflito.eq2.tam }}</td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                    </table>
+                    </div>
+                </div>
                {% endif %}
+           </div>
+        <!-- end rack -->
         {% endfor %}
     {% endfor %}
 {% endfor %}

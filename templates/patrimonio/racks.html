@@ -94,7 +94,9 @@
 <form>
 <input type="checkbox" id="chk_stencil" name="chk_stencil" value="1" {% if chk_stencil = 1 %}checked{% endif %}><span>&nbsp;Mostrar stencils</span><br>
 <input type="checkbox" id="chk_legenda" name="chk_legenda" value="1" {% if chk_legenda = 1 %}checked{% endif %}><span>&nbsp;Mostrar legendas</span><br>
-<input type="checkbox" id="chk_legenda_desc" name="chk_legenda_desc" value="1" {% if chk_legenda_desc = 1 %}checked{% endif %}><span>&nbsp;Mostrar descrição.</span>
+<input type="checkbox" id="chk_legenda_desc" name="chk_legenda_desc" value="1" {% if chk_legenda_desc = 1 %}checked{% endif %}><span>&nbsp;Mostrar descrição.</span><br><br>
+<input type="checkbox" id="chk_outros" name="chk_outros" value="1" {% if chk_outros = 1 %}checked{% endif %}><span>&nbsp;Mostrar outros equipamentos.</span><br>
+<input type="checkbox" id="chk_avisos" name="chk_avisos" value="1" {% if chk_avisos = 1 %}checked{% endif %}><span>&nbsp;Mostrar avisos.</span><br>
 </form>
     
 	{% for dc in dcs %}
