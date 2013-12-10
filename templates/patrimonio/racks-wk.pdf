@@ -115,7 +115,7 @@ Coluna de furos do rack
 .rack {
 #    width:255px;
     display:inline-block;
-    margin-right:10px;
+    margin-right:25px;
     margin-bottom:30px;
     font-size:0;
     top:20px;
@@ -123,7 +123,7 @@ Coluna de furos do rack
 }
 .outros,
 .conflitos {
-    float:left;
+    display:inline-block;
     width:315px;
 }
 .interno {
@@ -201,10 +201,6 @@ Coluna de furos do rack
 .dc {
     margin-top:5px;
 }
-.outros {
-    position:relative;
-    display:block;
-}
 .outros caption {
     display:block;
     text-align: left;
@@ -231,9 +227,6 @@ Coluna de furos do rack
     display: block;
     clear: both;
 }
-.conflitos {
-    float:left;
-}
 /**
     Exibe ou esconde as imagens dos stencils 
 */
@@ -254,7 +247,7 @@ Coluna de furos do rack
  {% endif %}
  
  {% if chk_outros == "0" %}
-    .outros-content { display:none; }
+    .outros { display:none; }
  {% endif %}
  {% if chk_avisos == "0" %}
     .conflitos { display:none; }
@@ -375,81 +368,86 @@ Coluna de furos do rack
               {% endfor %}
                 </div>
             </div>
-            <div class="rack outros-content">
-                {% if rack.equipamentos_fora_visao|length > 0 %}
-                <h2><caption class="outros-title">Outros equipamentos.</caption></h2>
-                <div class="outros">
-                    <div class="outros-content">
-                    <table>
-                        <tr>
-                            <th>Desc</th>
-                            <th>Tam</th>
-                            <th>Pos</th>
-                            <th>Col</th>
-                        </tr>
-                        {% for eq in rack.equipamentos_fora_visao %}
-                            <tr>
-                                <td>
-                                    {{ eq.descricao|truncatechars:45 }}
-                                </td>
-                                <td>{{ eq.tam }}</td>
-                                <td>{{ eq.pos }}</td>
-                                <td>{{ eq.pos_col|default:'' }}</td>
-                            </tr>
-                        {% endfor %}
-                    </table>
+            {% if chk_outros == "1" and rack.equipamentos_fora_visao|length > 0 %}
+                <div class="rack">
+                    <div class="outros">
+                        <h2><caption class="outros-title">Outros equipamentos.</caption></h2>
+                        <div class="outros-content">
+                            <table>
+                                <tr>
+                                    <th>Desc</th>
+                                    <th>Tam</th>
+                                    <th>Pos</th>
+                                    <th>Col</th>
+                                </tr>
+                                {% for eq in rack.equipamentos_fora_visao %}
+                                    <tr>
+                                        <td>
+                                            {{ eq.descricao|truncatechars:45 }}
+                                        </td>
+                                        <td>{{ eq.tam }}</td>
+                                        <td>{{ eq.pos }}</td>
+                                        <td>{{ eq.pos_col|default:'' }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                        </div>
                     </div>
                 </div>
-                {% endif %}
-                {% if rack.conflitos %}
-                <div class="conflitos">
-                    <span class="conflitos-title">Avisos!</span>
-                    <div class="conflitos-content">
-                    <table>
-                        <tr>
-                            <th>EQ</th>
-                            <th>Pos</th>
-                            <th>Alt</th>
-                        </tr>
-                        {% for conflito in rack.conflitos %}
-                           {% if not forloop.first and forloop.counter0|divisibleby:"8" %}
-                               </table>
-                               </div></div>
-                               <div class="conflitos">
-                                    <div class="conflitos-content">
-                                    <table>
-                           {% endif %}
-                            <tr class="conflito-tbl-obs">
-                               <td colspan=3>{{ conflito.obs }}</td>
-                            </tr>
-                            <tr>
-                               {% if conflito.eq1 %}
-                                <td>
-                                   <a href="{% url "admin:patrimonio_patrimonio_change" conflito.eq1.id %}" onclick="return showAddAnotherPopup(this);">
-                                    {{ conflito.eq1.descricao }}
-                                    </a>
-                                </td>
-                                <td>{{ conflito.eq1.pos }}</td>
-                                <td>{{ conflito.eq1.tam }}</td>
-                                {% endif %}
-                            </tr>
-                            <tr>
-                                {% if conflito.eq2 %}
-                                <td>
-                                    <a href="{% url "admin:patrimonio_patrimonio_change" conflito.eq2.id %}" onclick="return showAddAnotherPopup(this);">
-                                        {{ conflito.eq2.descricao }}
-                                    </a>
-                                </td>
-                                <td>{{ conflito.eq2.pos }}</td>
-                                <td>{{ conflito.eq2.tam }}</td>
-                                {% endif %}
-                            </tr>
-                        {% endfor %}
-                    </table>
+            {% endif %}
+            
+            {% if chk_avisos == "1" and rack.conflitos %}
+                <div class="rack">
+                    <div class="conflitos">
+                        <span class="conflitos-title">Avisos!</span>
+                        <div class="conflitos-content">
+                            <table>
+                                <tr>
+                                    <th>EQ</th>
+                                    <th>Pos</th>
+                                    <th>Alt</th>
+                                </tr>
+                                {% for conflito in rack.conflitos %}
+                                   {% if not forloop.first and forloop.counter0|divisibleby:"8" %}
+                                       </table>
+                                       </div></div></div>
+                                       <div class="rack">
+                                          <div class="conflitos">
+                                           <span class="conflitos-title">&nbsp;</span>
+                                            <div class="conflitos-content">
+                                            <table>
+                                   {% endif %}
+                                    <tr class="conflito-tbl-obs">
+                                       <td colspan=3>{{ conflito.obs }}</td>
+                                    </tr>
+                                    <tr>
+                                       {% if conflito.eq1 %}
+                                        <td>
+                                           <a href="{% url "admin:patrimonio_patrimonio_change" conflito.eq1.id %}" onclick="return showAddAnotherPopup(this);">
+                                            {{ conflito.eq1.descricao }}
+                                            </a>
+                                        </td>
+                                        <td>{{ conflito.eq1.pos }}</td>
+                                        <td>{{ conflito.eq1.tam }}</td>
+                                        {% endif %}
+                                    </tr>
+                                    <tr>
+                                        {% if conflito.eq2 %}
+                                        <td>
+                                            <a href="{% url "admin:patrimonio_patrimonio_change" conflito.eq2.id %}" onclick="return showAddAnotherPopup(this);">
+                                                {{ conflito.eq2.descricao }}
+                                            </a>
+                                        </td>
+                                        <td>{{ conflito.eq2.pos }}</td>
+                                        <td>{{ conflito.eq2.tam }}</td>
+                                        {% endif %}
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                        </div>
                     </div>
-                </div>
-               {% endif %}
-           </div>
+               </div>
+           {% endif %}
         <!-- end rack -->
         {% endfor %}
     {% endfor %}
