@@ -408,7 +408,7 @@ Coluna de furos do rack
                                     <th>Alt</th>
                                 </tr>
                                 {% for conflito in rack.conflitos %}
-                                   {% if not forloop.first and forloop.counter0|divisibleby:"8" %}
+                                   {% if not forloop.first and forloop.counter0|divisibleby:"7" %}
                                        </table>
                                        </div></div></div>
                                        <div class="rack">
