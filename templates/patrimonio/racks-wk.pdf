@@ -124,7 +124,7 @@ Coluna de furos do rack
 .outros,
 .conflitos {
     display:inline-block;
-    width:315px;
+    width:255px;
 }
 .interno {
     position:relative;
