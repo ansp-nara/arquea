@@ -26,24 +26,36 @@ $(function(){
    });
    
    /**
+    * Habilita/desabilita o targetSel
+    * Check/uncheck o chkSel
+    * Atualiza a URL da geração do PDF com o parametro urlSel
+    */
+   function _chk_toogle(targetSel, chkSel, urlSel) {
+	   $(targetSel).toggle();
+	   
+	   var showOrHide = ($(chkSel).prop('checked'));
+	   var newUrl = updateQueryString(urlSel, showOrHide?1:0, $('#icons a').attr('href'));
+	   $('#icons a').attr('href', newUrl);
+   }
+   function _chk_span_toogle(targetSel, chkSel, urlSel) {
+	   var showOrHide = !($(chkSel).prop('checked'));
+	   
+	   $(targetSel).toggle(showOrHide);
+	   $(chkSel).prop('checked', showOrHide);
+	   
+	   var newUrl = updateQueryString(urlSel, showOrHide?1:0, $('#icons a').attr('href'));
+	   $('#icons a').attr('href', newUrl);
+   }
+   
+   /**
     * Exibe ou esconde as imagens dos stencils dos equipamentos
     * Os disparos ocorrem no checkbox e no label do checkbox
     */
    $("#chk_stencil").change(function(e){
-	   $(".interno a img").toggle();
-	   
-	   var showOrHide = ($('#chk_stencil').prop('checked'));
-	   var newUrl = updateQueryString('chk_stencil', showOrHide?1:0, $('#icons a').attr('href'));
-	   $('#icons a').attr('href', newUrl);
+	   _chk_toogle(".interno a img", '#chk_stencil', 'chk_stencil');
    });
    $("#chk_stencil + span").click(function(e){
-	   var showOrHide = !($('#chk_stencil').prop('checked'));
-	   
-	   $(".interno a img").toggle(showOrHide);
-	   $('#chk_stencil').prop('checked', showOrHide);
-	   
-	   var newUrl = updateQueryString('chk_stencil', showOrHide?1:0, $('#icons a').attr('href'));
-	   $('#icons a').attr('href', newUrl);
+	   _chk_span_toogle(".interno a img", '#chk_stencil', 'chk_stencil');
    });
    
    /**
@@ -51,20 +63,10 @@ $(function(){
     * Os disparos ocorrem no checkbox e no label do checkbox
     */
    $("#chk_legenda").click(function(e){
-	   $(".equip div div:nth-child(1)").toggle();
-	   
-	   var showOrHide = ($('#chk_legenda').prop('checked'));
-	   var newUrl = updateQueryString('chk_legenda', showOrHide?1:0, $('#icons a').attr('href'));
-	   $('#icons a').attr('href', newUrl);
+	   _chk_toogle(".equip div div:nth-child(1)", '#chk_legenda', 'chk_legenda');
    });
    $("#chk_legenda + span").click(function(e){
-	   var showOrHide = !($('#chk_legenda').prop('checked'));
-	   
-	   $(".equip div div:nth-child(1)").toggle(showOrHide);
-	   $('#chk_legenda').prop('checked', showOrHide);
-	   
-	   var newUrl = updateQueryString('chk_legenda', showOrHide?1:0, $('#icons a').attr('href'));
-	   $('#icons a').attr('href', newUrl);
+	   _chk_span_toogle(".equip div div:nth-child(1)", '#chk_legenda', 'chk_legenda');
    });
    
    /**
@@ -72,21 +74,26 @@ $(function(){
     * Os disparos ocorrem no checkbox e no label do checkbox
     */
    $("#chk_legenda_desc").click(function(e){
-	   $(".equip div div:nth-child(2)").toggle();
-	   
-	   var showOrHide = ($('#chk_legenda_desc').prop('checked'));
-	   var newUrl = updateQueryString('chk_legenda_desc', showOrHide?1:0, $('#icons a').attr('href'));
-	   $('#icons a').attr('href', newUrl);
+	   _chk_toogle(".equip div div:nth-child(2)", '#chk_legenda_desc', 'chk_legenda_desc');
    });
    $("#chk_legenda_desc + span").click(function(e){
-	   var showOrHide = !($('#chk_legenda_desc').prop('checked'));
-	   
-	   $(".equip div div:nth-child(2)").toggle(showOrHide);
-	   $('#chk_legenda_desc').prop('checked', showOrHide);
-	   
-	   var newUrl = updateQueryString('chk_legenda_desc', showOrHide?1:0, $('#icons a').attr('href'));
-	   $('#icons a').attr('href', newUrl);
+	   _chk_span_toogle(".equip div div:nth-child(2)", '#chk_legenda_desc', 'chk_legenda_desc');
    });
+   
+   $("#chk_outros").click(function(e){
+	   _chk_toogle(".outros-content", '#chk_outros', 'chk_outros');
+   });
+   $("#chk_outros + span").click(function(e){
+	   _chk_span_toogle(".outros-content", '#chk_outros', 'chk_outros');
+   });
+   
+   $("#chk_avisos").click(function(e){
+	   _chk_toogle(".conflitos", '#chk_avisos', 'chk_avisos');
+   });
+   $("#chk_avisos + span").click(function(e){
+	   _chk_span_toogle(".conflitos", '#chk_avisos', 'chk_avisos');
+   });
+ 
    
    /**
     * Function para alterar a queryString de um parametro href

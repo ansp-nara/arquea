@@ -731,7 +731,6 @@ def racks(request):
                     rack.tamanho = 42
                     conflitos.append({'obs': 'Rack não possui tamanho.'})
                 
-                
                 # ordena os equipamentos do rack conforme a posição no rack
 #                 pts = list(rack.contido.filter(historicolocal__posicao__isnull=False).values('historicolocal__data').aggregate(Max('historicolocal__data')))
                 hist = rack.contido.annotate(hist=Max('historicolocal__data')).values_list('pk')
@@ -741,11 +740,12 @@ def racks(request):
                 ptAnterior = None
                 for pt in pts:
                     pos = pt.historico_atual.posicao_furo -1 
-    
-                    if pos <= 0 or pt.tamanho is None: continue
                     
+                    tamanho = 0
+                    if pt.tamanho:
+                        tamanho = pt.tamanho
                     # calculando a altura em furos
-                    tam = int(round(pt.tamanho * 3))
+                    tam = int(round(tamanho * 3))
     
                     # calculo da posição em pixel do eixoY, top-down
                     eixoY = int(round(((rack_altura - (pos) - tam) * 19)/3))
@@ -755,7 +755,7 @@ def racks(request):
                     if pt.equipamento and pt.equipamento.imagem:
                         imagem = pt.equipamento.imagem.url
                         
-                    if pt.historico_atual.posicao_colocacao in ('T', 'TD', 'TE', 'piso', 'lD', 'lE'):
+                    if pos <= 0 or pt.historico_atual.posicao_colocacao in ('T', 'TD', 'TE', 'piso', 'lD', 'lE'):
                         equipamentos_fora_visao.append({'id': pt.id, 'pos':pos, 'tam': tam, 'eixoY': eixoY, 'altura':(tam*19/3), 
                                           'pos_original':pt.historico_atual.posicao_furo, 'imagem':imagem, 
                                           'nome':pt.apelido, 'descricao':pt.descricao or u'Sem descrição', 
@@ -770,7 +770,16 @@ def racks(request):
                         espaco_ocupado += tam
                     
                     ## CHECAGEM DE PROBLEMAS
-                    if pos + (tam) > rack_altura:
+#                     if pos <= 0:
+#                         obs = 'Equip. com problema de posicionamento.'
+#                         conflitos.append({'obs': obs, 'eq1':equipamentos[-1]})
+#                         equipamentos[-1]['conflito'] = True 
+#                     elif pt.tamanho is None:
+                    if pt.tamanho is None:
+                        obs = 'Equip. com tamanho ZERO.'
+                        conflitos.append({'obs': obs, 'eq1':equipamentos[-1]})
+                        equipamentos[-1]['conflito'] = True 
+                    elif pos + (tam) > rack_altura:
                         # Ocorre quando um equipamento está passando do limite máximo do rack
                         #obs = '{!s} + {!s} > {!s}'.format(pos, (tam), 126)
                         obs = 'Equip. acima do limite do rack.'
@@ -818,13 +827,15 @@ def racks(request):
     chk_stencil = request.GET.get('chk_stencil') if request.GET.get('chk_stencil') else 1
     chk_legenda = request.GET.get('chk_legenda') if request.GET.get('chk_legenda') else 1
     chk_legenda_desc = request.GET.get('chk_legenda_desc') if request.GET.get('chk_legenda_desc') else 0
+    chk_outros = request.GET.get('chk_outros') if request.GET.get('chk_outros') else 1
+    chk_avisos = request.GET.get('chk_avisos') if request.GET.get('chk_avisos') else 1
             
     if request.GET.get('pdf') == "2":
-        return render_wk_to_pdf('patrimonio/racks-wk.pdf', {'dcs':dcs, 'todos_dcs':todos_dcs, 'chk_legenda':chk_legenda, 'chk_legenda_desc':chk_legenda, 'chk_legenda_desc':chk_legenda_desc, 'chk_stencil':chk_stencil}, request=request, filename='diagrama_de_racks.pdf',)
+        return render_wk_to_pdf('patrimonio/racks-wk.pdf', {'dcs':dcs, 'todos_dcs':todos_dcs, 'chk_legenda':chk_legenda, 'chk_legenda_desc':chk_legenda, 'chk_legenda_desc':chk_legenda_desc, 'chk_stencil':chk_stencil, 'chk_outros':chk_outros, 'chk_avisos':chk_avisos}, request=request, filename='diagrama_de_racks.pdf',)
     elif request.GET.get('pdf'):
-        return TemplateResponse(request, 'patrimonio/racks-wk.pdf', {'dcs':dcs, 'todos_dcs':todos_dcs, 'chk_legenda':chk_legenda, 'chk_legenda_desc':chk_legenda_desc, 'chk_stencil':chk_stencil})
+        return TemplateResponse(request, 'patrimonio/racks-wk.pdf', {'dcs':dcs, 'todos_dcs':todos_dcs, 'chk_legenda':chk_legenda, 'chk_legenda_desc':chk_legenda_desc, 'chk_stencil':chk_stencil, 'chk_outros':chk_outros, 'chk_avisos':chk_avisos})
     else:
-        return TemplateResponse(request, 'patrimonio/racks.html', {'dcs':dcs, 'todos_dcs':todos_dcs, 'chk_legenda':chk_legenda, 'chk_legenda_desc':chk_legenda_desc, 'chk_stencil':chk_stencil})
+        return TemplateResponse(request, 'patrimonio/racks.html', {'dcs':dcs, 'todos_dcs':todos_dcs, 'chk_legenda':chk_legenda, 'chk_legenda_desc':chk_legenda_desc, 'chk_stencil':chk_stencil, 'chk_outros':chk_outros, 'chk_avisos':chk_avisos})
 
 @login_required
 def racks1(request):
