@@ -775,6 +775,7 @@ def racks(request):
 #                         conflitos.append({'obs': obs, 'eq1':equipamentos[-1]})
 #                         equipamentos[-1]['conflito'] = True 
 #                     elif pt.tamanho is None:
+
                     if pt.tamanho is None:
                         obs = 'Equip. com tamanho ZERO.'
                         conflitos.append({'obs': obs, 'eq1':equipamentos[-1]})
@@ -786,11 +787,11 @@ def racks(request):
                         conflitos.append({'obs': obs, 'eq1':equipamentos[-1]})
                         equipamentos[-1]['conflito'] = True
                 
-                    elif len(equipamentos)>2 and eixoY:
+                    elif len(equipamentos)>=2 and eixoY:
                         # Ocorre quando um equipamento sobrepoe o outro
                         # Caso estejam na mesma posição 01 ou 02, ou então, haja um equipamento que ocupe toda largura do rack
                         # Não ocorre quando os equipamentos estiverem lado a lado (marcados no attr pos_col, por exemplo, 01 com 02)
-                        
+
                         if ptAnterior['eixoY'] + ptAnterior['tam'] > eixoY and (ptAnterior['pos_col'] == equipamentos[-1]['pos_col'] or not ptAnterior['pos_col'] or not equipamentos[-1]['pos_col']):
                             obs = 'Equipamentos sobrepostos.'
                             conflitos.append({'obs': obs, 'eq1':ptAnterior, 'eq2':equipamentos[-1]})
