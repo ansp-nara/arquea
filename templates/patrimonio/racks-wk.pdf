@@ -395,7 +395,7 @@ Coluna de furos do rack
                     </div>
                 </div>
             {% endif %}
-            
+            {# Exibindo o qadro de erros do rack #}
             {% if chk_avisos == "1" and rack.conflitos %}
                 <div class="rack">
                     <div class="conflitos">
@@ -408,6 +408,7 @@ Coluna de furos do rack
                                     <th>Alt</th>
                                 </tr>
                                 {% for conflito in rack.conflitos %}
+                                   {# Caso haja muitos erros, quebra a lista em mais colunas #}
                                    {% if not forloop.first and forloop.counter0|divisibleby:"7" %}
                                        </table>
                                        </div></div></div>
