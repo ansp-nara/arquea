@@ -82,6 +82,7 @@ $(function(){
     <option value="modelo">Modelo</option>
     <option value="pn">Part Number</option>
     <option value="sn">Serial Number</option>
+    <option value="cage">Cage</option>
     <option value="rack">Rack</option>
     <option value="furo">Furo</option>
     <option value="posicao">Posição</option>
@@ -112,6 +113,7 @@ $(function(){
         <th class="td_pn">Part Number</th>
         <th class="td_sn">Serial Number</th>
         
+        <th class="td_cage">Cage</th>
         <th class="td_rack"><a href="?&ord=rack&chk_patrimonio_vazio={{chk_patrimonio_vazio}}">Rack</a></th>
         <th class="td_furo">Furo</th>
         <th class="td_posicao">Posição</th>
@@ -123,6 +125,7 @@ $(function(){
         <th class="td_pn">Part Number</th>
         <th class="td_sn">Serial Number</th>
         
+        <th class="td_cage">Cage</th>
         <th class="td_rack">Rack</th>
         <th class="td_furo">Furo</th>
         <th class="td_posicao">Posição</th>
@@ -139,6 +142,7 @@ $(function(){
 	       <td class="td_pn">{{ p.part_number|default:"" }}</td>
 	       <td class="td_sn">{{ p.serial_number|default:"" }}</td>
 	       
+	       <td class="td_cage">{{ p.cage|default:"" }}</td>
 	       <td class="td_rack">{{ p.rack|default:"" }}</td>
 	       <td class="td_furo">{{ p.furo|default:"" }}</td>
 	       <td class="td_posicao">{{ p.posicao|default:"" }}</td>
@@ -149,6 +153,7 @@ $(function(){
 	       <td class="patr td_pn {% if p.patrimonio_model and p.part_number|default:"" == p.patrimonio_model.part_number|default:"" %} ok {% else %} nok {% endif %}">{{ p.patrimonio_model.part_number }}</td>
 	       <td class="patr td_sn {% if p.patrimonio_model and p.serial_number|default:"" == p.patrimonio_model.ns|default:"" %} ok {% else %} nok {% endif %}">{{ p.patrimonio_model.ns }}</td>
 
+           <td class="patr td_cage {% if p.patrimonio_model and p.cage in p.patrimonio_model.historico_atual.endereco.complemento %} ok {% else %} nok {% endif %}">{{ p.patrimonio_model.historico_atual.endereco.complemento|default:"" }}</td>
            <td class="patr td_rack {% if p.patrimonio_model and p.rack == p.patrimonio_model.historico_atual.posicao_rack %} ok {% else %} nok {% endif %}">{{ p.patrimonio_model.historico_atual.posicao_rack|default:"" }}</td>
            <td class="patr td_furo {% if p.patrimonio_model and p.furo|default:"-1"|add:"0" == p.patrimonio_model.historico_atual.posicao_furo|add:"0" %} ok {% else %} nok {% endif %}">{{ p.patrimonio_model.historico_atual.posicao_furo|default:"" }}</td>
            <td class="patr td_posicao {% if p.patrimonio_model and p.posicao == p.patrimonio_model.historico_atual.posicao_colocacao %} ok {% else %} nok {% endif %}">{{ p.patrimonio_model.historico_atual.posicao_colocacao|default:"" }}</td>
