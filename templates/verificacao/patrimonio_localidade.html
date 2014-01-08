@@ -3,6 +3,10 @@
 {% block breadcrumbs %}<div class="breadcrumbs">Você está em: <a href="/verificacao/relatorio/equipamento_consolidado">Relatório de verificação de equipamentos</a></div>{% endblock %}
 {% block content %}
 <style>
+ table {
+    border-collapse: collapse;
+ 
+ }
  #table-data th {
     background-color: lightgray;
     border: 1px #aaa dotted;
@@ -12,7 +16,15 @@
     border:1px;
     border-color: lightgray;
     border-style: dotted;
-}
+ }
+ #table-data .tr_data_line {
+    border-top: 1px solid gray;
+ }
+ 
+ .td_data {
+    white-space:nowrap;
+ 
+ }
 </style>
 <h1 repeat="1">Relatório de verificação de Patrimonio askjhdfasfdljadsflkj- {{ desc }}</h1>
 
@@ -28,7 +40,7 @@
            <th>Data</th>
       </tr>
       {% for pt in patrimonios %}
-	      <tr>
+	      <tr class="tr_data_line">
 	           <td><a href="{{ model.admin_url }}/admin/patrimonio/patrimonio/{{ pt.id }}/">{{ pt.id }}</a></td>
 	           <td><a href="{{ model.admin_url }}/admin/patrimonio/patrimonio/{{ pt.id }}/">{{ pt.descricao }}</a></td>
 	           <td>{{ pt.modelo }}</td>
@@ -36,7 +48,7 @@
 	           <td>{{ pt.endereco }}</td>
 	           <td>{{ pt.posicao }}</td>
 	           <td>{{ pt.estado }}</td>
-	           <td>{{ pt.data }}</td>
+	           <td class='td_data'>{{ pt.data }}</td>
 	      </tr>
 	      {% if pt.contido %}
 	          <tr style="background-color:#f9f9f9;"><td colspan="8">
@@ -58,7 +70,7 @@
 		           <td>{{ f.endereco }}</td>
 		           <td>{{ f.posicao }}</td>
 		           <td>{{ f.estado }}</td>
-		           <td>{{ f.data }}</td>
+		           <td class='td_data'>{{ f.data }}</td>
 		        </tr>
 		      {% endfor %}
 		      </td></tr>
