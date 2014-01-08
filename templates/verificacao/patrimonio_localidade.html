@@ -20,50 +20,24 @@
       <tr>
            <th>ID</th>
            <th>Desc</th>
+           <th>Part Number</th>
            <th>Model</th>
            <th>Marca</th>
-           <th>Endereco</th>
-           <th>Posicao</th>
-           <th>Status</th>
-           <th>Data</th>
+           <th>Procedencia</th>
+           <th>Procedencia/Entidade</th>
       </tr>
-      {% for pt in patrimonios %}
-	      <tr>
-	           <td><a href="{{ model.admin_url }}/admin/patrimonio/patrimonio/{{ pt.id }}/">{{ pt.id }}</a></td>
-	           <td><a href="{{ model.admin_url }}/admin/patrimonio/patrimonio/{{ pt.id }}/">{{ pt.descricao }}</a></td>
-	           <td>{{ pt.modelo }}</td>
-	           <td>{{ pt.marca }}</td>
-	           <td>{{ pt.endereco }}</td>
-	           <td>{{ pt.posicao }}</td>
-	           <td>{{ pt.estado }}</td>
-	           <td>{{ pt.data }}</td>
-	      </tr>
-	      {% if pt.contido %}
-	          <tr style="background-color:#f9f9f9;"><td colspan="8">
-	          <table>
-		      {% for f in pt.contido %}
-		        {% if forloop.first %}
-			        <tr>
-			           <th>ID</th>
-			           <th>Desc</th>
-			           <th>Endereco</th>
-			           <th>Posicao</th>
-			           <th>Status</th>
-			           <th>Data</th>
-			        </tr>
-		        {% endif %}
-		        <tr>
-		           <td><a href="{{ model.admin_url }}/admin/patrimonio/patrimonio/{{ f.id }}/">{{ f.id }}</a></td>
-		           <td><a href="{{ model.admin_url }}/admin/patrimonio/patrimonio/{{ f.id }}/">{{ f.descricao }}</a></td>
-		           <td>{{ f.endereco }}</td>
-		           <td>{{ f.posicao }}</td>
-		           <td>{{ f.estado }}</td>
-		           <td>{{ f.data }}</td>
-		        </tr>
-		      {% endfor %}
-		      </td></tr>
-		      </table>
-		  {% endif %}
+     {% for pt_group in patrimonios %}
+       {% for pt in pt_group %}
+       <tr>
+           <td><a href="{{ model.admin_url }}/admin/patrimonio/patrimonio/{{ pt.id }}/">{{ pt.id }}</a></td>
+           <td><a href="{{ model.admin_url }}/admin/patrimonio/patrimonio/{{ pt.id }}/">{{ pt.descricao }}</a></td>
+           <td>{{ pt.part_number }}</td>
+           <td>{{ pt.modelo }}</td>
+           <td>{{ pt.marca }}</td>
+           <td>{{ pt.procedencia }}</td>
+           <td>{{ pt.entidade_procedencia|default:'' }}</td>
+      </tr>
+      {% endfor %}
     {% endfor %}
     </table>
 {% endblock %}
