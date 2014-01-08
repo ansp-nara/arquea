@@ -227,10 +227,10 @@ def gastos_acordos(request):
     acordo = ['']
     for t in Termo.objects.filter(ano__gte=2005).order_by('ano'):
         acordo.append('%s (%s)' % (t.__unicode__(), t.duracao_meses()))
-         
+          
     acordos.append(acordo)
     for a in Acordo.objects.all():
-  
+   
         acordo = [a.descricao]
         for t in Termo.objects.filter(ano__gte=2005).order_by('ano'):
             total = Decimal('0.0')
@@ -238,7 +238,7 @@ def gastos_acordos(request):
                 total += o.gasto()
             acordo.append(total)
         acordos.append(acordo)
- 
+  
     return render_to_pdf('outorga/acordos.pdf', {'acordos':acordos})
 
 @login_required
@@ -265,6 +265,8 @@ def contratos(request):
     return render_to_response('outorga/contratos.html', {'entidades':entidades}, context_instance=RequestContext(request))
    
 
+#### ROGERIO: VERIFICAR SE EXISTE ALGUMA CHAMADA PARA ESTA VIEW
+####         PARA A SUA REMOÇÃO DO SISTEMA
 @login_required 
 def por_item(request):
     if request.method == 'GET':
