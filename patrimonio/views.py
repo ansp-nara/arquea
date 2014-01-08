@@ -5,7 +5,7 @@
 from django.contrib import admin
 from django.contrib.auth.decorators import permission_required, login_required
 from django.core.urlresolvers import reverse
-from django.db.models import Max, Q
+from django.db.models import Max, Q, F
 from django.db.models import Q
 from django.http import Http404, HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404
@@ -441,21 +441,18 @@ def iterate_patrimonio(p_pts, nivel=0, filtro_com_fmusp=False):
         return
     
     patrimonios = []
-    pts = p_pts.select_related('pagamento__protocolo'
-                ).order_by('-pagamento__protocolo__termo', '-numero_fmusp', 'historicolocal__posicao',
-                )
-                
+    
+    pts = p_pts
     if filtro_com_fmusp:
         pts = pts.filter(numero_fmusp__isnull=False)
     
-            
     for p in pts:
         patrimonio = {}
         patrimonio.update({'id':p.id, 'termo':'', 'fmusp':p.numero_fmusp, 'num_documento':'',
                             'apelido':p.apelido, 'modelo':p.modelo, 'part_number':p.part_number, 'descricao':p.descricao,
                             'ns':p.ns, 'estado':'', 'posicao':'','contido':[]})
         if p.pagamento and p.pagamento.protocolo:
-            patrimonio.update({'termo': p.pagamento.protocolo.termo})
+            patrimonio.update({'termo': str(p.pagamento.protocolo.termo)})
             patrimonio.update({'num_documento': p.pagamento.protocolo.num_documento})
             
         if p.historico_atual:
@@ -465,7 +462,13 @@ def iterate_patrimonio(p_pts, nivel=0, filtro_com_fmusp=False):
         
         contido = iterate_patrimonio(p.contido.all(), nivel+1, filtro_com_fmusp)
         patrimonio.update({'contido': contido})
+        
         patrimonios.append(patrimonio)
+        
+    patrimonios.sort(key=lambda p: p['posicao'], reverse=False)
+    patrimonios.sort(key=lambda p: p['fmusp'], reverse=True)
+    patrimonios.sort(key=lambda p: p['termo'], reverse=True)
+
     return patrimonios
 
 @login_required

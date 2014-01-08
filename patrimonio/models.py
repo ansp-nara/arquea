@@ -123,6 +123,35 @@ class Patrimonio(models.Model):
         else:
             return u'%s - %s - %s' % (self.apelido, self.ns, self.descricao)
 
+    def save(self, *args, **kwargs):
+        super(Patrimonio, self).save(*args, **kwargs)
+        
+        # Rogerio: após salvar o patrimonio, verifica se os patrimonios filhos estão
+        # no mesmo endereço e posição.
+        # Se não estiverem, cria um novo histórico de endereço para todos os filhos
+        if Patrimonio.objects.filter(patrimonio=self).exists():
+            filhos = Patrimonio.objects.filter(patrimonio=self)
+            
+            for filho in filhos:
+                # Rogerio: se não tiver endereço, não faz nada com os patrimonios filhos,
+                # já que não podemos remover os endereços
+                #
+                # Também não modificamos se o filho possui um histórico com data mais atual
+                if self.historico_atual and self.historico_atual.data >= filho.historico_atual.data:
+                    if not filho.historico_atual or \
+                        (self.historico_atual.endereco != filho.historico_atual.endereco) or \
+                            (self.historico_atual.posicao != filho.historico_atual.posicao):
+                        
+                        novoHistorico = HistoricoLocal.objects.create(memorando=self.historico_atual.memorando,
+                                                       patrimonio=filho,
+                                                       endereco=self.historico_atual.endereco,
+                                                       estado=self.historico_atual.estado,
+                                                       descricao="Movimentado junto com o patrimonio %s [%s]"%(self.id, self.historico_atual.descricao),
+                                                       data=self.historico_atual.data,
+                                                       posicao=self.historico_atual.posicao,
+                                                       )
+
+
     def marca(self):
         retorno = ''
         if self.equipamento and self.equipamento.entidade_fabricante and self.equipamento.entidade_fabricante.sigla:
@@ -154,12 +183,6 @@ class Patrimonio(models.Model):
             return ''
     nf.short_description = u'NF'
 
-    # Define a descrição do modelo.
-    class Meta:
-        verbose_name = _(u'Patrimônio')
-        verbose_name_plural = _(u'Patrimônio')
-	ordering = ('tipo', 'descricao')
-
     # retorna modalidade, parcial e pagina para exibicao no admin
     def auditoria(self):
         if not self.pagamento:
@@ -169,6 +192,12 @@ class Patrimonio(models.Model):
         modalidade = self.pagamento.origem_fapesp.item_outorga.natureza_gasto.modalidade.sigla
         return u'%s (%s/%s)' % (modalidade, self.pagamento.parcial(), self.pagamento.pagina())
     auditoria.short_description = u'Material (par/pág)'
+
+    # Define a descrição do modelo.
+    class Meta:
+        verbose_name = _(u'Patrimônio')
+        verbose_name_plural = _(u'Patrimônio')
+    ordering = ('tipo', 'descricao')
 
 
 class HistoricoLocal(models.Model):

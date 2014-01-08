@@ -193,7 +193,6 @@ class PatrimonioAdminForm(forms.ModelForm):
         """
         # Exibe a quantidade de patrimonios filhos no label
         self.fields['form_filhos'].label = u'Patrimônios contidos (%s)' % Patrimonio.objects.filter(patrimonio=instance).count()
-
         if instance:
             if instance.equipamento:
                 self.fields['filtro_equipamento'].widget = widget=forms.TextInput(attrs={'onchange': 'ajax_filter_equipamento(this.value, "%s", "%s");'%(instance.id, instance.equipamento.id)})
