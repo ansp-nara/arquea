@@ -161,7 +161,7 @@ def patrimonio_consolidado(request):
     
     localidadeDiferente = verificacaoPatrimonio.localidadeDiferente(filtros=filtros_entrada)
     count = sum([len(patrimonios) for patrimonios in localidadeDiferente])
-    retorno.append({'desc':u'Patrimonio com localidade diferente dos filhos', 'url':'patrimonio_localidade_diferente_dos_filhos', 'qtd':count})
+    retorno.append({'desc':u'Patrimonio com localidade diferente dos filhos', 'url':'patrimonio_localidade_diferente', 'qtd':count})
     
     retorno.append({'desc':u'Verificação de Patrimônios e Equipamentos', 'url':'check_patrimonio_equipamento', 'qtd':None})
     
@@ -181,9 +181,9 @@ def patrimonio_localidade_diferente(request):
     filtros_saida = []
     if len(retorno) > 0:
         filtros_saida = {"tipos":VerificacaoPatrimonioEquipamento().listaFiltroTipoPatrimonio(verficacao.equipamentoVazio()[0])}
-    
+
     return render_to_response('verificacao/patrimonio_localidade.html', 
-                              {'desc':'Patrimonios sem Equipamento', 'patrimonios':retorno, 'filtros':filtros_saida}, 
+                              {'desc':'Patrimonios com componentes com historico local diferente', 'patrimonios':retorno, 'filtros':filtros_saida}, 
                               context_instance=RequestContext(request))
 
 
