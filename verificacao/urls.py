@@ -13,6 +13,8 @@ urlpatterns = patterns('verificacao.views',
     (r'relatorio/patrimonio_equipamento_part_number_diferente$', 'patrimonio_equipamento_part_number_diferente'),
     (r'relatorio/patrimonio_equipamento_descricao_diferente$', 'patrimonio_equipamento_descricao_diferente'),
     (r'relatorio/patrimonio_procedencia_vazia$', 'patrimonio_procedencia_vazia'),
+    (r'relatorio/patrimonio_localidade_diferente_dos_filhos$', 'patrimonio_localidade_diferente'),
+    
     
     (r'relatorio/check_patrimonio_equipamento$', 'check_patrimonio_equipamento'),
     

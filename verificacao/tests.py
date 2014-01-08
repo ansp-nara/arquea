@@ -1,18 +1,17 @@
 # -*- coding: utf-8 -*-
-
-"""
-This file demonstrates writing tests using the unittest module. These will pass
-when you run "manage.py test".
-
-Replace this with more appropriate tests for your application.
-"""
-
 from django.test import TestCase
 from patrimonio.models import Equipamento, Patrimonio, Tipo
 from verificacao.models import *
+import unittest
 
-
-class TestPatrimonioComEquipamentpoVazio(TestCase):
+class TestPatrimonioComEquipamenpoVazio(TestCase):
+    
+    def setUp(self):
+        super(TestPatrimonioComEquipamenpoVazio, self).setUp()
+        
+    def tearDown(self):
+        super(TestPatrimonioComEquipamenpoVazio, self).tearDown()
+    
     """
     Testa equipamentos com part_number vazio
     """
@@ -515,5 +514,4 @@ class TestEquipamentoPNvsModelo(TestCase):
             
             self.assertEqual(len(retorno), 1)
             self.assertEqual(len(retorno[0]), 2)
-
 

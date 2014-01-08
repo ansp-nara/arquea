@@ -110,6 +110,55 @@ class VerificacaoPatrimonio:
         return retorno
 
 
+    # busca de patrimonio cujos filhos estejam com historico_local diferente
+    def localidadeDiferente(self, filtros=None):
+        retorno = []
+        
+        patrimonios = Patrimonio.objects.filter(patrimonio__isnull=False)
+        
+        if filtros and filtros["filtro_tipo_patrimonio"]:
+            patrimonios = patrimonios.filter(tipo=filtros["filtro_tipo_patrimonio"])
+        
+        for p in patrimonios:
+            # Busca patrimonios filhos que estão em localidade diferente deste patrimonio
+            contido = self.localidadeDiferenteFilho(p, filtros)
+            if len(contido) > 0:
+                patrimonio = {}
+                patrimonio.update({'id':p.id, 'modelo':p.modelo, 'descricao':p.descricao,
+                                'endereco':'', 'estado':'', 'posicao':'', 'data':'', 'contido':[]})
+                patrimonio.update({'endereco':p.historico_atual.endereco, 'estado':p.historico_atual.estado, 
+                                   'posicao':p.historico_atual.posicao, 'data':p.historico_atual.data})
+                patrimonio.update({'contido': contido})
+                retorno.append(patrimonio)
+
+        return retorno
+
+    # busca de patrimonio cujos filhos estejam com historico_local diferente
+    def localidadeDiferenteFilho(self, patrimonioPai, filtros=None):
+        retorno = []
+        
+        if patrimonioPai and patrimonioPai.historico_atual:
+            
+            patrimonios = Patrimonio.objects.filter(patrimonio=patrimonioPai)
+            
+            if filtros and filtros["filtro_tipo_patrimonio"]:
+                patrimonios = patrimonios.filter(tipo=filtros["filtro_tipo_patrimonio"])
+            
+            for p in patrimonios:
+                if p.historico_atual:
+                    # Verifica se a localidade do historico_atual é diferente do patrimonio pai
+                    if patrimonioPai.historico_atual.endereco != p.historico_atual.endereco or \
+                       patrimonioPai.historico_atual.posicao != p.historico_atual.posicao:
+                    
+                        patrimonio = {}
+                        patrimonio.update({'id':p.id, 'modelo':p.modelo, 'descricao':p.descricao,
+                                        'endereco':'', 'estado':'', 'posicao':'', 'data':'', 'contido':[]})
+                        patrimonio.update({'endereco':p.historico_atual.endereco, 'estado':p.historico_atual.estado, 
+                                           'posicao':p.historico_atual.posicao, 'data':p.historico_atual.data})
+
+                        retorno.append(patrimonio)
+        return retorno
+
     
 class VerificacaoPatrimonioEquipamento():
     def listaFiltroTipoPatrimonio(self, patrimonios):
@@ -148,18 +197,18 @@ class VerificacaoPatrimonioEquipamento():
         return retorno
     
     
-    # busca de patrimonio e equipamento
-    # com marca diferente
-    def marcaDiferente(self, filtros=None):
-        retorno = []
-        
-        patrimonios = Patrimonio.objects.filter(equipamento_id__isnull=False).filter(equipamento__entidade_fabricante__isnull=False).exclude(equipamento__entidade_fabricante__sigla=F('marca')).select_related("equipamento").order_by("id")
-
-        if filtros and filtros["filtro_tipo_patrimonio"]:
-            patrimonios = patrimonios.filter(tipo=filtros["filtro_tipo_patrimonio"])
-        
-        retorno.append(patrimonios)
-        return retorno
+#     # busca de patrimonio e equipamento
+#     # com marca diferente
+#     def marcaDiferente(self, filtros=None):
+#         retorno = []
+#         
+#         patrimonios = Patrimonio.objects.filter(equipamento_id__isnull=False).filter(equipamento__entidade_fabricante__isnull=False).exclude(equipamento__entidade_fabricante__sigla=F('marca')).select_related("equipamento").order_by("id")
+# 
+#         if filtros and filtros["filtro_tipo_patrimonio"]:
+#             patrimonios = patrimonios.filter(tipo=filtros["filtro_tipo_patrimonio"])
+#         
+#         retorno.append(patrimonios)
+#         return retorno
     
      
     # busca de patrimonio e equipamento
@@ -187,7 +236,7 @@ class VerificacaoPatrimonioEquipamento():
             patrimonios = patrimonios.filter(tipo=filtros["filtro_tipo_patrimonio"])
         
         retorno.append(patrimonios)
-        return retorno      
+        return retorno
     
         
     # busca de patrimonio e equipamento
@@ -201,8 +250,9 @@ class VerificacaoPatrimonioEquipamento():
             patrimonios = patrimonios.filter(tipo=filtros["filtro_tipo_patrimonio"])
         
         retorno.append(patrimonios)
-        return retorno     
-    
+        return retorno
+
+
     def copy_attribute(self, to_object, patrimonio_id, att_name):
         """
         to_object = ['patrimonio', 'equipamento']   objeto a ser copiado. deve ser de equipamento para patrimonio, ou de patrimonio para equipamento
