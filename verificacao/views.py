@@ -139,9 +139,9 @@ def patrimonio_consolidado(request):
     count = sum([len(patrimonios) for patrimonios in descricaoDiferente])
     retorno.append({'desc':u'Patrimonio e Equipamento com Descricao diferente', 'url':'patrimonio_equipamento_descricao_diferente', 'qtd':count})
 
-    marcaDiferente = verificacaoPatrimonioEquipamento.marcaDiferente(filtros_entrada)
-    count = sum([len(patrimonios) for patrimonios in marcaDiferente])
-    retorno.append({'desc':u'Patrimonio e Equipamento com Marca diferente', 'url':'patrimonio_equipamento_marca_diferente', 'qtd':count})
+#     marcaDiferente = verificacaoPatrimonioEquipamento.marcaDiferente(filtros_entrada)
+#     count = sum([len(patrimonios) for patrimonios in marcaDiferente])
+#     retorno.append({'desc':u'Patrimonio e Equipamento com Marca diferente', 'url':'patrimonio_equipamento_marca_diferente', 'qtd':count})
 
     modeloDiferente = verificacaoPatrimonioEquipamento.modeloDiferente(filtros_entrada)
     count = sum([len(patrimonios) for patrimonios in modeloDiferente])
@@ -155,15 +155,37 @@ def patrimonio_consolidado(request):
     count = sum([len(patrimonios) for patrimonios in tamanhoDiferente])
     retorno.append({'desc':u'Patrimonio e Equipamento com Tamanho diferente', 'url':'patrimonio_equipamento_tamanho_diferente', 'qtd':count})
     
-    tamanhoDiferente = verificacaoPatrimonio.procedenciaVazia(filtros_entrada)
-    count = sum([len(patrimonios) for patrimonios in tamanhoDiferente])
+    procedenciaVazia = verificacaoPatrimonio.procedenciaVazia(filtros_entrada)
+    count = sum([len(patrimonios) for patrimonios in procedenciaVazia])
     retorno.append({'desc':u'Patrimonio com procedecia vazia', 'url':'patrimonio_procedencia_vazia', 'qtd':count})
+    
+    localidadeDiferente = verificacaoPatrimonio.localidadeDiferente(filtros=filtros_entrada)
+    count = sum([len(patrimonios) for patrimonios in localidadeDiferente])
+    retorno.append({'desc':u'Patrimonio com localidade diferente dos filhos', 'url':'patrimonio_localidade_diferente_dos_filhos', 'qtd':count})
     
     retorno.append({'desc':u'Verificação de Patrimônios e Equipamentos', 'url':'check_patrimonio_equipamento', 'qtd':None})
     
     filtros = {"tipos":Tipo.objects.all()}
     
     return render_to_response('verificacao/patrimonio_consolidado.html', {'verificacoes':retorno, 'filtros':filtros}, context_instance=RequestContext(request))
+
+
+@login_required
+def patrimonio_localidade_diferente(request):
+    filtros_entrada = {'filtro_tipo_patrimonio':request.GET.get('filtro_tipo_patrimonio')}
+    
+    retorno = []
+    verficacao = VerificacaoPatrimonio()
+    retorno = verficacao.localidadeDiferente(filtros_entrada)
+    
+    filtros_saida = []
+    if len(retorno) > 0:
+        filtros_saida = {"tipos":VerificacaoPatrimonioEquipamento().listaFiltroTipoPatrimonio(verficacao.equipamentoVazio()[0])}
+    
+    return render_to_response('verificacao/patrimonio_localidade.html', 
+                              {'desc':'Patrimonios sem Equipamento', 'patrimonios':retorno, 'filtros':filtros_saida}, 
+                              context_instance=RequestContext(request))
+
 
 
 @login_required
