@@ -320,7 +320,9 @@ def lista_acordos(request, pdf=False):
 @login_required
 def item_modalidade(request, pdf=False):
     if request.method == 'GET':
-        if request.GET.get('termo') and request.GET.get('modalidade'):
+        if request.GET.get('termo') and request.GET.get('termo') != '0' and \
+           request.GET.get('modalidade') and request.GET.get('modalidade') != '0':
+            
             termo_id = request.GET.get('termo')
             termo = get_object_or_404(Termo, id=termo_id)
             mod_id = request.GET.get('modalidade')
@@ -338,11 +340,18 @@ def item_modalidade(request, pdf=False):
                     total += p.valor_fapesp
                 itens.append({'item':item, 'total':total, 'pagtos':pags})
             if pdf:
-		return render_to_pdf('outorga/por_item_modalidade.pdf', {'termo':termo, 'modalidade':mod, 'itens':itens}, filename='%s-%s.pdf' % (termo, mod.sigla))
+                return render_to_pdf('outorga/por_item_modalidade.pdf', {'termo':termo, 'modalidade':mod, 'itens':itens}, filename='%s-%s.pdf' % (termo, mod.sigla))
             else:
                 return render(request, 'outorga/por_item_modalidade.html', {'termo':termo, 'modalidade':mod, 'itens':itens, 'entidade':entidade_id})
         else:
-            return render(request, 'outorga/termo_mod.html', {'termos':Termo.objects.all(), 'modalidades':Modalidade.objects.all(), 'entidades':Entidade.objects.all()})
+            termos = Termo.objects.all()
+            termo = request.GET.get('termo')
+            modalidades = Modalidade.objects.all()
+            modalidade = request.GET.get('modalidade')
+            entidades = Entidade.objects.all()
+            entidade = request.GET.get('entidade')
+            
+            return render(request, 'outorga/termo_mod.html', {'termos':termos, 'termo':termo, 'modalidades':modalidades, 'modalidade':modalidade, 'entidades':entidades, 'entidade':entidade})
 
 @login_required
 def acordo_progressivo(request, pdf=False):
