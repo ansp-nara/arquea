@@ -193,7 +193,8 @@ class TermoAdmin(admin.ModelAdmin):
 
     fieldsets = (
                  (None, {
-                     'fields': (('ano', 'processo', 'digito', 'inicio', 'estado'), 'parecer', 'parecer_final', 'projeto', 'orcamento', 'extrato_financeiro', 'quitacao', 'doacao'),
+                     'fields': (('ano', 'processo', 'digito', 'inicio', 'estado'), \
+                                'parecer', 'parecer_final', 'projeto', 'orcamento', 'extrato_financeiro', 'quitacao', 'doacao', 'relatorio_final'),
                  }),
     )
 

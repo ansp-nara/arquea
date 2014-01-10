@@ -133,6 +133,7 @@ class Termo(models.Model):
     quitacao = models.FileField(_(u'Quitação'), upload_to='termo', blank=True, null=True)
     doacao = models.FileField(_(u'Doação'), upload_to='termo', blank=True, null=True)
     extrato_financeiro = models.FileField(upload_to='termo', blank=True, null=True)
+    relatorio_final = models.FileField(_(u'Relatório Final'), upload_to='termo', blank=True, null=True)
 #    membro = models.ForeignKey('membro.Membro', verbose_name=_(u'Outorga'))
 
 
