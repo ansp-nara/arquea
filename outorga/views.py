@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 # Create your views here.
 
-from django.shortcuts import render_to_response, get_object_or_404
+from decimal import Decimal
+from django.shortcuts import render, get_object_or_404
 from django.http import Http404, HttpResponse
 from django.contrib import admin
 from django.core.exceptions import PermissionDenied
-from outorga.models import Termo, Modalidade, Item, Natureza_gasto, Acordo
-import json as simplejson
-from utils.functions import render_to_pdf
-from decimal import Decimal
-from identificacao.models import *
-from financeiro.models import Pagamento
 from django.contrib.auth.decorators import permission_required, login_required
-from django.template import RequestContext
-from django.template.response import TemplateResponse
 from django.db.models import Sum
+import json as simplejson
+
+from financeiro.models import Pagamento
+from identificacao.models import *
+from outorga.models import Termo, Modalidade, Item, Natureza_gasto, Acordo
+from utils.functions import render_to_pdf
+
 import logging
 
 # Get an instance of a logger
@@ -262,7 +262,7 @@ def contratos(request):
             entidade.update({'contratos':contratos})
             entidades.append(entidade)
 
-    return render_to_response('outorga/contratos.html', {'entidades':entidades}, context_instance=RequestContext(request))
+    return render(request, 'outorga/contratos.html', {'entidades':entidades})
    
 
 #### ROGERIO: VERIFICAR SE EXISTE ALGUMA CHAMADA PARA ESTA VIEW
@@ -286,15 +286,14 @@ def por_item(request):
             it.update({'pgtos':pgs})
             its.append(it)
 
-        retorno = RequestContext(request)
         retorno.update({'itens':its})
-        return render_to_response('outorga/por_item.html', retorno)
+        return render(request, 'outorga/por_item.html', retorno)
 
 @login_required
 def relatorio_termos(request):
     if request.method == 'GET':
         termos = Termo.objects.order_by('-ano')
-        return render_to_response('outorga/termos.html', {'termos':termos}, context_instance=RequestContext(request))
+        return render(request, 'outorga/termos.html', {'termos':termos})
 
 
 @login_required
@@ -316,7 +315,7 @@ def lista_acordos(request, pdf=False):
     if pdf:
         return render_to_pdf('outorga/acordos.pdf', {'processos':processos})
     else:
-        return render_to_response('outorga/acordos.html', {'processos':processos}, context_instance=RequestContext(request))
+        return render(request, 'outorga/acordos.html', {'processos':processos})
 
 @login_required
 def item_modalidade(request, pdf=False):
@@ -341,11 +340,11 @@ def item_modalidade(request, pdf=False):
             if pdf:
 		return render_to_pdf('outorga/por_item_modalidade.pdf', {'termo':termo, 'modalidade':mod, 'itens':itens}, filename='%s-%s.pdf' % (termo, mod.sigla))
             else:
-                return render_to_response('outorga/por_item_modalidade.html', {'termo':termo, 'modalidade':mod, 'itens':itens, 'entidade':entidade_id}, context_instance=RequestContext(request))
+                return render(request, 'outorga/por_item_modalidade.html', {'termo':termo, 'modalidade':mod, 'itens':itens, 'entidade':entidade_id})
         else:
-            return render_to_response('outorga/termo_mod.html', {'termos':Termo.objects.all(), 'modalidades':Modalidade.objects.all(), 'entidades':Entidade.objects.all()}, context_instance=RequestContext(request))
+            return render(request, 'outorga/termo_mod.html', {'termos':Termo.objects.all(), 'modalidades':Modalidade.objects.all(), 'entidades':Entidade.objects.all()})
 
-
+@login_required
 def acordo_progressivo(request, pdf=False):
     acordos = []
     
@@ -367,7 +366,7 @@ def acordo_progressivo(request, pdf=False):
         totalTermoConcedidoDolar = Decimal('0.0')
         totalTermoSaldoDolar = Decimal('0.0')
         
-        for t in Termo.objects.order_by('ano').only('ano', 'processo', 'digito'):
+        for t in Termo.objects.filter(exibe_rel_ger_progressivo=True).order_by('ano').only('ano', 'processo', 'digito'):
             concedido_real = a.itens_outorga.filter(natureza_gasto__termo=t, natureza_gasto__modalidade__moeda_nacional=True).aggregate(Sum('valor'))
             concedido_real = concedido_real['valor__sum'] or Decimal('0.0')
 
@@ -424,7 +423,9 @@ def acordo_progressivo(request, pdf=False):
                         'totalTermoRealizadoDolar':totalTermoRealizadoDolar,'totalTermoConcedidoDolar':totalTermoConcedidoDolar, 'totalTermoSaldoDolar':totalTermoSaldoDolar,
                         })
         acordos.append(acordo)
+        
+        termos = Termo.objects.filter(exibe_rel_ger_progressivo=True).order_by('ano')
     if pdf:
-        return render_to_pdf('outorga/acordo_progressivo.pdf', {'acordos':acordos, 'termos':Termo.objects.all().order_by('ano')}, filename='acordo_progressivo.pdf')
+        return render_to_pdf('outorga/acordo_progressivo.pdf', {'acordos':acordos, 'termos':termos}, filename='acordo_progressivo.pdf')
     else:
-        return TemplateResponse(request, 'outorga/acordo_progressivo.html', {'acordos':acordos, 'termos':Termo.objects.all().order_by('ano')})
+        return render(request, 'outorga/acordo_progressivo.html', {'acordos':acordos, 'termos':termos})
