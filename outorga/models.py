@@ -134,6 +134,8 @@ class Termo(models.Model):
     doacao = models.FileField(_(u'Doação'), upload_to='termo', blank=True, null=True)
     extrato_financeiro = models.FileField(upload_to='termo', blank=True, null=True)
     relatorio_final = models.FileField(_(u'Relatório Final'), upload_to='termo', blank=True, null=True)
+    # flag para indicar se o termo deve aparecer no relatório gerencial progressivo
+    exibe_rel_ger_progressivo = models.BooleanField(_(u'Exibe o processo no Relatório Gerencial Progressivo?'), default=True) 
 #    membro = models.ForeignKey('membro.Membro', verbose_name=_(u'Outorga'))
 
 
