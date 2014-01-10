@@ -1,11 +1,9 @@
 # -* coding: utf-8 -*-
 
-# Create your views here.
-
 from django.contrib.auth.decorators import permission_required, login_required
 from django.db.models import Q, Max, Sum, Count 
 from django.http import Http404, HttpResponse
-from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import render, render_to_response, get_object_or_404
 from django.template import Context, loader, RequestContext
 from django.template.response import TemplateResponse
 
@@ -47,7 +45,7 @@ def equipamento_consolidado(request):
     count = len(marcaVazia)
     retorno.append({'desc':u'Marca/Entidade vazia', 'url':'equipamento_marca_vazia', 'qtd':count})
     
-    return render_to_response('verificacao/equipamento_consolidado.html', {'verificacoes':retorno}, context_instance=RequestContext(request))
+    return render(request, 'verificacao/equipamento_consolidado.html', {'verificacoes':retorno})
 
 @login_required
 def equipamento_marca_vazia(request, json=False):
@@ -56,9 +54,8 @@ def equipamento_marca_vazia(request, json=False):
     verficacao = VerificacaoEquipamento()
     retorno = verficacao.marcaVazia()
     
-    return render_to_response('verificacao/equipamento_marca.html', 
-                              {'desc':'Marca/Entidade vazia', 'equipamentos':retorno}, 
-                              context_instance=RequestContext(request))
+    return render(request, 'verificacao/equipamento_marca.html', 
+                              {'desc':'Marca/Entidade vazia', 'equipamentos':retorno})
 
 
 @login_required
@@ -68,9 +65,8 @@ def equipamento_part_number_modelo_diferente(request, json=False):
     verficacao = VerificacaoEquipamento()
     retorno = verficacao.partNumberVSModeloDiferente()
     
-    return render_to_response('verificacao/equipamento_part_number.html', 
-                              {'desc':'Part Numbers iguais com Modelos diferentes', 'equipamentos':retorno}, 
-                              context_instance=RequestContext(request))
+    return render(request, 'verificacao/equipamento_part_number.html', 
+                              {'desc':'Part Numbers iguais com Modelos diferentes', 'equipamentos':retorno})
 
 
 
@@ -81,9 +77,8 @@ def equipamento_part_number_vazio(request, json=False):
     verficacao = VerificacaoEquipamento()
     retorno = verficacao.partNumberVazio()
     
-    return render_to_response('verificacao/equipamento_part_number.html', 
-                              {'desc':'Part Numbers vazios', 'equipamentos':retorno}, 
-                              context_instance=RequestContext(request))
+    return render(request, 'verificacao/equipamento_part_number.html', 
+                              {'desc':'Part Numbers vazios', 'equipamentos':retorno})
 
 
 @login_required
@@ -93,9 +88,8 @@ def equipamento_part_number_modelo_vazio(request, json=False):
     verficacao = VerificacaoEquipamento()
     retorno = verficacao.partNumberVazioModeloVazio()
     
-    return render_to_response('verificacao/equipamento_part_number.html', 
-                              {'desc':'Part Numbers e Modelos vazios', 'equipamentos':retorno}, 
-                              context_instance=RequestContext(request))
+    return render(request, 'verificacao/equipamento_part_number.html', 
+                              {'desc':'Part Numbers e Modelos vazios', 'equipamentos':retorno})
     
 
 @login_required
@@ -106,7 +100,7 @@ def check_patrimonio_equipamento(request):
     
     patrimonios = patrimonios.filter(~Q(equipamento__part_number=F('part_number'))|
                                      ~Q(equipamento__modelo=F('modelo'))|
-                                     ~Q(equipamento__entidade_fabricante__sigla=F('marca'))|
+                                     #~Q(equipamento__entidade_fabricante__sigla=F('marca'))|
                                      #~Q(equipamento__descricao=F('descricao')) |
                                      Q(~Q(equipamento__ean=F('ean')), Q(equipamento__ean__isnull=False), Q(ean__isnull=False)) |
                                      Q(~Q(equipamento__ncm=F('ncm')), Q(equipamento__ncm__isnull=False), Q(ncm__isnull=False)) |
@@ -115,7 +109,7 @@ def check_patrimonio_equipamento(request):
     c = {}
     c.update({'patrimonios': patrimonios})
     
-    return TemplateResponse(request, 'verificacao/check_patrimonio_equipamento.html', c)
+    return render(request, 'verificacao/check_patrimonio_equipamento.html', c)
     
     
 @login_required
@@ -167,7 +161,7 @@ def patrimonio_consolidado(request):
     
     filtros = {"tipos":Tipo.objects.all()}
     
-    return render_to_response('verificacao/patrimonio_consolidado.html', {'verificacoes':retorno, 'filtros':filtros}, context_instance=RequestContext(request))
+    return render(request, 'verificacao/patrimonio_consolidado.html', {'verificacoes':retorno, 'filtros':filtros})
 
 
 @login_required
@@ -182,9 +176,8 @@ def patrimonio_localidade_diferente(request):
     if len(retorno) > 0:
         filtros_saida = {"tipos":VerificacaoPatrimonioEquipamento().listaFiltroTipoPatrimonio(verficacao.equipamentoVazio()[0])}
 
-    return render_to_response('verificacao/patrimonio_localidade.html', 
-                              {'desc':'Patrimonios com componentes com historico local diferente', 'patrimonios':retorno, 'filtros':filtros_saida}, 
-                              context_instance=RequestContext(request))
+    return render(request, 'verificacao/patrimonio_localidade.html', 
+                              {'desc':'Patrimonios com componentes com historico local diferente', 'patrimonios':retorno, 'filtros':filtros_saida})
 
 
 
@@ -200,9 +193,8 @@ def patrimonio_procedencia_vazia(request):
     if len(retorno) > 0:
         filtros_saida = {"tipos":VerificacaoPatrimonioEquipamento().listaFiltroTipoPatrimonio(verficacao.equipamentoVazio()[0])}
     
-    return render_to_response('verificacao/patrimonio_procedencia.html', 
-                              {'desc':'Patrimonios sem Equipamento', 'patrimonios':retorno, 'filtros':filtros_saida}, 
-                              context_instance=RequestContext(request))
+    return render(request, 'verificacao/patrimonio_procedencia.html', 
+                              {'desc':'Patrimonios sem Equipamento', 'patrimonios':retorno, 'filtros':filtros_saida})
 
 
 @login_required
@@ -217,9 +209,8 @@ def patrimonio_equipamento_vazio(request):
     if len(retorno) > 0:
         filtros_saida = {"tipos":VerificacaoPatrimonioEquipamento().listaFiltroTipoPatrimonio(verficacao.equipamentoVazio()[0])}
     
-    return render_to_response('verificacao/patrimonio.html', 
-                              {'desc':'Patrimonios sem Equipamento', 'patrimonios':retorno, 'filtros':filtros_saida}, 
-                              context_instance=RequestContext(request))
+    return render(request, 'verificacao/patrimonio.html', 
+                              {'desc':'Patrimonios sem Equipamento', 'patrimonios':retorno, 'filtros':filtros_saida})
 
 @login_required
 def patrimonio_equipamento_part_number_diferente(request):
@@ -235,13 +226,11 @@ def patrimonio_equipamento_part_number_diferente(request):
         filtros_saida = {"tipos":verficacao.listaFiltroTipoPatrimonio(verficacao.descricaoDiferente()[0])}
     
     if ajax:
-        return render_to_response('verificacao/patrimonio_equipamento-table.html', 
-                              {'desc':'Patrimonio e Equipamento com Part Number diferente', 'patrimonios':retorno, 'atributo':'part_number', 'filtros':filtros_saida}, 
-                              context_instance=RequestContext(request))
+        return render(request, 'verificacao/patrimonio_equipamento-table.html', 
+                              {'desc':'Patrimonio e Equipamento com Part Number diferente', 'patrimonios':retorno, 'atributo':'part_number', 'filtros':filtros_saida})
     else:
-        return render_to_response('verificacao/patrimonio_equipamento.html', 
-                              {'desc':'Patrimonio e Equipamento com Part Number diferente', 'patrimonios':retorno, 'atributo':'part_number', 'filtros':filtros_saida}, 
-                              context_instance=RequestContext(request))
+        return render(request, 'verificacao/patrimonio_equipamento.html', 
+                              {'desc':'Patrimonio e Equipamento com Part Number diferente', 'patrimonios':retorno, 'atributo':'part_number', 'filtros':filtros_saida})
 
 
 @login_required
@@ -258,13 +247,11 @@ def patrimonio_equipamento_descricao_diferente(request):
         filtros_saida = {"tipos":verficacao.listaFiltroTipoPatrimonio(verficacao.descricaoDiferente()[0])}
     
     if ajax:
-        return render_to_response('verificacao/patrimonio_equipamento-table.html', 
-                              {'desc':'Patrimonio e Equipamento com Descricao diferente', 'patrimonios':retorno, 'atributo':'descricao', 'filtros':filtros_saida}, 
-                              context_instance=RequestContext(request))
+        return render(request, 'verificacao/patrimonio_equipamento-table.html', 
+                              {'desc':'Patrimonio e Equipamento com Descricao diferente', 'patrimonios':retorno, 'atributo':'descricao', 'filtros':filtros_saida})
     else:
-        return render_to_response('verificacao/patrimonio_equipamento.html', 
-                              {'desc':'Patrimonio e Equipamento com Descricao diferente', 'patrimonios':retorno, 'atributo':'descricao', 'filtros':filtros_saida}, 
-                              context_instance=RequestContext(request))
+        return render(request, 'verificacao/patrimonio_equipamento.html', 
+                              {'desc':'Patrimonio e Equipamento com Descricao diferente', 'patrimonios':retorno, 'atributo':'descricao', 'filtros':filtros_saida})
 
 
 @login_required
@@ -282,13 +269,11 @@ def patrimonio_equipamento_marca_diferente(request):
 
     
     if ajax:
-        return render_to_response('verificacao/patrimonio_equipamento-table.html', 
-                              {'desc':'Patrimonio e Equipamento com Marca diferente', 'patrimonios':retorno, 'atributo':'marca', 'filtros':filtros_saida}, 
-                              context_instance=RequestContext(request))
+        return render(request, 'verificacao/patrimonio_equipamento-table.html', 
+                              {'desc':'Patrimonio e Equipamento com Marca diferente', 'patrimonios':retorno, 'atributo':'marca', 'filtros':filtros_saida})
     else:
-        return render_to_response('verificacao/patrimonio_equipamento.html', 
-                              {'desc':'Patrimonio e Equipamento com Marca diferente', 'patrimonios':retorno, 'atributo':'marca', 'filtros':filtros_saida}, 
-                              context_instance=RequestContext(request))
+        return render(request, 'verificacao/patrimonio_equipamento.html', 
+                              {'desc':'Patrimonio e Equipamento com Marca diferente', 'patrimonios':retorno, 'atributo':'marca', 'filtros':filtros_saida})
 
 
 
@@ -307,13 +292,11 @@ def patrimonio_equipamento_modelo_diferente(request):
         filtros_saida = {"tipos":verficacao.listaFiltroTipoPatrimonio(verficacao.modeloDiferente()[0])}
     
     if ajax:
-        return render_to_response('verificacao/patrimonio_equipamento-table.html', 
-                              {'desc':'Patrimonio e Equipamento com Modelo diferente', 'patrimonios':retorno, 'atributo':'modelo', 'filtros':filtros_saida}, 
-                              context_instance=RequestContext(request))
+        return render(request, 'verificacao/patrimonio_equipamento-table.html', 
+                              {'desc':'Patrimonio e Equipamento com Modelo diferente', 'patrimonios':retorno, 'atributo':'modelo', 'filtros':filtros_saida})
     else:
-        return render_to_response('verificacao/patrimonio_equipamento.html', 
-                              {'desc':'Patrimonio e Equipamento com Modelo diferente', 'patrimonios':retorno, 'atributo':'modelo', 'filtros':filtros_saida}, 
-                              context_instance=RequestContext(request))
+        return render(request, 'verificacao/patrimonio_equipamento.html', 
+                              {'desc':'Patrimonio e Equipamento com Modelo diferente', 'patrimonios':retorno, 'atributo':'modelo', 'filtros':filtros_saida})
 
 
 @login_required
@@ -332,13 +315,11 @@ def patrimonio_equipamento_ncm_diferente(request):
 
     
     if ajax:
-        return render_to_response('verificacao/patrimonio_equipamento-table.html', 
-                              {'desc':'Patrimonio e Equipamento com NCM diferente', 'patrimonios':retorno, 'atributo':'ncm', 'filtros':filtros_saida}, 
-                              context_instance=RequestContext(request))
+        return render(request, 'verificacao/patrimonio_equipamento-table.html', 
+                              {'desc':'Patrimonio e Equipamento com NCM diferente', 'patrimonios':retorno, 'atributo':'ncm', 'filtros':filtros_saida})
     else:    
-        return render_to_response('verificacao/patrimonio_equipamento.html', 
-                              {'desc':'Patrimonio e Equipamento com NCM diferente', 'patrimonios':retorno, 'atributo':'ncm', 'filtros':filtros_saida}, 
-                              context_instance=RequestContext(request))
+        return render(request, 'verificacao/patrimonio_equipamento.html', 
+                              {'desc':'Patrimonio e Equipamento com NCM diferente', 'patrimonios':retorno, 'atributo':'ncm', 'filtros':filtros_saida})
 
 
 
@@ -357,13 +338,11 @@ def patrimonio_equipamento_tamanho_diferente(request):
 
     
     if ajax:
-        return render_to_response('verificacao/patrimonio_equipamento-table.html', 
-                              {'desc':'Patrimonio e Equipamento com Tamanho diferente', 'patrimonios':retorno, 'atributo':'tamanho', 'filtros':filtros_saida}, 
-                              context_instance=RequestContext(request))
+        return render(request, 'verificacao/patrimonio_equipamento-table.html', 
+                              {'desc':'Patrimonio e Equipamento com Tamanho diferente', 'patrimonios':retorno, 'atributo':'tamanho', 'filtros':filtros_saida})
     else:    
-        return render_to_response('verificacao/patrimonio_equipamento.html', 
-                              {'desc':'Patrimonio e Equipamento com Tamanho diferente', 'patrimonios':retorno, 'atributo':'tamanho', 'filtros':filtros_saida}, 
-                              context_instance=RequestContext(request))
+        return render(request, 'verificacao/patrimonio_equipamento.html', 
+                              {'desc':'Patrimonio e Equipamento com Tamanho diferente', 'patrimonios':retorno, 'atributo':'tamanho', 'filtros':filtros_saida})
 
 
 @login_required
