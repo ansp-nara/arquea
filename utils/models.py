@@ -13,7 +13,7 @@ class CNPJField(models.CharField):
         return "CharField"
 
     def formfield(self, **kwargs):
-        from localflavor.br.forms import BRCNPJField
+        from django.contrib.localflavor.br.forms import BRCNPJField
         defaults = {'form_class': BRCNPJField}
         defaults.update(kwargs)
         return super(models.CharField, self).formfield(**defaults)
