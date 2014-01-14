@@ -108,6 +108,7 @@ class Patrimonio(models.Model):
     tipo = models.ForeignKey('patrimonio.Tipo')
     descricao_tecnica = models.TextField(u'Descrição técnica', null=True, blank=True)
     part_number = models.CharField(null=True, blank=True, max_length=50)
+    # Patrimonio não tem mais marca. Utilizar o campo equipamento.entidade_fabricante.sigla
     #marca = models.CharField(_(u'Marca/Editora'), null=True, blank=True, max_length=100)
     modelo = models.CharField(null=True, blank=True, max_length=100)
     imagem = models.ImageField(upload_to='patrimonio', null=True, blank=True)
