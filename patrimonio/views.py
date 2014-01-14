@@ -956,9 +956,23 @@ def abre_arvore_tipo(request):
                     r = u'<tr class=""><td class="td_1"><div><a href="%s" target="_blank">%s</a></div></td>' % (pUrl, ha.endereco.end.entidade if ha else 'ND') 
                     r += u'<td class="td_2"><a href="%s" target="_blank"><div>%s</a></div></td>' % (pUrl, ha.endereco.complemento if ha else 'ND')
                     r += u'<td class="td_3"><a href="%s" target="_blank"><div>%s</a></div></td>' % (pUrl, ha.posicao if ha and ha.posicao else 'ND')
-                    r += u'<td class="td_4"><a href="%s" target="_blank"><div>%s</a></div></td>' % (pUrl, p.equipamento.entidade_fabricante.sigla)
-                    r += u'<td class="td_5"><a href="%s" target="_blank"><div>%s</a></div></td>' % (pUrl, p.equipamento.modelo)
-                    r += u'<td class="td_6"><a href="%s" target="_blank"><div>%s</a></div></td>' % (pUrl, p.equipamento.part_number)
+                    
+                    eq_fabricante = ''
+                    eq_modelo = ''
+                    eq_part_number = ''
+                    if p.equipamento:
+                        if p.equipamento.entidade_fabricante:
+                            eq_fabricante = p.equipamento.entidade_fabricante.sigla
+                        if p.equipamento.modelo:
+                            eq_modelo = p.equipamento.modelo
+                        if p.equipamento.part_number:
+                            eq_part_number = p.equipamento.part_number
+
+                            
+                    r += u'<td class="td_4"><a href="%s" target="_blank"><div>%s</a></div></td>' % (pUrl, eq_fabricante)
+                    r += u'<td class="td_5"><a href="%s" target="_blank"><div>%s</a></div></td>' % (pUrl, eq_modelo)
+                    r += u'<td class="td_6"><a href="%s" target="_blank"><div>%s</a></div></td>' % (pUrl, eq_part_number)
+                    
                     r += u'<td class="td_7"><a href="%s" target="_blank"><div>%s</a></div></td>' % (pUrl, p.ns)
                     r += u'<td class="td_8"><a href="%s" target="_blank"><div>%s</a></div></td>' % (pUrl, ha.estado if ha else 'ND')
                     retPatrimonio = '%s %s' % (retPatrimonio, r) 
