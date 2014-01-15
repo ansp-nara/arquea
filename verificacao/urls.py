@@ -2,6 +2,7 @@
 from django.conf.urls import *
 
 urlpatterns = patterns('verificacao.views',
+    (r'versao$', 'versao'),
     (r'relatorio/equipamento_consolidado$', 'equipamento_consolidado'),
     (r'relatorio/equipamento_part_number_modelo_vazio$', 'equipamento_part_number_modelo_vazio'),
     (r'relatorio/equipamento_part_number_vazio$', 'equipamento_part_number_vazio'),
