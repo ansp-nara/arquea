@@ -68,17 +68,17 @@ class TermoTest(UnitTestCase):
         td = TipoDocumento.objects.create(nome='Nota Fiscal')
         og = Origem.objects.create(nome='Motoboy')
 
-        cot1 = Contato.objects.create(primeiro_nome='Joao', email='joao@joao.com.br', tel='')
-        cot2 = Contato.objects.create(primeiro_nome='Alex', email='alex@alex.com.br', tel='')
-        cot3 = Contato.objects.create(primeiro_nome='Marcos', email='alex@alex.com.br', tel='')
+        cot1 = Contato.objects.create(primeiro_nome='Joao', email='joao@joao.com.br', tel='', ativo=True)
+        cot2 = Contato.objects.create(primeiro_nome='Alex', email='alex@alex.com.br', tel='', ativo=True)
+        cot3 = Contato.objects.create(primeiro_nome='Marcos', email='alex@alex.com.br', tel='', ativo=True)
 
         iden1 = Identificacao.objects.create(endereco=end1, contato=cot1, funcao='Tecnico', area='Estoque', ativo=True)
         iden2 = Identificacao.objects.create(endereco=end2, contato=cot2, funcao='Gerente', area='Redes', ativo=True)
         iden3 = Identificacao.objects.create(endereco=end3, contato=cot3, funcao='Diretor', area='Redes', ativo=True)
 
-        p1 = Protocolo.objects.create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,9,30,10,10), origem=og, estado=ep, num_documento=8888, data_vencimento=date(2008,10,5), descricao='Conta mensal - armazenagem 09/2008', valor_total=None)
-        p2 = Protocolo.objects.create(termo=t, identificacao=iden2, tipo_documento=td, data_chegada=datetime(2008,9,30,10,10), origem=og, estado=ep, num_documento=7777, data_vencimento=date(2008,10,10), descricao='Serviço de Conexão Internacional - 09/2009', valor_total=None)
-        p3 = Protocolo.objects.create(termo=t, identificacao=iden3, tipo_documento=td, data_chegada=datetime(2008,9,30,10,10), origem=og, estado=ep, num_documento=5555, data_vencimento=date(2008,10,15), descricao='Serviço de Conexão Local - 09/2009', valor_total=None)
+        p1 = Protocolo.objects.create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,9,30,10,10), origem=og, estado=ep, num_documento=8888, data_vencimento=date(2008,10,5), descricao='Conta mensal - armazenagem 09/2008', valor_total=None, moeda_estrangeira=False)
+        p2 = Protocolo.objects.create(termo=t, identificacao=iden2, tipo_documento=td, data_chegada=datetime(2008,9,30,10,10), origem=og, estado=ep, num_documento=7777, data_vencimento=date(2008,10,10), descricao='Serviço de Conexão Internacional - 09/2009', valor_total=None, moeda_estrangeira=False)
+        p3 = Protocolo.objects.create(termo=t, identificacao=iden3, tipo_documento=td, data_chegada=datetime(2008,9,30,10,10), origem=og, estado=ep, num_documento=5555, data_vencimento=date(2008,10,15), descricao='Serviço de Conexão Local - 09/2009', valor_total=None, moeda_estrangeira=False)
 
         #Cria Item do Protocolo
         ip1 = ItemProtocolo.objects.create(protocolo=p1, descricao='Tarifa mensal - 09/2009', quantidade=1, valor_unitario=2500)
@@ -92,10 +92,10 @@ class TermoTest(UnitTestCase):
         ef1 = EstadoOutorga.objects.create(nome='Aprovado')
         ef2 = EstadoOutorga.objects.create(nome='Concluído')
 
-        ex1 = ExtratoCC.objects.create(data_extrato=date(2008,10,30), data_oper=date(2008,10,5), cod_oper=333333, valor='2650', historico='TED')
-        ex2 = ExtratoCC.objects.create(data_extrato=date(2008,10,30), data_oper=date(2008,10,10), cod_oper=4444, valor='250000', historico='TED')
-        ex3 = ExtratoCC.objects.create(data_extrato=date(2008,10,30), data_oper=date(2008,10,10), cod_oper=4444, valor='50000', historico='TED')
-        ex4 = ExtratoCC.objects.create(data_extrato=date(2008,10,30), data_oper=date(2008,10,15), cod_oper=5555, valor='100000', historico='TED')
+        ex1 = ExtratoCC.objects.create(data_extrato=date(2008,10,30), data_oper=date(2008,10,5), cod_oper=333333, valor='2650', historico='TED', despesa_caixa=False)
+        ex2 = ExtratoCC.objects.create(data_extrato=date(2008,10,30), data_oper=date(2008,10,10), cod_oper=4444, valor='250000', historico='TED', despesa_caixa=False)
+        ex3 = ExtratoCC.objects.create(data_extrato=date(2008,10,30), data_oper=date(2008,10,10), cod_oper=4444, valor='50000', historico='TED', despesa_caixa=False)
+        ex4 = ExtratoCC.objects.create(data_extrato=date(2008,10,30), data_oper=date(2008,10,15), cod_oper=5555, valor='100000', historico='TED', despesa_caixa=False)
 
         a1 = Acordo.objects.create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e GTech')
         a2 = Acordo.objects.create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e SAC')
@@ -402,51 +402,48 @@ class OutorgaViewTest(UnitTestCase):
         of1 = OrigemFapesp.objects.create(acordo=acordo, item_outorga=i1)
 
     def test_call__relatorio_contratos_por_entidade(self):
-        mock_render_to_response = mock.MagicMock()
+        mock_render = mock.MagicMock()
         with mock.patch.multiple('outorga.views',
-            render_to_response=mock_render_to_response,
-            RequestContext=mock.MagicMock(),
+            render=mock_render,
             login_required=lambda x: x):
              
             from outorga.views import contratos
             mock_request = mock.Mock()
             contratos(mock_request)
-            _, args, _ = mock_render_to_response.mock_calls[0]
+            _, args, _ = mock_render.mock_calls[0]
 
-            self.assertEquals(args[0], 'outorga/contratos.html', 'Template errado.')
-            self.assertEquals(args[1]['entidades'][0]['entidade'], 'GTECH')
-            self.assertEquals(args[1]['entidades'][0]['contratos'][0]['numero'], '1111/11')
-            self.assertEquals(args[1]['entidades'][0]['contratos'][0]['inicio'], date(2013, 1, 2))
-            self.assertEquals(args[1]['entidades'][0]['contratos'][0]['termino'], date(2013,01,03))
-#             self.assertEquals(args[1]['entidades'][0]['contratos'][0]['arquivo'], '1111/11')
-            self.assertEquals(args[1]['entidades'][0]['contratos'][0]['auto'], False)
-            self.assertEquals(args[1]['entidades'][0]['contratos'][0]['os'][0].tipo.nome, 'Tipo Fixo')
-            self.assertEquals(args[1]['entidades'][0]['contratos'][0]['os'][0].numero, u'66666')
+            self.assertEquals(args[1], 'outorga/contratos.html', 'Template errado.')
+            self.assertEquals(args[2]['entidades'][0]['entidade'], 'GTECH')
+            self.assertEquals(args[2]['entidades'][0]['contratos'][0]['numero'], '1111/11')
+            self.assertEquals(args[2]['entidades'][0]['contratos'][0]['inicio'], date(2013, 1, 2))
+            self.assertEquals(args[2]['entidades'][0]['contratos'][0]['termino'], date(2013,01,03))
+#             self.assertEquals(args[2]['entidades'][0]['contratos'][0]['arquivo'], '1111/11')
+            self.assertEquals(args[2]['entidades'][0]['contratos'][0]['auto'], False)
+            self.assertEquals(args[2]['entidades'][0]['contratos'][0]['os'][0].tipo.nome, 'Tipo Fixo')
+            self.assertEquals(args[2]['entidades'][0]['contratos'][0]['os'][0].numero, u'66666')
 
     def test_call__relatorio_contratos_por_entidade__sem_os(self):
         os = OrdemDeServico.objects.get(pk=1)
         os.delete()
         
-        mock_render_to_response = mock.MagicMock()
+        mock_render = mock.MagicMock()
         with mock.patch.multiple('outorga.views',
-            render_to_response=mock_render_to_response,
-            RequestContext=mock.MagicMock(),
+            render=mock_render,
             login_required=lambda x: x):
              
             from outorga.views import contratos
             mock_request = mock.Mock()
             # call view
             contratos(mock_request)
-            _, args, _ = mock_render_to_response.mock_calls[0]
+            _, args, _ = mock_render.mock_calls[0]
 
-            self.assertFalse('os' in args[1]['entidades'][0]['contratos'][0], 'Ordemdeservico não deve estar na resposta da view.')
+            self.assertFalse('os' in args[2]['entidades'][0]['contratos'][0], 'Ordemdeservico não deve estar na resposta da view.')
 
 
     def test_call__relatorio_termos(self):
-        mock_render_to_response = mock.MagicMock()
+        mock_render = mock.MagicMock()
         with mock.patch.multiple('outorga.views',
-            render_to_response=mock_render_to_response,
-            RequestContext=mock.MagicMock(),
+            render=mock_render,
             login_required=lambda x: x):
              
             from outorga.views import relatorio_termos
@@ -454,17 +451,16 @@ class OutorgaViewTest(UnitTestCase):
             mock_request.method = "GET"
             # call view
             relatorio_termos(mock_request)
-            _, args, _ = mock_render_to_response.mock_calls[0]
+            _, args, _ = mock_render.mock_calls[0]
 
-            self.assertEquals(args[0], 'outorga/termos.html')
-            self.assertEquals(args[1]['termos'][0].processo, 22222)
+            self.assertEquals(args[1], 'outorga/termos.html')
+            self.assertEquals(args[2]['termos'][0].processo, 22222)
 
 
     def test_call__relatorio_termos__request_post(self):
-        mock_render_to_response = mock.MagicMock()
+        mock_render = mock.MagicMock()
         with mock.patch.multiple('outorga.views',
-            render_to_response=mock_render_to_response,
-            RequestContext=mock.MagicMock(),
+            render=mock_render,
             login_required=lambda x: x):
              
             from outorga.views import relatorio_termos
@@ -472,14 +468,13 @@ class OutorgaViewTest(UnitTestCase):
             mock_request.method = "POST"
             # call view
             relatorio_termos(mock_request)
-            self.assertTrue(len(mock_render_to_response.mock_calls) == 0, 'Não deve responder request com POST.')
+            self.assertTrue(len(mock_render.mock_calls) == 0, 'Não deve responder request com POST.')
             
             
     def test_call__lista_acordos(self):
-        mock_render_to_response = mock.MagicMock()
+        mock_render = mock.MagicMock()
         with mock.patch.multiple('outorga.views',
-            render_to_response=mock_render_to_response,
-            RequestContext=mock.MagicMock(),
+            render=mock_render,
             login_required=lambda x: x):
              
             from outorga.views import lista_acordos
@@ -487,25 +482,24 @@ class OutorgaViewTest(UnitTestCase):
             mock_request.method = "GET"
             # call view
             lista_acordos(mock_request)
-            _, args, _ = mock_render_to_response.mock_calls[0]
+            _, args, _ = mock_render.mock_calls[0]
 
-            self.assertEquals(args[0], 'outorga/acordos.html')
+            self.assertEquals(args[1], 'outorga/acordos.html')
             
-            self.assertEquals(args[1]['processos'][0]['processo'].processo, 22222)
-            self.assertEquals(args[1]['processos'][0]['acordos'][0]['acordo'].__unicode__(), u'Acordo entre Instituto UNIEMP e SAC')
-            self.assertEquals(args[1]['processos'][0]['acordos'][0]['itens'][0]['modalidade'], u'STB')
-            self.assertEquals(args[1]['processos'][0]['acordos'][0]['itens'][0]['entidade'].sigla, u'GTECH')
-            self.assertEquals(args[1]['processos'][0]['acordos'][0]['itens'][0]['descricao'], u'Armazenagem')
+            self.assertEquals(args[2]['processos'][0]['processo'].processo, 22222)
+            self.assertEquals(args[2]['processos'][0]['acordos'][0]['acordo'].__unicode__(), u'Acordo entre Instituto UNIEMP e SAC')
+            self.assertEquals(args[2]['processos'][0]['acordos'][0]['itens'][0]['modalidade'], u'STB')
+            self.assertEquals(args[2]['processos'][0]['acordos'][0]['itens'][0]['entidade'].sigla, u'GTECH')
+            self.assertEquals(args[2]['processos'][0]['acordos'][0]['itens'][0]['descricao'], u'Armazenagem')
             
 
     def test_call__lista_acordos__sem_origemfapesp(self):
         origemFapesp = OrigemFapesp.objects.get(pk=1)
         origemFapesp.delete()
         
-        mock_render_to_response = mock.MagicMock()
+        mock_render = mock.MagicMock()
         with mock.patch.multiple('outorga.views',
-            render_to_response=mock_render_to_response,
-            RequestContext=mock.MagicMock(),
+            render=mock_render,
             login_required=lambda x: x):
              
             from outorga.views import lista_acordos
@@ -513,18 +507,17 @@ class OutorgaViewTest(UnitTestCase):
             mock_request.method = "GET"
             # call view
             lista_acordos(mock_request)
-            _, args, _ = mock_render_to_response.mock_calls[0]
+            _, args, _ = mock_render.mock_calls[0]
 
-            self.assertEquals(args[0], 'outorga/acordos.html')
+            self.assertEquals(args[1], 'outorga/acordos.html')
             
-            self.assertEquals(args[1]['processos'][0]['processo'].processo, 22222)
-            self.assertTrue(len(args[1]['processos'][0]['acordos']) == 0)
+            self.assertEquals(args[2]['processos'][0]['processo'].processo, 22222)
+            self.assertTrue(len(args[2]['processos'][0]['acordos']) == 0)
 
     def test_call__lista_acordos__pdf(self):
-        mock_render_to_response = mock.MagicMock()
+        mock_render = mock.MagicMock()
         with mock.patch.multiple('outorga.views',
-            render_to_response=mock_render_to_response,
-            RequestContext=mock.MagicMock(),
+            render=mock_render,
             login_required=lambda x: x):
              
             from outorga.views import lista_acordos
@@ -537,10 +530,9 @@ class OutorgaViewTest(UnitTestCase):
 
 
     def test_call__item_modalidade__pagina_filtro_inicial(self):
-        mock_render_to_response = mock.MagicMock()
+        mock_render = mock.MagicMock()
         with mock.patch.multiple('outorga.views',
-            render_to_response=mock_render_to_response,
-            RequestContext=mock.MagicMock(),
+            render=mock_render,
             login_required=lambda x: x):
              
             from outorga.views import item_modalidade
@@ -550,23 +542,22 @@ class OutorgaViewTest(UnitTestCase):
             mock_request.GET = QueryDict([])
             # call view
             item_modalidade(mock_request)
-            _, args, _ = mock_render_to_response.mock_calls[0]
+            _, args, _ = mock_render.mock_calls[0]
 
-            self.assertEquals(args[0], 'outorga/termo_mod.html')
+            self.assertEquals(args[1], 'outorga/termo_mod.html')
             
-            self.assertIsNotNone(args[1]['termos'])
-            self.assertIsNotNone(args[1]['modalidades'])
-            self.assertIsNotNone(args[1]['entidades'])
+            self.assertIsNotNone(args[2]['termos'])
+            self.assertIsNotNone(args[2]['modalidades'])
+            self.assertIsNotNone(args[2]['entidades'])
             # Verificando se não entrou no if errado dentro da view, buscando mais informações que deveria
-            self.assertFalse('itens' in args[1])
+            self.assertFalse('itens' in args[2])
             
             
 
     def test_call__item_modalidade__sem_entidade(self):
-        mock_render_to_response = mock.MagicMock()
+        mock_render = mock.MagicMock()
         with mock.patch.multiple('outorga.views',
-            render_to_response=mock_render_to_response,
-            RequestContext=mock.MagicMock(),
+            render=mock_render,
             login_required=lambda x: x):
              
             from outorga.views import item_modalidade
@@ -576,23 +567,21 @@ class OutorgaViewTest(UnitTestCase):
             mock_request.GET = QueryDict("&termo=1&modalidade=1")
             # call view
             item_modalidade(mock_request)
-            _, args, _ = mock_render_to_response.mock_calls[0]
+            _, args, _ = mock_render.mock_calls[0]
 
-            self.assertEquals(args[0], 'outorga/por_item_modalidade.html')
+            self.assertEquals(args[1], 'outorga/por_item_modalidade.html')
 
-            self.assertIsNotNone(args[1]['termo'])
-            self.assertIsNotNone(args[1]['modalidade'])
-            self.assertIsNotNone(args[1]['itens'])
-            
-            self.assertIsNone(args[1]['entidade'])
+            self.assertIsNotNone(args[2]['termo'])
+            self.assertIsNotNone(args[2]['modalidade'])
+            self.assertIsNotNone(args[2]['itens'])
+            self.assertIsNone(args[2]['entidade'])
             
             
 
     def test_call__item_modalidade(self):
-        mock_render_to_response = mock.MagicMock()
+        mock_render = mock.MagicMock()
         with mock.patch.multiple('outorga.views',
-            render_to_response=mock_render_to_response,
-            RequestContext=mock.MagicMock(),
+            render=mock_render,
             login_required=lambda x: x):
              
             from outorga.views import item_modalidade
@@ -602,14 +591,14 @@ class OutorgaViewTest(UnitTestCase):
             mock_request.GET = QueryDict("&termo=1&modalidade=1&entidade=1")
             # call view
             item_modalidade(mock_request)
-            _, args, _ = mock_render_to_response.mock_calls[0]
+            _, args, _ = mock_render.mock_calls[0]
 
-            self.assertEquals(args[0], 'outorga/por_item_modalidade.html')
+            self.assertEquals(args[1], 'outorga/por_item_modalidade.html')
 
-            self.assertIsNotNone(args[1]['termo'])
-            self.assertIsNotNone(args[1]['modalidade'])
-            self.assertIsNotNone(args[1]['itens'])
-            self.assertIsNotNone(args[1]['entidade'])
+            self.assertIsNotNone(args[2]['termo'])
+            self.assertIsNotNone(args[2]['modalidade'])
+            self.assertIsNotNone(args[2]['itens'])
+            self.assertIsNotNone(args[2]['entidade'])
 
 
 class Natureza_gastoTest(UnitTestCase):
@@ -656,8 +645,8 @@ class Natureza_gastoTest(UnitTestCase):
         iden1 = Identificacao.objects.create(endereco=end1, contato=cot1, funcao='Tecnico', area='Estoque', ativo=True)
         iden2 = Identificacao.objects.create(endereco=end2, contato=cot2, funcao='Diretor', area='Redes', ativo=True)
 
-        p1 = Protocolo.objects.create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,9,30,10,10), origem=og, estado=ep, num_documento=8888, data_vencimento=date(2008,10,5), descricao='Conta mensal - armazenagem 09/2008', valor_total=None)
-        p2 = Protocolo.objects.create(termo=t, identificacao=iden2, tipo_documento=td, data_chegada=datetime(2008,9,30,10,10), origem=og, estado=ep, num_documento=5555, data_vencimento=date(2008,10,15), descricao='Serviço de Conexão Local - 09/2009', valor_total=None)
+        p1 = Protocolo.objects.create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,9,30,10,10), origem=og, estado=ep, num_documento=8888, data_vencimento=date(2008,10,5), descricao='Conta mensal - armazenagem 09/2008', valor_total=None, moeda_estrangeira=False)
+        p2 = Protocolo.objects.create(termo=t, identificacao=iden2, tipo_documento=td, data_chegada=datetime(2008,9,30,10,10), origem=og, estado=ep, num_documento=5555, data_vencimento=date(2008,10,15), descricao='Serviço de Conexão Local - 09/2009', valor_total=None, moeda_estrangeira=False)
 
         #Cria Item do Protocolo
         ip1 = ItemProtocolo.objects.create(protocolo=p1, descricao='Tarifa mensal - 09/2009', quantidade=1, valor_unitario=2500)
@@ -669,8 +658,8 @@ class Natureza_gastoTest(UnitTestCase):
         ef1 = EstadoOutorga.objects.create(nome='Aprovado')
         ef2 = EstadoOutorga.objects.create(nome='Concluído')
 
-        ex1 = ExtratoCC.objects.create(data_extrato=date(2008,10,30), data_oper=date(2008,10,5), cod_oper=333333, valor='2650', historico='TED')
-        ex2 = ExtratoCC.objects.create(data_extrato=date(2008,10,30), data_oper=date(2008,10,15), cod_oper=5555, valor='100000', historico='TED')
+        ex1 = ExtratoCC.objects.create(data_extrato=date(2008,10,30), data_oper=date(2008,10,5), cod_oper=333333, valor='2650', historico='TED', despesa_caixa=False)
+        ex2 = ExtratoCC.objects.create(data_extrato=date(2008,10,30), data_oper=date(2008,10,15), cod_oper=5555, valor='100000', historico='TED', despesa_caixa=False)
 
         a1 = Acordo.objects.create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e GTech')
         a2 = Acordo.objects.create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e Terremark')
@@ -856,9 +845,9 @@ class ItemTest(UnitTestCase):
 
         iden1 = Identificacao.objects.create(contato=cot1, funcao='Gerente', area='Redes', ativo=True, endereco=endereco)
 
-        p1 = Protocolo.objects.create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,9,30,10,10), origem=og, estado=ep, num_documento=7777, data_vencimento=date(2008,10,10), descricao='Serviço de Conexão Internacional - 09/2009', valor_total=None)
-        p2 = Protocolo.objects.create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,10,30,10,10), origem=og, estado=ep, num_documento=5555, data_vencimento=date(2008,11,10), descricao='Serviço de Conexão Internacional - 10/2009', valor_total=None)
-        p3 = Protocolo.objects.create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,10,31,10,10), origem=og, estado=ep, num_documento=666, data_vencimento=date(2008,11,12), descricao='Serviço de Conexão Internacional - 10/2009', valor_total=None)
+        p1 = Protocolo.objects.create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,9,30,10,10), origem=og, estado=ep, num_documento=7777, data_vencimento=date(2008,10,10), descricao='Serviço de Conexão Internacional - 09/2009', valor_total=None, moeda_estrangeira=False)
+        p2 = Protocolo.objects.create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,10,30,10,10), origem=og, estado=ep, num_documento=5555, data_vencimento=date(2008,11,10), descricao='Serviço de Conexão Internacional - 10/2009', valor_total=None, moeda_estrangeira=False)
+        p3 = Protocolo.objects.create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,10,31,10,10), origem=og, estado=ep, num_documento=666, data_vencimento=date(2008,11,12), descricao='Serviço de Conexão Internacional - 10/2009', valor_total=None, moeda_estrangeira=False)
 
         #Cria Item do Protocolo
         ip1 = ItemProtocolo.objects.create(protocolo=p1, descricao='Conexão Internacional - 09/2009', quantidade=1, valor_unitario=250000)
@@ -871,9 +860,9 @@ class ItemTest(UnitTestCase):
         ef1 = EstadoFinanceiro.objects.create(nome='Aprovado')
         ef2 = EstadoFinanceiro.objects.create(nome='Concluído')
 
-        ex1 = ExtratoCC.objects.create(data_extrato=date(2008,10,30), data_oper=date(2008,10,10), cod_oper=333333, valor='300000', historico='TED')
-        ex2 = ExtratoCC.objects.create(data_extrato=date(2008,11,30), data_oper=date(2008,11,10), cod_oper=444444, valor='300000', historico='TED')
-        ex3 = ExtratoCC.objects.create(data_extrato=date(2008,11,30), data_oper=date(2008,11,12), cod_oper=555555, valor='10', historico='TED')
+        ex1 = ExtratoCC.objects.create(data_extrato=date(2008,10,30), data_oper=date(2008,10,10), cod_oper=333333, valor='300000', historico='TED', despesa_caixa=False)
+        ex2 = ExtratoCC.objects.create(data_extrato=date(2008,11,30), data_oper=date(2008,11,10), cod_oper=444444, valor='300000', historico='TED', despesa_caixa=False)
+        ex3 = ExtratoCC.objects.create(data_extrato=date(2008,11,30), data_oper=date(2008,11,12), cod_oper=555555, valor='10', historico='TED', despesa_caixa=False)
 
         a1 = Acordo.objects.create(estado=eo1, descricao='Acordo entre Instituto UNIEMP e SAC')
 
@@ -1104,14 +1093,14 @@ class OrigemFapespTest(UnitTestCase):
         td = TipoDocumento.objects.create(nome='Nota Fiscal')
         og = Origem.objects.create(nome='Motoboy')
         
-        cot1 = Contato.objects.create(primeiro_nome='Alex', email='alex@alex.com.br', tel='')
+        cot1 = Contato.objects.create(primeiro_nome='Alex', email='alex@alex.com.br', tel='', ativo=True)
         
 
         iden1 = Identificacao.objects.create(contato=cot1, funcao='Gerente', area='Redes', ativo=True, endereco=endereco)
 
-        p1 = Protocolo.objects.create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,9,30,10,10), origem=og, estado=ep, num_documento=7777, data_vencimento=date(2008,10,10), descricao='Serviço de Conexão Internacional - 09/2009', valor_total=None)
-        p2 = Protocolo.objects.create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,10,30,10,10), origem=og, estado=ep, num_documento=5555, data_vencimento=date(2008,11,10), descricao='Serviço de Conexão Internacional - 10/2009', valor_total=None)
-        p3 = Protocolo.objects.create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,10,31,10,10), origem=og, estado=ep, num_documento=666, data_vencimento=date(2008,11,12), descricao='Serviço de Conexão Internacional - 10/2009', valor_total=None)
+        p1 = Protocolo.objects.create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,9,30,10,10), origem=og, estado=ep, num_documento=7777, data_vencimento=date(2008,10,10), descricao='Serviço de Conexão Internacional - 09/2009', valor_total=None, moeda_estrangeira=False)
+        p2 = Protocolo.objects.create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,10,30,10,10), origem=og, estado=ep, num_documento=5555, data_vencimento=date(2008,11,10), descricao='Serviço de Conexão Internacional - 10/2009', valor_total=None, moeda_estrangeira=False)
+        p3 = Protocolo.objects.create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,10,31,10,10), origem=og, estado=ep, num_documento=666, data_vencimento=date(2008,11,12), descricao='Serviço de Conexão Internacional - 10/2009', valor_total=None, moeda_estrangeira=False)
 
         #Cria Item do Protocolo
         ip1 = ItemProtocolo.objects.create(protocolo=p1, descricao='Conexão Internacional - 09/2009', quantidade=1, valor_unitario=250000)
@@ -1124,9 +1113,9 @@ class OrigemFapespTest(UnitTestCase):
         ef1 = EstadoFinanceiro.objects.create(nome='Aprovado')
         ef2 = EstadoFinanceiro.objects.create(nome='Concluído')
 
-        ex1 = ExtratoCC.objects.create(data_extrato=date(2008,10,30), data_oper=date(2008,10,10), cod_oper=333333, valor='300000', historico='TED')
-        ex2 = ExtratoCC.objects.create(data_extrato=date(2008,11,30), data_oper=date(2008,11,10), cod_oper=444444, valor='300000', historico='TED')
-        ex3 = ExtratoCC.objects.create(data_extrato=date(2008,11,30), data_oper=date(2008,11,12), cod_oper=555555, valor='10', historico='TED')
+        ex1 = ExtratoCC.objects.create(data_extrato=date(2008,10,30), data_oper=date(2008,10,10), cod_oper=333333, valor='300000', historico='TED', despesa_caixa=False)
+        ex2 = ExtratoCC.objects.create(data_extrato=date(2008,11,30), data_oper=date(2008,11,10), cod_oper=444444, valor='300000', historico='TED', despesa_caixa=False)
+        ex3 = ExtratoCC.objects.create(data_extrato=date(2008,11,30), data_oper=date(2008,11,12), cod_oper=555555, valor='10', historico='TED', despesa_caixa=False)
 
         a1 = Acordo.objects.create(estado=eo1, descricao='Acordo entre Instituto UNIEMP e SAC')
 

@@ -36,17 +36,17 @@ class PatrimonioTest(TestCase):
         ent= Entidade.objects.create(sigla='SAC', nome='Global Crossing', cnpj='00.000.000/0000-00', fisco=True, url='')
         end = Endereco.objects.create(entidade=ent, rua='Dr. Ovidio', num=215, bairro='Cerqueira Cesar', cep='05403010', estado='SP', pais='Brasil')
         tipoDetalhe = TipoDetalhe.objects.create()
-        endDet = EnderecoDetalhe.objects.create(endereco=end, tipo=tipoDetalhe)
+        endDet = EnderecoDetalhe.objects.create(endereco=end, tipo=tipoDetalhe, mostra_bayface=True)
         est = Estado.objects.create()
         tipoPatr = Tipo.objects.create(nome='roteador')
         
-        patrPai = Patrimonio.objects.create(ns='AF345678GB3489X', modelo='NetIron400', tipo=tipoPatr, apelido="NetIron400")
+        patrPai = Patrimonio.objects.create(ns='AF345678GB3489X', modelo='NetIron400', tipo=tipoPatr, apelido="NetIron400", checado=True)
         historicoPai = HistoricoLocal.objects.create(patrimonio=patrPai, posicao="R039.F001", endereco= endDet, descricao='Emprestimo', data= datetime.date(2009,2,5), estado=est)
         # pegando novamente o objeto para resetar a propriedade do historico_atual
         patrPai = Patrimonio.objects.get(pk=patrPai.pk)
         
         tipoPatrFilho = Tipo.objects.create(nome='placa')
-        patrFilho = Patrimonio.objects.create(ns='NSFILHO', modelo='Placa mãe', tipo=tipoPatrFilho, apelido="Placa mãe", patrimonio=patrPai)
+        patrFilho = Patrimonio.objects.create(ns='NSFILHO', modelo='Placa mãe', tipo=tipoPatrFilho, apelido="Placa mãe", patrimonio=patrPai, checado=True)
         historicoFilho = HistoricoLocal.objects.create(patrimonio=patrFilho, posicao="R042.F001", endereco= endDet, descricao='Emprestimo', data= datetime.date(2007,2,5), estado=est)
         # pegando novamente o objeto para resetar a propriedade do historico_atual
         patrFilho = Patrimonio.objects.get(pk=patrFilho.pk)
@@ -63,18 +63,18 @@ class PatrimonioTest(TestCase):
         ent= Entidade.objects.create(sigla='SAC', nome='Global Crossing', cnpj='00.000.000/0000-00', fisco=True, url='')
         end = Endereco.objects.create(entidade=ent, rua='Dr. Ovidio', num=215, bairro='Cerqueira Cesar', cep='05403010', estado='SP', pais='Brasil')
         tipoDetalhe = TipoDetalhe.objects.create()
-        endDet = EnderecoDetalhe.objects.create(endereco=end, tipo=tipoDetalhe)
+        endDet = EnderecoDetalhe.objects.create(endereco=end, tipo=tipoDetalhe, mostra_bayface=True)
         est = Estado.objects.create()
         tipoPatr = Tipo.objects.create(nome='roteador')
         
-        patrPai = Patrimonio.objects.create(ns='AF345678GB3489X', modelo='NetIron400', tipo=tipoPatr, apelido="NetIron400")
+        patrPai = Patrimonio.objects.create(ns='AF345678GB3489X', modelo='NetIron400', tipo=tipoPatr, apelido="NetIron400", checado=True)
         # inserindo histórico sem posição
         historicoPai = HistoricoLocal.objects.create(patrimonio=patrPai, endereco= endDet, descricao='Emprestimo', data= datetime.date(2009,2,5), estado=est)
         # pegando novamente o objeto para resetar a propriedade do historico_atual
         patrPai = Patrimonio.objects.get(pk=patrPai.pk)
         
         tipoPatrFilho = Tipo.objects.create(nome='placa')
-        patrFilho = Patrimonio.objects.create(ns='NSFILHO', modelo='Placa mãe', tipo=tipoPatrFilho, apelido="Placa mãe", patrimonio=patrPai)
+        patrFilho = Patrimonio.objects.create(ns='NSFILHO', modelo='Placa mãe', tipo=tipoPatrFilho, apelido="Placa mãe", patrimonio=patrPai, checado=True)
         historicoFilho = HistoricoLocal.objects.create(patrimonio=patrFilho, posicao="R042.F001", endereco= endDet, descricao='Emprestimo', data= datetime.date(2007,2,5), estado=est)
         # pegando novamente o objeto para resetar a propriedade do historico_atual
         patrFilho = Patrimonio.objects.get(pk=patrFilho.pk)
@@ -91,17 +91,17 @@ class PatrimonioTest(TestCase):
         ent= Entidade.objects.create(sigla='SAC', nome='Global Crossing', cnpj='00.000.000/0000-00', fisco=True, url='')
         end = Endereco.objects.create(entidade=ent, rua='Dr. Ovidio', num=215, bairro='Cerqueira Cesar', cep='05403010', estado='SP', pais='Brasil')
         tipoDetalhe = TipoDetalhe.objects.create()
-        endDet = EnderecoDetalhe.objects.create(endereco=end, tipo=tipoDetalhe)
+        endDet = EnderecoDetalhe.objects.create(endereco=end, tipo=tipoDetalhe, mostra_bayface=True)
         est = Estado.objects.create()
         tipoPatr = Tipo.objects.create(nome='roteador')
         
-        patrPai = Patrimonio.objects.create(ns='AF345678GB3489X', modelo='NetIron400', tipo=tipoPatr, apelido="NetIron400")
+        patrPai = Patrimonio.objects.create(ns='AF345678GB3489X', modelo='NetIron400', tipo=tipoPatr, apelido="NetIron400", checado=True)
         historicoPai = HistoricoLocal.objects.create(patrimonio=patrPai, posicao="R039.F001", endereco= endDet, descricao='Emprestimo', data= datetime.date(2009,2,5), estado=est)
         # pegando novamente o objeto para resetar a propriedade do historico_atual
         patrPai = Patrimonio.objects.get(pk=patrPai.pk)
         
         tipoPatrFilho = Tipo.objects.create(nome='placa')
-        patrFilho = Patrimonio.objects.create(ns='NSFILHO', modelo='Placa mãe', tipo=tipoPatrFilho, apelido="Placa mãe", patrimonio=patrPai)
+        patrFilho = Patrimonio.objects.create(ns='NSFILHO', modelo='Placa mãe', tipo=tipoPatrFilho, apelido="Placa mãe", patrimonio=patrPai, checado=True)
         # inserindo histórico sem posição
         historicoFilho = HistoricoLocal.objects.create(patrimonio=patrFilho,endereco= endDet, descricao='Emprestimo', data= datetime.date(2007,2,5), estado=est)
         # pegando novamente o objeto para resetar a propriedade do historico_atual
@@ -119,17 +119,17 @@ class PatrimonioTest(TestCase):
         ent= Entidade.objects.create(sigla='SAC', nome='Global Crossing', cnpj='00.000.000/0000-00', fisco=True, url='')
         end = Endereco.objects.create(entidade=ent, rua='Dr. Ovidio', num=215, bairro='Cerqueira Cesar', cep='05403010', estado='SP', pais='Brasil')
         tipoDetalhe = TipoDetalhe.objects.create()
-        endDet = EnderecoDetalhe.objects.create(endereco=end, tipo=tipoDetalhe)
+        endDet = EnderecoDetalhe.objects.create(endereco=end, tipo=tipoDetalhe, mostra_bayface=True)
         est = Estado.objects.create()
         tipoPatr = Tipo.objects.create(nome='roteador')
         
-        patrPai = Patrimonio.objects.create(ns='AF345678GB3489X', modelo='NetIron400', tipo=tipoPatr, apelido="NetIron400")
+        patrPai = Patrimonio.objects.create(ns='AF345678GB3489X', modelo='NetIron400', tipo=tipoPatr, apelido="NetIron400", checado=True)
         historicoPai = HistoricoLocal.objects.create(patrimonio=patrPai, posicao="R039.F001", endereco= endDet, descricao='Emprestimo', data= datetime.date(2009,2,5), estado=est)
         # pegando novamente o objeto para resetar a propriedade do historico_atual
         patrPai = Patrimonio.objects.get(pk=patrPai.pk)
         
         tipoPatrFilho = Tipo.objects.create(nome='placa')
-        patrFilho = Patrimonio.objects.create(ns='NSFILHO', modelo='Placa mãe', tipo=tipoPatrFilho, apelido="Placa mãe", patrimonio=patrPai)
+        patrFilho = Patrimonio.objects.create(ns='NSFILHO', modelo='Placa mãe', tipo=tipoPatrFilho, apelido="Placa mãe", patrimonio=patrPai, checado=True)
         # colocando uma data de histórico mais nova que o do histórico do pai
         historicoFilho = HistoricoLocal.objects.create(patrimonio=patrFilho,endereco= endDet, descricao='Emprestimo', data= datetime.date(2013,2,5), estado=est)
         # pegando novamente o objeto para resetar a propriedade do historico_atual
@@ -148,7 +148,7 @@ class PatrimonioTest(TestCase):
         ent= Entidade.objects.create(sigla='SAC', nome='Global Crossing', cnpj='00.000.000/0000-00', fisco=True, url='')
         end = Endereco.objects.create(entidade=ent, rua='Dr. Ovidio', num=215, bairro='Cerqueira Cesar', cep='05403010', estado='SP', pais='Brasil')
         tipoDetalhe = TipoDetalhe.objects.create()
-        endDet = EnderecoDetalhe.objects.create(endereco=end, tipo=tipoDetalhe)
+        endDet = EnderecoDetalhe.objects.create(endereco=end, tipo=tipoDetalhe, mostra_bayface=True)
         est = Estado.objects.create()
         tipoPatr = Tipo.objects.create(nome='roteador')
 
@@ -164,13 +164,13 @@ class HistoricoLocalTest(TestCase):
         tipoDetalhe = TipoDetalhe()
         tipoDetalhe.save()
         
-        endDet = EnderecoDetalhe(endereco=end, tipo=tipoDetalhe)
+        endDet = EnderecoDetalhe(endereco=end, tipo=tipoDetalhe, mostra_bayface=True)
         endDet.save()
 
         tipoPatr = Tipo(nome='roteador')
         tipoPatr.save()
 
-        rt = Patrimonio(ns='AF345678GB3489X', modelo='NetIron400', tipo=tipoPatr, apelido="NetIron400")
+        rt = Patrimonio(ns='AF345678GB3489X', modelo='NetIron400', tipo=tipoPatr, apelido="NetIron400", checado=True)
         rt.save()
 
         est = Estado()
@@ -310,16 +310,16 @@ class HistoricoLocalTest(TestCase):
 
 class ViewTest(TestCase):
     def setUpPatrimonio(self, num_documento='', ns=''):
-        protocolo = Protocolo(id=1, num_documento=num_documento, tipo_documento_id=0, estado_id=0, termo_id=0, data_chegada=date(year=2000, month=01, day=01))
+        protocolo = Protocolo(id=1, num_documento=num_documento, tipo_documento_id=0, estado_id=0, termo_id=0, data_chegada=date(year=2000, month=01, day=01), moeda_estrangeira=False)
         protocolo.save()
         pagamento = Pagamento(id=1, protocolo=protocolo, valor_fapesp=0)
         pagamento.save()
         tipoPatr = Tipo(id=1)
         tipoPatr.save()
-        patrimonio = Patrimonio(id=1, pagamento=pagamento, tipo=tipoPatr)
+        patrimonio = Patrimonio(id=1, pagamento=pagamento, tipo=tipoPatr, checado=True)
         patrimonio.save()
         
-        patrimonio = Patrimonio(id=2, ns=ns, tipo=tipoPatr)
+        patrimonio = Patrimonio(id=2, ns=ns, tipo=tipoPatr, checado=True)
         patrimonio.save()
         
     def test_escolhe_patrimonio_ajax_empty(self):

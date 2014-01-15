@@ -26,11 +26,11 @@ class TestPatrimonioComEquipamenpoVazio(TestCase):
             tipo2.nome = 'tipo2'
             tipo2.save()
         
-            patr1 = Patrimonio(part_number="", modelo="m2", descricao="", tipo=tipo1, equipamento=eq)
+            patr1 = Patrimonio(part_number="", modelo="m2", descricao="", tipo=tipo1, equipamento=eq, checado=True)
             patr1.save()
-            patr2 = Patrimonio(part_number="pn1", modelo="m2", descricao="", tipo=tipo2)
+            patr2 = Patrimonio(part_number="pn1", modelo="m2", descricao="", tipo=tipo2, checado=True)
             patr2.save()
-            patr3 = Patrimonio(part_number="pn1", modelo="m2", descricao="", tipo=tipo2)
+            patr3 = Patrimonio(part_number="pn1", modelo="m2", descricao="", tipo=tipo2, checado=True)
             patr3.save()
             
             verficacao = VerificacaoPatrimonio()
@@ -73,11 +73,11 @@ class TestPatrimonioComEquipamenpoVazio(TestCase):
             tipo2.nome = 'tipo2'
             tipo2.save()
         
-            patr1 = Patrimonio(part_number="pn1", modelo="m2", descricao="", tipo=tipo1, equipamento=eq1)
+            patr1 = Patrimonio(part_number="pn1", modelo="m2", descricao="", tipo=tipo1, equipamento=eq1, checado=True)
             patr1.save()
-            patr2 = Patrimonio(part_number="", modelo="m2", descricao="", tipo=tipo1, equipamento=eq2)
+            patr2 = Patrimonio(part_number="", modelo="m2", descricao="", tipo=tipo1, equipamento=eq2, checado=True)
             patr2.save()
-            patr3 = Patrimonio(part_number="pn11111", modelo="m2", descricao="", tipo=tipo2, equipamento=eq3)
+            patr3 = Patrimonio(part_number="pn11111", modelo="m2", descricao="", tipo=tipo2, equipamento=eq3, checado=True)
             patr3.save()
             
             verficacao = VerificacaoPatrimonioEquipamento()
@@ -120,11 +120,11 @@ class TestPatrimonioComEquipamenpoVazio(TestCase):
             tipo2.nome = 'tipo2'
             tipo2.save()
         
-            patr1 = Patrimonio(part_number="pt1", modelo="pt1", descricao="desc1", tipo=tipo1, equipamento=eq1)
+            patr1 = Patrimonio(part_number="pt1", modelo="pt1", descricao="desc1", tipo=tipo1, equipamento=eq1, checado=True)
             patr1.save()
-            patr2 = Patrimonio(part_number="pt2", modelo="pt2", descricao="", tipo=tipo1, equipamento=eq2)
+            patr2 = Patrimonio(part_number="pt2", modelo="pt2", descricao="", tipo=tipo1, equipamento=eq2, checado=True)
             patr2.save()
-            patr3 = Patrimonio(part_number="pt3", modelo="pt3", descricao="desc11111", tipo=tipo2, equipamento=eq3)
+            patr3 = Patrimonio(part_number="pt3", modelo="pt3", descricao="desc11111", tipo=tipo2, equipamento=eq3, checado=True)
             patr3.save()
             
             verficacao = VerificacaoPatrimonioEquipamento()
@@ -166,11 +166,11 @@ class TestPatrimonioComEquipamenpoVazio(TestCase):
             tipo2.nome = 'tipo2'
             tipo2.save()
         
-            patr1 = Patrimonio(part_number="pt1", modelo="m1", descricao="pt1", tipo=tipo1, equipamento=eq1)
+            patr1 = Patrimonio(part_number="pt1", modelo="m1", descricao="pt1", tipo=tipo1, equipamento=eq1, checado=True)
             patr1.save()
-            patr2 = Patrimonio(part_number="pt2", modelo="", descricao="pt2", tipo=tipo1, equipamento=eq2)
+            patr2 = Patrimonio(part_number="pt2", modelo="", descricao="pt2", tipo=tipo1, equipamento=eq2, checado=True)
             patr2.save()
-            patr3 = Patrimonio(part_number="pt3", modelo="m1111", descricao="pt3", tipo=tipo2, equipamento=eq3)
+            patr3 = Patrimonio(part_number="pt3", modelo="m1111", descricao="pt3", tipo=tipo2, equipamento=eq3, checado=True)
             patr3.save()
             
             verficacao = VerificacaoPatrimonioEquipamento()
@@ -212,11 +212,11 @@ class TestPatrimonioComEquipamenpoVazio(TestCase):
             tipo2.nome = 'tipo2'
             tipo2.save()
         
-            patr1 = Patrimonio(part_number="pt1", modelo="pt1", descricao="pt1", ncm="n1", tipo=tipo1, equipamento=eq1)
+            patr1 = Patrimonio(part_number="pt1", modelo="pt1", descricao="pt1", ncm="n1", tipo=tipo1, equipamento=eq1, checado=True)
             patr1.save()
-            patr2 = Patrimonio(part_number="pt2", modelo="pt2", descricao="pt2", ncm="", tipo=tipo1, equipamento=eq2)
+            patr2 = Patrimonio(part_number="pt2", modelo="pt2", descricao="pt2", ncm="", tipo=tipo1, equipamento=eq2, checado=True)
             patr2.save()
-            patr3 = Patrimonio(part_number="pt3", modelo="pt3", descricao="pt3", ncm="n1111", tipo=tipo2, equipamento=eq3)
+            patr3 = Patrimonio(part_number="pt3", modelo="pt3", descricao="pt3", ncm="n1111", tipo=tipo2, equipamento=eq3, checado=True)
             patr3.save()
             
             verficacao = VerificacaoPatrimonioEquipamento()
@@ -259,11 +259,11 @@ class TestPatrimonioComEquipamenpoVazio(TestCase):
             tipo2.nome = 'tipo2'
             tipo2.save()
         
-            patr1 = Patrimonio(part_number="pt1", modelo="pt1", descricao="pt1", ncm="n1", tamanho=1.0,  tipo=tipo1, equipamento=eq1)
+            patr1 = Patrimonio(part_number="pt1", modelo="pt1", descricao="pt1", ncm="n1", tamanho=1.0,  tipo=tipo1, equipamento=eq1, checado=True)
             patr1.save()
-            patr2 = Patrimonio(part_number="pt2", modelo="pt2", descricao="pt2", ncm="", tipo=tipo1, equipamento=eq2)
+            patr2 = Patrimonio(part_number="pt2", modelo="pt2", descricao="pt2", ncm="", tipo=tipo1, equipamento=eq2, checado=True)
             patr2.save()
-            patr3 = Patrimonio(part_number="pt3", modelo="pt3", descricao="pt3", ncm="n1111", tamanho=11.0, tipo=tipo2, equipamento=eq3)
+            patr3 = Patrimonio(part_number="pt3", modelo="pt3", descricao="pt3", ncm="n1111", tamanho=11.0, tipo=tipo2, equipamento=eq3, checado=True)
             patr3.save()
             
             verficacao = VerificacaoPatrimonioEquipamento()
@@ -297,7 +297,7 @@ class TestPatrimonioComEquipamenpoVazio(TestCase):
             tipo = Tipo()
             tipo.save()
         
-            patr = Patrimonio(id = 2, part_number="part_number1", modelo="modelo1", descricao="descricao1", ncm="ncm1", tipo=tipo, equipamento=eq1)
+            patr = Patrimonio(id = 2, part_number="part_number1", modelo="modelo1", descricao="descricao1", ncm="ncm1", tipo=tipo, equipamento=eq1, checado=True)
             patr.save()
             
             # verifica se o valor do atributo está diferente ANTES do teste
@@ -355,7 +355,7 @@ class TestPatrimonioComEquipamenpoVazio(TestCase):
             tipo = Tipo()
             tipo.save()
         
-            patr = Patrimonio(id = 2, part_number="", modelo="", descricao="", ncm="", tipo=tipo, equipamento=eq1)
+            patr = Patrimonio(id = 2, part_number="", modelo="", descricao="", ncm="", tipo=tipo, equipamento=eq1, checado=False)
             patr.save()
             
             # verifica se o valor do atributo está diferente ANTES do teste

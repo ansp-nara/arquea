@@ -54,3 +54,24 @@ class ContatoTest(TestCase):
         self.assertEquals(c.contato_ent(), u'GTECH, SAC')
 
 
+class EnderecoTest(TestCase):
+    def setUp(self):
+        ent = Entidade.objects.create(sigla='SAC', nome='Global Crossing', cnpj='00.000.000/0000-00', fisco=True, url='')
+        c = Contato.objects.create(nome='Joao', email='joao@joao.com.br', tel='', ativo=True)
+        end = Endereco.objects.create(entidade=ent, rua='Dr. Ovidio', num=215, bairro='Cerqueira Cesar', cep='05403010', estado='SP', pais='Brasil')
+        iden = Identificacao.objects.create(endereco=end, contato=c, funcao='Tecnico', area='', ativo=True)
+
+    def test_unicode(self):
+        e = Endereco.objects.get(pk=1)
+        self.assertEquals(e.__unicode__(), u'SAC - Dr. Ovidio, 215')
+
+
+
+class EntidadeTest(TestCase):
+    def setUp(self):
+        from utils.models import CNPJField
+        e = Entidade.objects.create(sigla='SAC', nome='Global Crossing', cnpj='00.000.000/0000-00', fisco=True, url='')
+
+    def test_unicode(self):
+        e = Entidade.objects.get(pk=1)
+        self.assertEquals(e.sigla_nome(), u'SAC - Global Crossing')

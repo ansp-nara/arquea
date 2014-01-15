@@ -19,7 +19,7 @@ class Contato(models.Model):
     primeiro_nome = models.CharField(_(u'Primeiro nome'), max_length=100, help_text=_(u'ex. João Andrade'))
     ultimo_nome = models.CharField(_(u'Último nome'), max_length=45)
     email = models.CharField(_(u'E-mail'), max_length=100, blank=True, help_text=_(u'ex. joao@joao.br'))
-    ativo = models.BooleanField(_(u'Ativo'))
+    ativo = models.BooleanField(_(u'Ativo'), default=True)
     tel = models.CharField(_(u'Telefone'), max_length=100, help_text=_(u'ex. Com. (11)2222-2222, Cel. (11)9999-9999, Fax (11)3333-3333, ...'))
     documento = models.CharField(max_length=30, null=True, blank=True)
 
@@ -108,17 +108,6 @@ class Endereco(models.Model):
     O método '__unicode__'	Retorna os campos 'rua', 'num' e 'compl' (se existir).
     A 'class Meta'		Define a descrição do modelo (singular e plural), a ordenação dos dados e a unicidade que um endereço pelos 
 			    	campos 'identificacao', 'rua', 'num', 'compl', 'bairro', 'cidade', 'cep', 'estado' e 'pais'.
-
-    >>> ent, created = Entidade.objects.get_or_create(sigla='SAC', defaults={'nome': 'Global Crossing', 'cnpj': '00.000.000/0000-00', 'ativo': False, 'fisco': True, 'url': '', 'asn': 123})
-
-    >>> c, created = Contato.objects.get_or_create(nome='Joao', defaults={'email': 'joao@joao.com.br', 'tel': '', 'ativo': True})
-
-    >>> iden, created = Identificacao.objects.get_or_create(entidade=ent, contato=c, defaults={'funcao': 'Tecnico', 'area': '', 'ativo': True})
-
-    >>> end, created = Endereco.objects.get_or_create(identificacao=iden, rua='Dr. Ovidio', num=215, bairro='Cerqueira Cesar', cep='05403010', estado='SP', pais='Brasil')
-
-    >>> end.__unicode__()
-    'Dr. Ovidio, 215'
     """
 
     entidade = models.ForeignKey('identificacao.Entidade', verbose_name=_(u'Entidade'))
@@ -172,7 +161,6 @@ class ASN(models.Model):
         ordering = ('numero',)
 
 class Entidade(models.Model):
-
     """
     Uma instância dessa classe representa uma entidade cadastrada no sistema.
 
@@ -182,13 +170,6 @@ class Entidade(models.Model):
     A 'class Meta' 		Define a ordenação dos dados pela sigla.
 
     A unicidade dos dados é feita através do campo 'sigla'.
-
-    >>> from utils.models import CNPJField
-
-    >>> e, created = Entidade.objects.get_or_create(sigla='SAC', defaults={'nome': 'Global Crossing', 'cnpj': '00.000.000/0000-00', 'ativo': False, 'fisco': True, 'url': '', 'asn': 123})
-
-    >>> e.sigla_nome()
-    u'SAC - Global Crossing'
     """
 
     entidade = models.ForeignKey('identificacao.Entidade', verbose_name=_(u'Faz parte de'), null=True, blank=True, related_name='entidade_em')
