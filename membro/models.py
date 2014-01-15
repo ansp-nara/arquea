@@ -29,7 +29,7 @@ class CPFField(models.CharField):
         return "CharField"
 
     def formfield(self, **kwargs):
-        from django.contrib.localflavor.br.forms import BRCPFField
+        from localflavor.br.forms import BRCPFField
         defaults = {'form_class': BRCPFField}
         defaults.update(kwargs)
         return super(models.CharField, self).formfield(**defaults)
