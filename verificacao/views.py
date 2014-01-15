@@ -372,3 +372,12 @@ def copy_attribute_to_patrimonio(request):
         raise ValueError('Valor inválido para o parametro. att_name' + str(att_name))
     
     
+def versao(request):
+    import django
+    django_version = django.VERSION
+    
+    import sys
+    python_version = sys.version_info
+    
+    return render(request, 'verificacao/versao.html', 
+                  {'django_version':django_version, 'python_version':python_version})

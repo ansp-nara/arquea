@@ -99,6 +99,7 @@ def lista_relatorios():
     verificacoes.append({'url':'/verificacao/relatorio/equipamento_consolidado', 'nome':u'Verificação de equipamentos'})
     verificacoes.append({'url':'/verificacao/relatorio/patrimonio_consolidado', 'nome':u'Verificação de patrimônio'})
     verificacoes.append({'url':'/carga/', 'nome':u'Carga de planilha de patrimônio'})
+    verificacoes.append({'url':'/verificacao/versao', 'nome':u'Verificação de versão'})
 
     gerenciais.sort(key=lambda x: x['nome'])
     administrativos.sort(key=lambda x: x['nome'])
