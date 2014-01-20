@@ -374,10 +374,17 @@ def copy_attribute_to_patrimonio(request):
     
 def versao(request):
     import django
-    django_version = django.VERSION
+    django_version = str(django.VERSION)
     
     import sys
-    python_version = sys.version_info
+    python_version = str(sys.version_info)
+    
+       
+    from django.db import connection
+    version = connection.pg_version
+    lst = [str(i) for i in str(version)]
+    #print "%d %d %d" % (lst[1:2], lst[3:4], lst[:1])
+    db_version = "%s (%s, %s, %s)" % (connection.vendor, ''.join(lst[:len(lst)-4]), ''.join(lst[len(lst)-4:len(lst)-2]), ''.join(lst[len(lst)-2:]))
     
     return render(request, 'verificacao/versao.html', 
-                  {'django_version':django_version, 'python_version':python_version})
+                  {'django_version':django_version, 'python_version':python_version, 'db_version':db_version})
