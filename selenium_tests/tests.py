@@ -102,6 +102,11 @@ class AuthTest(SeleniumServerTestCase):
         self.browser.get(url)
         self.assertLoadPage(url)
 
+    def test__grupos__busca(self):
+        url = self.sistema_url + '/admin/auth/group/?q=protocolo'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
     def test__grupos__registro(self):
         url = self.sistema_url + '/admin/auth/group/8/'
         self.browser.get(url)
@@ -114,6 +119,11 @@ class AuthTest(SeleniumServerTestCase):
 
     def test__user__lista(self):
         url = self.sistema_url + '/admin/auth/user/'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__user__busca(self):
+        url = self.sistema_url + '/admin/auth/user/?q=admin'
         self.browser.get(url)
         self.assertLoadPage(url)
 
@@ -141,6 +151,11 @@ class EventoTest(SeleniumServerTestCase):
         self.browser.get(url)
         self.assertLoadPage(url)
 
+    def test__evento__busca(self):
+        url = self.sistema_url + '/admin/evento/evento/?q=palestra'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
     def test__evento__registro(self):
         url = self.sistema_url + '/admin/evento/evento/1/'
         self.browser.get(url)
@@ -153,6 +168,11 @@ class EventoTest(SeleniumServerTestCase):
 
     def test__sessao__lista(self):
         url = self.sistema_url + '/admin/evento/sessao/'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__sessao__busca(self):
+        url = self.sistema_url + '/admin/evento/sessao/?q=rnp'
         self.browser.get(url)
         self.assertLoadPage(url)
 
@@ -220,21 +240,6 @@ class MembroTest(SeleniumServerTestCase):
     def tearDown(self):
         super(MembroTest, self).tearDown()
 
-    def test__auth_assinatura__lista(self):
-        url = self.sistema_url + '/admin/membro/assinatura/'
-        self.browser.get(url)
-        self.assertLoadPage(url)
-
-    def test__auth_assinatura__registro(self):
-        url = self.sistema_url + '/admin/membro/assinatura/4/'
-        self.browser.get(url)
-        self.assertLoadPage(url)
-
-    def test__auth_assinatura__registro__save(self):
-        url = self.sistema_url + '/admin/membro/assinatura/4/'
-        self.browser.get(url)
-        self.assertLoadPageAndSaveEdit(url)
-
     def test__relatorios_administrativos__controle_de_horas__filtro(self):
         url = self.sistema_url + '/membro/mensalf'
         self.browser.get(url)
@@ -246,6 +251,51 @@ class MembroTest(SeleniumServerTestCase):
 #         self.browser.get(url)
 #         self.assertLoadPage(url)
 #         
+
+    def test__arq_sindicato__lista(self):
+        url = self.sistema_url + '/admin/membro/sindicatoarquivo/'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__arq_sindicato__busca_nome(self):
+        url = self.sistema_url + '/admin/membro/sindicatoarquivo/?q=amanda'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__arq_sindicato__busca_ano(self):
+        url = self.sistema_url + '/admin/membro/sindicatoarquivo/?q=2012'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__arq_sindicato__registro(self):
+        url = self.sistema_url + '/admin/membro/sindicatoarquivo/2/'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__arq_sindicato__registro__save(self):
+        url = self.sistema_url + '/admin/membro/sindicatoarquivo/2/'
+        self.browser.get(url)
+        self.assertLoadPageAndSaveEdit(url)
+
+    def test__assinatura__lista(self):
+        url = self.sistema_url + '/admin/membro/assinatura/'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__assinatura__busca(self):
+        url = self.sistema_url + '/admin/membro/assinatura/?q=anna'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__assinatura__registro(self):
+        url = self.sistema_url + '/admin/membro/assinatura/4/'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__assinatura__registro__save(self):
+        url = self.sistema_url + '/admin/membro/assinatura/4/'
+        self.browser.get(url)
+        self.assertLoadPageAndSaveEdit(url)
 
     def test__cargo__lista(self):
         url = self.sistema_url + '/admin/membro/cargo/'
@@ -264,6 +314,11 @@ class MembroTest(SeleniumServerTestCase):
 
     def test__controles__lista(self):
         url = self.sistema_url + '/admin/membro/controle/'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__controles__lista__filtro(self):
+        url = self.sistema_url + '/admin/membro/controle/?membro__id__exact=2'
         self.browser.get(url)
         self.assertLoadPage(url)
 
@@ -303,6 +358,11 @@ class MembroTest(SeleniumServerTestCase):
         url = self.sistema_url + '/admin/membro/ferias/?q=anna'
         self.browser.get(url)
         self.assertLoadPage(url)
+        
+    def test__ferias__busca(self):
+        url = self.sistema_url + '/admin/membro/ferias/?q=anna'
+        self.browser.get(url)
+        self.assertLoadPage(url)
 
     def test__ferias__registro(self):
         url = self.sistema_url + '/admin/membro/ferias/12/'
@@ -316,6 +376,16 @@ class MembroTest(SeleniumServerTestCase):
 
     def test__membro__lista(self):
         url = self.sistema_url + '/admin/membro/membro/'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__membro__busca_nome(self):
+        url = self.sistema_url + '/admin/membro/membro/?q=costa'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__membro__busca_email(self):
+        url = self.sistema_url + '/admin/membro/membro/?q=ansp.br'
         self.browser.get(url)
         self.assertLoadPage(url)
 
@@ -369,11 +439,6 @@ class MembroTest(SeleniumServerTestCase):
         self.browser.get(url)
         self.assertLoadPageAndSaveEdit(url)
 
-    def test__sindicatoarquivo__lista(self):
-        url = self.sistema_url + '/admin/membro/sindicatoarquivo/'
-        self.browser.get(url)
-        self.assertLoadPage(url)
-
 
 class MemorandoTest(SeleniumServerTestCase):
     
@@ -425,6 +490,16 @@ class MemorandoTest(SeleniumServerTestCase):
 
     def test__memorando_simples__lista(self):
         url = self.sistema_url + '/admin/memorando/memorandosimples/'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__memorando_simples__busca_assunto(self):
+        url = self.sistema_url + '/admin/memorando/memorandosimples/?q=termo+de+aceite'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__memorando_simples__busca_destinatario(self):
+        url = self.sistema_url + '/admin/memorando/memorandosimples/?q=level'
         self.browser.get(url)
         self.assertLoadPage(url)
 
@@ -534,6 +609,16 @@ class IdentificacaoTest(SeleniumServerTestCase):
         self.browser.get(url)
         self.assertLoadPage(url)
 
+    def test__asn__busca_numero(self):
+        url = self.sistema_url + '/admin/identificacao/asn/?q=1251'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__asn__busca_entidade(self):
+        url = self.sistema_url + '/admin/identificacao/asn/?q=ansp'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
     def test__asn__registro(self):
         url = self.sistema_url + '/admin/identificacao/asn/32/'
         self.browser.get(url)
@@ -579,6 +664,16 @@ class IdentificacaoTest(SeleniumServerTestCase):
         self.browser.get(url)
         self.assertLoadPage(url)
 
+    def test__contato__busca_nome(self):
+        url = self.sistema_url + '/admin/identificacao/contato/?q=lopez'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__contato__busca_entidade(self):
+        url = self.sistema_url + '/admin/identificacao/contato/?q=ansp'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
     def test__contato__registro(self):
         url = self.sistema_url + '/admin/identificacao/contato/480/'
         self.browser.get(url)
@@ -609,6 +704,11 @@ class IdentificacaoTest(SeleniumServerTestCase):
         self.browser.get(url)
         self.assertLoadPage(url)
 
+    def test__endereco_detalhe__busca(self):
+        url = self.sistema_url + '/admin/identificacao/enderecodetalhe/?q=fapesp'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
     def test__endereco_detalhe__registro(self):
         url = self.sistema_url + '/admin/identificacao/enderecodetalhe/14/'
         self.browser.get(url)
@@ -621,6 +721,11 @@ class IdentificacaoTest(SeleniumServerTestCase):
 
     def test__endereco__lista(self):
         url = self.sistema_url + '/admin/identificacao/endereco/'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__endereco__busca(self):
+        url = self.sistema_url + '/admin/identificacao/endereco/?q=fapesp'
         self.browser.get(url)
         self.assertLoadPage(url)
 
@@ -917,6 +1022,11 @@ class FinanceiroTest(SeleniumServerTestCase):
         self.browser.get(url)
         self.assertLoadPage(url)
 
+    def test__auditoria__busca(self):
+        url = self.sistema_url + '/admin/financeiro/auditoria/?q=135'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
     def test__auditoria__registro(self):
         url = self.sistema_url + '/admin/financeiro/auditoria/9064/'
         self.browser.get(url)
@@ -929,6 +1039,11 @@ class FinanceiroTest(SeleniumServerTestCase):
 
     def test__estados__lista(self):
         url = self.sistema_url + '/admin/financeiro/estado/'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__estados__busca(self):
+        url = self.sistema_url + '/admin/financeiro/estado/?q=emprestimo'
         self.browser.get(url)
         self.assertLoadPage(url)
 
@@ -947,6 +1062,11 @@ class FinanceiroTest(SeleniumServerTestCase):
         self.browser.get(url)
         self.assertLoadPage(url)
 
+    def test__extrato_cc__busca(self):
+        url = self.sistema_url + '/admin/financeiro/extratocc/?q=100'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
     def test__extrato_cc__registro(self):
         url = self.sistema_url + '/admin/financeiro/extratocc/6437/'
         self.browser.get(url)
@@ -959,6 +1079,11 @@ class FinanceiroTest(SeleniumServerTestCase):
 
     def test__extrato_financeiro__lista(self):
         url = self.sistema_url + '/admin/financeiro/extratofinanceiro/'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__extrato_financeiro__busca(self):
+        url = self.sistema_url + '/admin/financeiro/extratofinanceiro/?q=estorno'
         self.browser.get(url)
         self.assertLoadPage(url)
 
@@ -977,6 +1102,11 @@ class FinanceiroTest(SeleniumServerTestCase):
         self.browser.get(url)
         self.assertLoadPage(url)
 
+    def test__extrato_patrocinio__busca(self):
+        url = self.sistema_url + '/admin/financeiro/extratopatrocinio/?q=10'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
     def test__extrato_patrocinio__registro(self):
         url = self.sistema_url + '/admin/financeiro/extratopatrocinio/9/'
         self.browser.get(url)
@@ -989,6 +1119,11 @@ class FinanceiroTest(SeleniumServerTestCase):
 
     def test__localizacao_dos_patrocinios__lista(self):
         url = self.sistema_url + '/admin/financeiro/localizapatrocinio/'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__localizacao_dos_patrocinios__busca(self):
+        url = self.sistema_url + '/admin/financeiro/localizapatrocinio/?q=fapesp'
         self.browser.get(url)
         self.assertLoadPage(url)
 
@@ -1007,6 +1142,16 @@ class FinanceiroTest(SeleniumServerTestCase):
         self.browser.get(url)
         self.assertLoadPage(url)
 
+    def test__pagamento__busca_operacao(self):
+        url = self.sistema_url + '/admin/financeiro/pagamento/?q=850978'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__pagamento__busca_notafiscal(self):
+        url = self.sistema_url + '/admin/financeiro/pagamento/?q=200112'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
     def test__pagamento__registro(self):
         url = self.sistema_url + '/admin/financeiro/pagamento/4690/'
         self.browser.get(url)
@@ -1016,9 +1161,14 @@ class FinanceiroTest(SeleniumServerTestCase):
         url = self.sistema_url + '/admin/financeiro/pagamento/4690/'
         self.browser.get(url)
         self.assertLoadPageAndSaveEdit(url)
-        
+
     def test__tipo_comprovante_financeiro__lista(self):
         url = self.sistema_url + '/admin/financeiro/tipocomprovantefinanceiro/'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__tipo_comprovante_financeiro__busca(self):
+        url = self.sistema_url + '/admin/financeiro/tipocomprovantefinanceiro/?q=fapesp'
         self.browser.get(url)
         self.assertLoadPage(url)
 
@@ -1034,6 +1184,11 @@ class FinanceiroTest(SeleniumServerTestCase):
 
     def test__tipo_de_comprovante__lista(self):
         url = self.sistema_url + '/admin/financeiro/tipocomprovante/'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__tipo_de_comprovante__busca(self):
+        url = self.sistema_url + '/admin/financeiro/tipocomprovante/?q=geral'
         self.browser.get(url)
         self.assertLoadPage(url)
 
@@ -1082,6 +1237,11 @@ class OutorgaTest(SeleniumServerTestCase):
         self.browser.get(url)
         self.assertLoadPage(url)
 
+    def test__acordos__busca(self):
+        url = self.sistema_url + '/admin/outorga/acordo/?q=tidia'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
     def test__acordos__registro(self):
         url = self.sistema_url + '/admin/outorga/acordo/4/'
         self.browser.get(url)
@@ -1094,6 +1254,11 @@ class OutorgaTest(SeleniumServerTestCase):
 
     def test__alteracao_de_contrato_os__lista(self):
         url = self.sistema_url + '/admin/outorga/ordemdeservico/'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__alteracao_de_contrato_os__busca(self):
+        url = self.sistema_url + '/admin/outorga/ordemdeservico/?q=netconn'
         self.browser.get(url)
         self.assertLoadPage(url)
 
@@ -1112,8 +1277,23 @@ class OutorgaTest(SeleniumServerTestCase):
         self.browser.get(url)
         self.assertLoadPage(url)
 
+    def test__arquivos__busca_arquivo(self):
+        url = self.sistema_url + '/admin/outorga/arquivo/?q=pdf'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__arquivos__busca_pedido(self):
+        url = self.sistema_url + '/admin/outorga/arquivo/?q=inicial'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
     def test__categorias__lista(self):
         url = self.sistema_url + '/admin/outorga/categoria/'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__categorias__busca(self):
+        url = self.sistema_url + '/admin/outorga/categoria/?q=aditivo'
         self.browser.get(url)
         self.assertLoadPage(url)
 
@@ -1132,8 +1312,18 @@ class OutorgaTest(SeleniumServerTestCase):
         self.browser.get(url)
         self.assertLoadPage(url)
 
+    def test__contratos__busca(self):
+        url = self.sistema_url + '/admin/outorga/contrato/?q=uniemp'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
     def test__estados__lista(self):
         url = self.sistema_url + '/admin/outorga/estado/'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__estados__busca(self):
+        url = self.sistema_url + '/admin/outorga/estado/?q=ativo'
         self.browser.get(url)
         self.assertLoadPage(url)
 
@@ -1152,6 +1342,16 @@ class OutorgaTest(SeleniumServerTestCase):
         self.browser.get(url)
         self.assertLoadPage(url)
 
+    def test__concecao_outorga__busca_categoria(self):
+        url = self.sistema_url + '/admin/outorga/outorga/?q=cancelamento'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__concecao_outorga__busca_termo(self):
+        url = self.sistema_url + '/admin/outorga/outorga/?q=13708'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
     def test__concecao_outorga__registro(self):
         url = self.sistema_url + '/admin/outorga/outorga/26/'
         self.browser.get(url)
@@ -1167,6 +1367,26 @@ class OutorgaTest(SeleniumServerTestCase):
         self.browser.get(url)
         self.assertLoadPage(url)
 
+    def test__item__busca_descricao(self):
+        url = self.sistema_url + '/admin/outorga/item/?q=certificados'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__item__busca_termo(self):
+        url = self.sistema_url + '/admin/outorga/item/?q=11711'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__item__lista_filtro_modalidate(self):
+        url = self.sistema_url + '/admin/outorga/item/?natureza_gasto__modalidade__id__exact=2'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__item__lista_filtro_termo(self):
+        url = self.sistema_url + '/admin/outorga/item/n?natureza_gasto__termo__id__exact=13'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
     def test__item__registro(self):
         url = self.sistema_url + '/admin/outorga/item/484/'
         self.browser.get(url)
@@ -1179,6 +1399,16 @@ class OutorgaTest(SeleniumServerTestCase):
 
     def test__modalidade__lista(self):
         url = self.sistema_url + '/admin/outorga/modalidade/'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__modalidade__busca_sigla(self):
+        url = self.sistema_url + '/admin/outorga/modalidade/?q=det'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__modalidade__busca_nome(self):
+        url = self.sistema_url + '/admin/outorga/modalidade/?q=despesas'
         self.browser.get(url)
         self.assertLoadPage(url)
 
@@ -1209,6 +1439,26 @@ class OutorgaTest(SeleniumServerTestCase):
 
     def test__pastas__lista(self):
         url = self.sistema_url + '/admin/outorga/natureza_gasto/'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__pastas__busca_modalidade(self):
+        url = self.sistema_url + '/admin/outorga/natureza_gasto/?q=rei'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__pastas__busca_termo(self):
+        url = self.sistema_url + '/admin/outorga/natureza_gasto/?q=11711'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__pastas__lista_filtro_termo(self):
+        url = self.sistema_url + '/admin/outorga/natureza_gasto/?&termo__id__exact=17'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__pastas__lista_filtro_modalidade(self):
+        url = self.sistema_url + '/admin/outorga/natureza_gasto/?modalidade__id__exact=1'
         self.browser.get(url)
         self.assertLoadPage(url)
 
@@ -1254,6 +1504,11 @@ class OutorgaTest(SeleniumServerTestCase):
 
     def test__termo_de_outorga__lista(self):
         url = self.sistema_url + '/admin/outorga/termo/'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__termo_de_outorga__busca_termo(self):
+        url = self.sistema_url + '/admin/outorga/termo/?q=60733'
         self.browser.get(url)
         self.assertLoadPage(url)
 
@@ -1399,6 +1654,26 @@ class RedeTest(SeleniumServerTestCase):
         self.browser.get(url)
         self.assertLoadPage(url)
 
+    def test__bloco_ip__busca_as_anunciante(self):
+        url = self.sistema_url + '/admin/rede/blocoip/?q=fapesp'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__bloco_ip__busca_ip(self):
+        url = self.sistema_url + '/admin/rede/blocoip/?q=143.108'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__bloco_ip__filtro_bloco(self):
+        url = self.sistema_url + '/admin/rede/blocoip/?bloco=super'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__bloco_ip__filtro_as_anunciante(self):
+        url = self.sistema_url + '/admin/rede/blocoip/?asn__id__exact=32'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
     def test__bloco_ip__registro(self):
         url = self.sistema_url + '/admin/rede/blocoip/2/'
         self.browser.get(url)
@@ -1431,6 +1706,11 @@ class RedeTest(SeleniumServerTestCase):
 
     def test__enlace__lista(self):
         url = self.sistema_url + '/admin/rede/enlace/'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__enlace__busca(self):
+        url = self.sistema_url + '/admin/rede/enlace/?q=fapesp'
         self.browser.get(url)
         self.assertLoadPage(url)
 
@@ -1496,6 +1776,11 @@ class RedeTest(SeleniumServerTestCase):
 
     def test__planeja_arquisicao__lista(self):
         url = self.sistema_url + '/admin/rede/planejaaquisicaorecurso/'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__planeja_arquisicao__busca(self):
+        url = self.sistema_url + '/admin/rede/planejaaquisicaorecurso/?q=bandwidth'
         self.browser.get(url)
         self.assertLoadPage(url)
 
@@ -1620,6 +1905,11 @@ class SitesTest(SeleniumServerTestCase):
 
     def test__sites__lista(self):
         url = self.sistema_url + '/admin/sites/site/'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__sites__busca(self):
+        url = self.sistema_url + '/admin/sites/site/?q=intranet'
         self.browser.get(url)
         self.assertLoadPage(url)
 
@@ -1758,6 +2048,21 @@ class ProcessoTest(SeleniumServerTestCase):
         self.browser.get(url)
         self.assertLoadPage(url)
 
+    def test__processo__busca_area(self):
+        url = self.sistema_url + '/admin/processo/processo/?q=eaa'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__processo__busca_grupo(self):
+        url = self.sistema_url + '/admin/processo/processo/?q=grupo'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__processo__busca_macroprocesso(self):
+        url = self.sistema_url + '/admin/processo/processo/?q=atividades'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
     def test__processo__registro(self):
         url = self.sistema_url + '/admin/processo/processo/115/'
         self.browser.get(url)
@@ -1828,8 +2133,28 @@ class ProtocoloTest(SeleniumServerTestCase):
         self.browser.get(url)
         self.assertLoadPage(url)
 
+    def test__arquivo__busca(self):
+        url = self.sistema_url + '/admin/protocolo/arquivo/?q=52885'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
     def test__cotacao__lista(self):
         url = self.sistema_url + '/admin/protocolo/cotacao/'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__cotacao__busca(self):
+        url = self.sistema_url + '/admin/protocolo/cotacao/?q=dl380'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__cotacao__lista_filtro_estado(self):
+        url = self.sistema_url + '/admin/protocolo/cotacao/?estado__id__exact=9'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__cotacao__lista_filtro_vencimento(self):
+        url = self.sistema_url + '/admin/protocolo/cotacao/?data_vencimento__gte=2014-01-01&data_vencimento__lt=2015-01-01'
         self.browser.get(url)
         self.assertLoadPage(url)
 
@@ -1845,6 +2170,11 @@ class ProtocoloTest(SeleniumServerTestCase):
 
     def test__descricao__lista(self):
         url = self.sistema_url + '/admin/protocolo/descricao/'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__descricao__busca(self):
+        url = self.sistema_url + '/admin/protocolo/descricao/?q=agv'
         self.browser.get(url)
         self.assertLoadPage(url)
 
@@ -1878,6 +2208,16 @@ class ProtocoloTest(SeleniumServerTestCase):
         self.browser.get(url)
         self.assertLoadPage(url)
 
+    def test__feriado__busca(self):
+        url = self.sistema_url + '/admin/protocolo/feriado/?q=finados'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__feriado__filtro_tipo(self):
+        url = self.sistema_url + '/admin/protocolo/feriado/?tipo__id__exact=1'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
     def test__feriado__registro(self):
         url = self.sistema_url + '/admin/protocolo/feriado/11/'
         self.browser.get(url)
@@ -1905,6 +2245,26 @@ class ProtocoloTest(SeleniumServerTestCase):
 
     def test__protocolo__lista(self):
         url = self.sistema_url + '/admin/protocolo/protocolo/'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__protocolo__busca_nf(self):
+        url = self.sistema_url + '/admin/protocolo/protocolo/?q=12260'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__protocolo__busca_desc(self):
+        url = self.sistema_url + '/admin/protocolo/protocolo/?q=administrativa'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__protocolo__lista_filtro_termo(self):
+        url = self.sistema_url + '/admin/protocolo/protocolo/?termo__id__exact=17'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__protocolo__lista_filtro_estado(self):
+        url = self.sistema_url + '/admin/protocolo/protocolo/?estado__id__exact=7'
         self.browser.get(url)
         self.assertLoadPage(url)
 
@@ -2133,6 +2493,16 @@ class PatrimonioTest(SeleniumServerTestCase):
         self.browser.get(url)
         self.assertLoadPage(url)
 
+    def test__equipamento__busca_descricao(self):
+        url = self.sistema_url + '/admin/patrimonio/equipamento/?q=camera'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__equipamento__busca_partnumber(self):
+        url = self.sistema_url + '/admin/patrimonio/equipamento/?q=mpp2i'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
     def test__equipamento__registro(self):
         url = self.sistema_url + '/admin/patrimonio/equipamento/6/'
         self.browser.get(url)
@@ -2163,6 +2533,31 @@ class PatrimonioTest(SeleniumServerTestCase):
         self.browser.get(url)
         self.assertLoadPage(url)
 
+    def test__patrimonio__busca_descricao(self):
+        url = self.sistema_url + '/admin/patrimonio/patrimonio/?q=monitor'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__patrimonio__busca_nf(self):
+        url = self.sistema_url + '/admin/patrimonio/patrimonio/?q=682'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__patrimonio__busca_ns(self):
+        url = self.sistema_url + '/admin/patrimonio/patrimonio/?q=7c5038'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__patrimonio__filtro_tipo(self):
+        url = self.sistema_url + '/admin/patrimonio/patrimonio/?q=&tipo__id__exact=42'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__patrimonio__filtro_termo(self):
+        url = self.sistema_url + '/admin/patrimonio/patrimonio/?pagamento__protocolo__termo__id__exact=17'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
     def test__patrimonio__registro(self):
         url = self.sistema_url + '/admin/patrimonio/patrimonio/6096/'
         self.browser.get(url)
@@ -2175,6 +2570,11 @@ class PatrimonioTest(SeleniumServerTestCase):
 
     def test__historico_local__lista(self):
         url = self.sistema_url + '/admin/patrimonio/historicolocal/'
+        self.browser.get(url)
+        self.assertLoadPage(url)
+
+    def test__historico_local__busca(self):
+        url = self.sistema_url + '/admin/patrimonio/historicolocal/?q=monitor'
         self.browser.get(url)
         self.assertLoadPage(url)
 

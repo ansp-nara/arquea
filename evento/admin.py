@@ -25,7 +25,7 @@ class SessaoAdmin(admin.ModelAdmin):
                 )
     list_display = ('descricao', 'inicio', 'termino')
     inlines = [AtribuicaoInline,]
-    search_fields = ('area', 'descricao')
+    search_fields = ('area__nome', 'descricao')
 
 admin.site.register(Sessao, SessaoAdmin)
 admin.site.register(AreaOperacional)

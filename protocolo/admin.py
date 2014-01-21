@@ -97,7 +97,7 @@ class ProtocoloAdmin(admin.ModelAdmin):
 
     form = ProtocoloAdminForm
 
-    search_fields = ['descricao2__entidade__sigla', 'descricao2__descricao', 'num_documento', 'referente']
+    search_fields = ['descricao2__entidade__sigla', 'descricao2__entidade__nome', 'descricao2__descricao', 'num_documento', 'referente']
     
 
     muda_estado = 0
@@ -257,7 +257,9 @@ class CotacaoAdmin(admin.ModelAdmin):
 
     form = CotacaoAdminForm
 
-    search_fields = ('identificacao__entidade__nome', 'identificacao__entidade__sigla', 'descricao', 'estado__nome', 'responsavel__username', 'entrega')
+    search_fields = ('identificacao__endereco__entidade__nome', \
+                     'identificacao__endereco__entidade__sigla', \
+                     'descricao', 'estado__nome', 'responsavel__username', 'entrega')
 
 
     # Define o tipo do protocolo como 'Cotação' e envia um e-mail para o grupo 'adm' se o estado for 'Primeira opção'.
@@ -424,7 +426,9 @@ class ArquivoAdmin(admin.ModelAdmin):
 
     list_display_links= ('__unicode__', )
 
-    search_fields = ('protocolo__identificacao__entidade__sigla', 'protocolo__identificacao__entidade__nome', 'protocolo__descricao', 'arquivo', )
+    search_fields = ('protocolo__identificacao__endereco__entidade__sigla', \
+                     'protocolo__identificacao__endereco__entidade__nome', \
+                     'protocolo__descricao', 'arquivo', )
 
     list_per_page = 10
 
@@ -432,7 +436,7 @@ admin.site.register(Arquivo,ArquivoAdmin)
 
 class DescricaoAdmin(admin.ModelAdmin):
      list_display = ('entidade', 'descricao')
-     search_fields = ('entidade', 'descricao')
+     search_fields = ('entidade__nome', 'entidade__sigla', 'descricao')
 
 admin.site.register(Descricao, DescricaoAdmin)
 
