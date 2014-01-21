@@ -113,7 +113,11 @@ class HistoricoLocalAdmin(admin.ModelAdmin):
     
     list_display = ('data', 'patrimonio', 'endereco', 'descricao')
 
-    search_fields = ['endereco__identificacao____entidade__nome', 'endereco__identificacao__entidade__sigla', 'endereco__identificacao__contato__nome', 'endereco__identificacao__funcao', 'endereco__identificacao__area', 'endereco__rua', 'endereco__complemento', 'endereco__bairro', 'endereco__cidade', 'endereco__estado', 'endereco__cep', 'endereco__pais', 'descrica', 'data', 'patrimonio__itemprotocolo__descricao', 'patrimonio__itemprotocolo__protocolo__num_documento', 'patrimonio__itemprotocolo__protocolo__descricao']
+    search_fields = ['endereco__endereco__entidade__nome', 'endereco__endereco__entidade__sigla', \
+                     'endereco__endereco__rua', 'endereco__endereco__compl', 'endereco__endereco__bairro', \
+                     'endereco__endereco__cidade', 'endereco__endereco__estado', 'endereco__endereco__cep', \
+                     'endereco__endereco__pais', 'descricao', 'data', \
+                     'patrimonio__pagamento__protocolo__descricao', 'patrimonio__pagamento__protocolo__protocolo__num_documento', 'patrimonio__pagamento__protocolo__protocolo__descricao']
 
 admin.site.register(HistoricoLocal, HistoricoLocalAdmin)
 
