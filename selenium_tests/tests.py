@@ -1383,7 +1383,7 @@ class OutorgaTest(SeleniumServerTestCase):
         self.assertLoadPage(url)
 
     def test__item__lista_filtro_termo(self):
-        url = self.sistema_url + '/admin/outorga/item/n?natureza_gasto__termo__id__exact=13'
+        url = self.sistema_url + '/admin/outorga/item/?natureza_gasto__termo__id__exact=13'
         self.browser.get(url)
         self.assertLoadPage(url)
 
