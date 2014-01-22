@@ -94,7 +94,7 @@ class AuditoriaAdminForm(forms.ModelForm):
 
     parcial = forms.IntegerField(label=u'Parcial', widget=forms.TextInput(attrs={'onchange': 'ajax_nova_pagina(this);'}))
 
-    pagamento = AuditoriaPagamentoChoiceField(queryset=Pagamento.objects.all(),
+    pagamento = AuditoriaPagamentoChoiceField(queryset=Pagamento.objects.all().select_related('protocolo', 'origem_fapesp__item_outorga__natureza_gasto__modalidade'),
                                                  required=False, 
                                                  label=mark_safe('<a href="#" onclick="window.open(\'/financeiro/pagamento/\'+$(\'#id_pagamento\').val() + \'/\', \'_blank\');return true;">Pagamento</a>'),)
 
