@@ -405,15 +405,15 @@ def acordo_progressivo(request, pdf=False):
             
             if tem_real:
                 valores_real = {'tem_real':1, 'concedido_real':concedido_real, 'realizado_real':realizado_real, 'saldo_real':saldo_real}
-                totalTermoRealizadoReal += concedido_real 
-                totalTermoConcedidoReal += realizado_real
+                totalTermoRealizadoReal +=  realizado_real
+                totalTermoConcedidoReal += concedido_real
                 totalTermoSaldoReal += saldo_real
             else: valores_real = {'tem_real':0}
             
             if tem_dolar:
                 valores_dolar = {'tem_dolar':1, 'concedido_dolar':concedido_dolar, 'realizado_dolar':realizado_dolar, 'saldo_dolar':saldo_dolar}
-                totalTermoRealizadoDolar += concedido_dolar
-                totalTermoConcedidoDolar += realizado_dolar
+                totalTermoRealizadoDolar += realizado_dolar
+                totalTermoConcedidoDolar += concedido_dolar
                 totalTermoSaldoDolar += saldo_dolar
             else: valores_dolar = {'tem_dolar':0}
 
