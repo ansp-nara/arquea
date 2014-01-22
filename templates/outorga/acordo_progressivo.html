@@ -84,8 +84,8 @@
 	          </td>
 	       {% endfor %}
 	       <td class="td_total">
-	            {% if a.tem_real %}{{a.totalTermoRealizadoReal|moeda}}<br/>{{a.totalTermoConcedidoReal|moeda}}<br/>{{a.totalTermoSaldoReal|moeda_css}}<br/>{% else %}<br /><br /><br />{% endif %}
-	            {% if a.tem_dolar %}<span class="cons-dolar">{{a.totalTermoRealizadoDolar|moeda:0}}<br/>{{a.totalTermoConcedidoDolar|moeda:0}}<br/>{{a.totalTermoSaldoDolar|moeda_css:0}}<br/></span>{% endif %}
+	            {% if a.tem_real %}{{a.totalTermoConcedidoReal|moeda}}<br/>{{a.totalTermoRealizadoReal|moeda}}<br/>{{a.totalTermoSaldoReal|moeda_css}}<br/>{% else %}<br /><br /><br />{% endif %}
+	            {% if a.tem_dolar %}<span class="cons-dolar">{{a.totalTermoConcedidoDolar|moeda:0}}<br/>{{a.totalTermoRealizadoDolar|moeda:0}}<br/>{{a.totalTermoSaldoDolar|moeda_css:0}}<br/></span>{% endif %}
 	       </td>
 	    {% endfor %}
 	    </tr>
