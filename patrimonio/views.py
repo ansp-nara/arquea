@@ -502,7 +502,11 @@ def por_tipo_equipamento(request, pdf=0):
 
     for p in patrimonios_tipo:
         if p.historico_atual:
-            entidades.append({'entidade':p.historico_atual.endereco.end.entidade, 'local':p.historico_atual.endereco.complemento, 'patrimonio':p})
+            ht = HistoricoLocal.objects.select_related('endereco', 'endereco__endereco__entidade').only(\
+                        'endereco__complemento', 
+                        'endereco__endereco__entidade__sigla').\
+                        get(id=p.historico_atual.id)
+            entidades.append({'entidade':ht.endereco.end.entidade, 'local':ht.endereco.complemento, 'patrimonio':p})
 
     entidades.sort(key=lambda x: x['local'])
     entidades.sort(key=lambda x: x['entidade'].sigla)
