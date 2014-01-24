@@ -376,33 +376,45 @@ def acordo_progressivo(request, pdf=False):
         totalTermoSaldoDolar = Decimal('0.0')
         
         for t in Termo.objects.filter(exibe_rel_ger_progressivo=True).order_by('ano').only('ano', 'processo', 'digito'):
-            concedido_real = a.itens_outorga.filter(natureza_gasto__termo=t, natureza_gasto__modalidade__moeda_nacional=True).aggregate(Sum('valor'))
-            concedido_real = concedido_real['valor__sum'] or Decimal('0.0')
-
-            realizado_real = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__termo=t, origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional=True, origem_fapesp__acordo=a).aggregate(Sum('valor_fapesp'))
-            realizado_real = realizado_real['valor_fapesp__sum'] or Decimal('0.0')
+            concedido = a.itens_outorga.filter(natureza_gasto__termo=t).values('natureza_gasto__modalidade__moeda_nacional').annotate(soma=Sum('valor')).order_by()
+            
+            concedido_real = Decimal('0.0')
+            concedido_dolar = Decimal('0.0')
+            
+            for c in concedido:
+                if c['soma']:
+                    if c['natureza_gasto__modalidade__moeda_nacional'] == True:
+                        concedido_real = c['soma']
+                    else:
+                        concedido_dolar = c['soma']
+            
+            realizado_real = Decimal('0.0')
+            realizado_dolar = Decimal('0.0')
+            
+            realizado = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__termo=t, origem_fapesp__acordo=a) \
+                .values('origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional').annotate(soma=Sum('valor_fapesp')).order_by()
+            for r in realizado:
+                if r['soma']:
+                    if r['origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional'] == True:
+                        realizado_real = r['soma']
+                    else:
+                        realizado_dolar = r['soma']
             
             saldo_real = concedido_real - realizado_real
-            
-            concedido_dolar = a.itens_outorga.filter(natureza_gasto__termo=t, natureza_gasto__modalidade__moeda_nacional=False).aggregate(Sum('valor'))
-            concedido_dolar = concedido_dolar['valor__sum'] or Decimal('0.0')
-
-            realizado_dolar = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__termo=t, origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional=False, origem_fapesp__acordo=a).aggregate(Sum('valor_fapesp'))
-            realizado_dolar = realizado_dolar['valor_fapesp__sum'] or Decimal('0.0')
-            
             saldo_dolar = concedido_dolar - realizado_dolar
             
             tem_real = concedido_real or realizado_real
             tem_dolar = concedido_dolar or realizado_dolar
             itens = []
             
-            itensOutorga = a.itens_outorga.filter(natureza_gasto__termo=t).select_related('natureza_gasto__modalidade', 'entidade').defer('justificativa', 'obs')
-            for item in itensOutorga:
-                realiz = Pagamento.objects.filter(origem_fapesp__item_outorga=item, origem_fapesp__acordo=a).aggregate(Sum('valor_fapesp'))
-                realiz = realiz['valor_fapesp__sum'] or Decimal('0.0')
-                concede = item.valor or Decimal('0.0')
-                itens.append({'item':item, 'concedido':concede, 'realizado':realiz, 'saldo':concede-realiz})
-            
+            if a.itens_outorga.filter(natureza_gasto__termo=t).exists():
+                itensOutorga = a.itens_outorga.filter(natureza_gasto__termo=t).select_related('natureza_gasto__modalidade', 'entidade').defer('justificativa', 'obs')
+                for item in itensOutorga:
+                    realiz = Pagamento.objects.filter(origem_fapesp__item_outorga=item, origem_fapesp__acordo=a).aggregate(Sum('valor_fapesp'))
+                    realiz = realiz['valor_fapesp__sum'] or Decimal('0.0')
+                    concede = item.valor or Decimal('0.0')
+                    itens.append({'item':item, 'concedido':concede, 'realizado':realiz, 'saldo':concede-realiz})
+                
             if tem_real:
                 valores_real = {'tem_real':1, 'concedido_real':concedido_real, 'realizado_real':realizado_real, 'saldo_real':saldo_real}
                 totalTermoRealizadoReal +=  realizado_real
