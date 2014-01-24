@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
-from models import *
 from django import forms
-from outorga.models import Termo, OrigemFapesp
 from django.utils.translation import ugettext_lazy as _
 from django.forms.util import ErrorList
+from django.utils.html import mark_safe
+
+from models import *
+from outorga.models import Termo, OrigemFapesp
 from protocolo.models import Protocolo
 from financeiro.models import Pagamento
 
@@ -15,7 +17,6 @@ class PlanejaAquisicaoRecursoAdminForm(forms.ModelForm):
 
 
 class RecursoAdminForm(forms.ModelForm):
-
     """
     Uma instância dessa classe faz algumas definições para a tela de cadastramento do modelo 'Patrimonio'.
 
@@ -23,16 +24,26 @@ class RecursoAdminForm(forms.ModelForm):
     A class 'Meta'              Define o modelo que será utilizado.
     A class 'Media'             Define os arquivos .js que serão utilizados.
     """
+#    termo = forms.ModelChoiceField(Termo.objects.all(), label=_(u'Termo de outorga'), required=False, 
+#            widget=forms.Select(attrs={'onchange': 'ajax_filter_pagamentos2("/rede/escolhe_pagamento");'}))
 
+    termo = forms.ModelChoiceField(Termo.objects.all(), label=_(u'Termo de outorga'), required=False)
 
+    pagamento = forms.ModelChoiceField(Pagamento.objects.all().select_related('protocolo', 'origem_fapesp', 'protocolo', 'origem_fapesp__item_outorga__natureza_gasto__modalidade'),
+                                                 label=mark_safe('<a href="#" onclick="window.open(\'/financeiro/pagamento/\'+$(\'#id_pagamento\').val() + \'/\', \'_blank\');return true;">Pagamento</a>'),)
+
+    planejamento = forms.ModelChoiceField(PlanejaAquisicaoRecurso.objects.all().select_related('os', 'os__tipo', 'projeto', 'tipo', ),
+                                                 label=mark_safe('<a href="#" onclick="window.open(\'/admin/rede/planejaaquisicaorecurso/\'+$(\'#id_planejamento\').val() + \'/\', \'_blank\');return true;">Planejamento</a>'),)
 
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=':',
                  empty_permitted=False, instance=None):
 
-        if instance and not data and instance.pagamento is not None:
-            initial = initial or {}
-            initial.update({'termo':instance.pagamento.protocolo.termo.id})
+        if instance: 
+            if initial:
+                initial.update({'termo':instance.pagamento.protocolo.termo.id})
+            else:
+                initial = {'termo':instance.pagamento.protocolo.termo.id}
 
         super(RecursoAdminForm, self).__init__(data, files, auto_id, prefix, initial,
                                             error_class, label_suffix, empty_permitted, instance)
@@ -40,18 +51,14 @@ class RecursoAdminForm(forms.ModelForm):
         pg = self.fields['pagamento']
         if instance:
             if instance.pagamento is not None:
-                pg.queryset = Pagamento.objects.filter(protocolo__termo__id=instance.pagamento.protocolo.termo.id)
+                pg.queryset = Pagamento.objects.filter(protocolo__termo__id=instance.pagamento.protocolo.termo.id).select_related('protocolo', 'origem_fapesp', 'protocolo', 'origem_fapesp__item_outorga__natureza_gasto__modalidade')
             else:
-                pg.queryset = Pagamento.objects.filter(id__lte=0)
+                pg.queryset = Pagamento.objects.filter(id__lte=0).select_related('protocolo', 'origem_fapesp', 'protocolo', 'origem_fapesp__item_outorga__natureza_gasto__modalidade')
         elif data and data['termo']:
             t = data['termo']
-            t = Termo.objects.get(id=t)
-            pg.queryset = Pagamento.objects.filter(protocolo__termo=t)
+            pg.queryset = Pagamento.objects.filter(protocolo__termo=t).select_related('protocolo', 'origem_fapesp', 'protocolo', 'origem_fapesp__item_outorga__natureza_gasto__modalidade')
         else:
-            pg.queryset = Pagamento.objects.filter(id__lte=0)
-
-    termo = forms.ModelChoiceField(Termo.objects.all(), label=_(u'Termo de outorga'), required=False, 
-            widget=forms.Select(attrs={'onchange': 'ajax_filter_pagamentos2("/rede/escolhe_pagamento");'}))
+            pg.queryset = Pagamento.objects.filter(id__lte=0).select_related('protocolo', 'origem_fapesp', 'protocolo', 'origem_fapesp__item_outorga__natureza_gasto__modalidade')
 
 
     class Meta:
