@@ -385,7 +385,7 @@ def extrato(request, pdf=False):
 	    ano = int(request.GET.get('ano'))
 	    retorno = []
 	    mes = 1
-	    for e in ExtratoCC.objects.filter(data_oper__year=ano).order_by('data_oper'):
+	    for e in ExtratoCC.objects.filter(data_oper__year=ano).select_related('extrato_financeiro', 'extrato_financeiro__termo').order_by('data_oper'):
 		if e.data_oper.month==mes:
 		    retorno.append(e)
 		else:
