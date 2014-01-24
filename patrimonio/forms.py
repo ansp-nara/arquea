@@ -77,11 +77,11 @@ class PatrimonioAdminForm(forms.ModelForm):
     """
     Uma instância dessa classe faz algumas definições para a tela de cadastramento do modelo 'Patrimonio'.
 
-    O método '__init__'		Define as opções do campo 'protocolo' (apenas protocolos diferentes de 'Contrato', 'OS' e 'Cotação'.
-    O campo 'termo'		Foi criado para filtrar o campo 'protocolo'
-    O campo 'protocolo'		Foi criado para filtrar o campo 'itemprotocolo'
-    A class 'Meta'		Define o modelo que será utilizado.
-    A class 'Media'		Define os arquivos .js que serão utilizados.
+    O método '__init__'        Define as opções do campo 'protocolo' (apenas protocolos diferentes de 'Contrato', 'OS' e 'Cotação'.
+    O campo 'termo'        Foi criado para filtrar o campo 'protocolo'
+    O campo 'protocolo'        Foi criado para filtrar o campo 'itemprotocolo'
+    A class 'Meta'        Define o modelo que será utilizado.
+    A class 'Media'        Define os arquivos .js que serão utilizados.
     """
         
     termo = forms.ModelChoiceField(Termo.objects.all(), label=_(u'Termo de outorga'), required=False)
@@ -207,6 +207,14 @@ class PatrimonioAdminForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super(PatrimonioAdminForm, self).clean()
+        # Retorna erro para erros de sistemas não tratados
+        if any(self.errors):
+            raise forms.ValidationError(u'Erro sistema %s'%self.errors)
+        
+        if not cleaned_data.get("equipamento"):
+            # Verifica se há equipamento selecionado para o patrimonio
+            raise forms.ValidationError(u'Patrimônio deve ter um equipamento associado.')
+
         
         return cleaned_data
 
@@ -220,8 +228,10 @@ class HistoricoLocalAdminForm(forms.ModelForm):
         js = ('/media/js/selects.js',)
 
 
-    entidade = forms.ModelChoiceField(Entidade.objects.all(), required=False,
-                widget=forms.Select(attrs={'onchange': 'ajax_select_endereco(this.id);'}))
+    patrimonio = forms.ModelChoiceField(Patrimonio.objects.all().select_related('pagamento', 'pagamento__protocolo', 'pagamento__protocolo__num_documento'), \
+                                        widget=forms.Select(attrs={'style':'width:800px'}),)
+
+    endereco = forms.ModelChoiceField(EnderecoDetalhe.objects.all().select_related('detalhe', 'endereco'))
     
     descricao = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows':'2'}))    
 
@@ -229,28 +239,82 @@ class HistoricoLocalAdminForm(forms.ModelForm):
                  initial=None, error_class=ErrorList, label_suffix=':',
                  empty_permitted=False, instance=None):
 
-        if instance and instance.endereco and instance.endereco.endereco and instance.endereco.endereco.entidade: 
-            if initial:
-                initial.update({'entidade':instance.endereco.endereco.entidade})
-            else:
-                initial = {'entidade':instance.endereco.endereco.entidade}
+        if initial:
+            if instance:
+                if instance.endereco and instance.endereco.endereco and instance.endereco.endereco.entidade:
+                    entidade.update({'entidade':instance.endereco.endereco.entidade})
+                if instance.patrimonio:
+                    patrimonio.update({'patrimonio':instance.patrimonio})
+                if instance.endereco:
+                    endereco.update({'endereco':instance.endereco})
+        else:
+            initial = {}
+            if instance and instance.endereco and instance.endereco.endereco and instance.endereco.endereco.entidade:
+                initial['entidade'] = instance.endereco.endereco.entidade
+                logger.debug(initial['entidade'] )
+            if instance and instance.patrimonio:
+                initial['patrimonio'] = instance.patrimonio
+            if instance and instance.endereco:
+                initial['endereco'] = instance.endereco
 
         super(HistoricoLocalAdminForm, self).__init__(data, files, auto_id, prefix, initial,
                                             error_class, label_suffix, empty_permitted, instance)
 
-        end = EnderecoDetalhe.objects.filter(id__lte=0)
-        
+        end= None
+        end = EnderecoDetalhe.objects.filter(id=instance.endereco.id)
+
+        if not end:
+            end = EnderecoDetalhe.objects.filter(id__lte=0)
+
+        self.fields['endereco'].choices = [(e.id, e.__unicode__()) for e in end]
+
+
+class PatrimonioHistoricoLocalAdminForm(forms.ModelForm):
+    
+    class Meta:
+        model = HistoricoLocal
+
+    class Media:
+        js = ('/media/js/selects.js',)
+
+
+    entidade = forms.ModelChoiceField(Entidade.objects.all(), required=False,
+                widget=forms.Select(attrs={'onchange': 'ajax_select_endereco(this.id);'}))
+
+    descricao = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows':'2'}))    
+
+
+    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
+                 initial=None, error_class=ErrorList, label_suffix=':',
+                 empty_permitted=False, instance=None):
+
+        if initial:
+            if instance:
+                if instance.endereco and instance.endereco.endereco and instance.endereco.endereco.entidade:
+                    entidade.update({'entidade':instance.endereco.endereco.entidade})
+        else:
+            initial = {}
+            if instance and instance.endereco and instance.endereco.endereco and instance.endereco.endereco.entidade:
+                initial['entidade'] = instance.endereco.endereco.entidade
+
+        super(PatrimonioHistoricoLocalAdminForm, self).__init__(data, files, auto_id, prefix, initial,
+                                            error_class, label_suffix, empty_permitted, instance)
+
+        end= None
         if data:
-            end = EnderecoDetalhe.objects.filter(id=data.get(u'%s-endereco' % prefix))
+            end_id = data.get(u'%s-endereco' % prefix)
+            if end_id and end_id.isdigit():
+                end = EnderecoDetalhe.objects.filter(id=end_id)
         elif instance:
             end = EnderecoDetalhe.objects.filter(id=instance.endereco.id)
-            #else:
-            #    if data.has_key('%s-entidade' % prefix) and data['%s-entidade' % prefix]:
-            #        end = EnderecoDetalhe.objects.filter(endereco__entidade__id=data['%s-entidade' % prefix])
-            #    elif data.has_key('%s-endereco' % prefix) and data['%s-endereco' % prefix]:
-            #        end = EnderecoDetalhe.objects.filter(endereco__id=data['%s-endereco' % prefix])
 
-        else:
+#         if data and not end:
+#             if data.has_key('%s-entidade' % prefix) and data['%s-entidade' % prefix]:
+#                 end = EnderecoDetalhe.objects.filter(endereco__entidade__id=data['%s-entidade' % prefix])
+#             elif data.has_key('%s-endereco' % prefix) and data['%s-endereco' % prefix]:
+#                 end = EnderecoDetalhe.objects.filter(endereco__id=data['%s-endereco' % prefix])
+
+        if not end:
             end = EnderecoDetalhe.objects.filter(id__lte=0)
 
         #self.fields['endereco'].queryset = end
@@ -265,8 +329,9 @@ class BaseHistoricoLocalAdminFormSet(BaseInlineFormSet):
     
     def clean(self):
         cleaned_data = super(BaseHistoricoLocalAdminFormSet, self).clean()
+        # Retorna erro para erros de sistemas não tratados
         if any(self.errors):
-            return
+            raise forms.ValidationError(u'Erro sistema %s'%self.errors)
         
         form_mais_recente = None
         for i in range(0, self.total_form_count()):
@@ -283,21 +348,30 @@ class BaseHistoricoLocalAdminFormSet(BaseInlineFormSet):
             if cleaned_data.get("patrimonio") and cleaned_data.get("patrimonio").patrimonio:
                 contido_em = cleaned_data.get("patrimonio").patrimonio
                 endereco = cleaned_data.get("endereco")
-
+                
+                logger.debug(contido_em.historico_atual.endereco)
+                logger.debug(endereco)
+                
                 # Verifica se está no mesmo endereço do patrimonio pai
-                if (contido_em.historico_atual.endereco != endereco):
-                   raise forms.ValidationError(u'Patrimônio deve estar na mesma localização do patrimônio em que está contido.')
+                if (contido_em.historico_atual and contido_em.historico_atual.endereco != endereco):
+                    raise forms.ValidationError(u'Patrimônio deve estar na mesma localização do patrimônio em que está contido.')
                         
                 historicolocal = HistoricoLocal(posicao=cleaned_data.get("posicao"))
                 
                 # Verifica se está no mesmo rack do patrimonio pai
-                if (contido_em.historico_atual.posicao_rack != historicolocal.posicao_rack):
+                if (contido_em.historico_atual and \
+                    historicolocal and \
+                    contido_em.historico_atual.posicao_rack != historicolocal.posicao_rack):
+                    
                    raise forms.ValidationError(u'Patrimônio deve estar no mesmo rack do patrimônio em que está contido.')
 
-                # Verifica o furo para os patrimonios que estiverem dentro de um Rack                 
-                if (contido_em.equipamento.tipo.nome != 'Rack') and (contido_em.historico_atual.posicao_furo != historicolocal.posicao_furo):
+                # Verifica o furo para os patrimonios que estiverem dentro de um Rack
+                if (contido_em.equipamento.tipo.nome != 'Rack' and \
+                    contido_em.historico_atual.posicao_furo != historicolocal.posicao_furo):
+                    
                     raise forms.ValidationError(u'Patrimônio deve estar no mesmo furo do patrimônio em que está contido.')
 
+        
         return cleaned_data
 
 HistoricoLocalAdminFormSet = inlineformset_factory(Patrimonio, HistoricoLocal, formset=BaseHistoricoLocalAdminFormSet, fk_name='patrimonio')

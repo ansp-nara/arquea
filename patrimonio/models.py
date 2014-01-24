@@ -96,7 +96,7 @@ class Patrimonio(models.Model):
     obs = models.TextField(null=True, blank=True)
     agilis = models.BooleanField(_(u'Agilis?'), default=True)
     equipamento = models.ForeignKey('patrimonio.Equipamento', null=True, blank=True)
-    checado = models.BooleanField()
+    checado = models.BooleanField(default=False)
     apelido = models.CharField(max_length=30, null=True, blank=True)
     descricao = models.TextField(_(u'Descrição NF'))
     ean = models.CharField(u'EAN', max_length=45, null=True, blank=True)
@@ -198,7 +198,7 @@ class Patrimonio(models.Model):
     class Meta:
         verbose_name = _(u'Patrimônio')
         verbose_name_plural = _(u'Patrimônio')
-    ordering = ('tipo', 'descricao')
+        ordering = ('tipo', 'descricao')
 
 
 class HistoricoLocal(models.Model):
@@ -230,7 +230,7 @@ class HistoricoLocal(models.Model):
     class Meta:
         verbose_name = _(u'Histórico Local')
         verbose_name_plural = _(u'Histórico Local')
-        ordering = ('-data', )
+        ordering = ('-data', 'id')
         unique_together = (('patrimonio', 'endereco', 'descricao', 'data'), )
 
     @cached_property

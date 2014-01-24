@@ -24,7 +24,7 @@ class HistoricoLocalInline(admin.StackedInline):
     model = HistoricoLocal
     fk_name = 'patrimonio'
     formset = HistoricoLocalAdminFormSet
-    form = HistoricoLocalAdminForm
+    form = PatrimonioHistoricoLocalAdminForm
     choices = 1
     extra = 1
 
@@ -103,7 +103,7 @@ class HistoricoLocalAdmin(admin.ModelAdmin):
                          'número do documento' e 'descricao' do protocolo e,
                          'descricao' e 'data' do histórico.
     """
-
+    form = HistoricoLocalAdminForm
     fieldsets = (
                  (None, {
                      'fields': ('data', 'patrimonio', 'endereco', 'descricao'),
