@@ -1,15 +1,40 @@
 # -*- coding: utf-8 -*-
 import django
-from models import *
 from django import forms
-from outorga.models import Termo, OrigemFapesp
 from django.utils.translation import ugettext_lazy as _
 from django.forms.util import ErrorList
-from protocolo.models import Protocolo
 from django.forms.models import inlineformset_factory, BaseInlineFormSet
 from django.contrib.admin.widgets import FilteredSelectMultiple, RelatedFieldWidgetWrapper
 from django.db.models.fields.related import ManyToOneRel
 from django.utils.html import mark_safe
+
+from models import *
+from outorga.models import Termo, OrigemFapesp
+from protocolo.models import Protocolo
+
+from rede.models import PlanejaAquisicaoRecurso, Recurso
+
+
+class RecursoInlineAdminForm(forms.ModelForm):
+
+    planejamento = forms.ModelChoiceField(PlanejaAquisicaoRecurso.objects.all().select_related('os', 'os__tipo', 'projeto', 'tipo', ),
+                                                 label=mark_safe('<a href="#" onclick="window.open(\'/admin/rede/planejaaquisicaorecurso/\'+$(\'#id_planejamento\').val() + \'/\', \'_blank\');return true;">Planejamento</a>'),)
+
+    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
+                 initial=None, error_class=ErrorList, label_suffix=':',
+                 empty_permitted=False, instance=None):
+                                                     
+        super(RecursoInlineAdminForm, self).__init__(data, files, auto_id, prefix, initial,
+                                            error_class, label_suffix, empty_permitted, instance)
+        # Configurando a relação entre Patrimonio e Equipamento para aparecer o botão de +
+        # O self.admin_site foi declarado no admin.py
+        if django.VERSION[0:2] >= (1, 6):
+            rel = ManyToOneRel(field=Recurso._meta.get_field('planejamento'), to=PlanejaAquisicaoRecurso, field_name='id')
+        else:
+            rel = ManyToOneRel(PlanejaAquisicaoRecurso, 'id')
+            
+        self.fields['planejamento'].widget = RelatedFieldWidgetWrapper(self.fields['planejamento'].widget, rel, self.admin_site)
+
 
 class PagamentoAdminForm(forms.ModelForm):
 
@@ -30,22 +55,22 @@ class PagamentoAdminForm(forms.ModelForm):
 	      termo = data['termo']
 	      try:
 		t = Termo.objects.get(id=termo)
-		self.fields['protocolo'].queryset = Protocolo.objects.filter(termo=t).order_by('tipo_documento', 'num_documento', 'data_vencimento')
-		self.fields['origem_fapesp'].queryset = OrigemFapesp.objects.filter(item_outorga__natureza_gasto__termo=t).order_by('acordo__descricao', 'item_outorga__descricao')
+		self.fields['protocolo'].queryset = Protocolo.objects.filter(termo=t).select_related('tipo_documento').order_by('tipo_documento', 'num_documento', 'data_vencimento')
+		self.fields['origem_fapesp'].queryset = OrigemFapesp.objects.filter(item_outorga__natureza_gasto__termo=t).select_related('acordo', 'item_outorga').order_by('acordo__descricao', 'item_outorga__descricao')
 	      except:
 		pass
 	elif instance:
 	    termo = instance.protocolo.termo
 	    try:
 		t = termo #Termo.objects.get(id=termo)
-		self.fields['protocolo'].queryset = Protocolo.objects.filter(termo=t).order_by('tipo_documento', 'num_documento', 'data_vencimento')
-		self.fields['origem_fapesp'].queryset = OrigemFapesp.objects.filter(item_outorga__natureza_gasto__termo=t).order_by('acordo__descricao', 'item_outorga__descricao')
+		self.fields['protocolo'].queryset = Protocolo.objects.filter(termo=t).select_related('tipo_documento').order_by('tipo_documento', 'num_documento', 'data_vencimento')
+		self.fields['origem_fapesp'].queryset = OrigemFapesp.objects.filter(item_outorga__natureza_gasto__termo=t).select_related('acordo', 'item_outorga').order_by('acordo__descricao', 'item_outorga__descricao')
 	    except:
 		pass
 	    
 	else:
-	    self.fields['protocolo'].queryset = Protocolo.objects.filter(id__lte=0)
-	    self.fields['origem_fapesp'].queryset = OrigemFapesp.objects.filter(id__lte=0)
+	    self.fields['protocolo'].queryset = Protocolo.objects.filter(id__lte=0).select_related('tipo_documento')
+	    self.fields['origem_fapesp'].queryset = OrigemFapesp.objects.filter(id__lte=0).select_related('acordo', 'item_outorga')
 	    #self.fields['conta_corrente'].queryset = ExtratoCC.objects.filter(id__lte=0)
 
     class Meta:

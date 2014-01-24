@@ -11,6 +11,14 @@ from rede.models import Recurso
 class RecursoInline(admin.TabularInline):
     model = Recurso
     extra = 2
+    form = RecursoInlineAdminForm
+
+    def __init__(self, model, admin_site):
+        """
+        Utilizado para setar o admin_site para o forms
+        """
+        self.form.admin_site = admin_site
+        super(RecursoInline, self).__init__(model, admin_site)
 
 
 #class AuditoriaQuestionaInline(admin.TabularInline):

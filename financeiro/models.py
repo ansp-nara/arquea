@@ -53,7 +53,7 @@ class ExtratoCC(models.Model):
 	
     def parciais(self):
         mods = {}
-        for p in self.pagamento_set.all():
+        for p in self.pagamento_set.all().select_related('origem_fapesp', 'origem_fapesp__item_outorga__natureza_gasto__modalidade'):
             if p.origem_fapesp:
                 modalidade = p.origem_fapesp.item_outorga.natureza_gasto.modalidade.sigla
                 if modalidade not in mods.keys():
