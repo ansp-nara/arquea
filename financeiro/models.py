@@ -2,6 +2,7 @@
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+
 from utils.functions import formata_moeda
 from utils.models import NARADateField
 from decimal import Decimal
@@ -209,8 +210,9 @@ class Pagamento(models.Model):
     pagina.admin_order_field = 'auditoria__pagina'
 
     def parcial(self):
-        if self.auditoria_set.count() > 0:
+        if self.auditoria_set.exists():
             return self.auditoria_set.all()[0].parcial
+
         return ''
     parcial.admin_order_field = 'auditoria__parcial'
 

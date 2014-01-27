@@ -607,63 +607,64 @@ def financeiro_parciais(request, pdf=False):
 @login_required
 def parciais(request, caixa=False, pdf=False):
     if request.method == 'GET':
-	if request.GET.get('termo'):
-	    termo_id = int(request.GET.get('termo'))
-	    termo = get_object_or_404(Termo, id=termo_id)
-	    retorno = []
-	    for parcial in Auditoria.objects.filter(pagamento__protocolo__termo=termo).values_list('parcial', flat=True).distinct():
-		parcs = {'parcial':parcial}
-		ads = Auditoria.objects.filter(parcial=parcial, pagamento__protocolo__termo=termo) 
+        if request.GET.get('termo'):
+            termo_id = int(request.GET.get('termo'))
+            termo = get_object_or_404(Termo, id=termo_id)
+            retorno = []
 
-		pgs = []
-		for a in ads:
-		    if caixa:
-		        if a.pagamento.conta_corrente and a.pagamento.conta_corrente.despesa_caixa and a.pagamento not in pgs:
-			  pgs.append(a.pagamento)
-	            else:
-		        if a.pagamento not in pgs:
-			  pgs.append(a.pagamento)
-		      
+            for parcial in Auditoria.objects.filter(pagamento__protocolo__termo=termo).values_list('parcial', flat=True).distinct():
+                parcs = {'parcial':parcial}
+                ads = Auditoria.objects.filter(parcial=parcial, pagamento__protocolo__termo=termo) 
+    
+#                 pgs = []
+#                 for a in ads:
+#                     if caixa:
+#                         if a.pagamento.conta_corrente and a.pagamento.conta_corrente.despesa_caixa and a.pagamento not in pgs:
+#                             pgs.append(a.pagamento)
+#                         else:
+#                             if a.pagamento not in pgs:
+#                                 pgs.append(a.pagamento)
+
                 ch = ExtratoCC.objects.filter(extrato_financeiro__parcial=parcial, extrato_financeiro__termo=termo)
                 if caixa: ch = ch.filter(despesa_caixa=True)
 
-		#for p in pgs:
-		#    if p.conta_corrente and p.conta_corrente not in ch:
-	#		ch.append(p.conta_corrente)
-			
-			
-		ret = []
-		total_diff = Decimal('0.0')
-		for ecc in ch:
-		    pagos = ecc.pagamento_set.aggregate(Sum('valor_fapesp'))
-		    pago = pagos['valor_fapesp__sum'] or Decimal('0.0')
-		    pagos = ecc.pagamento_set.aggregate(Sum('valor_patrocinio'))
-		    #pago = pago + (pagos['valor_patrocinio__sum'] or Decimal('0.0'))
-		    diff = ecc.valor+pago
-		    total_diff += diff
-		    este = {'cheque':ecc, 'diff':-diff}
-		    pgtos = []
-		    for p in ecc.pagamento_set.all():
-			ok = True
-			for a in p.auditoria_set.all():
-			    if a.parcial != parcial:
-				ok = False
-				break
-			pgtos.append({'pg':p, 'naparcial':ok})
-		    este.update({'pgtos':pgtos})
-		    
-		    ret.append(este)
-		    
-		parcs.update({'dados':ret, 'diff':-total_diff})
-		retorno.append(parcs)
-		
+        #for p in pgs:
+        #    if p.conta_corrente and p.conta_corrente not in ch:
+    #        ch.append(p.conta_corrente)
+            
+            
+                ret = []
+                total_diff = Decimal('0.0')
+                for ecc in ch:
+                    pagos = ecc.pagamento_set.aggregate(Sum('valor_fapesp'))
+                    pago = pagos['valor_fapesp__sum'] or Decimal('0.0')
+                    pagos = ecc.pagamento_set.aggregate(Sum('valor_patrocinio'))
+                    #pago = pago + (pagos['valor_patrocinio__sum'] or Decimal('0.0'))
+                    diff = ecc.valor+pago
+                    total_diff += diff
+                    este = {'cheque':ecc, 'diff':-diff}
+                    pgtos = []
+                    for p in ecc.pagamento_set.all().select_related('protocolo', 'origem_fapesp__item_outorga__natureza_gasto', 'origem_fapesp__item_outorga__natureza_gasto__modalidade', 'origem_fapesp__item_outorga__natureza_gasto__modalidade__sigla'):
+                        ok = True
+                        for a in p.auditoria_set.distinct('parcial'):
+                            if a.parcial != parcial:
+                                ok = False
+                                break
+                        pgtos.append({'pg':p, 'naparcial':ok})
+                    este.update({'pgtos':pgtos})
+                    
+                    ret.append(este)
+    
+                parcs.update({'dados':ret, 'diff':-total_diff})
+                retorno.append(parcs)
+
             if pdf:
-	        return render_to_pdf('financeiro/parciais.pdf', {'parciais':retorno, 'termo':termo}, filename='parciais.pdf')
+                return render_to_pdf('financeiro/parciais.pdf', {'parciais':retorno, 'termo':termo}, filename='parciais.pdf')
             else:
                 return render_to_response('financeiro/parciais.html', {'caixa':caixa, 'parciais':retorno, 'termo':termo}, context_instance=RequestContext(request))
-	else:
- 	    return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all()}, context_instance=RequestContext(request))
-		   
+        else:
+            return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all()}, context_instance=RequestContext(request))
+
 def escolhe_extrato(request):
     if request.method == 'POST':
     	termo_id = request.POST.get('termo')
@@ -681,9 +682,9 @@ def escolhe_extrato(request):
 @login_required
 def presta_contas(request, pdf=False):
     if request.method == 'GET':
-    	if request.GET.get('termo'):
-	    termo_id = request.GET.get('termo')
-	    termo = get_object_or_404(Termo, id=termo_id)
+        if request.GET.get('termo'):
+            termo_id = request.GET.get('termo')
+            termo = get_object_or_404(Termo, id=termo_id)
             m = []
             for ng in Natureza_gasto.objects.filter(termo=termo).select_related('modalidade'):
                 mod = {'modalidade':ng.modalidade.nome}
@@ -691,17 +692,22 @@ def presta_contas(request, pdf=False):
                 for p in Auditoria.objects.filter(pagamento__origem_fapesp__item_outorga__natureza_gasto=ng).values_list('parcial', flat=True).distinct():
                     pgtos = []
                     pag = None
-                    for a in Auditoria.objects.filter(pagamento__origem_fapesp__item_outorga__natureza_gasto=ng, parcial=p).order_by('pagina').select_related('pagamento', 'pagamento__conta_corrente', 'pagamento__extrato_financeiro').prefetch_related('pagamento__auditoria_set', 'pagamento__auditoria_set__estado'):
+                    for a in Auditoria.objects.filter(pagamento__origem_fapesp__item_outorga__natureza_gasto=ng, parcial=p).order_by('pagina').select_related('pagamento', 'pagamento__protocolo', 'pagamento__origem_fapesp__item_outorga', 'pagamento__conta_corrente', 'pagamento__extrato_financeiro', 'pagamento__conta_corrente__extrato_financeiro__comprovante'):
+                        auditorias = []
                         if a.pagamento != pag:
-                            pgtos.append({'pg':a.pagamento, 'pagina':a.pagina})
+                            pgtos.append({'pg':a.pagamento, 'pagina':a.pagina, 'auditorias':auditorias})
                             pag = a.pagamento
+                        
+                            for auditoria in a.pagamento.auditoria_set.all().select_related('tipo', 'estado', 'arquivo'):
+                                auditorias.append({'auditoria':auditoria}) 
+                        
                     parcs.append({'num':p, 'pgtos':pgtos})
                 mod.update({'parcial':parcs})
                 m.append(mod)
-	    if pdf:
+            if pdf:
                return render_to_pdf('financeiro/presta_contas.pdf', {'modalidades':m, 'termo':termo}, filename='presta_contas_%s.pdf' % termo.__unicode__(), context_instance=RequestContext(request))
-	    else:
-	       return render_to_response('financeiro/presta_contas.html', {'modalidades':m, 'termo':termo}, context_instance=RequestContext(request))
+            else:
+               return render_to_response('financeiro/presta_contas.html', {'modalidades':m, 'termo':termo}, context_instance=RequestContext(request))
         else:
             return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all()}, context_instance=RequestContext(request))
 
