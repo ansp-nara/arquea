@@ -63,7 +63,7 @@
 </style>
 
 <h1 repeat="1">Inventário por local</h1>
-<h4><a href="{% url 'patrimonio.views.por_local_termo' 1 %}?entidade={{request.GET.entidade}}&endereco={{request.GET.endereco}}&detalhe={{request.GET.detalhe}}">Imprimir</a></h4>
+<h4><a href="{% url 'patrimonio.views.por_local_termo' 1 %}?entidade={{request.GET.entidade}}&endereco={{request.GET.endereco}}&detalhe={{request.GET.detalhe}}&com_fmusp={{request.GET.com_fmusp}}">Imprimir</a></h4>
 
 {% comment %}
     <form action="{% url 'patrimonio.views.por_estado' 1 %}" method="GET">
