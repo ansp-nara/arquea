@@ -762,7 +762,7 @@ def racks(request):
                     if pt.equipamento and pt.equipamento.imagem:
                         imagem = pt.equipamento.imagem.url
                         
-                    if pos <= 0 or pt.historico_atual.posicao_colocacao in ('T', 'TD', 'TE', 'piso', 'lD', 'lE'):
+                    if pos < 0 or pt.historico_atual.posicao_colocacao in ('T', 'TD', 'TE', 'piso', 'lD', 'lE'):
                         equipamentos_fora_visao.append({'id': pt.id, 'pos':pos, 'tam': tam, 'eixoY': eixoY, 'altura':(tam*19/3), 
                                           'pos_original':pt.historico_atual.posicao_furo, 'imagem':imagem, 
                                           'nome':pt.apelido, 'descricao':pt.descricao or u'Sem descrição', 
