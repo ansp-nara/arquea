@@ -627,7 +627,7 @@ class Item(models.Model):
 
     # Retorna a descrição e o termo, se existir.
     def __unicode__(self):
-        return u'%s' % (self.descricao)
+        return u'%s - %s' % (self.natureza_gasto.termo,self.descricao)
 
 
     # Retorna o Termo se o pedido de concessão estiver conectado a um termo.
