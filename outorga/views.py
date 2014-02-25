@@ -375,7 +375,7 @@ def acordo_progressivo(request, pdf=False):
         totalTermoConcedidoDolar = Decimal('0.0')
         totalTermoSaldoDolar = Decimal('0.0')
         
-        for t in Termo.objects.filter(exibe_rel_ger_progressivo=True).order_by('ano').only('ano', 'processo', 'digito'):
+        for t in Termo.objects.filter(exibe_rel_ger_progressivo=True).order_by('inicio').only('ano', 'processo', 'digito'):
             concedido = a.itens_outorga.filter(natureza_gasto__termo=t).values('natureza_gasto__modalidade__moeda_nacional').annotate(soma=Sum('valor')).order_by()
             
             concedido_real = Decimal('0.0')
@@ -445,7 +445,7 @@ def acordo_progressivo(request, pdf=False):
                         })
         acordos.append(acordo)
         
-        termos = Termo.objects.filter(exibe_rel_ger_progressivo=True).order_by('ano')
+        termos = Termo.objects.filter(exibe_rel_ger_progressivo=True).order_by('inicio')
     if pdf:
         return render_to_pdf('outorga/acordo_progressivo.pdf', {'acordos':acordos, 'termos':termos}, filename='acordo_progressivo.pdf')
     else:
