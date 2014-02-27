@@ -46,7 +46,7 @@ class Assunto(models.Model):
     descricao = models.CharField(max_length=100)
     
     def __unicode__(self):
-	return self.descricao
+		return self.descricao
 
 
 class MemorandoFAPESP(models.Model):
@@ -141,9 +141,14 @@ class MemorandoSimples(models.Model):
     pai = models.ForeignKey('memorando.MemorandoSimples', verbose_name=u'Memorando pai', null=True, blank=True)
 
     def __unicode__(self):
+        return u'%s/%s - %s' % (self.data.year, self.numero, self.assunto.__unicode__())
+        #return u'%s/%s' % (self.data.year, self.numero)
+    
+    def num_memo(self):
         return u'%s/%s' % (self.data.year, self.numero)
-    __unicode__.admin_order_field = 'data'
-        
+    num_memo.admin_order_field = 'data'
+    num_memo.short_description = u'Número'
+      
     class Meta:
         verbose_name_plural = u'Memorandos Simples'
         ordering = ('-data',)

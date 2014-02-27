@@ -34,6 +34,7 @@ urlpatterns = patterns('',
     (r'^rede/', include('rede.urls')),
     (r'^processo/', include('processo.urls')),
     (r'^verificacao/', include('verificacao.urls')),
+    (r'^repositorio/', include('repositorio.urls')),
     (r'^carga/', include('carga.urls')),
     (r'^accounts/login/$', 'django_cas.views.login'),
     (r'^accounts/logout/$', 'django_cas.views.logout'),
@@ -54,6 +55,6 @@ urlpatterns = patterns('',
 
     
     (r'^', include(admin.site.urls)),
-)# + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
  
 
