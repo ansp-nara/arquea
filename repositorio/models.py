@@ -34,7 +34,15 @@ class Natureza(models.Model):
 	def __unicode__(self):
 		return '%s' % self.nome
 		
-		
+class Servico(models.Model):
+	"""
+	Serviços envolvidos
+	"""
+	nome = models.CharField(max_length=50)
+	
+	def __unicode__(self):
+		return '%s' % self.nome
+				
 class Ticket(models.Model):
 	"""
 	Tickets do OTRS
@@ -55,11 +63,12 @@ class Repositorio(models.Model):
 	numero = models.IntegerField(editable=False)
 	
 	# data também gerada automaticamente
-	data = models.DateField(auto_now_add=True)
+	data = models.DateField(u'Data de registro', auto_now_add=True)
 	data_ocorrencia = models.DateField(u'Data da ocorrência')
 	tipo = models.ForeignKey('repositorio.Tipo', help_text=u'Diário de bordo, manutenção, etc.')
 	estado = models.ForeignKey('repositorio.Estado', help_text=u'Pendente, resolvido, etc.')
 	natureza = models.ForeignKey('repositorio.Natureza', help_text=u'Problema, incidente, etc.')
+	servicos = models.ManyToManyField('repositorio.Servico', help_text=u'Serviços envolvidos', verbose_name=u'Serviços', null=True, blank=True)
 	ocorrencia = models.TextField(u'Ocorrência')
 	obs = models.TextField(u'Observação', null=True, blank=True)
 	
