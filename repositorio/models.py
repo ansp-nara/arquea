@@ -57,9 +57,9 @@ class Repositorio(models.Model):
 	# data também gerada automaticamente
 	data = models.DateField(auto_now_add=True)
 	data_ocorrencia = models.DateField(u'Data da ocorrência')
-	tipo = models.ForeignKey('repositorio.Tipo')
-	estado = models.ForeignKey('repositorio.Estado')
-	natureza = models.ForeignKey('repositorio.Natureza')
+	tipo = models.ForeignKey('repositorio.Tipo', help_text=u'Diário de bordo, manutenção, etc.')
+	estado = models.ForeignKey('repositorio.Estado', help_text=u'Pendente, resolvido, etc.')
+	natureza = models.ForeignKey('repositorio.Natureza', help_text=u'Problema, incidente, etc.')
 	ocorrencia = models.TextField(u'Ocorrência')
 	obs = models.TextField(u'Observação', null=True, blank=True)
 	
