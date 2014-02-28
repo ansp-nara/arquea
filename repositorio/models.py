@@ -13,7 +13,9 @@ class Tipo(models.Model):
 	def __unicode__(self):
 		return '%s' % self.nome
 	
-
+	class Meta:
+		ordering = ('nome',)
+		
 class Estado(models.Model):
 	"""
 	Estado da ocorrência
@@ -24,7 +26,9 @@ class Estado(models.Model):
 	def __unicode__(self):
 		return '%s' % self.nome
 
-
+	class Meta:
+		ordering = ('nome',)
+		
 class Natureza(models.Model):
 	"""
 	Natureza do ocorrido
@@ -33,7 +37,11 @@ class Natureza(models.Model):
 	
 	def __unicode__(self):
 		return '%s' % self.nome
+
+	class Meta:
+		ordering = ('nome',)
 		
+	
 class Servico(models.Model):
 	"""
 	Serviços envolvidos
@@ -43,6 +51,9 @@ class Servico(models.Model):
 	def __unicode__(self):
 		return '%s' % self.nome
 				
+	class Meta:
+		ordering = ('nome',)
+		
 class Ticket(models.Model):
 	"""
 	Tickets do OTRS
@@ -83,6 +94,7 @@ class Repositorio(models.Model):
 	def num_rep(self):
 		return '%s/%s' % (self.data.year, self.numero)
 	num_rep.short_description = u'Número'
+	num_rep.admin_order_field = 'numero'
 	
 	def proximo_numero(self):
 		from datetime import datetime
@@ -102,13 +114,14 @@ class Repositorio(models.Model):
 		verbose_name_plural = u'Repositórios'
 		
 		
-class Anexo:
+class Anexo(models.Model):
 	"""
 	Arquivos anexos ao repositório
 	"""
 	
 	arquivo = models.FileField(upload_to='repositorio')
 	palavras_chave = models.TextField(u'Palavras chave')
+	repositorio = models.ForeignKey('repositorio.Repositorio')
 	
 	def lista_palavras_chave(self):
 		return self.palavras_chave.split()

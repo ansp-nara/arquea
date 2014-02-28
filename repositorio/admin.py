@@ -1,17 +1,21 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
-from repositorio.models import Repositorio, Ticket, Tipo, Estado, Natureza, Servico
+from repositorio.models import Repositorio, Ticket, Tipo, Estado, Natureza, Servico, Anexo
 from repositorio.forms import RepositorioAdminForm
 
 class TicketInline(admin.TabularInline):
 	model = Ticket
 	extra = 1
 	
+class AnexoInline(admin.TabularInline):
+	model = Anexo
+	extra = 1
+	
 class RepositorioAdmin(admin.ModelAdmin):
 	"""
 	Interface administrativa para o repositório
 	"""
-	inlines = [TicketInline]
+	inlines = [TicketInline, AnexoInline]
 	form = RepositorioAdminForm
 	
 	fieldsets = (
