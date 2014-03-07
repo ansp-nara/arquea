@@ -227,8 +227,8 @@ class FeriadoAdminForm(forms.ModelForm):
             raise forms.ValidationError(u"Feriado fixo deve ser no mesmo dia/mês especificado no tipo do feriado. Este feriado ocorre no dia %s/%s" % (tipo.dia, tipo.mes))
 
         # Verifica se já há uma data de feriado cadastrada no mesmo dia
-        f = Feriado.objects.get(feriado=feriado)
-        if f and self.instance and f.id != self.instance.id:
+        f = Feriado.objects.filter(feriado=feriado)
+        if f.count() > 0 and self.instance and f.id != self.instance.id:
             raise forms.ValidationError(u"O feriado nesta data já existe.")
         
         return self.cleaned_data
