@@ -2,6 +2,9 @@
 {% load proto_tags %}
 {% block content %}
 <style>
+    .excedido{
+        color:red
+    }
     #container {
         margin: 0 auto;
         width: 1680px;
@@ -45,7 +48,6 @@
         border-right:1px black solid;
         font-weight:bold;
     }
-    
     .tbl_acordos th {
         background-color:lightgray;
         border-bottom:1px black solid;
@@ -54,7 +56,6 @@
         display:block;
         border-top:1px darkgray dotted;
     }
-    
     .tbl_acordos .tr_item {
         border-top:1px darkgray solid;
     }
@@ -141,19 +142,24 @@
         <th width="6%">Termo</th>
         <th width="54%">Item da outorga</th>
         <th width="10%">Entidade</th>
-        <th width="10%">Concedido</th>
+        <th width="10%">Total Concedido</th>
         <th width="10%">Realizado</th>
-        <th width="10%">Saldo</th>
+        <th width="10%">Porcentagem</th>
        </tr>
        {% for t in a.termos %}
           {% for item in t.itens %}
              <tr class="{% if forloop.first %}tr_item{% endif %} ">
                  <td>{% if forloop.counter == 1 %}{{ t.termo }}{% endif %}</td>
-                 <td>{{ item.item.descricao }}</td><td>{{ item.item.entidade }}</td>
+                 <td>{{ item.item.descricao }}</td>
+                 <td>{{ item.item.entidade }}</td>
                  {% if item.item.natureza_gasto.modalidade.moeda_nacional %}
-                     <td>{{ item.concedido|moeda }}</td><td>{{ item.realizado|moeda }}</td><td>{{ item.saldo|moeda_css }}</td>
+                     <td>{{ item.concedido|moeda }}</td>
+                     <td>{{ item.realizado|moeda }}</td>
+                     <td {% if item.excedido %}class="excedido"{% endif %}>{{ item.porcentagem }}</td>
                  {% else %}
-		             <td>{{ item.concedido|moeda:0 }}</td><td>{{ item.realizado|moeda:0 }}</td><td>{{ item.saldo|moeda_css:0 }}</td>
+		             <td>{{ item.concedido|moeda:0 }}</td>
+		             <td>{{ item.realizado|moeda:0 }}</td>
+		             <td {% if item.excedido %}class="excedido"{% endif %}>{{ item.porcentagem }}</td>
 		         {% endif %}
 		     </tr>
           {% endfor %}
