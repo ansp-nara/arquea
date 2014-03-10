@@ -403,6 +403,16 @@ def acordo_progressivo(request, pdf=False):
             saldo_real = concedido_real - realizado_real
             saldo_dolar = concedido_dolar - realizado_dolar
             
+            if concedido_real and concedido_real != 0:
+                porcentagem_real = str(round(Decimal('100.0') * realizado_real / concedido_real, 2)) + '%'
+            else:
+                porcentagem_real = "==="
+                
+            if concedido_dolar and concedido_dolar != 0:
+                porcentagem_dolar = str(round(Decimal('100.0') * realizado_dolar / concedido_dolar, 2)) + '%'
+            else:
+                porcentagem_dolar = "==="
+            
             tem_real = concedido_real or realizado_real
             tem_dolar = concedido_dolar or realizado_dolar
             itens = []
@@ -410,20 +420,28 @@ def acordo_progressivo(request, pdf=False):
             if a.itens_outorga.filter(natureza_gasto__termo=t).exists():
                 itensOutorga = a.itens_outorga.filter(natureza_gasto__termo=t).select_related('natureza_gasto__modalidade', 'entidade').defer('justificativa', 'obs')
                 for item in itensOutorga:
+                    
                     realiz = Pagamento.objects.filter(origem_fapesp__item_outorga=item, origem_fapesp__acordo=a).aggregate(Sum('valor_fapesp'))
                     realiz = realiz['valor_fapesp__sum'] or Decimal('0.0')
                     concede = item.valor or Decimal('0.0')
-                    itens.append({'item':item, 'concedido':concede, 'realizado':realiz, 'saldo':concede-realiz})
+                    
+                    excedido = realiz.compare(concede) == Decimal('1')
+                    if concede and concede != 0:
+                        porcentagem = str(round(Decimal('100.0') * realiz / concede, 2)) + '%'
+                    else:
+                        porcentagem = "==="
+                    
+                    itens.append({'item':item, 'concedido':concede, 'realizado':realiz, 'saldo':concede-realiz, 'porcentagem':porcentagem, 'excedido':excedido})
                 
             if tem_real:
-                valores_real = {'tem_real':1, 'concedido_real':concedido_real, 'realizado_real':realizado_real, 'saldo_real':saldo_real}
+                valores_real = {'tem_real':1, 'concedido_real':concedido_real, 'realizado_real':realizado_real, 'saldo_real':saldo_real, 'porcentagem_real':porcentagem_real}
                 totalTermoRealizadoReal +=  realizado_real
                 totalTermoConcedidoReal += concedido_real
                 totalTermoSaldoReal += saldo_real
             else: valores_real = {'tem_real':0}
             
             if tem_dolar:
-                valores_dolar = {'tem_dolar':1, 'concedido_dolar':concedido_dolar, 'realizado_dolar':realizado_dolar, 'saldo_dolar':saldo_dolar}
+                valores_dolar = {'tem_dolar':1, 'concedido_dolar':concedido_dolar, 'realizado_dolar':realizado_dolar, 'saldo_dolar':saldo_dolar, 'porcentagem_dolar':porcentagem_dolar}
                 totalTermoRealizadoDolar += realizado_dolar
                 totalTermoConcedidoDolar += concedido_dolar
                 totalTermoSaldoDolar += saldo_dolar
