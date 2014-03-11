@@ -83,6 +83,7 @@ class Repositorio(models.Model):
 	ocorrencia = models.TextField(u'Ocorrência')
 	obs = models.TextField(u'Observação', null=True, blank=True)
 	
+	anterior = models.ForeignKey('repositorio.Repositorio', help_text=u'Item do repositório ao qual este se refere', null=True, blank=True)
 	memorandos = models.ManyToManyField('memorando.MemorandoSimples', null=True, blank=True)
 	patrimonios = models.ManyToManyField('patrimonio.Patrimonio', verbose_name='Patrimônios', null=True, blank=True)
 	responsavel = models.ForeignKey('membro.Membro', limit_choices_to={'historico__funcionario':True, 'historico__termino__isnull':True}, verbose_name='Responsável')
