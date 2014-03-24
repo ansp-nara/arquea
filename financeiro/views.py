@@ -277,7 +277,7 @@ def relatorio_gerencial(request, pdf=False):
             
             for ng in Natureza_gasto.objects.filter(termo=t).exclude(modalidade__sigla='REI').select_related('modalidade__moeda_nacional'):
 
-                item = {'modalidade':ng.modalidade, 'concedido':ng.valor_concedido, 'realizado':ng.total_realizado, 'saldo':ng.valor_saldo, 'meses':[], 'itens':{}, 'obs':ng.obs}
+                item = {'modalidade':ng.modalidade, 'concedido':ng.valor_concedido, 'realizado':ng.total_realizado, 'saldo':ng.valor_saldo(), 'meses':[], 'itens':{}, 'obs':ng.obs}
                 for it in ng.item_set.all():
                     item['itens'].update({it:[]})
 
@@ -563,6 +563,7 @@ def financeiro_parciais(request, pdf=False):
 			tcheques += c.valor
 			mods = {}		    
 			for p in c.pagamento_set.all():
+                            if not p.origem_fapesp: continue
                             v_fapesp += p.valor_fapesp
                             modalidade = p.origem_fapesp.item_outorga.natureza_gasto.modalidade.sigla
                             if modalidade not in mods.keys():
