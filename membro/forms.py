@@ -167,9 +167,8 @@ class BaseControleFeriasAdminFormSet(BaseInlineFormSet):
         if any(self.errors):
             return
 
-        
-        if self.total_form_count() > 3:
-            raise forms.ValidationError(u'Não pode haver mais de 3 Controles de Férias')
+#         if self.total_form_count() > 3:
+#             raise forms.ValidationError(u'Não pode haver mais de 3 Controles de Férias')
 
         oficiais = 0
         nao_oficiais = 1
@@ -179,8 +178,8 @@ class BaseControleFeriasAdminFormSet(BaseInlineFormSet):
             else: nao_oficiais += 1
 
 
-        if oficiais > 1 or nao_oficiais > 2:
-            raise forms.ValidationError(u'No máximo um período oficial e dois não oficiais')
+#         if oficiais > 1 or nao_oficiais > 2:
+#             raise forms.ValidationError(u'No máximo um período oficial e dois não oficiais')
 
 ControleFeriasAdminFormSet = inlineformset_factory(Ferias, ControleFerias, formset=BaseControleFeriasAdminFormSet)
 
