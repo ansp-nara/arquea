@@ -143,7 +143,7 @@ class PatrimonioAdminForm(forms.ModelForm):
                                             error_class, label_suffix, empty_permitted, instance)
         
         pg = self.fields['pagamento']
-        if data and data['termo']:
+        if data and 'termo' in data and data['termo']:
             t = data['termo']
             t = Termo.objects.get(id=t)
             pg.queryset = Pagamento.objects.filter(protocolo__termo=t)
@@ -153,7 +153,7 @@ class PatrimonioAdminForm(forms.ModelForm):
             pg.queryset = Pagamento.objects.filter(id__lte=0)
 
         pt = self.fields['patrimonio']
-        if data and data['patrimonio']:
+        if data and 'patrimonio' in data and data['patrimonio']:
             pt.choices = [(p.id, p.__unicode__()) for p in Patrimonio.objects.filter(id=data['patrimonio'])]
         elif instance and instance.patrimonio:
             pt.choices = [(p.id, p.__unicode__()) for p in Patrimonio.objects.filter(id=instance.patrimonio.id)]
