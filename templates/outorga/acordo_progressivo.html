@@ -20,6 +20,9 @@
     }
     #tbl_consolidado th.td_nome {
         border-right:1px black solid;
+        line-height: 30px;
+        vertical-align: middle;
+        padding-left:10px;
     }
     #tbl_consolidado th.td_nome span {
         width: 190px;
@@ -65,7 +68,7 @@
     <table id="tbl_consolidado" border="0" repeat="1" cellpadding="5">
 	    <tr>
 	    {% comment %}<th colspan="2" class="td_nome"><span>&nbsp;</span></th>{% endcomment %}
-	    <th class="td_nome"><span>&nbsp;</span></th>
+	    <th class="td_nome"><div>Realizado</div></th>
 	    {% for t in termos %}
 	       <th class="td_tipo">Processo {{ t }}<br />{{ t.inicio|date:"d/m/Y" }}<br />a<br />{{ t.termino|date:"d/m/Y" }}</th>
 	    {% endfor %}

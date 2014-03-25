@@ -54,6 +54,7 @@
         border-bottom:1px black solid;
     }
     #tbl_consolidado th.td_nome {
+        font-weight:bold;
         border-right:1px black solid;
     }
     #tbl_consolidado th.td_nome span {
@@ -110,7 +111,7 @@
     <!-- switch page templates -->
     <table id="tbl_consolidado" border="0" repeat="1" cellpadding="1">
         <tr>
-        <th colspan="2" class="td_nome"><span>&nbsp;</span></th>
+        <th class="td_nome">Realizado</th>
         {% for t in termos %}
            <th class="td_tipo">Processo {{ t }}<br />{{ t.inicio|date:"d/m/Y" }}<br />a<br />{{ t.termino|date:"d/m/Y" }}</th>
         {% endfor %}
@@ -119,6 +120,7 @@
         {% for a in acordos %}
         <tr>
            <td class="td_nome">{{ a.nome }}</td>
+        {% comment %}
            <td class="td_tipo">
                {% if a.tem_real %}
                     <span>
@@ -135,7 +137,7 @@
                     </span>
                {% endif %}
            </td>
-           
+           {% endcomment %}
            {% for t in a.termos %}
               <td class="td_termo">
               {% if t.tem_real %}
@@ -173,7 +175,7 @@
     </table>
     <!-- switch page templates -->
     
-    <pdf:nexttemplate name="acordos_template"><div style="page-break-after:always">&nbsp;</div></pdf:nexttemplate>
+    <pdf:nexttemplate name="acordos_template"></pdf:nexttemplate>
     
     {% for a in acordos %}
     <h4>{{ a.nome }}</h4>
