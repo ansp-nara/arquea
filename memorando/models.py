@@ -132,7 +132,7 @@ class MemorandoSimples(models.Model):
     data = models.DateField(auto_now_add=True)
     destinatario = models.TextField(u'Destinatário')
     numero = models.IntegerField(editable=False)
-    assunto = models.ForeignKey('memorando.Assunto')
+    assunto = models.ForeignKey('memorando.Assunto', null=True)
     corpo = models.TextField()
     equipamento = models.BooleanField('Equipamento?')
     envio = models.BooleanField('Envio?')
@@ -141,8 +141,10 @@ class MemorandoSimples(models.Model):
     pai = models.ForeignKey('memorando.MemorandoSimples', verbose_name=u'Memorando pai', null=True, blank=True)
 
     def __unicode__(self):
-        return u'%s/%s - %s' % (self.data.year, self.numero, self.assunto.__unicode__())
-        #return u'%s/%s' % (self.data.year, self.numero)
+        if self.assunto is not None:
+            return u'%s/%s - %s' % (self.data.year, self.numero, self.assunto.__unicode__())
+        else:
+            return u'%s/%s' % (self.data.year, self.numero)
     
     def num_memo(self):
         return u'%s/%s' % (self.data.year, self.numero)
