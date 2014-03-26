@@ -173,8 +173,9 @@
         {% endfor %}
         </tr>
     </table>
+    <div style="display:none; page-break-after:always">&nbsp;</div>
+
     <!-- switch page templates -->
-    
     <pdf:nexttemplate name="acordos_template"></pdf:nexttemplate>
     
     {% for a in acordos %}
