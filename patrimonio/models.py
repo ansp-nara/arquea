@@ -415,6 +415,8 @@ class Equipamento(models.Model):
     convencoes = models.ManyToManyField('patrimonio.Distribuicao', verbose_name=u'Convenções')
     titulo_autor = models.CharField(_(u'Título e autor'), null=True, blank=True, max_length=100)
     isbn = models.CharField(_(u'ISBN'), null=True, blank=True, max_length=20)
+    
+    url_equipamento = models.CharField(_(u'url_equipamento'), null=True, blank=True, max_length=200)
 
     def __unicode__(self):
         return u'%s - %s' % (self.descricao, self.part_number)
