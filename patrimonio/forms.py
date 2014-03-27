@@ -383,6 +383,8 @@ class EquipamentoAdminForm(forms.ModelForm):
     entidade_fabricante = forms.ModelChoiceField(queryset=Entidade.objects.all(),
                                                  required=False, 
                                                  label=mark_safe('<a href="#" onclick="window.open(\'/identificacao/entidade/\'+$(\'#id_entidade_fabricante\').val() + \'/\', \'_blank\');return true;">Marca</a>'),)
+    
+    url_equipamento = forms.CharField(widget=forms.TextInput(attrs={'size':120}))
 
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=':',
