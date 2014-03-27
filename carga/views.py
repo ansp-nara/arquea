@@ -49,7 +49,35 @@ def list_planilha_patrimonio(request):
     c.update({'sem_patrimonio':Carga_inventario.objects.filter(patrimonio_model__isnull=True).count()})
         
     return TemplateResponse(request, 'admin/carga/patrimonio/lista_carga_patrimonio.html', c)
-            
+
+
+
+
+@login_required
+def add_patrimonio(request):
+    chk_patrimonio_vazio = request.GET.get('chk_patrimonio_vazio')
+    
+    if chk_patrimonio_vazio == '1':
+        inventario = Carga_inventario.objects.filter(patrimonio_model__isnull=True)
+    elif chk_patrimonio_vazio == '0':
+        inventario = Carga_inventario.objects.filter(patrimonio_model__isnull=False)
+    else:
+        inventario = Carga_inventario.objects.all()
+        
+    ordenacao = request.GET.get('ord')
+    if ordenacao == 'rack':
+        inventario = inventario.order_by('rack', 'furo', )
+    elif ordenacao == 'patrimonio':
+        inventario = inventario.order_by('patrimonio_model', 'planilha_linha')
+    else:
+        inventario = inventario.order_by('planilha_linha')
+        
+    c = {'inventario':inventario}
+    c.update({'chk_patrimonio_vazio':chk_patrimonio_vazio})
+    c.update({'com_patrimonio':Carga_inventario.objects.filter(patrimonio_model__isnull=False).count()})
+    c.update({'sem_patrimonio':Carga_inventario.objects.filter(patrimonio_model__isnull=True).count()})
+        
+    return TemplateResponse(request, 'admin/carga/patrimonio/lista_carga_patrimonio.html', c)
 
 
 @login_required
@@ -183,8 +211,12 @@ def handle_uploaded_file(file):
 #                 if inventario.quantidade and inventario.quantidade != 1:
 #                     raise Exception('Quantidade deve ser 1. Verificar dados de importação.')
         
+            inventario.url_equipamento = item[37]
+
         
             inventario.save()
+
+
 
 def buscaPatrimonioPorSN(item):
     patr = None
@@ -227,25 +259,26 @@ def buscaPatrimonioPorModeloPNPosicao(item):
                     furo = pt.historico_atual.posicao_furo
                     posicao = pt.historico_atual.posicao_colocacao
                     
-                    chk_rack = False
-                    if rack and item.rack:
-                        chk_rack = item.rack == rack
-                    chk_furo = False    
-                    if furo and item.furo:
-                        chk_furo = int(item.furo) == furo
-                    chk_posicao = True
-                    if posicao or item.posicao:
-                        chk_posicao = item.posicao == posicao
-            
-                    if chk_rack and chk_furo and chk_posicao:
-                        if patr:
-                            # se houver mais de um patrimonio com mesmo modelo e part-number na mesma posição
-                            # aborta a procura pois não é possível descobrir qual que é o correto
-                            patr = None
-                            break;
-                        else:
-                            patr = pt
-                            patr.tipo_carga = 2
+                    
+#                     chk_rack = False
+#                     if rack and item.rack:
+#                         chk_rack = item.rack == rack
+#                     chk_furo = False    
+#                     if furo and item.furo:
+#                         chk_furo = int(item.furo) == furo
+#                     chk_posicao = True
+#                     if posicao or item.posicao:
+#                         chk_posicao = item.posicao == posicao
+#             
+#                     if chk_rack and chk_furo and chk_posicao:
+#                         if patr:
+#                             # se houver mais de um patrimonio com mesmo modelo e part-number na mesma posição
+#                             # aborta a procura pois não é possível descobrir qual que é o correto
+#                             patr = None
+#                             break;
+#                         else:
+#                             patr = pt
+#                             patr.tipo_carga = 2
 
     return patr
 
@@ -268,44 +301,44 @@ def buscaPatrimonioSemSNPorPosicao(item):
                     furo = pt.historico_atual.posicao_furo
                     posicao = pt.historico_atual.posicao_colocacao
                     
-                    chk_modelo = True
-                    if pt.modelo or item.model_number:
-                        chk_modelo = item.model_number == pt.modelo
-                        
-                    chk_part_number = True
-                    if pt.part_number or item.part_number:
-                        chk_part_number = item.part_number == pt.part_number
-                        
-                    chk_ns = True
-                    if pt.ns or item.serial_number:
-                        chk_ns = item.serial_number == pt.ns
-                     
-                    chk_rack = False
-                    if rack and item.rack:
-                        chk_rack = item.rack == rack
-                        
-                    chk_furo = False    
-                    if furo == -1:
-                        chk_furo = item.furo == None
-                    elif item.furo and item.furo.isdigit():
-                            chk_furo = int(item.furo) == furo
-                        
-                    chk_posicao = True
-                    if posicao or item.posicao:
-                        if posicao and posicao.isdigit() and item.posicao and item.posicao.isdigit():
-                            chk_posicao = int(item.posicao) == int(posicao)
-                        else:
-                            chk_posicao = item.posicao == posicao
-
-                    if chk_rack and chk_furo and chk_posicao and chk_modelo and chk_part_number and chk_ns:
-                        if patr:
-                            # se houver mais de um patrimonio com mesmo modelo e part-number na mesma posição
-                            # aborta a procura pois não é possível descobrir qual que é o correto
-                            patr = None
-                            break;
-                        else:
-                            patr = pt
-                            patr.tipo_carga = 3
+#                     chk_modelo = True
+#                     if pt.modelo or item.model_number:
+#                         chk_modelo = item.model_number == pt.modelo
+#                         
+#                     chk_part_number = True
+#                     if pt.part_number or item.part_number:
+#                         chk_part_number = item.part_number == pt.part_number
+#                         
+#                     chk_ns = True
+#                     if pt.ns or item.serial_number:
+#                         chk_ns = item.serial_number == pt.ns
+#                      
+#                     chk_rack = False
+#                     if rack and item.rack:
+#                         chk_rack = item.rack == rack
+#                         
+#                     chk_furo = False    
+#                     if furo == -1:
+#                         chk_furo = item.furo == None
+#                     elif item.furo and item.furo.isdigit():
+#                             chk_furo = int(item.furo) == furo
+#                         
+#                     chk_posicao = True
+#                     if posicao or item.posicao:
+#                         if posicao and posicao.isdigit() and item.posicao and item.posicao.isdigit():
+#                             chk_posicao = int(item.posicao) == int(posicao)
+#                         else:
+#                             chk_posicao = item.posicao == posicao
+# 
+#                     if chk_rack and chk_furo and chk_posicao and chk_modelo and chk_part_number and chk_ns:
+#                         if patr:
+#                             # se houver mais de um patrimonio com mesmo modelo e part-number na mesma posição
+#                             # aborta a procura pois não é possível descobrir qual que é o correto
+#                             patr = None
+#                             break;
+#                         else:
+#                             patr = pt
+#                             patr.tipo_carga = 3
 
     return patr
 
@@ -350,19 +383,19 @@ def checkPatrimonioPosicao():
         furo = item.patrimonio_model.historico_atual.posicao_furo
         posicao = item.patrimonio_model.historico_atual.posicao_colocacao
         
-        chk_rack = False
-        if rack or item.rack:
-            chk_rack = item.rack == rack
-            
-        chk_furo = False
-        if furo or item.furo:
-            chk_furo = item.furo == furo
-            
-        chk_posicao = False
-        if posicao or item.posicao:
-            chk_posicao = item.posicao == posicao
-
-        item.chk_posicao = chk_rack and chk_furo and chk_posicao
+#         chk_rack = False
+#         if rack or item.rack:
+#             chk_rack = item.rack == rack
+#             
+#         chk_furo = False
+#         if furo or item.furo:
+#             chk_furo = item.furo == furo
+#             
+#         chk_posicao = False
+#         if posicao or item.posicao:
+#             chk_posicao = item.posicao == posicao
+# 
+#         item.chk_posicao = chk_rack and chk_furo and chk_posicao
         item.save()     
         
         

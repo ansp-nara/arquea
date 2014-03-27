@@ -118,6 +118,12 @@ class Patrimonio(models.Model):
     ncm = models.CharField(u'NCM/SH', null=True, blank=True, max_length=30)
     tamanho = models.DecimalField(u'Tamanho (em U)', max_digits=5, decimal_places=2, blank=True, null=True)
 
+    revision = models.CharField(u'Revision', null=True, blank=True, max_length=30)
+    version = models.CharField(u'Version', null=True, blank=True, max_length=30)
+    ocst = models.CharField(u'O/CST', null=True, blank=True, max_length=30)
+    cfop = models.CharField(u'CFOP', null=True, blank=True, max_length=30)
+    garantia_termino = NARADateField(_(u'Data de término da garantia'))
+
     def __unicode__(self):
         if self.pagamento:
             return u'%s - %s  - %s - %s' % (self.pagamento.protocolo.num_documento, self.apelido, self.ns, self.descricao)
