@@ -154,7 +154,6 @@ $(function(){
 	       <td class="td_furo">{{ p.furo|default:"" }}</td>
 	       <td class="td_posicao">{{ p.posicao|default:"" }}</td>
 	       <td class="td_descricao">{{ p.descricao|default:"" }}</td>
-	       <td class="td_url">{{ p.url|default:"" }}</td>
 	       
 	       <td class="patr td_marca {% if p.patrimonio_model and p.fabricante|default:"" == p.patrimonio_model.marca|default:"" %} ok {% else %} nok {% endif %}">{{ p.patrimonio_model.marca }}</td>
 	       <td class="patr td_modelo {% if p.patrimonio_model and p.model_number|default:"" == p.patrimonio_model.modelo|default:"" %} ok {% else %} nok {% endif %}">{{ p.patrimonio_model.modelo }}</td>
