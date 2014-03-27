@@ -77,7 +77,14 @@ class Carga_inventario(models.Model):
     observacao = models.CharField(_(u'observacao'), null=True, blank=True, max_length=350)
     #[34] 
     atualizado = NARADateField(_(u'atualizado'), null=True, blank=True)
-    #[35] 
+    #[35]
+    # id do patrimonio
+    #[36]
+    # id do patrimonio pai
+    #[37] 
+    url_equipamento = models.CharField(_(u'url_equipamento'), null=True, blank=True, max_length=200)
+    
+    
 #     website_part_number = models.CharField(u'website_part_number', null=True, blank=True, max_length=200)
 #     #[36] 
 #     website_fabricante = models.CharField(u'website_fabricante', null=True, blank=True, max_length=200)
@@ -89,10 +96,13 @@ class Carga_inventario(models.Model):
     patrimonio_model = models.ForeignKey('patrimonio.Patrimonio', null=True, blank=True)
     equipamento_model = models.ForeignKey('patrimonio.Equipamento', null=True, blank=True)
     
-    chk_posicao = models.BooleanField(_(u'Posicao ok?'))
-    chk_sn = models.BooleanField(_(u'Serial ok?'))
-    chk_pn = models.BooleanField(_(u'Part Number ok?'))
-    chk_model = models.BooleanField(_(u'Modelo ok?'))
+    
+#     chk_posicao = models.BooleanField(_(u'Posicao ok?'), null=True, blank=True)
+#     chk_sn = models.BooleanField(_(u'Serial ok?'), null=True, blank=True)
+#     chk_pn = models.BooleanField(_(u'Part Number ok?'), null=True, blank=True)
+#     chk_model = models.BooleanField(_(u'Modelo ok?'), null=True, blank=True)
+    
+    
     
     tipo_carga = models.DecimalField(_(u'tipo_carga'), max_digits=2, decimal_places=0, null=True, blank=True)
  

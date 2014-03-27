@@ -42,7 +42,7 @@ class PatrimonioAdmin(admin.ModelAdmin):
                  }),
                  ('Extras', {
                       'classes': ('collapse',),
-                      'fields': ('imagem', 'especificacao', 'obs', 'titulo_autor', 'isbn',),
+                      'fields': ('imagem', 'especificacao', 'obs', 'titulo_autor', 'isbn', 'revision', 'version', 'ocst', 'cfop', 'garantia_termino'),
                  }),
                  ('Patrimônios contidos', {
                       'classes': ('collapse',),

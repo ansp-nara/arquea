@@ -87,6 +87,7 @@ $(function(){
     <option value="furo">Furo</option>
     <option value="posicao">Posição</option>
     <option value="descricao">Descrição</option>
+    <option value="url">URL Equip.</option>
 </select>
 <button>Esconder colunas</button>
 </div>
@@ -130,6 +131,7 @@ $(function(){
         <th class="td_furo">Furo</th>
         <th class="td_posicao">Posição</th>
         <th class="td_descricao">Descrição</th>
+        <th class="td_url">URL</th>
 
         <th class="td_patrimonio"><a href="?&ord=patrimonio&chk_patrimonio_vazio={{chk_patrimonio_vazio}}">Patrimonio</a></th>
     </tr>
@@ -147,6 +149,7 @@ $(function(){
 	       <td class="td_furo">{{ p.furo|default:"" }}</td>
 	       <td class="td_posicao">{{ p.posicao|default:"" }}</td>
 	       <td class="td_descricao">{{ p.descricao|default:"" }}</td>
+	       <td class="td_url">{{ p.url|default:"" }}</td>
 	       
 	       <td class="patr td_marca {% if p.patrimonio_model and p.fabricante|default:"" == p.patrimonio_model.marca|default:"" %} ok {% else %} nok {% endif %}">{{ p.patrimonio_model.marca }}</td>
 	       <td class="patr td_modelo {% if p.patrimonio_model and p.model_number|default:"" == p.patrimonio_model.modelo|default:"" %} ok {% else %} nok {% endif %}">{{ p.patrimonio_model.modelo }}</td>
@@ -159,6 +162,13 @@ $(function(){
            <td class="patr td_posicao {% if p.patrimonio_model and p.posicao == p.patrimonio_model.historico_atual.posicao_colocacao %} ok {% else %} nok {% endif %}">{{ p.patrimonio_model.historico_atual.posicao_colocacao|default:"" }}</td>
            <td class="patr td_descricao {% if p.patrimonio_model and p.descricao|default:"" == p.patrimonio_model.descricao|default:"" %} ok {% else %} nok {% endif %}">{{p.patrimonio_model.descricao|default:"" }}</td>
 
+
+           <td class="patr td_url {% if p.url_equipamento == "" or p.patrimonio_model and p.patrimonio_model.equipamento.especificacao.url %} ok {% else %} nok {% endif %}">
+                {% if p.url_equipamento %}
+                    <a href="{{p.url_equipamento}}">url</a>
+                {% endif %}
+           </td>
+           
 	       <td class="patr td_patrimonio">{{ p.patrimonio_model.id }}</td>
 	       
 	    </tr>
