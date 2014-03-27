@@ -60,11 +60,16 @@ $(function(){
     
    $(".patr").click(function () {
         id = $(this).closest("tr").attr('id');
-        id = id.replace('tr_', '');
-        if (id != 'None') {
-            window.open('/patrimonio/patrimonio/'+id, '_blank');
-        }
-        
+        ids = id.split("__")
+        if (ids.length == 2) {
+	        patrimonio_id = ids[0]
+	        equipamento_id = ids[1]
+        	if ($(this).hasClass('td_url')) {
+        	    window.open('/patrimonio/equipamento/'+equipamento_id, '_blank');
+        	} else {
+                window.open('/patrimonio/patrimonio/'+patrimonio_id, '_blank');
+        	}
+	    }
    });
     
 });
@@ -136,7 +141,7 @@ $(function(){
         <th class="td_patrimonio"><a href="?&ord=patrimonio&chk_patrimonio_vazio={{chk_patrimonio_vazio}}">Patrimonio</a></th>
     </tr>
     {% for p in inventario %}
-	    <tr id="tr_{{ p.patrimonio_model_id }}">
+	    <tr id="{{ p.patrimonio_model_id }}__{{ p.patrimonio_model.equipamento_id }}">
 	       <td>{{ p.planilha_linha }}</td>
 	       
 	       <td class="td_marca">{{ p.fabricante|default:"" }}</td>
