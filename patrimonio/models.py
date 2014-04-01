@@ -122,7 +122,7 @@ class Patrimonio(models.Model):
     version = models.CharField(u'Version', null=True, blank=True, max_length=30)
     ocst = models.CharField(u'O/CST', null=True, blank=True, max_length=30)
     cfop = models.CharField(u'CFOP', null=True, blank=True, max_length=30)
-    garantia_termino = NARADateField(_(u'Data de término da garantia'))
+    garantia_termino = NARADateField(_(u'Data de término da garantia'), null=True, blank=True)
 
     def __unicode__(self):
         if self.pagamento:
