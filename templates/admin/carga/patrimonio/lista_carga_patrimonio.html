@@ -165,7 +165,7 @@ $(function(){
            <td class="patr td_rack {% if p.patrimonio_model and p.rack == p.patrimonio_model.historico_atual.posicao_rack %} ok {% else %} nok {% endif %}">{{ p.patrimonio_model.historico_atual.posicao_rack|default:"" }}</td>
            <td class="patr td_furo {% if p.patrimonio_model and p.furo|default:"-1"|add:"0" == p.patrimonio_model.historico_atual.posicao_furo|add:"0" %} ok {% else %} nok {% endif %}">{{ p.patrimonio_model.historico_atual.posicao_furo|default:"" }}</td>
            <td class="patr td_posicao {% if p.patrimonio_model and p.posicao == p.patrimonio_model.historico_atual.posicao_colocacao %} ok {% else %} nok {% endif %}">{{ p.patrimonio_model.historico_atual.posicao_colocacao|default:"" }}</td>
-           <td class="patr td_descricao {% if p.patrimonio_model and p.descricao|default:"" == p.patrimonio_model.descricao|default:"" %} ok {% else %} nok {% endif %}">{{p.patrimonio_model.descricao|default:"" }}</td>
+           <td class="patr td_descricao {% if p.patrimonio_model and p.descricao|slugify|default:"" == p.patrimonio_model.descricao|slugify|default:"" %} ok {% else %} nok {% endif %}">{{p.patrimonio_model.descricao|default:"" }}</td>
 
 
            <td class="patr td_url {% if p.url_equipamento == "" %} ok {% elif p.patrimonio_model and p.patrimonio_model.equipamento.especificacao.url %} ok {% else %} nok {% endif %}">
