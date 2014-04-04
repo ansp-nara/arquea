@@ -217,6 +217,9 @@ class HistoricoLocalTest(TestCase):
         
         historico = HistoricoLocal(posicao="S042.piso")
         self.assertEquals(historico.posicao_furo, -1)
+        
+        historico = HistoricoLocal(posicao="S042.F001")
+        self.assertEquals(historico.posicao_furo, 1)
 
         
     def test_posicao_colocacao(self):
@@ -357,4 +360,6 @@ class ViewTest(TestCase):
         response = self.client.post(url, {'num_doc': '789'})
         self.assertIn(b'"pk": 2', response.content)
         
+
+
 
