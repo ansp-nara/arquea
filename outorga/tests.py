@@ -756,7 +756,7 @@ class Natureza_gastoTest(UnitTestCase):
         r = n1.todos_itens()
         self.assertTrue(len(r) == 2)
         self.assertEquals(str(r[0]), u'08/22222-2 - Armazenagem')
-        self.assertEquals(str(r[1]), u'Servico de Conexao')
+        self.assertEquals(str(r[1]), u'08/22222-2 - Servico de Conexao')
 
     def test_total_concedido_mod_termo(self):
         n1 = Natureza_gasto.objects.get(pk=1)
@@ -1131,7 +1131,7 @@ class OrigemFapespTest(UnitTestCase):
 
     def test_unicode(self):
         of = OrigemFapesp.objects.get(pk=1)
-        self.assertEquals(of.__unicode__(), u'08/22222-2 - Acordo entre Instituto UNIEMP e SAC - Serviço de Conexão Internacional')
+        self.assertEquals(of.__unicode__(), u'Acordo entre Instituto UNIEMP e SAC - 08/22222-2 - Serviço de Conexão Internacional')
 
     def test_gasto_zero(self):
         pg1 = Pagamento.objects.get(pk=1)
