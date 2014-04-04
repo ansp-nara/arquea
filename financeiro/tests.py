@@ -284,7 +284,7 @@ class PagamentoTest(TestCase):
     def test_item(self):
         exf = Pagamento.objects.get(pk=1)
         
-        self.assertEquals(exf.item(), u'08/22222-22 - Armazenagem')
+        self.assertEquals(exf.item(), u'08/22222-2 - Armazenagem')
 
     def test_item_sem_origem_fapesp(self):
         exf = Pagamento.objects.get(pk=1)
