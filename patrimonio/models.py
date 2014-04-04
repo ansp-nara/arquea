@@ -92,7 +92,7 @@ class Patrimonio(models.Model):
     ns = models.CharField(_(u'Número de série'), null=True, blank=True, max_length=50)
     complemento = models.CharField('Compl', max_length=100, null=True, blank=True)
     valor = models.DecimalField(u'Vl unit', max_digits=12, decimal_places=2, null=True, blank=True)
-    procedencia = models.CharField(_(u'Procedência'), null=True, blank=True, max_length=100)
+    #procedencia = models.CharField(_(u'Procedência'), null=True, blank=True, max_length=100)
     obs = models.TextField(null=True, blank=True)
     agilis = models.BooleanField(_(u'Agilis?'), default=True)
     equipamento = models.ForeignKey('patrimonio.Equipamento', null=True, blank=True)
@@ -129,6 +129,12 @@ class Patrimonio(models.Model):
             return u'%s - %s  - %s - %s' % (self.pagamento.protocolo.num_documento, self.apelido, self.ns, self.descricao)
         else:
             return u'%s - %s - %s' % (self.apelido, self.ns, self.descricao)
+
+    @property
+    def procedencia(self):
+        if self.entidade_procedencia_id:
+            return self.entidade_procedencia.sigla
+        return ''
 
     def save(self, *args, **kwargs):
         super(Patrimonio, self).save(*args, **kwargs)

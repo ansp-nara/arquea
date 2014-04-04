@@ -210,6 +210,7 @@ def patrimonio_existente(request):
 
         if part_number and existentes.count():
             p = existentes[0]
+            
             retorno = {'marca':p.marca, 'modelo':p.modelo, 'descricao':p.descricao, 'procedencia':p.procedencia}
 
         json = simplejson.dumps(retorno)
