@@ -150,10 +150,10 @@ class Patrimonio(models.Model):
                 # já que não podemos remover os endereços
                 #
                 # Também não modificamos se o filho possui um histórico com data mais atual
-                if self.historico_atual and self.historico_atual.data >= filho.historico_atual.data:
+                if self.historico_atual and self.historico_atual.data > filho.historico_atual.data:
                     if not filho.historico_atual or \
                         (self.historico_atual.endereco != filho.historico_atual.endereco) or \
-                            (self.historico_atual.posicao != filho.historico_atual.posicao):
+                        (self.historico_atual.posicao != filho.historico_atual.posicao):
                         
                         novoHistorico = HistoricoLocal.objects.create(memorando=self.historico_atual.memorando,
                                                        patrimonio=filho,
