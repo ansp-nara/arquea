@@ -291,3 +291,16 @@ def acordo_modalidades(a_id):
 
     return {'acordo':ac.__unicode__(), 'valores':retorno, 'modalidades':modalidades}
 dispatcher.register_function(acordo_modalidades, 'acordo_modalidades')
+
+
+def patrimonio(p_id):
+
+    try:
+        patrimonio = Patrimonio.objects.get(id=p_id)
+	patrimonio = patrimonio.apelido
+    except:
+	patrimonio = ''
+
+    return patrimonio
+dispatcher.register_function(patrimonio, 'patrimonio')
+
