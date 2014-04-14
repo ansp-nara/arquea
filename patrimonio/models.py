@@ -139,30 +139,41 @@ class Patrimonio(models.Model):
     def save(self, *args, **kwargs):
         super(Patrimonio, self).save(*args, **kwargs)
         
-        # Rogerio: após salvar o patrimonio, verifica se os patrimonios filhos estão
-        # no mesmo endereço e posição.
-        # Se não estiverem, cria um novo histórico de endereço para todos os filhos
-        if Patrimonio.objects.filter(patrimonio=self).exists():
-            filhos = Patrimonio.objects.filter(patrimonio=self)
-            
-            for filho in filhos:
-                # Rogerio: se não tiver endereço, não faz nada com os patrimonios filhos,
-                # já que não podemos remover os endereços
-                #
-                # Também não modificamos se o filho possui um histórico com data mais atual
-                if self.historico_atual and self.historico_atual.data > filho.historico_atual.data:
-                    if not filho.historico_atual or \
-                        (self.historico_atual.endereco != filho.historico_atual.endereco) or \
-                        (self.historico_atual.posicao != filho.historico_atual.posicao):
-                        
-                        novoHistorico = HistoricoLocal.objects.create(memorando=self.historico_atual.memorando,
-                                                       patrimonio=filho,
-                                                       endereco=self.historico_atual.endereco,
-                                                       estado=self.historico_atual.estado,
-                                                       descricao="Movimentado junto com o patrimonio %s [%s]"%(self.id, self.historico_atual.descricao),
-                                                       data=self.historico_atual.data,
-                                                       posicao=self.historico_atual.posicao,
-                                                       )
+#       ROGERIO: COMENTANDO O CODIGO DE SALVAMENTO DE HISTORICOS NO FILHO
+#       DEVIDO A INCONCISTENCIA NO CASO DE UPDATE DO HISTORICO ATUAL DO PATRIMONIO
+        
+#         # fazendo a busca do historico atual, pois está em cache
+#         # e esta requisição pode ter mudado este valor
+#         ht = self.historicolocal_set.order_by('-data', '-id')
+#         if not ht: return None
+#         self_historico_atual = ht[0]
+
+        
+#         # Rogerio: após salvar o patrimonio, verifica se os patrimonios filhos estão
+#         # no mesmo endereço e posição.
+#         # Se não estiverem, cria um novo histórico de endereço para todos os filhos
+#         if Patrimonio.objects.filter(patrimonio=self).exists():
+#             filhos = Patrimonio.objects.filter(patrimonio=self)
+#             
+#             for filho in filhos:
+#                 # Rogerio: se não tiver endereço, não faz nada com os patrimonios filhos,
+#                 # já que não podemos remover os endereços
+#                 #
+#                 # Também não modificamos se o filho possui um histórico com data mais atual
+#                 if self_historico_atual:
+#                     if not filho.historico_atual or \
+#                         (self_historico_atual.endereco != filho.historico_atual.endereco) or \
+#                         (self_historico_atual.posicao != filho.historico_atual.posicao) or \
+#                         (self_historico_atual.data > filho.historico_atual.data):
+#                         
+#                         novoHistorico = HistoricoLocal.objects.create(memorando=self_historico_atual.memorando,
+#                                                        patrimonio=filho,
+#                                                        endereco=self_historico_atual.endereco,
+#                                                        estado=self_historico_atual.estado,
+#                                                        descricao="Movimentado junto com o patrimonio %s [%s]"%(self.id, self_historico_atual.descricao),
+#                                                        data=self_historico_atual.data,
+#                                                        posicao=self.historico_atual.posicao,
+#                                                        )
 
 
     def marca(self):
@@ -174,7 +185,7 @@ class Patrimonio(models.Model):
     
     @cached_property
     def historico_atual(self):
-        ht = self.historicolocal_set.order_by('-data')
+        ht = self.historicolocal_set.order_by('-data', '-id')
         if not ht: return None
         return ht[0]
    
