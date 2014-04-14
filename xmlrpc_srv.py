@@ -299,7 +299,7 @@ def patrimonio(p_id):
         patrimonio = Patrimonio.objects.get(id=p_id)
 	patrimonio = patrimonio.apelido
     except:
-	patrimonio = ''
+	patrimonio = u'Não cadastrado'
 
     return patrimonio
 dispatcher.register_function(patrimonio, 'patrimonio')
