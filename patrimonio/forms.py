@@ -112,14 +112,18 @@ class PatrimonioAdminForm(forms.ModelForm):
     
     patrimonio = EquipamentoContidoModelChoiceField(queryset=Patrimonio.objects.all(), 
                                      required=False,
-                                     label=mark_safe('<a href="#" onclick="window.open(\'/patrimonio/patrimonio/\'+$(\'#id_patrimonio\').val() + \'/\', \'_blank\');return true;">Contido em:</a>'),
+                                     label=mark_safe('<a href="#" onclick="window.open(\'/patrimonio/patrimonio/\'+$(\'#id_patrimonio\').val() + \'/\', \'_blank\');return true;">Contido em</a>'),
                                      widget=forms.Select(attrs={'style':'width:800px'}),
                                      empty_label='---'
                                      )
     
     entidade_procedencia = forms.ModelChoiceField(queryset=Entidade.objects.all(),
                                                  required=False, 
-                                                 label=mark_safe('<a href="#" onclick="window.open(\'/identificacao/entidade/\'+$(\'#id_entidade_procedencia\').val() + \'/\', \'_blank\');return true;">Fornecedor</a>'),)
+                                                 label=mark_safe('<a href="#" onclick="window.open(\'/identificacao/entidade/\'+$(\'#id_entidade_procedencia\').val() + \'/\', \'_blank\');return true;">Procedência</a>'),)
+
+    pagamento = forms.ModelChoiceField(queryset=Pagamento.objects.all(), 
+                                       required=False, 
+                                       label=mark_safe('<a href="#" onclick="window.open(\'/admin/financeiro/pagamento/\'+$(\'#id_pagamento\').val() + \'/\', \'_blank\');return true;">Pagamento</a>'),)
 
 
     form_filhos = PatrimonioReadOnlyField()

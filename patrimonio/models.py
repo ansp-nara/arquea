@@ -175,13 +175,13 @@ class Patrimonio(models.Model):
 #                                                        posicao=self.historico_atual.posicao,
 #                                                        )
 
-
+    @property
     def marca(self):
         retorno = ''
         if self.equipamento and self.equipamento.entidade_fabricante and self.equipamento.entidade_fabricante.sigla:
             retorno = self.equipamento.entidade_fabricante.sigla
         return retorno
-    marca.short_description = u'Marca'
+    #marca.short_description = u'Marca'
     
     @cached_property
     def historico_atual(self):
