@@ -2,6 +2,7 @@
 from django.test import TestCase
 from patrimonio.models import Equipamento, Patrimonio, Tipo
 from verificacao.models import *
+from identificacao.models import Entidade
 import unittest
 
 class TestPatrimonioComEquipamenpoVazio(TestCase):
@@ -16,22 +17,14 @@ class TestPatrimonioComEquipamenpoVazio(TestCase):
     Testa equipamentos com part_number vazio
     """
     def test_equipamento_vazio(self):
-            eq = Equipamento(id=1, part_number="", modelo="", descricao="") 
-            eq.save()
+            eq = Equipamento.objects.create(id=1, part_number="", modelo="", descricao="") 
         
-            tipo1 = Tipo()
-            tipo1.nome = 'tipo1'
-            tipo1.save()
-            tipo2 = Tipo()
-            tipo2.nome = 'tipo2'
-            tipo2.save()
+            tipo1 = Tipo.objects.create(nome = 'tipo1')
+            tipo2 = Tipo.objects.create(nome = 'tipo2')
         
-            patr1 = Patrimonio(part_number="", modelo="m2", descricao="", tipo=tipo1, equipamento=eq, checado=True)
-            patr1.save()
-            patr2 = Patrimonio(part_number="pn1", modelo="m2", descricao="", tipo=tipo2, checado=True)
-            patr2.save()
-            patr3 = Patrimonio(part_number="pn1", modelo="m2", descricao="", tipo=tipo2, checado=True)
-            patr3.save()
+            patr1 = Patrimonio.objects.create(part_number="", modelo="m2", descricao="", tipo=tipo1, equipamento=eq, checado=True)
+            patr2 = Patrimonio.objects.create(part_number="pn1", modelo="m2", descricao="", tipo=tipo2, checado=True)
+            patr3 = Patrimonio.objects.create(part_number="pn1", modelo="m2", descricao="", tipo=tipo2, checado=True)
             
             verficacao = VerificacaoPatrimonio()
             retorno = verficacao.equipamentoVazio()
@@ -59,26 +52,16 @@ class TestPatrimonioComEquipamenpoVazio(TestCase):
     Testa patrimonio e equipamentos com part_number diferente
     """
     def test_part_number_diferente(self):
-            eq1 = Equipamento(id=1, part_number="pn1", modelo="", descricao="") 
-            eq1.save()
-            eq2 = Equipamento(id=2, part_number="", modelo="", descricao="") 
-            eq2.save()
-            eq3 = Equipamento(id=3, part_number="pn3", modelo="", descricao="") 
-            eq3.save()
+            eq1 = Equipamento.objects.create(id=1, part_number="pn1", modelo="", descricao="") 
+            eq2 = Equipamento.objects.create(id=2, part_number="", modelo="", descricao="") 
+            eq3 = Equipamento.objects.create(id=3, part_number="pn3", modelo="", descricao="") 
         
-            tipo1 = Tipo()
-            tipo1.nome = 'tipo1'
-            tipo1.save()
-            tipo2 = Tipo()
-            tipo2.nome = 'tipo2'
-            tipo2.save()
+            tipo1 = Tipo.objects.create(nome = 'tipo1')
+            tipo2 = Tipo.objects.create(nome = 'tipo2')
         
-            patr1 = Patrimonio(part_number="pn1", modelo="m2", descricao="", tipo=tipo1, equipamento=eq1, checado=True)
-            patr1.save()
-            patr2 = Patrimonio(part_number="", modelo="m2", descricao="", tipo=tipo1, equipamento=eq2, checado=True)
-            patr2.save()
-            patr3 = Patrimonio(part_number="pn11111", modelo="m2", descricao="", tipo=tipo2, equipamento=eq3, checado=True)
-            patr3.save()
+            patr1 = Patrimonio.objects.create(part_number="pn1", modelo="m2", descricao="", tipo=tipo1, equipamento=eq1, checado=True)
+            patr2 = Patrimonio.objects.create(part_number="", modelo="m2", descricao="", tipo=tipo1, equipamento=eq2, checado=True)
+            patr3 = Patrimonio.objects.create(part_number="pn11111", modelo="m2", descricao="", tipo=tipo2, equipamento=eq3, checado=True)
             
             verficacao = VerificacaoPatrimonioEquipamento()
             retorno = verficacao.partNumberDiferente()
@@ -106,26 +89,16 @@ class TestPatrimonioComEquipamenpoVazio(TestCase):
     Testa patrimonio e equipamentos com descricao diferente
     """
     def test_descricao_diferente(self):
-            eq1 = Equipamento(id=1, part_number="", modelo="", descricao="desc1") 
-            eq1.save()
-            eq2 = Equipamento(id=2, part_number="", modelo="", descricao="") 
-            eq2.save()
-            eq3 = Equipamento(id=3, part_number="", modelo="", descricao="desc3") 
-            eq3.save()
+            eq1 = Equipamento.objects.create(id=1, part_number="", modelo="", descricao="desc1") 
+            eq2 = Equipamento.objects.create(id=2, part_number="", modelo="", descricao="") 
+            eq3 = Equipamento.objects.create(id=3, part_number="", modelo="", descricao="desc3") 
         
-            tipo1 = Tipo()
-            tipo1.nome = 'tipo1'
-            tipo1.save()
-            tipo2 = Tipo()
-            tipo2.nome = 'tipo2'
-            tipo2.save()
+            tipo1 = Tipo.objects.create(nome = 'tipo1')
+            tipo2 = Tipo.objects.create(nome = 'tipo2')
         
-            patr1 = Patrimonio(part_number="pt1", modelo="pt1", descricao="desc1", tipo=tipo1, equipamento=eq1, checado=True)
-            patr1.save()
-            patr2 = Patrimonio(part_number="pt2", modelo="pt2", descricao="", tipo=tipo1, equipamento=eq2, checado=True)
-            patr2.save()
-            patr3 = Patrimonio(part_number="pt3", modelo="pt3", descricao="desc11111", tipo=tipo2, equipamento=eq3, checado=True)
-            patr3.save()
+            patr1 = Patrimonio.objects.create(part_number="pt1", modelo="pt1", descricao="desc1", tipo=tipo1, equipamento=eq1, checado=True)
+            patr2 = Patrimonio.objects.create(part_number="pt2", modelo="pt2", descricao="", tipo=tipo1, equipamento=eq2, checado=True)
+            patr3 = Patrimonio.objects.create(part_number="pt3", modelo="pt3", descricao="desc11111", tipo=tipo2, equipamento=eq3, checado=True)
             
             verficacao = VerificacaoPatrimonioEquipamento()
             retorno = verficacao.descricaoDiferente()
@@ -152,26 +125,16 @@ class TestPatrimonioComEquipamenpoVazio(TestCase):
     Testa patrimonio e equipamentos com modelo diferente
     """
     def test_modelo_diferente(self):
-            eq1 = Equipamento(id=1, part_number="", modelo="m1", descricao="") 
-            eq1.save()
-            eq2 = Equipamento(id=2, part_number="", modelo="", descricao="") 
-            eq2.save()
-            eq3 = Equipamento(id=3, part_number="", modelo="m3", descricao="") 
-            eq3.save()
+            eq1 = Equipamento.objects.create(id=1, part_number="", modelo="m1", descricao="") 
+            eq2 = Equipamento.objects.create(id=2, part_number="", modelo="", descricao="") 
+            eq3 = Equipamento.objects.create(id=3, part_number="", modelo="m3", descricao="") 
         
-            tipo1 = Tipo()
-            tipo1.nome = 'tipo1'
-            tipo1.save()
-            tipo2 = Tipo()
-            tipo2.nome = 'tipo2'
-            tipo2.save()
+            tipo1 = Tipo.objects.create(nome = 'tipo1')
+            tipo2 = Tipo.objects.create(nome = 'tipo2')
         
-            patr1 = Patrimonio(part_number="pt1", modelo="m1", descricao="pt1", tipo=tipo1, equipamento=eq1, checado=True)
-            patr1.save()
-            patr2 = Patrimonio(part_number="pt2", modelo="", descricao="pt2", tipo=tipo1, equipamento=eq2, checado=True)
-            patr2.save()
-            patr3 = Patrimonio(part_number="pt3", modelo="m1111", descricao="pt3", tipo=tipo2, equipamento=eq3, checado=True)
-            patr3.save()
+            patr1 = Patrimonio.objects.create(part_number="pt1", modelo="m1", descricao="pt1", tipo=tipo1, equipamento=eq1, checado=True)
+            patr2 = Patrimonio.objects.create(part_number="pt2", modelo="", descricao="pt2", tipo=tipo1, equipamento=eq2, checado=True)
+            patr3 = Patrimonio.objects.create(part_number="pt3", modelo="m1111", descricao="pt3", tipo=tipo2, equipamento=eq3, checado=True)
             
             verficacao = VerificacaoPatrimonioEquipamento()
             retorno = verficacao.modeloDiferente()
@@ -198,26 +161,16 @@ class TestPatrimonioComEquipamenpoVazio(TestCase):
     Testa patrimonio e equipamentos com ncm diferente
     """
     def test_ncm_diferente(self):
-            eq1 = Equipamento(id=1, part_number="", modelo="", descricao="", ncm="n1") 
-            eq1.save()
-            eq2 = Equipamento(id=2, part_number="", modelo="", descricao="", ncm="") 
-            eq2.save()
-            eq3 = Equipamento(id=3, part_number="", modelo="", descricao="", ncm="n3") 
-            eq3.save()
+            eq1 = Equipamento.objects.create(id=1, part_number="", modelo="", descricao="", ncm="n1") 
+            eq2 = Equipamento.objects.create(id=2, part_number="", modelo="", descricao="", ncm="") 
+            eq3 = Equipamento.objects.create(id=3, part_number="", modelo="", descricao="", ncm="n3") 
         
-            tipo1 = Tipo()
-            tipo1.nome = 'tipo1'
-            tipo1.save()
-            tipo2 = Tipo()
-            tipo2.nome = 'tipo2'
-            tipo2.save()
+            tipo1 = Tipo.objects.create(nome = 'tipo1')
+            tipo2 = Tipo.objects.create(nome = 'tipo2')
         
-            patr1 = Patrimonio(part_number="pt1", modelo="pt1", descricao="pt1", ncm="n1", tipo=tipo1, equipamento=eq1, checado=True)
-            patr1.save()
-            patr2 = Patrimonio(part_number="pt2", modelo="pt2", descricao="pt2", ncm="", tipo=tipo1, equipamento=eq2, checado=True)
-            patr2.save()
-            patr3 = Patrimonio(part_number="pt3", modelo="pt3", descricao="pt3", ncm="n1111", tipo=tipo2, equipamento=eq3, checado=True)
-            patr3.save()
+            patr1 = Patrimonio.objects.create(part_number="pt1", modelo="pt1", descricao="pt1", ncm="n1", tipo=tipo1, equipamento=eq1, checado=True)
+            patr2 = Patrimonio.objects.create(part_number="pt2", modelo="pt2", descricao="pt2", ncm="", tipo=tipo1, equipamento=eq2, checado=True)
+            patr3 = Patrimonio.objects.create(part_number="pt3", modelo="pt3", descricao="pt3", ncm="n1111", tipo=tipo2, equipamento=eq3, checado=True)
             
             verficacao = VerificacaoPatrimonioEquipamento()
             retorno = verficacao.ncmDiferente()
@@ -245,26 +198,16 @@ class TestPatrimonioComEquipamenpoVazio(TestCase):
     Testa patrimonio e equipamentos com tamanhos diferente
     """
     def test_tamanho_diferente(self):
-            eq1 = Equipamento(id=1, part_number="", modelo="", descricao="", ncm="n1", tamanho=1.0) 
-            eq1.save()
-            eq2 = Equipamento(id=2, part_number="", modelo="", descricao="", ncm="") 
-            eq2.save()
-            eq3 = Equipamento(id=3, part_number="", modelo="", descricao="", ncm="n3", tamanho=1.0) 
-            eq3.save()
+            eq1 = Equipamento.objects.create(id=1, part_number="", modelo="", descricao="", ncm="n1", tamanho=1.0) 
+            eq2 = Equipamento.objects.create(id=2, part_number="", modelo="", descricao="", ncm="") 
+            eq3 = Equipamento.objects.create(id=3, part_number="", modelo="", descricao="", ncm="n3", tamanho=1.0) 
         
-            tipo1 = Tipo()
-            tipo1.nome = 'tipo1'
-            tipo1.save()
-            tipo2 = Tipo()
-            tipo2.nome = 'tipo2'
-            tipo2.save()
+            tipo1 = Tipo.objects.create(nome = 'tipo1')
+            tipo2 = Tipo.objects.create(nome = 'tipo2')
         
-            patr1 = Patrimonio(part_number="pt1", modelo="pt1", descricao="pt1", ncm="n1", tamanho=1.0,  tipo=tipo1, equipamento=eq1, checado=True)
-            patr1.save()
-            patr2 = Patrimonio(part_number="pt2", modelo="pt2", descricao="pt2", ncm="", tipo=tipo1, equipamento=eq2, checado=True)
-            patr2.save()
-            patr3 = Patrimonio(part_number="pt3", modelo="pt3", descricao="pt3", ncm="n1111", tamanho=11.0, tipo=tipo2, equipamento=eq3, checado=True)
-            patr3.save()
+            patr1 = Patrimonio.objects.create(part_number="pt1", modelo="pt1", descricao="pt1", ncm="n1", tamanho=1.0,  tipo=tipo1, equipamento=eq1, checado=True)
+            patr2 = Patrimonio.objects.create(part_number="pt2", modelo="pt2", descricao="pt2", ncm="", tipo=tipo1, equipamento=eq2, checado=True)
+            patr3 = Patrimonio.objects.create(part_number="pt3", modelo="pt3", descricao="pt3", ncm="n1111", tamanho=11.0, tipo=tipo2, equipamento=eq3, checado=True)
             
             verficacao = VerificacaoPatrimonioEquipamento()
             retorno = verficacao.tamanhoDiferente()
@@ -290,15 +233,10 @@ class TestPatrimonioComEquipamenpoVazio(TestCase):
     """
     Testa a copia de atributos entre patrimonio e equipamento
     """
-    def test_copy_attribute(self):
-            eq1 = Equipamento(id=1, part_number="", modelo="", descricao="", ncm="") 
-            eq1.save()
-        
-            tipo = Tipo()
-            tipo.save()
-        
-            patr = Patrimonio(id = 2, part_number="part_number1", modelo="modelo1", descricao="descricao1", ncm="ncm1", tipo=tipo, equipamento=eq1, checado=True)
-            patr.save()
+    def test_copy_attribute__equipamento__descricao(self):
+            eq1 = Equipamento.objects.create(id=1, part_number="", modelo="", descricao="", ncm="") 
+            tipo = Tipo.objects.create()
+            patr = Patrimonio.objects.create(id = 2, part_number="part_number1", modelo="modelo1", descricao="descricao1", ncm="ncm1", tipo=tipo, equipamento=eq1, checado=True)
             
             # verifica se o valor do atributo está diferente ANTES do teste
             self.assertNotEqual(patr.descricao, patr.equipamento.descricao)
@@ -309,6 +247,11 @@ class TestPatrimonioComEquipamenpoVazio(TestCase):
             self.assertEqual(patr_retrieve.descricao, eq_retrieve.descricao)
             self.assertEqual(eq_retrieve.descricao, 'descricao1')
             
+            
+    def test_copy_attribute__equipamento__part_number(self):
+            eq1 = Equipamento.objects.create(id=1, part_number="", modelo="", descricao="", ncm="") 
+            tipo = Tipo.objects.create()
+            patr = Patrimonio.objects.create(id = 2, part_number="part_number1", modelo="modelo1", descricao="descricao1", ncm="ncm1", tipo=tipo, equipamento=eq1, checado=True)
             
             # verifica se o valor do atributo está diferente ANTES do teste
             self.assertNotEqual(patr.part_number, patr.equipamento.part_number)
@@ -321,6 +264,11 @@ class TestPatrimonioComEquipamenpoVazio(TestCase):
             self.assertEqual(eq_retrieve.part_number, 'part_number1')
             
             
+    def test_copy_attribute__equipamento__modelo(self):
+            eq1 = Equipamento.objects.create(id=1, part_number="", modelo="", descricao="", ncm="") 
+            tipo = Tipo.objects.create()
+            patr = Patrimonio.objects.create(id = 2, part_number="part_number1", modelo="modelo1", descricao="descricao1", ncm="ncm1", tipo=tipo, equipamento=eq1, checado=True)
+            
             # verifica se o valor do atributo está diferente ANTES do teste
             self.assertNotEqual(patr.descricao, patr.equipamento.modelo)
             verficacao = VerificacaoPatrimonioEquipamento()
@@ -332,6 +280,11 @@ class TestPatrimonioComEquipamenpoVazio(TestCase):
             self.assertEqual(eq_retrieve.modelo, 'modelo1')
             
             
+    def test_copy_attribute__equipamento__ncm(self):
+            eq1 = Equipamento.objects.create(id=1, part_number="", modelo="", descricao="", ncm="") 
+            tipo = Tipo.objects.create()
+            patr = Patrimonio.objects.create(id = 2, part_number="part_number1", modelo="modelo1", descricao="descricao1", ncm="ncm1", tipo=tipo, equipamento=eq1, checado=True)
+            
             # verifica se o valor do atributo está diferente ANTES do teste
             self.assertNotEqual(patr.ncm, patr.equipamento.ncm)
             verficacao = VerificacaoPatrimonioEquipamento()
@@ -341,22 +294,15 @@ class TestPatrimonioComEquipamenpoVazio(TestCase):
             eq_retrieve = Equipamento.objects.get(pk=1)
             self.assertEqual(patr_retrieve.ncm, eq_retrieve.ncm)
             self.assertEqual(eq_retrieve.ncm, 'ncm1')
-            
-            
-            
-  
+
+
     """
     Testa a copia de atributos entre equipamento e patrimonio
     """
-    def test_copy_attribute(self):
-            eq1 = Equipamento(id=1, part_number="part_number1", modelo="modelo1", descricao="descricao1", ncm="ncm1") 
-            eq1.save()
-        
-            tipo = Tipo()
-            tipo.save()
-        
-            patr = Patrimonio(id = 2, part_number="", modelo="", descricao="", ncm="", tipo=tipo, equipamento=eq1, checado=False)
-            patr.save()
+    def test_copy_attribute__patrimonio__descricao(self):
+            eq1 = Equipamento.objects.create(id=1, part_number="part_number1", modelo="modelo1", descricao="descricao1", ncm="ncm1") 
+            tipo = Tipo.objects.create()
+            patr = Patrimonio.objects.create(id = 2, part_number="", modelo="", descricao="", ncm="", tipo=tipo, equipamento=eq1, checado=False)
             
             # verifica se o valor do atributo está diferente ANTES do teste
             self.assertNotEqual(patr.descricao, patr.equipamento.descricao)
@@ -368,6 +314,11 @@ class TestPatrimonioComEquipamenpoVazio(TestCase):
             self.assertEqual(patr_retrieve.descricao, 'descricao1')
             
             
+    def test_copy_attribute__patrimonio__part_number(self):
+            eq1 = Equipamento.objects.create(id=1, part_number="part_number1", modelo="modelo1", descricao="descricao1", ncm="ncm1") 
+            tipo = Tipo.objects.create()
+            patr = Patrimonio.objects.create(id = 2, part_number="", modelo="", descricao="", ncm="", tipo=tipo, equipamento=eq1, checado=False)
+            
             # verifica se o valor do atributo está diferente ANTES do teste
             self.assertNotEqual(patr.part_number, patr.equipamento.part_number)
             verficacao = VerificacaoPatrimonioEquipamento()
@@ -378,6 +329,11 @@ class TestPatrimonioComEquipamenpoVazio(TestCase):
             self.assertEqual(patr_retrieve.part_number, eq_retrieve.part_number)
             self.assertEqual(patr_retrieve.part_number, 'part_number1')
 
+
+    def test_copy_attribute__patrimonio__modelo(self):
+            eq1 = Equipamento.objects.create(id=1, part_number="part_number1", modelo="modelo1", descricao="descricao1", ncm="ncm1") 
+            tipo = Tipo.objects.create()
+            patr = Patrimonio.objects.create(id = 2, part_number="", modelo="", descricao="", ncm="", tipo=tipo, equipamento=eq1, checado=False)
             
             # verifica se o valor do atributo está diferente ANTES do teste
             self.assertNotEqual(patr.descricao, patr.equipamento.modelo)
@@ -389,6 +345,11 @@ class TestPatrimonioComEquipamenpoVazio(TestCase):
             self.assertEqual(patr_retrieve.modelo, eq_retrieve.modelo)
             self.assertEqual(patr_retrieve.modelo, 'modelo1')
 
+
+    def test_copy_attribute__patrimonio__ncm(self):
+            eq1 = Equipamento.objects.create(id=1, part_number="part_number1", modelo="modelo1", descricao="descricao1", ncm="ncm1") 
+            tipo = Tipo.objects.create()
+            patr = Patrimonio.objects.create(id = 2, part_number="", modelo="", descricao="", ncm="", tipo=tipo, equipamento=eq1, checado=False)
             
             # verifica se o valor do atributo está diferente ANTES do teste
             self.assertNotEqual(patr.ncm, patr.equipamento.ncm)
@@ -401,20 +362,31 @@ class TestPatrimonioComEquipamenpoVazio(TestCase):
             self.assertEqual(patr_retrieve.ncm, 'ncm1')
             
             
-
+    def test_copy_attribute__patrimonio__procedencia(self):
+            ent= Entidade.objects.create(sigla='HP', nome='Hewlet', cnpj='00.000.000/0000-00', fisco=True, url='')
+            equip = Equipamento.objects.create(id=1, entidade_fabricante=ent) 
+            tipo = Tipo.objects.create()
+            patr = Patrimonio.objects.create(id = 2, tipo=tipo, equipamento=equip)
+            
+            # verifica se o valor do atributo está diferente ANTES do teste
+            self.assertNotEqual(patr.entidade_procedencia, equip.entidade_fabricante)
+            verficacao = VerificacaoPatrimonioEquipamento()
+            verficacao.copy_attribute('patrimonio', 2, 'procedencia')
+            # verifica se o valor do atributo está diferente DEPOIS do teste
+            patr_retrieve = Patrimonio.objects.get(pk=2)
+            eq_retrieve = Equipamento.objects.get(pk=1)
+            self.assertEqual(patr_retrieve.entidade_procedencia, eq_retrieve.entidade_fabricante)
+            
+            
 class TestEquipamentoPNvVazio(TestCase):
     """
     Testa equipamentos com part_number vazio e com modelo vazio
     """
     def test_pn_vazio(self):
-            eq = Equipamento(part_number="", modelo="", descricao="")
-            eq.save()
-            eq = Equipamento(part_number="", modelo="", descricao="")
-            eq.save()
-            eq = Equipamento(part_number="", modelo="m2", descricao="")
-            eq.save()
-            eq = Equipamento(part_number="pn1", modelo="m2", descricao="")
-            eq.save()
+            eq = Equipamento.objects.create(part_number="", modelo="", descricao="")
+            eq = Equipamento.objects.create(part_number="", modelo="", descricao="")
+            eq = Equipamento.objects.create(part_number="", modelo="m2", descricao="")
+            eq = Equipamento.objects.create(part_number="pn1", modelo="m2", descricao="")
             
             verficacao = VerificacaoEquipamento()
             retorno = verficacao.partNumberVazioModeloVazio()
@@ -426,11 +398,8 @@ class TestEquipamentoPNvsModelo(TestCase):
     
     # teste sem nenhum pn duplicado mas sem modelos diferentes
     def test_sem_pn_duplicados(self):
-        
-        eq = Equipamento(part_number="pn1", modelo="m1", descricao="")
-        eq.save()
-        eq = Equipamento(part_number="pn2", modelo="m2", descricao="")
-        eq.save()
+        eq = Equipamento.objects.create(part_number="pn1", modelo="m1", descricao="")
+        eq = Equipamento.objects.create(part_number="pn2", modelo="m2", descricao="")
         
         verficacao = VerificacaoEquipamento()
         retorno = verficacao.partNumberVSModeloDiferente()
@@ -440,13 +409,9 @@ class TestEquipamentoPNvsModelo(TestCase):
 
     # teste com dois PN duplicados mas sem modelos diferentes
     def test_com_multiplos_pn_duplicados(self):
-        eq = Equipamento(part_number="pn1", modelo="m1", descricao="")
-        eq.save()
-        eq = Equipamento(part_number="pn1", modelo="m1", descricao="")
-        eq.save()
-        eq.save()
-        eq = Equipamento(part_number="pn2", modelo="m2", descricao="")
-        eq.save()
+        eq = Equipamento.objects.create(part_number="pn1", modelo="m1", descricao="")
+        eq = Equipamento.objects.create(part_number="pn1", modelo="m1", descricao="")
+        eq = Equipamento.objects.create(part_number="pn2", modelo="m2", descricao="")
         
         verficacao = VerificacaoEquipamento()
         retorno = verficacao.partNumberVSModeloDiferente()
@@ -455,14 +420,10 @@ class TestEquipamentoPNvsModelo(TestCase):
         
     # teste com dois PN duplicados mas sem modelos diferentes
     def test_com_dois_pn_duplicados(self):
-        eq = Equipamento(part_number="pn1", modelo="m1", descricao="")
-        eq.save()
-        eq = Equipamento(part_number="pn1", modelo="m1", descricao="")
-        eq.save()
-        eq = Equipamento(part_number="pn2", modelo="m2", descricao="")
-        eq.save()
-        eq = Equipamento(part_number="pn2", modelo="m2", descricao="")
-        eq.save()
+        eq = Equipamento.objects.create(part_number="pn1", modelo="m1", descricao="")
+        eq = Equipamento.objects.create(part_number="pn1", modelo="m1", descricao="")
+        eq = Equipamento.objects.create(part_number="pn2", modelo="m2", descricao="")
+        eq = Equipamento.objects.create(part_number="pn2", modelo="m2", descricao="")
         
         verficacao = VerificacaoEquipamento()
         retorno = verficacao.partNumberVSModeloDiferente()
@@ -472,12 +433,9 @@ class TestEquipamentoPNvsModelo(TestCase):
         
     # teste com dois PN duplicados mas com modelos diferentes
     def test_com_dois_pn_modelos_duplicados_diferentes(self):
-        eq = Equipamento(part_number="pn1", modelo="m1", descricao="")
-        eq.save()
-        eq = Equipamento(part_number="pn1", modelo="m2", descricao="")
-        eq.save()
-        eq = Equipamento(part_number="pn1", modelo="m2", descricao="")
-        eq.save()
+        eq = Equipamento.objects.create(part_number="pn1", modelo="m1", descricao="")
+        eq = Equipamento.objects.create(part_number="pn1", modelo="m2", descricao="")
+        eq = Equipamento.objects.create(part_number="pn1", modelo="m2", descricao="")
         
         verficacao = VerificacaoEquipamento()
         retorno = verficacao.partNumberVSModeloDiferente()
@@ -486,10 +444,8 @@ class TestEquipamentoPNvsModelo(TestCase):
         
     # teste com dois PN duplicados mas com modelos diferentes
     def test_com_dois_pn_modelos_diferentes(self):
-            eq = Equipamento(part_number="pn1", modelo="m1", descricao="")
-            eq.save()
-            eq = Equipamento(part_number="pn1", modelo="m2", descricao="")
-            eq.save()
+            eq = Equipamento.objects.create(part_number="pn1", modelo="m1", descricao="")
+            eq = Equipamento.objects.create(part_number="pn1", modelo="m2", descricao="")
             
             verficacao = VerificacaoEquipamento()
             retorno = verficacao.partNumberVSModeloDiferente()
@@ -498,16 +454,11 @@ class TestEquipamentoPNvsModelo(TestCase):
             
     # teste com dois PN vazio
     def test_com_dois_pn_modelos_diferentes(self):
-            eq = Equipamento(part_number="", modelo="m1", descricao="")
-            eq.save()
-            eq = Equipamento(part_number="", modelo="m2", descricao="")
-            eq.save()
-            eq = Equipamento(part_number="", modelo="m2", descricao="")
-            eq.save()
-            eq = Equipamento(part_number="p1", modelo="m2", descricao="")
-            eq.save()
-            eq = Equipamento(part_number="p1", modelo="m1", descricao="")
-            eq.save()
+            eq = Equipamento.objects.create(part_number="", modelo="m1", descricao="")
+            eq = Equipamento.objects.create(part_number="", modelo="m2", descricao="")
+            eq = Equipamento.objects.create(part_number="", modelo="m2", descricao="")
+            eq = Equipamento.objects.create(part_number="p1", modelo="m2", descricao="")
+            eq = Equipamento.objects.create(part_number="p1", modelo="m1", descricao="")
             
             verficacao = VerificacaoEquipamento()
             retorno = verficacao.partNumberVSModeloDiferente()

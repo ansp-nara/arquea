@@ -70,18 +70,13 @@ class ExtratoCCTest(TestCase):
         of1 = OrigemFapesp.objects.create(acordo=a1, item_outorga=i1)
         of2 = OrigemFapesp.objects.create(acordo=a2, item_outorga=i2)
 
-        fp1 = Pagamento(protocolo=p1, conta_corrente=ex1, origem_fapesp=of1, valor_fapesp='2650')
-        fp1.save()
-        fp2 = Pagamento(protocolo=p2, conta_corrente=ex2, origem_fapesp=of2, valor_fapesp='250000')
-        fp2.save()
+        fp1 = Pagamento.objects.create(protocolo=p1, conta_corrente=ex1, origem_fapesp=of1, valor_fapesp='2650')
+        fp2 = Pagamento.objects.create(protocolo=p2, conta_corrente=ex2, origem_fapesp=of2, valor_fapesp='250000')
         
-        efi1 = EstadoFinanceiro(nome="Estado financeiro 1")
-        efi1.save()
-        tcomprov1 = TipoComprovante(nome="Tipo Comprovante 1")
-        tcomprov1.save()
+        efi1 = EstadoFinanceiro.objects.create(nome="Estado financeiro 1")
+        tcomprov1 = TipoComprovante.objects.create(nome="Tipo Comprovante 1")
 
-        audit1 = Auditoria(estado=efi1, pagamento=fp1, tipo=tcomprov1, parcial=101.0, pagina=102.0, obs='observacao')
-        audit1.save()
+        audit1 = Auditoria.objects.create(estado=efi1, pagamento=fp1, tipo=tcomprov1, parcial=101.0, pagina=102.0, obs='observacao')
 
     def test_unicode(self):
         extrato = ExtratoCC.objects.get(pk=1)
@@ -103,8 +98,7 @@ class ExtratoCCTest(TestCase):
 
 class TipoComprovanteFinanceiroTest(TestCase):
     def setUp(self):
-        tcomprov1 = TipoComprovante(nome="Tipo Comprovante 1")
-        tcomprov1.save()
+        tcomprov1 = TipoComprovante.objects.create(nome="Tipo Comprovante 1")
 
     def test_unicode(self):
         tipo = TipoComprovante.objects.get(pk=1)
@@ -117,11 +111,9 @@ class ExtratoFinanceiroTest(TestCase):
         e = EstadoOutorga.objects.create(nome='Vigente')
         t = Termo.objects.create(ano=2008, processo=22222, digito=2, inicio=date(2008,1,1), estado=e)
 
-        tcomprov1 = TipoComprovanteFinanceiro(nome="Tipo Comprovante Financeiro 1")
-        tcomprov1.save()
+        tcomprov1 = TipoComprovanteFinanceiro.objects.create(nome="Tipo Comprovante Financeiro 1")
         
-        exf1 = ExtratoFinanceiro(termo=t, data_libera='2013-08-10', cod='EFC', historico="historico", valor=123456, tipo_comprovante=tcomprov1, parcial=543)
-        exf1.save()
+        exf1 = ExtratoFinanceiro.objects.create(termo=t, data_libera='2013-08-10', cod='EFC', historico="historico", valor=123456, tipo_comprovante=tcomprov1, parcial=543)
   
 
     def test_unicode(self):
@@ -201,11 +193,9 @@ class PagamentoTest(TestCase):
         of1 = OrigemFapesp.objects.create(acordo=a1, item_outorga=i1)
         of2 = OrigemFapesp.objects.create(acordo=a2, item_outorga=i2)
 
-        fp1 = Pagamento(protocolo=p1, conta_corrente=ex1, origem_fapesp=of1, valor_fapesp='2650')
-        fp1.save()
-        fp2 = Pagamento(protocolo=p2, conta_corrente=ex2, origem_fapesp=of2, valor_fapesp='250000')
-        fp2.save()
-          
+        fp1 = Pagamento.objects.create(protocolo=p1, conta_corrente=ex1, origem_fapesp=of1, valor_fapesp='2650')
+        fp2 = Pagamento.objects.create(protocolo=p2, conta_corrente=ex2, origem_fapesp=of2, valor_fapesp='250000')
+
 
     def test_unicode(self):
         exf = Pagamento.objects.get(pk=1)
@@ -220,14 +210,10 @@ class PagamentoTest(TestCase):
     def test_unicode_com_auditoria(self):
         exf = Pagamento.objects.get(pk=1)
 
-        efi1 = EstadoFinanceiro(nome="Estado financeiro 1")
-        efi1.save()
-        tcomprov1 = TipoComprovante(nome="Tipo Comprovante 1")
-        tcomprov1.save()
+        efi1 = EstadoFinanceiro.objects.create(nome="Estado financeiro 1")
+        tcomprov1 = TipoComprovante.objects.create(nome="Tipo Comprovante 1")
 
-        audit1 = Auditoria(estado=efi1, pagamento=exf, tipo=tcomprov1, parcial=101.0, pagina=102.0, obs='observacao')
-        audit1.save()
-        
+        audit1 = Auditoria.objects.create(estado=efi1, pagamento=exf, tipo=tcomprov1, parcial=101.0, pagina=102.0, obs='observacao')
         
         self.assertEquals(exf.__unicode__(), u'8888 - 2650 - STB, parcial 101, página 102    ID: 1')
 
@@ -235,14 +221,10 @@ class PagamentoTest(TestCase):
     def test_unicode_para_auditoria(self):
         exf = Pagamento.objects.get(pk=1)
 
-        efi1 = EstadoFinanceiro(nome="Estado financeiro 1")
-        efi1.save()
-        tcomprov1 = TipoComprovante(nome="Tipo Comprovante 1")
-        tcomprov1.save()
+        efi1 = EstadoFinanceiro.objects.create(nome="Estado financeiro 1")
+        tcomprov1 = TipoComprovante.objects.create(nome="Tipo Comprovante 1")
 
-        audit1 = Auditoria(estado=efi1, pagamento=exf, tipo=tcomprov1, parcial=101.0, pagina=102.0, obs='observacao')
-        audit1.save()
-        
+        audit1 = Auditoria.objects.create(estado=efi1, pagamento=exf, tipo=tcomprov1, parcial=101.0, pagina=102.0, obs='observacao')
         
         self.assertEquals(exf.unicode_para_auditoria(), u'8888 - 2650 - STB    ID: 1')
 
@@ -266,13 +248,10 @@ class PagamentoTest(TestCase):
         exf = Pagamento.objects.get(pk=1)
         exf.conta_corrente = None
 
-        efi1 = EstadoFinanceiro(nome="Estado financeiro 1")
-        efi1.save()
-        tcomprov1 = TipoComprovante(nome="Tipo Comprovante 1")
-        tcomprov1.save()
+        efi1 = EstadoFinanceiro.objects.create(nome="Estado financeiro 1")
+        tcomprov1 = TipoComprovante.objects.create(nome="Tipo Comprovante 1")
 
-        audit1 = Auditoria(estado=efi1, pagamento=exf, tipo=tcomprov1, parcial=101.0, pagina=102.0, obs='observacao')
-        audit1.save()
+        audit1 = Auditoria.objects.create(estado=efi1, pagamento=exf, tipo=tcomprov1, parcial=101.0, pagina=102.0, obs='observacao')
 
         self.assertEquals(exf.anexos(), u'Sim')
 
@@ -322,13 +301,10 @@ class PagamentoTest(TestCase):
         exf = Pagamento.objects.get(pk=1)
         exf.conta_corrente = None
 
-        efi1 = EstadoFinanceiro(nome="Estado financeiro 1")
-        efi1.save()
-        tcomprov1 = TipoComprovante(nome="Tipo Comprovante 1")
-        tcomprov1.save()
+        efi1 = EstadoFinanceiro.objects.create(nome="Estado financeiro 1")
+        tcomprov1 = TipoComprovante.objects.create(nome="Tipo Comprovante 1")
 
-        audit1 = Auditoria(estado=efi1, pagamento=exf, tipo=tcomprov1, parcial=101.0, pagina=102.0, obs='observacao')
-        audit1.save()
+        audit1 = Auditoria.objects.create(estado=efi1, pagamento=exf, tipo=tcomprov1, parcial=101.0, pagina=102.0, obs='observacao')
 
         self.assertEquals(exf.pagina(), 102)
 
@@ -341,13 +317,9 @@ class PagamentoTest(TestCase):
         exf = Pagamento.objects.get(pk=1)
         exf.conta_corrente = None
 
-        efi1 = EstadoFinanceiro(nome="Estado financeiro 1")
-        efi1.save()
-        tcomprov1 = TipoComprovante(nome="Tipo Comprovante 1")
-        tcomprov1.save()
-
-        audit1 = Auditoria(estado=efi1, pagamento=exf, tipo=tcomprov1, parcial=101.0, pagina=102.0, obs='observacao')
-        audit1.save()
+        efi1 = EstadoFinanceiro.objects.create(nome="Estado financeiro 1")
+        tcomprov1 = TipoComprovante.objects.create(nome="Tipo Comprovante 1")
+        audit1 = Auditoria.objects.create(estado=efi1, pagamento=exf, tipo=tcomprov1, parcial=101.0, pagina=102.0, obs='observacao')
 
         self.assertEquals(exf.parcial(), 101)
 
@@ -436,18 +408,13 @@ class AuditoriaTest(TestCase):
         of1 = OrigemFapesp.objects.create(acordo=a1, item_outorga=i1)
         of2 = OrigemFapesp.objects.create(acordo=a2, item_outorga=i2)
 
-        fp1 = Pagamento(protocolo=p1, conta_corrente=ex1, origem_fapesp=of1, valor_fapesp='2650')
-        fp1.save()
-        fp2 = Pagamento(protocolo=p2, conta_corrente=ex2, origem_fapesp=of2, valor_fapesp='250000')
-        fp2.save()
+        fp1 = Pagamento.objects.create(protocolo=p1, conta_corrente=ex1, origem_fapesp=of1, valor_fapesp='2650')
+        fp2 = Pagamento.objects.create(protocolo=p2, conta_corrente=ex2, origem_fapesp=of2, valor_fapesp='250000')
         
-        efi1 = EstadoFinanceiro(nome="Estado financeiro 1")
-        efi1.save()
-        tcomprov1 = TipoComprovante(nome="Tipo Comprovante 1")
-        tcomprov1.save()
+        efi1 = EstadoFinanceiro.objects.create(nome="Estado financeiro 1")
+        tcomprov1 = TipoComprovante.objects.create(nome="Tipo Comprovante 1")
 
-        audit1 = Auditoria(estado=efi1, pagamento=fp1, tipo=tcomprov1, parcial=101.0, pagina=102.0, obs='observacao')
-        audit1.save()
+        audit1 = Auditoria.objects.create(estado=efi1, pagamento=fp1, tipo=tcomprov1, parcial=101.0, pagina=102.0, obs='observacao')
 
     def test_unicode(self):
         audit1 = Auditoria.objects.get(pk=1)
@@ -456,8 +423,7 @@ class AuditoriaTest(TestCase):
 
 class TipoComprovanteTest(TestCase):
     def setUp(self):
-        tcomprov1 = TipoComprovante(nome="Tipo Comprovante 1")
-        tcomprov1.save()
+        tcomprov1 = TipoComprovante.objects.create(nome="Tipo Comprovante 1")
 
     def test_unicode(self):
         tcomprov1 = TipoComprovante.objects.get(pk=1)
