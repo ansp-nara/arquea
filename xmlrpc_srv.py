@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # Patchless XMLRPC Service for Django
 # Kind of hacky, and stolen from Crast on irc.freenode.net:#django
 # Self documents as well, so if you call it from outside of an XML-RPC Client
