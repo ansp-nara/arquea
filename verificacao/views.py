@@ -345,6 +345,7 @@ def patrimonio_equipamento_tamanho_diferente(request):
                               {'desc':'Patrimonio e Equipamento com Tamanho diferente', 'patrimonios':retorno, 'atributo':'tamanho', 'filtros':filtros_saida})
 
 
+
 @login_required
 def copy_attribute_to_patrimonio(request):
     # Id do patrimonio
@@ -368,8 +369,11 @@ def copy_attribute_to_patrimonio(request):
         return patrimonio_equipamento_part_number_diferente(request)
     elif att_name == 'tamanho':
         return patrimonio_equipamento_tamanho_diferente(request)
+    elif att_name == 'procedencia':
+        return patrimonio_procedencia_vazia(request)
     else:
         raise ValueError('Valor inválido para o parametro. att_name' + str(att_name))
+    
     
     
 def versao(request):

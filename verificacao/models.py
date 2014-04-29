@@ -85,7 +85,7 @@ class VerificacaoPatrimonio:
         """
         
         retorno = []
-        patrimonios = Patrimonio.objects.filter(entidade_procedencia__isnull=True).order_by("procedencia")
+        patrimonios = Patrimonio.objects.filter(entidade_procedencia__isnull=True).select_related("equipamento__entidade_fabricante").order_by("id")
         
         if filtros and filtros["filtro_tipo_patrimonio"]:
             patrimonios = patrimonios.filter(tipo=filtros["filtro_tipo_patrimonio"])
@@ -278,6 +278,9 @@ class VerificacaoPatrimonioEquipamento():
                 patr.save()
             elif att_name == 'part_number':
                 patr.part_number = eq.part_number
+                patr.save()
+            elif att_name == 'procedencia':
+                patr.entidade_procedencia_id = eq.entidade_fabricante_id
                 patr.save()
             else:
                 raise ValueError('Valor inválido para o parametro. att_name' + str(att_name))        
