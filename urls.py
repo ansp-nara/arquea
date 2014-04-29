@@ -1,9 +1,11 @@
-# -* coding: utf-8 -*-
+# -*- coding: utf-8 -*-
+
 from django.conf.urls import *
 from django.views.generic import TemplateView
 
 from django.conf import settings
 from django.conf.urls.static import static
+from django.conf.urls import include, patterns, url
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
