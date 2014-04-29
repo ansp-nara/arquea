@@ -2,7 +2,48 @@
 {% load proto_tags %}
 {% block breadcrumbs %}<div class="breadcrumbs">Você está em: <a href="/verificacao/relatorio/equipamento_consolidado">Relatório de verificação de equipamentos</a></div>{% endblock %}
 {% block content %}
+
 <style>
+/* Start by setting display:none to make this hidden.
+   Then we position it in relation to the viewport window
+   with position:fixed. Width, height, top and left speak
+   speak for themselves. Background we set to 80% white with
+   our animation centered, and no-repeating */
+.modal {
+    display:    none;
+    position:   fixed;
+    z-index:    1000;
+    top:        0;
+    left:       0;
+    height:     100%;
+    width:      100%;
+    background: rgba( 255, 255, 255, .8 ) 
+                url('/media/img/admin/loading.gif') 
+                50% 50% 
+                no-repeat;
+}
+
+/* Anytime the body has the loading class, our
+   modal element will be visible */
+body.loading .modal {
+    display: block;
+}
+
+ #table-data th {
+    background-color: lightgray;
+    border: 1px #aaa dotted;
+}
+
+ #table-data td {
+    border:1px;
+    border-color: lightgray;
+    border-style: dotted;
+}
+
+ #table-data .td_buttons {
+    background-color: #eee;
+}
+
  #table-data th {
     background-color: lightgray;
     border: 1px #aaa dotted;
@@ -14,16 +55,49 @@
     border-style: dotted;
 }
 </style>
+
+<script type="text/javascript">
+
+
+function ajax_verificacao_patr_equi(patrimonio_id, to_object, att_name) {
+    $("body").addClass("loading");
+     $.ajax({
+       url: "/verificacao/verificacao/copy_attribute_to_patrimonio",
+       dataType: "html",
+       data: {'ajax':1, 'patrimonio_id': patrimonio_id, 'to_object': to_object, 'att_name':att_name},
+       success: function(data){
+            location.reload();
+       },
+       error: function(retorno, status, error){
+            alert('ERROR retorno=' + retorno + ' \nstatus=' + status + ' \nerror=' + error);
+       }
+     });
+}
+function bindButtons() {
+    $(".btn_to_pt").click(function(){
+        patrimonio_id = this.id.replace('btn_to_pt_', '');
+        to_object = 'patrimonio';
+        att_name = 'procedencia'
+        ajax_verificacao_patr_equi(patrimonio_id, to_object, att_name);
+    });
+    
+}
+
+$(document).ready(function() {
+    bindButtons();
+});
+    
+</script>
 <h1 repeat="1">Relatório de verificação de Patrimonio - {{ desc }}</h1>
 
-    <table id="table-data" border="0" cellpadding="5">
+    <table id="table-data" border="0" cellpadding="5" style="display:none">
       <tr>
            <th>ID</th>
            <th>Desc</th>
            <th>Part Number</th>
            <th>Model</th>
            <th>Marca</th>
-           <th>Procedencia</th>
+           <th title="Copiar a Marca do equipamento para a Procedencia do patrimônio."><a href="#">?</a></th>
            <th>Procedencia/Entidade</th>
       </tr>
      {% for pt_group in patrimonios %}
@@ -34,10 +108,18 @@
            <td>{{ pt.part_number }}</td>
            <td>{{ pt.modelo }}</td>
            <td>{{ pt.marca }}</td>
-           <td>{{ pt.procedencia }}</td>
+           <td class="td_buttons">
+              <span style="white-space:nowrap">
+                  <button id="btn_to_pt_{{pt.id}}" type="button"  title="copiar marca > procedencia" class="btn_to_pt">>></button>
+              </span>
+           </td>
+           
            <td>{{ pt.entidade_procedencia|default:'' }}</td>
       </tr>
       {% endfor %}
     {% endfor %}
     </table>
+    <script>
+        document.getElementById('table-data').style.display = 'block';
+    </script>
 {% endblock %}
