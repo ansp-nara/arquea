@@ -7,7 +7,7 @@ unittest). These will both pass when you run "manage.py test".
 Replace these with more appropriate tests for your application.
 """
 
-from django.core.urlresolvers import resolve
+from django.core.urlresolvers import resolve, reverse
 from django.test import TestCase
 from django.test import Client
 from django.http import HttpRequest
