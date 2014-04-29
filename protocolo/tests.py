@@ -204,8 +204,7 @@ class TipoDocumentoTest(TestCase):
 
 class FeriadoTest(TestCase):
     def test_unicode(self):
-        f = Feriado(feriado=date(2008,10,8))
-        f.save()
+        f = Feriado.objects.create(feriado=date(2008,10,8))
         
         self.assertEquals('08/10/08', f.__unicode__())
         
@@ -245,8 +244,7 @@ class CotacaoTest(TestCase):
     def setUp(self):
         mb = Membro.objects.create(nome='Gerson Gomes', email='gerson@gomes.com', cpf='000.000.000-00', site=True)
         
-        cg = Cargo(nome='Outorgado')
-        cg.save()
+        cg = Cargo.objects.create(nome='Outorgado')
 
         ht = Historico.objects.create(inicio=datetime(2008,1,1), cargo=cg, membro=mb, funcionario=True)
         

@@ -30,160 +30,20 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class PatrimonioTest(TestCase):
-    
-    def test_save___historico_do_filho__posicao_diferente(self):
-        ent= Entidade.objects.create(sigla='SAC', nome='Global Crossing', cnpj='00.000.000/0000-00', fisco=True, url='')
-        end = Endereco.objects.create(entidade=ent, rua='Dr. Ovidio', num=215, bairro='Cerqueira Cesar', cep='05403010', estado='SP', pais='Brasil')
-        tipoDetalhe = TipoDetalhe.objects.create()
-        endDet = EnderecoDetalhe.objects.create(endereco=end, tipo=tipoDetalhe, mostra_bayface=True)
-        est = Estado.objects.create()
-        tipoPatr = Tipo.objects.create(nome='roteador')
-        
-        patrPai = Patrimonio.objects.create(ns='AF345678GB3489X', modelo='NetIron400', tipo=tipoPatr, apelido="NetIron400", checado=True)
-        historicoPai = HistoricoLocal.objects.create(patrimonio=patrPai, posicao="R039.F001", endereco= endDet, descricao='Emprestimo', data= datetime.date(2009,2,5), estado=est)
-        # pegando novamente o objeto para resetar a propriedade do historico_atual
-        patrPai = Patrimonio.objects.get(pk=patrPai.pk)
-        
-        tipoPatrFilho = Tipo.objects.create(nome='placa')
-        patrFilho = Patrimonio.objects.create(ns='NSFILHO', modelo='Placa mãe', tipo=tipoPatrFilho, apelido="Placa mãe", patrimonio=patrPai, checado=True)
-        historicoFilho = HistoricoLocal.objects.create(patrimonio=patrFilho, posicao="R042.F001", endereco= endDet, descricao='Emprestimo', data= datetime.date(2007,2,5), estado=est)
-        # pegando novamente o objeto para resetar a propriedade do historico_atual
-        patrFilho = Patrimonio.objects.get(pk=patrFilho.pk)
-        
-        # verificando se o valor de historico ainda está diferente
-        self.assertNotEqual(patrPai.historico_atual.posicao, patrFilho.historico_atual.posicao)
-        patrPai.save()
-        
-        # verificando se o valor de historico do filho foi recarregado
-        patrFilho = Patrimonio.objects.get(pk=patrFilho.pk)
-        self.assertEqual(patrPai.historico_atual.posicao, patrFilho.historico_atual.posicao)
-        
-    def test_save___historico_do_filho__pai_com_posicao_vazia(self):
-        ent= Entidade.objects.create(sigla='SAC', nome='Global Crossing', cnpj='00.000.000/0000-00', fisco=True, url='')
-        end = Endereco.objects.create(entidade=ent, rua='Dr. Ovidio', num=215, bairro='Cerqueira Cesar', cep='05403010', estado='SP', pais='Brasil')
-        tipoDetalhe = TipoDetalhe.objects.create()
-        endDet = EnderecoDetalhe.objects.create(endereco=end, tipo=tipoDetalhe, mostra_bayface=True)
-        est = Estado.objects.create()
-        tipoPatr = Tipo.objects.create(nome='roteador')
-        
-        patrPai = Patrimonio.objects.create(ns='AF345678GB3489X', modelo='NetIron400', tipo=tipoPatr, apelido="NetIron400", checado=True)
-        # inserindo histórico sem posição
-        historicoPai = HistoricoLocal.objects.create(patrimonio=patrPai, endereco= endDet, descricao='Emprestimo', data= datetime.date(2009,2,5), estado=est)
-        # pegando novamente o objeto para resetar a propriedade do historico_atual
-        patrPai = Patrimonio.objects.get(pk=patrPai.pk)
-        
-        tipoPatrFilho = Tipo.objects.create(nome='placa')
-        patrFilho = Patrimonio.objects.create(ns='NSFILHO', modelo='Placa mãe', tipo=tipoPatrFilho, apelido="Placa mãe", patrimonio=patrPai, checado=True)
-        historicoFilho = HistoricoLocal.objects.create(patrimonio=patrFilho, posicao="R042.F001", endereco= endDet, descricao='Emprestimo', data= datetime.date(2007,2,5), estado=est)
-        # pegando novamente o objeto para resetar a propriedade do historico_atual
-        patrFilho = Patrimonio.objects.get(pk=patrFilho.pk)
-        
-        # verificando se o valor de historico ainda está diferente
-        self.assertNotEqual(patrPai.historico_atual.posicao, patrFilho.historico_atual.posicao)
-        patrPai.save()
-        
-        # verificando se o valor de historico do filho foi recarregado
-        patrFilho = Patrimonio.objects.get(pk=patrFilho.pk)
-        self.assertEqual(patrPai.historico_atual.posicao, patrFilho.historico_atual.posicao)
-
-    def test_save___historico_do_filho__filho_com_posicao_vazia(self):
-        ent= Entidade.objects.create(sigla='SAC', nome='Global Crossing', cnpj='00.000.000/0000-00', fisco=True, url='')
-        end = Endereco.objects.create(entidade=ent, rua='Dr. Ovidio', num=215, bairro='Cerqueira Cesar', cep='05403010', estado='SP', pais='Brasil')
-        tipoDetalhe = TipoDetalhe.objects.create()
-        endDet = EnderecoDetalhe.objects.create(endereco=end, tipo=tipoDetalhe, mostra_bayface=True)
-        est = Estado.objects.create()
-        tipoPatr = Tipo.objects.create(nome='roteador')
-        
-        patrPai = Patrimonio.objects.create(ns='AF345678GB3489X', modelo='NetIron400', tipo=tipoPatr, apelido="NetIron400", checado=True)
-        historicoPai = HistoricoLocal.objects.create(patrimonio=patrPai, posicao="R039.F001", endereco= endDet, descricao='Emprestimo', data= datetime.date(2009,2,5), estado=est)
-        # pegando novamente o objeto para resetar a propriedade do historico_atual
-        patrPai = Patrimonio.objects.get(pk=patrPai.pk)
-        
-        tipoPatrFilho = Tipo.objects.create(nome='placa')
-        patrFilho = Patrimonio.objects.create(ns='NSFILHO', modelo='Placa mãe', tipo=tipoPatrFilho, apelido="Placa mãe", patrimonio=patrPai, checado=True)
-        # inserindo histórico sem posição
-        historicoFilho = HistoricoLocal.objects.create(patrimonio=patrFilho,endereco= endDet, descricao='Emprestimo', data= datetime.date(2007,2,5), estado=est)
-        # pegando novamente o objeto para resetar a propriedade do historico_atual
-        patrFilho = Patrimonio.objects.get(pk=patrFilho.pk)
-        
-        # verificando se o valor de historico ainda está diferente
-        self.assertNotEqual(patrPai.historico_atual.posicao, patrFilho.historico_atual.posicao)
-        patrPai.save()
-        
-        # verificando se o valor de historico do filho foi recarregado
-        patrFilho = Patrimonio.objects.get(pk=patrFilho.pk)
-        self.assertEqual(patrPai.historico_atual.posicao, patrFilho.historico_atual.posicao)
-
-    def test_save___historico_do_filho__filho_com_data_mais_atual(self):
-        ent= Entidade.objects.create(sigla='SAC', nome='Global Crossing', cnpj='00.000.000/0000-00', fisco=True, url='')
-        end = Endereco.objects.create(entidade=ent, rua='Dr. Ovidio', num=215, bairro='Cerqueira Cesar', cep='05403010', estado='SP', pais='Brasil')
-        tipoDetalhe = TipoDetalhe.objects.create()
-        endDet = EnderecoDetalhe.objects.create(endereco=end, tipo=tipoDetalhe, mostra_bayface=True)
-        est = Estado.objects.create()
-        tipoPatr = Tipo.objects.create(nome='roteador')
-        
-        patrPai = Patrimonio.objects.create(ns='AF345678GB3489X', modelo='NetIron400', tipo=tipoPatr, apelido="NetIron400", checado=True)
-        historicoPai = HistoricoLocal.objects.create(patrimonio=patrPai, posicao="R039.F001", endereco= endDet, descricao='Emprestimo', data= datetime.date(2009,2,5), estado=est)
-        # pegando novamente o objeto para resetar a propriedade do historico_atual
-        patrPai = Patrimonio.objects.get(pk=patrPai.pk)
-        
-        tipoPatrFilho = Tipo.objects.create(nome='placa')
-        patrFilho = Patrimonio.objects.create(ns='NSFILHO', modelo='Placa mãe', tipo=tipoPatrFilho, apelido="Placa mãe", patrimonio=patrPai, checado=True)
-        # colocando uma data de histórico mais nova que o do histórico do pai
-        historicoFilho = HistoricoLocal.objects.create(patrimonio=patrFilho,endereco= endDet, descricao='Emprestimo', data= datetime.date(2013,2,5), estado=est)
-        # pegando novamente o objeto para resetar a propriedade do historico_atual
-        patrFilho = Patrimonio.objects.get(pk=patrFilho.pk)
-        
-        # verificando se o valor de historico ainda está diferente
-        self.assertNotEqual(patrPai.historico_atual.posicao, patrFilho.historico_atual.posicao)
-        patrPai.save()
-        
-        # verificando se o valor de historico do filho continua o mesmo, já que possui histórico com data mais nova que o do patrimonio pai
-        patrFilho = Patrimonio.objects.get(pk=patrFilho.pk)
-        self.assertNotEqual(patrPai.historico_atual.posicao, patrFilho.historico_atual.posicao)
-
-
-    def test_save___historico_do_filho__endereco_diferente(self):
-        ent= Entidade.objects.create(sigla='SAC', nome='Global Crossing', cnpj='00.000.000/0000-00', fisco=True, url='')
-        end = Endereco.objects.create(entidade=ent, rua='Dr. Ovidio', num=215, bairro='Cerqueira Cesar', cep='05403010', estado='SP', pais='Brasil')
-        tipoDetalhe = TipoDetalhe.objects.create()
-        endDet = EnderecoDetalhe.objects.create(endereco=end, tipo=tipoDetalhe, mostra_bayface=True)
-        est = Estado.objects.create()
-        tipoPatr = Tipo.objects.create(nome='roteador')
-
-
 class HistoricoLocalTest(TestCase):
     def test_criacao_historico_local(self):
-        ent= Entidade(sigla='SAC', nome='Global Crossing', cnpj='00.000.000/0000-00', fisco=True, url='')
-        ent.save()
-        
-        end = Endereco(entidade=ent, rua='Dr. Ovidio', num=215, bairro='Cerqueira Cesar', cep='05403010', estado='SP', pais='Brasil')
-        end.save()
-        
-        tipoDetalhe = TipoDetalhe()
-        tipoDetalhe.save()
-        
-        endDet = EnderecoDetalhe(endereco=end, tipo=tipoDetalhe, mostra_bayface=True)
-        endDet.save()
-
-        tipoPatr = Tipo(nome='roteador')
-        tipoPatr.save()
-
-        rt = Patrimonio(ns='AF345678GB3489X', modelo='NetIron400', tipo=tipoPatr, apelido="NetIron400", checado=True)
-        rt.save()
-
-        est = Estado()
-        est.save()
-
-        hl = HistoricoLocal(patrimonio=rt, endereco= endDet, descricao='Emprestimo', data= datetime.date(2009,2,5), estado=est)
-        hl.save()
+        ent= Entidade.objects.create(sigla='SAC', nome='Global Crossing', cnpj='00.000.000/0000-00', fisco=True, url='')
+        end = Endereco.objects.create(entidade=ent, rua='Dr. Ovidio', num=215, bairro='Cerqueira Cesar', cep='05403010', estado='SP', pais='Brasil')
+        tipoDetalhe = TipoDetalhe.objects.create()
+        endDet = EnderecoDetalhe.objects.create(endereco=end, tipo=tipoDetalhe, mostra_bayface=True)
+        tipoPatr = Tipo.objects.create(nome='roteador')
+        rt = Patrimonio.objects.create(ns='AF345678GB3489X', modelo='NetIron400', tipo=tipoPatr, apelido="NetIron400", checado=True)
+        est = Estado.objects.create()
+        hl = HistoricoLocal.objects.create(patrimonio=rt, endereco= endDet, descricao='Emprestimo', data= datetime.date(2009,2,5), estado=est)
 
         self.assertEquals(u'05/02/2009 - NetIron400 - AF345678GB3489X -  | SAC - Dr. Ovidio, 215 - ', hl.__unicode__())
 
-    
-    
-    
+
     def test_posicao_furo(self):
         """
         Teste de posicionamento de um equipamento em um furo de um rack
@@ -313,17 +173,11 @@ class HistoricoLocalTest(TestCase):
 
 class ViewTest(TestCase):
     def setUpPatrimonio(self, num_documento='', ns=''):
-        protocolo = Protocolo(id=1, num_documento=num_documento, tipo_documento_id=0, estado_id=0, termo_id=0, data_chegada=date(year=2000, month=01, day=01), moeda_estrangeira=False)
-        protocolo.save()
-        pagamento = Pagamento(id=1, protocolo=protocolo, valor_fapesp=0)
-        pagamento.save()
-        tipoPatr = Tipo(id=1)
-        tipoPatr.save()
-        patrimonio = Patrimonio(id=1, pagamento=pagamento, tipo=tipoPatr, checado=True)
-        patrimonio.save()
-        
-        patrimonio = Patrimonio(id=2, ns=ns, tipo=tipoPatr, checado=True)
-        patrimonio.save()
+        protocolo = Protocolo.objects.create(id=1, num_documento=num_documento, tipo_documento_id=0, estado_id=0, termo_id=0, data_chegada=date(year=2000, month=01, day=01), moeda_estrangeira=False)
+        pagamento = Pagamento.objects.create(id=1, protocolo=protocolo, valor_fapesp=0)
+        tipoPatr = Tipo.objects.create(id=1)
+        patrimonio = Patrimonio.objects.create(id=1, pagamento=pagamento, tipo=tipoPatr, checado=True)
+        patrimonio = Patrimonio.objects.create(id=2, ns=ns, tipo=tipoPatr, checado=True)
         
     def test_escolhe_patrimonio_ajax_empty(self):
         """
