@@ -29,11 +29,11 @@ def list_planilha_patrimonio(request):
     chk_patrimonio_vazio = request.GET.get('chk_patrimonio_vazio')
     
     if chk_patrimonio_vazio == '1':
-        inventario = Carga_inventario.objects.filter(patrimonio_model__isnull=True)
+        inventario = Carga_inventario.objects.filter(patrimonio_model__isnull=True).select_related('patrimonio_model', 'patrimonio_model__equipamento', 'patrimonio_model__equipamento__especificacao')
     elif chk_patrimonio_vazio == '0':
-        inventario = Carga_inventario.objects.filter(patrimonio_model__isnull=False)
+        inventario = Carga_inventario.objects.filter(patrimonio_model__isnull=False).select_related('patrimonio_model', 'patrimonio_model__equipamento', 'patrimonio_model__equipamento__especificacao')
     else:
-        inventario = Carga_inventario.objects.all()
+        inventario = Carga_inventario.objects.all().select_related('patrimonio_model', 'patrimonio_model__marca', 'patrimonio_model__equipamento', 'patrimonio_model__equipamento__especificacao')
         
     ordenacao = request.GET.get('ord')
     if ordenacao == 'rack':
@@ -42,6 +42,7 @@ def list_planilha_patrimonio(request):
         inventario = inventario.order_by('patrimonio_model', 'planilha_linha')
     else:
         inventario = inventario.order_by('planilha_linha')
+        
         
     c = {'inventario':inventario}
     c.update({'chk_patrimonio_vazio':chk_patrimonio_vazio})
