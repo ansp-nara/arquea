@@ -375,19 +375,22 @@ def copy_attribute_to_patrimonio(request):
         raise ValueError('Valor inválido para o parametro. att_name' + str(att_name))
     
     
-    
+# Verifica a versão dos Python, Django e do PostgreeSQL
 def versao(request):
+    # Versão do django
     import django
-    django_version = str(django.VERSION)
+    django_version = 'django ' + str(django.VERSION)
     
+    # Versão do python
     import sys
     python_version = str(sys.version_info)
+    python_version = python_version.replace('sys.version_info', 'python ').replace('major=', '').replace('minor=', '') \
+                                   .replace('micro=', '').replace('releaselevel=', '').replace('serial=', '')
     
-       
+    # Versão do banco de dados
     from django.db import connection
     version = connection.pg_version
     lst = [str(i) for i in str(version)]
-    #print "%d %d %d" % (lst[1:2], lst[3:4], lst[:1])
     db_version = "%s (%s, %s, %s)" % (connection.vendor, ''.join(lst[:len(lst)-4]), ''.join(lst[len(lst)-4:len(lst)-2]), ''.join(lst[len(lst)-2:]))
     
     return render(request, 'verificacao/versao.html', 
