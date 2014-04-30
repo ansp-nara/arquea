@@ -55,10 +55,22 @@ class MembroTest(TestCase):
     def test_ramal(self):
         mb = Membro.objects.get(email='soraya@gomes.com')
         self.assertEquals(23, mb.existe_ramal())
-    
+
+    def test_ramal_vazio(self):
+        mb = Membro.objects.get(email='soraya@gomes.com')
+        mb.ramal = None
+        
+        self.assertEqual('', mb.existe_ramal())
+
     def test_curriculo_vazio(self):
         mb = Membro.objects.get(email='soraya@gomes.com')
         self.assertEquals('', mb.existe_curriculo())
+
+    def test_curriculo(self):
+        mb = Membro.objects.get(email='soraya@gomes.com')
+        mb.url_lattes = 'teste'
+        
+        self.assertEquals('<center><a href="teste">teste</a></center>', mb.existe_curriculo())
 
     def test_unicode(self):
         mb = Membro.objects.get(email='soraya@gomes.com')
