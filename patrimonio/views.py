@@ -20,6 +20,7 @@ from identificacao.models import Entidade, EnderecoDetalhe, Endereco
 from outorga.models import Termo, Modalidade, Natureza_gasto, Item
 from protocolo.models import Protocolo, ItemProtocolo
 from financeiro.models import Pagamento
+import datetime
 import logging
 
 # Get an instance of a logger
@@ -992,3 +993,33 @@ def abre_arvore_tipo(request):
 
     json = simplejson.dumps(ret)
     return HttpResponse(json, mimetype="application/json")
+
+
+"""
+Retorna os dados de um Historico Atual dado o ID de um patrimonio
+"""
+def patrimonio_historico(request):
+    if request.method == 'GET':
+        retorno = {}
+        patr_id = request.GET.get('id')
+        patr = Patrimonio.objects.get(id=patr_id)
+        historico = patr.historico_atual
+        
+        retorno = {'entidade_id':historico.endereco.endereco.entidade_id if historico.endereco.endereco_id else '', 
+                   'entidade_desc':historico.endereco.endereco.entidade.__unicode__() if historico.endereco.endereco_id and historico.endereco.endereco.entidade_id else '',
+                   'localizacao_id':historico.endereco_id, 
+                   'localizacao_desc':historico.endereco.__unicode__(),
+                   'posicao':historico.posicao, 
+                   'descricao':historico.descricao, 
+                   'data':str(datetime.date.today()), 
+                   'estado_id':historico.estado_id, 
+                   'estado_desc':historico.estado.__unicode__(),
+                   'memorando_id':historico.memorando_id,
+                   'memorando_desc': historico.memorando.__unicode__() if historico.memorando_id else '',
+                   }
+
+        json = simplejson.dumps(retorno)
+    else:
+        raise Http404
+    
+    return HttpResponse(json, mimetype='application/json')

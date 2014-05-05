@@ -171,6 +171,29 @@ class HistoricoLocalTest(TestCase):
         historico = HistoricoLocal(posicao="ABC42.F049")
         self.assertEquals(historico.posicao_rack, 'ABC42')
 
+
+class PatrimonioTest(TestCase):
+    def setUp(self):
+        ent= Entidade.objects.create(sigla='SAC', nome='Global Crossing', cnpj='00.000.000/0000-00', fisco=True, url='')
+        end = Endereco.objects.create(entidade=ent, rua='Dr. Ovidio', num=215, bairro='Cerqueira Cesar', cep='05403010', estado='SP', pais='Brasil')
+        tipoDetalhe = TipoDetalhe.objects.create()
+        endDet = EnderecoDetalhe.objects.create(endereco=end, tipo=tipoDetalhe, mostra_bayface=True)
+        tipoPatr = Tipo.objects.create(nome='roteador')
+        rt = Patrimonio.objects.create(ns='AF345678GB3489X', modelo='NetIron400', tipo=tipoPatr, apelido="NetIron400", checado=True)
+        est = Estado.objects.create()
+        hl = HistoricoLocal.objects.create(patrimonio=rt, endereco= endDet, descricao='Emprestimo', data= datetime.date(2009,2,5), estado=est, posicao='S042')
+        hl = HistoricoLocal.objects.create(patrimonio=rt, endereco= endDet, descricao='Emprestimo 2', data= datetime.date(2010,2,5), estado=est, posicao='S043')
+
+
+    def test_historico_atual(self):
+        """
+        Verifica chamanda do historico atual do patrimonio
+        """
+        patr = Patrimonio.objects.get(ns='AF345678GB3489X')
+        hist = patr.historico_atual
+        self.assertEquals('Emprestimo 2', hist.descricao)
+
+
 class ViewTest(TestCase):
     def setUpPatrimonio(self, num_documento='', ns=''):
         protocolo = Protocolo.objects.create(id=1, num_documento=num_documento, tipo_documento_id=0, estado_id=0, termo_id=0, data_chegada=date(year=2000, month=01, day=01), moeda_estrangeira=False)

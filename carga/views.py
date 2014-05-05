@@ -29,11 +29,11 @@ def list_planilha_patrimonio(request):
     chk_patrimonio_vazio = request.GET.get('chk_patrimonio_vazio')
     
     if chk_patrimonio_vazio == '1':
-        inventario = Carga_inventario.objects.filter(patrimonio_model__isnull=True).select_related('patrimonio_model', 'patrimonio_model__equipamento', 'patrimonio_model__equipamento__especificacao')
+        inventario = Carga_inventario.objects.filter(patrimonio_model__isnull=True).select_related('patrimonio_model', 'patrimonio_model__equipamento', 'patrimonio_model__equipamento__especificacao', 'patrimonio_model__equipamento__entidade_fabricante')
     elif chk_patrimonio_vazio == '0':
-        inventario = Carga_inventario.objects.filter(patrimonio_model__isnull=False).select_related('patrimonio_model', 'patrimonio_model__equipamento', 'patrimonio_model__equipamento__especificacao')
+        inventario = Carga_inventario.objects.filter(patrimonio_model__isnull=False).select_related('patrimonio_model', 'patrimonio_model__equipamento', 'patrimonio_model__equipamento__especificacao', 'patrimonio_model__equipamento__entidade_fabricante')
     else:
-        inventario = Carga_inventario.objects.all().select_related('patrimonio_model', 'patrimonio_model__marca', 'patrimonio_model__equipamento', 'patrimonio_model__equipamento__especificacao')
+        inventario = Carga_inventario.objects.all().select_related('patrimonio_model', 'patrimonio_model__marca', 'patrimonio_model__equipamento', 'patrimonio_model__equipamento__especificacao', 'patrimonio_model__equipamento__entidade_fabricante')
         
     ordenacao = request.GET.get('ord')
     if ordenacao == 'rack':
