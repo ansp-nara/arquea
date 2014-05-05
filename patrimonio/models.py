@@ -100,8 +100,8 @@ class Patrimonio(models.Model):
     apelido = models.CharField(max_length=30, null=True, blank=True)
     descricao = models.TextField(_(u'Descrição NF'))
     ean = models.CharField(u'EAN', max_length=45, null=True, blank=True)
-    tem_numero_fmusp = models.BooleanField('Tem número de patrimônio FMUSP?', default=False)
-    numero_fmusp = models.IntegerField('Número de patrimônio FMUSP', null=True, blank=True)
+    tem_numero_fmusp = models.BooleanField('Tem nº de patrimônio FMUSP?', default=False)
+    numero_fmusp = models.IntegerField('Nº de patrimônio FMUSP', null=True, blank=True)
     entidade_procedencia = models.ForeignKey('identificacao.Entidade', verbose_name=_(u'Procedência'), null=True, blank=True, help_text=u"Representa a Entidade que fornece este patrimônio.")
 
 # Campos duplicados que existem no Model de Equipamento
@@ -185,9 +185,15 @@ class Patrimonio(models.Model):
     
     @cached_property
     def historico_atual(self):
-        ht = self.historicolocal_set.order_by('-data', '-id')
+#         ht = self.historicolocal_set.order_by('-data', '-id')
+#         if not ht: return None
+#         return ht[0]
+        ht = HistoricoLocal.objects.filter(patrimonio_id=self.id) \
+                                   .select_related('endereco', 'estado', 'memorando') \
+                                   .order_by('-data', '-id')
         if not ht: return None
         return ht[0]
+ 
    
 
     def posicao(self):

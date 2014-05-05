@@ -36,13 +36,21 @@ class PatrimonioAdmin(admin.ModelAdmin):
                       'classes': ('wide',)
                  }),
                  ('Geral', {
-                      'fields': (('checado', 'tipo', 'apelido', 'tem_numero_fmusp', 'numero_fmusp'), ('part_number', 'ns', 'ncm', 'ean', 'agilis'), 
-                                 ('nf', 'patrimonio'), 'descricao', ('complemento', 'tamanho'), ('modelo',), 
-                                 ('entidade_procedencia',),('filtro_equipamento', 'equipamento',))
+                      'fields': (('agilis', 'checado',),
+                                 ('tipo', 'apelido', 'tem_numero_fmusp', 'numero_fmusp'), 
+                                 ('filtro_equipamento', 'equipamento',),
+                                 ('part_number', 'modelo', 'ean'),
+                                 'ns', 
+                                 ('ncm', 'ocst', 'cfop', ),
+                                 'descricao', 
+                                 ('complemento', 'tamanho'),  
+                                 ('entidade_procedencia',),
+                                 ('nf', 'patrimonio'), 
+                                )
                  }),
                  ('Extras', {
                       'classes': ('collapse',),
-                      'fields': ('imagem', 'especificacao', 'obs', 'titulo_autor', 'isbn', 'revision', 'version', 'ocst', 'cfop', 'garantia_termino'),
+                      'fields': ('obs', 'titulo_autor', 'isbn', 'revision', 'version', 'garantia_termino'),
                  }),
                  ('Patrimônios contidos', {
                       'classes': ('collapse',),

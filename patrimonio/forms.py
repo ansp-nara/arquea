@@ -86,15 +86,15 @@ class PatrimonioAdminForm(forms.ModelForm):
         
     termo = forms.ModelChoiceField(Termo.objects.all(), label=_(u'Termo de outorga'), required=False)
 
-    npgto = forms.CharField(label=_(u'Número do cheque ou do documento'), required=False,
+    npgto = forms.CharField(label=_(u'Nº do cheque ou do documento'), required=False,
             widget=forms.TextInput(attrs={'onchange': 'ajax_filter_pagamentos("/patrimonio/escolhe_pagamento", this.value);'}))
 
     part_number = forms.CharField(required=False, widget=forms.TextInput(attrs={'onchange':'ajax_patrimonio_existente(this.value);'}))
 
-    nf = forms.CharField(label=_(u'Número da NF ou NS'), required=False,
+    nf = forms.CharField(label=_(u'Nº da NF ou NS'), required=False,
             widget=forms.TextInput(attrs={'onchange': 'ajax_filter_patrimonio(this.value);'}))
 
-    tem_numero_fmusp = forms.BooleanField(label=u'Tem número de patrimônio FMUSP?', required=False, 
+    tem_numero_fmusp = forms.BooleanField(label=u'Tem nº de patrimônio FMUSP?', required=False, 
             widget=forms.CheckboxInput(attrs={'onchange':'ajax_numero_fmusp();'}))
 
     descricao = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows':'2', 'cols':'152'}))
@@ -112,8 +112,13 @@ class PatrimonioAdminForm(forms.ModelForm):
     
     patrimonio = EquipamentoContidoModelChoiceField(queryset=Patrimonio.objects.all(), 
                                      required=False,
-                                     label=mark_safe('<a href="#" onclick="window.open(\'/patrimonio/patrimonio/\'+$(\'#id_patrimonio\').val() + \'/\', \'_blank\');return true;">Contido em</a>'),
-                                     widget=forms.Select(attrs={'style':'width:800px'}),
+                                     label=mark_safe('<a href="#" ' + 
+                                            'onclick="window.open(\'/patrimonio/patrimonio/\'+$(\'#id_patrimonio\').val() + \'/\', \'_blank\');return true;" '+
+                                            '>Contido em</a>'),
+                                     widget=forms.Select(attrs={
+                                                                'style':'width:800px ', 
+                                                                'onchange':'ajax_patrimonio_historico($(\'#id_patrimonio\').val());'
+                                                               }),
                                      empty_label='---'
                                      )
     

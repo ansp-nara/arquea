@@ -26,5 +26,7 @@ urlpatterns = patterns('patrimonio.views',
     (r'abre_arvore$', 'abre_arvore'),
     (r'abre_arvore_tipo$', 'abre_arvore_tipo'),
     (r'racks$', 'racks'),
+    (r'patrimonio_historico$', 'patrimonio_historico'),
+    
 )
 

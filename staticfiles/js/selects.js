@@ -1088,3 +1088,54 @@ function ajax_select_ano_proj()
        });
 
 }
+
+
+function ajax_patrimonio_historico(patr_id)
+{
+	django.jQuery.ajax({
+		type: "GET",
+		url: "/patrimonio/patrimonio_historico",
+		dataType: "json",
+		data: {'id':patr_id},
+		success: function(retorno) {
+			// N. total de forms de historicos historicolocal_set-TOTAL_FORMS
+			// O form vazio deve ser o de indice = total - 1
+			var total_forms = $('#id_historicolocal_set-TOTAL_FORMS').val();
+
+			form_index = total_forms - 1;
+
+			// Entidade
+			if (retorno.entidade_id != '') { 
+					$("#id_historicolocal_set-"+form_index+"-entidade option[value='"+retorno.entidade_id+"']").attr("selected","selected");
+			} else {
+				$("#id_historicolocal_set-"+form_index+"-entidade option")[0].selected = true;
+			}
+			
+			// Endereco
+			// É necessário limpar o select, pois ele é recarregado sempre que se muda a entidade
+			$("#id_historicolocal_set-"+form_index+"-endereco").empty();
+			$("#id_historicolocal_set-"+form_index+"-endereco")
+	    		.append('<option value="'+ retorno.localizacao_id +'">'+ retorno.localizacao_desc +'</option>');
+			
+			// Estado
+			if (retorno.estado_id != '') { 
+				$("#id_historicolocal_set-"+form_index+"-estado option[value='"+ retorno.estado_id +"']").attr("selected","selected");
+			} else {
+				$("#id_historicolocal_set-"+form_index+"-estado option")[0].selected = true;
+			}
+			
+			// Memorando
+			if (retorno.memorando_id && retorno.memorando_id != '') { 
+				$("#id_historicolocal_set-"+form_index+"-memorando option[value='"+ retorno.memorando_id +"']").attr("selected","selected");
+			} else {
+				$("#id_historicolocal_set-"+form_index+"-memorando option")[0].selected = true;
+			}
+			
+			// Campos textos: posição, descrição e data
+			$("#id_historicolocal_set-"+form_index+"-posicao").val(retorno.posicao);
+			$("#id_historicolocal_set-"+form_index+"-descricao").val(retorno.descricao);
+			$("#id_historicolocal_set-"+form_index+"-data").val(retorno.data);
+		},
+	});
+}
+
