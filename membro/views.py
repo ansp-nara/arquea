@@ -9,6 +9,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, Http404, HttpResponseForbidden, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
+from django.db.models import Max, Min
 from forms import *
 from models import *
 from protocolo.models import Feriado
@@ -100,8 +101,9 @@ def mensal_func(request):
         meses = []
         funcionario = request.GET.get('funcionario')
         membro = Membro.objects.get(id=funcionario)
-	if request.user.is_superuser == False and  request.user.email != membro.email: 
-	    raise Http404
+        if request.user.is_superuser == False and  request.user.email != membro.email: 
+            raise Http404
+        
         ano = request.GET.get('ano')
         mes = request.GET.get('mes')
         
@@ -192,7 +194,19 @@ def mensal_func(request):
         meses = range(13)
         funcionarios = [m for m in Membro.objects.all() if m.funcionario]
 
-        return TemplateResponse(request, 'membro/sel_func.html', {'anos':anos, 'meses':meses, 'funcionarios':funcionarios})
+        retorno = []
+        for f in funcionarios:
+            entrada = Controle.objects.filter(membro=f).aggregate(Max('entrada'), Min('entrada'))
+            
+            if entrada['entrada__min']:
+                ano_inicio = entrada['entrada__min'].year
+                mes_inicio = entrada['entrada__min'].month
+                ano_fim = entrada['entrada__max'].year
+                mes_fim = entrada['entrada__max'].month
+                retorno.append({'funcionario':f, 'ano_inicio':ano_inicio, 'mes_inicio':mes_inicio,\
+                                      'ano_fim':ano_fim, 'mes_fim':mes_fim})
+
+        return TemplateResponse(request, 'membro/sel_func.html', {'anos':anos, 'meses':meses, 'funcionarios':retorno})
 
 @login_required
 def observacao(request, id):
