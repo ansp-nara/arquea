@@ -99,6 +99,7 @@ $(document).ready(function() {
            <th>Marca</th>
            <th title="Copiar a Marca do equipamento para a Procedencia do patrimônio."><a href="#">?</a></th>
            <th>Procedencia/Entidade</th>
+           <th>Outorga</th>
       </tr>
      {% for pt_group in patrimonios %}
        {% for pt in pt_group %}
@@ -115,6 +116,7 @@ $(document).ready(function() {
            </td>
            
            <td>{{ pt.entidade_procedencia|default:'' }}</td>
+           <td style="white-space:nowrap;">{{ pt.pagamento.protocolo.termo|default:'' }}</td>
       </tr>
       {% endfor %}
     {% endfor %}
