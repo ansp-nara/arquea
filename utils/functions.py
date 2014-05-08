@@ -1,28 +1,32 @@
+# -*- coding: utf-8 -*-
 
-import httplib
-from django.core import serializers
-import json as simplejson
-import os
-import ho.pisa as pisa
-from sx.pisa3.pisa_pdf import *
-import cStringIO as StringIO
-import cgi
-from django.template import Context, loader, RequestContext
-from django.template.loader import render_to_string
-from django.http import HttpResponse
 import settings
 from datetime import date, timedelta, datetime
 import calendar
-from django.conf import settings
-import logging
-from wkhtmltopdf.views import PDFTemplateResponse
+import httplib
+import json as simplejson
+import os
+import cgi
+import cStringIO as StringIO
 
+import weasyprint
+
+from django.conf import settings
+from django.core import serializers
+from django.http import HttpResponse
+from django.template import Context, loader, RequestContext
+from django.template.loader import render_to_string
+from django.contrib.sites.models import Site
+
+import logging
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
 
-
 def render_to_pdf(template_src, context_dict, context_instance=None, filename='file.pdf', attachments=[]):
+    import ho.pisa as pisa
+    from sx.pisa3.pisa_pdf import *
+
     template = loader.get_template(template_src)
     context = context_instance or Context()
     context.update(context_dict)
@@ -43,7 +47,60 @@ def render_to_pdf(template_src, context_dict, context_instance=None, filename='f
         return response
     return HttpResponse('We had some errors<pre>%s</pre>' % cgi.escape(html))
 
+"""
+weasyprint
+"""
+def weasy_fetcher(url,**kwargs):
+    if url.startswith('graph:'):
+        url = url[len('graph:'):]
+        return weasyprint.default_url_fetcher('file://' +settings.STATIC_ROOT + url)
+    else:
+        return weasyprint.default_url_fetcher(url)
+
+def render_to_pdf_weasy(template_src, context_dict, context_instance=None, filename='file.pdf'):
+    # Renderiza o HTML
+    template = loader.get_template(template_src)
+    context = context_instance or Context()
+    context.update(context_dict)
+    html  = template.render(context)
+    
+    
+    response = HttpResponse(mimetype="application/pdf")
+    weasyprint.HTML(string=html, url_fetcher=weasy_fetcher).write_pdf(response)
+    #response['Content-Disposition'] = 'attachment; filename=%s' % filename
+    return response
+
+
+
+def render_to_pdfxhtml2pdf(template_src, context_dict, context_instance=None, filename='file.pdf', attachments=[]):
+    from xhtml2pdf import pisa
+    from xhtml2pdf.pdf import pisaPDF
+    # Renderiza o HTML
+    template = loader.get_template(template_src)
+    context = context_instance or Context()
+    context.update(context_dict)
+    html  = template.render(context)
+    pdf = pisaPDF()
+    pdf_princ = pisa.pisaDocument(StringIO.StringIO(html.encode("utf-8"))) #, link_callback=fetch_resources)
+    pdf.addDocument(pdf_princ)
+    a = 0
+    for f,d,t in attachments:
+        a += 1
+        pdf.addDocument(pisa.pisaDocument(StringIO.StringIO((u'<div style="text-align:center; font-size:22px; padding-top:12cm;"><strong>Anexo %s<br />%s</strong></div>' % (a,d)).encode('utf-8'))))
+        if t == 1: pdf.addFromFile(open(f, "rb"))
+        elif t == 2: pdf.addFromString(f)
+        
+    if not pdf_princ.err:
+        response = HttpResponse(mimetype='application/pdf')
+        response.write(pdf.getvalue())
+        response['Content-Disposition'] = 'attachment; filename=%s' % filename
+        return response
+    return HttpResponse('We had some errors<pre>%s</pre>' % cgi.escape(html))
+
+
 def render_wk_to_pdf(template_src, context_dict, context_instance=None, filename=None, attachments=[], request=None, header_template=None, footer_template=None):
+    from wkhtmltopdf.views import PDFTemplateResponse
+    
     """
     Renderiza o HTML utilizando o wkHTMLtoPDF, por linha de comando, utilizando a engine QT com webkit
     """

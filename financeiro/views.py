@@ -18,10 +18,6 @@ from django.db.models import Q, Max
 from django.contrib.auth.decorators import permission_required, login_required
 from django.db.models import Sum
 from django.template import Context, loader, RequestContext
-import os
-import ho.pisa as pisa
-import cStringIO as StringIO
-import cgi
 import datetime
 from operator import itemgetter
 import logging
