@@ -251,7 +251,7 @@ def contratos(request):
             entidade = {'entidade':e.sigla}
             contratos = []
             for c in cts:
-                contrato = {'inicio':c.data_inicio, 'termino':c.limite_rescisao, 'numero':c.numero, 'arquivo':c.arquivo, 'auto':c.auto_renova}
+                contrato = {'id':c.id, 'inicio':c.data_inicio, 'termino':c.limite_rescisao, 'numero':c.numero, 'arquivo':c.arquivo, 'auto':c.auto_renova}
                 oss = c.ordemdeservico_set.order_by('-data_inicio')
                 if oss.count():
                    ordens = []
