@@ -67,7 +67,7 @@ def render_to_pdf_weasy(template_src, context_dict, context_instance=None, filen
     
     response = HttpResponse(mimetype="application/pdf")
     weasyprint.HTML(string=html, url_fetcher=weasy_fetcher).write_pdf(response)
-    #response['Content-Disposition'] = 'attachment; filename=%s' % filename
+    response['Content-Disposition'] = 'attachment; filename=%s' % filename
     return response
 
 
