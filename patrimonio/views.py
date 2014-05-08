@@ -12,7 +12,7 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.template.response import TemplateResponse
 from django.utils import simplejson
-from utils.functions import render_to_pdf, render_wk_to_pdf
+from utils.functions import render_to_pdf, render_wk_to_pdf, render_to_pdf_weasy
 import itertools
 
 from models import *
@@ -386,7 +386,7 @@ def por_local_termo(request, pdf=0):
             context = {'entidade': entidade, 'ent':entidade_id, 'enderecos': enderecos}
             
         if pdf:
-            return render_to_pdf('patrimonio/por_local_termo.pdf', context, filename='inventario_por_local.pdf')
+            return render_to_pdf_weasy('patrimonio/por_local_termo_weasy.pdf', context, filename='inventario_por_local.pdf')
         else:
             return render_to_response('patrimonio/por_local_termo.html', context,  RequestContext(request,context))
     else:
