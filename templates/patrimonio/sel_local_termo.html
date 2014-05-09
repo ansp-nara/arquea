@@ -3,6 +3,7 @@
 <script type="text/javascript" src="/media/js/selects.js"></script>
 {% endblock %}
 {% block content %}
+<div style="margin:10px; color:red; font-weight:bold;">{{ msg }}</div>
 <form method="GET">
 <label for="id_entidade">Entidade</label>:
 <select name="entidade" id="id_entidade" onchange="ajax_filter_enderecos(this.id);">

@@ -8,7 +8,8 @@
     .num { text-align:right; }
     .peq { width: 100px; }
     body {
-        font-family:Arial;font-size:9px; margin:15px;
+        font-family:Arial;font-size:9px; 
+        margin:15px;
         clear:both;
         position:relative;
         left: 0;
