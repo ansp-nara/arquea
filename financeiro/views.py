@@ -10,7 +10,7 @@ from django.core.exceptions import PermissionDenied
 from django.contrib.auth.models import Group
 from django.contrib import admin
 from django.http import Http404, HttpResponse
-from utils.functions import pega_lista, formata_moeda, render_to_pdf
+from utils.functions import pega_lista, formata_moeda, render_to_pdf, render_to_pdf_weasy
 import json as simplejson
 from models import *
 from decimal import Decimal
@@ -340,14 +340,14 @@ def relatorio_acordos(request, pdf=False):
                 totalGeralDolar = Decimal('0.0')
                 itens = []
 
-                for o in  a.origemfapesp_set.filter(item_outorga__natureza_gasto__termo=t).select_related('item_outorga'):
+                for o in  a.origemfapesp_set.filter(item_outorga__natureza_gasto__termo=t).select_related('item_outorga', 'item_outorga__entidade'):
                     it = {'desc':'%s - %s' % (o.item_outorga.entidade, o.item_outorga.descricao), 'id':o.id}
                     totalReal = Decimal('0.0')
                     totalDolar = Decimal('0.0')
                     pg = []
                     for p in o.pagamento_set.order_by('conta_corrente__data_oper', 'id') \
                                             .select_related('conta_corrente', 'protocolo', 'protocolo__descricao2', 'protocolo__tipo_documento',\
-                                                            'origem_fapesp__item_outorga__natureza_gasto__modalidade'):
+                                                            'protocolo__descricao2__entidade','origem_fapesp__item_outorga__natureza_gasto__modalidade'):
                         
                         pags = {'p':p, 'docs':p.auditoria_set.select_related('tipo')}
                         pg.append(pags)
@@ -367,7 +367,7 @@ def relatorio_acordos(request, pdf=False):
                 retorno.append(ac)
 
             if pdf:
-                return render_to_pdf(template_src='financeiro/acordos.pdf', context_dict={'termo':t, 'acordos':retorno}, filename='relatorio_de_acordos_da_outorga_%s.pdf'%t,)
+                return render_to_pdf_weasy(template_src='financeiro/acordos_weasy.pdf', context_dict={'termo':t, 'acordos':retorno}, filename='relatorio_de_acordos_da_outorga_%s.pdf'%t,)
             else:
                 return render_to_response('financeiro/acordos.html', {'termo':t, 'acordos':retorno}, context_instance=RequestContext(request))
         else:
