@@ -114,7 +114,13 @@
         	      <tr class="{% cycle 'z1' 'z2' %} nivel3 tr_1_{{forloop.parentloop.parentloop.counter}} tr_2_{{forloop.parentloop.parentloop.counter}}_{{forloop.parentloop.counter}}" id="tr_3_{{forloop.parentloop.parentloop.counter}}_{{forloop.parentloop.counter}}_{{forloop.counter}}">
         			      <td class="td1">&nbsp;</td>
         			      <td class="td2">&nbsp;</td>
-        			      <td class="td3">{{ pg.p.conta_corrente.cod_oper|default:"-" }}</td>
+        			      <td class="td3">
+                             {% if pg.p.conta_corrente.imagem %}
+                                 <span style="white-space:nowrap">CHQ {{ pg.p.conta_corrente.cod_oper|default:"-" }}</span>
+                             {% else %}
+                                 {{ pg.p.conta_corrente.cod_oper|default:"-" }}
+                             {% endif %}
+        			      </td>
         			      <td class="td4">{{ pg.p.conta_corrente.data_oper|date:"d/m"|default:"-" }}</td>
         			      <td>{{ pg.p.protocolo.descricao2 }}</td><td>{{ pg.p.protocolo.referente }}</td>
         			      <td>{% if pg.p.origem_fapesp and pg.p.origem_fapesp.item_outorga.natureza_gasto.modalidade.moeda_nacional == False %}
