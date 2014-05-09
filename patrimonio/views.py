@@ -274,7 +274,7 @@ def por_marca(request, pdf=0):
 
 @login_required
 def por_local(request, pdf=0):
-    if request.GET.get('endereco') is not None:
+    if request.GET.get('endereco'):
         atuais = []
         for p in Patrimonio.objects.filter(patrimonio__isnull=True):
             ht = p.historico_atual
@@ -315,12 +315,13 @@ def por_local(request, pdf=0):
         return render_to_response('patrimonio/por_local.html', context)
     else:
         entidades = find_entidades_filhas(None)
-        return render_to_response('patrimonio/sel_local.html', {'entidades':entidades}, context_instance=RequestContext(request))
+        msg = "A seleção da Entidade e Endereço são obrigatórias."
+        return render_to_response('patrimonio/sel_local.html', {'entidades':entidades, 'msg':msg}, context_instance=RequestContext(request))
 
 
 @login_required
 def por_local_termo(request, pdf=0):
-    if request.GET.get('endereco') is not None:
+    if request.GET.get('entidade'):
         atuais = []
         # Buscando os históricos atuais de patrimonios de primeiro nível
         for p in Patrimonio.objects.filter(patrimonio__isnull=True):
@@ -392,7 +393,8 @@ def por_local_termo(request, pdf=0):
     else:
         # Cria a lista para o SELECT de filtro de Entidades, buscando as Entidades que possuem EnderecoDetalhe
         entidades = find_entidades_filhas(None)
-        return render_to_response('patrimonio/sel_local_termo.html', {'entidades':entidades}, context_instance=RequestContext(request))
+        msg = "A seleção da Entidade é obrigatória."
+        return render_to_response('patrimonio/sel_local_termo.html', {'entidades':entidades, 'msg':msg}, context_instance=RequestContext(request))
 
 # Usado para criar o filtro de entidades.
 # Caso o parametro seja None, busca todas as entidades de primeiro nível, seguidas pela busca de todas as entidades abaixo.
