@@ -339,10 +339,10 @@ def por_local(request, pdf=0):
                                                             .order_by('descricao', 'complemento')
                                 })
             context = {'endereco':endereco, 'end':endereco_id, 'detalhes':detalhes}
-
+        
         if pdf:
-            return render_to_pdf('patrimonio/por_local.pdf', context, filename='inventario_por_local.pdf')
-        return render_to_response('patrimonio/por_local.html', context)
+            return render_to_pdf_weasy('patrimonio/por_local_weasy.pdf', context, filename='inventario_por_local.pdf')
+        return render_to_response('patrimonio/por_local.html', context, context_instance=RequestContext(request))
     else:
         entidades = find_entidades_filhas(None)
         msg = "A seleção da Entidade e Endereço são obrigatórias."
