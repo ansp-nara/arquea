@@ -272,21 +272,25 @@ def por_marca(request, pdf=0):
     else:
         return TemplateResponse(request, 'patrimonio/sel_marca.html', {'marcas':Patrimonio.objects.values_list('equipamento__entidade_fabricante__sigla', flat=True).order_by('equipamento__entidade_fabricante__sigla').distinct()})
 
+
 @login_required
 def por_local(request, pdf=0):
     if request.GET.get('endereco'):
         atuais = []
-        for p in Patrimonio.objects.filter(patrimonio__isnull=True):
-            ht = p.historico_atual
-            if ht:
-                 atuais.append(ht.id)
+        detalhes = []
 
+        endereco_id = request.GET.get('endereco')
         detalhe_id = request.GET.get('detalhe2')
+        
         if not detalhe_id:
            detalhe_id = request.GET.get('detalhe1')
         if not detalhe_id:
            detalhe_id = request.GET.get('detalhe')
+           
+        
+        # Listamos os patrimonios candidatos, a partir do filtro de endereços
         if detalhe_id:
+            
             detalhe = get_object_or_404(EnderecoDetalhe, pk=detalhe_id)
             detalhes = [detalhe]
             i = 0
@@ -294,10 +298,32 @@ def por_local(request, pdf=0):
                 for ed in detalhes[i].enderecodetalhe_set.all():
                     detalhes.append(ed)
                 i += 1
-            historicos = HistoricoLocal.objects.filter(id__in=atuais, endereco__in=detalhes)
-            context = {'detalhe':detalhe, 'det':detalhe_id, 'detalhes':[{'patrimonio':Patrimonio.objects.filter(historicolocal__in=historicos).order_by('descricao', 'complemento')}]}
+                
+            patrimonio_ids = HistoricoLocal.objects.filter(patrimonio__patrimonio__isnull=True, endereco__in=detalhes).values_list('patrimonio', flat=True).order_by('id')
         else:
-            endereco_id = request.GET.get('endereco')
+            # Se não tiver filtro de detalhe, temos que buscar em todos os enderecos possiveis
+            endereco = get_object_or_404(Endereco, pk=endereco_id)
+
+            patrimonio_ids = HistoricoLocal.objects.filter(id__in=atuais, endereco__endereco=endereco).values_list('patrimonio', flat=True).order_by('id') \
+                            | HistoricoLocal.objects.filter(id__in=atuais, endereco__detalhe__endereco=endereco).values_list('patrimonio', flat=True).order_by('id') \
+                            | HistoricoLocal.objects.filter(id__in=atuais, endereco__detalhe__detalhe__endereco=endereco).values_list('patrimonio', flat=True).order_by('id')
+        
+        # Com os patrimonios candidatos, buscamos somente endereços que possuem
+        # históricos atuais nos patrimonios
+        for p in Patrimonio.objects.filter(patrimonio__isnull=True, id__in=patrimonio_ids):
+            ht = p.historico_atual
+            if ht:
+                 atuais.append(ht.id)
+           
+        # Aqui listamos os Patrimonios que possuem Historico Atual no endereço selecionado
+        if detalhe_id:
+            historicos = HistoricoLocal.objects.filter(id__in=atuais, endereco__in=detalhes)
+            context = {'detalhe':detalhe, 
+                       'det':detalhe_id, 
+                       'detalhes':[{'patrimonio':Patrimonio.objects.filter(historicolocal__in=historicos)
+                                    .select_related('equipamento__entidade_fabricante', 'entidade_procedencia', 'pagamento__protocolo')
+                                    .order_by('descricao', 'complemento')}]}
+        else:
             endereco = get_object_or_404(Endereco, pk=endereco_id)
 
             historicos = HistoricoLocal.objects.filter(id__in=atuais, endereco__endereco=endereco
@@ -307,7 +333,11 @@ def por_local(request, pdf=0):
             detalhes = []
             detalhes_ids = historicos.values_list('endereco', flat=True)
             for d in EnderecoDetalhe.objects.filter(id__in=detalhes_ids):
-                detalhes.append({'detalhe':d, 'patrimonio':Patrimonio.objects.filter(historicolocal__in=historicos.filter(endereco=d)).order_by('descricao', 'complemento')})
+                detalhes.append({'detalhe':d, 
+                                 'patrimonio':Patrimonio.objects.filter(historicolocal__in=historicos.filter(endereco=d))
+                                                            .select_related('equipamento__entidade_fabricante', 'entidade_procedencia', 'pagamento__protocolo')
+                                                            .order_by('descricao', 'complemento')
+                                })
             context = {'endereco':endereco, 'end':endereco_id, 'detalhes':detalhes}
 
         if pdf:
