@@ -9,7 +9,9 @@ from django.contrib.admin.widgets import FilteredSelectMultiple, RelatedFieldWid
 from django.db.models.fields.related import ManyToOneRel
 from django.forms.formsets import BaseFormSet
 from django.forms.models import BaseInlineFormSet, inlineformset_factory
-
+from django.forms import models
+from django.forms.fields import ChoiceField
+from django.forms.models import ModelChoiceIterator, ModelChoiceField
 
 from models import *
 from financeiro.models import Pagamento
@@ -52,7 +54,26 @@ class PatrimonioReadOnlyField(forms.FileField):
         self.widget.initial = initial
         return initial
 
-        
+"""
+Classe para exibição da Entidade no formato Select, ordenado pelo sigla_completa
+que inclui a Entidade pai, no formato "<sigla entidade pai> - <sigla entidade>"
+"""
+class EntidadeModelChoiceField(forms.ModelChoiceField):
+    def __init__(self, *args, **kwargs):
+        super(EntidadeModelChoiceField, self).__init__(*args, **kwargs)
+
+    def _get_choices(self):
+        if hasattr(self, '_choices'):
+            return self._choices
+ 
+        choices = [("", self.empty_label or "---------")]
+        for item in self.queryset:
+            choices.append((item.pk, item.sigla_completa()))
+        choices = sorted(choices, key=lambda obj: obj[1])
+        return choices
+
+    choices = property(_get_choices, ChoiceField._set_choices)
+
 class EquipamentoContidoModelChoiceField(forms.ModelChoiceField):
     """
     Classe para exibição de Equipamentos - contidos em.
@@ -122,7 +143,7 @@ class PatrimonioAdminForm(forms.ModelForm):
                                      empty_label='---'
                                      )
     
-    entidade_procedencia = forms.ModelChoiceField(queryset=Entidade.objects.all(),
+    entidade_procedencia = EntidadeModelChoiceField(queryset=Entidade.objects.all(),
                                                  required=False, 
                                                  label=mark_safe('<a href="#" onclick="window.open(\'/identificacao/entidade/\'+$(\'#id_entidade_procedencia\').val() + \'/\', \'_blank\');return true;">Procedência</a>'),)
 
@@ -287,7 +308,7 @@ class PatrimonioHistoricoLocalAdminForm(forms.ModelForm):
         js = ('/media/js/selects.js',)
 
 
-    entidade = forms.ModelChoiceField(Entidade.objects.all(), required=False,
+    entidade = EntidadeModelChoiceField(Entidade.objects.all(), required=False,
                 widget=forms.Select(attrs={'onchange': 'ajax_select_endereco(this.id);'}))
 
     descricao = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows':'2'}))    
@@ -325,6 +346,7 @@ class PatrimonioHistoricoLocalAdminForm(forms.ModelForm):
 
         if not end:
             end = EnderecoDetalhe.objects.filter(id__lte=0)
+            
 
         #self.fields['endereco'].queryset = end
         self.fields['endereco'].choices = [(e.id, e.__unicode__()) for e in end]
@@ -389,7 +411,7 @@ HistoricoLocalAdminFormSet = inlineformset_factory(Patrimonio, HistoricoLocal, f
 
 
 class EquipamentoAdminForm(forms.ModelForm):
-    entidade_fabricante = forms.ModelChoiceField(queryset=Entidade.objects.all(),
+    entidade_fabricante = EntidadeModelChoiceField(queryset=Entidade.objects.all(),
                                                  required=False, 
                                                  label=mark_safe('<a href="#" onclick="window.open(\'/identificacao/entidade/\'+$(\'#id_entidade_fabricante\').val() + \'/\', \'_blank\');return true;">Marca</a>'),)
     
