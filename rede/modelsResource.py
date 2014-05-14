@@ -68,7 +68,7 @@ class CustoTerremarkRecursoResource(resources.ModelResource):
     def dehydrate_planejamento__os(self, recurso):
         return '%s' % recurso.planejamento.os
     def dehydrate_planejamento__os__data_inicio(self, recurso):
-        return '%s' % recurso.planejamento.os.data_inicio
+        return '%s' % recurso.planejamento.os.data_inicio.strftime('%d/%m/%Y')
     def dehydrate_planejamento__tipo(self, recurso):
         return '%s' % recurso.planejamento.tipo
     def dehydrate_planejamento__referente(self, recurso):
