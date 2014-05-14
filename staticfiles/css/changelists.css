@@ -32,9 +32,9 @@
 }
 
 .change-list .filtered table, .change-list .filtered .paginator, .filtered #toolbar, .filtered div.xfull {
-    margin-right: 180px !important;
+    /*margin-right: 180px !important;*/
     width: auto !important;
-	min-width: 85% !important;
+	/*min-width: 85% !important;*/
 }
 
 .change-list .filtered table tbody th {
@@ -133,18 +133,37 @@
 
 #changelist-filter {
 	position: absolute;
-    top: 0;
+    top: 36px;
     right: 0;
     /*z-index: 1000;*/
 	float:right;
     width: 160px;
-	min-height:100%;
     background: #efefef;
     margin: 0;
-	padding:0 10px;
-	background:#ccccff;
+	padding:10px;
+    background: #eee;
+    border: 1px darkgray solid;
+    border-radius: 5px;
 }
-
+.hide {
+    display:none;
+}
+#toolbar_search_btn {
+    border:1px solid;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    border-radius: 4px;
+    display: block;
+    height: 22px;
+    left: 810px;
+    top: 7px;
+    position: relative;
+    padding: 1px 10px 1px 10px;
+    font-size: 12px;
+    font-weight:bold;
+    background-color: #ff5a00;
+    color: #fff;
+}
 #changelist-filter h2 {
     font-size: 14px;
 	margin:0;

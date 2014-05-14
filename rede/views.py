@@ -1,13 +1,16 @@
-from outorga.models import *
-from financeiro.models import Pagamento
-from django.http import Http404, HttpResponse
-import json as simplejson
-from django.template.response import TemplateResponse
-from identificacao.models import Entidade, Identificacao, ASN
-from models import *
-from utils.functions import render_to_pdf
 from django.db.models import Q
 from django.contrib.auth.decorators import permission_required, login_required
+from django.http import Http404, HttpResponse
+from django.template.response import TemplateResponse
+import json as simplejson
+
+from utils.functions import render_to_pdf
+from outorga.models import *
+from financeiro.models import Pagamento
+from identificacao.models import Entidade, Identificacao, ASN
+from models import *
+from modelsResource import *
+
 
 # Create your views here.
 def escolhe_pagamento(request):
@@ -215,8 +218,21 @@ def blocos_ip(request):
         return TemplateResponse(request, 'rede/blocosip.html', {'blocos':blocos})
      
 @login_required
-def custo_terremark(request, pdf=0):
+def custo_terremark(request, pdf=0, xls=0):
     recursos = Recurso.objects.order_by('planejamento__os', 'planejamento__tipo')
-    if pdf:
+    
+    if request.GET.get('xls') and request.GET.get('xls')=='1':
+        # Export para Excel/XLS
+        recursos = Recurso.objects.order_by('planejamento__os', 'planejamento__tipo')
+        dataset = CustoTerremarkRecursoResource().export(queryset=recursos)
+        
+        response = HttpResponse(dataset.xls, content_type='application/vnd.ms-excel;charset=utf-8')
+        response['Content-Disposition'] = "attachment; filename=custo_terremark.xls"
+
+        return response
+        
+    elif pdf:
+        # Export para PDF
         return render_to_pdf(template_src='rede/tabela_terremark.pdf', context_dict={'recursos':recursos, }, filename='custos_dos_recursos_contratados.pdf')
+        
     return TemplateResponse(request, 'rede/tabela_terremark.html', {'recursos':recursos})

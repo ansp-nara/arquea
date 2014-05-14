@@ -664,6 +664,17 @@ div.system-message p.system-message-title {
 
 /* ACTION ICONS */
 
+.printlink {
+    display:block;
+    padding-left: 25px;
+    /*width:60px;*/
+    min-height:20px;
+    line-height:20px;
+    outline:none;
+    cursor:pointer;
+    color:rgba(5,176,52,1);
+    font-weight:bold;
+}
 .addlink {
 	display:block;
 	float:right;
@@ -677,9 +688,20 @@ div.system-message p.system-message-title {
 	color:rgba(5,176,52,1);
 	font-weight:bold;
 }
-.addlink:hover {background-position: top left; color:rgba(102,204,51,1);}
-.changelink:hover {background-position: top left; color:rgba(4,68,118,1);}
-.deletelink:hover {background-position: top left; color:rgba(191,4,4,1);}
+
+.export_link {
+    display: block;
+    float: right;
+    padding-left: 25px;
+    /*width:60px;*/
+    min-height:20px;
+    line-height:20px;
+    outline:none;
+    cursor:pointer;
+    background:url(../img/admin/xls_small.png) no-repeat bottom left;
+    color:rgba(0,112,158,1);
+    font-weight:bold;
+}
 
 .changelink {
     display:block;
@@ -709,6 +731,13 @@ div.system-message p.system-message-title {
 	font-weight:bold;
 }
 
+.export_link {background-position: top left; color:rgba(102,204,51,1);}
+.printlink:hover {background-position: top left; color:rgba(102,204,51,1);}
+.addlink:hover {background-position: top left; color:rgba(102,204,51,1);}
+.changelink:hover {background-position: top left; color:rgba(4,68,118,1);}
+.deletelink:hover {background-position: top left; color:rgba(191,4,4,1);}
+
+
 a.deletelink:link, a.deletelink:visited {
     color: #CC0033;
 }
@@ -724,9 +753,11 @@ a.deletelink:hover {
 	min-width:160px;
     font-size: 11px;
     font-weight: bold;
-    float: right;
 	position:relative;
-	top:-35px;
+	display: block;
+    height: 15px;
+    top: -35px;
+    float:right;
 }
 
 .form-row .object-tools {
@@ -741,6 +772,7 @@ a.deletelink:hover {
     display: block;
     float: left;
 	min-width:145px;
+	margin-left: 5px;
 }
 
 .object-tools li:hover {
@@ -770,8 +802,17 @@ a.deletelink:hover {
 	height:25px;
 }
 
-.object-tools a.viewsitelink:hover, .object-tools a.golink:hover {
+.object-tools a.export_link:hover,
+.object-tools a.printlink:hover,
+.object-tools a.viewsitelink:hover, 
+.object-tools a.golink:hover {
     background: #ff9900 url(../img/admin/bg-btn-go2.png) center right no-repeat;
+}
+
+.object-tools a.export_link, 
+.object-tools a.printlink{
+    background: #134089 center right;
+    padding:5px 27px 5px 10px;
 }
 
 .object-tools a.addlink{
@@ -1014,6 +1055,7 @@ table#change-history tbody th {
     text-align: left;
 	clear:both;
 	color:#fa6001;
+	height: 27px;
 }
 
 #container .breadcrumbs a{
@@ -1213,3 +1255,81 @@ table#change-history tbody th {
 .textDuplaLinhaClass {
 	height:2.5em;
 }
+#result_list {
+    width:100%;
+    margin: 0 !important;
+}
+
+div.btn_print input {
+    background:url(../img/admin/printer-small.png) no-repeat;
+    background-size: contain;
+    cursor:pointer;
+    width: 30px;
+    height: 30px;
+    border: 1px solid #efefef;
+}
+div.btn_print input[type=submit]:active {
+    background:url(../img/admin/printer-small.png) no-repeat;
+    background-size: contain;
+}
+div.btn_excel input[type=submit]:hover,
+div.btn_print input[type=submit]:hover {
+    border: 1px darkgray solid;
+    border-radius: 4px;
+}
+div.btn_excel input {
+    background:url(../img/admin/xls_small.png) no-repeat;
+    background-size: contain;
+    cursor:pointer;
+    width: 30px;
+    height: 30px;
+    border: 1px solid #efefef;
+}
+div.btn_excel input[type=submit]:active {
+    background:url(../img/admin/xls_small.png) no-repeat;
+    background-size: contain;
+}
+
+
+
+#report_title {
+    height: 10px;
+}
+#report_toolbar {
+    float: left;
+    width: 195px;
+    height: 40px;
+    margin: 0 0 0 25px;
+    padding: 0;
+}
+#report_toolbar form {
+    float: left;
+    margin-right: 10px;
+}
+
+/**
+Para a impressão de uma página removemos as informações de navegação do site
+do cabeçalho e rodapé.
+Deixamos somente o Logo e a mensagem de Copyright 
+*/
+@media print {
+  .header-sites,
+  #user-tools,
+  .content-abas {
+    display:none;
+  }
+  .content-modules-footer,
+  .footer-sites,
+  .nara-logo {
+    display:none;
+  }
+  #footer {
+    height:100%;
+  }
+
+  #report_toolbar {
+    display:none;
+  }
+}
+
+
