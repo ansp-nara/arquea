@@ -156,14 +156,14 @@
     display: block;
     height: 22px;
     top: 7px;
-    position: relative;
     padding: 1px 10px 1px 10px;
     font-size: 12px;
     font-weight:bold;
     background-color: #ff5a00;
     color: #fff;
-    float:right;
-    right:-180px;
+    position:absolute;
+    right:0;
+    left:inherit;
 }
 #changelist-filter h2 {
     font-size: 14px;
