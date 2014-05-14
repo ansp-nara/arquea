@@ -162,7 +162,7 @@
     background-color: #ff5a00;
     color: #fff;
     position:absolute;
-    right:0;
+    right:5px;
     left:inherit;
 }
 #changelist-filter h2 {
