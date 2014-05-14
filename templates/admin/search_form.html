@@ -26,6 +26,16 @@
 		
 	</form>
 
-{% endif %}	
+{% endif %}
+{% if cl.has_filters %}
+  <button id="toolbar_search_btn">+ Filtro</button>
+{% endif %}
+
 </div>
-<script type="text/javascript">if (document.getElementById("searchbar") != null) { document.getElementById("searchbar").focus(); }</script>
+<script type="text/javascript">
+    if (document.getElementById("searchbar") != null) { document.getElementById("searchbar").focus(); }
+    
+    $("#toolbar_search_btn").click(function() {
+	  $("#changelist-filter").toggleClass("hide");
+	});
+</script>
