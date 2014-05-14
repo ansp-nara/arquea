@@ -51,7 +51,7 @@
    <tr>
      <td><a href="{% url 'admin:outorga_contrato_change' r.planejamento.os.contrato.id %}">{{ r.planejamento.os.contrato.numero }}</a></td>
 	 <td class="td_os"><span><a href="{% url 'admin:outorga_ordemdeservico_change' r.planejamento.os.id %}">{{ r.planejamento.os }}</a></td>
-         <td>{{ r.planejamento.os.data_inicio|date:"SHORT_DATE_FORMAT" }}</span></td>
+         <td>{{ r.planejamento.os.data_inicio|date:"d/m/Y" }}</span></td>
 	 <td>{{ r.planejamento.tipo }}</td>
 	 <td>{{ r.planejamento.referente }}</td>
 	 <td>{{ r.planejamento.unidade }}</td>
