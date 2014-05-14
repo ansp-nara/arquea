@@ -4,7 +4,14 @@ from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 from utils.functions import clone_objects
 from models import *
+from modelsResource import *
 from forms import *
+from resource import *
+
+from import_export.admin import ExportMixin
+from import_export.admin import ImportExportModelAdmin,ExportMixin
+from import_export import fields,widgets
+from import_export import resources
 
 admin.site.register(Estado)
 admin.site.register(Tipo)
@@ -29,7 +36,9 @@ class HistoricoLocalInline(admin.StackedInline):
     extra = 1
 
 
-class PatrimonioAdmin(admin.ModelAdmin):
+class PatrimonioAdmin(ExportMixin, admin.ModelAdmin):
+    resource_class = PatrimonioResource
+    
     fieldsets = (
                  ('Pagamento', {
                       'fields': (('termo', 'npgto',), ('pagamento', 'valor',)),
