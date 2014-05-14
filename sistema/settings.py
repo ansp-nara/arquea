@@ -88,7 +88,8 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'tinymce',
-    'ckeditor'
+    'ckeditor',
+    'import_export'
 )
 PROJECT_APPS = (
     'carga',
