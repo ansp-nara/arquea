@@ -13,7 +13,9 @@ class CustoTerremarkRecursoResource(resources.ModelResource):
     planejamento__valor_unitario = fields.Field(column_name='Preço unitário')
     planejamento__os__contrato__numero = fields.Field(column_name='Contrato')
     planejamento__os = fields.Field(column_name='OS')
-    planejamento__os__data_inicio = fields.Field(column_name='Data')
+    planejamento__os__data_inicio = fields.Field(column_name='Data Ini')
+    planejamento__os__data_rescisao = fields.Field(column_name='Data Fim')
+    planejamento__projeto = fields.Field(column_name='Projeto')
     planejamento__tipo = fields.Field(column_name='Descrição')
     planejamento__referente = fields.Field(column_name='Referente')
     planejamento__unidade = fields.Field(column_name='Unidade')
@@ -28,6 +30,8 @@ class CustoTerremarkRecursoResource(resources.ModelResource):
         fields = ('planejamento__os__contrato__numero',
                   'planejamento__os',
                   'planejamento__os__data_inicio',
+                  'planejamento__os__data_rescisao',
+                  'planejamento__projeto',
                   'planejamento__tipo',
                   'planejamento__referente',
                   'planejamento__unidade',
@@ -43,6 +47,8 @@ class CustoTerremarkRecursoResource(resources.ModelResource):
         export_order = ('planejamento__os__contrato__numero',
                   'planejamento__os',
                   'planejamento__os__data_inicio',
+                  'planejamento__os__data_rescisao',
+                  'planejamento__projeto',
                   'planejamento__tipo',
                   'planejamento__referente',
                   'planejamento__unidade',
@@ -67,7 +73,17 @@ class CustoTerremarkRecursoResource(resources.ModelResource):
     def dehydrate_planejamento__os(self, recurso):
         return '%s' % recurso.planejamento.os
     def dehydrate_planejamento__os__data_inicio(self, recurso):
-        return '%s' % recurso.planejamento.os.data_inicio.strftime('%d/%m/%Y')
+        if recurso.planejamento.os.data_inicio:
+            return '%s' % (recurso.planejamento.os.data_inicio).strftime('%d/%m/%Y')
+        else:
+            return ''
+    def dehydrate_planejamento__os__data_rescisao(self, recurso):
+        if recurso.planejamento.os.data_rescisao:
+            return '%s' % (recurso.planejamento.os.data_rescisao).strftime('%d/%m/%Y')
+        else:
+            return ''
+    def dehydrate_planejamento__projeto(self, recurso):
+        return '%s' % recurso.planejamento.projeto
     def dehydrate_planejamento__tipo(self, recurso):
         return '%s' % recurso.planejamento.tipo
     def dehydrate_planejamento__referente(self, recurso):
@@ -84,7 +100,6 @@ class CustoTerremarkRecursoResource(resources.ModelResource):
         return recurso.quantidade
     def dehydrate_pagamento__protocolo__num_documento(self, recurso):
         return '%s' % recurso.pagamento.protocolo.num_documento
-
 
 
 class BlocosIPResource(resources.ModelResource):
@@ -154,4 +169,5 @@ class BlocosIPResource(resources.ModelResource):
 # <td>{{ b.designado|default_if_none:"" }}</td>
 # <td>{{ b.rir }}</td>
 # <td>{{ b.obs }}</td>
+
 
