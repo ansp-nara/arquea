@@ -4,7 +4,6 @@ from import_export import resources
 from rede.models import *
 from utils.functions import formata_moeda
 
-
 """
 Modelo do model Recurso para a geração do XLS para o relatório Custo Terremark
 """
@@ -85,3 +84,74 @@ class CustoTerremarkRecursoResource(resources.ModelResource):
         return recurso.quantidade
     def dehydrate_pagamento__protocolo__num_documento(self, recurso):
         return '%s' % recurso.pagamento.protocolo.num_documento
+
+
+
+class BlocosIPResource(resources.ModelResource):
+    
+    usuario = fields.Field(column_name='Usado por')
+    cidr = fields.Field(column_name='Bloco IP')
+    asn = fields.Field(column_name='AS Anunciante')
+    proprietario = fields.Field(column_name='AS Proprietário')
+    designado = fields.Field(column_name='Designado para')
+    rir = fields.Field(column_name='RIR')
+    obs = fields.Field(column_name='Observacao')
+    superbloco = fields.Field(column_name='Superbloco')
+    
+    class Meta:
+        model = BlocoIP
+        fields = ('id',
+                  'usuario',
+                  'superbloco',
+                  'cidr',
+                  'asn',
+                  'proprietario',
+                  'designado',
+                  'rir',
+                  'obs',
+                 )
+        export_order = (
+                  'id',
+                  'usuario',
+                  'superbloco',
+                  'cidr',
+                  'asn',
+                  'proprietario',
+                  'designado',
+                  'rir',
+                  'obs',
+                 )
+
+    def dehydrate_usuario(self, bloco):
+        return '%s' % (bloco.usuario or '')
+
+    def dehydrate_superbloco(self, bloco):
+        return '%s' % (bloco.superbloco or '')
+
+    def dehydrate_cidr(self, bloco):
+        return '%s' % bloco.cidr()
+    
+    def dehydrate_asn(self, bloco):
+        return '%s' % (bloco.asn or '')
+    
+    def dehydrate_proprietario(self, bloco):
+        return '%s' % (bloco.proprietario or '')
+    
+    def dehydrate_designado(self, bloco):
+        return '%s' % bloco.designado
+    
+    def dehydrate_rir(self, bloco):
+        return '%s' % bloco.rir
+    
+    def dehydrate_obs(self, bloco):
+        return '%s' % bloco.obs
+
+
+# <td>{{ b.usuario|default_if_none:"" }}</td>
+# <td>{{ b.cidr|safe }}</td>
+# <td>{{ b.asn }}</td>
+# <td>{{ b.proprietario|default_if_none:"" }}</td>
+# <td>{{ b.designado|default_if_none:"" }}</td>
+# <td>{{ b.rir }}</td>
+# <td>{{ b.obs }}</td>
+

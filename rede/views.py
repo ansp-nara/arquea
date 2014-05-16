@@ -213,9 +213,24 @@ def blocos_ip(request):
         if designado != '0':
             blocos = blocos.filter(designado__id=designado)
 
-        if request.GET.get('porusuario'):
+
+        if request.GET.get('xls') and request.GET.get('xls')=='1':
+            # Export para Excel/XLS
+            querysetPais=blocos.filter(superbloco__isnull=True)
+            querysetFilhos=BlocoIP.objects.all().filter(superbloco__in=querysetPais)
+            queryset=(querysetPais|querysetFilhos).order_by('ip', 'mask')
+            dataset = BlocosIPResource().export(queryset=queryset)
+            
+            response = HttpResponse(dataset.xls, content_type='application/vnd.ms-excel;charset=utf-8')
+            response['Content-Disposition'] = "attachment; filename=blocosip.xls"
+    
+            return response
+
+        elif request.GET.get('porusuario'):
             return TemplateResponse(request, 'rede/blocosip.html.notree', {'blocos':blocos.order_by('usuario__sigla')})
         return TemplateResponse(request, 'rede/blocosip.html', {'blocos':blocos})
+     
+     
      
 @login_required
 def custo_terremark(request, pdf=0, xls=0):

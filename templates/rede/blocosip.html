@@ -7,7 +7,7 @@
   div.colunas {float:left; width:140px;}
   div.obs {float:left; width:230px;}
   ins {float:left;}
-  div#theader {font-weight:bold;}
+  div#theader {font-weight:bold; clear:both;}
   </style>
 {% endblock %}
 {% block extrahead %}
@@ -15,7 +15,23 @@
 <script type="text/javascript" src="/media/js/jstree/jquery.jstree.js"></script>
 {% endblock %}
 {% block content %}
-<h1>Blocos IP</h1>
+<div id="report_title">
+	<h1>Blocos IP</h1>
+    <div id="report_toolbar">
+        <form action="{% url 'rede.views.blocos_ip' %}" method="GET" id="id_form_recurso_xls">
+            <input type="hidden" name="anunciante" value="{{request.GET.anunciante}}" />
+            <input type="hidden" name="proprietario" value="{{request.GET.proprietario}}" />
+            <input type="hidden" name="usuario" value="{{request.GET.usuario}}" />
+            <input type="hidden" name="designado" value="{{request.GET.designado}}" />
+            <input type="hidden" name="xls" value="1" />
+            <div title="Exportar para Excel" class="btn_excel">
+               <input type="submit" value="" />
+            </div>
+        </form>
+    </div>
+    <p></p>
+</div>
+
 <div id="theader">
 <div class="col1">
 Bloco IP
