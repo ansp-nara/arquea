@@ -857,7 +857,7 @@ table#change-history tbody th {
 #container {
 	margin:0 auto;
     position: relative;
-    width: 1200px;
+    width: 100%;
     min-width: 1000px;
 	height:auto;
     padding: 0;
@@ -866,7 +866,7 @@ table#change-history tbody th {
 
 #content {
     margin: 0;
-	width:1200px;
+	width:100%;
 	height:100%;
 	background:#fff;
 	filter: alpha(opacity=90);
@@ -995,7 +995,7 @@ table#change-history tbody th {
 }
 
 /* HEADER */
-.header-content{min-width:1000px; width:1200px; margin:0 auto;}
+.header-content{min-width:1000px; width:100%; margin:0 auto;}
 
 #header {
     width:100%;
@@ -1113,8 +1113,6 @@ table#change-history tbody th {
     clear: both;
     width:100%;
     min-width:1200px;
-    padding: 10px;
-	border:solid 1px #ccc;
 	height:180px;
 	background:#134089;
 }
