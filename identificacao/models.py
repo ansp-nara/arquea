@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 
-
 from django.db import models
 from utils.models import CNPJField
 from utils.models import NARADateField
 from django.utils.translation import ugettext_lazy as _
 from datetime import datetime
-
+import re
 
 class Contato(models.Model):
     """
@@ -191,6 +190,18 @@ class Entidade(models.Model):
         else:
            return u'%s' % self.sigla
     sigla_completa.short_description = _(u'Faz parte de')
+    
+    
+    #Retorna a sigla com 4 espaços iniciais para cada nível de entidade pai
+    def sigla_tabulada(self):
+        if self.entidade:
+            entidade_pai = self.entidade.sigla_tabulada()
+            # substitui qualquer string que não inicia com espaços por quatro espaços
+            retorno =  re.sub('[^\s]+.+', '    ', entidade_pai)
+            return u'%s%s' % (retorno,self.sigla)
+        else:
+            return u'%s' % self.sigla
+    sigla_tabulada.short_description = _(u'Faz parte de')
 
     # Retorna a sigla e o nome.
     def sigla_nome(self):

@@ -66,16 +66,25 @@ class EntidadeModelChoiceField(forms.ModelChoiceField):
         if hasattr(self, '_choices'):
             return self._choices
         # Escolhe entre o empty_label ou senão coloca um valor padrão para o item vazio
-        choices = [("", self.empty_label or "---------")]
+        choices = [("", self.empty_label or "---------", '')]
         
-        # Preenche os valores do compo com o ID e a sigla completa com a entidade pai
-        for item in self.queryset.select_related('entidade'):
-            choices.append((item.pk, item.sigla_completa()))
+        
+        # Preenche os valores do compo com o ID, a sigla completa com a entidade pai, e a sigla tabulada
+        for item in self.queryset.select_related('entidade', 'entidade__entidade'):
+
+            label = mark_safe(item.sigla_tabulada().replace(' ', '&nbsp;'))
+            sortValue = item.sigla_completa()
+            choices.append((item.pk, label, sortValue))
             
-        # Reordena os itens
-        choices = sorted(choices, key=lambda obj: obj[1])
+        # Reordena os itens utilizando a sigla completa
+        choices = sorted(choices, key=lambda obj: obj[2])
         
-        return choices
+        # Remonta o Select com o ID e o valor tabulado
+        result = []
+        for item in choices:
+            result.append((item[0], item[1]))
+        
+        return result
 
     choices = property(_get_choices, ChoiceField._set_choices)
 
