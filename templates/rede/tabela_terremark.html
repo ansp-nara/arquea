@@ -34,8 +34,10 @@
 <tr>
     <th>Contrato</th>
     <th>OS</th>
-    <th>Data</th>
+    <th>Data Ini.</th>
+    <th>Data Fim</th>
     <th>Descrição</th>
+    <th>Projeto</th>
     <th>Referente</th>
     <th>Unidade</th>
     <th>Preço unitário</th>
@@ -50,9 +52,11 @@
 {% for r in recursos %}
    <tr>
      <td><a href="{% url 'admin:outorga_contrato_change' r.planejamento.os.contrato.id %}">{{ r.planejamento.os.contrato.numero }}</a></td>
-	 <td class="td_os"><span><a href="{% url 'admin:outorga_ordemdeservico_change' r.planejamento.os.id %}">{{ r.planejamento.os }}</a></td>
-         <td>{{ r.planejamento.os.data_inicio|date:"d/m/Y" }}</span></td>
+     <td class="td_os"><span><a href="{% url 'admin:outorga_ordemdeservico_change' r.planejamento.os.id %}">{{ r.planejamento.os }}</a></td>
+     <td>{{ r.planejamento.os.data_inicio|date:"d/m/Y" }}</span></td>
+     <td>{{ r.planejamento.os.data_rescisao|date:"d/m/Y" }}</span></td>
 	 <td>{{ r.planejamento.tipo }}</td>
+	 <td>{{ r.planejamento.projeto }}</td>
 	 <td>{{ r.planejamento.referente }}</td>
 	 <td>{{ r.planejamento.unidade }}</td>
 	 <td class="td_v_unit"><span>{{ r.planejamento.valor_unitario|moeda }}</span></td>
