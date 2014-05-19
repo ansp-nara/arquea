@@ -50,11 +50,11 @@ table tr td {
 <h1>Custos dos recursos contratados</h1>
 <table border="1" repeat="1" id="tbl_content">
 <tr>
-    <th style="width:1.2cm;">Contrato</th>
+    <th style="width:1.3cm;">Contrato</th>
     <th style="width:1.5cm;">OS</th>
     <th style="width:1.6cm;">Data Ini</th>
     <th style="width:1.6cm;">Data Fim</th>
-    <th style="width:2.6cm;">Projeto</th>
+    <th style="width:3.4cm;">Projeto</th>
     <th style="">Descrição</th>
     <th style="">Referente</th>
     <th style="width:1.3cm;">Unidade</th>
