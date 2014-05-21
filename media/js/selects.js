@@ -16,7 +16,7 @@ function filter_select(sel, filter_by)
 {
     select_ctrl = document.getElementById(sel);
     filter_by_ctrl = document.getElementById(filter_by);
-    filter_text = filter_by_ctrl.options[filter_by_ctrl.selectedIndex].text.replace(/^\s+|\s+django.jQuery/g,"");
+    filter_text = filter_by_ctrl.options[filter_by_ctrl.selectedIndex].text.replace(/^\s+|\s+$/g,"");
     //if (filter_by_ctrl.value == filter_by_ctrl.old_value) return false;    
     sel_found = false;
     
@@ -63,9 +63,9 @@ function filter_select2(sel, filter1, filter2)
     select_ctrl = document.getElementById(sel);
     filter1_by_ctrl = document.getElementById(filter1);
     filter2_by_ctrl = document.getElementById(filter2);
-    filter2_text = filter2_by_ctrl.options[filter2_by_ctrl.selectedIndex].text.replace(/^\s+|\s+django.jQuery/g,"");
+    filter2_text = filter2_by_ctrl.options[filter2_by_ctrl.selectedIndex].text.replace(/^\s+|\s+$/g,"");
     filter1_text = filter1_by_ctrl.options[filter1_by_ctrl.selectedIndex].text.split(" - ")[0]
-    filter1_text = filter1_text.replace(/^\s+|\s+django.jQuery/g,"");
+    filter1_text = filter1_text.replace(/^\s+|\s+$/g,"");
     for(i=0;i<select_ctrl.options.length;i++)
     {
         txt = select_ctrl.options[i].text;
@@ -115,13 +115,13 @@ function ajax_soma_valores(url, objHtmlReturn, select)
     }
 
     dados = {'despesas':d};
-    django.jQuery.ajax({
+    $.ajax({
       type: "POST",
       url: url,
       dataType: "json",
       data: dados,
       success: function(retorno){
-          django.jQuery("#"+objHtmlReturn).val(retorno);
+          $("#"+objHtmlReturn).val(retorno);
       },
       error: function(erro) {
         alert('Erro: Sem valor.');
@@ -147,14 +147,14 @@ function ajax_soma_valor_descricao(url, total, descricao, select)
     }
 
     dados = {'despesas':d};
-    django.jQuery.ajax({
+    $.ajax({
       type: "POST",
       url: url,
       dataType: "json",
       data: dados,
       success: function(retorno){
-          django.jQuery("#"+total).val(retorno['total']);
-          django.jQuery("#"+descricao).val(retorno['desc']);
+          $("#"+total).val(retorno['total']);
+          $("#"+descricao).val(retorno['desc']);
       },
       error: function(erro) {
         alert('Erro: Sem valor.');
@@ -168,26 +168,26 @@ function ajax_gera_despesas_internas(url, objHtmlReturn, pagina, select, auditor
 {
     dados = {'id':select, 'ai':auditoria, 'pagina':pag};
 
-    django.jQuery("#"+objHtmlReturn).html('<select multiple>');
-    django.jQuery("#"+objHtmlReturn).html('<option value="">Carregando...</option>');
-    django.jQuery.ajax({
+    $("#"+objHtmlReturn).html('<select multiple>');
+    $("#"+objHtmlReturn).html('<option value="">Carregando...</option>');
+    $.ajax({
       type: "POST",
       url: url,
       dataType: "json",
       data: dados,
       success: function(retorno){
-          django.jQuery("#"+objHtmlReturn).empty();
-          django.jQuery.each(retorno['fp'], function(i, item){
-              django.jQuery("#"+objHtmlReturn).append('<option value="'+item.pk+'">'+item.valor+'</option>');
+          $("#"+objHtmlReturn).empty();
+          $.each(retorno['fp'], function(i, item){
+              $("#"+objHtmlReturn).append('<option value="'+item.pk+'">'+item.valor+'</option>');
           });
 
-          django.jQuery("#"+pagina).val(retorno['pag']);
+          $("#"+pagina).val(retorno['pag']);
       },
       error: function(erro) {
         alert('Erro. Sem retorno da requisicao.');
       }
     });
-    django.jQuery("#"+objHtmlReturn).html('</select>');
+    $("#"+objHtmlReturn).html('</select>');
 }
 
 
@@ -199,27 +199,27 @@ function ajax_gera_despesas_fapesp(url, objHtmlReturn, parcial, pagina, select, 
 
     dados = {'modalidade':select, 'af':auditoria, 'parcial': parc, 'pagina':pag, 'termo':termo};
 
-    django.jQuery("#"+objHtmlReturn).html('<select multiple>');
-    django.jQuery("#"+objHtmlReturn).html('<option value="">Carregando...</option>');
-    django.jQuery.ajax({
+    $("#"+objHtmlReturn).html('<select multiple>');
+    $("#"+objHtmlReturn).html('<option value="">Carregando...</option>');
+    $.ajax({
       type: "POST",
       url: url,
       dataType: "json",
       data: dados,
       success: function(retorno){
-          django.jQuery("#"+objHtmlReturn).empty();
-          django.jQuery.each(retorno['fp'], function(i, item){
-              django.jQuery("#"+objHtmlReturn).append('<option value="'+item.pk+'">'+item.valor+'</option>');
+          $("#"+objHtmlReturn).empty();
+          $.each(retorno['fp'], function(i, item){
+              $("#"+objHtmlReturn).append('<option value="'+item.pk+'">'+item.valor+'</option>');
           });
 
-          django.jQuery("#"+parcial).val(retorno['parcial']);
-          django.jQuery("#"+pagina).val(retorno['pagina']);
+          $("#"+parcial).val(retorno['parcial']);
+          $("#"+pagina).val(retorno['pagina']);
       },
       error: function(erro) {
         alert('Erro. Sem retorno da requisicao.');
       }
     });
-    django.jQuery("#"+objHtmlReturn).html('</select>');
+    $("#"+objHtmlReturn).html('</select>');
 }
 
 
@@ -230,14 +230,14 @@ function ajax_proxima_parcial(url, parcial, pagina, select)
     id[0] = select;
 
     dados = {'fontepagadora': id};
-    django.jQuery.ajax({
+    $.ajax({
       type: "POST",
       url: url,
       dataType: "json",
       data: dados,
       success: function(retorno){
-          django.jQuery("#"+parcial).val(retorno['parcial']);
-          django.jQuery("#"+pagina).val(retorno['pagina']);
+          $("#"+parcial).val(retorno['parcial']);
+          $("#"+pagina).val(retorno['pagina']);
       },
       error: function(erro) {
         alert('Erro: Sem valor.');
@@ -250,18 +250,18 @@ function ajax_proxima_parcial(url, parcial, pagina, select)
 function ajax_filter(url, objHtmlReturn, id)
 {
     dados = {'id':id};
-//    django.jQuery("#"+objHtmlReturn).html('<option value="0">Carregando...</option>');
-    django.jQuery("#"+objHtmlReturn).html('<option value="">Carregando...</option>');
-    django.jQuery.ajax({
+//    $("#"+objHtmlReturn).html('<option value="0">Carregando...</option>');
+    $("#"+objHtmlReturn).html('<option value="">Carregando...</option>');
+    $.ajax({
       type: "POST",
       url: url,
       dataType: "json",
       data: dados,
       success: function(retorno){
-          django.jQuery("#"+objHtmlReturn).empty();
-          django.jQuery("#"+objHtmlReturn).append('<option value="">------------</option>');
-          django.jQuery.each(retorno, function(i, item){
-              django.jQuery("#"+objHtmlReturn).append('<option value="'+item.pk+'">'+item.valor+'</option>'); 
+          $("#"+objHtmlReturn).empty();
+          $("#"+objHtmlReturn).append('<option value="">------------</option>');
+          $.each(retorno, function(i, item){
+              $("#"+objHtmlReturn).append('<option value="'+item.pk+'">'+item.valor+'</option>'); 
           });
       },
       error: function(erro) {
@@ -274,22 +274,22 @@ function ajax_filter(url, objHtmlReturn, id)
 
 function ajax_filter2(url, objHtmlReturn, id, objHtmlPrevious)
 {
-    previous = django.jQuery("#"+objHtmlPrevious).val();
+    previous = $("#"+objHtmlPrevious).val();
     dados = {'id':id, 'previous':previous};
 
-//    django.jQuery("#"+objHtmlReturn).html('<option value="0">Carregando...</option>');
-    django.jQuery("#"+objHtmlReturn).html('<option value="">Carregando...</option>');
-    django.jQuery.ajax({
+//    $("#"+objHtmlReturn).html('<option value="0">Carregando...</option>');
+    $("#"+objHtmlReturn).html('<option value="">Carregando...</option>');
+    $.ajax({
       type: "POST",
       url: url,
       dataType: "json",
       data: dados,
       success: function(retorno){
-          django.jQuery("#"+objHtmlReturn).empty();
-//          django.jQuery("#"+objHtmlReturn).append('<option value="0">------------</option>'); 
-          django.jQuery("#"+objHtmlReturn).append('<option value="">------------</option>');
-          django.jQuery.each(retorno, function(i, item){
-              django.jQuery("#"+objHtmlReturn).append('<option value="'+item.pk+'">'+item.valor+'</option>'); 
+          $("#"+objHtmlReturn).empty();
+//          $("#"+objHtmlReturn).append('<option value="0">------------</option>'); 
+          $("#"+objHtmlReturn).append('<option value="">------------</option>');
+          $.each(retorno, function(i, item){
+              $("#"+objHtmlReturn).append('<option value="'+item.pk+'">'+item.valor+'</option>'); 
           });
       },
       error: function(erro) {
@@ -305,17 +305,17 @@ function ajax_seleciona_extrato(url, objHtmlReturn, id, previous)
     dados = {'id':id, 'previous': previous};
     alert(dados['id']);
 
-    django.jQuery("#"+objHtmlReturn).html('<option value="">Carregando...</option>');
-    django.jQuery.ajax({
+    $("#"+objHtmlReturn).html('<option value="">Carregando...</option>');
+    $.ajax({
       type: "POST",
       url: url,
       dataType: "json",
       data: dados,
       success: function(retorno){
-          django.jQuery("#"+objHtmlReturn).empty();
-          django.jQuery("#"+objHtmlReturn).append('<option value="">------------</option>');
-          django.jQuery.each(retorno, function(i, item){
-              django.jQuery("#"+objHtmlReturn).append('<option value="'+item.pk+'">'+item.valor+'</option>');
+          $("#"+objHtmlReturn).empty();
+          $("#"+objHtmlReturn).append('<option value="">------------</option>');
+          $.each(retorno, function(i, item){
+              $("#"+objHtmlReturn).append('<option value="'+item.pk+'">'+item.valor+'</option>');
           });
       },
       error: function(erro) {
@@ -334,23 +334,23 @@ function ajax_filter_inline(url, id, name)
     item_outorga = n[0] + 'item_outorga'
 
 
-    previous = django.jQuery("#"+termo).val();
+    previous = $("#"+termo).val();
     dados = {'id':id, 'previous':previous};
 
-//    django.jQuery("#"+item_outorga).html('<option value="0">Carregando...</option>');
-    django.jQuery("#"+item_outorga).html('<option value="">Carregando...</option>');
+//    $("#"+item_outorga).html('<option value="0">Carregando...</option>');
+    $("#"+item_outorga).html('<option value="">Carregando...</option>');
 
-    django.jQuery.ajax({
+    $.ajax({
       type: "POST",
       url: url,
       dataType: "json",
       data: dados,
       success: function(retorno){
-          django.jQuery("#"+item_outorga).empty();
-//          django.jQuery("#"+item_outorga).append('<option value="0">------------</option>');
-          django.jQuery("#"+item_outorga).append('<option value="">------------</option>');
-          django.jQuery.each(retorno, function(i, item){
-              django.jQuery("#"+item_outorga).append('<option value="'+item.pk+'">'+item.valor+'</option>');
+          $("#"+item_outorga).empty();
+//          $("#"+item_outorga).append('<option value="0">------------</option>');
+          $("#"+item_outorga).append('<option value="">------------</option>');
+          $.each(retorno, function(i, item){
+              $("#"+item_outorga).append('<option value="'+item.pk+'">'+item.valor+'</option>');
           });
       },
       error: function(erro) {
@@ -370,32 +370,32 @@ function ajax_filter_item_natureza(url, termo, item_anterior, natureza, id, name
     item_anterior = n[0] + item_anterior
     natureza = n[0] + natureza
 
-    previous = django.jQuery("#"+termo).val();
+    previous = $("#"+termo).val();
     dados = {'id':id, 'previous':previous};
 
-//    django.jQuery("#"+item_anterior).html('<option value="0">Carregando...</option>');
-//    django.jQuery("#"+natureza).html('<option value="0">Carregando...</option>');
-    django.jQuery("#"+item_anterior).html('<option value="">Carregando...</option>');
-    django.jQuery("#"+natureza).html('<option value="">Carregando...</option>');
+//    $("#"+item_anterior).html('<option value="0">Carregando...</option>');
+//    $("#"+natureza).html('<option value="0">Carregando...</option>');
+    $("#"+item_anterior).html('<option value="">Carregando...</option>');
+    $("#"+natureza).html('<option value="">Carregando...</option>');
 
-    django.jQuery.ajax({
+    $.ajax({
       type: "POST",
       url: url,
       dataType: "json",
       data: dados,
       success: function(retorno){
-          django.jQuery("#"+item_anterior).empty();
-//          django.jQuery("#"+item_anterior).append('<option value="0">------------</option>');
-          django.jQuery("#"+item_anterior).append('<option value="">------------</option>');
-          django.jQuery.each(retorno['item'], function(i, item){
-              django.jQuery("#"+item_anterior).append('<option value="'+item.pk+'">'+item.valor+'</option>');
+          $("#"+item_anterior).empty();
+//          $("#"+item_anterior).append('<option value="0">------------</option>');
+          $("#"+item_anterior).append('<option value="">------------</option>');
+          $.each(retorno['item'], function(i, item){
+              $("#"+item_anterior).append('<option value="'+item.pk+'">'+item.valor+'</option>');
           });
 
-          django.jQuery("#"+natureza).empty();
-//          django.jQuery("#"+natureza).append('<option value="0">------------</option>');
-          django.jQuery("#"+natureza).append('<option value="">------------</option>');
-          django.jQuery.each(retorno['natureza'], function(i, item){
-              django.jQuery("#"+natureza).append('<option value="'+item.pk+'">'+item.valor+'</option>');
+          $("#"+natureza).empty();
+//          $("#"+natureza).append('<option value="0">------------</option>');
+          $("#"+natureza).append('<option value="">------------</option>');
+          $.each(retorno['natureza'], function(i, item){
+              $("#"+natureza).append('<option value="'+item.pk+'">'+item.valor+'</option>');
           });
       },
       error: function(erro) {
@@ -417,40 +417,40 @@ function ajax_filter_mod_item_natureza(url, modalidade, item_anterior, natureza,
     item_anterior = n[0] + item_anterior
     natureza = n[0] + natureza
 
-//    django.jQuery("#"+modalidade).html('<option value="0">Carregando...</option>');
-//    django.jQuery("#"+item_anterior).html('<option value="0">Carregando...</option>');
-//    django.jQuery("#"+natureza).html('<option value="0">Carregando...</option>');
+//    $("#"+modalidade).html('<option value="0">Carregando...</option>');
+//    $("#"+item_anterior).html('<option value="0">Carregando...</option>');
+//    $("#"+natureza).html('<option value="0">Carregando...</option>');
 
-    django.jQuery("#"+modalidade).html('<option value="">Carregando...</option>');
-    django.jQuery("#"+item_anterior).html('<option value="">Carregando...</option>');
-    django.jQuery("#"+natureza).html('<option value="">Carregando...</option>');
+    $("#"+modalidade).html('<option value="">Carregando...</option>');
+    $("#"+item_anterior).html('<option value="">Carregando...</option>');
+    $("#"+natureza).html('<option value="">Carregando...</option>');
 
 
-    django.jQuery.ajax({
+    $.ajax({
       type: "POST",
       url: url,
       dataType: "json",
       data: dados,
       success: function(retorno){
-          django.jQuery("#"+modalidade).empty();
-//          django.jQuery("#"+modalidade).append('<option value="0">------------</option>');
-          django.jQuery("#"+modalidade).append('<option value="">------------</option>');
-          django.jQuery.each(retorno['modalidade'], function(i, item){
-              django.jQuery("#"+modalidade).append('<option value="'+item.pk+'">'+item.valor+'</option>');
+          $("#"+modalidade).empty();
+//          $("#"+modalidade).append('<option value="0">------------</option>');
+          $("#"+modalidade).append('<option value="">------------</option>');
+          $.each(retorno['modalidade'], function(i, item){
+              $("#"+modalidade).append('<option value="'+item.pk+'">'+item.valor+'</option>');
           });
 
-          django.jQuery("#"+item_anterior).empty();
-//          django.jQuery("#"+item_anterior).append('<option value="0">------------</option>');
-          django.jQuery("#"+item_anterior).append('<option value="">------------</option>');
-          django.jQuery.each(retorno['item'], function(i, item){
-              django.jQuery("#"+item_anterior).append('<option value="'+item.pk+'">'+item.valor+'</option>');
+          $("#"+item_anterior).empty();
+//          $("#"+item_anterior).append('<option value="0">------------</option>');
+          $("#"+item_anterior).append('<option value="">------------</option>');
+          $.each(retorno['item'], function(i, item){
+              $("#"+item_anterior).append('<option value="'+item.pk+'">'+item.valor+'</option>');
           });
 
-          django.jQuery("#"+natureza).empty();
-//          django.jQuery("#"+natureza).append('<option value="0">------------</option>');
-          django.jQuery("#"+natureza).append('<option value="">------------</option>');
-          django.jQuery.each(retorno['natureza'], function(i, item){
-              django.jQuery("#"+natureza).append('<option value="'+item.pk+'">'+item.valor+'</option>');
+          $("#"+natureza).empty();
+//          $("#"+natureza).append('<option value="0">------------</option>');
+          $("#"+natureza).append('<option value="">------------</option>');
+          $.each(retorno['natureza'], function(i, item){
+              $("#"+natureza).append('<option value="'+item.pk+'">'+item.valor+'</option>');
           });
       },
       
@@ -472,31 +472,31 @@ function ajax_filter_modalidade_item_inline(url, id, name)
     modalidade = n[0] + 'modalidade'
     item_outorga = n[0] + 'item_outorga' 
 
-//    django.jQuery("#"+modalidade).html('<option value="0">Carregando...</option>');
-//    django.jQuery("#"+item_outorga).html('<option value="0">Carregando...</option>');
+//    $("#"+modalidade).html('<option value="0">Carregando...</option>');
+//    $("#"+item_outorga).html('<option value="0">Carregando...</option>');
 
-    django.jQuery("#"+modalidade).html('<option value="">Carregando...</option>');
-    django.jQuery("#"+item_outorga).html('<option value="">Carregando...</option>');
+    $("#"+modalidade).html('<option value="">Carregando...</option>');
+    $("#"+item_outorga).html('<option value="">Carregando...</option>');
 
 
-    django.jQuery.ajax({
+    $.ajax({
       type: "POST",
       url: url,
       dataType: "json",
       data: dados,
       success: function(retorno){
-          django.jQuery("#"+modalidade).empty();
-//          django.jQuery("#"+modalidade).append('<option value="0">------------</option>');
-          django.jQuery("#"+modalidade).append('<option value="">------------</option>');
-          django.jQuery.each(retorno['modalidade'], function(i, item){
-              django.jQuery("#"+modalidade).append('<option value="'+item.pk+'">'+item.valor+'</option>');
+          $("#"+modalidade).empty();
+//          $("#"+modalidade).append('<option value="0">------------</option>');
+          $("#"+modalidade).append('<option value="">------------</option>');
+          $.each(retorno['modalidade'], function(i, item){
+              $("#"+modalidade).append('<option value="'+item.pk+'">'+item.valor+'</option>');
           });
 
-          django.jQuery("#"+item_outorga).empty();
-//          django.jQuery("#"+item_outorga).append('<option value="0">------------</option>');
-          django.jQuery("#"+item_outorga).append('<option value="">------------</option>');
-          django.jQuery.each(retorno['item'], function(i, item){
-              django.jQuery("#"+item_outorga).append('<option value="'+item.pk+'">'+item.valor+'</option>');
+          $("#"+item_outorga).empty();
+//          $("#"+item_outorga).append('<option value="0">------------</option>');
+          $("#"+item_outorga).append('<option value="">------------</option>');
+          $.each(retorno['item'], function(i, item){
+              $("#"+item_outorga).append('<option value="'+item.pk+'">'+item.valor+'</option>');
           });
       },
       error: function(erro) {
@@ -514,18 +514,18 @@ function ajax_filter_termo_natureza(url, natureza, id, name)
 
     natureza = n[0] + natureza
 
-    django.jQuery("#"+natureza).html('<option value="">Carregando...</option>');
+    $("#"+natureza).html('<option value="">Carregando...</option>');
 
-    django.jQuery.ajax({
+    $.ajax({
       type: "POST",
       url: url,
       dataType: "json",
       data: dados,
       success: function(retorno){
-          django.jQuery("#"+natureza).empty();
-          django.jQuery("#"+natureza).append('<option value="">------------</option>');
-          django.jQuery.each(retorno, function(i, item){
-              django.jQuery("#"+natureza).append('<option value="'+item.pk+'">'+item.valor+'</option>');
+          $("#"+natureza).empty();
+          $("#"+natureza).append('<option value="">------------</option>');
+          $.each(retorno, function(i, item){
+              $("#"+natureza).append('<option value="'+item.pk+'">'+item.valor+'</option>');
           });
       },
       
@@ -540,33 +540,33 @@ function ajax_filtra_item(url, item_pedido, modalidade, termo, select)
 {
 
     dados = {'protocolo': select};
-//    django.jQuery("#"+item_pedido).html('<option value="0">Carregando...</option>');
-//    django.jQuery("#"+modalidade).html('<option value="0">Carregando...</option>');
+//    $("#"+item_pedido).html('<option value="0">Carregando...</option>');
+//    $("#"+modalidade).html('<option value="0">Carregando...</option>');
 
-    django.jQuery("#"+item_pedido).html('<option value="">Carregando...</option>');
-    django.jQuery("#"+modalidade).html('<option value="">Carregando...</option>');
+    $("#"+item_pedido).html('<option value="">Carregando...</option>');
+    $("#"+modalidade).html('<option value="">Carregando...</option>');
 
-    django.jQuery.ajax({
+    $.ajax({
       type: "POST",
       url: url,
       dataType: "json",
       data: dados,
       success: function(retorno){
-          django.jQuery("#"+item_pedido).empty();
-//          django.jQuery("#"+item_pedido).append('<option value="0">------------</option>');
-          django.jQuery("#"+item_pedido).append('<option value="">------------</option>');
-          django.jQuery.each(retorno['itens'], function(i, item){
-              django.jQuery("#"+item_pedido).append('<option value="'+item.pk+'">'+item.valor+'</option>');
+          $("#"+item_pedido).empty();
+//          $("#"+item_pedido).append('<option value="0">------------</option>');
+          $("#"+item_pedido).append('<option value="">------------</option>');
+          $.each(retorno['itens'], function(i, item){
+              $("#"+item_pedido).append('<option value="'+item.pk+'">'+item.valor+'</option>');
           });
 
-          django.jQuery("#"+modalidade).empty();
-//          django.jQuery("#"+modalidade).append('<option value="0">------------</option>');
-          django.jQuery("#"+modalidade).append('<option value="">------------</option>');
-          django.jQuery.each(retorno['modalidades'], function(i, item){
-              django.jQuery("#"+modalidade).append('<option value="'+item.pk+'">'+item.valor+'</option>');
+          $("#"+modalidade).empty();
+//          $("#"+modalidade).append('<option value="0">------------</option>');
+          $("#"+modalidade).append('<option value="">------------</option>');
+          $.each(retorno['modalidades'], function(i, item){
+              $("#"+modalidade).append('<option value="'+item.pk+'">'+item.valor+'</option>');
           });
 
-          django.jQuery("#"+termo).val(retorno['termo']);
+          $("#"+termo).val(retorno['termo']);
 
       },
       error: function(erro) {
@@ -585,62 +585,62 @@ function ajax_filter_origem_protocolo(termo_campo, termo)
       else {
 	nomes = "#id_";
       }
-      django.jQuery(nomes+"protocolo").html('<option value="">Carregando...</option>');
-      django.jQuery(nomes+"origem_fapesp").html('<option value="">Carregando...</option>');
+      $(nomes+"protocolo").html('<option value="">Carregando...</option>');
+      $(nomes+"origem_fapesp").html('<option value="">Carregando...</option>');
 
-      django.jQuery.ajax({
+      $.ajax({
 	  type: "POST",
 	  url: "/financeiro/pagamento_termo",
 	  dataType: "json",
 	  data: {'termo_id':termo},
 	  success: function(retorno) {
-	      django.jQuery(nomes+"protocolo").empty();
-	      django.jQuery(nomes+"protocolo").append('<option value="">---------</option>');
-	      django.jQuery.each(retorno['protocolos'], function(i, item){
-		  django.jQuery(nomes+"protocolo").append('<option value="'+item.pk+'">'+item.valor+'</option>');
+	      $(nomes+"protocolo").empty();
+	      $(nomes+"protocolo").append('<option value="">---------</option>');
+	      $.each(retorno['protocolos'], function(i, item){
+		  $(nomes+"protocolo").append('<option value="'+item.pk+'">'+item.valor+'</option>');
 	      });
-	      django.jQuery(nomes+"origem_fapesp").empty();
-	      django.jQuery(nomes+"origem_fapesp").append('<option value="">------------</option>');
-	      django.jQuery.each(retorno['origens'], function(i, item){
-		  django.jQuery(nomes+"origem_fapesp").append('<option value="'+item.pk+'">'+item.valor+'</option>');
+	      $(nomes+"origem_fapesp").empty();
+	      $(nomes+"origem_fapesp").append('<option value="">------------</option>');
+	      $.each(retorno['origens'], function(i, item){
+		  $(nomes+"origem_fapesp").append('<option value="'+item.pk+'">'+item.valor+'</option>');
 	      });
 	  },
 	  error: function(erro) {
 	    alert('Erro: Sem retorno da requisição.');
 	  }
       });
-      if (!django.jQuery("#id_auditoria_set-0-pagina").val()){
-       django.jQuery.ajax({
+/*      if (!$("#id_auditoria_set-0-pagina").val()){
+       $.ajax({
 	  type: "POST",
 	  url: "/financeiro/parcial_pagina_termo",
 	  dataType: "json",
 	  data: {'termo_id':termo},
 	  success: function(retorno) {
-	      django.jQuery("#id_auditoria_set-0-parcial").val(retorno['parcial']);
-	      django.jQuery("#id_auditoria_set-0-pagina").val(retorno['pagina']);
+	      $("#id_auditoria_set-0-parcial").val(retorno['parcial']);
+	      $("#id_auditoria_set-0-pagina").val(retorno['pagina']);
 	  },
 	  error: function(erro) {
 	    alert('Erro: Sem retorno da requisição.');
 	  }
        });
-      }
+      }*/
 }
 
 function ajax_filter_protocolo_numero(numero)
 {
-      django.jQuery("#id_protocolo").html('<option value="">Carregando...</option>');
-      termo = django.jQuery("#id_termo").val()
+      $("#id_protocolo").html('<option value="">Carregando...</option>');
+      termo = $("#id_termo").val()
 
-      django.jQuery.ajax({
+      $.ajax({
 	  type: "POST",
 	  url: "/financeiro/pagamento_numero",
 	  dataType: "json",
 	  data: {'termo_id':termo, 'numero':numero},
 	  success: function(retorno) {
-	      django.jQuery("#id_protocolo").empty();
-	      django.jQuery("#id_protocolo").append('<option value="">--------</option>');
-	      django.jQuery.each(retorno['protocolos'], function(i, item){
-		  django.jQuery("#id_protocolo").append('<option value="'+item.pk+'">'+item.valor+'</option>');
+	      $("#id_protocolo").empty();
+	      $("#id_protocolo").append('<option value="">--------</option>');
+	      $.each(retorno['protocolos'], function(i, item){
+		  $("#id_protocolo").append('<option value="'+item.pk+'">'+item.valor+'</option>');
 	      });
 	  },
 	  error: function(erro) {
@@ -651,18 +651,18 @@ function ajax_filter_protocolo_numero(numero)
 
 function ajax_filter_cc_cod(codigo)
 {
-      django.jQuery("#id_conta_corrente").html('<option value="">Carregando...</option>');
+      $("#id_conta_corrente").html('<option value="">Carregando...</option>');
 
-      django.jQuery.ajax({
+      $.ajax({
       	  type: "POST",
 	  url: "/financeiro/pagamento_cc",
 	  dataType: "json",
 	  data: {'codigo':codigo},
 	  success: function(retorno) {
-	      django.jQuery("#id_conta_corrente").empty();
-	      django.jQuery("#id_conta_corrente").append('<option value="">--------</option>');
-	      django.jQuery.each(retorno['ccs'], function(i, item){
-	      	  django.jQuery("#id_conta_corrente").append('<option value="'+item.pk+'">'+item.valor+'</option>');
+	      $("#id_conta_corrente").empty();
+	      $("#id_conta_corrente").append('<option value="">--------</option>');
+	      $.each(retorno['ccs'], function(i, item){
+	      	  $("#id_conta_corrente").append('<option value="'+item.pk+'">'+item.valor+'</option>');
 	      });
 	  },
 	  error: function(erro) {
@@ -673,18 +673,18 @@ function ajax_filter_cc_cod(codigo)
 
 function ajax_filter_pagamentos(url, numero)
 {
-      django.jQuery("#id_pagamento").html('<option value="">Carregando...</option>');
-      termo = django.jQuery("#id_termo").val()
-      django.jQuery.ajax({
+      $("#id_pagamento").html('<option value="">Carregando...</option>');
+      termo = $("#id_termo").val()
+      $.ajax({
       	  type: "POST",
 	  url: url,
 	  dataType: "json",
 	  data: {'numero':numero, 'termo':termo},
 	  success: function(retorno) {
-	      django.jQuery("#id_pagamento").empty();
-	      django.jQuery("#id_pagamento").append('<option value="">--------</option>');
-	      django.jQuery.each(retorno, function(i, item){
-	      	  django.jQuery("#id_pagamento").append('<option value="'+item.pk+'">'+item.valor+'</option>');
+	      $("#id_pagamento").empty();
+	      $("#id_pagamento").append('<option value="">--------</option>');
+	      $.each(retorno, function(i, item){
+	      	  $("#id_pagamento").append('<option value="'+item.pk+'">'+item.valor+'</option>');
 	      });
 	  },
 	  error: function(erro) {
@@ -696,17 +696,17 @@ function ajax_filter_pagamentos(url, numero)
 
 function ajax_filter_financeiro(termo_id)
 {
-       django.jQuery("#id_extrato_financeiro").html('<option value="">Carregando...</option>');
-       django.jQuery.ajax({
+       $("#id_extrato_financeiro").html('<option value="">Carregando...</option>');
+       $.ajax({
        	   type: "POST",
 	   url: "/financeiro/sel_extrato",
 	   dataType: "json",
 	   data: {'termo':termo_id},
 	   success: function(retorno) {
-	   	django.jQuery("#id_extrato_financeiro").empty();
-		django.jQuery("#id_extrato_financeiro").append('<option value="">--------</option>');
-		django.jQuery.each(retorno, function(i, item){
-		    django.jQuery("#id_extrato_financeiro").append('<option value="'+item.pk+'">'+item.valor+'</option>');
+	   	$("#id_extrato_financeiro").empty();
+		$("#id_extrato_financeiro").append('<option value="">--------</option>');
+		$.each(retorno, function(i, item){
+		    $("#id_extrato_financeiro").append('<option value="'+item.pk+'">'+item.valor+'</option>');
 		});
 	   },
            error: function(erro) {
@@ -718,20 +718,20 @@ function ajax_filter_financeiro(termo_id)
 function ajax_select_endereco(id_field)
 {
        
-       entidade = django.jQuery("#"+id_field).val();
+       entidade = $("#"+id_field).val();
        partes = id_field.split("-");
        e_id = "#id_historicolocal_set-"+partes[1]+"-endereco";
-       django.jQuery(e_id).html('<option value="">Carregando...</option>');
-       django.jQuery.ajax({
+       $(e_id).html('<option value="">Carregando...</option>');
+       $.ajax({
        	   type: "POST",
 	   url: "/patrimonio/escolhe_entidade",
 	   dataType: "json",
 	   data: {'entidade':entidade},
 	   success: function(retorno) {
-	        django.jQuery(e_id).empty();
-		django.jQuery(e_id).append('<option value="">--------</option>');
-		django.jQuery.each(retorno, function(i, item){
-		    django.jQuery(e_id).append('<option value="'+item.pk+'">'+item.valor+'</option>');
+	        $(e_id).empty();
+		$(e_id).append('<option value="">--------</option>');
+		$.each(retorno, function(i, item){
+		    $(e_id).append('<option value="'+item.pk+'">'+item.valor+'</option>');
 		});	   
 	   },
 	   error: function(erro) {
@@ -742,19 +742,19 @@ function ajax_select_endereco(id_field)
 
 function ajax_select_endereco2()
 {
-       entidade = django.jQuery("#id_entidade").val();
+       entidade = $("#id_entidade").val();
        e_id = "#id_endereco";
-       django.jQuery(e_id).html('<option value="">Carregando...</option>');
-       django.jQuery.ajax({
+       $(e_id).html('<option value="">Carregando...</option>');
+       $.ajax({
            type: "POST",
            url: "/identificacao/escolhe_entidade",
            dataType: "json",
            data: {'entidade':entidade},
            success: function(retorno) {
-                django.jQuery(e_id).empty();
-                django.jQuery(e_id).append('<option value="">--------</option>');
-                django.jQuery.each(retorno, function(i, item){
-                    django.jQuery(e_id).append('<option value="'+item.pk+'">'+item.valor+'</option>');
+                $(e_id).empty();
+                $(e_id).append('<option value="">--------</option>');
+                $.each(retorno, function(i, item){
+                    $(e_id).append('<option value="'+item.pk+'">'+item.valor+'</option>');
                 });
            },
            error: function(erro) {
@@ -767,17 +767,17 @@ function ajax_select_endereco2()
 
 function ajax_patrimonio_existente(pn)
 {
-       django.jQuery.ajax({
+       $.ajax({
            type: "POST",
 	   url: "/patrimonio/patrimonio_existente",
 	   dataType: "json",
 	   data: {'part_number':pn},
 	   success: function(retorno) {
 	      if (retorno.marca) {
-	         django.jQuery("#id_marca").val(retorno.marca);
-	         django.jQuery("#id_modelo").val(retorno.modelo);
-	         django.jQuery("#id_descricao").val(retorno.descricao);
-	         django.jQuery("#id_procedencia").val(retorno.procedencia);
+	         $("#id_marca").val(retorno.marca);
+	         $("#id_modelo").val(retorno.modelo);
+	         $("#id_descricao").val(retorno.descricao);
+	         $("#id_procedencia").val(retorno.procedencia);
 	      }
 	   },
 	   error: function(erro) {
@@ -787,51 +787,81 @@ function ajax_patrimonio_existente(pn)
 }
 
 
-function ajax_filter_enderecos() {
-     ent_id = django.jQuery("#id_entidade").val();
-     django.jQuery("#id_endereco").html('<option value="">Carregando...</option>');
+function ajax_filter_enderecos(id_ent) {
+     ent_id = $("#"+id_ent).val();
+     $("#id_endereco").html('<option value="0">Carregando...</option>');
 
-     django.jQuery.ajax({
+     $.ajax({
        type: "POST",
-       url: "/identificacao/escolhe_entidade",
+       url: "/identificacao/escolhe_entidade_filhos",
        dataType: "json",
        data: {'entidade': ent_id},
        success: function(retorno){
-          django.jQuery("#id_endereco").empty();
-          django.jQuery("#id_endereco").append('<option value="">------------</option>');
-          django.jQuery.each(retorno, function(i, item){
-              django.jQuery("#id_endereco").append('<option value="'+item.pk+'">'+item.valor+'</option>');
+          $("#id_endereco").empty();
+          $("#id_endereco").append('<option value="">------------</option>');
+          $.each(retorno['enderecos'], function(i, item){
+              $("#id_endereco").append('<option value="'+item.pk+'">'+item.valor+'</option>');
           });
+          if (retorno['filhos'].length > 0) {
+              $("#id_entidade1").empty();
+    	      $("#id_entidade1").append('<option value="">-----------</option>');
+              $.each(retorno['filhos'], function(i, item){
+	          $("#id_entidade1").append('<option value="'+item.pk+'">'+item.valor+'</option>');
+              });
+              $("#filhos").show();
+          }
+          else if (id_ent == 'id_entidade') {
+              $("#filhos").hide();
+          }
        },
      });
 } 
 
 function ajax_filter_locais() {
-     end_id = django.jQuery("#id_endereco").val();
-     django.jQuery("#id_detalhe").html('<option value="">Carregando...</option>');
+     end_id = $("#id_endereco").val();
+     $("#id_detalhe").html('<option value="0">Carregando...</option>');
 
-     django.jQuery.ajax({
+     $.ajax({
        type: "POST",
        url: "/identificacao/escolhe_endereco",
        dataType: "json",
        data: {'endereco': end_id},
        success: function(retorno){
-          django.jQuery("#id_detalhe").empty();
-          django.jQuery("#id_detalhe").append('<option value="">------------</option>');
-          django.jQuery.each(retorno, function(i, item){
-              django.jQuery("#id_detalhe").append('<option value="'+item.pk+'">'+item.valor+'</option>');
+          $("#id_detalhe").empty();
+          $("#id_detalhe").append('<option value="">------------</option>');
+          $.each(retorno, function(i, item){
+              $("#id_detalhe").append('<option value="'+item.pk+'">'+item.valor+'</option>');
           });
        },
      });
 }
 
+function ajax_filter_nivel(nivel, ed_id) {
+     $("#id_detalhe_"+nivel).html('<option value="0">Carregando</option>');
+
+     $.ajax({
+       type: "POST",
+       url: "/patrimonio/escolhe_detalhe",
+       dataType: "json",
+       data: {'detalhe': ed_id},
+       success: function(retorno){
+          $("#id_detalhe_"+nivel).empty();
+          $("#id_detalhe_"+nivel).append('<option value="">------------</option>');
+          $.each(retorno, function(i, item){
+              $("#id_detalhe_"+nivel).append('<option value="'+item.pk+'">'+item.valor+'</option>');
+          });
+
+       },
+     });
+}
+    
 function ajax_filter_pagamentos_memorando(termo)
 {
-     n = parseInt(django.jQuery("#id_corpo_set-TOTAL_FORMS").val());
+     n = parseInt($("#id_corpo_set-TOTAL_FORMS").val());
      for(j=0;j<n;j++){
-        django.jQuery("#id_corpo_set-"+j+"-pagamento_from").empty();
+        $("#id_corpo_set-"+j+"-pagamento_from").empty();
      }
-     django.jQuery.ajax({
+     $.ajax({
        type: "POST",
        url: "/memorando/pagamentos",
        dataType: "json",
@@ -840,13 +870,13 @@ function ajax_filter_pagamentos_memorando(termo)
           for(j=0;j<n;j++){
              SelectBox.cache["id_corpo_set-"+j+"-pagamento_from"] = new Array();
           }
-          django.jQuery("#id_corpo_set-__prefix__-pagamento_from").empty();
-          django.jQuery.each(retorno, function(i, item){
+          $("#id_corpo_set-__prefix__-pagamento_from").empty();
+          $.each(retorno, function(i, item){
               for(j=0;j<n;j++){
                  var opt = new Object ({value:item.pk, text:item.valor});
                  SelectBox.add_to_cache("id_corpo_set-"+j+"-pagamento_from", opt);
               }
-              django.jQuery("#id_corpo_set-__prefix__-pagamento_from").append('<option value="'+item.pk+'">'+item.valor+'</option>');
+              $("#id_corpo_set-__prefix__-pagamento_from").append('<option value="'+item.pk+'">'+item.valor+'</option>');
           });
           for(j=0;j<n;j++){
              SelectBox.redisplay("id_corpo_set-"+j+"-pagamento_from");
@@ -860,17 +890,17 @@ function ajax_filter_pagamentos_memorando(termo)
 
 function ajax_init_pagamentos()
 {
-   termo = django.jQuery("#id_termo").val();
+   termo = $("#id_termo").val();
    if (termo) {
-     django.jQuery.ajax({
+     $.ajax({
        type: "POST",
        url: "/memorando/pagamentos",
        dataType: "json",
        data: {'termo':termo},
        success: function(retorno) {
-          django.jQuery("#id_corpo_set-__prefix__-pagamento_from").empty();
-          django.jQuery.each(retorno, function(i, item){
-              django.jQuery("#id_corpo_set-__prefix__-pagamento_from").append('<option value="'+item.pk+'">'+item.valor+'</option>');
+          $("#id_corpo_set-__prefix__-pagamento_from").empty();
+          $.each(retorno, function(i, item){
+              $("#id_corpo_set-__prefix__-pagamento_from").append('<option value="'+item.pk+'">'+item.valor+'</option>');
           });
        },
        error: function(erro) {
@@ -882,22 +912,22 @@ function ajax_init_pagamentos()
 
 function ajax_filter_perguntas(memorando)
 {
-   n = parseInt(django.jQuery("#id_corpo_set-TOTAL_FORMS").val());
+   n = parseInt($("#id_corpo_set-TOTAL_FORMS").val());
    for(j=0;j<n;j++){
-        django.jQuery("#id_corpo_set-"+j+"-pergunta").empty();
+        $("#id_corpo_set-"+j+"-pergunta").empty();
    }
 
-   django.jQuery.ajax({
+   $.ajax({
        type: "POST",
        url: "/memorando/perguntas",
        dataType: "json",
        data: {'memorando':memorando},
        success: function(retorno) {
-          django.jQuery.each(retorno, function(i, item){
+          $.each(retorno, function(i, item){
               for(j=0;j<n;j++){
-                django.jQuery("#id_corpo_set-"+j+"-pergunta").append('<option value="'+item.pk+'">'+item.valor+'</option>');
+                $("#id_corpo_set-"+j+"-pergunta").append('<option value="'+item.pk+'">'+item.valor+'</option>');
               }
-              django.jQuery("#id_corpo_set-__prefix__-pergunta").append('<option value="'+item.pk+'">'+item.valor+'</option>');
+              $("#id_corpo_set-__prefix__-pergunta").append('<option value="'+item.pk+'">'+item.valor+'</option>');
           });
        },
        error: function(erro) {
@@ -909,18 +939,18 @@ function ajax_filter_perguntas(memorando)
 function ajax_select_pergunta(id_field)
 {
 
-       pergunta = django.jQuery("#"+id_field).val();
+       pergunta = $("#"+id_field).val();
        partes = id_field.split("-");
        e_id = "#id_corpo_set-"+partes[1]+"-perg";
-       django.jQuery(e_id).html('Carregando...');
-       django.jQuery.ajax({
+       $(e_id).html('Carregando...');
+       $.ajax({
            type: "POST",
            url: "/memorando/escolhe_pergunta",
            dataType: "json",
            data: {'pergunta':pergunta},
            success: function(retorno) {
-                django.jQuery(e_id).empty();
-                django.jQuery(e_id).html(retorno);
+                $(e_id).empty();
+                $(e_id).html(retorno);
            },
            error: function(erro) {
               alert('Erro: Sem retorno de requisição.');
@@ -928,23 +958,204 @@ function ajax_select_pergunta(id_field)
        });
 }
 
-function ajax_filter_patrimonios()
+$(window).load(function () {
+    ajax_init_pagamentos();
+});	
+
+function ajax_filter_pagamentos2(url)
 {
-	filtro = django.jQuery("#id_filtra_patrimonio").val();
+      termo = $("#id_termo").val()
+      $.ajax({
+          type: "POST",
+          url: url,
+          dataType: "json",
+          data: {'termo':termo},
+          success: function(retorno) {
+              $("#id_pagamento").empty();
+              $("#id_pagamento").append('<option value="">-----</option>');
+              $.each(retorno, function(i, item){
+                  $("#id_pagamento").append('<option value="'+item.pk+'">'+item.valor+'</option>');
+              });
+          },
+          error: function(erro) {
+             alert('Erro: Sem retorno de requisição.');
+          }
+       });
+
+}
+function ajax_filter_equipamento(num_doc, id_patrimonio, id_equipamento)
+{
+       p_id = "#id_equipamento";
+       $(p_id).html('Carregando...');
+       $.ajax({
+           type: "POST",
+           url: "/patrimonio/escolhe_equipamento",
+           dataType: "json",
+           data: {'num_doc':num_doc, 'id_patrimonio':id_patrimonio, 'id_equipamento':id_equipamento},
+           success: function(retorno) {
+              $(p_id).empty();
+              $(p_id).append('<option value="">-----</option>');
+              $.each(retorno, function(i, item){
+            	  if (item.selected) {
+                      $(p_id).append('<option value="'+item.pk+'" selected>'+ item.valor+'</option>');
+            	  } else {
+            		  $(p_id).append('<option value="'+item.pk+'">'+item.valor+'</option>');
+            	  }
+              });
+           },
+           error: function(erro) {
+              alert('Erro: Sem retorno de requisição.');
+           }
+       });
+}
+
+function ajax_filter_patrimonio(num_doc)
+{
+       p_id = "#id_patrimonio";
+       $(p_id).html('Carregando...');
+       $.ajax({
+           type: "POST",
+           url: "/patrimonio/escolhe_patrimonio",
+           dataType: "json",
+           data: {'num_doc':num_doc},
+           success: function(retorno) {
+              $(p_id).empty();
+              $(p_id).append('<option value="">-----</option>');
+              $.each(retorno, function(i, item){
+                  $(p_id).append('<option value="'+item.pk+'">'+item.valor+'</option>');
+              });
+           },
+           error: function(erro) {
+              alert('Erro: Sem retorno de requisição.');
+           }
+       });
+}
+
+function ajax_prox_audit(origem)
+{
+      if (!$("#id_auditoria_set-0-pagina").val()){
+       $.ajax({
+          type: "POST",
+          url: "/financeiro/parcial_pagina_termo",
+          dataType: "json",
+          data: {'orig_id':origem},
+          success: function(retorno) {
+              $("#id_auditoria_set-0-parcial").val(retorno['parcial']);
+              $("#id_auditoria_set-0-pagina").val(retorno['pagina']);
+          },
+          error: function(erro) {
+            alert('Erro: Sem retorno da requisição.');
+          }
+       });
+      }
+}
+
+function ajax_nova_pagina(parcial)
+{
+    $.ajax({
+       type:"POST",
+       url:"/financeiro/nova_pagina",
+       dataType:"json",
+       data: {'orig_id':$("#id_origem_fapesp").val(), 'parcial':parcial.value},
+       success: function(retorno){
+           numero = parcial.id.split("-")[1];
+           $("#id_auditoria_set-"+numero+"-pagina").val(retorno);
+       }
+    });
+}
+
+function ajax_select_ano_proj()
+{
+       anoproj = $("#id_anoproj").val();
+       partes = anoproj.split("/");
+       ano = partes[0];
+       proj_id = partes[1];
+       $("#id_os").html('Carregando...');
+       $.ajax({
+           type: "POST",
+           url: "/rede/planeja_contrato",
+           dataType: "json",
+           data: {'ano':ano, 'proj_id':proj_id},
+           success: function(retorno) {
+                $("#id_os").html('<option value="">Nenhum</option>');
+	            $.each(retorno.oss, function(i, item){
+                     $("#id_os").append('<option value="'+item.pk+'">'+item.valor+'</option>');
+ 	            });
+	   },
+	   error: function(erro) {
+              alert('Erro: Sem retorno de requisição.');
+           }
+       });
+
+}
+
+
+function ajax_patrimonio_historico(patr_id)
+{
 	django.jQuery.ajax({
 		type: "GET",
-		url: "/repositorio/seleciona_patrimonios",
+		url: "/patrimonio/patrimonio_historico",
 		dataType: "json",
-		data: {'string':filtro},
+		data: {'id':patr_id},
 		success: function(retorno) {
-			django.jQuery("#id_patrimonios").empty();
-			django.jQuery.each(retorno, function(i, item) {
-				django.jQuery("#id_patrimonios").append('<option value="'+item.pk+'">'+item.fields.ns+' - '+item.fields.descricao+'</option>');
-			});
+			// N. total de forms de historicos historicolocal_set-TOTAL_FORMS
+			// O form vazio deve ser o de indice = total - 1
+			var total_forms = $('#id_historicolocal_set-TOTAL_FORMS').val();
+
+			form_index = total_forms - 1;
+
+			// Entidade
+			if (retorno.entidade_id != '') { 
+					$("#id_historicolocal_set-"+form_index+"-entidade option[value='"+retorno.entidade_id+"']").attr("selected","selected");
+			} else {
+				$("#id_historicolocal_set-"+form_index+"-entidade option")[0].selected = true;
+			}
+			
+			// Endereco
+			// É necessário limpar o select, pois ele é recarregado sempre que se muda a entidade
+			$("#id_historicolocal_set-"+form_index+"-endereco").empty();
+			$("#id_historicolocal_set-"+form_index+"-endereco")
+	    		.append('<option value="'+ retorno.localizacao_id +'">'+ retorno.localizacao_desc +'</option>');
+			
+			// Estado
+			if (retorno.estado_id != '') { 
+				$("#id_historicolocal_set-"+form_index+"-estado option[value='"+ retorno.estado_id +"']").attr("selected","selected");
+			} else {
+				$("#id_historicolocal_set-"+form_index+"-estado option")[0].selected = true;
+			}
+			
+			// Memorando
+			if (retorno.memorando_id && retorno.memorando_id != '') { 
+				$("#id_historicolocal_set-"+form_index+"-memorando option[value='"+ retorno.memorando_id +"']").attr("selected","selected");
+			} else {
+				$("#id_historicolocal_set-"+form_index+"-memorando option")[0].selected = true;
+			}
+			
+			// Campos textos: posição, descrição e data
+			$("#id_historicolocal_set-"+form_index+"-posicao").val(retorno.posicao);
+			$("#id_historicolocal_set-"+form_index+"-descricao").val(retorno.descricao);
+			$("#id_historicolocal_set-"+form_index+"-data").val(retorno.data);
 		},
 	});
 }
 
-django.jQuery(window).load(function () {
-    ajax_init_pagamentos();
-});	
+
+function ajax_patr_form_get_equipamento(id_equipamento)
+{
+       p_id = "#id_equipamento";
+       $.ajax({
+           type: "POST",
+           url: "/patrimonio/ajax_get_equipamento",
+           dataType: "json",
+           data: {'id_equipamento':id_equipamento},
+           success: function(retorno) {
+        	   $('#id_modelo').html(retorno.modelo);
+        	   $('#id_part_number').text(retorno.part_number);
+        	   $('#id_ean').text(retorno.ean);
+           },
+           error: function(erro) {
+              alert('Erro: Sem retorno de requisição.');
+           }
+       });
+}
+
