@@ -53,13 +53,38 @@
  #tbl_content {
     margin: 0;
     width: 100%;
+    word-break: break-all;
  }
- #tbl_content td:nth-child(2),
- #tbl_content td:nth-child(4),
- #tbl_contenttd:nth-child(6),
- #tbl_contenttd:nth-child(7) {
-    white-space:nowrap;
- }
+ 
+ /* Descricao */
+ #tbl_content td:nth-child(9) {
+    word-break: break-word;
+ } 
+ 
+ /* ID */
+  #tbl_content td:nth-child(1) { width:25px; }
+ /* PROCESSO */
+  #tbl_content td:nth-child(2) { width:65px; }
+ /* FMUSP */
+  #tbl_content td:nth-child(3) { width:50px; }
+ /* NF */
+  #tbl_content td:nth-child(4) { width:90px; }
+ /* MODELO */
+  #tbl_content td:nth-child(5) { width:105px; }
+ /* PART NUMBER */
+  #tbl_content td:nth-child(6) { width:105px; }
+ /* NS */
+  #tbl_content td:nth-child(7) { width:105px; }
+ /* APELIDO */
+  #tbl_content td:nth-child(8) { width:60px; }
+  /* DESCRICAO com largura variável*/
+  /*#tbl_content td:nth-child(9) { width:50px; }*/
+ /* POSICAO */
+  #tbl_content td:nth-child(10) { width:55px; }
+ /* ESTADO */
+  #tbl_content td:nth-child(11) { width:75px; }
+ 
+ 
 </style>
 
 <h1 repeat="1">Inventário por local</h1>
