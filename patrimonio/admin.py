@@ -48,7 +48,7 @@ class PatrimonioAdmin(ExportMixin, admin.ModelAdmin):
                       'fields': (('agilis', 'checado',),
                                  ('tipo', 'apelido', 'tem_numero_fmusp', 'numero_fmusp'), 
                                  ('filtro_equipamento', 'equipamento',),
-                                 ('part_number', 'modelo', 'ean'),
+                                 ('part_number', 'modelo', 'ean',),
                                  'ns', 
                                  ('ncm', 'ocst', 'cfop', ),
                                  'descricao', 
@@ -65,23 +65,35 @@ class PatrimonioAdmin(ExportMixin, admin.ModelAdmin):
                       'classes': ('collapse',),
                       'fields': ('form_filhos',),
                  }),
-
     )
-    #readonly_fields = ('equipamento__entidade_fabricante',)
+    
+    readonly_fields = ('part_number', 'modelo', 'ean')
     form = PatrimonioAdminForm
     list_display = ('tipo', 'descricao', 'complemento', 'posicao', 'agilis', 'modelo', 'ns', 'nf', 'valor', 'checado')
     list_filter = ('tipo', 'pagamento__protocolo__termo',)
     inlines = [HistoricoLocalInline,]
-    search_fields = ('descricao', 'ns', 'pagamento__protocolo__num_documento', 'ncm', 'historicolocal__descricao', 'equipamento__entidade_fabricante__sigla', 'part_number', 'modelo', 'historicolocal__posicao', 'apelido')
+    search_fields = ('descricao', 'ns', 'pagamento__protocolo__num_documento', 'ncm', 'historicolocal__descricao', 'equipamento__entidade_fabricante__sigla', 'equipamento__part_number', 'modelo', 'historicolocal__posicao', 'apelido')
     actions = ['action_mark_agilis', 'action_unmark_agilis', 'action_mark_checado', 'action_clone']
 
 
-    def __init__(self, model, admin_site):
+    def __init__(self, model, admin_site, *args, **kwargs):
         """
         Utilizado para setar o admin_site para o forms
         """
         self.form.admin_site = admin_site
-        super(PatrimonioAdmin, self).__init__(model, admin_site)
+        super(PatrimonioAdmin, self).__init__(model, admin_site, *args, **kwargs)
+        
+        instance = getattr(self, 'instance', None)
+        
+
+    def modelo(self, instance):
+        return mark_safe("<span id='id_modelo' class='input_readonly'>"+instance.modelo+"</span>")
+    
+    def part_number(self, instance):
+        return mark_safe("<span id='id_part_number' class='input_readonly'>"+instance.part_number+"</span>")
+
+    def ean(self, instance):
+        return mark_safe("<span id='id_ean' class='input_readonly'>"+instance.ean+"</span>")
         
     def action_clone(self, request, queryset):
         objs = clone_objects(queryset)

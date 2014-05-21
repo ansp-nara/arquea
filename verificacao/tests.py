@@ -49,43 +49,6 @@ class TestPatrimonioComEquipamenpoVazio(TestCase):
             self.assertEqual(len(retorno[0]), 1)
             
     """
-    Testa patrimonio e equipamentos com part_number diferente
-    """
-    def test_part_number_diferente(self):
-            eq1 = Equipamento.objects.create(id=1, part_number="pn1", modelo="", descricao="") 
-            eq2 = Equipamento.objects.create(id=2, part_number="", modelo="", descricao="") 
-            eq3 = Equipamento.objects.create(id=3, part_number="pn3", modelo="", descricao="") 
-        
-            tipo1 = Tipo.objects.create(nome = 'tipo1')
-            tipo2 = Tipo.objects.create(nome = 'tipo2')
-        
-            patr1 = Patrimonio.objects.create(part_number="pn1", modelo="m2", descricao="", tipo=tipo1, equipamento=eq1, checado=True)
-            patr2 = Patrimonio.objects.create(part_number="", modelo="m2", descricao="", tipo=tipo1, equipamento=eq2, checado=True)
-            patr3 = Patrimonio.objects.create(part_number="pn11111", modelo="m2", descricao="", tipo=tipo2, equipamento=eq3, checado=True)
-            
-            verficacao = VerificacaoPatrimonioEquipamento()
-            retorno = verficacao.partNumberDiferente()
-            
-            self.assertEqual(len(retorno), 1)
-            self.assertEqual(len(retorno[0]), 1)
-
-            # check filter            
-            filtro = {"filtro_tipo_patrimonio":1}
-            retorno = verficacao.partNumberDiferente(filtro)
-            
-            self.assertEqual(len(retorno), 1)
-            self.assertEqual(len(retorno[0]), 0)
-            
-            patr3.tipo = tipo1;
-            patr3.save()
-            
-            retorno = verficacao.partNumberDiferente(filtro)
-            
-            self.assertEqual(len(retorno), 1)
-            self.assertEqual(len(retorno[0]), 1)
-            
-            
-    """
     Testa patrimonio e equipamentos com descricao diferente
     """
     def test_descricao_diferente(self):
@@ -121,78 +84,6 @@ class TestPatrimonioComEquipamenpoVazio(TestCase):
             self.assertEqual(len(retorno), 1)
             self.assertEqual(len(retorno[0]), 1)
             
-    """
-    Testa patrimonio e equipamentos com modelo diferente
-    """
-    def test_modelo_diferente(self):
-            eq1 = Equipamento.objects.create(id=1, part_number="", modelo="m1", descricao="") 
-            eq2 = Equipamento.objects.create(id=2, part_number="", modelo="", descricao="") 
-            eq3 = Equipamento.objects.create(id=3, part_number="", modelo="m3", descricao="") 
-        
-            tipo1 = Tipo.objects.create(nome = 'tipo1')
-            tipo2 = Tipo.objects.create(nome = 'tipo2')
-        
-            patr1 = Patrimonio.objects.create(part_number="pt1", modelo="m1", descricao="pt1", tipo=tipo1, equipamento=eq1, checado=True)
-            patr2 = Patrimonio.objects.create(part_number="pt2", modelo="", descricao="pt2", tipo=tipo1, equipamento=eq2, checado=True)
-            patr3 = Patrimonio.objects.create(part_number="pt3", modelo="m1111", descricao="pt3", tipo=tipo2, equipamento=eq3, checado=True)
-            
-            verficacao = VerificacaoPatrimonioEquipamento()
-            retorno = verficacao.modeloDiferente()
-            
-            self.assertEqual(len(retorno), 1)
-            self.assertEqual(len(retorno[0]), 1)
-            
-            # check filter            
-            filtro = {"filtro_tipo_patrimonio":1}
-            retorno = verficacao.modeloDiferente(filtro)
-            
-            self.assertEqual(len(retorno), 1)
-            self.assertEqual(len(retorno[0]), 0)
-            
-            patr3.tipo = tipo1;
-            patr3.save()
-            
-            retorno = verficacao.modeloDiferente(filtro)
-            
-            self.assertEqual(len(retorno), 1)
-            self.assertEqual(len(retorno[0]), 1)
-            
-    """
-    Testa patrimonio e equipamentos com ncm diferente
-    """
-    def test_ncm_diferente(self):
-            eq1 = Equipamento.objects.create(id=1, part_number="", modelo="", descricao="", ncm="n1") 
-            eq2 = Equipamento.objects.create(id=2, part_number="", modelo="", descricao="", ncm="") 
-            eq3 = Equipamento.objects.create(id=3, part_number="", modelo="", descricao="", ncm="n3") 
-        
-            tipo1 = Tipo.objects.create(nome = 'tipo1')
-            tipo2 = Tipo.objects.create(nome = 'tipo2')
-        
-            patr1 = Patrimonio.objects.create(part_number="pt1", modelo="pt1", descricao="pt1", ncm="n1", tipo=tipo1, equipamento=eq1, checado=True)
-            patr2 = Patrimonio.objects.create(part_number="pt2", modelo="pt2", descricao="pt2", ncm="", tipo=tipo1, equipamento=eq2, checado=True)
-            patr3 = Patrimonio.objects.create(part_number="pt3", modelo="pt3", descricao="pt3", ncm="n1111", tipo=tipo2, equipamento=eq3, checado=True)
-            
-            verficacao = VerificacaoPatrimonioEquipamento()
-            retorno = verficacao.ncmDiferente()
-            
-            self.assertEqual(len(retorno), 1)
-            self.assertEqual(len(retorno[0]), 1)
-            
-            # check filter            
-            filtro = {"filtro_tipo_patrimonio":1}
-            retorno = verficacao.ncmDiferente(filtro)
-            
-            self.assertEqual(len(retorno), 1)
-            self.assertEqual(len(retorno[0]), 0)
-            
-            patr3.tipo = tipo1;
-            patr3.save()
-            
-            retorno = verficacao.ncmDiferente(filtro)
-            
-            self.assertEqual(len(retorno), 1)
-            self.assertEqual(len(retorno[0]), 1)
-           
            
     """
     Testa patrimonio e equipamentos com tamanhos diferente
@@ -248,52 +139,6 @@ class TestPatrimonioComEquipamenpoVazio(TestCase):
             self.assertEqual(eq_retrieve.descricao, 'descricao1')
             
             
-    def test_copy_attribute__equipamento__part_number(self):
-            eq1 = Equipamento.objects.create(id=1, part_number="", modelo="", descricao="", ncm="") 
-            tipo = Tipo.objects.create()
-            patr = Patrimonio.objects.create(id = 2, part_number="part_number1", modelo="modelo1", descricao="descricao1", ncm="ncm1", tipo=tipo, equipamento=eq1, checado=True)
-            
-            # verifica se o valor do atributo está diferente ANTES do teste
-            self.assertNotEqual(patr.part_number, patr.equipamento.part_number)
-            verficacao = VerificacaoPatrimonioEquipamento()
-            verficacao.copy_attribute('equipamento', 2, 'part_number')
-            # verifica se o valor do atributo está diferente DEPOIS do teste
-            patr_retrieve = Patrimonio.objects.get(pk=2)
-            eq_retrieve = Equipamento.objects.get(pk=1)
-            self.assertEqual(patr_retrieve.part_number, eq_retrieve.part_number)
-            self.assertEqual(eq_retrieve.part_number, 'part_number1')
-            
-            
-    def test_copy_attribute__equipamento__modelo(self):
-            eq1 = Equipamento.objects.create(id=1, part_number="", modelo="", descricao="", ncm="") 
-            tipo = Tipo.objects.create()
-            patr = Patrimonio.objects.create(id = 2, part_number="part_number1", modelo="modelo1", descricao="descricao1", ncm="ncm1", tipo=tipo, equipamento=eq1, checado=True)
-            
-            # verifica se o valor do atributo está diferente ANTES do teste
-            self.assertNotEqual(patr.descricao, patr.equipamento.modelo)
-            verficacao = VerificacaoPatrimonioEquipamento()
-            verficacao.copy_attribute('equipamento', 2, 'modelo')
-            # verifica se o valor do atributo está diferente DEPOIS do teste
-            patr_retrieve = Patrimonio.objects.get(pk=2)
-            eq_retrieve = Equipamento.objects.get(pk=1)
-            self.assertEqual(patr_retrieve.modelo, eq_retrieve.modelo)
-            self.assertEqual(eq_retrieve.modelo, 'modelo1')
-            
-            
-    def test_copy_attribute__equipamento__ncm(self):
-            eq1 = Equipamento.objects.create(id=1, part_number="", modelo="", descricao="", ncm="") 
-            tipo = Tipo.objects.create()
-            patr = Patrimonio.objects.create(id = 2, part_number="part_number1", modelo="modelo1", descricao="descricao1", ncm="ncm1", tipo=tipo, equipamento=eq1, checado=True)
-            
-            # verifica se o valor do atributo está diferente ANTES do teste
-            self.assertNotEqual(patr.ncm, patr.equipamento.ncm)
-            verficacao = VerificacaoPatrimonioEquipamento()
-            verficacao.copy_attribute('equipamento', 2, 'ncm')
-            # verifica se o valor do atributo está diferente DEPOIS do teste
-            patr_retrieve = Patrimonio.objects.get(pk=2)
-            eq_retrieve = Equipamento.objects.get(pk=1)
-            self.assertEqual(patr_retrieve.ncm, eq_retrieve.ncm)
-            self.assertEqual(eq_retrieve.ncm, 'ncm1')
 
 
     """
@@ -314,52 +159,6 @@ class TestPatrimonioComEquipamenpoVazio(TestCase):
             self.assertEqual(patr_retrieve.descricao, 'descricao1')
             
             
-    def test_copy_attribute__patrimonio__part_number(self):
-            eq1 = Equipamento.objects.create(id=1, part_number="part_number1", modelo="modelo1", descricao="descricao1", ncm="ncm1") 
-            tipo = Tipo.objects.create()
-            patr = Patrimonio.objects.create(id = 2, part_number="", modelo="", descricao="", ncm="", tipo=tipo, equipamento=eq1, checado=False)
-            
-            # verifica se o valor do atributo está diferente ANTES do teste
-            self.assertNotEqual(patr.part_number, patr.equipamento.part_number)
-            verficacao = VerificacaoPatrimonioEquipamento()
-            verficacao.copy_attribute('patrimonio', 2, 'part_number')
-            # verifica se o valor do atributo está diferente DEPOIS do teste
-            patr_retrieve = Patrimonio.objects.get(pk=2)
-            eq_retrieve = Equipamento.objects.get(pk=1)
-            self.assertEqual(patr_retrieve.part_number, eq_retrieve.part_number)
-            self.assertEqual(patr_retrieve.part_number, 'part_number1')
-
-
-    def test_copy_attribute__patrimonio__modelo(self):
-            eq1 = Equipamento.objects.create(id=1, part_number="part_number1", modelo="modelo1", descricao="descricao1", ncm="ncm1") 
-            tipo = Tipo.objects.create()
-            patr = Patrimonio.objects.create(id = 2, part_number="", modelo="", descricao="", ncm="", tipo=tipo, equipamento=eq1, checado=False)
-            
-            # verifica se o valor do atributo está diferente ANTES do teste
-            self.assertNotEqual(patr.descricao, patr.equipamento.modelo)
-            verficacao = VerificacaoPatrimonioEquipamento()
-            verficacao.copy_attribute('patrimonio', 2, 'modelo')
-            # verifica se o valor do atributo está diferente DEPOIS do teste
-            patr_retrieve = Patrimonio.objects.get(pk=2)
-            eq_retrieve = Equipamento.objects.get(pk=1)
-            self.assertEqual(patr_retrieve.modelo, eq_retrieve.modelo)
-            self.assertEqual(patr_retrieve.modelo, 'modelo1')
-
-
-    def test_copy_attribute__patrimonio__ncm(self):
-            eq1 = Equipamento.objects.create(id=1, part_number="part_number1", modelo="modelo1", descricao="descricao1", ncm="ncm1") 
-            tipo = Tipo.objects.create()
-            patr = Patrimonio.objects.create(id = 2, part_number="", modelo="", descricao="", ncm="", tipo=tipo, equipamento=eq1, checado=False)
-            
-            # verifica se o valor do atributo está diferente ANTES do teste
-            self.assertNotEqual(patr.ncm, patr.equipamento.ncm)
-            verficacao = VerificacaoPatrimonioEquipamento()
-            verficacao.copy_attribute('patrimonio', 2, 'ncm')
-            # verifica se o valor do atributo está diferente DEPOIS do teste
-            patr_retrieve = Patrimonio.objects.get(pk=2)
-            eq_retrieve = Equipamento.objects.get(pk=1)
-            self.assertEqual(patr_retrieve.ncm, eq_retrieve.ncm)
-            self.assertEqual(patr_retrieve.ncm, 'ncm1')
             
             
     def test_copy_attribute__patrimonio__procedencia(self):

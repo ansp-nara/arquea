@@ -177,6 +177,25 @@ def escolhe_equipamento(request):
     json = simplejson.dumps(retorno)
     return HttpResponse(json, mimetype="application/json")
 
+def get_equipamento(request):
+    """
+    Faz a de equipamento
+    Utilizado para montar dados de "Equipamentos" durante a tela de cadastro/modificação de patrimonio. 
+    """
+    
+    retorno = []
+    id_equipamento = request.GET.get('id_equipamento') or request.POST.get('id_equipamento')
+    p = Equipamento.objects.get(id=id_equipamento)
+    
+    retorno = {'pk':p.pk, 
+                'valor':p.__unicode__(), 
+                'modelo':p.modelo,
+                'part_number':p.part_number,
+                'ean':p.ean,
+              }
+    
+    json = simplejson.dumps(retorno)
+    return HttpResponse(json, mimetype="application/json")
 
 def escolhe_patrimonio(request):
     """

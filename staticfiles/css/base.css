@@ -1222,6 +1222,17 @@ table#change-history tbody th {
 #content-actions ul li a{font-size:11px; margin-bottom:10px;}
 #content-actions h3 {text-align:center; margin-bottom:15px;}
 
+/* form readonly */
+.field-box .input_readonly {
+    border: 1px solid #CCC;
+    color: #656565;
+    background-color: #EDEDED;
+    height: 1.2em;
+    min-width: 14em;
+    display: block;
+    padding: 0.2em 0.5em 0.2em 0.5em;
+}
+
 .slide-btn {
 	display:block;
 	width: 160px;

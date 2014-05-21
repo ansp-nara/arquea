@@ -168,20 +168,6 @@ class VerificacaoPatrimonioEquipamento():
         return tipos
         
     
-    # busca de patrimonio e equipamento
-    # com part_number diferente
-    def partNumberDiferente(self, filtros=None):
-        retorno = []
-        
-        patrimonios = Patrimonio.objects.filter(equipamento_id__isnull=False).filter(equipamento__part_number__isnull=False).exclude(equipamento__part_number=F('part_number')).select_related("equipamento").order_by("id")
-
-        if filtros and filtros["filtro_tipo_patrimonio"]:
-            patrimonios = patrimonios.filter(tipo=filtros["filtro_tipo_patrimonio"])
-        
-        retorno.append(patrimonios)
-
-        return retorno
-    
     
     # busca de patrimonio e equipamento
     # com descrição diferente
@@ -195,49 +181,7 @@ class VerificacaoPatrimonioEquipamento():
         
         retorno.append(patrimonios)
         return retorno
-    
-    
-#     # busca de patrimonio e equipamento
-#     # com marca diferente
-#     def marcaDiferente(self, filtros=None):
-#         retorno = []
-#         
-#         patrimonios = Patrimonio.objects.filter(equipamento_id__isnull=False).filter(equipamento__entidade_fabricante__isnull=False).exclude(equipamento__entidade_fabricante__sigla=F('marca')).select_related("equipamento").order_by("id")
-# 
-#         if filtros and filtros["filtro_tipo_patrimonio"]:
-#             patrimonios = patrimonios.filter(tipo=filtros["filtro_tipo_patrimonio"])
-#         
-#         retorno.append(patrimonios)
-#         return retorno
-    
-     
-    # busca de patrimonio e equipamento
-    # com modelo diferente
-    def modeloDiferente(self, filtros=None):
-        retorno = []
-        
-        patrimonios = Patrimonio.objects.filter(equipamento_id__isnull=False).filter(equipamento__modelo__isnull=False).exclude(equipamento__modelo=F('modelo')).select_related("equipamento").order_by("id")
 
-        if filtros and filtros["filtro_tipo_patrimonio"]:
-            patrimonios = patrimonios.filter(tipo=filtros["filtro_tipo_patrimonio"])
-        
-        retorno.append(patrimonios)
-        return retorno   
-    
-        
-    # busca de patrimonio e equipamento
-    # com ncm diferente
-    def ncmDiferente(self, filtros=None):
-        retorno = []
-        
-        patrimonios = Patrimonio.objects.filter(equipamento_id__isnull=False).filter(equipamento__ncm__isnull=False).exclude(equipamento__ncm=F('ncm')).select_related("equipamento").order_by("id")
-
-        if filtros and filtros["filtro_tipo_patrimonio"]:
-            patrimonios = patrimonios.filter(tipo=filtros["filtro_tipo_patrimonio"])
-        
-        retorno.append(patrimonios)
-        return retorno
-    
         
     # busca de patrimonio e equipamento
     # com tamanho em Us diferente
