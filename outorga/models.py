@@ -856,6 +856,17 @@ class TipoContrato(models.Model):
 	  verbose_name_plural = u'Tipos de documento'
           ordering = ('nome',)
 
+class EstadoOS(models.Model):
+    nome = models.CharField(max_length=20)
+    
+    def __unicode__(self):
+        return '%s' % self.nome
+        
+    class Meta:
+        ordering = ('nome',)
+        verbose_name = 'Estado da OS'
+        verbose_name_plural = 'Estados das OSs'
+        
 class OrdemDeServico(models.Model):
       """
       Uma instância dessa classe representa uma ordem de serviço de um Contrato.
@@ -872,6 +883,7 @@ class OrdemDeServico(models.Model):
       antes_rescisao = models.IntegerField(_(u'Prazo p/ solicitar rescisão'), null=True, blank=True)
       descricao = models.TextField(_(u'Descrição'))
       #arquivo = models.FileField(upload_to='OS', null=True, blank=True)
+      estado = models.ForeignKey('outorga.EstadoOS')
       pergunta = models.ManyToManyField('memorando.Pergunta', null=True, blank=True)
       substituicoes = models.TextField(null=True, blank=True)
 

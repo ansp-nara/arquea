@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.contrib import admin
-from models import OrdemDeServico, Contrato, Termo, Outorga, Modalidade, Estado, Natureza_gasto, Item, Categoria, Arquivo, Acordo, OrigemFapesp, ArquivoOS, TipoContrato
+from models import OrdemDeServico, Contrato, Termo, Outorga, Modalidade, Estado, Natureza_gasto, Item, Categoria, Arquivo, Acordo, OrigemFapesp, ArquivoOS, TipoContrato, EstadoOS
 from forms import *
 from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
@@ -379,7 +379,7 @@ class OrdemDeServicoAdmin(admin.ModelAdmin):
                     'fields': ('acordo', 'tipo')
                  }),
                 (_(u'Ordem de Serviço'), {
-                    'fields': ('numero', ('data_inicio', 'data_rescisao', 'contrato', 'antes_rescisao'), 'descricao', 'pergunta')
+                    'fields': (('numero', 'estado'), ('data_inicio', 'data_rescisao', 'contrato', 'antes_rescisao'), 'descricao', 'pergunta')
                  }),
     )
 
@@ -398,3 +398,4 @@ admin.site.register(OrdemDeServico,OrdemDeServicoAdmin)
 #admin.site.register(ArquivoOS)
 admin.site.register(TipoContrato)
 admin.site.register(OrigemFapesp)
+admin.site.register(EstadoOS)
