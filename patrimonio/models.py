@@ -99,7 +99,6 @@ class Patrimonio(models.Model):
     checado = models.BooleanField(default=False)
     apelido = models.CharField(max_length=30, null=True, blank=True)
     descricao = models.TextField(_(u'Descrição NF'))
-    ean = models.CharField(u'EAN', max_length=45, null=True, blank=True)
     tem_numero_fmusp = models.BooleanField('Tem nº de patrimônio FMUSP?', default=False)
     numero_fmusp = models.IntegerField('Nº de patrimônio FMUSP', null=True, blank=True)
     entidade_procedencia = models.ForeignKey('identificacao.Entidade', verbose_name=_(u'Procedência'), null=True, blank=True, help_text=u"Representa a Entidade que fornece este patrimônio.")
@@ -107,19 +106,21 @@ class Patrimonio(models.Model):
 # Campos duplicados que existem no Model de Equipamento
     tipo = models.ForeignKey('patrimonio.Tipo')
     descricao_tecnica = models.TextField(u'Descrição técnica', null=True, blank=True)
-    part_number = models.CharField(null=True, blank=True, max_length=50)
+#     ean = models.CharField(u'EAN', max_length=45, null=True, blank=True)
+#     part_number = models.CharField(null=True, blank=True, max_length=50)
     # Patrimonio não tem mais marca. Utilizar o campo equipamento.entidade_fabricante.sigla
     #marca = models.CharField(_(u'Marca/Editora'), null=True, blank=True, max_length=100)
-    modelo = models.CharField(null=True, blank=True, max_length=100)
+#     modelo = models.CharField(null=True, blank=True, max_length=100)
     imagem = models.ImageField(upload_to='patrimonio', null=True, blank=True)
     isbn = models.CharField(_(u'ISBN'), null=True, blank=True, max_length=20)
     titulo_autor = models.CharField(_(u'Título e autor'), null=True, blank=True, max_length=100)
     especificacao = models.FileField(u'Especificação', upload_to='patrimonio', null=True, blank=True)
-    ncm = models.CharField(u'NCM/SH', null=True, blank=True, max_length=30)
     tamanho = models.DecimalField(u'Tamanho (em U)', max_digits=5, decimal_places=2, blank=True, null=True)
 
     revision = models.CharField(u'Revision', null=True, blank=True, max_length=30)
     version = models.CharField(u'Version', null=True, blank=True, max_length=30)
+
+    ncm = models.CharField(u'NCM/SH', null=True, blank=True, max_length=30)
     ocst = models.CharField(u'O/CST', null=True, blank=True, max_length=30)
     cfop = models.CharField(u'CFOP', null=True, blank=True, max_length=30)
     garantia_termino = NARADateField(_(u'Data de término da garantia'), null=True, blank=True)
@@ -181,8 +182,28 @@ class Patrimonio(models.Model):
         if self.equipamento and self.equipamento.entidade_fabricante and self.equipamento.entidade_fabricante.sigla:
             retorno = self.equipamento.entidade_fabricante.sigla
         return retorno
-    #marca.short_description = u'Marca'
-    
+#     
+    @property
+    def modelo(self):
+        retorno = ''
+        if self.equipamento_id:
+            retorno = self.equipamento.modelo
+        return retorno
+ 
+    @property
+    def part_number(self):
+        retorno = ''
+        if self.equipamento_id:
+            retorno = self.equipamento.part_number
+        return retorno
+ 
+    @property
+    def ean(self):
+        retorno = ''
+        if self.equipamento_id:
+            retorno = self.equipamento.ean
+        return retorno
+     
     @cached_property
     def historico_atual(self):
 #         ht = self.historicolocal_set.order_by('-data', '-id')
@@ -439,7 +460,8 @@ class Equipamento(models.Model):
     titulo_autor = models.CharField(_(u'Título e autor'), null=True, blank=True, max_length=100)
     isbn = models.CharField(_(u'ISBN'), null=True, blank=True, max_length=20)
     
-    url_equipamento = models.CharField(_(u'url_equipamento'), null=True, blank=True, max_length=200)
+    # utilizado somente para carga de arquivos de especificação
+    #url_equipamento = models.CharField(_(u'url_equipamento'), null=True, blank=True, max_length=200)
 
     def __unicode__(self):
         return u'%s - %s' % (self.descricao, self.part_number)

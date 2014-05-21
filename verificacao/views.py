@@ -98,13 +98,7 @@ def check_patrimonio_equipamento(request):
    
     patrimonios = Patrimonio.objects.filter(equipamento_id__isnull=False).select_related('equipamento')
     
-    patrimonios = patrimonios.filter(~Q(equipamento__part_number=F('part_number'))|
-                                     ~Q(equipamento__modelo=F('modelo'))|
-                                     #~Q(equipamento__entidade_fabricante__sigla=F('marca'))|
-                                     #~Q(equipamento__descricao=F('descricao')) |
-                                     Q(~Q(equipamento__ean=F('ean')), Q(equipamento__ean__isnull=False), Q(ean__isnull=False)) |
-                                     Q(~Q(equipamento__ncm=F('ncm')), Q(equipamento__ncm__isnull=False), Q(ncm__isnull=False)) |
-                                     Q(~Q(equipamento__tamanho=F('tamanho')), Q(equipamento__tamanho__isnull=False), Q(tamanho__isnull=False)) 
+    patrimonios = patrimonios.filter(Q(~Q(equipamento__tamanho=F('tamanho')), Q(equipamento__tamanho__isnull=False), Q(tamanho__isnull=False)) 
                                      )
     c = {}
     c.update({'patrimonios': patrimonios})
@@ -125,25 +119,10 @@ def patrimonio_consolidado(request):
     retorno.append({'desc':u'Patrimonios sem Equipamento', 'url':'patrimonio_equipamento_vazio', 'qtd':count})
     
     verificacaoPatrimonioEquipamento = VerificacaoPatrimonioEquipamento()
-    partNumberDiferente = verificacaoPatrimonioEquipamento.partNumberDiferente(filtros_entrada)
-    count = sum([len(patrimonios) for patrimonios in partNumberDiferente])
-    retorno.append({'desc':u'Patrimonio e Equipamento com Part Number diferente', 'url':'patrimonio_equipamento_part_number_diferente', 'qtd':count})
     
     descricaoDiferente = verificacaoPatrimonioEquipamento.descricaoDiferente(filtros_entrada)
     count = sum([len(patrimonios) for patrimonios in descricaoDiferente])
     retorno.append({'desc':u'Patrimonio e Equipamento com Descricao diferente', 'url':'patrimonio_equipamento_descricao_diferente', 'qtd':count})
-
-#     marcaDiferente = verificacaoPatrimonioEquipamento.marcaDiferente(filtros_entrada)
-#     count = sum([len(patrimonios) for patrimonios in marcaDiferente])
-#     retorno.append({'desc':u'Patrimonio e Equipamento com Marca diferente', 'url':'patrimonio_equipamento_marca_diferente', 'qtd':count})
-
-    modeloDiferente = verificacaoPatrimonioEquipamento.modeloDiferente(filtros_entrada)
-    count = sum([len(patrimonios) for patrimonios in modeloDiferente])
-    retorno.append({'desc':u'Patrimonio e Equipamento com Modelo diferente', 'url':'patrimonio_equipamento_modelo_diferente', 'qtd':count})
-
-    ncmDiferente = verificacaoPatrimonioEquipamento.ncmDiferente(filtros_entrada)
-    count = sum([len(patrimonios) for patrimonios in ncmDiferente])
-    retorno.append({'desc':u'Patrimonio e Equipamento com NCM diferente', 'url':'patrimonio_equipamento_ncm_diferente', 'qtd':count})
     
     tamanhoDiferente = verificacaoPatrimonioEquipamento.tamanhoDiferente(filtros_entrada)
     count = sum([len(patrimonios) for patrimonios in tamanhoDiferente])

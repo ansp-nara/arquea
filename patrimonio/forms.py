@@ -124,7 +124,7 @@ class PatrimonioAdminForm(forms.ModelForm):
     npgto = forms.CharField(label=_(u'Nº do cheque ou do documento'), required=False,
             widget=forms.TextInput(attrs={'onchange': 'ajax_filter_pagamentos("/patrimonio/escolhe_pagamento", this.value);'}))
 
-    part_number = forms.CharField(required=False, widget=forms.TextInput(attrs={'onchange':'ajax_patrimonio_existente(this.value);'}))
+#    part_number = forms.CharField(required=False, widget=forms.TextInput(attrs={'onchange':'ajax_patrimonio_existente(this.value);'}))
 
     nf = forms.CharField(label=_(u'Nº da NF ou NS'), required=False,
             widget=forms.TextInput(attrs={'onchange': 'ajax_filter_patrimonio(this.value);'}))
@@ -142,8 +142,10 @@ class PatrimonioAdminForm(forms.ModelForm):
     equipamento = EquipamentoModelChoiceField(queryset=Equipamento.objects.all(), 
                                      required=False,
                                      label=mark_safe('<a href="#" onclick="window.open(\'/patrimonio/equipamento/\'+$(\'#id_equipamento\').val() + \'/\', \'_blank\');return true;">Equipamento</a>'),
-                                     widget=forms.Select(attrs={'style':'width:800px'}),
-                                     )
+                                     widget=forms.Select(attrs={'style':'width:800px',
+                                                                'onchange':'ajax_patr_form_get_equipamento($(\'#id_equipamento\').val());'
+                                                                }))
+                                              
     
     patrimonio = EquipamentoContidoModelChoiceField(queryset=Patrimonio.objects.all(), 
                                      required=False,
@@ -164,6 +166,7 @@ class PatrimonioAdminForm(forms.ModelForm):
     pagamento = forms.ModelChoiceField(queryset=Pagamento.objects.all(), 
                                        required=False, 
                                        label=mark_safe('<a href="#" onclick="window.open(\'/admin/financeiro/pagamento/\'+$(\'#id_pagamento\').val() + \'/\', \'_blank\');return true;">Pagamento</a>'),)
+
 
 
     form_filhos = PatrimonioReadOnlyField()
@@ -242,6 +245,7 @@ class PatrimonioAdminForm(forms.ModelForm):
                 self.fields['filtro_equipamento'].widget = widget=forms.TextInput(attrs={'onchange': 'ajax_filter_equipamento(this.value, "%s", "%s");'%(instance.id, instance.equipamento.id)})
             else:
                 self.fields['filtro_equipamento'].widget = widget=forms.TextInput(attrs={'onchange': 'ajax_filter_equipamento(this.value, "%s");'%(instance.id)})
+                
                 
     class Meta:
         model = Patrimonio
@@ -429,8 +433,6 @@ class EquipamentoAdminForm(forms.ModelForm):
                                                  required=False, 
                                                  label=mark_safe('<a href="#" onclick="window.open(\'/identificacao/entidade/\'+$(\'#id_entidade_fabricante\').val() + \'/\', \'_blank\');return true;">Marca</a>'),)
     
-    url_equipamento = forms.CharField(widget=forms.TextInput(attrs={'size':120}))
-
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=':',
                  empty_permitted=False, instance=None):
