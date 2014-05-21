@@ -294,7 +294,7 @@ def por_marca(request, pdf=0):
 
 @login_required
 def por_local(request, pdf=0):
-    if request.GET.get('endereco'):
+    if request.GET.get('entidade') and request.GET.get('endereco') and request.GET.get('detalhe'):
         atuais = []
         detalhes = []
 
@@ -364,7 +364,7 @@ def por_local(request, pdf=0):
         return render_to_response('patrimonio/por_local.html', context, context_instance=RequestContext(request))
     else:
         entidades = find_entidades_filhas(None)
-        msg = "A seleção da Entidade e Endereço são obrigatórias."
+        msg = "A seleção da Entidade, Endereço e Localização são obrigatórios."
         return render_to_response('patrimonio/sel_local.html', {'entidades':entidades, 'msg':msg}, context_instance=RequestContext(request))
 
 
