@@ -576,12 +576,27 @@ input[type=text], input[type=password], textarea, select, .vTextField {
 ul.messagelist {
     padding: 0 0 5px 0;
     margin: 0;
+    width: 100%;
+    position: relative;
 }
 
+ul.messagelist span {
+    position: absolute;
+    left: 200px;
+    display: block;
+}
+
+
 ul.messagelist li {
+    width: 100%;
+    position: absolute;
+    top: 0;
+    height: 30px;
+    
+    
     font-size: 12px;
     display: block;
-    padding: 4px 5px 4px 25px;
+    padding: 15px 5px 4px;
     margin: 0 0 3px 0;
     border-bottom: 1px solid #ddd;
     color: #666;
@@ -1015,6 +1030,10 @@ table#change-history tbody th {
     text-decoration: underline;
 }
 
+#branding {
+    position:relative;
+    z-index:99;
+}
 #branding h1 {
     padding:0;
     font-size: 14px;
