@@ -127,7 +127,8 @@ class PatrimonioAdminForm(forms.ModelForm):
 #    part_number = forms.CharField(required=False, widget=forms.TextInput(attrs={'onchange':'ajax_patrimonio_existente(this.value);'}))
 
     nf = forms.CharField(label=_(u'Nº da NF ou NS'), required=False,
-            widget=forms.TextInput(attrs={'onchange': 'ajax_filter_patrimonio(this.value);'}))
+            widget=forms.TextInput(attrs={'onkeydown':'if (event.keyCode == 13) {$(\'#id_patrimonio\').focus(); return false;}', 
+                                          'onchange': 'ajax_filter_patrimonio(this.value);'}))
 
     tem_numero_fmusp = forms.BooleanField(label=u'Tem nº de patrimônio FMUSP?', required=False, 
             widget=forms.CheckboxInput(attrs={'onchange':'ajax_numero_fmusp();'}))
@@ -135,7 +136,8 @@ class PatrimonioAdminForm(forms.ModelForm):
     descricao = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows':'2', 'cols':'152'}))
     
     filtro_equipamento = forms.CharField(label=_(u'Filtro para busca de Equipamento'), required=False,\
-        widget = forms.TextInput(attrs={'onchange': 'ajax_filter_equipamento(this.value);'}))
+        widget = forms.TextInput(attrs={'onchange': 'ajax_filter_equipamento(this.value);',
+                                        'onkeydown':'return false;'}))
     
     # Uso de Model específico para a adição de reticências na descrição
     # e javascript para adição de link no label para a página do Equipamento selecionado 
@@ -143,7 +145,7 @@ class PatrimonioAdminForm(forms.ModelForm):
                                      required=False,
                                      label=mark_safe('<a href="#" onclick="window.open(\'/patrimonio/equipamento/\'+$(\'#id_equipamento\').val() + \'/\', \'_blank\');return true;">Equipamento</a>'),
                                      widget=forms.Select(attrs={'style':'width:800px',
-                                                                'onchange':'ajax_patr_form_get_equipamento($(\'#id_equipamento\').val());'
+                                                                'onchange':'ajax_patr_form_get_equipamento($(\'#id_equipamento\').val());',
                                                                 }))
                                               
     
@@ -242,9 +244,9 @@ class PatrimonioAdminForm(forms.ModelForm):
         self.fields['form_filhos'].label = u'Patrimônios contidos (%s)' % Patrimonio.objects.filter(patrimonio=instance).count()
         if instance:
             if instance.equipamento:
-                self.fields['filtro_equipamento'].widget = widget=forms.TextInput(attrs={'onchange': 'ajax_filter_equipamento(this.value, "%s", "%s");'%(instance.id, instance.equipamento.id)})
+                self.fields['filtro_equipamento'].widget = widget=forms.TextInput(attrs={'onkeydown':'if (event.keyCode == 13) {$(\'#id_equipamento\').focus(); return false;}','onchange': 'ajax_filter_equipamento(this.value, "%s", "%s");'%(instance.id, instance.equipamento.id)})
             else:
-                self.fields['filtro_equipamento'].widget = widget=forms.TextInput(attrs={'onchange': 'ajax_filter_equipamento(this.value, "%s");'%(instance.id)})
+                self.fields['filtro_equipamento'].widget = widget=forms.TextInput(attrs={'onkeydown':'if (event.keyCode == 13) {$(\'#id_equipamento\').focus(); return false;}','onchange': 'ajax_filter_equipamento(this.value, "%s");'%(instance.id)})
                 
                 
     class Meta:
