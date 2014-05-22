@@ -114,10 +114,24 @@ class PlanejaAquisicaoRecursoAdmin(admin.ModelAdmin):
                 )
     list_display = ('projeto', 'quantidade', 'tipo', 'os', 'referente', 'valor_unitario', 'instalacao')
 
+    actions = ['action_clone']
+    
     search_fields = ('os__numero', 'referente', 'tipo__nome')
 
     inlines = [BeneficiadoInline]
-
+    
+    def action_clone(self,request,queryset):
+        for obj in queryset:
+            bs = obj.beneficiado_set.all()
+            obj.pk = None
+            obj.save()
+            
+            for b in bs:
+                b.pk = None
+                b.planejamento = obj
+                b.save()
+    action_clone.short_description = u'Clonar Planejamentos selecionados'
+    
 class TipoServicoAdmin(admin.ModelAdmin):
 
     actions = ['action_clone',]
