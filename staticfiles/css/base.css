@@ -862,6 +862,7 @@ table#change-history tbody th {
 	height:auto;
     padding: 0;
 	background:#fff;
+	min-height: 300px;
 }
 
 #content {
