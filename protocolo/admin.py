@@ -421,16 +421,28 @@ class ArquivoAdmin(admin.ModelAdmin):
     )
 
 #    list_display = ('protocolo', '__unicode__')
-    list_display = ('mostra_termo', 'mostra_entidade', 'mostra_descricao', '__unicode__')
+    list_display = ('mostra_termo', 'mostra_entidade', 'mostra_descricao', 'arquivo_link')
+    
+    list_select_related = ('protocolo__termo', 'protocolo', )
 
-
-    list_display_links= ('__unicode__', )
 
     search_fields = ('protocolo__identificacao__endereco__entidade__sigla', \
                      'protocolo__identificacao__endereco__entidade__nome', \
                      'protocolo__descricao', 'arquivo', )
 
     list_per_page = 10
+    form = ArquivoAdminForm
+    
+        
+    def arquivo_link(self,obj):
+        return u'<a href="/files/%s">%s</a>' % (obj.arquivo, obj)
+    arquivo_link.allow_tags = True
+    arquivo_link.short_description = "arquivo"
+    
+    def __init__(self,*args,**kwargs):
+        super(ArquivoAdmin, self).__init__(*args, **kwargs)
+        self.list_display_links = (None, )
+
 
 admin.site.register(Arquivo,ArquivoAdmin)
 
