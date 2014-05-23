@@ -4,9 +4,11 @@ from django import forms
 from django.forms.util import ErrorList
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ObjectDoesNotExist
-from models import Cotacao, TipoDocumento, Protocolo, Estado, Feriado
+from models import Cotacao, TipoDocumento, Protocolo, Estado, Feriado, Arquivo
+
 from outorga.models import Termo
 from identificacao.models import Entidade
+
 import logging
 
 # Get an instance of a logger
@@ -247,6 +249,26 @@ class TipoFeriadoAdminForm(forms.ModelForm):
             raise forms.ValidationError(u"Feriado fixo deve ter o dia/mês especificado")
 
         return self.cleaned_data
+
+
+
+class ArquivoAdminForm(forms.ModelForm):
     
-    
-    
+    protocolo = forms.ModelChoiceField(Protocolo.objects.all().select_related('tipo_documento'))
+
+    class Meta:
+        model = Arquivo
+
+    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
+                 initial=None, error_class=ErrorList, label_suffix=':',
+                 empty_permitted=False, instance=None):
+
+        super(ArquivoAdminForm, self).__init__(data, files, auto_id, prefix, initial,
+                                            error_class, label_suffix, empty_permitted, instance)
+        if instance:
+            if initial:
+                initial.update({'protocolo':instance.protocolo})
+            else:
+                initial = {'protocolo':instance.protocolo}
+
+

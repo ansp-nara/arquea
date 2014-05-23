@@ -658,7 +658,7 @@ class Arquivo(models.Model):
 
     # Retorna a sigla da entidade.
     def mostra_entidade(self):
-        if self.protocolo.identificacao:
+        if self.protocolo.identificacao_id:
 	    return self.protocolo.identificacao.entidade.sigla
         else:
 	    return ''
