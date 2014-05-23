@@ -421,7 +421,7 @@ class Dimensao(models.Model):
 	altura = models.DecimalField(max_digits=6, decimal_places=3, null=True, blank=True)
 	largura = models.DecimalField(max_digits=6, decimal_places=3, null=True, blank=True)
 	profundidade = models.DecimalField(max_digits=6, decimal_places=3, null=True, blank=True)
-	peso = models.DecimalField(max_digits=6, decimal_places=3, null=True, blank=True)
+	peso = models.DecimalField('Peso (kg)', max_digits=6, decimal_places=3, null=True, blank=True)
 	unidade = models.ForeignKey('patrimonio.UnidadeDimensao')
 	
 	def __unicode__(self):

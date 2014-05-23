@@ -880,7 +880,7 @@ class OrdemDeServico(models.Model):
       contrato = models.ForeignKey('outorga.Contrato')
       data_inicio = NARADateField(_(u'Início'))
       data_rescisao = NARADateField(_(u'Término'), null=True, blank=True)
-      antes_rescisao = models.IntegerField(_(u'Prazo p/ solicitar rescisão'), null=True, blank=True)
+      antes_rescisao = models.IntegerField(_(u'Prazo p/ solicitar rescisão (dias)'), null=True, blank=True)
       descricao = models.TextField(_(u'Descrição'))
       #arquivo = models.FileField(upload_to='OS', null=True, blank=True)
       estado = models.ForeignKey('outorga.EstadoOS')
@@ -897,9 +897,9 @@ class OrdemDeServico(models.Model):
           if self.antes_rescisao < 1:
               return '-'
           if self.antes_rescisao > 1:
-              return u'%s meses' % self.antes_rescisao
-          return u'%s meses' % self.antes_rescisao
-      mostra_prazo.short_description = _(u'Prazo p/ solicitar rescisão')
+              return u'%s dias' % self.antes_rescisao
+          return u'%s dias' % self.antes_rescisao
+      mostra_prazo.short_description = _(u'Prazo p/ rescisão')
 
       # Retorna um ícone se a ordem de serviço tiver anexo.
       def existe_arquivo(self):
