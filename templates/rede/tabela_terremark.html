@@ -17,16 +17,22 @@
 <div id="report_title">
 	<h1>Custos dos recursos contratados</h1>
 	<div id="report_toolbar">
-		<form action="{% url 'rede.views.custo_terremark' 1 %}" method="GET" id="id_form_recurso_pdf">
+		<form action="{% url 'rede.views.custo_terremark' %}" method="GET" id="id_form_recurso">
 		    <div title="Imprimir" class="btn_print">
-		       <input type="submit" title="Versão para impressão" class="btn_print" value="" />
+		       <input type="submit" title="Versão para impressão" class="btn_print" name="acao" value="1"  />
 		    </div>
-		</form>
-		<form action="{% url 'rede.views.custo_terremark' %}" method="GET" id="id_form_recurso_xls">
-		    <input type="hidden" name="xls" value="1" />
 		    <div title="Exportar para Excel" class="btn_excel">
-		       <input type="submit" value="" />
+		       <input type="submit" name="acao" value="2"  />
 		    </div>
+                    <div style="padding-left:15px; float:left;">
+                       <label for="id_estado" style="font-weight:bold;">Filtro por estado da OS: </label>
+ 		       <select name="estado" id="id_estado" onchange="javascript: document.forms['id_form_recurso'].submit()">
+                          <option value="0">Todos</option>
+                          {% for e in estados %}
+                          <option value="{{ e.id }}" {% if e.id == selected %}selected{% endif %}>{{ e.nome }}</option>
+                          {% endfor %}
+                       </select>
+                    </div>
 		</form>
 	</div>
 </div>

@@ -235,19 +235,24 @@ def blocos_ip(request):
 @login_required
 def custo_terremark(request, pdf=0, xls=0):
     recursos = Recurso.objects.order_by('planejamento__os', 'planejamento__tipo')
-    
-    if request.GET.get('xls') and request.GET.get('xls')=='1':
+    selected = 0
+
+    if request.GET.get('estado') and request.GET.get('estado') > '0':
+        selected = int(request.GET.get('estado'))
+        recursos = recursos.filter(planejamento__os__estado__id=selected)
+
+    if request.GET.get('acao') and request.GET.get('acao')=='2':
         # Export para Excel/XLS
-        recursos = Recurso.objects.order_by('planejamento__os', 'planejamento__tipo')
         dataset = CustoTerremarkRecursoResource().export(queryset=recursos)
-        
+
         response = HttpResponse(dataset.xls, content_type='application/vnd.ms-excel;charset=utf-8')
         response['Content-Disposition'] = "attachment; filename=custo_terremark.xls"
 
         return response
-        
-    elif pdf:
+
+    elif request.GET.get('acao') and request.GET.get('acao')=='1':
         # Export para PDF
         return render_to_pdf(template_src='rede/tabela_terremark.pdf', context_dict={'recursos':recursos, }, filename='custos_dos_recursos_contratados.pdf')
-        
-    return TemplateResponse(request, 'rede/tabela_terremark.html', {'recursos':recursos})
+
+    return TemplateResponse(request, 'rede/tabela_terremark.html', {'recursos':recursos, 'estados':EstadoOS.objects.all(), 'selected':selected})
+

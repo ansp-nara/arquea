@@ -15,7 +15,6 @@ from import_export import resources
 
 admin.site.register(Estado)
 admin.site.register(Tipo)
-admin.site.register(Dimensao)
 admin.site.register(Distribuicao)
 admin.site.register(DistribuicaoUnidade)
 admin.site.register(UnidadeDimensao)
@@ -167,3 +166,14 @@ admin.site.register(Equipamento, EquipamentoAdmin)
 
 
 
+class DimensaoAdmin(admin.ModelAdmin):
+ 
+    fieldsets = (
+		(None, {
+			'fields': (('unidade', 'altura', 'largura', 'profundidade'), 'peso'),
+			'classes': ('wide',)
+			}
+		),
+		)
+
+admin.site.register(Dimensao, DimensaoAdmin)
