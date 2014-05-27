@@ -288,7 +288,7 @@ class Beneficiado(models.Model):
 
 class Recurso(models.Model):
     planejamento = models.ForeignKey('rede.PlanejaAquisicaoRecurso')
-    quantidade = models.FloatField()
+    quantidade = models.FloatField(u'Quantidade (meses pagos)')
     valor_mensal_sem_imposto = models.DecimalField(u'Valor mensal sem imposto', max_digits=12, decimal_places=2, null=True, blank=True)
     valor_imposto_mensal = models.DecimalField(u'Valor mensal com imposto', max_digits=12, decimal_places=2)
     pagamento = models.ForeignKey('financeiro.Pagamento', null=True, blank=True)
