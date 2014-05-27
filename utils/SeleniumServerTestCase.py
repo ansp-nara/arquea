@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from django.test import LiveServerTestCase
+#from django.test import LiveServerTestCase
+from django_selenium.testcases import SeleniumTestCase
 from django.conf import settings
 from selenium import webdriver, selenium
 from selenium.webdriver.common.by import By
@@ -12,7 +13,7 @@ import logging
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
-class SeleniumServerTestCase(LiveServerTestCase):
+class SeleniumServerTestCase(SeleniumTestCase):
     """
     Classe para utilização em testes de Selenium.
     Possui setup para conectar em um Selenium Server, e fazer login no Sistema via CAS.
@@ -36,6 +37,9 @@ class SeleniumServerTestCase(LiveServerTestCase):
                 #get html contet
                 #browser.page_source
     """
+    def __init__(self, *args, **kwargs):
+        SeleniumTestCase.__init__(self, *args, **kwargs)
+
     @classmethod
     def setUpClass(cls):
         # Only display possible problems
