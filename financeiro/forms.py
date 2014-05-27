@@ -91,6 +91,16 @@ class PagamentoAdminForm(forms.ModelForm):
     origem_fapesp = forms.ModelChoiceField(OrigemFapesp.objects.all(), label=_(u'Origem Fapesp'),
               required=False, widget=forms.Select(attrs={'onchange':'ajax_prox_audit(this.value);'}))
 
+    # tornando clicável o label do campo conta_corrente
+    conta_corrente = forms.ModelChoiceField(queryset=ExtratoCC.objects.all(), 
+                                       required=False, 
+                                       label=mark_safe('<a href="#" onclick="window.open(\'/admin/financeiro/extratocc/\'+$(\'#id_conta_corrente\').val() + \'/\', \'_blank\');return true;">Conta corrente</a>'),)
+    # tornando clicável o label do campo protocolo
+    protocolo = forms.ModelChoiceField(queryset=Protocolo.objects.all(), 
+                                       required=False, 
+                                       label=mark_safe('<a href="#" onclick="window.open(\'/admin/protocolo/protocolo/\'+$(\'#id_protocolo\').val() + \'/\', \'_blank\');return true;">Protocolo</a>'),)
+
+
     def clean(self):
         valor = self.cleaned_data.get('valor_fapesp')
         origem = self.cleaned_data.get('origem_fapesp')
