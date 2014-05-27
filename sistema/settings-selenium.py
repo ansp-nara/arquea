@@ -59,7 +59,8 @@ INSTALLED_APPS += (
 
 JENKINS_TASKS = (
     'django_jenkins.tasks.with_coverage',
-    'django_jenkins.tasks.django_tests',   # select one django or
+    'django_jenkins.tasks.run_pylint',
+#     'django_jenkins.tasks.django_tests',   # select one django or
  #    'django_jenkins.tasks.dir_tests',      # directory tests discovery
  #    'django_jenkins.tasks.run_pep8',
  #    'django_jenkins.tasks.run_pyflakes',
@@ -71,7 +72,10 @@ JENKINS_TASKS = (
 
 PROJECT_APPS = (
                 'selenium_tests',
+                
                 )
+#JENKINS_TEST_RUNNER = 'django_selenium.jenkins_runner.JenkinsTestRunner'
+TEST_RUNNER = 'django_selenium.selenium_runner.SeleniumTestRunner'
 
 # end JENKINS CONFIGURATION
 
@@ -98,5 +102,6 @@ SELENIUM_SISTEMA_USERNAME ='teste'
 
 SELENIUM_SISTEMA_PASS ='selenium135#%&'
 
+SELENIUM_DRIVER = 'Remote'
 # end SELENIUM CONFIGURATION
 
