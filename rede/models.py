@@ -287,7 +287,7 @@ class Beneficiado(models.Model):
         return self.quantidade*100/self.planejamento.quantidade
 
 class Recurso(models.Model):
-    planejamento = models.ForeignKey('rede.PlanejaAquisicaoRecurso')
+    planejamento = models.ForeignKey('rede.PlanejaAquisicaoRecurso', limit_choices_to={'os__estado__nome':u'Vigente'})
     quantidade = models.FloatField(u'Quantidade (meses pagos)')
     valor_mensal_sem_imposto = models.DecimalField(u'Valor mensal sem imposto', max_digits=12, decimal_places=2, null=True, blank=True)
     valor_imposto_mensal = models.DecimalField(u'Valor mensal com imposto', max_digits=12, decimal_places=2)
