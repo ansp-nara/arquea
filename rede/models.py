@@ -261,7 +261,10 @@ class PlanejaAquisicaoRecurso(models.Model):
     banda = models.ForeignKey('rede.Banda', null=True, blank=True)
 
     def __unicode__(self):
-        return u'%s - %s - %s - %s - %s (%s)' % (self.os, self.projeto, self.tipo, self.quantidade, self.valor_unitario, self.referente)
+        inst = ''
+        if self.instalacao:
+	    inst = u'Instalação - '
+        return u'%s - %s%s - %s - %s - %s (%s)' % (self.os, inst, self.projeto, self.tipo, self.quantidade, self.valor_unitario, self.referente)
 
     @property
     def valor_total(self):
@@ -271,7 +274,7 @@ class PlanejaAquisicaoRecurso(models.Model):
     class Meta:
         verbose_name = u'Planeja Aquisição de Recursos'
         verbose_name_plural = u'Planeja Aquisição de Recursos'
-        ordering = ('os__numero', 'tipo')
+        ordering = ('os__numero', 'instalacao', 'tipo')
 
 class Beneficiado(models.Model):
     planejamento = models.ForeignKey('rede.PlanejaAquisicaoRecurso')
