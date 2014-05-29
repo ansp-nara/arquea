@@ -812,10 +812,24 @@ def racks(request):
                     
                     # Setando Imagem do equipamento
                     imagem = None
+                    imagem_traseira = None 
                     if pt.equipamento and pt.equipamento.imagem:
                         imagem = pt.equipamento.imagem.url
+                    if pt.equipamento and pt.equipamento.imagem_traseira:
+                        imagem_traseira = pt.equipamento.imagem_traseira.url
                         
-                    if pos < 0 or pt.historico_atual.posicao_colocacao in ('T', 'TD', 'TE', 'piso', 'lD', 'lE'):
+                    # Verificando profundidade
+                    # Assinala somente se ocupa a profundidade toda, ou somente metade 
+                    # da profundidade do rack
+                    profundidade = 1.0
+                    if rack.equipamento.dimensao_id and pt.equipamento.dimensao_id:
+                        if pt.equipamento.dimensao.profundidade < \
+                            rack.equipamento.dimensao.profundidade /2:
+                            profundidade = 0.5
+                        
+                    if pos < 0 or pt.historico_atual.posicao_colocacao in ('TD', 'TE', 'piso', 'lD', 'lE'):
+                        if pos < 0: 
+                            pos = '-'
                         equipamentos_fora_visao.append({'id': pt.id, 'pos':pos, 'tam': tam, 'eixoY': eixoY, 'altura':(tam*19/3), 
                                           'pos_original':pt.historico_atual.posicao_furo, 'imagem':imagem, 
                                           'nome':pt.apelido, 'descricao':pt.descricao or u'Sem descrição', 
@@ -823,8 +837,12 @@ def racks(request):
                         continue
                     else :
                         # x a partir do topo do container
+                        # Adiciona os equipamentos frontais e traseiros. 
+                        # O layout deve ser tratado no template
                         equipamentos.append({'id': pt.id, 'pos':pos, 'tam': tam, 'eixoY': eixoY, 'altura':(tam*19/3), 
-                                              'pos_original':pt.historico_atual.posicao_furo, 'imagem':imagem, 
+                                              'pos_original':pt.historico_atual.posicao_furo, 
+                                              'imagem':imagem, 'imagem_traseira':imagem_traseira, 
+                                              'profundidade':profundidade,
                                               'nome':pt.apelido, 'descricao':pt.descricao or u'Sem descrição',  
                                               'conflito':False, 'pos_col':pt.historico_atual.posicao_colocacao})
                         espaco_ocupado += tam
