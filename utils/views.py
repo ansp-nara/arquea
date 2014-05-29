@@ -76,7 +76,7 @@ def serve_files(request, filename):
     # monta a resposta sem conteúdo, apenas com o header do x-sendfile
     response = HttpResponse(mimetype=mime)
     response['X-Sendfile-encoding'] = 'url'
-    response['X-Sendfile'] = urllib.quote(path.encode('utf-8')
+    response['X-Sendfile'] = urllib.quote(path.encode('utf-8'))
     response['Content-length'] = os.path.getsize(path)
 
     return response
