@@ -455,7 +455,10 @@ class Equipamento(models.Model):
     tamanho = models.DecimalField(u'Tamanho (em U)', max_digits=5, decimal_places=2, null=True, blank=True)
     dimensao = models.ForeignKey('patrimonio.Dimensao', null=True, blank=True)
     especificacao = models.FileField(u'Especificação', upload_to='patrimonio', null=True, blank=True)
-    imagem = models.ImageField(u'Imagem do equipamento', upload_to='patrimonio', null=True, blank=True)
+    
+    imagem = models.ImageField(u'Imagem Frontal do equipamento', upload_to='patrimonio', null=True, blank=True)
+    imagem_traseira = models.ImageField(u'Imagem Traseira do equipamento', upload_to='patrimonio', null=True, blank=True)
+    
     convencoes = models.ManyToManyField('patrimonio.Distribuicao', verbose_name=u'Convenções')
     titulo_autor = models.CharField(_(u'Título e autor'), null=True, blank=True, max_length=100)
     isbn = models.CharField(_(u'ISBN'), null=True, blank=True, max_length=20)
