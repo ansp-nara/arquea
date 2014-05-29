@@ -13,7 +13,7 @@ import mock
 
 from outorga.views import *
 from outorga.models import Termo, Item, OrigemFapesp, Estado as EstadoOutorga, Categoria, Outorga, Modalidade, Natureza_gasto, \
-                           Acordo, Contrato, OrdemDeServico, TipoContrato, ArquivoOS, Arquivo
+                           Acordo, Contrato, OrdemDeServico, TipoContrato, ArquivoOS, Arquivo, EstadoOS
 from financeiro.models import Pagamento, ExtratoCC, Estado as EstadoFinanceiro
 from identificacao.models import Entidade, Contato, Identificacao, Endereco
 from protocolo.models import Protocolo, ItemProtocolo, TipoDocumento, Origem, Estado as EstadoProtocolo
@@ -392,10 +392,11 @@ class OutorgaViewTest(UnitTestCase):
         cont1 = Contrato.objects.create(numero='1111/11', descricao='contrato1', entidade=ent1, data_inicio=date(2013, 01, 02), limite_rescisao=date(2013,01,03), auto_renova=False)
         
         #Cria uma Ordem de Serviço
+        estadoOs = EstadoOS.objects.create(nome="Vigente")
         tipo = TipoContrato.objects.create(nome='Tipo Fixo')
         ef1 = EstadoOutorga.objects.create(nome='Aprovado')
         acordo = Acordo.objects.create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e SAC')
-        os = OrdemDeServico.objects.create(acordo=acordo, contrato=cont1, tipo=tipo, 
+        os = OrdemDeServico.objects.create(acordo=acordo, contrato=cont1, tipo=tipo, estado=estadoOs,
                                    data_inicio=date(2008,2,1), data_rescisao=date(2008,11,1), antes_rescisao=2, numero=66666,   
                                    descricao='OS 34567 - Contratação de mais um link')
         
@@ -1213,8 +1214,9 @@ class OrdemDeServicoTest(UnitTestCase):
         ef1 = EstadoOutorga.objects.create(nome='Aprovado')
         tipo = TipoContrato.objects.create(nome='Tipo Fixo')
         #Cria uma Ordem de Serviço
+        estadoOs = EstadoOS.objects.create(nome="Vigente")
         a = Acordo.objects.create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e SAC')
-        os = OrdemDeServico.objects.create(acordo=a, contrato=ct, tipo=tipo, 
+        os = OrdemDeServico.objects.create(acordo=a, contrato=ct, tipo=tipo, estado=estadoOs,
                                    data_inicio=date(2008,2,1), data_rescisao=date(2008,11,1), antes_rescisao=2, numero=66666,   
                                    descricao='OS 34567 - Contratação de mais um link')
 
@@ -1227,7 +1229,7 @@ class OrdemDeServicoTest(UnitTestCase):
 
     def test_mostra_prazo__positivo(self):
         os = OrdemDeServico.objects.get(pk=1)
-        self.assertEquals(os.mostra_prazo(), u'2 meses')
+        self.assertEquals(os.mostra_prazo(), u'2 dias')
 
     def test_mostra_prazo__negativo(self):
         os = OrdemDeServico.objects.get(pk=1)
@@ -1237,7 +1239,7 @@ class OrdemDeServicoTest(UnitTestCase):
     def test_mostra_prazo__um(self):
         os = OrdemDeServico.objects.get(pk=1)
         os.antes_rescisao = 1
-        self.assertEquals(os.mostra_prazo(), u'1 meses')
+        self.assertEquals(os.mostra_prazo(), u'1 dias')
 
     def test_existe_arquivo_vazio(self):
         os = OrdemDeServico.objects.get(pk=1)
@@ -1335,8 +1337,9 @@ class ArquivoOSTest(UnitTestCase):
         ef1 = EstadoOutorga.objects.create(nome='Aprovado')
         tipo = TipoContrato.objects.create(nome='Tipo Fixo')
         #Cria uma Ordem de Serviço
+        estadoOs = EstadoOS.objects.create(nome="Vigente")
         a = Acordo.objects.create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e SAC')
-        os = OrdemDeServico.objects.create(acordo=a, contrato=ct, tipo=tipo, 
+        os = OrdemDeServico.objects.create(acordo=a, contrato=ct, tipo=tipo, estado=estadoOs,
                                    data_inicio=date(2008,2,1), data_rescisao=date(2008,11,1), antes_rescisao=2, numero=66666,   
                                    descricao='OS 34567 - Contratação de mais um link')
 
