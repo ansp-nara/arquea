@@ -3,7 +3,6 @@ from django.test import TestCase
 from patrimonio.models import Equipamento, Patrimonio, Tipo
 from verificacao.models import *
 from identificacao.models import Entidade
-import unittest
 
 class TestPatrimonioComEquipamenpoVazio(TestCase):
     

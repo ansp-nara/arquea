@@ -6,7 +6,6 @@ from utils.functions import clone_objects
 from models import *
 from modelsResource import *
 from forms import *
-from resource import *
 
 from import_export.admin import ExportMixin
 from import_export.admin import ImportExportModelAdmin,ExportMixin
