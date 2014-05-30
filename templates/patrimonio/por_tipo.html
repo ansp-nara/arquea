@@ -1,16 +1,77 @@
 {% extends "admin/base_site.html" %}
 {% load proto_tags %}
+{% block extrahead %}
+<style>
+    
+</style>
+<script type="text/javascript" src="/media/js/selects.js"></script>
+{% endblock %}
 {% block content %}
 <h1 repeat="1">Inventário por tipo</h1>
 {% comment %}<h4><a href="{% url 'patrimonio.views.por_local' 1 %}?endereco={{ end }}&detalhe={{ det }}">Imprimir</a></h4>{% endcomment %}
 
 <h4>Patrimonios do tipo {{ tipo }}</h4>
- 
-    <table border="0" repeat="1" cellpadding="5">
-    <tr><th>Checado</th><th>ID</th><th>Procedência</th><th>Marca</th><th>Modelo</th><th>Part number</th><th>Descrição</th><th>NS</th><th>Local</th><th>Posição</th><th>Estado</th><th>NF</th></tr>
+<form id="filtro" method="GET">
+<p>
+<label for="id_tipo">Tipo</label>:
+<select name="tipo" id="id_tipo" onchange="ajax_get_procedencia_filter_tipo(this.value)">
+  {% for t in tipos %}
+     <option value="{{ t.id }}" {% if t.id == tipo.id %}selected{% endif %}>{{ t }}</option>
+  {% endfor %}
+</select>
+<label for="id_procedencia">Procedencia</label>:
+<select name="procedencia" id="id_procedencia">
+    <option value="">Todos</option>
+  {% for p in procedencias %}
+     <option value="{{ p.id }}" {% if p.id == procedencia.id %}selected{% endif %}>{{ p }}</option>
+  {% endfor %}
+</select>
+<input type="submit" value="Filtrar">
+</p>
+</form>
+<div id="report_toolbar">
+    <form action="{% url 'patrimonio.views.por_tipo' %}" method="GET" id="id_form_recurso">
+        <input type="hidden" name="tipo" value="{{tipo.id}}" >
+        <input type="hidden" name="procedencia" value="{{procedencia.id}}" >
+        <div title="Imprimir" class="btn_print">
+           <input type="submit" title="Versão para impressão" class="btn_print" name="acao" value="1"  />
+        </div>
+        <div title="Exportar para Excel" class="btn_excel">
+           <input type="submit" name="acao" value="2"  />
+        </div>
+    </form>
+</div>
+<table border="0" repeat="1" cellpadding="5">
+    <tr>
+        <th>Checado</th>
+        <th>ID</th>
+        <th>Procedência</th>
+        <th>Marca</th>
+        <th>Modelo</th>
+        <th>Part number</th>
+        <th>Descrição</th>
+        <th>NS</th>
+        <th>Local</th>
+        <th>Posição</th>
+        <th>Estado</th>
+        <th>NF</th>
+     </tr>
      {% for p in patrimonios %}
-              <tr><td>{{ p.checado }}</td><td>{{ p.id }}</td><td>{{ p.procedencia }}</td><td>{{ p.equipamento.entidade_fabricante.sigla }}</td><td>{{ p.modelo }}</td><td>{{ p.part_number }}</td><td>{{ p.descricao }}</td><td>{{ p.ns }}</td><td>{{ p.historico_atual.endereco.end }}</td><td>{{ p.historico_atual.endereco.complemento }}</td><td>{{ p.historico_atual.estado }}</td><td>{{ p.pagamento.protocolo.num_documento }}</td></tr>
+	    <tr>
+	        <td>{{ p.checado }}</td>
+	        <td>{{ p.id }}</td>
+	        <td>{{ p.procedencia }}</td>
+	        <td>{{ p.equipamento.entidade_fabricante.sigla }}</td>
+	        <td>{{ p.modelo }}</td>
+	        <td>{{ p.part_number }}</td>
+	        <td>{{ p.descricao }}</td>
+	        <td>{{ p.ns }}</td>
+	        <td>{{ p.historico_atual.endereco.end }}</td>
+	        <td>{{ p.historico_atual.endereco.complemento }}</td>
+	        <td>{{ p.historico_atual.estado }}</td>
+	        <td>{{ p.pagamento.protocolo.num_documento }}</td>
+	    </tr>
     {% endfor %}
-    </table>
+</table>
 
 {% endblock %}

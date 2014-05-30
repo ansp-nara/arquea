@@ -1,12 +1,29 @@
 {% extends "admin/base_site.html" %}
+{% block extrahead %}
+<style>
+    form#filtro label { display:inline-block; width: 75px; }
+</style>
+<script type="text/javascript" src="/media/js/selects.js"></script>
+{% endblock %}
 {% block content %}
-<form method="GET">
-<label for="id_tipo">Tipo</label>:
-<select name="tipo" id="id_tipo">
+<form id="filtro" method="GET">
+<p>
+<label for="id_tipo">Tipo*</label>:
+<select name="tipo" id="id_tipo" onchange="ajax_get_procedencia_filter_tipo(this.value)">
   {% for t in tipos %}
      <option value="{{ t.id }}">{{ t }}</option>
   {% endfor %}
 </select>
+</p>
+<p>
+<label for="id_procedencia">Procedencia</label>:
+<select name="procedencia" id="id_procedencia">
+    <option value="">Todos</option>
+  {% for procedencia in procedencias %}
+     <option value="{{ procedencia.id }}">{{ procedencia }}</option>
+  {% endfor %}
+</select>
+</p>
 <input type="submit" value="Enviar">
 </form>
 {% endblock %}
