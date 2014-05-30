@@ -2,7 +2,7 @@
 {% load proto_tags %}
 {% block extrahead %}
 <style>
-    
+td a { line-height: normal; }
 </style>
 <script type="text/javascript" src="/media/js/selects.js"></script>
 {% endblock %}
@@ -59,7 +59,7 @@
      {% for p in patrimonios %}
 	    <tr>
 	        <td>{{ p.checado }}</td>
-	        <td>{{ p.id }}</td>
+	        <td><a href="{% url 'admin:patrimonio_patrimonio_change' p.id %}">{{ p.id }}</a></td>
 	        <td>{{ p.procedencia }}</td>
 	        <td>{{ p.equipamento.entidade_fabricante.sigla }}</td>
 	        <td>{{ p.modelo }}</td>
