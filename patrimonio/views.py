@@ -14,14 +14,15 @@ from django.template.response import TemplateResponse
 from django.utils import simplejson
 from utils.functions import render_to_pdf, render_wk_to_pdf, render_to_pdf_weasy
 import itertools
+import datetime
+import logging
 
 from models import *
+from modelsResource import RelatorioPorTipoResource
 from identificacao.models import Entidade, EnderecoDetalhe, Endereco
 from outorga.models import Termo, Modalidade, Natureza_gasto, Item
 from protocolo.models import Protocolo, ItemProtocolo
 from financeiro.models import Pagamento
-import datetime
-import logging
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -177,7 +178,7 @@ def escolhe_equipamento(request):
     json = simplejson.dumps(retorno)
     return HttpResponse(json, mimetype="application/json")
 
-def get_equipamento(request):
+def ajax_get_equipamento(request):
     """
     Faz a de equipamento
     Utilizado para montar dados de "Equipamentos" durante a tela de cadastro/modificação de patrimonio. 
@@ -193,6 +194,22 @@ def get_equipamento(request):
                 'part_number':p.part_number,
                 'ean':p.ean,
               }
+    
+    json = simplejson.dumps(retorno)
+    return HttpResponse(json, mimetype="application/json")
+
+def ajax_get_procedencia_filter_tipo(request):
+    """
+    AJAX para buscar procedencias de patrimonio filtrados por tipo 
+    """
+    retorno = []
+    id_tipo = request.GET.get('id_tipo') or request.POST.get('id_equipamento')
+    entidades_ids = Patrimonio.objects.filter(tipo=id_tipo).order_by('tipo').values_list('entidade_procedencia', flat=True).distinct()
+    
+    procedencias = Entidade.objects.filter(id__in=entidades_ids)
+    
+    retorno = [{'pk':p.pk, 'valor':p.__unicode__()} 
+               for p in procedencias]
     
     json = simplejson.dumps(retorno)
     return HttpResponse(json, mimetype="application/json")
@@ -273,13 +290,49 @@ def por_estado(request):
         return TemplateResponse(request, 'patrimonio/sel_estado.html', {'estados':Estado.objects.all()})
 
 @login_required
-def por_tipo(request, pdf=0):
+def por_tipo(request):
     if request.method == 'GET' and request.GET.get('tipo'):
         tipo_id = request.GET.get('tipo')
         tipo = get_object_or_404(Tipo, pk=tipo_id)
-        return TemplateResponse(request, 'patrimonio/por_tipo.html', {'tipo':tipo, 'patrimonios':Patrimonio.objects.filter(tipo=tipo)})
+        
+        procedencia = ''
+        patrimonios = Patrimonio.objects.filter(tipo_id=tipo_id).order_by('entidade_procedencia', 'equipamento__entidade_fabricante', 'ns')
+        if request.GET.get('procedencia') and request.GET.get('procedencia') != '':
+            procedencia_id = request.GET.get('procedencia')
+            patrimonios = patrimonios.filter(entidade_procedencia=procedencia_id)
+            procedencia = Entidade.objects.get(id=procedencia_id)
+            
+#         patrimonios.select_related('entidade_procedencia', 'equipamento')
+        patrimonios = patrimonios.select_related('entidade_procedencia', 'equipamento', 'equipamento__entidade_fabricante')
+        
+        pdf = request.GET.get('acao') == '1'
+        xls = request.GET.get('acao') == '2'
+        if pdf:
+            return render_to_pdf_weasy('patrimonio/por_tipo_weasy.pdf', {'tipo':tipo,
+                                                                  'procedencia':procedencia,
+                                                                  'patrimonios':patrimonios})
+        elif xls:
+            # Export para Excel/XLS
+            dataset = RelatorioPorTipoResource().export(queryset=patrimonios)
+            
+            response = HttpResponse(dataset.xls, content_type='application/vnd.ms-excel;charset=utf-8')
+            response['Content-Disposition'] = "attachment; filename=relatorio_patrimonio_por_tipo.xls"
+    
+            return response
+        else:
+            # Listas para remontar o filtro de Tipos e o filtro e Procedencias
+            tipos = Tipo.objects.all()
+            entidades_ids = Patrimonio.objects.filter(tipo=tipo_id).order_by('tipo').values_list('entidade_procedencia', flat=True).distinct()
+            procedencias = Entidade.objects.filter(id__in=entidades_ids)
+        
+            return TemplateResponse(request, 'patrimonio/por_tipo.html', {'tipos': tipos,
+                                                                      'procedencias':procedencias,
+                                                                      'tipo':tipo,
+                                                                      'procedencia':procedencia,
+                                                                      'patrimonios':patrimonios})
     else:
-        return TemplateResponse(request, 'patrimonio/sel_tipo.html', {'tipos':Tipo.objects.all()})
+        tipos = Tipo.objects.all()
+        return TemplateResponse(request, 'patrimonio/sel_tipo.html', {'tipos':tipos})
 
 @login_required
 def por_marca(request, pdf=0):

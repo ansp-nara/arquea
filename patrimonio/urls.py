@@ -27,6 +27,7 @@ urlpatterns = patterns('patrimonio.views',
     (r'abre_arvore_tipo$', 'abre_arvore_tipo'),
     (r'racks$', 'racks'),
     (r'patrimonio_historico$', 'patrimonio_historico'),
-    (r'ajax_get_equipamento$', 'get_equipamento'),
+    (r'ajax_get_equipamento$', 'ajax_get_equipamento'),
+    (r'ajax_get_procedencia_filter_tipo$', 'ajax_get_procedencia_filter_tipo'),
 )
 

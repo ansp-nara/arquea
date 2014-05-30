@@ -1139,7 +1139,12 @@ function ajax_patrimonio_historico(patr_id)
 	});
 }
 
-
+/**
+ * Utilizado para o formulário do objeto Patrimonio para poder exibir
+ * os dados do Equipamento relacionado
+ * 
+ * @param id_equipamento
+ */
 function ajax_patr_form_get_equipamento(id_equipamento)
 {
        p_id = "#id_equipamento";
@@ -1152,6 +1157,35 @@ function ajax_patr_form_get_equipamento(id_equipamento)
         	   $('#id_modelo').html(retorno.modelo);
         	   $('#id_part_number').text(retorno.part_number);
         	   $('#id_ean').text(retorno.ean);
+           },
+           error: function(erro) {
+              alert('Erro: Sem retorno de requisição.');
+           }
+       });
+}
+
+/**
+ * Ajax para filtro do relatório de Patrimonio por tipo, 
+ * para restringir os dados do segundo campo de filtro Procedencia
+ * @param num_doc
+ * @param id_patrimonio
+ * @param id_equipamento
+ */
+function ajax_get_procedencia_filter_tipo(id_tipo)
+{
+       p_id = "#id_procedencia";
+       $(p_id).html('Carregando...');
+       $.ajax({
+           type: "GET",
+           url: "/patrimonio/ajax_get_procedencia_filter_tipo",
+           dataType: "json",
+           data: {'id_tipo':id_tipo},
+           success: function(retorno) {
+              $(p_id).empty();
+              $(p_id).append('<option value="">-----</option>');
+              $.each(retorno, function(i, item){
+                  $(p_id).append('<option value="'+item.pk+'" selected>'+ item.valor+'</option>');
+              });
            },
            error: function(erro) {
               alert('Erro: Sem retorno de requisição.');

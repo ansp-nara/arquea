@@ -162,12 +162,4 @@ class BlocosIPResource(resources.ModelResource):
         return '%s' % bloco.obs
 
 
-# <td>{{ b.usuario|default_if_none:"" }}</td>
-# <td>{{ b.cidr|safe }}</td>
-# <td>{{ b.asn }}</td>
-# <td>{{ b.proprietario|default_if_none:"" }}</td>
-# <td>{{ b.designado|default_if_none:"" }}</td>
-# <td>{{ b.rir }}</td>
-# <td>{{ b.obs }}</td>
-
 
