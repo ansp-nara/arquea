@@ -76,7 +76,7 @@ def lista_relatorios():
     administrativos.append({'url':'/outorga/relatorios/item_modalidade', 'nome':u'Itens do orçamento por modalidade'})
     tecnicos.append({'url':'/patrimonio/relatorio/por_estado', 'nome':u'Patrimônio por estado do item'})
     tecnicos.append({'url':'/patrimonio/relatorio/por_local', 'nome':u'Patrimônio por localização'})
-    tecnicos.append({'url':'/patrimonio/relatorio/por_local_termo', 'nome':u'Patrimônio por localização e termo'})
+    tecnicos.append({'url':'/patrimonio/relatorio/por_local_termo', 'nome':u'Patrimônio por localização (com Termo)'})
     tecnicos.append({'url':'/patrimonio/relatorio/por_tipo', 'nome':u'Patrimônio por tipo'})
     administrativos.append({'url':'/identificacao/agenda', 'nome':u'Agenda'})
     administrativos.append({'url':'/identificacao/ecossistema/par', 'nome':u'Ecossistema'})
