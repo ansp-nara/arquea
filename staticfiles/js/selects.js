@@ -1184,7 +1184,7 @@ function ajax_get_procedencia_filter_tipo(id_tipo)
               $(p_id).empty();
               $(p_id).append('<option value="">-----</option>');
               $.each(retorno, function(i, item){
-                  $(p_id).append('<option value="'+item.pk+'" selected>'+ item.valor+'</option>');
+                  $(p_id).append('<option value="'+item.pk+'">'+ item.valor+'</option>');
               });
            },
            error: function(erro) {
