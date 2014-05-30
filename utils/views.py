@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
 # Create your views here.
-from django.http import HttpResponse, Http404
 from django.contrib.admin.models import LogEntry
 from django.contrib.auth.models import User
-from membro.models import Membro
-from django.template.response import TemplateResponse
 from django.contrib.auth.decorators import permission_required, login_required
 from django.conf import settings
+from django.http import HttpResponse, Http404
+from django.template.response import TemplateResponse
+import os
 import datetime
 import logging
 import magic
-import os
+import urllib
+from membro.models import Membro
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
