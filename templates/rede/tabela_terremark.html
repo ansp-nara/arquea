@@ -57,8 +57,8 @@
 <tr>
 {% for r in recursos %}
    <tr>
-     <td><a href="{% url 'admin:outorga_contrato_change' r.planejamento.os.contrato.id %}">{{ r.planejamento.os.contrato.numero }}</a></td>
-     <td class="td_os"><span><a href="{% url 'admin:outorga_ordemdeservico_change' r.planejamento.os.id %}">{{ r.planejamento.os }}</a></td>
+     <td><a href="{% url 'admin:outorga_contrato_change' r.planejamento.os.contrato_id %}">{{ r.planejamento.os.contrato.numero }}</a></td>
+     <td class="td_os"><span><a href="{% url 'admin:outorga_ordemdeservico_change' r.planejamento.os_id %}">{{ r.planejamento.os }}</a></td>
      <td>{{ r.planejamento.os.data_inicio|date:"d/m/Y" }}</span></td>
      <td>{{ r.planejamento.os.data_rescisao|date:"d/m/Y" }}</span></td>
 	 <td>{{ r.planejamento.projeto }}</td>
@@ -72,7 +72,7 @@
 	 <td>{{ r.quantidade }}</td>
 	 <td class="td_t_simp"><span>{{ r.total_sem_imposto|moeda }}</span></td>
 	 <td class="td_t_geral"><span>{{ r.total_geral|moeda }}</span></td>
-	 <td><a href="{% url 'admin:financeiro_pagamento_change' r.pagamento.id %}">{{ r.pagamento.protocolo.num_documento }}</a></td>
+	 <td><a href="{% url 'admin:financeiro_pagamento_change' r.pagamento_id %}">{{ r.pagamento.protocolo.num_documento }}</a></td>
    </tr>
 {% endfor %}
 </table>

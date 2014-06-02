@@ -235,6 +235,14 @@ def blocos_ip(request):
 @login_required
 def custo_terremark(request, pdf=0, xls=0):
     recursos = Recurso.objects.order_by('planejamento__os', 'planejamento__tipo')
+    
+    # Otimizando o queryset do relatorio
+    recursos = recursos.select_related('planejamento', 'planejamento__projeto', \
+                                       'planejamento__tipo', \
+                                       'planejamento__unidade', \
+                                       'planejamento__os', 'planejamento__os__contrato', \
+                                       'planejamento__os__tipo', \
+                                       'pagamento', 'pagamento__protocolo' )
     selected = 0
 
     if request.GET.get('estado') and request.GET.get('estado') > '0':
