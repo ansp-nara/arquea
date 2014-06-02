@@ -11,8 +11,9 @@ from django.utils.html import mark_safe
 from models import *
 from outorga.models import Termo, OrigemFapesp
 from protocolo.models import Protocolo
-
+from memorando.models import Pergunta
 from rede.models import PlanejaAquisicaoRecurso, Recurso
+from financeiro.models import ExtratoPatrocinio
 
 
 class RecursoInlineAdminForm(forms.ModelForm):
@@ -48,30 +49,33 @@ class PagamentoAdminForm(forms.ModelForm):
         super(PagamentoAdminForm, self).__init__(data, files, auto_id, prefix, initial,
                                             error_class, label_suffix, empty_permitted, instance)
 
-
+        self.fields['pergunta'].queryset = Pergunta.objects.all().select_related('memorando')
+        self.fields['patrocinio'].queryset = ExtratoPatrocinio.objects.all().select_related('localiza')
+        
         # Permite selecionar apenas as despesas com valor superior a soma dos valores de suas fontes pagadoras.
         if data:
-	    if data.has_key('termo'):
-	      termo = data['termo']
-	      try:
-		t = Termo.objects.get(id=termo)
-		self.fields['protocolo'].queryset = Protocolo.objects.filter(termo=t).select_related('tipo_documento').order_by('tipo_documento', 'num_documento', 'data_vencimento')
-		self.fields['origem_fapesp'].queryset = OrigemFapesp.objects.filter(item_outorga__natureza_gasto__termo=t).select_related('acordo', 'item_outorga').order_by('acordo__descricao', 'item_outorga__descricao')
-	      except:
-		pass
-	elif instance:
-	    termo = instance.protocolo.termo
-	    try:
-		t = termo #Termo.objects.get(id=termo)
-		self.fields['protocolo'].queryset = Protocolo.objects.filter(termo=t).select_related('tipo_documento').order_by('tipo_documento', 'num_documento', 'data_vencimento')
-		self.fields['origem_fapesp'].queryset = OrigemFapesp.objects.filter(item_outorga__natureza_gasto__termo=t).select_related('acordo', 'item_outorga').order_by('acordo__descricao', 'item_outorga__descricao')
-	    except:
-		pass
+            if data.has_key('termo'):
+                termo = data['termo']
+                try:
+                    t = Termo.objects.get(id=termo)
+                    self.fields['protocolo'].queryset = Protocolo.objects.filter(termo=t).select_related('tipo_documento').order_by('tipo_documento', 'num_documento', 'data_vencimento')
+                    self.fields['origem_fapesp'].queryset = OrigemFapesp.objects.filter(item_outorga__natureza_gasto__termo=t).select_related('acordo', 'item_outorga').order_by('acordo__descricao', 'item_outorga__descricao')
+                except:
+                    pass
+        elif instance:
+            termo = instance.protocolo.termo
+            try:
+                t = termo #Termo.objects.get(id=termo)
+                self.fields['protocolo'].queryset = Protocolo.objects.filter(termo=t).select_related('tipo_documento').order_by('tipo_documento', 'num_documento', 'data_vencimento')
+                self.fields['origem_fapesp'].queryset = OrigemFapesp.objects.filter(item_outorga__natureza_gasto__termo=t).select_related('acordo', 'item_outorga', 'item_outorga__natureza_gasto', 'item_outorga__natureza_gasto__termo').order_by('acordo__descricao', 'item_outorga__descricao')
+            except:
+                pass
+        
 	    
-	else:
-	    self.fields['protocolo'].queryset = Protocolo.objects.filter(id__lte=0).select_related('tipo_documento')
-	    self.fields['origem_fapesp'].queryset = OrigemFapesp.objects.filter(id__lte=0).select_related('acordo', 'item_outorga')
-	    #self.fields['conta_corrente'].queryset = ExtratoCC.objects.filter(id__lte=0)
+        else:
+            self.fields['protocolo'].queryset = Protocolo.objects.filter(id__lte=0).select_related('tipo_documento')
+            self.fields['origem_fapesp'].queryset = OrigemFapesp.objects.filter(id__lte=0).select_related('acordo', 'item_outorga')
+            #self.fields['conta_corrente'].queryset = ExtratoCC.objects.filter(id__lte=0)
 
     class Meta:
         model = Pagamento
@@ -128,8 +132,7 @@ class AuditoriaPagamentoChoiceField(forms.ModelChoiceField):
 class AuditoriaAdminForm(forms.ModelForm):
 
     parcial = forms.IntegerField(label=u'Parcial', widget=forms.TextInput(attrs={'onchange': 'ajax_nova_pagina(this);'}))
-
-    pagamento = AuditoriaPagamentoChoiceField(queryset=Pagamento.objects.all().select_related('protocolo', 'origem_fapesp__item_outorga__natureza_gasto__modalidade'),
+    pagamento = AuditoriaPagamentoChoiceField(queryset=Pagamento.objects.all().select_related('protocolo', 'origem_fapesp__item_outorga__natureza_gasto', 'origem_fapesp__item_outorga__natureza_gasto__modalidade'),
                                                  required=False, 
                                                  label=mark_safe('<a href="#" onclick="window.open(\'/financeiro/pagamento/\'+$(\'#id_pagamento\').val() + \'/\', \'_blank\');return true;">Pagamento</a>'),)
 
