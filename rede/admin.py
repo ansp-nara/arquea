@@ -92,7 +92,11 @@ class RecursoAdmin(admin.ModelAdmin):
 
     fieldsets = (
                  (None, {
-                         'fields': ('planejamento', ('termo', 'pagamento'), 'obs', ('quantidade', 'valor_imposto_mensal', 'valor_mensal_sem_imposto'), ),
+                         'fields': ('planejamento', 
+                                    ('termo', 'pagamento'), 
+                                    'obs', 
+                                    ('quantidade', 'mes_referencia', 'ano_referencia'), 
+                                    ('valor_imposto_mensal', 'valor_mensal_sem_imposto'),),
                          'classes': ('wide',)
                         }
                  ),

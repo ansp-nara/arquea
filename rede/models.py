@@ -1,5 +1,6 @@
 #-*- encoding:utf-8 -*-
 from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
 from decimal import Decimal
 
 # Create your models here.
@@ -290,11 +291,15 @@ class Beneficiado(models.Model):
         return self.quantidade*100/self.planejamento.quantidade
 
 class Recurso(models.Model):
-    planejamento = models.ForeignKey('rede.PlanejaAquisicaoRecurso', limit_choices_to={'os__estado__nome':u'Vigente'})
+    planejamento = models.ForeignKey('rede.PlanejaAquisicaoRecurso')
     quantidade = models.FloatField(u'Quantidade (meses pagos)')
     valor_mensal_sem_imposto = models.DecimalField(u'Valor mensal sem imposto', max_digits=12, decimal_places=2, null=True, blank=True)
     valor_imposto_mensal = models.DecimalField(u'Valor mensal com imposto', max_digits=12, decimal_places=2)
     pagamento = models.ForeignKey('financeiro.Pagamento', null=True, blank=True)
+    
+    mes_referencia = models.DecimalField(u'Mes inicial de referencia', max_digits=2, decimal_places=0, validators=[MaxValueValidator(12), MinValueValidator(1)], null=True, blank=True)
+    ano_referencia  = models.DecimalField(u'Ano inicial de referencia', max_digits=4, decimal_places=0, validators=[MinValueValidator(1950)], null=True, blank=True)
+    
     obs = models.TextField(null=True, blank=True)
 
     def __unicode__(self):
