@@ -106,8 +106,9 @@ class Membro(models.Model):
 
     # Retorna o nome e o cargo.
     def __unicode__(self):
-        if self.cargo_atual():
-            return u'%s (%s)' % (self.nome, self.cargo_atual())
+        cargo = self.cargo_atual()
+        if cargo:
+            return u'%s (%s)' % (self.nome, cargo)
         return u'%s' % (self.nome)
 
 
@@ -130,7 +131,7 @@ class Membro(models.Model):
 
     # cargo atual do membro, caso exista, a partir do histórico
     def cargo_atual(self):
-        cargos = [h.cargo.nome for h in Historico.ativos.filter(membro=self)]
+        cargos = [h.cargo.nome for h in Historico.ativos.filter(membro=self).select_related('cargo').only('cargo', 'cargo__nome')]
  
         return ' - '.join(cargos)
 
