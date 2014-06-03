@@ -303,7 +303,8 @@ def por_tipo(request):
             procedencia = Entidade.objects.get(id=procedencia_id)
             
 #         patrimonios.select_related('entidade_procedencia', 'equipamento')
-        patrimonios = patrimonios.select_related('entidade_procedencia', 'equipamento', 'equipamento__entidade_fabricante')
+
+        patrimonios = patrimonios.select_related('entidade_procedencia', 'equipamento', 'equipamento__entidade_fabricante', 'pagamento', 'pagamento__protocolo')
         
         pdf = request.GET.get('acao') == '1'
         xls = request.GET.get('acao') == '2'
@@ -320,6 +321,7 @@ def por_tipo(request):
     
             return response
         else:
+
             # Listas para remontar o filtro de Tipos e o filtro e Procedencias
             tipos = Tipo.objects.all()
             entidades_ids = Patrimonio.objects.filter(tipo=tipo_id).order_by('tipo').values_list('entidade_procedencia', flat=True).distinct()
