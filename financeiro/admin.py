@@ -8,10 +8,11 @@ from memorando.models import Corpo
 from utils.admin import PrintModelAdmin
 from rede.models import Recurso
 
-class RecursoInline(admin.TabularInline):
+class RecursoInline(admin.StackedInline):
     model = Recurso
     extra = 2
     form = RecursoInlineAdminForm
+    fieldsets = ((None, {'fields':('planejamento',('quantidade','valor_mensal_sem_imposto','valor_imposto_mensal'),'obs')}),)
 
     def __init__(self, model, admin_site):
         """
@@ -73,7 +74,9 @@ class PagamentoAdmin(PrintModelAdmin):
     
     fieldsets = (
 		  (None, {
-			  'fields': (('cod_oper', 'conta_corrente', 'patrocinio'), ('termo', 'numero', 'protocolo'), ('valor_fapesp', 'valor_patrocinio')),
+			  'fields': (('cod_oper', 'conta_corrente', 'patrocinio'), 
+                         ('termo', 'numero', 'protocolo'), 
+                         ('valor_fapesp', 'valor_patrocinio')),
 			  'classes': ('wide',)
 		  }),
 		  ('Outros', {
@@ -83,6 +86,7 @@ class PagamentoAdmin(PrintModelAdmin):
     )
     
     list_display = ('item', 'nota', 'data', 'codigo_operacao', 'formata_valor_fapesp', 'parcial', 'pagina')
+    list_select_related = ('protocolo', 'origem_fapesp', 'origem_fapesp__item_outorga', 'origem_fapesp__item_outorga__natureza_gasto__modalidade', 'origem_fapesp__item_outorga__natureza_gasto__termo',)
     search_fields = ('protocolo__num_documento', 'conta_corrente__cod_oper', 'protocolo__descricao2__descricao', 'protocolo__descricao2__entidade__sigla', 'protocolo__referente')
     form = PagamentoAdminForm
     inlines = (AuditoriaInline, RecursoInline)
@@ -118,6 +122,10 @@ class AuditoriaAdmin(admin.ModelAdmin):
     )
     
     list_display = ('pagamento', 'tipo', 'parcial', 'pagina')
+    list_select_related = ('tipo', 'pagamento__protocolo', 'pagamento__origem_fapesp', \
+                           'pagamento__origem_fapesp__item_outorga', \
+                           'pagamento__origem_fapesp__item_outorga__natureza_gasto__modalidade', \
+                           'pagamento__origem_fapesp__item_outorga__natureza_gasto__termo',)
     search_fields = ('parcial', 'pagina')
     form = AuditoriaAdminForm
 

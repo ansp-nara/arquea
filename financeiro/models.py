@@ -135,7 +135,7 @@ class Pagamento(models.Model):
         if self.origem_fapesp:
             mod = self.origem_fapesp.item_outorga.natureza_gasto.modalidade.sigla
             if self.auditoria_set.exists():
-                a = self.auditoria_set.filter()[:1].get()
+                a = self.auditoria_set.only('pagamento', 'parcial', 'pagina')[:1].get()
                 return u"%s - %s - %s, parcial %s, página %s    ID: %s" % (self.protocolo.num_documento, valor, mod, a.parcial, a.pagina, self.pk)
         return u"%s - %s - %s    ID: %s" % (self.protocolo.num_documento, valor, mod, self.pk)
 
@@ -162,10 +162,9 @@ class Pagamento(models.Model):
 
     def anexos(self):
         retorno = u'Não'
-    	if self.auditoria_set.count() > 0:
-	   retorno = u'Sim'
-
-	return retorno
+        if self.auditoria_set.exists():
+            retorno = u'Sim'
+        return retorno
 
     def save(self, *args, **kwargs):
 
@@ -203,15 +202,16 @@ class Pagamento(models.Model):
     formata_valor_fapesp.admin_order_field = 'valor_fapesp'
 
     def pagina(self):
-        if self.auditoria_set.count() > 0:
-            return self.auditoria_set.all()[0].pagina
+        if self.auditoria_set.exists():
+            return self.auditoria_set.only('pagina', 'pagamento')[0].pagina
+    
         return ''
     pagina.short_description = u'Página'
     pagina.admin_order_field = 'auditoria__pagina'
 
     def parcial(self):
         if self.auditoria_set.exists():
-            return self.auditoria_set.all()[0].parcial
+            return self.auditoria_set.only('parcial', 'pagamento')[0].parcial
 
         return ''
     parcial.admin_order_field = 'auditoria__parcial'

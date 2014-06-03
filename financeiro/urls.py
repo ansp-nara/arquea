@@ -42,4 +42,6 @@ urlpatterns = patterns('financeiro.views',
     #(r'relatorio\.pdf/(?P<termo>\d+)/(?P<modalidade>\d+)$', 'relatorio_despesas', {'pdf':True}),
     #(r'relatorio\.pdf/(?P<termo>\d+)$', 'relatorio_despesas', {'pdf':True}),
     #(r'relatorio\.pdf$', 'relatorio_despesas', {'pdf':True}),
+    (r'ajax_get_recursos_vigentes$', 'ajax_get_recursos_vigentes'),
+    
 )
