@@ -203,7 +203,7 @@ def ajax_get_procedencia_filter_tipo(request):
     AJAX para buscar procedencias de patrimonio filtrados por tipo 
     """
     retorno = []
-    id_tipo = request.GET.get('id_tipo') or request.POST.get('id_equipamento')
+    id_tipo = request.GET.get('id_tipo') or request.POST.get('id_tipo')
     entidades_ids = Patrimonio.objects.filter(tipo=id_tipo).order_by('tipo').values_list('entidade_procedencia', flat=True).distinct()
     
     procedencias = Entidade.objects.filter(id__in=entidades_ids)

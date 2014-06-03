@@ -68,6 +68,7 @@ class PatrimonioAdmin(ExportMixin, admin.ModelAdmin):
     readonly_fields = ('part_number', 'modelo', 'ean')
     form = PatrimonioAdminForm
     list_display = ('tipo', 'descricao', 'complemento', 'posicao', 'agilis', 'modelo', 'ns', 'nf', 'valor', 'checado')
+    list_select_related = ('tipo', 'equipamento', 'pagamento__protocolo__termo')
     list_filter = ('tipo', 'pagamento__protocolo__termo',)
     inlines = [HistoricoLocalInline,]
     search_fields = ('descricao', 'ns', 'pagamento__protocolo__num_documento', 'ncm', 'historicolocal__descricao', \
