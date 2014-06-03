@@ -58,6 +58,7 @@ class ArquivoInline(admin.TabularInline):
 class MemorandoSimplesAdmin(admin.ModelAdmin):
     form = MemorandoSimplesForm
     list_display = ('num_memo', 'assunto', 'destinatario', 'data')
+    list_select_related = ('assunto', )
     inlines = [ArquivoInline]
     search_fields = ['assunto__descricao', 'corpo', 'data']
 
