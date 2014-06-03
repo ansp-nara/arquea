@@ -3,24 +3,26 @@
 # Create your views here.
 
 from django.shortcuts import render_to_response, get_object_or_404
-from outorga.models import Modalidade, Outorga, Item, Termo, OrigemFapesp, Natureza_gasto, Acordo
-from protocolo.models import Protocolo
-from identificacao.models import Entidade, Identificacao
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.models import Group
 from django.contrib import admin
 from django.http import Http404, HttpResponse
-from utils.functions import pega_lista, formata_moeda, render_to_pdf, render_to_pdf_weasy
-import json as simplejson
-from models import *
-from decimal import Decimal
 from django.db.models import Q, Max
 from django.contrib.auth.decorators import permission_required, login_required
 from django.db.models import Sum
 from django.template import Context, loader, RequestContext
+import json as simplejson
+from decimal import Decimal
 import datetime
-from operator import itemgetter
 import logging
+
+from outorga.models import Modalidade, Outorga, Item, Termo, OrigemFapesp, Natureza_gasto, Acordo
+from protocolo.models import Protocolo
+from identificacao.models import Entidade, Identificacao
+from rede.models import Recurso, PlanejaAquisicaoRecurso
+from utils.functions import pega_lista, formata_moeda, render_to_pdf, render_to_pdf_weasy
+from operator import itemgetter
+from models import *
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -724,3 +726,22 @@ def tipos_documentos(context):
         protocolos.append({'tipo':p.tipo_documento.nome, 'auditorias':audits})
 
     return render_to_response('financeiro/tipos.html', {'protocolos':protocolos})
+
+def ajax_get_recursos_vigentes(request):
+    """
+    AJAX para buscar os dados dos recursos.
+    Recebe parametro para filtra por estado (ex: Vigente) ou buscar todos os registros
+    """
+    estado = request.GET.get('estado') or request.POST.get('estado')
+    print estado
+    retorno = []
+    if estado and estado != '':
+        recursos = PlanejaAquisicaoRecurso.objects.filter(os__estado__nome=estado).select_related('os', 'os__tipo', 'projeto', 'tipo', )
+    else:
+        recursos = PlanejaAquisicaoRecurso.objects.all().select_related('os', 'os__tipo', 'projeto', 'tipo', )
+        
+    retorno = [{'pk':r.pk, 'valor':r.__unicode__()}
+               for r in recursos]
+    
+    json = simplejson.dumps(retorno)
+    return HttpResponse(json, mimetype="application/json")
