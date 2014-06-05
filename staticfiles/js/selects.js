@@ -1167,9 +1167,7 @@ function ajax_patr_form_get_equipamento(id_equipamento)
 /**
  * Ajax para filtro do relatório de Patrimonio por tipo, 
  * para restringir os dados do segundo campo de filtro Procedencia
- * @param num_doc
- * @param id_patrimonio
- * @param id_equipamento
+ * @param id_tipo	ID do Tipo do Patrimonio 
  */
 function ajax_get_procedencia_filter_tipo(id_tipo)
 {
@@ -1180,6 +1178,33 @@ function ajax_get_procedencia_filter_tipo(id_tipo)
            url: "/patrimonio/ajax_get_procedencia_filter_tipo",
            dataType: "json",
            data: {'id_tipo':id_tipo},
+           success: function(retorno) {
+              $(p_id).empty();
+              $(p_id).append('<option value="">-----</option>');
+              $.each(retorno, function(i, item){
+                  $(p_id).append('<option value="'+item.pk+'">'+ item.valor+'</option>');
+              });
+           },
+           error: function(erro) {
+              alert('Erro: Sem retorno de requisição.');
+           }
+       });
+}
+
+
+/**
+ * Ajax para filtro no formulário de Pagamentos, inline Recursos 
+ * @param id_retorno	ID do DOM para renderizar o resultado
+ * @param estado	Estado para filtrar os Recursos. (EX: Vigente)
+ */
+function ajax_get_recursos(id_retorno, estado)
+{
+	   p_id = id_retorno;
+       $.ajax({
+           type: "GET",
+           url: "/financeiro/ajax_get_recursos_vigentes",
+           dataType: "json",
+           data: {'estado':estado},
            success: function(retorno) {
               $(p_id).empty();
               $(p_id).append('<option value="">-----</option>');
