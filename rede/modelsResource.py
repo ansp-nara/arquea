@@ -163,3 +163,66 @@ class BlocosIPResource(resources.ModelResource):
 
 
 
+"""
+Modelo do model Recurso para a geração do XLS para o relatório Custo Terremark
+"""
+class RecursoOperacionalResource(resources.ModelResource):
+    planejamento__os__contrato__numero = fields.Field(column_name='Contrato')
+    planejamento__os = fields.Field(column_name='OS')
+    planejamento__projeto = fields.Field(column_name='Projeto')
+    planejamento__tipo = fields.Field(column_name='Descrição')
+    planejamento__referente = fields.Field(column_name='Referente')
+    planejamento__quantidade = fields.Field(column_name='Qtd. Total')
+    entidade = fields.Field(column_name='Beneficiado')
+    estado = fields.Field(column_name='Ben. Estado')
+    quantidade = fields.Field(column_name='Ben. Qtd')
+
+    class Meta:
+        model = Beneficiado
+        fields = ('planejamento__os__contrato__numero',
+                  'planejamento__os',
+                  'planejamento__projeto',
+                  'planejamento__tipo',
+                  'planejamento__referente',
+                  'planejamento__quantidade',
+                  'entidade',
+                  'estado',
+                  'quantidade',
+                  )
+        export_order = ('planejamento__os__contrato__numero',
+                  'planejamento__os',
+                  'planejamento__projeto',
+                  'planejamento__tipo',
+                  'planejamento__referente',
+                  'planejamento__quantidade',
+                  'entidade',
+                  'estado',
+                  'quantidade',
+                  )
+
+    def dehydrate_planejamento__os__contrato__numero(self, beneficiado):
+        if beneficiado.planejamento.os_id and beneficiado.planejamento.os.contrato_id:
+            return '%s' % beneficiado.planejamento.os.contrato.numero
+        return ''
+        
+    def dehydrate_planejamento__os(self, beneficiado):
+        return '%s' % beneficiado.planejamento.os
+    def dehydrate_planejamento__projeto(self, beneficiado):
+        return '%s' % beneficiado.planejamento.projeto
+    def dehydrate_planejamento__tipo(self, beneficiado):
+        return '%s' % beneficiado.planejamento.tipo
+    def dehydrate_planejamento__referente(self, beneficiado):
+        return '%s' % beneficiado.planejamento.referente
+    def dehydrate_planejamento__quantidade(self, beneficiado):
+        return beneficiado.planejamento.quantidade
+    def dehydrate_entidade(self, beneficiado):
+        if beneficiado.entidade_id:
+            return beneficiado.entidade.nome
+        return ''
+    def dehydrate_estado(self, beneficiado):
+        if beneficiado.estado_id:
+            return beneficiado.estado.nome
+        return ''
+    def dehydrate_quantidade(self, beneficiado):
+        return beneficiado.quantidade
+

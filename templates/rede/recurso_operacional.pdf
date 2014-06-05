@@ -1,0 +1,89 @@
+{% extends "base.pdf" %}
+{% load proto_tags %}
+{% block pagesize %}a4 landscape{% endblock %}
+{% block landscape %}_paisagem{% endblock %}
+{% block extrastyle %}
+
+tbody td { padding-top:3px; padding-left:2px;}
+tbody th { padding-top:3px; }
+table tbody tr td { border:1; }
+
+ td.td_os span,
+ td.td_v_unit span,
+ td.td_v_simp span,
+ td.td_v_cimp span,
+ td.td_t_simp span,
+ td.td_t_geral span
+ {
+     white-space:nowrap;
+ }
+ 
+    #tbl_relatorio .td_contrato      { width:1.2cm; }
+    #tbl_relatorio .td_os            { width:1.2cm; }
+    #tbl_relatorio .td_estado_os     { width:1.2cm; }
+    
+    #tbl_relatorio .td_classificacao { width:5.0cm; }
+    #tbl_relatorio .td_descricao     { width:8.0cm; }
+    /*
+    #tbl_relatorio .td_referente     { width:1.2cm; }
+    */
+    #tbl_relatorio .td_quantidade    { width:0.9cm; }
+    
+    
+{% endblock %}
+{% block content %}
+<h1>Custos dos recursos contratados</h1>
+<table id="tbl_relatorio">
+<thead>
+<tr>
+    <td>Contrato</td>
+    <td>OS</td>
+    {% if not estado_selected or estado_selected == 0 %}
+        <td>Est. OS</td>
+    {% endif %}
+    <td>Classificação</td>
+    <td>Descrição</td>
+    <td>Referente</td>
+    <td><span title="Quantidade de recurso contratrado.">Qtd</span></td>
+<tr>
+<tr>
+    <td></td>
+    <td></td>
+    {% if not estado_selected or estado_selected == 0 %}
+        <td colspan="3">Beneficiado</td>
+    {% else %}
+        <td colspan="2">Beneficiado</td>
+    {% endif %}
+    <td>Estado</td>
+    <td>Qtd</td>
+<tr>
+</thead>
+<tbody>
+{% for r in planejamentos %}
+   <tr style="border-top:1px black solid; border-bottom:1px darkgray solid; background-color:#f9f9f9;">
+        <td class="td_contrato">{{ r.contrato.numero }}</td>
+        <td class="td_os"><span>{{ r.os.numero }}</td>
+        {% if not estado_selected or estado_selected == 0 %}
+            <td class="td_estado_os"><span>{{ r.os.estado|default:'-' }}</span></td>
+        {% endif %}
+        <td class="td_classificacao">{{ r.classificacao }}</td>
+        <td class="td_descricao">{{ r.descricao }}</td>
+        <td class="td_referente">{{ r.referente }}</td>
+        <td class="td_quantidade">{{ r.quantidade }}</td>
+   </tr>
+    {% for b in r.beneficiados %}
+        <tr>
+            <td colspan='2'></td>
+            {% if not estado_selected or estado_selected == 0 %}
+                <td colspan="3">{{b.entidade}}</td>
+            {% else %}
+                <td colspan="2">{{b.entidade}}</td>
+            {% endif %}
+            <td>{{b.estado|default:'-'}}</td>
+            <td>{{b.quantidade|default:'-'}}</td>
+        </tr>
+    {% endfor %}
+{% endfor %}
+</tbody>
+</table>
+{% endblock %}
