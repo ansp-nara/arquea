@@ -52,8 +52,11 @@ table tr td {
 <tr>
     <th style="width:1.3cm;">Contrato</th>
     <th style="width:1.5cm;">OS</th>
-    <th style="width:1.6cm;">Data Ini</th>
-    <th style="width:1.6cm;">Data Fim</th>
+    {% if not estado_selected or estado_selected == '0' %}
+        <th style="width:1.2cm;">Est. OS</th>
+    {% endif %}
+    <th style="width:1.5cm;">Data Ini</th>
+    <th style="width:1.5cm;">Data Fim</th>
     <th style="width:3.4cm;">Projeto</th>
     <th style="">Descrição</th>
     <th style="">Referente</th>
@@ -63,14 +66,21 @@ table tr td {
     <th style="width:2cm;">Custo mensal sem imposto</th>
     <th style="width:2cm;">Custo mensal com imposto</th>
     <th style="width:0.9cm;">Meses pagos</th>
+    <th style="width:1.3cm;">Ref.</th>
     <th style="width:2cm;">Total sem imposto</th>
     <th style="width:2cm;">Total com imposto</th>
-    <th style="width:1.3cm;">Nota fiscal</th>
+    <th style="width:1.2cm;">Nota fiscal</th>
+    <th style="width:1.6cm;">Termo</th>
 <tr>
 {% for r in recursos %}
    <tr>
      <td>{{ r.planejamento.os.contrato.numero }}</td>
 	 <td class="td_os"><span>{{ r.planejamento.os }}</span></td>
+	 
+	 {% if not estado_selected or estado_selected == '0' %}
+        <td class="td_estado_os"><span>{{ r.planejamento.os.estado|default:'-' }}</span></td>
+     {% endif %}
+	 
      <td>{{ r.planejamento.os.data_inicio|date:"SHORT_DATE_FORMAT" }}</td>
      <td>{{ r.planejamento.os.data_rescisao|date:"SHORT_DATE_FORMAT" }}</td>
 	 <td>{{ r.planejamento.projeto }}</td>
@@ -82,9 +92,11 @@ table tr td {
 	 <td class="td_v_simp"><span>{{ r.valor_mensal_sem_imposto|moeda }}</span></td>
 	 <td class="td_v_cimp"><span>{{ r.valor_imposto_mensal|moeda }}</span></td>
 	 <td>{{ r.quantidade }}</td>
+	 <td class="td_ref"><span>{{r.mes_referencia|default:"-"}} / {{r.ano_referencia|default:"-"}}</span></td>
 	 <td class="td_t_simp"><span>{{ r.total_sem_imposto|moeda }}</span></td>
 	 <td>{{ r.total_geral|moeda }}</td>
 	 <td class="td_t_geral"><span>{{ r.pagamento.protocolo.num_documento }}</span></td>
+     <td class="td_termo"><span>{{ r.pagamento.termo }}</span></td>
    </tr>
 {% endfor %}
 </table>
