@@ -280,14 +280,16 @@ class PlanejaAquisicaoRecurso(models.Model):
 class Beneficiado(models.Model):
     planejamento = models.ForeignKey('rede.PlanejaAquisicaoRecurso')
     entidade = models.ForeignKey('identificacao.Entidade')
+    estado = models.ForeignKey('rede.Estado', null=True)
     quantidade = models.FloatField()
-    estado = models.ForeignKey('rede.Estado')
+
 
     def __unicode__(self):
-	return u'%s' % self.entidade
+        return u'%s' % self.entidade
 
     def porcentagem(self):
-	if not self.quantidade: return 100.0
+        if not self.quantidade: 
+            return 100.0
         return self.quantidade*100/self.planejamento.quantidade
 
 class Recurso(models.Model):

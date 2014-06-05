@@ -1,0 +1,115 @@
+{% extends "admin/base_site.html" %}
+{% load proto_tags %}
+{% block extrastyle %}
+<style>
+ 
+ #tbl_relatorio td a{
+    line-height:inherit;
+ }
+ #tbl_relatorio thead{
+    font-weight:bold;
+    background-color:#ddd;
+    white-space:nowrap;
+ }
+ 
+ td.td_estado_os { text-align: center; } 
+ 
+ .td_os span,
+ .td_contrato span,
+ .td_estado_os span,
+ .td_classificacao span,
+ .td_quantidade span
+ {
+     white-space:nowrap;
+ }
+</style>
+{% endblock %}
+{% block content %}
+<div id="report_title">
+	<h1>Custos dos recursos contratados</h1>
+	<div id="report_toolbar">
+		<form action="{% url 'rede.views.relatorio_recursos_operacional' %}" method="GET" id="id_form_recurso">
+		    <div title="Imprimir" class="btn_print">
+		       <input type="submit" title="Versão para impressão" class="btn_print" name="acao" value="1"  />
+		    </div>
+		    <div title="Exportar para Excel" class="btn_excel">
+		       <input type="submit" name="acao" value="2"  />
+		    </div>
+            <div style="padding-left:15px; float:left;">
+               <label for="id_estado" style="font-weight:bold;">Filtro por estado da OS: </label>
+               <select name="estado" id="id_estado" onchange="javascript: document.forms['id_form_recurso'].submit()">
+                    <option value="0">Todos</option>
+                    {% for e in filtro_estados %}
+                        <option value="{{ e.id }}" {% if e.id == estado_selected %}selected{% endif %}>{{ e.nome }}</option>
+                    {% endfor %}
+               </select>
+            </div>
+            <div style="padding-left:15px; float:left;">
+               <label for="id_beneficiado" style="font-weight:bold;">Filtro por beneficiado: </label>
+               <select name="beneficiado" id="id_beneficiado" onchange="javascript: document.forms['id_form_recurso'].submit()">
+                    <option></option>
+                    <option value="0">Todos</option>
+                    {% for e in filtro_beneficiados %}
+                        <option value="{{ e.entidade.id }}" {% if e.entidade.id == beneficiado_selected %}selected{% endif %}>{{ e.entidade }}</option>
+                    {% endfor %}
+               </select>
+            </div>
+		</form>
+	</div>
+</div>
+<table id="tbl_relatorio">
+<thead>
+<tr>
+    <td>Contrato</td>
+    <td>OS</td>
+    {% if estado_selected == 0 %}
+        <td>Est. OS</td>
+    {% endif %}
+    <td>Classificação</td>
+    <td>Descrição</td>
+    <td>Referente</td>
+    <td><span title="Quantidade de recurso contratrado.">Qtd</span></td>
+<tr>
+<tr>
+    <td></td>
+    <td></td>
+    {% if estado_selected == 0 %}
+        <td colspan="3">Beneficiado</td>
+    {% else %}
+        <td colspan="2">Beneficiado</td>
+    {% endif %}
+    <td>Estado</td>
+    <td>Qtd</td>
+<tr>
+</thead>
+<tbody>
+{% for r in planejamentos %}
+   <tr style="border-top:1px black solid; border-bottom:1px darkgray solid; background-color:#f9f9f9;">
+        <td class="td_contrato">{{ r.contrato.numero }}</td>
+        <td class="td_os"><span>{{ r.os.numero }}</td>
+        {% if not estado_selected or estado_selected == 0 %}
+            <td class="td_estado_os"><span>{{ r.os.estado|default:'-' }}</span></td>
+        {% endif %}
+        <td class="td_classificacao"><span>{{ r.classificacao }}</span></td>
+        <td class="td_descricao"><span>{{ r.descricao }}</span></td>
+        <td class="td_referente"><span>{{ r.referente }}</span></td>
+        <td class="td_quantidade"><span>{{ r.quantidade }}</span></td>
+   </tr>
+    {% for b in r.beneficiados %}
+        <tr>
+            <td colspan='2'></td>
+            {% if not estado_selected or estado_selected == 0 %}
+	            <td colspan='3'>{{b.entidade}}</td>
+            {% else %}
+	            <td colspan='2'>{{b.entidade}}</td>
+	        {% endif %}
+            <td>{{b.estado|default:'-'}}</td>
+            <td>{{b.quantidade|default:'-'}}</td>
+        </tr>
+    {% endfor %}
+{% endfor %}
+</tbody>
+</table>
+{% endblock %}
+
+

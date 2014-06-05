@@ -1,3 +1,4 @@
+# -* coding: utf-8 -*-
 from django.db.models import Q
 from django.contrib.auth.decorators import permission_required, login_required
 from django.http import Http404, HttpResponse
@@ -8,6 +9,7 @@ from utils.functions import render_to_pdf
 from outorga.models import *
 from financeiro.models import Pagamento
 from identificacao.models import Entidade, Identificacao, ASN
+from rede.models import PlanejaAquisicaoRecurso
 from models import *
 from modelsResource import *
 
@@ -231,23 +233,33 @@ def blocos_ip(request):
         return TemplateResponse(request, 'rede/blocosip.html', {'blocos':blocos})
      
      
-     
+
 @login_required
 def custo_terremark(request, pdf=0, xls=0):
-    recursos = Recurso.objects.order_by('planejamento__os', 'planejamento__tipo')
     
+    # Filtrando por Entidade
+    recursos = Recurso.objects.filter(planejamento__os__contrato__entidade_id=Entidade.TERREMARK_ID) \
+                              .order_by('planejamento__projeto__nome', \
+                                        'planejamento__tipo__nome', \
+                                        'planejamento__referente', \
+                                        'planejamento__os__numero', \
+                                        '-ano_referencia', \
+                                        '-mes_referencia')
     # Otimizando o queryset do relatorio
     recursos = recursos.select_related('planejamento', 'planejamento__projeto', \
                                        'planejamento__tipo', \
                                        'planejamento__unidade', \
                                        'planejamento__os', 'planejamento__os__contrato', \
                                        'planejamento__os__tipo', \
-                                       'pagamento', 'pagamento__protocolo' )
-    selected = 0
+                                       'pagamento', 'pagamento__protocolo', 'pagamento__protocolo__termo')
+    
+    estado_selected = 0
+    estado = request.GET.get('estado')
+    # Filtro do estado da OS
+    if estado and estado > '0':
+        estado_selected = int(request.GET.get('estado'))
+        recursos = recursos.filter(planejamento__os__estado__id=estado_selected)
 
-    if request.GET.get('estado') and request.GET.get('estado') > '0':
-        selected = int(request.GET.get('estado'))
-        recursos = recursos.filter(planejamento__os__estado__id=selected)
 
     if request.GET.get('acao') and request.GET.get('acao')=='2':
         # Export para Excel/XLS
@@ -260,7 +272,111 @@ def custo_terremark(request, pdf=0, xls=0):
 
     elif request.GET.get('acao') and request.GET.get('acao')=='1':
         # Export para PDF
-        return render_to_pdf(template_src='rede/tabela_terremark.pdf', context_dict={'recursos':recursos, }, filename='custos_dos_recursos_contratados.pdf')
+        return render_to_pdf(template_src='rede/tabela_terremark.pdf', context_dict={'recursos':recursos, 'estado_selected':estado_selected}, filename='custos_dos_recursos_contratados.pdf')
 
-    return TemplateResponse(request, 'rede/tabela_terremark.html', {'recursos':recursos, 'estados':EstadoOS.objects.all(), 'selected':selected})
+    return TemplateResponse(request, 'rede/tabela_terremark.html', 
+                            {'recursos':recursos, 
+                             'filtro_estados':EstadoOS.objects.all(), 'estado_selected':estado_selected, 'estado':estado})
+
+
+
+@login_required
+def relatorio_recursos_operacional(request, pdf=0, xls=0):
+    """
+    Relatório operacional para visualização dos recursos.
+    """
+    # Filtrando por Entidade
+    planejamentos = PlanejaAquisicaoRecurso.objects.filter(os__contrato__entidade_id=Entidade.TERREMARK_ID) \
+                              .prefetch_related('beneficiado_set') \
+                              .select_related('os', 'os__estado', 'os__contrato', 'projeto', 'tipo') \
+                              .order_by('projeto__nome', \
+                                        'tipo__nome', \
+                                        'os__numero')
+
+    estado_selected = 0
+    # Filtro selecionado do estado da OS
+    estado = request.GET.get('estado')
+    if estado and estado > '0':
+        estado_selected = int(request.GET.get('estado'))
+        planejamentos = planejamentos.filter(os__estado__id=estado_selected)
+        
+    # Dados para montar o filtro dos estados
+    filtro_estados = EstadoOS.objects.all()
+
+    # Filtro selecionado do beneficiado
+    beneficiado_selected = 0
+    beneficiado = request.GET.get('beneficiado')
+    if beneficiado and beneficiado > '0':
+        beneficiado_selected = int(request.GET.get('beneficiado'))
+
+    # Restringindo a lista de dados do filtro de beneficiados de acordo com o 
+    # filtro de Estado da OS selecionado 
+    if estado and estado > '0':
+        filtro_beneficiados = Beneficiado.objects.filter(planejamento__os__estado__id=estado_selected) \
+                                          .distinct('entidade__nome') \
+                                          .order_by('entidade__nome') \
+                                          .select_related('entidade')
+    else:
+        filtro_beneficiados = Beneficiado.objects.all().distinct('entidade__nome') \
+                                          .order_by('entidade__nome') \
+                                          .select_related('entidade')
+
+    # Montando os dados de contexto
+    context_dict = []
+    for p in planejamentos:
+        ctx_beneficiados = []
+        
+        # Filtra os beneficiados, se for informado o parametro no REQUEST
+        beneficiados = []
+        if beneficiado_selected != 0:
+            beneficiados = p.beneficiado_set.filter(entidade_id=beneficiado_selected)
+        else:
+            beneficiados = p.beneficiado_set.all()
+        
+        beneficiados = beneficiados.select_related('entidade', 'estado')
+            
+        for b in beneficiados:
+            beneficiado = {'id':b.id, 'entidade':b.entidade.nome, 'quantidade':b.quantidade, 'estado':b.estado}
+            ctx_beneficiados.append(beneficiado)
+
+        ctx_planejamento = {'id':p.id, 'beneficiados':ctx_beneficiados, \
+                        'contrato':p.os.contrato,
+                        'os':p.os, \
+                        'classificacao':p.projeto, 'descricao':p.tipo, \
+                        'referente':p.referente, \
+                        'entidade':'', 'quantidade':p.quantidade, }
+        context_dict.append(ctx_planejamento)
+
+
+    if request.GET.get('acao') and request.GET.get('acao')=='2':
+        # Export para Excel/XLS
+        beneficiados = Beneficiado.objects.all()
+        
+        if beneficiado_selected != 0:
+            beneficiados = Beneficiado.objects.filter(entidade_id=beneficiado_selected)
+        
+        if estado and estado > '0':
+            beneficiados = beneficiados.filter(planejamento__os__estado__id=estado_selected)
+        
+        beneficiados = beneficiados.order_by('planejamento__projeto__nome', \
+                                            'planejamento__tipo__nome', \
+                                            'planejamento__os__numero')
+    
+        dataset = RecursoOperacionalResource().export(queryset=beneficiados)
+ 
+        response = HttpResponse(dataset.xls, content_type='application/vnd.ms-excel;charset=utf-8')
+        response['Content-Disposition'] = "attachment; filename=recursos_tecnicos.xls"
+ 
+        return response
+ 
+    elif request.GET.get('acao') and request.GET.get('acao')=='1':
+        # Export para PDF
+        return render_to_pdf(template_src='rede/recurso_operacional.pdf', context_dict={'planejamentos':context_dict,}, filename='recursos_tecnicos.pdf')
+
+
+    return TemplateResponse(request, 'rede/recurso_operacional.html', 
+                            {'planejamentos':context_dict, 
+                             'filtro_estados':filtro_estados, 'estado_selected':estado_selected, 'estado':estado,
+                             'filtro_beneficiados':filtro_beneficiados, 'beneficiado_selected':beneficiado_selected, 'beneficiado':beneficiado})
+
 
