@@ -2,12 +2,21 @@
 {% load proto_tags %}
 {% block extrastyle %}
 <style>
+ 
+ #tbl_relatorio td a{
+    line-height:inherit;
+ }
+ 
+ td.td_estado_os { text-align: center; } 
+ 
  td.td_os span,
  td.td_v_unit span,
  td.td_v_simp span,
  td.td_v_cimp span,
  td.td_t_simp span,
- td.td_t_geral span
+ td.td_t_geral span,
+ td.td_ref span,
+ td.td_termo span
  {
      white-space:nowrap;
  }
@@ -28,18 +37,22 @@
                        <label for="id_estado" style="font-weight:bold;">Filtro por estado da OS: </label>
  		       <select name="estado" id="id_estado" onchange="javascript: document.forms['id_form_recurso'].submit()">
                           <option value="0">Todos</option>
-                          {% for e in estados %}
-                          <option value="{{ e.id }}" {% if e.id == selected %}selected{% endif %}>{{ e.nome }}</option>
+                          {% for e in filtro_estados %}
+                              <option value="{{ e.id }}" {% if e.id == estado_selected %}selected{% endif %}>{{ e.nome }}</option>
                           {% endfor %}
                        </select>
                     </div>
 		</form>
 	</div>
 </div>
-<table>
+<table id="tbl_relatorio">
 <tr>
+    {#<th>ID</th>#}
     <th>Contrato</th>
     <th>OS</th>
+    {% if not estado_selected or estado_selected == '0' %}
+        <th>Est. OS</th>
+    {% endif %}
     <th>Data Ini.</th>
     <th>Data Fim</th>
     <th>Projeto</th>
@@ -47,20 +60,28 @@
     <th>Referente</th>
     <th>Unidade</th>
     <th>Preço unitário</th>
-    <th>Qtd</th>
+    <th><span title="Quantidade de recurso contratrado.">Qtd</span></th>
     <th>Custo mensal sem imposto</th>
     <th>Custo mensal com imposto</th>
     <th>Meses pagos</th>
+    <th>Ref.</th>
     <th>Total sem imposto</th>
     <th>Total com imposto</th>
     <th>Nota fiscal</th>
+    <th>Termo</th>
+    
+    
 <tr>
 {% for r in recursos %}
    <tr>
+     {#<td><a href="{% url 'admin:rede_recurso_change' r.id %}">{{ r.id }}</a></td>#}
      <td><a href="{% url 'admin:outorga_contrato_change' r.planejamento.os.contrato_id %}">{{ r.planejamento.os.contrato.numero }}</a></td>
      <td class="td_os"><span><a href="{% url 'admin:outorga_ordemdeservico_change' r.planejamento.os_id %}">{{ r.planejamento.os }}</a></td>
-     <td>{{ r.planejamento.os.data_inicio|date:"d/m/Y" }}</span></td>
-     <td>{{ r.planejamento.os.data_rescisao|date:"d/m/Y" }}</span></td>
+     {% if not estado_selected or estado_selected == '0' %}
+        <td class="td_estado_os"><span>{{ r.planejamento.os.estado|default:'-' }}</span></td>
+     {% endif %}
+     <td><span>{{ r.planejamento.os.data_inicio|date:"d/m/Y" }}</span></td>
+     <td><span>{{ r.planejamento.os.data_rescisao|date:"d/m/Y" }}</span></td>
 	 <td>{{ r.planejamento.projeto }}</td>
 	 <td>{{ r.planejamento.tipo }}</td>
 	 <td>{{ r.planejamento.referente }}</td>
@@ -69,10 +90,12 @@
 	 <td>{{ r.planejamento.quantidade }}</td>
 	 <td class="td_v_simp"><span>{{ r.valor_mensal_sem_imposto|moeda }}</span></td>
 	 <td class="td_v_cimp"><span>{{ r.valor_imposto_mensal|moeda }}</span></td>
-	 <td>{{ r.quantidade }}</td>
+	 <td><a href="{% url 'admin:rede_recurso_change' r.id %}">{{ r.quantidade }}</a></td>
+	 <td class="td_ref"><span>{{r.mes_referencia|default:"-"}} / {{r.ano_referencia|default:"-"}}</span></td>
 	 <td class="td_t_simp"><span>{{ r.total_sem_imposto|moeda }}</span></td>
 	 <td class="td_t_geral"><span>{{ r.total_geral|moeda }}</span></td>
 	 <td><a href="{% url 'admin:financeiro_pagamento_change' r.pagamento_id %}">{{ r.pagamento.protocolo.num_documento }}</a></td>
+	 <td class="td_termo"><span>{{ r.pagamento.termo }}</span></td>
    </tr>
 {% endfor %}
 </table>
