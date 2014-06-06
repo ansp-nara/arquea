@@ -170,7 +170,8 @@ class Entidade(models.Model):
 
     A unicidade dos dados é feita através do campo 'sigla'.
     """
-
+    TERREMARK_ID = 1
+    
     entidade = models.ForeignKey('identificacao.Entidade', verbose_name=_(u'Faz parte de'), null=True, blank=True, related_name='entidade_em')
     nome = models.CharField(_(u'Nome'), max_length=255, help_text=_(u'Razão Social (ex. Telecomunicações de São Paulo S.A.)'))
     url = models.URLField(_(u'URL'), blank=True, help_text=_(u'ex. www.telefonica.com.br'))
