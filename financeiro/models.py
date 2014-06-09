@@ -20,6 +20,13 @@ CODIGO_FINANCEIRO = (
   ('ANMP', 'Anulacao'),
   ('ESMP', 'Estorno ANMP'),
   ('CAMP', 'Canc. Bens/Serv. Pais'),
+  ('CORP', 'Concessao Reserva Tecnica Auxil. Pais'),
+  ('PGRP', 'Pgto. Reserva Tecnica Auxil. Pais'),
+  ('DVRP', 'Devl. Reserva Tecnica Auxil. Pais'),
+  ('SURP', 'Supl. Reserva Tecnica Auxil. Pais'),
+  ('ANRP', 'Anulacao Reserva Tecnica Auxil. Pais'),
+  ('ESRP', 'Estorno ANRP'),
+  ('CARP', 'Canc. Reserva Tecnica Auxil. Pais'),
 )
 class ExtratoCC(models.Model):
     extrato_financeiro = models.ForeignKey('financeiro.ExtratoFinanceiro', verbose_name=_(u'Extrato Financeiro'), blank=True, null=True) 
