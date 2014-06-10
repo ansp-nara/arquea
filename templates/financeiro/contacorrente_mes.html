@@ -32,6 +32,9 @@
 </div>
     <table border="0" repeat="1" cellpadding="5" id="tbl_conteudo">
        <tr><th>Data</th><th>Documento</th><th>Histórico</th><th>Valor</th></tr>
+    {% if extrato|length == 0 %}
+        <tr><td colspan="4" style="text-align:center; padding:10px;">Não há lançamentos no extrato.</td></tr>
+    {% endif %}
     {% for e in extrato %}
         {% if e.data_oper %}
  	   <tr><td>{{ e.data_oper|date:"d/m/Y" }}</td><td>{{ e.cod_oper }}</td><td>{{ e.historico }}</td><td>{{ e.valor|moeda }}</td></tr>

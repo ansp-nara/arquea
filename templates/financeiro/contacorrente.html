@@ -36,6 +36,9 @@
 
     <table border="0" repeat="1" cellpadding="5" id="tbl_conteudo">
     <tr><th>Data</th><th>Documento</th><th>Histórico</th><th>Valor</th><th>Liberação do financeiro</th><th>Pagamento</th><th>Imagem do cheque</th><th>Processo</th></tr>
+    {% if extrato|length == 0 %}
+        <tr><td colspan="8" style="text-align:center; padding:10px;">Não há lançamentos no extrato.</td></tr>
+    {% endif %}
     {% for e in extrato %}
         {% if e.saldo_mes_anterior %}
            <tr class="tr_saldo"><td colspan=3><b>Saldo anterior</b></td><td><b>{{ e.saldo_mes_anterior|default:0|moeda }}</b></td><td colspan="4"></td></tr>
