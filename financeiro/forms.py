@@ -55,8 +55,11 @@ class PagamentoAdminForm(forms.ModelForm):
         super(PagamentoAdminForm, self).__init__(data, files, auto_id, prefix, initial,
                                             error_class, label_suffix, empty_permitted, instance)
 
-        self.fields['pergunta'].queryset = Pergunta.objects.all().select_related('memorando')
-        self.fields['patrocinio'].queryset = ExtratoPatrocinio.objects.all().select_related('localiza')
+        if self.fields.has_key('pergunta'):
+            self.fields['pergunta'].queryset = Pergunta.objects.all().select_related('memorando')
+            
+        if self.fields.has_key('patrocinio'):
+            self.fields['patrocinio'].queryset = ExtratoPatrocinio.objects.all().select_related('localiza')
         
         # Permite selecionar apenas as despesas com valor superior a soma dos valores de suas fontes pagadoras.
         if data:
