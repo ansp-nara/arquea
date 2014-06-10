@@ -1,9 +1,36 @@
 {% extends "admin/base_site.html" %}
 {% load proto_tags %}
+{% load i18n %}
+{% block extrahead %}
+<style>
+#tbl_conteudo th {
+    background-color:#ddd;
+    font-weight: bold;
+    border-bottom:1px darkgray solid;
+}
+.tr_saldo td{
+    background-color:#f7f7f7;
+}
+</style>
+{% endblock %}
+{% block breadcrumbs %}
+    <div class="breadcrumbs">Você está em: 
+      <a href="../../">{% trans "Home" %}</a> &rsaquo; 
+      <a href="{% url 'financeiro.views.extrato_mes' %}">Extrato da conta corrente por mês</a> &rsaquo;
+    </div>
+{% endblock %}
 {% block content %}
 <h1 repeat="1">Extrato da conta corrente do projeto em {{ mes }}/{{ ano }}</h1>
-
-    <table border="0" repeat="1" cellpadding="5">
+<div id="report_toolbar">
+    <form action="{% url 'financeiro.views.extrato_mes' 1 %}" method="GET" id="id_form_recurso">
+        <input type="hidden" name="ano" value="{{ ano }}" />
+        <input type="hidden" name="mes" value="{{ mes }}" />
+        <div title="Imprimir" class="btn_print">
+           <input type="submit" title="Versão para impressão A4" class="btn_print" name="acao" value="1"  />
+        </div>
+    </form>
+</div>
+    <table border="0" repeat="1" cellpadding="5" id="tbl_conteudo">
        <tr><th>Data</th><th>Documento</th><th>Histórico</th><th>Valor</th></tr>
     {% for e in extrato %}
         {% if e.data_oper %}
@@ -12,7 +39,7 @@
               <tr><td></td><td colspan="3" style="color:red;"><b>Observação</b>: {{ e.obs }}</td></tr>
            {% endif %}
 	{% else %}
-	   <tr><td colspan=3><b>Saldo ao final do mês</b></td><td><b>{{ e|moeda }}</b></td></tr>
+	   <tr class="tr_saldo"><td colspan=3><b>Saldo ao final do mês</b></td><td><b>{{ e|moeda }}</b></td></tr>
 	{% endif %}
     {% endfor %}
     </table>

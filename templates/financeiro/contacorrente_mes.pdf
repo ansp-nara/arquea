@@ -18,14 +18,24 @@
                 height: 1cm;
 		left: -2.3cm;
                 } 
-} 
+}
+tr th { background-color: #eee; }
+.th_data { width: 2.5cm; }
+.th_documento { width: 2cm; }
+.th_historico { width: 9cm; }
+.th_valor { width: 3.5cm; }
+
 </style> 
 </head>
 <body>
 <h1 repeat="1">Extrato da conta corrente do projeto em {{ mes }}/{{ ano }}</h1>
-
     <table border="0" repeat="1" cellpadding="5">
-       <tr><th>Data</th><th>Documento</th><th>Histórico</th><th>Valor</th></tr>
+       <tr>
+        <th class="th_data">Data</th>
+        <th class="th_documento">Documento</th>
+        <th class="th_historico">Histórico</th>
+        <th class="th_valor">Valor</th>
+       </tr>
     {% for e in extrato %}
         {% if e.data_oper %}
  	   <tr><td>{{ e.data_oper|date:"d/m/Y" }}</td><td>{{ e.cod_oper }}</td><td>{{ e.historico }}</td><td>{{ e.valor|moeda }}</td></tr>
