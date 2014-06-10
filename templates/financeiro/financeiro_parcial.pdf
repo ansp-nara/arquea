@@ -133,6 +133,9 @@
     </tbody>
 </table>
 {% for p in parciais %}
+{% if not forloop.first %}
+    <div style="page-break-before: always;" />
+{% endif %}
 <div class="parciais_wrapper">
     <table class="tbl_resumo">
         <thead>
