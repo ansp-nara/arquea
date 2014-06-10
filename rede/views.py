@@ -339,13 +339,14 @@ def relatorio_recursos_operacional(request, pdf=0, xls=0):
             beneficiado = {'id':b.id, 'entidade':b.entidade.nome, 'quantidade':b.quantidade, 'estado':b.estado}
             ctx_beneficiados.append(beneficiado)
 
-        ctx_planejamento = {'id':p.id, 'beneficiados':ctx_beneficiados, \
-                        'contrato':p.os.contrato,
-                        'os':p.os, \
-                        'classificacao':p.projeto, 'descricao':p.tipo, \
-                        'referente':p.referente, \
-                        'entidade':'', 'quantidade':p.quantidade, }
-        context_dict.append(ctx_planejamento)
+        if beneficiado_selected == 0 or len(ctx_beneficiados) > 0:
+            ctx_planejamento = {'id':p.id, 'beneficiados':ctx_beneficiados, \
+                            'contrato':p.os.contrato,
+                            'os':p.os, \
+                            'classificacao':p.projeto, 'descricao':p.tipo, \
+                            'referente':p.referente, \
+                            'entidade':'', 'quantidade':p.quantidade, }
+            context_dict.append(ctx_planejamento)
 
 
     if request.GET.get('acao') and request.GET.get('acao')=='2':
