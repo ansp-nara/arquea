@@ -1343,6 +1343,13 @@ div.btn_excel {
     float: left;
     margin-right: 10px;
 }
+#report_toolbar span {
+    display: inline-block;
+    width: 126px;
+    margin-top: 9px;
+    left: 5px;
+    position: relative;
+}
 
 /**
 Para a impressão de uma página removemos as informações de navegação do site
