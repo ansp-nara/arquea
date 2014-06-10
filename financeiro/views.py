@@ -530,13 +530,13 @@ def financeiro_parciais(request, pdf=False):
                 liberacoes = ExtratoFinanceiro.objects.filter(termo=termo, parcial=parcial).values('cod').annotate(Sum('valor')).order_by()
                 
                 for t in liberacoes:
-                    if t['cod'] == 'PGMP': liberado = t['valor__sum'] or Decimal('0.0')
-                    elif t['cod'] == 'DVMP': devolvido= t['valor__sum'] or Decimal('0.0')
-                    elif t['cod'] == 'COMP': concedido= t['valor__sum'] or Decimal('0.0')
-                    elif t['cod'] == 'SUMP': suplementado= t['valor__sum'] or Decimal('0.0')
-                    elif t['cod'] == 'ANMP': anulado= t['valor__sum'] or Decimal('0.0')
-                    elif t['cod'] == 'ESMP': estornado= t['valor__sum'] or Decimal('0.0')
-                    elif t['cod'] == 'CAMP': cancelado= t['valor__sum'] or Decimal('0.0')
+                    if t['cod'] == 'PGMP' or t['cod'] == 'PGRP': liberado = t['valor__sum'] or Decimal('0.0')
+                    elif t['cod'] == 'DVMP' or t['cod'] == 'DVRP': devolvido= t['valor__sum'] or Decimal('0.0')
+                    elif t['cod'] == 'COMP' or t['cod'] == 'CORP': concedido= t['valor__sum'] or Decimal('0.0')
+                    elif t['cod'] == 'SUMP' or t['cod'] == 'SURP': suplementado= t['valor__sum'] or Decimal('0.0')
+                    elif t['cod'] == 'ANMP' or t['cod'] == 'ANRP': anulado= t['valor__sum'] or Decimal('0.0')
+                    elif t['cod'] == 'ESMP' or t['cod'] == 'ESRP': estornado= t['valor__sum'] or Decimal('0.0')
+                    elif t['cod'] == 'CAMP' or t['cod'] == 'CARP': cancelado= t['valor__sum'] or Decimal('0.0')
                     
                 pagamentos = liberado+devolvido+estornado
                 concessoes = concedido+suplementado+anulado+cancelado
