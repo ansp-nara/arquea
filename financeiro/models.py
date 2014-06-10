@@ -98,7 +98,7 @@ class ExtratoFinanceiro(models.Model):
     valor = models.DecimalField(_(u'Valor'), max_digits=12, decimal_places=2)
     comprovante = models.FileField(_(u'Comprovante da operação'), upload_to='extratofinanceiro', null=True, blank=True)
     tipo_comprovante = models.ForeignKey('financeiro.TipoComprovanteFinanceiro', null=True, blank=True)
-    parcial = models.IntegerField(null=True, blank=True)
+    parcial = models.IntegerField(null=False, blank=False, default=0)
   
     class Meta:
 	verbose_name = _(u'Extrato do Financeiro')
