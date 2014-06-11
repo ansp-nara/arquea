@@ -174,6 +174,23 @@ admin.site.register(DispensaLegal, DispensaLegalAdmin)
 class ControleAdmin(admin.ModelAdmin):
     list_filter = ('membro',)
     form = ControleAdminForms
+    
+    list_display = ('membro', 'format_entrada', 'format_saida', )
+    list_per_page = 20
+    search_fields = ['membro__nome']
+    
+    def format_entrada(self, obj):
+        if obj.entrada:
+            return obj.entrada.strftime('%d %b %Y - %H:%M')
+        return '(Nenhum)'
+    format_entrada.short_description = 'Entrada'
+    
+    def format_saida(self, obj):
+        if obj.saida:
+            return obj.saida.strftime('%d %b %Y - %H:%M')
+        return '(Nenhum)'
+    format_saida.short_description = 'Saída'
+
 
     def queryset(self, request):
         qs = super(ControleAdmin, self).queryset(request)
