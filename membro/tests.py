@@ -41,7 +41,7 @@ class MembroTest(TestCase):
     
     def test_cargo_atual(self):
         mb = Membro.objects.get(email='soraya@gomes.com')
-        self.assertEquals('Secretaria', mb.cargo_atual())
+        self.assertEquals('Secretaria', mb.cargo_atual)
     
     
     def test_cargo_atual_depois_do_desligamento(self):
@@ -50,7 +50,7 @@ class MembroTest(TestCase):
         ht.termino=datetime(2008,1,2)
         ht.save()
         
-        self.assertEquals('', mb.cargo_atual())
+        self.assertEquals('', mb.cargo_atual)
 
     def test_ramal(self):
         mb = Membro.objects.get(email='soraya@gomes.com')
