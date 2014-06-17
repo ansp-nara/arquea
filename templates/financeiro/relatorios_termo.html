@@ -23,6 +23,11 @@
      <option value="{{ t.id }}">{{ t }}</option>
   {% endfor %}
 </select>
+{% if not meses %}
+<label for="id_rt">Reserva técnica?</label>
+<input type="checkbox" name="rt">
+</label>
+{% endif %}
 <input type="submit" value="Enviar">
 </form>
 {% endblock %}

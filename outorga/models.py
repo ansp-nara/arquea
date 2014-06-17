@@ -624,6 +624,7 @@ class Item(models.Model):
     quantidade = models.IntegerField(_(u'Quantidade'))
     obs = models.TextField(_(u'Observação'), blank=True)
     valor = models.DecimalField(_(u'Valor Concedido'), max_digits=12, decimal_places=2, help_text=_(u'ex. 150500.50'))
+    rt = models.BooleanField(_(u'É reserva técnica?'))
 
     # Retorna a descrição e o termo, se existir.
     def __unicode__(self):
@@ -886,6 +887,7 @@ class OrdemDeServico(models.Model):
       estado = models.ForeignKey('outorga.EstadoOS')
       pergunta = models.ManyToManyField('memorando.Pergunta', null=True, blank=True)
       substituicoes = models.TextField(null=True, blank=True)
+
 
       # Retorna a descrição.
       def __unicode__(self):
