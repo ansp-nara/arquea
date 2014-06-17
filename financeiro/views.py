@@ -512,9 +512,14 @@ def financeiro_parciais(request, pdf=False):
     if request.method == 'GET':
         if request.GET.get('termo'):
             termo_id = int(request.GET.get('termo'))
+            rt = bool(request.GET.get('rt'))
+	    if rt:
+		codigo = 'RP'
+	    else:
+		codigo = 'MP'
             termo = get_object_or_404(Termo, id=termo_id)
             retorno = []
-            parciais = ExtratoFinanceiro.objects.filter(termo=termo).distinct('parcial').values_list('parcial', flat=True).order_by('parcial')
+            parciais = ExtratoFinanceiro.objects.filter(termo=termo, cod__endswith=codigo).distinct('parcial').values_list('parcial', flat=True).order_by('parcial')
             
             for parcial in parciais:
                 extrato = []
@@ -527,7 +532,7 @@ def financeiro_parciais(request, pdf=False):
                 estornado = Decimal('0.0')
                 cancelado = Decimal('0.0')
                 
-                liberacoes = ExtratoFinanceiro.objects.filter(termo=termo, parcial=parcial).values('cod').annotate(Sum('valor')).order_by()
+                liberacoes = ExtratoFinanceiro.objects.filter(termo=termo, cod__endswith=codigo, parcial=parcial).values('cod').annotate(Sum('valor')).order_by()
                 
                 for t in liberacoes:
                     if t['cod'] == 'PGMP' or t['cod'] == 'PGRP': liberado = t['valor__sum'] or Decimal('0.0')
@@ -544,7 +549,7 @@ def financeiro_parciais(request, pdf=False):
                 anterior = datetime.date(1971,1,1)
                 tdia = Decimal('0.0')
                 exi = {}
-                for ef in ExtratoFinanceiro.objects.filter(termo=termo, parcial=parcial).prefetch_related('extratocc_set').order_by('data_libera', '-historico'):
+                for ef in ExtratoFinanceiro.objects.filter(termo=termo, cod__endswith=codigo, parcial=parcial).prefetch_related('extratocc_set').order_by('data_libera', '-historico'):
                     if ef.data_libera > anterior:
                         ex = {'data':ef.data_libera}
                         anterior = ef.data_libera

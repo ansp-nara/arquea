@@ -6,6 +6,8 @@ from forms import *
 from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode
+from django.contrib.admin.util import unquote
+from django.template.response import TemplateResponse
 from identificacao.models import Entidade
 from rede.models import PlanejaAquisicaoRecurso
 
@@ -41,7 +43,7 @@ class ArquivoOSInline(admin.TabularInline):
 class ItemInline(admin.StackedInline):
     fieldsets = (
                  (None, {
-                     'fields': ('natureza_gasto', ('descricao', 'entidade', 'quantidade'), 'valor'),
+                     'fields': (('natureza_gasto', 'rt'), ('descricao', 'entidade', 'quantidade'), 'valor'),
                  }),
                  (_(u'Justificativa/Observação'), {
                      'fields': ('justificativa', 'obs',),
@@ -295,7 +297,7 @@ class ItemAdmin(admin.ModelAdmin):
 
     fieldsets = (
                  (None, {
-                     'fields': (('termo', 'natureza_gasto'), ('descricao', 'entidade', 'quantidade'), 'valor'),
+                     'fields': (('termo', 'natureza_gasto', 'rt'), ('descricao', 'entidade', 'quantidade'), 'valor'),
                  }),
                  (_(u'Justificativa/Observação'), {
                      'fields': ('justificativa', 'obs',),
@@ -393,6 +395,18 @@ class OrdemDeServicoAdmin(admin.ModelAdmin):
 
     list_per_page = 10
     filter_horizontal = ('pergunta',)
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+
+	if request.method =='POST':
+	    obj = self.get_object(request, unquote(object_id))
+	    if obj.estado.id != int(request.POST.get('estado')) and request.POST.get('confirma') is None:
+                if request.POST.get('nconfirma'):
+		    return HttpResponseRedirect('/admin/outorga/ordemdeservico/%s' % object_id)
+		return TemplateResponse(request, 'admin/outorga/ordemdeservico/confirma_alteracao.html', {'form_url':form_url})
+
+	return super(OrdemDeServicoAdmin, self).change_view(request, object_id, form_url, extra_context)
+    
 
 admin.site.register(OrdemDeServico,OrdemDeServicoAdmin)
 #admin.site.register(ArquivoOS)
