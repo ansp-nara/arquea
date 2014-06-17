@@ -520,7 +520,8 @@ def financeiro_parciais(request, pdf=False):
             termo = get_object_or_404(Termo, id=termo_id)
             retorno = []
             parciais = ExtratoFinanceiro.objects.filter(termo=termo, cod__endswith=codigo).distinct('parcial').values_list('parcial', flat=True).order_by('parcial')
-            
+            totais = {}
+
             for parcial in parciais:
                 extrato = []
                 
