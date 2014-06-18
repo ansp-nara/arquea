@@ -891,7 +891,9 @@ def racks(request):
                                               'nome':pt.apelido, 'descricao':pt.descricao or u'Sem descrição',  
                                               'conflito':False, 'pos_col':pt.historico_atual.posicao_colocacao}
                         
-                    if 'tomada' in pt.equipamento.tipo.nome and pt.historico_atual.posicao_colocacao in ('TD', 'TE', 'lD', 'lE', 'LD', 'LE'):
+                    if pt.equipamento and pt.equipamento.tipo and 'tomada' in pt.equipamento.tipo.nome and \
+                        pt.historico_atual.posicao_colocacao in ('TD', 'TE', 'lD', 'lE', 'LD', 'LE'):
+                        
                         # Guardando as calhas de tomadas para apresentar nas laterais do Rack
                         equipamentos_pdu.append(last_equipamento)
                     elif pos < 0 or pt.historico_atual.posicao_colocacao in ('TD', 'TE', 'piso', 'lD', 'lE'):
