@@ -944,7 +944,7 @@ def racks(request):
                         obs = 'Equip. abaixo do limite do rack.'
                         conflitos.append({'obs': obs, 'eq1':equipamentos[-1]})
                         equipamentos[-1]['conflito'] = True
-                    elif equipamentos[-1] and equipamentos[-1]['pos_col'] and equipamentos[-1]['pos_col'] not in ('01','02','T', 'TD', 'TE', 'piso', 'lD', 'lE', 'LD', 'LE'):
+                    elif len(equipamentos) > 0 and equipamentos[-1]['pos_col'] and equipamentos[-1]['pos_col'] not in ('01','02','T', 'TD', 'TE', 'piso', 'lD', 'lE', 'LD', 'LE'):
                         obs = 'Posicao inválida %s' % pt.historico_atual.posicao_colocacao
                         conflitos.append({'obs': obs, 'eq1':equipamentos[-1]}, )
                         equipamentos[-1]['conflito'] = True
