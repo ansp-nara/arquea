@@ -884,72 +884,68 @@ def racks(request):
                             profundidade = 0.5
                         
                         
+                    last_equipamento = {'id': pt.id, 'pos':pos, 'tam': tam, 'eixoY': eixoY, 'altura':(tam*19/3), 
+                                              'pos_original':pt.historico_atual.posicao_furo, 
+                                              'imagem':imagem, 'imagem_traseira':imagem_traseira, 
+                                              'profundidade':profundidade,
+                                              'nome':pt.apelido, 'descricao':pt.descricao or u'Sem descrição',  
+                                              'conflito':False, 'pos_col':pt.historico_atual.posicao_colocacao}
+                        
                     if 'tomada' in pt.equipamento.tipo.nome and pt.historico_atual.posicao_colocacao in ('TD', 'TE', 'lD', 'lE', 'LD', 'LE'):
                         # Guardando as calhas de tomadas para apresentar nas laterais do Rack
-                        equipamentos_pdu.append({'id': pt.id, 'pos':pos, 'tam': tam, 'eixoY': eixoY, 'altura':(tam*19/3), 
-                                          'pos_original':pt.historico_atual.posicao_furo, 'imagem':imagem, 
-                                          'nome':pt.apelido, 'descricao':pt.descricao or u'Sem descrição', 
-                                          'conflito':False, 'pos_col':pt.historico_atual.posicao_colocacao})
+                        equipamentos_pdu.append(last_equipamento)
                     elif pos < 0 or pt.historico_atual.posicao_colocacao in ('TD', 'TE', 'piso', 'lD', 'lE'):
                         if pos < 0: 
                             pos = '-'
-                        equipamentos_fora_visao.append({'id': pt.id, 'pos':pos, 'tam': tam, 'eixoY': eixoY, 'altura':(tam*19/3), 
-                                          'pos_original':pt.historico_atual.posicao_furo, 'imagem':imagem, 
-                                          'nome':pt.apelido, 'descricao':pt.descricao or u'Sem descrição', 
-                                          'conflito':False, 'pos_col':pt.historico_atual.posicao_colocacao})
+                        equipamentos_fora_visao.append(last_equipamento)
                         continue
                     else:
                         # x a partir do topo do container
                         # Adiciona os equipamentos frontais e traseiros. 
                         # O layout deve ser tratado no template
-                        equipamentos.append({'id': pt.id, 'pos':pos, 'tam': tam, 'eixoY': eixoY, 'altura':(tam*19/3), 
-                                              'pos_original':pt.historico_atual.posicao_furo, 
-                                              'imagem':imagem, 'imagem_traseira':imagem_traseira, 
-                                              'profundidade':profundidade,
-                                              'nome':pt.apelido, 'descricao':pt.descricao or u'Sem descrição',  
-                                              'conflito':False, 'pos_col':pt.historico_atual.posicao_colocacao})
+                        equipamentos.append(last_equipamento)
                         espaco_ocupado += tam
                     
                     ## CHECAGEM DE PROBLEMAS
 #                     if pos <= 0:
 #                         obs = 'Equip. com problema de posicionamento.'
-#                         conflitos.append({'obs': obs, 'eq1':equipamentos[-1]})
-#                         equipamentos[-1]['conflito'] = True 
+#                         conflitos.append({'obs': obs, 'eq1':last_equipamento})
+#                         last_equipamento['conflito'] = True 
 #                     elif pt.tamanho is None:
 
                     if pt.tamanho is None:
                         obs = 'Equip. com tamanho ZERO.'
-                        conflitos.append({'obs': obs, 'eq1':equipamentos[-1]})
-                        equipamentos[-1]['conflito'] = True 
+                        conflitos.append({'obs': obs, 'eq1':last_equipamento})
+                        last_equipamento['conflito'] = True 
                     elif pos + (tam) > rack_altura:
                         # Ocorre quando um equipamento está passando do limite máximo do rack
                         #obs = '{!s} + {!s} > {!s}'.format(pos, (tam), 126)
                         obs = 'Equip. acima do limite do rack.'
-                        conflitos.append({'obs': obs, 'eq1':equipamentos[-1]})
-                        equipamentos[-1]['conflito'] = True
+                        conflitos.append({'obs': obs, 'eq1':last_equipamento})
+                        last_equipamento['conflito'] = True
                 
                     elif len(equipamentos)>=2 and eixoY:
                         # Ocorre quando um equipamento sobrepoe o outro
                         # Caso estejam na mesma posição 01 ou 02, ou então, haja um equipamento que ocupe toda largura do rack
                         # Não ocorre quando os equipamentos estiverem lado a lado (marcados no attr pos_col, por exemplo, 01 com 02)
 
-                        if ptAnterior['eixoY'] + ptAnterior['tam'] > eixoY and (ptAnterior['pos_col'] == equipamentos[-1]['pos_col'] or not ptAnterior['pos_col'] or not equipamentos[-1]['pos_col']):
+                        if ptAnterior and ptAnterior['eixoY'] + ptAnterior['tam'] > eixoY and (ptAnterior['pos_col'] == last_equipamento['pos_col'] or not ptAnterior['pos_col'] or not last_equipamento['pos_col']):
                             obs = 'Equipamentos sobrepostos.'
-                            conflitos.append({'obs': obs, 'eq1':ptAnterior, 'eq2':equipamentos[-1]})
-                            equipamentos[-1]['conflito'] = True
+                            conflitos.append({'obs': obs, 'eq1':ptAnterior, 'eq2':last_equipamento})
+                            last_equipamento['conflito'] = True
                             equipamentos[-2]['conflito'] = True
                     elif pos < 0:
                         # Posição negativa
                         # Ocorre quando o equipamento não tem uma posição válida
                         obs = 'Equip. abaixo do limite do rack.'
-                        conflitos.append({'obs': obs, 'eq1':equipamentos[-1]})
-                        equipamentos[-1]['conflito'] = True
-                    elif len(equipamentos) > 0 and equipamentos[-1]['pos_col'] and equipamentos[-1]['pos_col'] not in ('01','02','T', 'TD', 'TE', 'piso', 'lD', 'lE', 'LD', 'LE'):
+                        conflitos.append({'obs': obs, 'eq1':last_equipamento})
+                        last_equipamento['conflito'] = True
+                    elif len(equipamentos) > 0 and last_equipamento['pos_col'] and last_equipamento['pos_col'] not in ('01','02','T', 'TD', 'TE', 'piso', 'lD', 'lE', 'LD', 'LE'):
                         obs = 'Posicao inválida %s' % pt.historico_atual.posicao_colocacao
-                        conflitos.append({'obs': obs, 'eq1':equipamentos[-1]}, )
-                        equipamentos[-1]['conflito'] = True
+                        conflitos.append({'obs': obs, 'eq1':last_equipamento}, )
+                        last_equipamento['conflito'] = True
                         
-                    ptAnterior = equipamentos[-1]
+                    ptAnterior = last_equipamento
 
                 
                 rack = {'id':rack.id,   
