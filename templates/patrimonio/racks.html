@@ -32,18 +32,6 @@
   .bloco-n {}
 }
 
- #wrap-form {
-    width: 250px;
-	height: 35px;
-	position: relative;
-	display: inline-block;
- }
- #icons {
-    display: inline-block;
- }
- #icons img {
-    margin:-10px;
- }
  
  /* utilizado para mostrar que um equipamento está 'desabilitado'
     na visão do rack. Isso normalmente acontece quando ele oculpa
@@ -51,38 +39,6 @@
     Ex: O equipamento de meia profundidade está na posição frontal. Na visão traseira
         ele vai aparecer como 'desabilitado'
  */
- .equip.disabled {
-    background-color:#ccc;
- }
- .rack {
-    width: 580px;
-    vertical-align: top;
- }
- .rack h2 {
-    height: 20px;
- }
- .rack_frontal {
-    margin:0 0 0 10px;
-    padding:0;
-    width: 255px;
-    float:left;
- }
- .rack_traseiro {
-    margin:0 0 0 10px;
-    padding:0;
-    width: 255px;
-    float:left;
-	vertical-align: top;
- }
- 
- .rack_lateral {
-    display: table-cell;
-	min-width: 16px;
-	color: black;
-	margin: 0;
-	font-size:12px;
-	vertical-align: top;
- }
 /**
     Exibe ou esconde as imagens dos stencils 
 */
@@ -95,11 +51,9 @@
  {% if chk_legenda == "0" %}
     .interno a div div div { display:none; }
  {% endif %}
- 
- 
 </style>
-   <script type="text/javascript" src="{{ STATIC_PREFIX }}js/racks.js"></script>
-   <script type="text/javascript" src="{{ STATIC_PREFIX }}js/admin/RelatedObjectLookups.js"></script>
+<script type="text/javascript" src="{{ STATIC_PREFIX }}js/racks.js"></script>
+<script type="text/javascript" src="{{ STATIC_PREFIX }}js/admin/RelatedObjectLookups.js"></script>
 {% endblock %}
 {% block breadcrumbs %}
 	{% if not is_popup %}
@@ -136,6 +90,8 @@
 <input type="checkbox" id="chk_stencil" name="chk_stencil" value="1" {% if chk_stencil = 1 %}checked{% endif %}><span>&nbsp;Mostrar stencils</span><br>
 <input type="checkbox" id="chk_legenda" name="chk_legenda" value="1" {% if chk_legenda = 1 %}checked{% endif %}><span>&nbsp;Mostrar legendas</span><br>
 <input type="checkbox" id="chk_legenda_desc" name="chk_legenda_desc" value="1" {% if chk_legenda_desc = 1 %}checked{% endif %}><span>&nbsp;Mostrar descrição.</span><br><br>
+
+<input type="checkbox" id="chk_traseira" name="chk_traseira" value="1" {% if chk_traseira = 1 %}checked{% endif %}><span>&nbsp;Mostrar visão traseira do Rack.</span><br>
 <input type="checkbox" id="chk_outros" name="chk_outros" value="1" {% if chk_outros = 1 %}checked{% endif %}><span>&nbsp;Mostrar outros equipamentos.</span><br>
 <input type="checkbox" id="chk_avisos" name="chk_avisos" value="1" {% if chk_avisos = 1 %}checked{% endif %}><span>&nbsp;Mostrar avisos.</span><br>
 </form>
@@ -152,19 +108,35 @@
 		<div class="rack">
 		  <div style="display:inline-table">
 		    <div class="rack_frontal_E rack_lateral"> </div>
-			<div class="rack_frontal">
+			<div class="rack_frontal" style="display:table-row;">
 			    <h2>
 			      <a href="{% url "admin:patrimonio_patrimonio_change" rack.id %}" onclick="return showAddAnotherPopup(this);">
 			      {{ rack.nome|default:'' }} ({{ rack.vazio }} ocupado)
 			      </a>
 			    </h2>
+			    <div class="div_pdu" style="height: {{ rack.altura_pxs }}px;">
+				    {% for eq in rack.equipamentos_pdu %}
+				        {% if eq.pos_col == 'LE' %}
+						   {% if eq.id %}
+		                       <a href="{% url "admin:patrimonio_patrimonio_change" eq.id %}" onclick="return showAddAnotherPopup(this);">
+		                   {% endif %}
+					       <div class="equip " rel="tooltip" title="{{ eq.descricao }}" 
+                                style="margin-top:{{ eq.eixoY }}px; height:{{ eq.altura }}px;">
+                                {% if eq.imagem %}<img src="{{ eq.imagem }}" />{% endif %}
+                           </div>
+                           {% if eq.id %}
+                               </a>
+                           {% endif %}
+					    {% endif %}
+				    {% endfor %}
+			    </div>
 			    <div id="rack{{ dc.id }}_{{forloop.counter}}" class="bloco-n" style="height: {{ rack.altura_pxs }}px;">
 			        {% for i in rack.altura_pts|get_range reversed %}
 			            <div class="u-n"><div>{{ i|add:"1" }}</div></div>
 			        {% endfor %}
 			    </div>
 			    <div class="u" style="height: {{ rack.altura_pxs }}px;"></div>
-			    <div class="interno">
+			    <div class="interno" style="">
 			    {% for eq in rack.equipamentos %}
 			       {% if eq.id %}
 			           <a href="{% url "admin:patrimonio_patrimonio_change" eq.id %}" onclick="return showAddAnotherPopup(this);">
@@ -216,6 +188,22 @@
 			    {% endfor %}
 			    </div>
 			    <div class="u" style="height: {{ rack.altura_pxs }}px;"></div>
+			    <div class="div_pdu" style="height: {{ rack.altura_pxs }}px;">
+			    {% for eq in rack.equipamentos_pdu %}
+                    {% if eq.pos_col == 'LD' %}
+                        {% if eq.id %}
+                            <a href="{% url "admin:patrimonio_patrimonio_change" eq.id %}" onclick="return showAddAnotherPopup(this);">
+                        {% endif %}
+                       <div class="equip " rel="tooltip" title="{{ eq.descricao }}" 
+                            style="margin-top:{{ eq.eixoY }}px; height:{{ eq.altura }}px;">
+                            {% if eq.imagem %}<img src="{{ eq.imagem }}" />{% endif %}
+                       </div>
+                        {% if eq.id %}
+                            </a>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+                </div>
 			</div>
 			<div class="rack_frontal_D rack_lateral"> </div>
 		    <div style="display:table-cell;min-width:20px;"></div>
@@ -223,6 +211,22 @@
 			<div class="rack_traseiro_E rack_lateral"> </div>
             <div class="rack_traseiro">
                 <h2>{{ rack.nome|default:'' }} (Visão traseira)</h2>
+                <div class="div_pdu" style="height: {{ rack.altura_pxs }}px;">
+                    {% for eq in rack.equipamentos_pdu %}
+                        {% if eq.pos_col == 'TE' %}
+                           {% if eq.id %}
+                               <a href="{% url "admin:patrimonio_patrimonio_change" eq.id %}" onclick="return showAddAnotherPopup(this);">
+                           {% endif %}
+                           <div class="equip " rel="tooltip" title="{{ eq.descricao }}" 
+                                style="margin-top:{{ eq.eixoY }}px; height:{{ eq.altura }}px;">
+                                {% if eq.imagem %}<img src="{{ eq.imagem }}" />{% endif %}
+                           </div>
+                           {% if eq.id %}
+                               </a>
+                           {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </div>
                 <div id="rack{{ dc.id }}_{{forloop.counter}}" class="bloco-n" style="height: {{ rack.altura_pxs }}px;">
                     {% for i in rack.altura_pts|get_range reversed %}
                         <div class="u-n"><div>{{ i|add:"1" }}</div></div>
@@ -280,6 +284,22 @@
                 {% endfor %}
                 </div>
                 <div class="u" style="height: {{ rack.altura_pxs }}px;"></div>
+                <div class="div_pdu" style="height: {{ rack.altura_pxs }}px;">
+                    {% for eq in rack.equipamentos_pdu %}
+                        {% if eq.pos_col == 'TD' %}
+                           {% if eq.id %}
+                               <a href="{% url "admin:patrimonio_patrimonio_change" eq.id %}" onclick="return showAddAnotherPopup(this);">
+                           {% endif %}
+                           <div class="equip " rel="tooltip" title="{{ eq.descricao }}" 
+                                style="margin-top:{{ eq.eixoY }}px; height:{{ eq.altura }}px;">
+                                {% if eq.imagem %}<img src="{{ eq.imagem }}" />{% endif %}
+                           </div>
+                           {% if eq.id %}
+                               </a>
+                           {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </div>
             </div>
             <div class="rack_frontal_D rack_lateral"> </div>
           </div>

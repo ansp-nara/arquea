@@ -1377,3 +1377,16 @@ Deixamos somente o Logo e a mensagem de Copyright
 }
 
 
+/**
+Modulo do patrimonio
+*/
+/* movendo o help da posição do historico local para aparecer Inline com o campo */
+.patrimonio-patrimonio .posicao .help {
+ margin:0;
+ padding:0;
+ display:inline;
+
+ }
+ 
+ 
+}
