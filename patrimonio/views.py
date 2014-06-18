@@ -835,6 +835,7 @@ def racks(request):
                 espaco_ocupado = 0
                 equipamentos = []
                 equipamentos_fora_visao = []
+                equipamentos_pdu = []
                 conflitos = []
                 
                 eixoY = 0
@@ -882,7 +883,14 @@ def racks(request):
                             rack.equipamento.dimensao.profundidade /2:
                             profundidade = 0.5
                         
-                    if pos < 0 or pt.historico_atual.posicao_colocacao in ('TD', 'TE', 'piso', 'lD', 'lE'):
+                        
+                    if 'tomada' in pt.equipamento.tipo.nome and pt.historico_atual.posicao_colocacao in ('TD', 'TE', 'lD', 'lE', 'LD', 'LE'):
+                        # Guardando as calhas de tomadas para apresentar nas laterais do Rack
+                        equipamentos_pdu.append({'id': pt.id, 'pos':pos, 'tam': tam, 'eixoY': eixoY, 'altura':(tam*19/3), 
+                                          'pos_original':pt.historico_atual.posicao_furo, 'imagem':imagem, 
+                                          'nome':pt.apelido, 'descricao':pt.descricao or u'Sem descrição', 
+                                          'conflito':False, 'pos_col':pt.historico_atual.posicao_colocacao})
+                    elif pos < 0 or pt.historico_atual.posicao_colocacao in ('TD', 'TE', 'piso', 'lD', 'lE'):
                         if pos < 0: 
                             pos = '-'
                         equipamentos_fora_visao.append({'id': pt.id, 'pos':pos, 'tam': tam, 'eixoY': eixoY, 'altura':(tam*19/3), 
@@ -890,7 +898,7 @@ def racks(request):
                                           'nome':pt.apelido, 'descricao':pt.descricao or u'Sem descrição', 
                                           'conflito':False, 'pos_col':pt.historico_atual.posicao_colocacao})
                         continue
-                    else :
+                    else:
                         # x a partir do topo do container
                         # Adiciona os equipamentos frontais e traseiros. 
                         # O layout deve ser tratado no template
@@ -936,7 +944,7 @@ def racks(request):
                         obs = 'Equip. abaixo do limite do rack.'
                         conflitos.append({'obs': obs, 'eq1':equipamentos[-1]})
                         equipamentos[-1]['conflito'] = True
-                    elif equipamentos[-1]['pos_col'] and equipamentos[-1]['pos_col'] not in ('01','02','T', 'TD', 'TE', 'piso', 'lD', 'lE'):
+                    elif equipamentos[-1]['pos_col'] and equipamentos[-1]['pos_col'] not in ('01','02','T', 'TD', 'TE', 'piso', 'lD', 'lE', 'LD', 'LE'):
                         obs = 'Posicao inválida %s' % pt.historico_atual.posicao_colocacao
                         conflitos.append({'obs': obs, 'eq1':equipamentos[-1]}, )
                         equipamentos[-1]['conflito'] = True
@@ -947,7 +955,9 @@ def racks(request):
                 rack = {'id':rack.id,   
                         'altura':int(rack.tamanho) * 3.0, 'altura_pts': rack.tamanho, 'altura_pxs': int(rack.tamanho) * 19.0,
                         'nome':rack.apelido, 'marca': rack.marca, 'local': pt.historico_atual.posicao,  
-                        'equipamentos':equipamentos, 'equipamentos_fora_visao':equipamentos_fora_visao, 'conflitos':conflitos}
+                        'equipamentos':equipamentos, 'equipamentos_fora_visao':equipamentos_fora_visao,
+                        'equipamentos_pdu':equipamentos_pdu, 
+                        'conflitos':conflitos}
                 
                 # Calculo de uso do rack                
                 rack['vazio'] = '%.2f%%'  % ( (espaco_ocupado * 100.0) / (rack['altura'])) 
@@ -963,13 +973,14 @@ def racks(request):
     chk_legenda_desc = request.GET.get('chk_legenda_desc') if request.GET.get('chk_legenda_desc') else 0
     chk_outros = request.GET.get('chk_outros') if request.GET.get('chk_outros') else 1
     chk_avisos = request.GET.get('chk_avisos') if request.GET.get('chk_avisos') else 1
+    chk_traseira = request.GET.get('chk_traseira') if request.GET.get('chk_traseira') else 0
             
     if request.GET.get('pdf') == "2":
-        return render_wk_to_pdf('patrimonio/racks-wk.pdf', {'dcs':dcs, 'todos_dcs':todos_dcs, 'chk_legenda':chk_legenda, 'chk_legenda_desc':chk_legenda, 'chk_legenda_desc':chk_legenda_desc, 'chk_stencil':chk_stencil, 'chk_outros':chk_outros, 'chk_avisos':chk_avisos}, request=request, filename='diagrama_de_racks.pdf',)
+        return render_wk_to_pdf('patrimonio/racks-wk.pdf', {'dcs':dcs, 'todos_dcs':todos_dcs, 'chk_legenda':chk_legenda, 'chk_legenda_desc':chk_legenda, 'chk_legenda_desc':chk_legenda_desc, 'chk_stencil':chk_stencil, 'chk_outros':chk_outros, 'chk_avisos':chk_avisos, 'chk_traseira':chk_traseira}, request=request, filename='diagrama_de_racks.pdf',)
     elif request.GET.get('pdf'):
-        return TemplateResponse(request, 'patrimonio/racks-wk.pdf', {'dcs':dcs, 'todos_dcs':todos_dcs, 'chk_legenda':chk_legenda, 'chk_legenda_desc':chk_legenda_desc, 'chk_stencil':chk_stencil, 'chk_outros':chk_outros, 'chk_avisos':chk_avisos})
+        return TemplateResponse(request, 'patrimonio/racks-wk.pdf', {'dcs':dcs, 'todos_dcs':todos_dcs, 'chk_legenda':chk_legenda, 'chk_legenda_desc':chk_legenda_desc, 'chk_stencil':chk_stencil, 'chk_outros':chk_outros, 'chk_avisos':chk_avisos, 'chk_traseira':chk_traseira})
     else:
-        return TemplateResponse(request, 'patrimonio/racks.html', {'dcs':dcs, 'todos_dcs':todos_dcs, 'chk_legenda':chk_legenda, 'chk_legenda_desc':chk_legenda_desc, 'chk_stencil':chk_stencil, 'chk_outros':chk_outros, 'chk_avisos':chk_avisos})
+        return TemplateResponse(request, 'patrimonio/racks.html', {'dcs':dcs, 'todos_dcs':todos_dcs, 'chk_legenda':chk_legenda, 'chk_legenda_desc':chk_legenda_desc, 'chk_stencil':chk_stencil, 'chk_outros':chk_outros, 'chk_avisos':chk_avisos, 'chk_traseira':chk_traseira})
 
 @login_required
 def racks1(request):

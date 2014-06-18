@@ -14,26 +14,18 @@
 
 .u {
     background:white repeat-y;
-    display:inline-block;
     width:7px;
-    /*
-    height:798px;
-    */
     vertical-align:top;
-
+    display:table-cell;
 }
 .bloco-n {
-    display:inline-block;
     width:20px;
-    /*
-    height:798px;
-    */
     background-color:white;
     margin-right:7px;
     vertical-align:top;
     border-bottom:1px solid;
     border-color: #999a9a;
-    
+    display:table-cell;
 }
 
 .bloco-n .u-n {
@@ -62,7 +54,9 @@
 	margin-top:20px;
 	margin-bottom:30px;
     font-size:0;
+    vertical-align: top;
 }
+.rack h2 { height: 20px; }
 .rack h2 a:link,
 .rack h2  a:visited,
 .rack h2  a:hover,
@@ -71,12 +65,11 @@
 } 
 .interno {
 	position:relative;
-    display:inline-block;
     width:199px;
-    margin-left:1px;
-    margin-right:4px;
+    padding-left:1px;
+    padding-right:4px;
     font-size:10px;
-    
+    display:table-cell;
 }
 .interno a:link,
 .interno a:visited,
@@ -114,13 +107,8 @@
     display:none;
 }
 	
-@media screen {
-	.interno a div div div {
-        text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black, -2px 0 1px black, 0 2px 1px black, 2px 0 1px black, 0 -2px 1px black;
-	}
-}
 .equip {
-    display:inline-block;
+    display:table-cell;
     background:#81878b;
     width:199px;
     border-bottom:1px solid #fff;
@@ -169,6 +157,7 @@
     position:relative;
     color: red;
     cursor:pointer
+    margin-left: 15px;
 }
 .conflitos {
     font-size:11px;	
@@ -204,13 +193,72 @@
 }
 #chk_stencil+span,
 #chk_legenda+span,
+#chk_traseiro+span,
 #chk_legenda_desc+span {
 	cursor:pointer;
 }
+ #wrap-form {
+    width: 250px;
+    height: 35px;
+    position: relative;
+    display: inline-block;
+ }
+
+ #icons {
+    display: inline-block;
+ }
 #icons img {
 	width:30px;
 	height:35px;
+	margin:-10px;
 }
+ .equip.disabled {
+    background-color:#ccc;
+ }
+ 
+ .rack_frontal {
+    margin:0 0 0 10px;
+    padding:0;
+    width: 285px;
+    float:left;
+ }
+ .rack_traseiro {
+    margin:0 0 0 10px;
+    padding:0;
+    width: 285px;
+    float:left;
+    vertical-align: top;
+    display:none;
+ }
+ 
+ .rack_lateral {
+    display: table-cell;
+    min-width: 16px;
+    color: black;
+    margin: 0;
+    font-size:12px;
+    vertical-align: top;
+ }
+ 
+ .div_pdu {
+    display: table-cell;
+    width: 21px;
+    color: black;
+    font-size: 5px;
+}
+ .div_pdu a .equip {
+    width: 10px;
+    margin-left: 5px;
+    margin-right: 5px;
+    position:absolute;
+ }
+
+@media screen {
+    .interno a div div div {
+        text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black, -2px 0 1px black, 0 2px 1px black, 2px 0 1px black, 0 -2px 1px black;
+    }
+}
+
 @media print {
 	.page-break {
 		page-break-after:always;

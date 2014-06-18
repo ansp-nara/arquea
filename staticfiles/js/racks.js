@@ -38,6 +38,8 @@ $(function(){
 	   $('#icons a').attr('href', newUrl);
    }
    function _chk_span_toogle(targetSel, chkSel, urlSel) {
+	   
+	   
 	   var showOrHide = !($(chkSel).prop('checked'));
 	   
 	   $(targetSel).toggle(showOrHide);
@@ -85,6 +87,13 @@ $(function(){
    });
    $("#chk_outros + span").click(function(e){
 	   _chk_span_toogle(".outros-content", '#chk_outros', 'chk_outros');
+   });
+   
+   $("#chk_traseira").click(function(e){
+	   _chk_toogle(".rack_traseiro", '#chk_traseira', 'chk_traseira');''
+   });
+   $("#chk_traseira + span").click(function(e){
+	   _chk_span_toogle(".rack_traseiro", '#chk_traseira', 'chk_traseira');
    });
    
    $("#chk_avisos").click(function(e){
