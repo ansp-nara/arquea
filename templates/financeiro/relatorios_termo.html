@@ -23,7 +23,7 @@
      <option value="{{ t.id }}">{{ t }}</option>
   {% endfor %}
 </select>
-{% if not meses %}
+{% if rt != None %}
 <label for="id_rt">Reserva técnica?</label>
 <input type="checkbox" name="rt">
 </label>

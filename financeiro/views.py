@@ -656,7 +656,7 @@ def financeiro_parciais(request, pdf=False):
             else:
                 return render_to_response('financeiro/financeiro_parcial.html', {'termo':termo, 'parciais':retorno, 'totais':totais}, context_instance=RequestContext(request))
         else:
-            return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all()}, context_instance=RequestContext(request))
+            return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all(), 'rt':False, }, context_instance=RequestContext(request))
 
 @login_required
 def parciais(request, caixa=False, pdf=False):
