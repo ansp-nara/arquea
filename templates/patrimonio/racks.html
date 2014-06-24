@@ -138,10 +138,11 @@
 			    <div class="u" style="height: {{ rack.altura_pxs }}px;"></div>
 			    <div class="interno" style="">
 			    {% for eq in rack.equipamentos %}
+			       <div {% if not eq.flag_traseiro %} style="z-index:10;"{% endif %}>
 			       {% if eq.id %}
 			           <a href="{% url "admin:patrimonio_patrimonio_change" eq.id %}" onclick="return showAddAnotherPopup(this);">
 			       {% endif %}
-			       <div class="{% if eq.pos_col %} pos_{{eq.pos_col}} {% endif %} {% if eq.conflito %}conflito{% endif %} equip {% if eq.pos_col == 'T' and eq.profundidade < 1.0 %}disabled{% endif %}" rel="tooltip" title="{% if eq.nome %}{{ eq.nome|default:'' }} - {% endif %}{{ eq.descricao }} - pos:{{eq.pos_original|default:'0'}} pt" 
+			       <div class="{% if eq.pos_col %} pos_{{eq.pos_col}} {% endif %} {% if eq.conflito %}conflito{% endif %} equip {% if eq.flag_traseiro and eq.profundidade < 1.0 %}profundidade_curta{% endif %}" rel="tooltip" title="{% if eq.nome %}{{ eq.nome|default:'' }} - {% endif %}{{ eq.descricao }} - pos:{{eq.pos_original|default:'0'}} pt" 
 			           style="margin-top:{{ eq.eixoY }}px; height:{{ eq.altura }}px;">
 		               <div>
 			               <div class="{% if eq.pos_col %} pos_{{eq.pos_col}} {% endif %}" style="height:{{ eq.altura }}px;">
@@ -174,8 +175,8 @@
 	                        {% endif %}
 	                        </div>
 			            </div>
-			            {% if eq.pos_col == 'T' %}
-    			            {% if eq.imagem_traseira %}<img src="{{ eq.imagem_traseira }}" />{% endif %}
+			            {% if eq.flag_traseiro %}
+    			            {% if eq.imagem_traseira %}<img src="{{ eq.imagem_traseira }}" {% if eq.profundidade < 1.0 %}class="profundidade_curta"{% endif %}/>{% endif %}
     			        {% else %}
     			            {% if eq.imagem %}<img src="{{ eq.imagem }}" />{% endif %}
                         {% endif %}
@@ -185,6 +186,7 @@
 			       {% if eq.id %}
 			           </a>
 			       {% endif %}
+			       </div>
 			    {% endfor %}
 			    </div>
 			    <div class="u" style="height: {{ rack.altura_pxs }}px;"></div>
@@ -235,10 +237,11 @@
                 <div class="u" style="height: {{ rack.altura_pxs }}px;"></div>
                 <div class="interno">
                 {% for eq in rack.equipamentos %}
+                   <div {% if eq.flag_traseiro %} style="z-index:10;"{% endif %}>
                    {% if eq.id %}
                        <a href="{% url "admin:patrimonio_patrimonio_change" eq.id %}" onclick="return showAddAnotherPopup(this);">
                    {% endif %}
-                   <div class="{% if eq.pos_col %} pos_{{eq.pos_col}} {% endif %} {% if eq.conflito %}conflito{% endif %} equip {% if eq.pos_col|default:'' == '' and eq.profundidade < 1.0 %}disabled{% endif %}" rel="tooltip" title="{% if eq.nome %}{{ eq.nome|default:'' }} - {% endif %}{{ eq.descricao }} - pos:{{eq.pos_original|default:'0'}} pt" 
+                   <div class="{% if eq.pos_col %} pos_{{eq.pos_col}} {% endif %} {% if eq.conflito %}conflito{% endif %} equip {% if not eq.flag_traseiro and eq.profundidade < 1.0 %}profundidade_curta{% endif %}" rel="tooltip" title="{% if eq.nome %}{{ eq.nome|default:'' }} - {% endif %}{{ eq.descricao }} - pos:{{eq.pos_original|default:'0'}} pt" 
                        style="margin-top:{{ eq.eixoY }}px; height:{{ eq.altura }}px;">
                        <div>
                            <div class="{% if eq.pos_col %} pos_{{eq.pos_col}} {% endif %}" style="height:{{ eq.altura }}px;">
@@ -271,16 +274,18 @@
                             {% endif %}
                             </div>
                         </div>
-                        {% if eq.pos_col == 'T' %}
+                        
+                        {% if eq.flag_traseiro %}
                             {% if eq.imagem %}<img src="{{ eq.imagem }}" />{% endif %}
                         {% else %}
-                            {% if eq.imagem_traseira %}<img src="{{ eq.imagem_traseira }}" />{% endif %}
+                            {% if eq.imagem_traseira %}<img src="{{ eq.imagem_traseira }}" {% if eq.profundidade < 1.0 %}class="profundidade_curta"{% endif %} />{% endif %}
                         {% endif %}
                    </div>
                    
                    {% if eq.id %}
                        </a>
                    {% endif %}
+                   </div>
                 {% endfor %}
                 </div>
                 <div class="u" style="height: {{ rack.altura_pxs }}px;"></div>
@@ -322,7 +327,7 @@
 		    	                </td>
 		                        <td>{{ eq.tam }}</td>
 		                        <td>{{ eq.pos }}</td>
-		                        <td>{{ eq.pos_col }}</td>
+		                        <td>{{ eq.pos_col|default:'-' }}</td>
 	                        </tr>
 	                    {% endfor %}
 	                </table>

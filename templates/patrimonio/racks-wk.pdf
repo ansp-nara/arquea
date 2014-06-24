@@ -128,6 +128,13 @@ Coluna de furos do rack
     display:inline-block;
     width:255px;
 }
+.equip.profundidade_curta {
+    background-color:#ccc;
+}
+img.profundidade_curta {
+    opacity:0.3;
+    filter: alpha(opacity=30); /* For IE8 and earlier */
+}
 .interno {
     position:relative;
     display: table-cell;
@@ -144,7 +151,7 @@ Coluna de furos do rack
 }
 .interno div {
     position:absolute;
-    z-index: 10;
+    z-index: 1;
 }
 .interno div div div:nth-child(1) {
     position:relative;
@@ -182,20 +189,28 @@ Coluna de furos do rack
     vertical-align:middle; 
     line-height:1.5em;
     width: 199px;
+    z-index:1;
 }
+.equip.pos_T01,
+.equip.pos_T01 div,
 .equip.pos_01,
 .equip.pos_01 div {
     width:97px;
     font-size: 9px;
 }
+.equip.pos_T02,
+.equip.pos_T02 div div,
 .equip.pos_02,
 .equip.pos_02 div div {
-    right:0;
+    /*left:16.3em;*/
+    right:43px;
     width:97px;
     padding-right: 0;
     margin-right: 0;
     font-size: 9px;
 }
+.equip.pos_T03,
+.equip.pos_T03 div,
 .equip.pos_03,
 .equip.pos_03 div {
 }
@@ -232,7 +247,7 @@ Coluna de furos do rack
 }
  .div_pdu a .equip {
     width: 18px;
-    margin-left: 5px;
+    margin-left: 4px;
     margin-right: 5px;
     position:absolute;
  }
@@ -343,8 +358,8 @@ Coluna de furos do rack
                     
                     <div class="interno">
                     {% for eq in rack.equipamentos %}
-                       <div class="{% if eq.pos_col %} pos_{{eq.pos_col}} {% endif %}  equip" 
-                           style="margin-top:{{ eq.eixoY }}px; height:{{ eq.altura }}px;">
+                       <div class="{% if eq.pos_col %} pos_{{eq.pos_col}} {% endif %}  equip {% if eq.flag_traseiro and eq.profundidade < 1.0 %}profundidade_curta{% endif %}" 
+                           style="margin-top:{{ eq.eixoY }}px; height:{{ eq.altura }}px; {% if not eq.flag_traseiro %} z-index:10;{% endif %}">
                            <div>
                                <div style="height:{{ eq.altura }}px;">
                                 {% if eq.pos_col %}
@@ -401,8 +416,8 @@ Coluna de furos do rack
                                 {% endif %}
                                 </div>
                             </div>
-                            {% if eq.pos_col == 'T' %}
-                                {% if eq.imagem_traseira %}<img src="{{ eq.imagem_traseira }}" />{% endif %}
+                            {% if eq.flag_traseiro %}
+                                {% if eq.imagem_traseira %}<img src="{{ eq.imagem_traseira }}" {% if eq.profundidade < 1.0 %}class="profundidade_curta"{% endif %} />{% endif %}
                             {% else %}
                                 {% if eq.imagem %}<img src="{{ eq.imagem }}" />{% endif %}
                             {% endif %}
@@ -500,8 +515,8 @@ Coluna de furos do rack
                 
                 <div class="interno">
                 {% for eq in rack.equipamentos %}
-                   <div class="{% if eq.pos_col %} pos_{{eq.pos_col}} {% endif %}  equip" 
-                       style="margin-top:{{ eq.eixoY }}px; height:{{ eq.altura }}px;">
+                   <div class="{% if eq.pos_col %} pos_{{eq.pos_col}} {% endif %}  equip  {% if not eq.flag_traseiro and eq.profundidade < 1.0 %}profundidade_curta{% endif %} " 
+                       style="margin-top:{{ eq.eixoY }}px; height:{{ eq.altura }}px; {% if eq.flag_traseiro %} z-index:10;{% endif %}">
                        <div>
                            <div style="height:{{ eq.altura }}px;">
                             {% if eq.pos_col %}
@@ -558,11 +573,12 @@ Coluna de furos do rack
                             {% endif %}
                             </div>
                         </div>
-                        {% if eq.pos_col == 'T' %}
+                        {% if eq.flag_traseiro %}
                             {% if eq.imagem %}<img src="{{ eq.imagem }}" />{% endif %}
                         {% else %}
-                            {% if eq.imagem_traseira %}<img src="{{ eq.imagem_traseira }}" />{% endif %}
+                            {% if eq.imagem_traseira %}<img src="{{ eq.imagem_traseira }}"  {% if eq.profundidade < 1.0 %}class="profundidade_curta"{% endif %} />{% endif %}
                         {% endif %}
+                        
                    </div>
                 {% endfor %}
                 </div>
@@ -603,7 +619,7 @@ Coluna de furos do rack
                                         </td>
                                         <td>{{ eq.tam }}</td>
                                         <td>{{ eq.pos }}</td>
-                                        <td>{{ eq.pos_col|default:'' }}</td>
+                                        <td>{{ eq.pos_col|default:'-' }}</td>
                                     </tr>
                                 {% endfor %}
                             </table>
