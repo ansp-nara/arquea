@@ -882,14 +882,18 @@ def racks(request):
                         if pt.equipamento.dimensao.profundidade < \
                             rack.equipamento.dimensao.profundidade /2:
                             profundidade = 0.5
-                        
+                    
+                    flag_traseiro = False
+                    if pt.historico_atual.posicao_colocacao in ('TD', 'TE', 'T', 'T01', 'T02', 'T03'):
+                        flag_traseiro = True
                         
                     last_equipamento = {'id': pt.id, 'pos':pos, 'tam': tam, 'eixoY': eixoY, 'altura':(tam*19/3), 
                                               'pos_original':pt.historico_atual.posicao_furo, 
                                               'imagem':imagem, 'imagem_traseira':imagem_traseira, 
                                               'profundidade':profundidade,
                                               'nome':pt.apelido, 'descricao':pt.descricao or u'Sem descrição',  
-                                              'conflito':False, 'pos_col':pt.historico_atual.posicao_colocacao}
+                                              'conflito':False, 'pos_col':pt.historico_atual.posicao_colocacao,
+                                              'flag_traseiro':flag_traseiro}
                         
                     if pt.equipamento and pt.equipamento.tipo and 'tomada' in pt.equipamento.tipo.nome and \
                         pt.historico_atual.posicao_colocacao in ('TD', 'TE', 'lD', 'lE', 'LD', 'LE'):
@@ -899,6 +903,7 @@ def racks(request):
                     elif pos < 0 or pt.historico_atual.posicao_colocacao in ('TD', 'TE', 'piso', 'lD', 'lE'):
                         if pos < 0: 
                             pos = '-'
+                            last_equipamento['pos'] = pos
                         equipamentos_fora_visao.append(last_equipamento)
                         continue
                     else:
@@ -931,18 +936,27 @@ def racks(request):
                         # Caso estejam na mesma posição 01 ou 02, ou então, haja um equipamento que ocupe toda largura do rack
                         # Não ocorre quando os equipamentos estiverem lado a lado (marcados no attr pos_col, por exemplo, 01 com 02)
 
-                        if ptAnterior and ptAnterior['eixoY'] + ptAnterior['tam'] > eixoY and (ptAnterior['pos_col'] == last_equipamento['pos_col'] or not ptAnterior['pos_col'] or not last_equipamento['pos_col']):
+                        if ptAnterior and \
+                            ptAnterior['profundidade'] + last_equipamento['profundidade'] <= 1.0 and \
+                            ptAnterior['eixoY'] + ptAnterior['tam'] > eixoY and \
+                            (ptAnterior['pos_col'] == last_equipamento['pos_col'] or not ptAnterior['pos_col'] or not last_equipamento['pos_col']):
+                        
                             obs = 'Equipamentos sobrepostos.'
                             conflitos.append({'obs': obs, 'eq1':ptAnterior, 'eq2':last_equipamento})
                             last_equipamento['conflito'] = True
                             equipamentos[-2]['conflito'] = True
+                    elif pos == -2:
+                        # Posição -2 significa que o patrimonio não possui furo.
+                        obs = 'Equip. sem posição definida.'
+                        conflitos.append({'obs': obs, 'eq1':last_equipamento})
+                        last_equipamento['conflito'] = True
                     elif pos < 0:
                         # Posição negativa
                         # Ocorre quando o equipamento não tem uma posição válida
                         obs = 'Equip. abaixo do limite do rack.'
                         conflitos.append({'obs': obs, 'eq1':last_equipamento})
                         last_equipamento['conflito'] = True
-                    elif len(equipamentos) > 0 and last_equipamento['pos_col'] and last_equipamento['pos_col'] not in ('01','02','T', 'TD', 'TE', 'piso', 'lD', 'lE', 'LD', 'LE'):
+                    elif len(equipamentos) > 0 and last_equipamento['pos_col'] and last_equipamento['pos_col'] not in ('01','02','T', 'TD', 'TE', 'T01', 'T02', 'piso', 'lD', 'lE', 'LD', 'LE'):
                         obs = 'Posicao inválida %s' % pt.historico_atual.posicao_colocacao
                         conflitos.append({'obs': obs, 'eq1':last_equipamento}, )
                         last_equipamento['conflito'] = True
