@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 import django
 from django import forms
-from django.utils.translation import ugettext_lazy as _
-from django.forms.util import ErrorList
-from django.forms.models import inlineformset_factory, BaseInlineFormSet
+from django.core.exceptions import ValidationError
 from django.contrib.admin.widgets import FilteredSelectMultiple, RelatedFieldWidgetWrapper
 from django.db.models.fields.related import ManyToOneRel
+from django.forms.util import ErrorList
+from django.forms.models import inlineformset_factory, BaseInlineFormSet
 from django.utils.html import mark_safe
+from django.utils.translation import ugettext_lazy as _
 
 from models import *
 from outorga.models import Termo, OrigemFapesp
@@ -132,6 +133,24 @@ class ExtratoCCAdminForm(forms.ModelForm):
     class Meta:
     	model = ExtratoCC
 
+    def clean_imagem(self):
+        """
+        Verificando a extensão do arquivo de imagem. Pode conter somente JPEG.
+        """
+        imagem = self.cleaned_data.get('imagem', False)
+        if imagem:
+            imagem_split = imagem.name.split('.')
+            
+            extensao = ''
+            if len(imagem_split) > 1:
+                extensao = imagem_split[-1]
+            
+            if not (extensao.lower() in ['jpeg', 'jpg']):
+                raise forms.ValidationError(_('Somente utilizar imagens JPEG.'))
+        else:
+            raise ValidationError(_("Não foi possível verificar a imagem."))
+
+        return imagem
 
 
 class AuditoriaPagamentoChoiceField(forms.ModelChoiceField):

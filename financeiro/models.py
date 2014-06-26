@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
 
+import datetime
+from decimal import Decimal
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+from django.db.models import Sum
+from django.db.models import Q, Max
 from django.utils.translation import ugettext_lazy as _
 
 from utils.functions import formata_moeda
 from utils.models import NARADateField
-from decimal import Decimal
-from django.db.models import Q, Max
 from protocolo.models import Protocolo, Estado as EstadoProtocolo, Cotacao
 from membro.models import *
-import datetime
-from django.db.models import Sum
 
 CODIGO_FINANCEIRO = (
   ('COMP', 'Concessao Bens/Serv. Pais'),
@@ -31,12 +32,12 @@ CODIGO_FINANCEIRO = (
 class ExtratoCC(models.Model):
     extrato_financeiro = models.ForeignKey('financeiro.ExtratoFinanceiro', verbose_name=_(u'Extrato Financeiro'), blank=True, null=True) 
     data_oper = NARADateField(_(u'Data da operação'))
-    cod_oper = models.IntegerField(_(u'Documento'))
+    cod_oper = models.IntegerField(verbose_name=_(u'Documento'), validators=[MinValueValidator(0), MaxValueValidator(999999999)], help_text=u'Código com máximo de 9 dígitos.')
     despesa_caixa = models.BooleanField(_(u'Despesa de caixa?'))
     valor = models.DecimalField(_(u'Valor'), max_digits=12, decimal_places=2)
     historico = models.CharField(_(u'Histórico'), max_length=30)
     data_extrato = NARADateField(_(u'Data do extrato'), null=True, blank=True)
-    imagem = models.ImageField(_(u'Imagem do cheque'), upload_to='extratocc', null=True, blank=True)
+    imagem = models.ImageField(_(u'Imagem do cheque'), upload_to='extratocc', null=True, blank=True, help_text=u'Somente imagem .jpeg', validators=[RegexValidator(regex=".+((\.jpg)|.+(\.jpeg))$", message="Enviar somente imagem .jpeg"),])
     capa = models.TextField(null=True, blank=True)
     obs = models.TextField(null=True, blank=True)
     
@@ -98,7 +99,7 @@ class ExtratoFinanceiro(models.Model):
     valor = models.DecimalField(_(u'Valor'), max_digits=12, decimal_places=2)
     comprovante = models.FileField(_(u'Comprovante da operação'), upload_to='extratofinanceiro', null=True, blank=True)
     tipo_comprovante = models.ForeignKey('financeiro.TipoComprovanteFinanceiro', null=True, blank=True)
-    parcial = models.IntegerField(null=False, blank=False, default=0)
+    parcial = models.IntegerField(null=False, blank=False, default=0, validators=[MinValueValidator(0), MaxValueValidator(999999999)])
   
     class Meta:
 	verbose_name = _(u'Extrato do Financeiro')
@@ -239,7 +240,7 @@ class LocalizaPatrocinio(models.Model):
 class ExtratoPatrocinio(models.Model):
     localiza = models.ForeignKey('financeiro.LocalizaPatrocinio', verbose_name=_(u'Localização do patrocínio'))
     data_oper = NARADateField(_(u'Data da operação'))
-    cod_oper = models.IntegerField(_(u'Código da operação'))
+    cod_oper = models.IntegerField(_(u'Código da operação'), validators=[MinValueValidator(0), MaxValueValidator(999999999)], help_text=u'Código com máximo de 9 dígitos.')
     valor = models.DecimalField(max_digits=12, decimal_places=2)
     historico = models.CharField(max_length=30)
     obs = models.TextField()
@@ -278,7 +279,7 @@ class Auditoria(models.Model):
     pagamento = models.ForeignKey('financeiro.Pagamento')
     tipo = models.ForeignKey('financeiro.TipoComprovante')
     arquivo = models.FileField(upload_to='auditoria', null=True, blank=True)
-    parcial = models.IntegerField()
+    parcial = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(999999999)])
     pagina = models.IntegerField()
     obs = models.TextField(null=True, blank=True)
     

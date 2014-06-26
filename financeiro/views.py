@@ -8,8 +8,8 @@ from django.db.models import Q, Max
 from django.contrib.auth.decorators import permission_required, login_required
 from django.db.models import Sum
 from django.template import Context, loader, RequestContext
-import json as simplejson
 from decimal import Decimal
+import json as simplejson
 import datetime
 import logging
 
@@ -434,7 +434,7 @@ def extrato_mes(request, pdf=False):
             return render_to_response('financeiro/sel_contacorrente_mes.html', {'anos':anos, 'meses':meses}, context_instance=RequestContext(request))	    
 
 @login_required
-def extrato_financeiro(request, ano=datetime.datetime.now().year, pdf=False):
+def extrato_financeiro(request, ano=datetime.now().year, pdf=False):
 
     if request.method == 'GET':
         if request.GET.get('termo'):
