@@ -2,7 +2,7 @@
 
 import datetime
 from decimal import Decimal
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 from django.db import models
 from django.db.models import Sum
 from django.db.models import Q, Max
