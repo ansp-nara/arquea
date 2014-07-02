@@ -782,10 +782,9 @@ def por_termo(request, pdf=0):
         patrimonios = Patrimonio.objects.all()
 
     if doado == '0':
-        # Exclui a FUSSESP (id=1372)
-        patrimonios = patrimonios.exclude(historicolocal__endereco__id=1372, historicolocal__estado__id=1)
+        patrimonios = patrimonios.exclude(historicolocal__endereco__endereco__entidade__recebe_doacao=True, historicolocal__estado__id=1)
     elif doado == '1':
-        patrimonios = patrimonios.filter(historicolocal__endereco__id=1372, historicolocal__estado__id=1)
+        patrimonios = patrimonios.filter(historicolocal__endereco__endereco__entidade__recebe_doacao=True)
 
     if localizado == '1':
         patrimonios = patrimonios.exclude(historicolocal__endereco__complemento__icontains='Localizado')
