@@ -107,13 +107,12 @@ class EntidadeAdmin(admin.ModelAdmin):
                      'classes': ('wide',)
                  }),
                  (None, {
-                     'fields': ('url', ('cnpj', 'fisco')),
+                     'fields': ('url', ('cnpj', 'fisco'), ('recebe_doacao',)),
                      'classes': ('wide',)
                  }),
-
     )
 
-    list_display = ('sigla_nome', 'sigla_completa', 'url', 'cnpj', 'fisco')
+    list_display = ('sigla_nome', 'sigla_completa', 'url', 'cnpj', 'fisco', 'recebe_doacao')
 
     list_filter = ('fisco', )
 

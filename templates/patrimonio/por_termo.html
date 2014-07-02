@@ -46,6 +46,15 @@
     font-weight: bold;
     border-bottom:1px darkgray solid;
 }
+.th_nf {}
+.th_descricao {}
+.th_valor {}
+.th_marca {}
+.th_ns {}
+.th_estado {}
+.th_localizacao {width:445px;}
+.th_posicao {}
+
 .tr_saldo td{
     background-color:#f7f7f7;
 }
@@ -142,7 +151,7 @@
 		    </select>
 		</div>
 		<div>
-		    <label for="id_numero_fmusp">Com identificação da instituição</label>
+		    <label for="id_numero_fmusp">Com identificação do patrimônio oficial</label>
 		    <select name="numero_fmusp" id="id_numero_fmusp">
 		         <option value="2" {% if '2' == numero_fmusp%}selected{% endif %}>Todos</option>
 		         <option value="0" {% if '0' == numero_fmusp%}selected{% endif %}>Não</option>
@@ -150,7 +159,7 @@
 		    </select>
 		</div>
 		<div>
-		    <label for="id_ver_numero_fmusp">Visualizar identificação da instituição</label>
+		    <label for="id_ver_numero_fmusp">Apresenta patrimônio oficial no relatório</label>
 		    <input type="checkbox" name="ver_numero_fmusp" id="id_ver_numero_fmusp"  {% if 'on' in ver_numero_fmusp%}checked{% endif %} />
 		</div>
 	</div>
@@ -165,16 +174,16 @@
     <table id="tbl_conteudo" border="0" repeat="1" cellpadding="5">
     <tr>
         {% if ver_numero_fmusp %}
-            <th>Patrimônio FMUSP</th>
+            <th>Patrimônio oficial</th>
         {% endif %}
-        <th>NF</th>
-        <th colspan="2">Descrição - complemento</th>
-        <th>Valor</th>
-        <th>Marca</th>
-        <th>NS</th>
-        <th>Estado</th>
-        <th>Localização</th>
-        <th>Posição</th>
+        <th class="th_nf">NF</th>
+        <th colspan="2" class="th_descricao">Descrição - complemento</th>
+        <th class="th_valor">Valor</th>
+        <th class="th_marca">Marca</th>
+        <th class="th_ns">NS</th>
+        <th class="th_estado">Estado</th>
+        <th class="th_localizacao">Localização</th>
+        <th class="th_posicao">Posição</th>
     </tr>
     {% for t in termos %}
         {% for tp in t.tipos %}

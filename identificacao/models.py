@@ -179,12 +179,14 @@ class Entidade(models.Model):
     #asn = models.IntegerField(_(u'ASN'), blank=True, null=True, help_text=_(u' '))
     cnpj = CNPJField(_(u'CNPJ'), blank=True, help_text=_(u'ex. 00.000.000/0000-00'))
     fisco = models.BooleanField(_(u'Fisco'), help_text=_(u'ex. Ativo no site da Receita Federal?'))
+    recebe_doacao = models.BooleanField(_(u'Recebe doação de equipamentos?'))
+    
 
 
     # Retorna a sigla.
     def __unicode__(self):
         return self.sigla
-
+    
     def sigla_completa(self):
         if self.entidade:
            return u'%s - %s' % (self.entidade.sigla_completa(), self.sigla)
