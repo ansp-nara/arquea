@@ -184,7 +184,7 @@ function ajax_gera_despesas_internas(url, objHtmlReturn, pagina, select, auditor
           $("#"+pagina).val(retorno['pag']);
       },
       error: function(erro) {
-        alert('Erro. Sem retorno da requisicao.');
+        alert('ajax_gera_despesas_internas Erro. Sem retorno da requisicao.');
       }
     });
     $("#"+objHtmlReturn).html('</select>');
@@ -265,7 +265,7 @@ function ajax_filter(url, objHtmlReturn, id)
           });
       },
       error: function(erro) {
-        alert('Erro. Sem retorno da requisicao.');
+        alert('ajax_filter Erro. Sem retorno da requisicao.');
       }
   });
 }
@@ -293,7 +293,7 @@ function ajax_filter2(url, objHtmlReturn, id, objHtmlPrevious)
           });
       },
       error: function(erro) {
-        alert('Erro. Sem retorno da requisicao.');
+        alert('ajax_filter2 Erro. Sem retorno da requisicao.');
       }
   });
 }
@@ -319,7 +319,7 @@ function ajax_seleciona_extrato(url, objHtmlReturn, id, previous)
           });
       },
       error: function(erro) {
-        alert('Erro. Sem retorno da requisicao.');
+        alert('ajax_seleciona_extrato Erro. Sem retorno da requisicao.');
       }
   });
 }
@@ -354,7 +354,7 @@ function ajax_filter_inline(url, id, name)
           });
       },
       error: function(erro) {
-        alert('Erro. Sem retorno da requisicao.');
+        alert('ajax_filter_inline Erro. Sem retorno da requisicao.');
       }
   });
 }
@@ -399,7 +399,7 @@ function ajax_filter_item_natureza(url, termo, item_anterior, natureza, id, name
           });
       },
       error: function(erro) {
-        alert('Erro. Sem retorno da requisicao.');
+        alert('ajax_filter_item_natureza Erro. Sem retorno da requisicao.');
       }
   });
 }
@@ -455,7 +455,7 @@ function ajax_filter_mod_item_natureza(url, modalidade, item_anterior, natureza,
       },
       
       error: function(erro) {
-        alert('Erro. Sem retorno da requisicao.');
+        alert('ajax_filter_mod_item_natureza Erro. Sem retorno da requisicao.');
       }
   });
 
@@ -500,7 +500,7 @@ function ajax_filter_modalidade_item_inline(url, id, name)
           });
       },
       error: function(erro) {
-        alert('Erro. Sem retorno da requisicao.');
+        alert('ajax_filter_modalidade_item_inline Erro. Sem retorno da requisicao.');
       }
   });
 }
@@ -530,7 +530,7 @@ function ajax_filter_termo_natureza(url, natureza, id, name)
       },
       
       error: function(erro) {
-        alert('Erro. Sem retorno da requisicao.');
+        alert('ajax_filter_termo_natureza Erro. Sem retorno da requisicao.');
       }
   });
 
@@ -570,7 +570,7 @@ function ajax_filtra_item(url, item_pedido, modalidade, termo, select)
 
       },
       error: function(erro) {
-        alert('Erro: Sem retorno da requisição.');
+        alert('ajax_filtra_item Erro: Sem retorno da requisição.');
       }
   });
 }
@@ -606,7 +606,7 @@ function ajax_filter_origem_protocolo(termo_campo, termo)
 	      });
 	  },
 	  error: function(erro) {
-	    alert('Erro: Sem retorno da requisição.');
+	    alert('ajax_filter_origem_protocolo Erro: Sem retorno da requisição.');
 	  }
       });
 /*      if (!$("#id_auditoria_set-0-pagina").val()){
@@ -644,7 +644,7 @@ function ajax_filter_protocolo_numero(numero)
 	      });
 	  },
 	  error: function(erro) {
-	    alert('Erro: Sem retorno da requisição.');
+	    alert('ajax_filter_protocolo_numero Erro: Sem retorno da requisição.');
 	  }
       });
 }
@@ -666,7 +666,7 @@ function ajax_filter_cc_cod(codigo)
 	      });
 	  },
 	  error: function(erro) {
-	     alert('Erro: Sem retorno de requisição.');
+	     alert('ajax_filter_cc_cod Erro: Sem retorno de requisição.');
 	  }
        });
 }
@@ -688,7 +688,7 @@ function ajax_filter_pagamentos(url, numero)
 	      });
 	  },
 	  error: function(erro) {
-	     alert('Erro: Sem retorno de requisição.');
+	     alert('ajax_filter_pagamentos Erro: Sem retorno de requisição.');
 	  }
        });
 	
@@ -710,7 +710,7 @@ function ajax_filter_financeiro(termo_id)
 		});
 	   },
            error: function(erro) {
-              alert('Erro: Sem retorno de requisição.');
+              alert('ajax_filter_financeiro Erro: Sem retorno de requisição.');
            }
        });
 }
@@ -735,7 +735,7 @@ function ajax_select_endereco(id_field)
 		});	   
 	   },
 	   error: function(erro) {
-	      alert('Erro: Sem retorno de requisição.');
+	      alert('ajax_select_endereco Erro: Sem retorno de requisição.');
 	   }
        });
 }
@@ -758,7 +758,7 @@ function ajax_select_endereco2()
                 });
            },
            error: function(erro) {
-              alert('Erro: Sem retorno de requisição.');
+              alert('ajax_select_endereco2 Erro: Sem retorno de requisição.');
            }
        });
 
@@ -781,7 +781,7 @@ function ajax_patrimonio_existente(pn)
 	      }
 	   },
 	   error: function(erro) {
-	      alert('Erro: Sem retonro de requisição.');
+	      alert('ajax_patrimonio_existente Erro: Sem retonro de requisição.');
 	   }
        });
 }
@@ -883,7 +883,7 @@ function ajax_filter_pagamentos_memorando(termo)
           }
        },
        error: function(erro) {
-         alert('Erro. Sem retorno da requisicao.');
+         alert('ajax_filter_pagamentos_memorando Erro. Sem retorno da requisicao.');
        }
      });
 }
@@ -904,7 +904,9 @@ function ajax_init_pagamentos()
           });
        },
        error: function(erro) {
-         alert('Erro. Sem retorno da requisicao.');
+    	 // Rogério: verificar porque este disparo deve ser feito no window.onload. Com isso está dando erro toda vez que carrega o selects.js.
+    	   
+         //alert('ajax_init_pagamentos Erro. Sem retorno da requisicao.');
        }
      });
   }
@@ -931,7 +933,7 @@ function ajax_filter_perguntas(memorando)
           });
        },
        error: function(erro) {
-         alert('Erro. Sem retorno da requisicao.');
+         alert('ajax_filter_perguntas Erro. Sem retorno da requisicao.');
        }
    });
 }
@@ -953,7 +955,7 @@ function ajax_select_pergunta(id_field)
                 $(e_id).html(retorno);
            },
            error: function(erro) {
-              alert('Erro: Sem retorno de requisição.');
+              alert('ajax_select_pergunta Erro: Sem retorno de requisição.');
            }
        });
 }
@@ -978,7 +980,7 @@ function ajax_filter_pagamentos2(url)
               });
           },
           error: function(erro) {
-             alert('Erro: Sem retorno de requisição.');
+             alert('ajax_filter_pagamentos2 Erro: Sem retorno de requisição.');
           }
        });
 
@@ -1004,7 +1006,7 @@ function ajax_filter_equipamento(num_doc, id_patrimonio, id_equipamento)
               });
            },
            error: function(erro) {
-              alert('Erro: Sem retorno de requisição.');
+              alert('ajax_filter_equipamento Erro: Sem retorno de requisição.');
            }
        });
 }
@@ -1026,7 +1028,7 @@ function ajax_filter_patrimonio(num_doc)
               });
            },
            error: function(erro) {
-              alert('Erro: Sem retorno de requisição.');
+              alert('ajax_filter_patrimonio Erro: Sem retorno de requisição.');
            }
        });
 }
@@ -1044,7 +1046,7 @@ function ajax_prox_audit(origem)
               $("#id_auditoria_set-0-pagina").val(retorno['pagina']);
           },
           error: function(erro) {
-            alert('Erro: Sem retorno da requisição.');
+            alert('ajax_prox_audit Erro: Sem retorno da requisição.');
           }
        });
       }
@@ -1083,7 +1085,7 @@ function ajax_select_ano_proj()
  	            });
 	   },
 	   error: function(erro) {
-              alert('Erro: Sem retorno de requisição.');
+              alert('ajax_select_ano_proj Erro: Sem retorno de requisição.');
            }
        });
 
@@ -1159,7 +1161,7 @@ function ajax_patr_form_get_equipamento(id_equipamento)
         	   $('#id_ean').text(retorno.ean);
            },
            error: function(erro) {
-              alert('Erro: Sem retorno de requisição.');
+              alert('ajax_patr_form_get_equipamento Erro: Sem retorno de requisição.');
            }
        });
 }
@@ -1186,7 +1188,7 @@ function ajax_get_procedencia_filter_tipo(id_tipo)
               });
            },
            error: function(erro) {
-              alert('Erro: Sem retorno de requisição.');
+              alert('ajax_get_procedencia_filter_tipo Erro: Sem retorno de requisição.');
            }
        });
 }
@@ -1213,7 +1215,34 @@ function ajax_get_recursos(id_retorno, estado)
               });
            },
            error: function(erro) {
-              alert('Erro: Sem retorno de requisição.');
+              alert('ajax_get_recursos Erro: Sem retorno de requisição.');
+           }
+       });
+}
+
+
+/**
+ * Ajax para filtro no relatório de Patrimonio por Termo 
+ * @param id_retorno	ID do DOM para renderizar o resultado
+ * @param termo_id		ID do Termo para fazer a busca de marcas dos patrimonios 
+ */
+function ajax_get_marcas_por_termo(id_retorno, termo_id)
+{
+	   p_id = id_retorno;
+       $.ajax({
+           type: "GET",
+           url: "/patrimonio/ajax_get_marcas_por_termo",
+           dataType: "json",
+           data: {'termo':termo_id},
+           success: function(retorno) {
+              $(p_id).empty();
+              $(p_id).append('<option value="0" selected>Todos</option>');
+              $.each(retorno, function(i, item){
+                  $(p_id).append('<option value="'+item.pk+'">'+ item.valor+'</option>');
+              });
+           },
+           error: function(erro) {
+              alert('ajax_get_marcas_por_termo - Erro: Sem retorno de requisição.');
            }
        });
 }
