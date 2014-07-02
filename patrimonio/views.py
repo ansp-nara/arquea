@@ -178,9 +178,31 @@ def escolhe_equipamento(request):
     json = simplejson.dumps(retorno)
     return HttpResponse(json, mimetype="application/json")
 
+
+def ajax_get_marcas_por_termo(request):
+    """
+    Utilizado para montar dados de "Equipamentos" durante a tela de cadastro/modificação de patrimonio. 
+    """
+    retorno = []
+    
+    termo_id = request.GET.get('termo')
+
+
+    if termo_id != None and termo_id == 0:
+        patrimonios = Patrimonio.objects.filter(equipamento__entidade_fabricante__isnull=False).order_by('equipamento__entidade_fabricante__sigla').distinct('equipamento__entidade_fabricante__sigla')
+    else:
+        patrimonios = Patrimonio.objects.filter(pagamento__protocolo__termo_id=termo_id, equipamento__entidade_fabricante__isnull=False).order_by('equipamento__entidade_fabricante__sigla').distinct('equipamento__entidade_fabricante__sigla')
+    
+    retorno = [{'pk':p.equipamento.entidade_fabricante.pk, 'valor':p.equipamento.entidade_fabricante.__unicode__()} 
+           for p in patrimonios]
+    
+    json = simplejson.dumps(retorno)
+    return HttpResponse(json, mimetype="application/json")
+
+    
 def ajax_get_equipamento(request):
     """
-    Faz a de equipamento
+    Faz a busca de equipamentos
     Utilizado para montar dados de "Equipamentos" durante a tela de cadastro/modificação de patrimonio. 
     """
     
@@ -722,16 +744,28 @@ def filtra_pn_estado(request):
 
 @login_required
 def por_termo(request, pdf=0):
-    termo_id = request.GET.get('termo')
-    modalidade = request.GET.get('modalidade')
-    agilis = request.GET.get('agilis')
-    doado = request.GET.get('doado')
-    localizado = request.GET.get('localizado')
-    numero_fmusp = request.GET.get('numero_fmusp')
+    termo_id = request.GET.get('termo') or request.POST.get('termo') 
+    modalidade = request.GET.get('modalidade') or request.POST.get('modalidade')
+    agilis = request.GET.get('agilis') or request.POST.get('agilis')
+    doado = request.GET.get('doado') or request.POST.get('doado')
+    localizado = request.GET.get('localizado') or request.POST.get('localizado')
+    numero_fmusp = request.GET.get('numero_fmusp') or request.POST.get('numero_fmusp')
+    ver_numero_fmusp = request.GET.get('ver_numero_fmusp') or request.POST.get('ver_numero_fmusp')
+    marcas = request.GET.getlist('marca') or request.POST.getlist('marca')
+    
     template_name = 'por_termo'
+    
 
+    # Se não tiver Termo selecionado, volta para a tela de seleção de filtros.
+    filtro_patrimonios = Patrimonio.objects.filter(pagamento__protocolo__termo_id=termo_id, equipamento__entidade_fabricante__isnull=False) \
+                                            .only('equipamento__entidade_fabricante') \
+                                            .select_related('equipamento__entidade_fabricante') \
+                                            .order_by('equipamento__entidade_fabricante__sigla') \
+                                            .distinct('equipamento__entidade_fabricante__sigla')
+    filtro_marcas = [p.equipamento.entidade_fabricante for p in filtro_patrimonios]
+    filtro_termos = Termo.objects.all()
     if termo_id is None:
-        return TemplateResponse(request, 'patrimonio/escolhe_termo.html', {'termos':Termo.objects.all()})
+        return TemplateResponse(request, 'patrimonio/escolhe_termo.html', {'filtro_termos':filtro_termos, 'filtro_marcas':filtro_marcas})
 
     if termo_id != '0':
         qs = Termo.objects.filter(id=termo_id)
@@ -751,10 +785,10 @@ def por_termo(request, pdf=0):
         # Exclui a FUSSESP (id=1372)
         patrimonios = patrimonios.exclude(historicolocal__endereco__id=1372, historicolocal__estado__id=1)
     elif doado == '1':
-	patrimonios = patrimonios.filter(historicolocal__endereco__id=1372, historicolocal__estado__id=1)
+        patrimonios = patrimonios.filter(historicolocal__endereco__id=1372, historicolocal__estado__id=1)
 
     if localizado == '1':
-	patrimonios = patrimonios.exclude(historicolocal__endereco__complemento__icontains='Localizado')
+        patrimonios = patrimonios.exclude(historicolocal__endereco__complemento__icontains='Localizado')
     elif localizado == '0':
         patrimonios = patrimonios.filter(historicolocal__endereco__complemento__icontains='Localizado')
 
@@ -764,8 +798,19 @@ def por_termo(request, pdf=0):
         patrimonios = patrimonios.filter(pagamento__origem_fapesp__item_outorga__natureza_gasto__modalidade__sigla__in=['MCN', 'MCI'])
 
     if numero_fmusp == '1':
-	patrimonios = patrimonios.filter(numero_fmusp__isnull=False)
-        template_name = 'por_termo_fm'
+        patrimonios = patrimonios.filter(numero_fmusp__isnull=False)
+    elif numero_fmusp == '0':
+        patrimonios = patrimonios.filter(numero_fmusp__isnull=True)
+    
+    if marcas and len(marcas) > 0:
+        filter_marcas = []
+        for m in marcas:
+            if m and m != '0':
+                filter_marcas.append(m)
+        if len(filter_marcas) > 0:
+            patrimonios = patrimonios.filter(equipamento__entidade_fabricante__id__in=filter_marcas)
+
+    patrimonios = patrimonios.select_related('equipamento__entidade_fabricante', 'equipamento__tipo')
 
     for t in qs:
         termo = {'termo':t}
@@ -774,7 +819,7 @@ def por_termo(request, pdf=0):
         if numero_fmusp == '1':
             termo.update({'patrimonios':pat_termo.order_by('numero_fmusp', 'descricao', 'complemento')})
             termos.append(termo)
-            continue
+            #continue
 
         tipos = pat_termo.values_list('tipo', flat=True).order_by('tipo').distinct()
         for tipo in Tipo.objects.filter(id__in=tipos):
@@ -782,21 +827,40 @@ def por_termo(request, pdf=0):
             pgtos = []
             pt = pat_termo.filter(tipo=tipo)
             pagtos = pt.values_list('pagamento', flat=True).order_by('numero_fmusp').distinct()
-            for pg in Pagamento.objects.filter(id__in=pagtos):
+            for pg in Pagamento.objects.filter(id__in=pagtos).select_related('protocolo'):
                 pgto = {'pg': pg, 'patrimonios':pt.filter(pagamento=pg).order_by('numero_fmusp', 'descricao', 'complemento')}
                 pgtos.append(pgto)
             tp.update({'pagamentos':pgtos})
             tps.append(tp)
         termo.update({'tipos':tps})
         termos.append(termo)
+        
+
 
     if pdf:
-        vars = {'termos':termos, 'i':itertools.count(1), 'numero_fmusp':numero_fmusp}
+        vars = {'termos':termos, 
+                'i':itertools.count(1), 
+                'numero_fmusp':numero_fmusp, 
+                'ver_numero_fmusp':ver_numero_fmusp,}
         if termo_id !=0 and len(qs) > 0:
             vars.update({'t':qs[0]})
 	return render_to_pdf('patrimonio/%s.pdf' % template_name, vars, filename='invertario_por_termo.pdf')
     else:
-        return TemplateResponse(request, 'patrimonio/%s.html' % template_name, {'termos':termos, 'i':itertools.count(1), 't':qs[0], 'm':modalidade, 'a':agilis, 'd':doado, 'l':localizado, 'numero_fmusp':numero_fmusp})
+        
+        return TemplateResponse(request, 'patrimonio/%s.html' % template_name, {'termos':termos, 
+                                                                                'i':itertools.count(1), 
+                                                                                'termo':qs[0],
+                                                                                'modalidade':modalidade, 
+                                                                                'agilis':agilis, 
+                                                                                'doado':doado, 
+                                                                                'localizado':localizado,
+                                                                                'marca':marcas,
+                                                                                'numero_fmusp':numero_fmusp,
+                                                                                'ver_numero_fmusp':ver_numero_fmusp,
+                                                                                
+                                                                                'filtro_marcas':filtro_marcas,
+                                                                                'filtro_termos':filtro_termos, 
+                                                                                })
 
 @login_required
 def racks(request):

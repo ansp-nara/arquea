@@ -5,14 +5,14 @@
 <style>
 @import url('/var/www/media/css/pdf.css');
 
-
 @page {
   size:a4 landscape;
           background-image: url('/var/www/media/img/papel_timbrado_paisagem.jpg');
   top: 3.6cm;
-  left: 1.5cm;
-  right: 1.5cm;
+  left: 1.2cm;
+  right: 1.3cm;
   bottom: 2cm;
+  
   @frame footer {
                 -pdf-frame-content: footerContent;
                 bottom: 1cm;
@@ -21,27 +21,78 @@
                 left: -2.3cm;
                 }
 }
-</style>
-<style type="text/css">
+
 th {text-align: left;}
+td {font-size: 0.9em;}
+.th_numusp { width:1.5cm; }
+.th_nf { width:1.7cm; }
+/*.th_descricao { width:5cm; }*/
+.th_valor { width:1.7cm; }
+.th_marca { width:1.6cm; }
+.th_ns { width:4.7cm; }
+.th_estado { width:1.2cm; }
+.th_localizacao { width:5.5cm; }
+.th_posicao { width:1.0cm; }
+
 </style>
 </head>
 <body>
-<h1 repeat="1">Inventário por termo</h1>
-
-    <h4>Patrimôniodo termo de outorga {{ t }}</h4>
-
+    <h1 repeat="1">Inventário por termo</h1>
+    <h4>Patrimôniodo termo de outorga {{ termo }}</h4>
     <table border="0" repeat="1" cellpadding="5">
-    <tr><th>Patrimônio FMUSP</th><th width="8%">NF</th><th colspan="2"  >Descrição - complemento</th><th>Valor</th><th>Marca</th><th width="10%">NS</th><th>Estado</th><th width="30%">Localização</th><th>Posição</th></tr>
+    <tr>
+        {% if ver_numero_fmusp %}
+            <th class="th_numusp">Patr. Instit.</th>
+        {% endif %}
+        <th class="th_nf">NF</th>
+        <th colspan="2" class="th_descricao">Descrição - complemento</th>
+        <th class="th_valor">Valor</th>
+        <th class="th_marca">Marca</th>
+        <th class="th_ns">NS</th>
+        <th class="th_estado">Estado</th>
+        <th class="th_localizacao">Localização</th>
+        <th class="th_posicao">Posição</th>
+    </tr>
     {% for t in termos %}
         {% for tp in t.tipos %}
            {% for pg in tp.pagamentos %}
-              <tr><td></td><td>{{ pg.pg.protocolo.num_documento }}</td><td colspan="6"></td></tr>
+              <tr>
+                {% if ver_numero_fmusp %}
+                            <td></td>
+                        {% endif %}
+                <td>{{ pg.pg.protocolo.num_documento }}</td>
+                <td colspan="6"></td>
+              </tr>
               {% for p in pg.patrimonios %}
-                 <tr><td>{{ p.numero_fmusp|default_if_none:"" }}</td><td></td><td colspan="2">{% if p.equipamento %}[{{ p.equipamento.tipo }}] {% endif %}{{ p.descricao }} - {{ p.complemento|default:"" }}</td><td>{{ p.valor|moeda }}</td><td>{{ p.equipamento.entidade_fabricante.sigla }}</td><td>{{ p.ns }}</td><td>{{ p.historico_atual.estado }}</td><td>{{ p.historico_atual.endereco }}</td><td>{{ p.historico_atual.posicao|default_if_none:"" }}</td></tr>
+                 <tr>
+                    {% if ver_numero_fmusp %}
+                        <td>{{ p.numero_fmusp|default_if_none:"" }}</td>
+                    {% endif %}
+                    <td></td>
+                    <td colspan="2">{% if p.equipamento %}[{{ p.equipamento.tipo }}] {% endif %}{{ p.descricao }} - {{ p.complemento|default:"" }}</td>
+                    <td>{{ p.valor|moeda }}</td>
+                    <td>{{ p.equipamento.entidade_fabricante.sigla }}</td>
+                    <td>{{ p.ns }}</td>
+                    <td>{{ p.historico_atual.estado }}</td>
+                    <td>{{ p.historico_atual.endereco }}</td>
+                    <td>{{ p.historico_atual.posicao|default_if_none:"" }}</td>
+                 </tr>
                  {% if not numero_fmusp %}
                  {% for pf in p.contido.all %}
-                    <tr><td colspan="2"></td><td width="10px"></td><td width="30%">{% if pf.equipamento %}[{{ pf.equipamento.tipo }}] {% endif %}{{ pf.descricao }} - {{ pf.complemento|default:"" }}</td><td>{{ pf.valor }}</td><td>{{ pf.equipamento.entidade_fabricante.sigla }}</td><td>{{ pf.ns }}</td><td>{{ pf.historico_atual.estado }}</td><td>{{ pf.historico_atual.endereco }}</td><td>{{ pf.historico_atual.posicao|default_if_none:"" }}</td></tr>
+                    <tr>
+                        {% if ver_numero_fmusp %}
+                            <td></td>
+                        {% endif %}
+                        <td></td>
+                        <td width="10px"></td>
+                        <td width="30%">{% if pf.equipamento %}[{{ pf.equipamento.tipo }}] {% endif %}{{ pf.descricao }} - {{ pf.complemento|default:"" }}</td>
+                        <td>{{ pf.valor }}</td>
+                        <td>{{ pf.equipamento.entidade_fabricante.sigla }}</td>
+                        <td>{{ pf.ns }}</td>
+                        <td>{{ pf.historico_atual.estado }}</td>
+                        <td>{{ pf.historico_atual.endereco }}</td>
+                        <td>{{ pf.historico_atual.posicao|default_if_none:"" }}</td>
+                    </tr>
                  {% endfor %}
                  {% endif %}
               {% endfor %}

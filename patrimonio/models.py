@@ -210,7 +210,7 @@ class Patrimonio(models.Model):
 #         if not ht: return None
 #         return ht[0]
         ht = HistoricoLocal.objects.filter(patrimonio_id=self.id) \
-                                   .select_related('endereco', 'estado', 'memorando') \
+                                   .select_related('endereco__endereco__entidade', 'estado', 'memorando') \
                                    .order_by('-data', '-id')
         if not ht: return None
         return ht[0]
