@@ -508,6 +508,7 @@ def cheque(request, cc=1):
 	p = p[0]
 	pp = p.__unicode__()
 	name = pp.split('-')[-1]
+	name = name.split('ID')[0]
     else:
 	name = None
 
