@@ -22,3 +22,10 @@
 #box td {
 	padding-top:12px;
 	}
+
+.pp-cheque p {
+        text-align:right;
+        font-size:14px;
+        font-weight:bold;
+}
+

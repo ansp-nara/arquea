@@ -503,8 +503,16 @@ def cheque(request, cc=1):
     if not extrato.extrato_financeiro: raise Http404
     termo = extrato.extrato_financeiro.termo
 
+    p = extrato.pagamento_set.all()
+    if p.count() > 0:
+	p = p[0]
+	pp = p.__unicode__()
+	name = pp.split('-')[-1]
+    else:
+	name = None
+
     #return render_to_response('financeiro/cheque.pdf', {'cc':extrato, 'termo':termo})
-    return render_to_pdf('financeiro/cheque.pdf', {'cc':extrato, 'termo':termo}, filename='capa_%s.pdf' % extrato.cod_oper)
+    return render_to_pdf('financeiro/cheque.pdf', {'cc':extrato, 'termo':termo, 'pp':name}, filename='capa_%s.pdf' % extrato.cod_oper)
 
 
 @login_required
