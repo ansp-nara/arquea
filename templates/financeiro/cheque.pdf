@@ -19,6 +19,7 @@
   </style>
 </head>
 <body>
+  <div class="pp-cheque"><p>{{ pp }}</p></div>
   <img src="/var/www{% if cc.imagem %}{{ cc.imagem.url }}{% else %}/files/extratocc/cheque_branco.jpg{% endif %}">
 
   <div class="cheque">
