@@ -141,7 +141,7 @@ class ExtratoCCAdminForm(forms.ModelForm):
         Verificando a extensão do arquivo de imagem. Pode conter somente JPEG.
         """
         imagem = self.cleaned_data.get('imagem', False)
-        if imagem:
+        if imagem and imagem.name:
             imagem_split = imagem.name.split('.')
             
             extensao = ''
@@ -149,9 +149,7 @@ class ExtratoCCAdminForm(forms.ModelForm):
                 extensao = imagem_split[-1]
             
             if not (extensao.lower() in ['jpeg', 'jpg']):
-                raise forms.ValidationError(_('Somente utilizar imagens JPEG.'))
-        else:
-            raise ValidationError(_("Não foi possível verificar a imagem."))
+                raise forms.ValidationError(_(u'Somente utilizar imagens JPEG.'))
 
         return imagem
 
