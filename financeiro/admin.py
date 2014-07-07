@@ -33,7 +33,7 @@ class PagamentoInline(admin.TabularInline):
     form = PagamentoAdminForm
 
 class AuditoriaInline(admin.TabularInline):
-    form = AuditoriaAdminForm
+    form = PagamentoAuditoriaAdminInlineForm
     model = Auditoria
     choices = 1
 
