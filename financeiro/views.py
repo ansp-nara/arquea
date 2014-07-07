@@ -10,7 +10,8 @@ from django.db.models import Sum
 from django.template import Context, loader, RequestContext
 from decimal import Decimal
 import json as simplejson
-from datetime import datetime
+from datetime import datetime as dtime
+from datetime import date
 import logging
 
 from outorga.models import Modalidade, Outorga, Item, Termo, OrigemFapesp, Natureza_gasto, Acordo
@@ -184,7 +185,7 @@ def pagamentos_mensais(request, pdf=False):
                 return render_to_response('financeiro/pagamentos.html', {'pagamentos':dados['pg'], 'ano':ano, 'mes':mes, 'total':formata_moeda(dados['total']['valor_fapesp__sum'], ','), 'pm':dados['pm']}, context_instance=RequestContext(request))
         else:
             meses = range(1,13)
-            anos = range(1990,datetime.now().year+1)
+            anos = range(1990,dtime.now().year+1)
             anos.sort(reverse=True)
             return render_to_response('financeiro/pagamentos_mes.html', {'meses':meses, 'anos':anos}, context_instance=RequestContext(request))
 
@@ -237,10 +238,10 @@ def relatorio_gerencial(request, pdf=False):
             ultimo = ultimo['ultimo']
             
             while ano < afinal or (ano <= afinal and mes <= mfinal):
-                dt = datetime.date(ano,mes,1)
+                dt = date(ano,mes,1)
                 meses.append(dt.strftime('%B de %Y').decode('latin1'))
                 if ano == afinal and mes == mfinal:
-                    dt2 = datetime.date(ano+5,mes,1)
+                    dt2 = date(ano+5,mes,1)
                     total_real = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__termo=t,origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional=True, conta_corrente__data_oper__range=(dt,dt2)).aggregate(Sum('valor_fapesp'))
                     total_dolar = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__termo=t,origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional=False, protocolo__data_vencimento__range=(dt,dt2)).aggregate(Sum('valor_fapesp'))
                 else:
@@ -292,17 +293,17 @@ def relatorio_gerencial(request, pdf=False):
                     total += sumFapesp['valor_fapesp__sum'] or Decimal('0.0')
            
                     try:
-                        dt = datetime.date(ano,mes+1,1)
+                        dt = date(ano,mes+1,1)
                     except:
-                        dt = datetime.date(ano+1, 1,1)
-                    dt2 = datetime.date(ano+5,1,1)
+                        dt = date(ano+1, 1,1)
+                    dt2 = date(ano+5,1,1)
                     if ano == afinal and mes == mfinal:
                         if ng.modalidade.moeda_nacional:
                             sumFapesp = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto=ng, conta_corrente__data_oper__range=(dt,dt2)).aggregate(Sum('valor_fapesp'))
                         else:
                             sumFapesp = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto=ng, protocolo__data_vencimento__range=(dt,dt2)).aggregate(Sum('valor_fapesp'))
                         total += sumFapesp['valor_fapesp__sum'] or Decimal('0.0')
-                    dt = datetime.date(ano,mes,1)
+                    dt = date(ano,mes,1)
                     item['meses'].append({'ord':dt.strftime('%Y%m'), 'data':dt.strftime('%B de %Y'),'valor':total})
                     for it in item['itens'].keys():
                         after = False
@@ -400,7 +401,7 @@ def extrato(request, pdf=False):
             else:
                 return render_to_response('financeiro/contacorrente.html', {'ano':ano, 'extrato':retorno}, context_instance=RequestContext(request))
         else:
-            anos = range(1990,datetime.now().year+1)
+            anos = range(1990,dtime.now().year+1)
             anos.sort(reverse=True)
             return render_to_response('financeiro/sel_contacorrente.html', {'anos':anos}, context_instance=RequestContext(request))	    
 
@@ -429,12 +430,12 @@ def extrato_mes(request, pdf=False):
                 return render_to_response('financeiro/contacorrente_mes.html', {'ano':ano, 'mes':mes, 'extrato':retorno}, context_instance=RequestContext(request))
         else:
             meses = range(1,13)
-            anos = range(1990,datetime.now().year+1)
+            anos = range(1990,dtime.now().year+1)
             anos.sort(reverse=True)
             return render_to_response('financeiro/sel_contacorrente_mes.html', {'anos':anos, 'meses':meses}, context_instance=RequestContext(request))	    
 
 @login_required
-def extrato_financeiro(request, ano=datetime.now().year, pdf=False):
+def extrato_financeiro(request, ano=dtime.now().year, pdf=False):
 
     if request.method == 'GET':
         if request.GET.get('termo'):
@@ -491,7 +492,7 @@ def extrato_tarifas(request, pdf=False):
                 return render_to_response('financeiro/tarifas.html', context, context_instance=RequestContext(request))
         else:
             meses = range(0,13)
-            anos = range(1990,datetime.now().year+1)
+            anos = range(1990,dtime.now().year+1)
             anos.sort(reverse=True)
             return render_to_response('financeiro/pagamentos_mes.html', {'anos':anos, 'meses':meses}, context_instance=RequestContext(request))
 
@@ -556,7 +557,7 @@ def financeiro_parciais(request, pdf=False):
                 pagamentos = liberado+devolvido+estornado
                 concessoes = concedido+suplementado+anulado+cancelado
                 diferenca_total = Decimal('0.0')
-                anterior = datetime.date(1971,1,1)
+                anterior = date(1971,1,1)
                 tdia = Decimal('0.0')
                 exi = {}
                 for ef in ExtratoFinanceiro.objects.filter(termo=termo, cod__endswith=codigo, parcial=parcial).prefetch_related('extratocc_set').order_by('data_libera', '-historico'):
