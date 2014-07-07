@@ -1033,9 +1033,14 @@ function ajax_filter_patrimonio(num_doc)
        });
 }
 
+/**
+ * Ajax utilizado no preenchimento no formulário de Pagamento, formulário inline de Auditoria, campos Parcial e Pagina
+ * Não dispara se não houver o valor de origem, e se na Auditoria os campos de Estado e Tipo não estiverem sido preenchidos.
+ * @param origem Valor do campo Origem Fapesp
+ */
 function ajax_prox_audit(origem)
 {
-      if (!$("#id_auditoria_set-0-pagina").val()){
+    if (origem != "" && ($("#id_auditoria_set-0-estado").val() || $("#id_auditoria_set-0-tipo").val()) && !$("#id_auditoria_set-0-pagina").val()){
        $.ajax({
           type: "POST",
           url: "/financeiro/parcial_pagina_termo",
@@ -1049,7 +1054,10 @@ function ajax_prox_audit(origem)
             alert('ajax_prox_audit Erro: Sem retorno da requisição.');
           }
        });
-      }
+    } else {
+        $("#id_auditoria_set-0-parcial").val('');
+        $("#id_auditoria_set-0-pagina").val('');
+    }
 }
 
 function ajax_nova_pagina(parcial)

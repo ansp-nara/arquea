@@ -10,7 +10,7 @@ from django.db.models import Sum
 from django.template import Context, loader, RequestContext
 from decimal import Decimal
 import json as simplejson
-import datetime
+from datetime import datetime
 import logging
 
 from outorga.models import Modalidade, Outorga, Item, Termo, OrigemFapesp, Natureza_gasto, Acordo
@@ -184,7 +184,7 @@ def pagamentos_mensais(request, pdf=False):
                 return render_to_response('financeiro/pagamentos.html', {'pagamentos':dados['pg'], 'ano':ano, 'mes':mes, 'total':formata_moeda(dados['total']['valor_fapesp__sum'], ','), 'pm':dados['pm']}, context_instance=RequestContext(request))
         else:
             meses = range(1,13)
-            anos = range(1990,datetime.datetime.now().year+1)
+            anos = range(1990,datetime.now().year+1)
             anos.sort(reverse=True)
             return render_to_response('financeiro/pagamentos_mes.html', {'meses':meses, 'anos':anos}, context_instance=RequestContext(request))
 
@@ -400,7 +400,7 @@ def extrato(request, pdf=False):
             else:
                 return render_to_response('financeiro/contacorrente.html', {'ano':ano, 'extrato':retorno}, context_instance=RequestContext(request))
         else:
-            anos = range(1990,datetime.datetime.now().year+1)
+            anos = range(1990,datetime.now().year+1)
             anos.sort(reverse=True)
             return render_to_response('financeiro/sel_contacorrente.html', {'anos':anos}, context_instance=RequestContext(request))	    
 
@@ -429,12 +429,12 @@ def extrato_mes(request, pdf=False):
                 return render_to_response('financeiro/contacorrente_mes.html', {'ano':ano, 'mes':mes, 'extrato':retorno}, context_instance=RequestContext(request))
         else:
             meses = range(1,13)
-            anos = range(1990,datetime.datetime.now().year+1)
+            anos = range(1990,datetime.now().year+1)
             anos.sort(reverse=True)
             return render_to_response('financeiro/sel_contacorrente_mes.html', {'anos':anos, 'meses':meses}, context_instance=RequestContext(request))	    
 
 @login_required
-def extrato_financeiro(request, ano=datetime.datetime.now().year, pdf=False):
+def extrato_financeiro(request, ano=datetime.now().year, pdf=False):
 
     if request.method == 'GET':
         if request.GET.get('termo'):
@@ -491,7 +491,7 @@ def extrato_tarifas(request, pdf=False):
                 return render_to_response('financeiro/tarifas.html', context, context_instance=RequestContext(request))
         else:
             meses = range(0,13)
-            anos = range(1990,datetime.datetime.now().year+1)
+            anos = range(1990,datetime.now().year+1)
             anos.sort(reverse=True)
             return render_to_response('financeiro/pagamentos_mes.html', {'anos':anos, 'meses':meses}, context_instance=RequestContext(request))
 

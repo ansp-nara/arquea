@@ -14,7 +14,7 @@ from outorga.models import Termo, OrigemFapesp
 from protocolo.models import Protocolo
 from memorando.models import Pergunta
 from rede.models import PlanejaAquisicaoRecurso, Recurso
-from financeiro.models import ExtratoPatrocinio
+from financeiro.models import ExtratoPatrocinio, Estado, TipoComprovante
 
 
 class RecursoInlineAdminForm(forms.ModelForm):
@@ -111,18 +111,21 @@ class PagamentoAdminForm(forms.ModelForm):
                                        label=mark_safe('<a href="#" onclick="window.open(\'/admin/financeiro/extratocc/\'+$(\'#id_conta_corrente\').val() + \'/\', \'_blank\');return true;">Conta corrente</a>'),)
     # tornando clicável o label do campo protocolo
     protocolo = forms.ModelChoiceField(queryset=Protocolo.objects.all(), 
-                                       required=False, 
                                        label=mark_safe('<a href="#" onclick="window.open(\'/admin/protocolo/protocolo/\'+$(\'#id_protocolo\').val() + \'/\', \'_blank\');return true;">Protocolo</a>'),)
 
-
     def clean(self):
+        cleaned_data = super(PagamentoAdminForm, self).clean()
+        
+        if any(self.errors):
+            return self.cleaned_data
+
         valor = self.cleaned_data.get('valor_fapesp')
         origem = self.cleaned_data.get('origem_fapesp')
 
-	if valor and not origem:
-	    raise forms.ValidationError(u'Valor da FAPESP obriga a ter uma origem da FAPESP')
+        if valor and not origem:
+            raise forms.ValidationError(u'Valor da FAPESP obriga a ter uma origem da FAPESP')
 
-    	return self.cleaned_data
+        return self.cleaned_data
 
 
 class ExtratoCCAdminForm(forms.ModelForm):
@@ -180,6 +183,30 @@ class AuditoriaAdminForm(forms.ModelForm):
         
         self.fields['pagamento'].widget = RelatedFieldWidgetWrapper(self.fields['pagamento'].widget, rel, self.admin_site)
 
+
+            
+    class Meta:
+        model = Auditoria
+
+
+class PagamentoAuditoriaAdminInlineForm(forms.ModelForm):
+    """
+    Form de Auditoria utilizado como inline dentro do form do Pagamento
+    """
+    estado = forms.ModelChoiceField(Estado.objects.all(), 
+                                    label=u'Estado', 
+                                    widget=forms.Select(attrs={'onchange': 'ajax_prox_audit($("#id_origem_fapesp").val());'}))
+    
+    tipo = forms.ModelChoiceField(TipoComprovante.objects.all(), 
+                                    label=u'Tipo', 
+                                    widget=forms.Select(attrs={'onchange': 'ajax_prox_audit($("#id_origem_fapesp").val());'}))
+
+    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
+                 initial=None, error_class=ErrorList, label_suffix=':',
+                 empty_permitted=False, instance=None, widget=None, label=None, help_text=None):
+        
+        super(PagamentoAuditoriaAdminInlineForm, self).__init__(data, files, auto_id, prefix, initial,
+                                            error_class, label_suffix, empty_permitted, instance)
 
             
     class Meta:
