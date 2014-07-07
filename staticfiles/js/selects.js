@@ -1040,20 +1040,22 @@ function ajax_filter_patrimonio(num_doc)
  */
 function ajax_prox_audit(origem)
 {
-    if (origem != "" && ($("#id_auditoria_set-0-estado").val() || $("#id_auditoria_set-0-tipo").val()) && !$("#id_auditoria_set-0-pagina").val()){
-       $.ajax({
-          type: "POST",
-          url: "/financeiro/parcial_pagina_termo",
-          dataType: "json",
-          data: {'orig_id':origem},
-          success: function(retorno) {
-              $("#id_auditoria_set-0-parcial").val(retorno['parcial']);
-              $("#id_auditoria_set-0-pagina").val(retorno['pagina']);
-          },
-          error: function(erro) {
-            alert('ajax_prox_audit Erro: Sem retorno da requisição.');
-          }
-       });
+    if (origem != "" && ($("#id_auditoria_set-0-estado").val() || $("#id_auditoria_set-0-tipo").val())){
+    	if (!$("#id_auditoria_set-0-pagina").val()) {
+	       $.ajax({
+	          type: "POST",
+	          url: "/financeiro/parcial_pagina_termo",
+	          dataType: "json",
+	          data: {'orig_id':origem},
+	          success: function(retorno) {
+	              $("#id_auditoria_set-0-parcial").val(retorno['parcial']);
+	              $("#id_auditoria_set-0-pagina").val(retorno['pagina']);
+	          },
+	          error: function(erro) {
+	            alert('ajax_prox_audit Erro: Sem retorno da requisição.');
+	          }
+	       });
+    	}
     } else {
         $("#id_auditoria_set-0-parcial").val('');
         $("#id_auditoria_set-0-pagina").val('');
