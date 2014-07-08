@@ -80,12 +80,15 @@ class PagamentoAdminForm(forms.ModelForm):
                 self.fields['origem_fapesp'].queryset = OrigemFapesp.objects.filter(item_outorga__natureza_gasto__termo=t).select_related('acordo', 'item_outorga', 'item_outorga__natureza_gasto', 'item_outorga__natureza_gasto__termo').order_by('acordo__descricao', 'item_outorga__descricao')
             except:
                 pass
-        
-	    
         else:
             self.fields['protocolo'].queryset = Protocolo.objects.filter(id__lte=0).select_related('tipo_documento')
             self.fields['origem_fapesp'].queryset = OrigemFapesp.objects.filter(id__lte=0).select_related('acordo', 'item_outorga')
-            #self.fields['conta_corrente'].queryset = ExtratoCC.objects.filter(id__lte=0)
+            
+        # mensagens de erro
+        self.fields['protocolo'].error_messages['required'] = u'O campo PROTOCOLO é obrigatório'
+        self.fields['valor_fapesp'].error_messages['required'] = u'O campo VALOR ORIGINÁRIO DA FAPESP é obrigatório'
+        self.fields['valor_patrocinio'].error_messages['required'] = u'O campo VALOR ORIGINÁRIO DE PATROCÍNI é obrigatório'
+
 
     class Meta:
         model = Pagamento
@@ -123,15 +126,72 @@ class PagamentoAdminForm(forms.ModelForm):
         origem = self.cleaned_data.get('origem_fapesp')
 
         if valor and not origem:
-            raise forms.ValidationError(u'Valor da FAPESP obriga a ter uma origem da FAPESP')
+            #raise forms.ValidationError()
+            self._errors["origem_fapesp"] = self.error_class([ u'Valor da FAPESP obriga a ter uma origem da FAPESP'])
+            del cleaned_data["origem_fapesp"]
 
         return self.cleaned_data
 
+
+class ExtratoFinanceiroAdminForm(forms.ModelForm):
+
+    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
+                 initial=None, error_class=ErrorList, label_suffix=':',
+                 empty_permitted=False, instance=None):
+    
+        super(ExtratoFinanceiroAdminForm, self).__init__(data, files, auto_id, prefix, initial,
+                                            error_class, label_suffix, empty_permitted, instance)
+
+        # mensagens de erro
+        self.fields['termo'].error_messages['required'] = u'O campo TERMO DE OUTORGA é obrigatório'
+        self.fields['data_libera'].error_messages['required'] = u'O campo DATA é obrigatório'
+        self.fields['cod'].error_messages['required'] = u'O campo CODIGO é obrigatório'
+        self.fields['valor'].error_messages['required'] = u'O campo VALOR é obrigatório'
+
+
+    class Meta:
+        model = ExtratoFinanceiro
+
+
+class ExtratoPatrocinioAdminForm(forms.ModelForm):
+
+    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
+                 initial=None, error_class=ErrorList, label_suffix=':',
+                 empty_permitted=False, instance=None):
+    
+        super(ExtratoPatrocinioAdminForm, self).__init__(data, files, auto_id, prefix, initial,
+                                            error_class, label_suffix, empty_permitted, instance)
+
+        # mensagens de erro
+        self.fields['localiza'].error_messages['required'] = u'O campo LOCALIZAÇÃO DO PATROCÍONIO é obrigatório'
+        self.fields['data_oper'].error_messages['required'] = u'O campo DATA DA OPERAÇÃO é obrigatório'
+        self.fields['cod_oper'].error_messages['required'] = u'O campo CÓDIGO DA OPERAÇÃO é obrigatório'
+        self.fields['valor'].error_messages['required'] = u'O campo VALOR é obrigatório'
+        self.fields['historico'].error_messages['required'] = u'O campo HISTÓRICO é obrigatório'
+        self.fields['obs'].error_messages['required'] = u'O campo OBS é obrigatório'
+
+
+    class Meta:
+        model = ExtratoPatrocinio
 
 class ExtratoCCAdminForm(forms.ModelForm):
 
     termo = forms.ModelChoiceField(Termo.objects.all(), label=_(u'Termo'), required=False,
                   widget=forms.Select(attrs={'onchange': 'ajax_filter_financeiro(this.value);'}))
+
+    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
+                 initial=None, error_class=ErrorList, label_suffix=':',
+                 empty_permitted=False, instance=None):
+    
+        super(ExtratoCCAdminForm, self).__init__(data, files, auto_id, prefix, initial,
+                                            error_class, label_suffix, empty_permitted, instance)
+
+        # mensagens de erro
+        self.fields['data_oper'].error_messages['required'] = u'O campo DATA DA OPERAÇÃO é obrigatório'
+        self.fields['cod_oper'].error_messages['required'] = u'O campo DOCUMENTO é obrigatório'
+        self.fields['historico'].error_messages['required'] = u'O campo HISTORICO é obrigatório'
+        self.fields['valor'].error_messages['required'] = u'O campo VALOR é obrigatório'
+
 
     class Meta:
     	model = ExtratoCC
@@ -162,7 +222,6 @@ class AuditoriaAdminForm(forms.ModelForm):
 
     parcial = forms.IntegerField(label=u'Parcial', widget=forms.TextInput(attrs={'onchange': 'ajax_nova_pagina(this);'}))
     pagamento = AuditoriaPagamentoChoiceField(queryset=Pagamento.objects.all().select_related('protocolo', 'origem_fapesp__item_outorga__natureza_gasto', 'origem_fapesp__item_outorga__natureza_gasto__modalidade'),
-                                                 required=False, 
                                                  label=mark_safe('<a href="#" onclick="window.open(\'/financeiro/pagamento/\'+$(\'#id_pagamento\').val() + \'/\', \'_blank\');return true;">Pagamento</a>'),)
 
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
@@ -180,9 +239,14 @@ class AuditoriaAdminForm(forms.ModelForm):
             rel = ManyToOneRel(Pagamento, 'id')
         
         self.fields['pagamento'].widget = RelatedFieldWidgetWrapper(self.fields['pagamento'].widget, rel, self.admin_site)
+        
+        # mensagens de erro
+        self.fields['pagamento'].error_messages['required'] = u'O campo PAGAMENTO é obrigatório'
+        self.fields['estado'].error_messages['required'] = u'O campo ESTADO é obrigatório'
+        self.fields['tipo'].error_messages['required'] = u'O campo TIPO é obrigatório'
+        self.fields['parcial'].error_messages['required'] = u'O campo PARCIAL é obrigatório'
+        self.fields['pagina'].error_messages['required'] = u'O campo PAGINA é obrigatório'
 
-
-            
     class Meta:
         model = Auditoria
 

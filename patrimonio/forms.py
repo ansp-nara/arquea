@@ -257,15 +257,12 @@ class PatrimonioAdminForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super(PatrimonioAdminForm, self).clean()
-        # Retorna erro para erros de sistemas não tratados
-        if any(self.errors):
-            raise forms.ValidationError(u'Erro sistema %s'%self.errors)
         
-        if not cleaned_data.get("equipamento"):
-            # Verifica se há equipamento selecionado para o patrimonio
-            raise forms.ValidationError(u'Patrimônio deve ter um equipamento associado.')
+        equipamento = self.cleaned_data.get('equipamento')
+        if not equipamento:
+            self._errors["equipamento"] = self.error_class([u'Patrimônio deve ter um equipamento associado.'])
+            del cleaned_data["equipamento"]
 
-        
         return cleaned_data
 
 
@@ -310,13 +307,14 @@ class HistoricoLocalAdminForm(forms.ModelForm):
         super(HistoricoLocalAdminForm, self).__init__(data, files, auto_id, prefix, initial,
                                             error_class, label_suffix, empty_permitted, instance)
 
-        end= None
-        end = EnderecoDetalhe.objects.filter(id=instance.endereco.id)
-
-        if not end:
-            end = EnderecoDetalhe.objects.filter(id__lte=0)
-
-        self.fields['endereco'].choices = [(e.id, e.__unicode__()) for e in end]
+        if instance and instance.endereco:
+            end= None
+            end = EnderecoDetalhe.objects.filter(id=instance.endereco.id)
+    
+            if not end:
+                end = EnderecoDetalhe.objects.filter(id__lte=0)
+    
+            self.fields['endereco'].choices = [(e.id, e.__unicode__()) for e in end]
 
 
 class PatrimonioHistoricoLocalAdminForm(forms.ModelForm):

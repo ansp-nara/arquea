@@ -74,7 +74,6 @@ logger = logging.getLogger(__name__)
 
 
 class CotacaoAdminForm(forms.ModelForm):
-
     """
     Uma instância dessa classe faz algumas definições para a tela de cadastramento do modelo 'Contacao'.
 
@@ -86,19 +85,14 @@ class CotacaoAdminForm(forms.ModelForm):
                       'entidade' para filtrar o campo 'identificacao'.
     A 'class Meta' define o modelo que será utilizado.
     """
-
-
     termo = forms.ModelChoiceField(Termo.objects.all(),  
             widget=forms.Select(attrs={'onchange': 'filter_select("id_protocolo", "id_termo");'}))
-
 
     entidade = forms.ModelChoiceField(Entidade.objects.all(), required=False,
             widget=forms.Select(attrs={'onchange': 'filter_select("id_identificacao", "id_entidade");'}))
 
-
     class Meta:
         model = Cotacao
-
 
     class Media:
         js = ('/media/js/selects.js', '/media/js/protocolo.js')
@@ -111,7 +105,6 @@ class CotacaoAdminForm(forms.ModelForm):
 
         super(CotacaoAdminForm, self).__init__(data, files, auto_id, prefix, initial,
                                             error_class, label_suffix, empty_permitted, instance)
-
 
         # Gera uma lista com os tipos de documento diferentes de 'Cotação', 'Contrato' e 'Ordem de Serviço'
         nomes = []
@@ -135,7 +128,6 @@ class CotacaoAdminForm(forms.ModelForm):
 
 
 class ProtocoloAdminForm(forms.ModelForm):
-
     """
     Uma instância dessa classe faz algumas definições/limitações para a tela de cadastramento do modelo 'Protocolo'.
 
@@ -144,8 +136,6 @@ class ProtocoloAdminForm(forms.ModelForm):
     Cria o campo 'entidade' para filtrar o campo 'identificacao'.
     A 'class Meta' define o modelo que será utilizado.
     """
-
-
 #    entidade = forms.ModelChoiceField(Entidade.objects.all(), required=False,
 #            widget=forms.Select(attrs={'onchange': 'filter_select("id_identificacao", "id_entidade");'}))
 
@@ -154,7 +144,6 @@ class ProtocoloAdminForm(forms.ModelForm):
 
     class Meta:
         model = Protocolo
-
 
     class Media:
         js = ('/media/js/selects.js', '/media/js/protocolo.js',)
@@ -196,7 +185,6 @@ class ProtocoloAdminForm(forms.ModelForm):
         super(ProtocoloAdminForm, self).__init__(data, files, auto_id, prefix, initial,
                                             error_class, label_suffix, empty_permitted, instance)
 
-
         # Gera uma lista com os tipos de documento diferentes de 'Contrato' e 'Ordem de Serviço'
         nomes = []
         tipo = TipoDocumento.objects.all()
@@ -219,24 +207,25 @@ class ItemAdminForm(forms.ModelForm):
 class FeriadoAdminForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super(FeriadoAdminForm, self).clean()
-        
-        feriado = self.cleaned_data.get('feriado')
-        
-        tipo = self.cleaned_data.get('tipo')
-        
-        # Verifica se um feriado fixo ocorre na data especificada do tipo de feriado
-        if not tipo.movel and (tipo.dia != feriado.day or tipo.mes != feriado.month):
-            raise forms.ValidationError(u"Feriado fixo deve ser no mesmo dia/mês especificado no tipo do feriado. Este feriado ocorre no dia %s/%s" % (tipo.dia, tipo.mes))
 
-	fid = self.cleaned_data.get('id')
+        feriado = self.cleaned_data.get('feriado')
+
+        tipo = self.cleaned_data.get('tipo')
+
+        # Verifica se um feriado fixo ocorre na data especificada do tipo de feriado
+        if tipo and not tipo.movel and (tipo.dia != feriado.day or tipo.mes != feriado.month):
+            self._errors["tipo"] = self.error_class([u"Feriado fixo deve ser no mesmo dia/mês especificado no tipo do feriado. Este feriado ocorre no dia %s/%s" % (tipo.dia, tipo.mes)])
+            del cleaned_data["tipo"]
+
+        fid = self.cleaned_data.get('id')
         # Verifica se já há uma data de feriado cadastrada no mesmo dia
         f = Feriado.objects.filter(feriado=feriado)
         if f.count() > 0 and fid and f.id != fid:
             raise forms.ValidationError(u"O feriado nesta data já existe.")
-        
+
         return self.cleaned_data
-    
-    
+
+
 class TipoFeriadoAdminForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super(TipoFeriadoAdminForm, self).clean()
@@ -245,8 +234,13 @@ class TipoFeriadoAdminForm(forms.ModelForm):
         mes = self.cleaned_data.get('mes')
         
         # Verifica se um feriado fixo ocorre na data especificada do tipo de feriado
-        if not movel and (not dia or not mes):
-            raise forms.ValidationError(u"Feriado fixo deve ter o dia/mês especificado")
+        if not movel:
+            if not dia:
+                self._errors["dia"] = self.error_class([u"Feriado fixo deve ter o dia especificado"])
+                del cleaned_data["dia"]
+            if not mes:
+                self._errors["mes"] = self.error_class([u"Feriado fixo deve ter o mês especificado"])
+                del cleaned_data["mes"]
 
         return self.cleaned_data
 

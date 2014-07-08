@@ -109,3 +109,76 @@ class OrigemFapespAdminForm(forms.ModelForm):
     # Define os arquivos .js que serão utilizados.
     class Media:
         js = ('/site-media/js/selects.js', )
+
+
+
+class ContratoAdminForm(forms.ModelForm):
+
+    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
+                 initial=None, error_class=ErrorList, label_suffix=':',
+                 empty_permitted=False, instance=None):
+
+        super(ContratoAdminForm, self).__init__(data, files, auto_id, prefix, initial,
+                                            error_class, label_suffix, empty_permitted, instance)
+
+        # mensagens de erro
+        self.fields['numero'].error_messages['required'] = u'O campo NUMERO é obrigatório'
+        self.fields['data_inicio'].error_messages['required'] = u'O campo INÍCIO é obrigatório'
+        self.fields['entidade'].error_messages['required'] = u'O campo ENTIDADE é obrigatório'
+        self.fields['arquivo'].error_messages['required'] = u'O campo ARQUIVO é obrigatório'
+        
+
+
+class OutorgaAdminForm(forms.ModelForm):
+
+    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
+                 initial=None, error_class=ErrorList, label_suffix=':',
+                 empty_permitted=False, instance=None):
+
+        super(OutorgaAdminForm, self).__init__(data, files, auto_id, prefix, initial,
+                                            error_class, label_suffix, empty_permitted, instance)
+
+        # mensagens de erro
+        self.fields['categoria'].error_messages['required'] = u'O campo CATEGORIA é obrigatório'
+        self.fields['termo'].error_messages['required'] = u'O campo TERMO é obrigatório'
+        self.fields['termino'].error_messages['required'] = u'O campo TÉRMINO é obrigatório'
+        self.fields['data_solicitacao'].error_messages['required'] = u'O campo SOLICITAÇÃO é obrigatório'
+
+
+class ModalidadeAdminForm(forms.ModelForm):
+
+    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
+                 initial=None, error_class=ErrorList, label_suffix=':',
+                 empty_permitted=False, instance=None):
+
+        super(ModalidadeAdminForm, self).__init__(data, files, auto_id, prefix, initial,
+                                            error_class, label_suffix, empty_permitted, instance)
+
+    def clean(self):
+        cleaned_data = super(ModalidadeAdminForm, self).clean()
+        
+        if any(self.errors):
+            return self.cleaned_data
+
+        sigla = self.cleaned_data.get('sigla')
+        if not sigla:
+            self._errors["sigla"] = self.error_class([ u'Sigla não pode ser vazia'])
+            del cleaned_data["sigla"]
+
+        return self.cleaned_data
+
+
+class TermoAdminForm(forms.ModelForm):
+
+    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
+                 initial=None, error_class=ErrorList, label_suffix=':',
+                 empty_permitted=False, instance=None):
+
+        super(TermoAdminForm, self).__init__(data, files, auto_id, prefix, initial,
+                                            error_class, label_suffix, empty_permitted, instance)
+
+        # mensagens de erro
+        self.fields['estado'].error_messages['required'] = u'O campo ESTADO é obrigatório'
+
+
+#     estado = models.ForeignKey('outorga.Estado', verbose_name=_(u'Estado'))

@@ -180,6 +180,8 @@ class ModalidadeAdmin(admin.ModelAdmin):
     search_fields = ('sigla', 'nome')
 
     list_per_page = 10
+    
+    form = ModalidadeAdminForm
 
 admin.site.register(Modalidade, ModalidadeAdmin)
 
@@ -208,6 +210,8 @@ class TermoAdmin(admin.ModelAdmin):
     search_fields = ('ano', 'processo', 'inicio')
 
     list_per_page = 10
+    
+    form = TermoAdminForm
 
 admin.site.register(Termo, TermoAdmin)
 
@@ -245,6 +249,8 @@ class OutorgaAdmin(admin.ModelAdmin):
     list_filter = ('termo', )
 
     list_per_page = 10
+    
+    form = OutorgaAdminForm
 
 admin.site.register(Outorga, OutorgaAdmin)
 
@@ -367,6 +373,8 @@ class ContratoAdmin(admin.ModelAdmin):
     inlines = (OrdemDeServicoInline, )
 
     list_per_page = 10
+    
+    form = ContratoAdminForm
 
 admin.site.register(Contrato,ContratoAdmin)
 

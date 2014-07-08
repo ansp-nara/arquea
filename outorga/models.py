@@ -58,7 +58,6 @@ class Modalidade(models.Model):
                             modalidades = modalidades.exclude(pk=m.id)
         return modalidades
 
-
     # Define ordenação dos dados pela sigla.
     class Meta:
         ordering = ('sigla', )
@@ -73,13 +72,11 @@ class Estado(models.Model):
     A class 'Meta'		Define a ordenação dos dados pelo nome.
     """
 
-    nome = models.CharField(_(u'Nome'), max_length=30, blank=True, help_text=_(u'ex. Vigente'), unique=True)
-
+    nome = models.CharField(_(u'Nome'), max_length=30, help_text=_(u'ex. Vigente'), unique=True)
 
     # Retorna o nome.
     def __unicode__(self):
         return u'%s' % self.nome
-
 
     # Define ordena dos dados pelo nome.
     class Meta:

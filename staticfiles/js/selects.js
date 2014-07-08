@@ -1159,7 +1159,7 @@ function ajax_patrimonio_historico(patr_id)
  */
 function ajax_patr_form_get_equipamento(id_equipamento)
 {
-       p_id = "#id_equipamento";
+    if (id_equipamento != '') {
        $.ajax({
            type: "POST",
            url: "/patrimonio/ajax_get_equipamento",
@@ -1174,6 +1174,11 @@ function ajax_patr_form_get_equipamento(id_equipamento)
               alert('ajax_patr_form_get_equipamento Erro: Sem retorno de requisição.');
            }
        });
+    } else {
+    	$('#id_modelo').html('');
+    	$('#id_part_number').text('');
+    	$('#id_ean').text('');
+    }
 }
 
 /**
