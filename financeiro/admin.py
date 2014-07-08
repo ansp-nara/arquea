@@ -68,7 +68,7 @@ class ExtratoFinanceiroAdmin(admin.ModelAdmin):
     list_display = ('termo', 'data_libera', 'cod', 'historico', 'valor')
     list_filter = ('termo',)
     search_fields = ('historico',)
-    
+    form = ExtratoFinanceiroAdminForm
     
 class PagamentoAdmin(PrintModelAdmin):
     
@@ -110,7 +110,8 @@ class ExtratoPatrocinioAdmin(admin.ModelAdmin):
     list_display = ('localiza', 'cod_oper', 'data_oper', 'historico', 'valor')
     search_fields = ('cod_oper',)
     ordering = ('-data_oper',)
-
+    form = ExtratoPatrocinioAdminForm
+    
 
 class AuditoriaAdmin(admin.ModelAdmin):
   
