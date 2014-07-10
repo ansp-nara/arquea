@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import django
 from django.contrib import admin
 from models import *
 from django.utils.translation import ugettext_lazy as _
@@ -58,7 +58,12 @@ class ArquivoInline(admin.TabularInline):
 class MemorandoSimplesAdmin(admin.ModelAdmin):
     form = MemorandoSimplesForm
     list_display = ('num_memo', 'assunto', 'destinatario', 'data')
-    list_select_related = ('assunto', )
+    # list_select_related pode ser somente boolean no 1.5
+    if django.VERSION[0:2] >= (1, 6):
+        list_select_related = ('assunto', )
+    else:
+        list_select_related = True
+
     inlines = [ArquivoInline]
     search_fields = ['assunto__descricao', 'corpo', 'data']
 

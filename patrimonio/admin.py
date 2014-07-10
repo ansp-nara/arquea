@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import django
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 from utils.functions import clone_objects
@@ -68,7 +68,11 @@ class PatrimonioAdmin(ExportMixin, admin.ModelAdmin):
     readonly_fields = ('part_number', 'modelo', 'ean')
     form = PatrimonioAdminForm
     list_display = ('tipo', 'descricao', 'complemento', 'posicao', 'agilis', 'modelo', 'ns', 'nf', 'valor', 'checado')
-    list_select_related = ('tipo', 'equipamento', 'pagamento__protocolo__termo')
+    # list_select_related pode ser somente boolean no 1.5
+    if django.VERSION[0:2] >= (1, 6):
+        list_select_related = ('tipo', 'equipamento', 'pagamento__protocolo__termo')
+    else:
+        list_select_related = True
     list_filter = ('tipo', 'pagamento__protocolo__termo',)
     inlines = [HistoricoLocalInline,]
     search_fields = ('descricao', 'ns', 'pagamento__protocolo__num_documento', 'ncm', 'historicolocal__descricao', \

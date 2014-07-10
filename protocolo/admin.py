@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
-
+import django
 import datetime
 from django.contrib import admin
-from models import Origem, TipoDocumento, Estado, Protocolo, Feriado, ItemProtocolo, Cotacao, Arquivo, Descricao, TipoFeriado
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import Group
 from django.core.mail import send_mail
 from django.http import HttpResponseRedirect
-from forms import CotacaoAdminForm, ProtocoloAdminForm, ItemAdminForm
-from utils.admin import AutoCompleteAdmin
 from financeiro.models import Estado as EstadoDespesa
+from utils.admin import AutoCompleteAdmin
 from utils.functions import clone_objects
 
+from models import Origem, TipoDocumento, Estado, Protocolo, Feriado, ItemProtocolo, Cotacao, Arquivo, Descricao, TipoFeriado
+from forms import CotacaoAdminForm, ProtocoloAdminForm, ItemAdminForm
 from forms import *
 
 admin.site.register(TipoDocumento)
@@ -423,8 +423,12 @@ class ArquivoAdmin(admin.ModelAdmin):
 #    list_display = ('protocolo', '__unicode__')
     list_display = ('mostra_termo', 'mostra_entidade', 'mostra_descricao', 'arquivo_link')
     
-    list_select_related = ('protocolo__termo', 'protocolo', )
-
+    # list_select_related pode ser somente boolean no 1.5
+    if django.VERSION[0:2] >= (1, 6):
+        list_select_related = ('protocolo__termo', 'protocolo', )
+    else:
+        list_select_related = True
+    
 
     search_fields = ('protocolo__identificacao__endereco__entidade__sigla', \
                      'protocolo__identificacao__endereco__entidade__nome', \
