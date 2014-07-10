@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import django
 from models import *
 from forms import *
 from django.contrib import admin
@@ -86,7 +87,12 @@ class PagamentoAdmin(PrintModelAdmin):
     )
     
     list_display = ('item', 'nota', 'data', 'codigo_operacao', 'formata_valor_fapesp', 'parcial', 'pagina')
-    list_select_related = ('protocolo', 'origem_fapesp', 'origem_fapesp__item_outorga', 'origem_fapesp__item_outorga__natureza_gasto__modalidade', 'origem_fapesp__item_outorga__natureza_gasto__termo',)
+    # list_select_related pode ser somente boolean no 1.5
+    if django.VERSION[0:2] >= (1, 6):
+        list_select_related = ('protocolo', 'origem_fapesp', 'origem_fapesp__item_outorga', 'origem_fapesp__item_outorga__natureza_gasto__modalidade', 'origem_fapesp__item_outorga__natureza_gasto__termo',)
+    else:
+        list_select_related = True
+    
     search_fields = ('protocolo__num_documento', 'conta_corrente__cod_oper', 'protocolo__descricao2__descricao', 'protocolo__descricao2__entidade__sigla', 'protocolo__referente')
     form = PagamentoAdminForm
     inlines = (AuditoriaInline, RecursoInline)
@@ -123,10 +129,15 @@ class AuditoriaAdmin(admin.ModelAdmin):
     )
     
     list_display = ('pagamento', 'tipo', 'parcial', 'pagina')
-    list_select_related = ('tipo', 'pagamento__protocolo', 'pagamento__origem_fapesp', \
-                           'pagamento__origem_fapesp__item_outorga', \
-                           'pagamento__origem_fapesp__item_outorga__natureza_gasto__modalidade', \
-                           'pagamento__origem_fapesp__item_outorga__natureza_gasto__termo',)
+    # list_select_related pode ser somente boolean no 1.5
+    if django.VERSION[0:2] >= (1, 6):
+        list_select_related = ('tipo', 'pagamento__protocolo', 'pagamento__origem_fapesp', \
+                       'pagamento__origem_fapesp__item_outorga', \
+                       'pagamento__origem_fapesp__item_outorga__natureza_gasto__modalidade', \
+                       'pagamento__origem_fapesp__item_outorga__natureza_gasto__termo',)
+    else:
+        list_select_related = True
+
     search_fields = ('parcial', 'pagina')
     form = AuditoriaAdminForm
 
