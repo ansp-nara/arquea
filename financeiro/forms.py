@@ -21,11 +21,7 @@ class RecursoInlineAdminForm(forms.ModelForm):
     # Foi codificado no label um Checkbox para exibir somente os recursos vigentes
     # Ele chama um AJAX para repopular o SELECT 
     # O estado inicial é exibir somente os vigentes
-    planejamento = forms.ModelChoiceField(PlanejaAquisicaoRecurso.objects.filter(os__estado__nome='Vigente').select_related('os', 'os__tipo', 'projeto', 'tipo', ),
-                                                 label=mark_safe('<a href="#"  onclick="window.open(\'/admin/rede/planejaaquisicaorecurso/\'+$(\'#\'+$(this).parent().attr(\'for\')).val() + \'/\', \'_blank\');return true;">Planejamento:</a>'\
-                                                                 + '<script type="text/javascript">function get_recursos(obj) {var check = obj.is(":checked")?"Vigente":""; ajax_get_recursos("#"+obj.parent().attr("for"), check); }</script>'
-                                                                 + ' <input type="checkbox" checked onclick="get_recursos($(this));"> Exibir somente os vigentes.'),)
-    
+                                          
     obs = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows':'3', 'style':'width:400px'}))
 
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
@@ -42,6 +38,9 @@ class RecursoInlineAdminForm(forms.ModelForm):
             rel = ManyToOneRel(PlanejaAquisicaoRecurso, 'id')
             
         self.fields['planejamento'].widget = RelatedFieldWidgetWrapper(self.fields['planejamento'].widget, rel, self.admin_site)
+        self.fields['planejamento'].label=mark_safe('<a href="#"  onclick="window.open(\'/admin/rede/planejaaquisicaorecurso/\'+$(\'#\'+$(this).parent().attr(\'for\')).val() + \'/\', \'_blank\');return true;">Planejamento:</a>'\
+                                                                  + '<script type="text/javascript">function get_recursos(obj) {var check = obj.is(":checked")?"Vigente":""; ajax_get_recursos("#"+obj.parent().attr("for"), check); }</script>'
+                                                                  + ' <input type="checkbox" onclick="get_recursos($(this));"> Exibir somente os vigentes.')
 
 
 class PagamentoAdminForm(forms.ModelForm):
