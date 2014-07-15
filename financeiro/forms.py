@@ -37,9 +37,10 @@ class RecursoInlineAdminForm(forms.ModelForm):
         else:
             rel = ManyToOneRel(PlanejaAquisicaoRecurso, 'id')
             
+        self.fields['planejamento'].query = PlanejaAquisicaoRecurso.objects.all().select_related('os', 'os__tipo', 'projeto', 'tipo', )
         self.fields['planejamento'].widget = RelatedFieldWidgetWrapper(self.fields['planejamento'].widget, rel, self.admin_site)
         self.fields['planejamento'].label=mark_safe('<a href="#"  onclick="window.open(\'/admin/rede/planejaaquisicaorecurso/\'+$(\'#\'+$(this).parent().attr(\'for\')).val() + \'/\', \'_blank\');return true;">Planejamento:</a>'\
-                                                                  + '<script type="text/javascript">function get_recursos(obj) {var check = obj.is(":checked")?"Vigente":""; ajax_get_recursos("#"+obj.parent().attr("for"), check); }</script>'
+                                                                  + '<script type="text/javascript">function get_recursos(obj) {var check = obj.is(":checked")?"Vigente":""; ajax_get_recursos("#"+obj.parent().attr("for"), check); }</script>'\
                                                                   + ' <input type="checkbox" onclick="get_recursos($(this));"> Exibir somente os vigentes.')
 
 
