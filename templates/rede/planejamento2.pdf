@@ -1,40 +1,99 @@
-{% extends "base.pdf" %}
 {% load proto_tags %}
-{% block pagesize %}a3{% endblock %}
-{% block extrastyle %}
+{% load static %}
+<html xmlns="http://www.w3.org/1999/xhtml" lang="pt-br" xml:lang="pt-br" >
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style>
+@import url('/var/www/django/media/css/pdf.css');
+@page {
+  size: a3;
+  background-image: url('{% get_media_prefix %}{{papelaria.papel_timbrado_retrato_a3}}');
+  background-size: contain;
+  background-repeat:no-repeat;
+  top: {{papelaria.retrato_a3_margem_superior}}cm;
+  left: 1.5cm;
+  right: 1.5cm;
+  bottom: {{papelaria.retrato_a3_margem_inferior}}cm;
+  @frame footer {
+    -pdf-frame-content: footerContent;
+    bottom: 0.5cm;
+    margin-right: 0.5cm;
+    height: 0.5cm;
+    left: -2.3cm;
+    } 
+} 
+
+tr th { background-color: #eee; }
 td { padding-top:3px; padding-left:2px;}
 th { padding-top:3px; }
 table tr td {
   border:0;
 }
 
-{% endblock %}
-{% block content %}
+</style> 
+</head>
+<body>
 <h1>Realizado de terceiros</h1>
 <h3>{{ entidade }}{% if beneficiado %} - {{ beneficiado }} ({{ sem|moeda }}, {{ com|moeda }}){% endif %}</h3>
 <h3>Processo {{ termo }}</h3>
 
 <h4 style="color:red;">O valor total por nota refere-se à soma dos ítens descritos, com e sem impostos, confome beneficiado e serviço selecionados no filtro.</h4>
-<table>
 {% for p in pagamentos %}
-   <tr><td><table border="1">
-   <tr><th>Nota fiscal</th><th>Valor total sem imposto</th><th>Valor total com imposto</th></tr>
-   <tr><td>{{ p.nf }}</td><td>{{ p.sem|moeda }}</td><td>{{ p.com|moeda }}</td></tr>
-      <tr><td colspan="3" style="padding:5px;">
-          <table border="1">
-             <tr><th rowspan="2">OS e contrato</th><th rowspan="2">Número de vezes que foi pago</th><th rowspan="2">Descrição do item</th> <th colspan="2">Valor sem imposto</th><th colspan="2">Valor com imposto</th></tr>
-             <tr><th width="10%">Unitário</th><th  width="10%">Subtotal</th><th  width="10%">Unitário</th><th  width="10%">Subtotal</th></tr>
-      {% for r in p.recursos %}
-             <tr><td><a href="{{ r.os.primeiro_arquivo.url }}">{{ r.os }}</a> <a href="{{ r.os.contrato.arquivo.url }}">CT {{ r.os.contrato.numero }}</a></td><td>{{ r.quantidade }}</td><td>{{ r.tipo }} - {{ r.referente }}</td><td>{{ r.sem|moeda }}</td><td>{{ r.sub_sem|moeda }}</td><td>{{ r.com|moeda }}</td><td>{{ r.sub_com|moeda }}</td></tr>
-      {% if r.beneficiados %}<tr style="border-top-color:white;"><td colspan="7">
-      {% for b in r.beneficiados %}
-         {{ b }} - {{ b.porcentagem|floatformat:"-3" }} %{% if not forloop.last %},{% endif %} 
-      {% endfor %}
-      </td></tr>{% endif %}
-   {% endfor %}
-   </table></td></tr>
-   </table></td></tr>
+    <table repeat="1" border="1">
+        <tr>
+            <th>Nota fiscal</th>
+            <th>Valor total sem imposto</th>
+            <th>Valor total com imposto</th>
+        </tr>
+        <tr>
+            <td>{{ p.nf }}</td>
+            <td>{{ p.sem|moeda }}</td>
+            <td>{{ p.com|moeda }}</td>
+        </tr>
+    </table>
+    <table repeat="1" style="border:1px black solid;border-collapse:collapse;">
+        <tr>
+            <th style="width:3.5cm;">OS e contrato</th>
+            <th style="width:2cm;">Número de vezes que foi pago</th>
+            <th style="width:12cm;">Descrição do item</th>
+            <th colspan="2">
+                <table>
+                    <tr><td colspan="2">Valor sem imposto</td></tr>
+                    <tr><td>Unitário</td><td>Subtotal</td></tr>
+                </table>
+             </th>
+            <th colspan="2">
+                <table>
+                    <tr><td colspan="2">Valor com imposto</td></tr>
+                    <tr><td>Unitário</td><td>Subtotal</td></tr>
+                </table>
+            </th>
+        </tr>
+        {% for r in p.recursos %}
+            <tr>
+                <td><a href="{{ r.os.primeiro_arquivo.url }}">{{ r.os }}</a> <a href="{{ r.os.contrato.arquivo.url }}">CT {{ r.os.contrato.numero }}</a></td>
+                <td>{{ r.quantidade }}</td>
+                <td>{{ r.tipo }} - {{ r.referente }}</td>
+                <td>{{ r.sem|moeda }}</td>
+                <td>{{ r.sub_sem|moeda }}</td>
+                <td>{{ r.com|moeda }}</td>
+                <td>{{ r.sub_com|moeda }}</td>
+            </tr>
+              {% if r.beneficiados %}
+                  {% for b in r.beneficiados %}
+                    <tr style="border:0;">
+                        <td>{{ b }}</td>
+                        <td colspan="6">{{ b.porcentagem|floatformat:"-3" }} %{% if not forloop.last %},{% endif %} 
+                    </td></tr>
+                  {% endfor %}
+              {% endif %}
+        {% endfor %}
+    </table>
+    <div style="height:0.5cm;">&nbsp;</div>
 {% endfor %}
-</table>
-{% endblock %}
 
+  <div id="footerContent">
+      pág <pdf:pagenumber example="00" />
+  </div> 
+</body>
+</html>

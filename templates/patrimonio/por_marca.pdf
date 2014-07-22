@@ -3,41 +3,75 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <style>
-@import url('/var/www/media/css/pdf.css');
-
-
 @page {
-  size:a4 landscape;
-          background-image: url('/var/www/media/img/papel_timbrado_paisagem.jpg');
-  top: 3.6cm;
-  left: 1.5cm;
-  right: 1.5cm;
-  bottom: 2cm;
-  @frame footer {
-                -pdf-frame-content: footerContent;
-                bottom: 0.5cm;
-                margin-right: 1cm;
-                height: 1cm;
-                left: -2.3cm;
-                }
+    size:a4 landscape;
+    background-image: url('media:{{papelaria.papel_timbrado_paisagem_a4}}');
+    background-size: contain;
+    background-repeat:no-repeat;
+    margin-top:0;
+    margin-right:1cm;
+    margin-bottom:1cm;
+    margin-left:0;
+    padding: {{papelaria.paisagem_a4_margem_superior}}cm 1cm {{papelaria.paisagem_a4_margem_inferior}}cm 1cm;
+
+  @bottom-right {
+    content: 'Pág ' counter(page);
+    white-space: pre;
+    color: grey;
+    vertical-align: bottom;
+    font-family: Arial;
+    font-size: 0.7em;
+    margin:0;
+    padding-bottom:1cm;
+  }
 }
-</style>
-<style type="text/css">
-th {text-align: left;}
+ body {
+    position:relative;
+    margin: 0;
+    padding: 0;
+    width:100%;
+    height:100%;
+ }
+ #conteudo {
+    font-family: Arial;
+    font-size:0.6em;
+    position:relative;
+    padding:0;
+    margin:0;
+ }
+ h1, h4 {
+    font-size:1.5em;
+ }
+#tbl_conteudo {
+      border-collapse:collapse;
+      width:100%;
+      height:100%;
+ }
+ #tbl_conteudo td {
+    padding: 0.5em;
+ }
+ td p {
+    line-height:inherit;
+    margin:0;
+ }
+ th {text-align: left;}
 </style>
 </head>
 <body>
-<h1 repeat="1">Inventário por marca</h1>
-
-<h4>Patrimonios da marca {{ marca }}</h4>
- 
-    <table border="0" repeat="1" cellpadding="5">
-    <tr><th>Checado</th><th>ID</th><th>Procedência</th><th>Modelo</th><th>Part number</th><th width="30%">Descrição</th><th>NS</th><th>Tipo</th><th width="20%">Local</th><th>Posição</th><th>Estado</th><th>NF</th></tr>
-     {% for p in patrimonios %}
-              <tr><td>{{ p.checado }}</td><td>{{ p.id }}</td><td>{{ p.procedencia }}</td><td>{{ p.modelo }}</td><td>{{ p.part_number }}</td><td>{{ p.descricao }}</td><td>{{ p.ns }}</td><td>{{ p.tipo }}</td><td>{{ p.historico_atual.endereco.end }}</td><td>{{ p.historico_atual.endereco.complemento }}</td><td>{{ p.historico_atual.estado }}</td><td>{{ p.pagamento.protocolo.num_documento }}</td></tr>
-    {% endfor %}
+<div id="conteudo">
+    <h1 repeat="1">Inventário por marca</h1>
+    <h4>Patrimonios da marca {{ marca }}</h4>
+    <table id="tbl_conteudo" border="0" repeat="1">
+        <thead>
+            <tr><th>ID</th><th>Procedência</th><th>Modelo</th><th>Part number</th><th width="30%">Descrição</th><th>NS</th><th>Tipo</th><th width="20%">Local</th><th>Posição</th><th>Estado</th><th>NF</th></tr>
+        </thead>
+        <tbody>
+        {% for p in patrimonios %}
+            <tr><td>{{ p.id }}</td><td>{{ p.procedencia }}</td><td>{{ p.modelo }}</td><td>{{ p.part_number }}</td><td>{{ p.descricao }}</td><td>{{ p.ns }}</td><td>{{ p.tipo }}</td><td>{{ p.historico_atual.endereco.end.entidade|default:'' }}</td><td>{{ p.historico_atual.endereco.complemento }}</td><td>{{ p.historico_atual.estado }}</td><td>{{ p.pagamento.protocolo.num_documento }}</td></tr>
+        {% endfor %}
+        </tbody>
     </table>
-
+</div>
 </body>
 </html>
 

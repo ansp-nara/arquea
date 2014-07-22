@@ -1,8 +1,14 @@
 {% extends "admin/base_site.html" %}
 {% load proto_tags %}
+{% load i18n %}
+{% block breadcrumbs %}
+    <div class="breadcrumbs">Você está em: 
+      <a href="../../">{% trans "Home" %}</a> &rsaquo; 
+      <a href="{% url 'outorga.views.contratos' %}">Contratos por entidade</a>
+    </div>
+{% endblock %}
 {% block content %}
 <h1 repeat="1">Contratos por entidade</h1>
-
     <table border="0" repeat="1" cellpadding="5">
     {% for e in entidades %}
         <tr><th>{{ e.entidade }}</th></tr>

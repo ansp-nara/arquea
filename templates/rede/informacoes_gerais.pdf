@@ -1,15 +1,31 @@
 {% extends "base.pdf" %}
 {% load proto_tags %}
-{% block pagesize %}a4 {% endblock %}
-{% block extrastyle %}
+{% load static %}
+{% block content %}
+<style>
+@page {
+  size: a4;
+  background-image: url('{% get_media_prefix %}{{papelaria.papel_timbrado_retrato_a4}}');
+  background-size: contain;
+  background-repeat:no-repeat;
+  top: {{papelaria.retrato_a4_margem_superior}}cm;
+  left: 1.5cm;
+  right: 1.5cm;
+  bottom: {{papelaria.retrato_a4_margem_inferior}}cm;
+  @frame footer {
+    -pdf-frame-content: footerContent;
+    bottom: 0.5cm;
+    margin-right: 0.5cm;
+    height: 0.5cm;
+    left: -2.3cm;
+    } 
+} 
 td { padding-top:3px; padding-left:2px;}
 th { padding-top:3px; }
 table tr td {
   border:0;
 }
-
-{% endblock %}
-{% block content %}
+</style>
 <h2>Entidades ligadas à ANSP</h2>
 <table>
 {% for i in info %}

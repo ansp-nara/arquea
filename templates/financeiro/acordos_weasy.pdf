@@ -1,17 +1,20 @@
 {% load proto_tags %}
+{% load static %}
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <style>
 @page {
-  size: a3;
-  background-image: url('graph:img/papel_timbrado.png');
-  background-size: cover;
-  background-repeat:no-repeat;
-  counter-increment: page;
-  padding-top:5cm;
-  padding-bottom:3.5cm;
-  
+    size: a3;
+    background-image: url('media:{{papelaria.papel_timbrado_retrato_a3}}');
+    background-size: contain;
+    background-repeat:no-repeat;
+    margin-top:0;
+    margin-right:1cm;
+    margin-bottom:1cm;
+    margin-left:0;
+    padding: {{papelaria.retrato_a3_margem_superior}}cm 1cm {{papelaria.retrato_a3_margem_inferior}}cm 1cm;
+
   @bottom-right {
     content: 'Pág ' counter(page);
     white-space: pre;
@@ -19,7 +22,8 @@
     vertical-align: bottom;
     font-family: Arial;
     font-size: 0.7em;
-    margin-bottom: 0.8cm;
+    margin:0;
+    padding-bottom:1cm;
   }
 } 
  body {
@@ -33,6 +37,8 @@
     font-family: Arial;
     font-size:0.6em;
     position:relative;
+    padding:0;
+    margin:0;
  }
  h1 {
     font-size:1.5em;
@@ -84,14 +90,14 @@
     <table id="tbl_conteudo" border="0">
         <tbody>
         <tr>
-           <td width="4%"></td>
-           <td width="5%"></td>
-           <td width="3%"></td>
-           <td width="3%"></td>
-           <td width="22%"></td>
-           <td width="35%"></td>
-           <td width="9%"></td>
-           <td width="18%"></td>
+           <td style="width:0.25cm"></td>
+           <td style="width:0.2cm"></td>
+           <td style="width:0.2cm"></td>
+           <td style="width:0.2cm"></td>
+           <td style="width:5.0cm"></td>
+           <td style="width:10.3cm"></td>
+           <td style="width:1.7cm"></td>
+           <td style="width:5cm"></td>
         </tr>
         {% for ac in acordos %}
         	<tr class="nivel1">

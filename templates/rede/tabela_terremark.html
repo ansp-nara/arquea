@@ -1,5 +1,6 @@
 {% extends "admin/base_site.html" %}
 {% load proto_tags %}
+{% load i18n %}
 {% block extrastyle %}
 <style>
  
@@ -21,6 +22,12 @@
      white-space:nowrap;
  }
 </style>
+{% endblock %}
+{% block breadcrumbs %}
+    <div class="breadcrumbs">Você está em: 
+      <a href="../../">{% trans "Home" %}</a> &rsaquo; 
+      <a href="{% url 'rede.views.custo_terremark' %}">Custo dos recursos contratados</a>
+    </div>
 {% endblock %}
 {% block content %}
 <div id="report_title">

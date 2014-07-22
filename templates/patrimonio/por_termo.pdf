@@ -1,50 +1,81 @@
 {% load proto_tags %}
+{% load static %}
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <style>
-@import url('/var/www/media/css/pdf.css');
 
 @page {
-  size:a4 landscape;
-          background-image: url('/var/www/media/img/papel_timbrado_paisagem.jpg');
-  top: 3.6cm;
-  left: 1.2cm;
-  right: 1.3cm;
-  bottom: 2cm;
-  
-  @frame footer {
-                -pdf-frame-content: footerContent;
-                bottom: 1cm;
-                margin-right: 1cm;
-                height: 1cm;
-                left: -2.3cm;
-                }
-}
+    size:a4 landscape;
+    background-image: url('media:{{papelaria.papel_timbrado_paisagem_a4}}');
+    background-size: contain;
+    background-repeat:no-repeat;
+    margin-top:0;
+    margin-right:1cm;
+    margin-bottom:1cm;
+    margin-left:0;
+    padding: {{papelaria.paisagem_a4_margem_superior}}cm 1cm {{papelaria.paisagem_a4_margem_inferior}}cm 1cm;
 
-th {text-align: left;}
-td {font-size: 0.9em;}
-.th_numusp { width:1.5cm; }
-.th_nf { width:1.7cm; }
+  @bottom-right {
+    content: 'Pág ' counter(page);
+    white-space: pre;
+    color: grey;
+    vertical-align: bottom;
+    font-family: Arial;
+    font-size: 0.7em;
+    margin:0;
+    padding-bottom:1cm;
+  }
+}
+body {
+    font-family:Arial;font-size:9px; 
+    margin:0;
+    clear:both;
+    position:relative;
+    left: 0;
+    top: 0;
+    padding: 0;
+    width:100%;
+    height:100%;
+}
+#content {
+    /*Margem para não sobrepor o layout do papel timbrado*/
+    width: 27.5cm;
+    position:relative;
+    display: block;
+    float: none !important;
+}
+th { text-align:center; font-size:11px; font-weight:bolder; }
+td {text-align:left; font-size: 1em; vertical-align:top; padding-top:0.2cm;}
+
+.th_numusp { width:1.0cm; 	word-wrap: break-word;}
+.th_nf { width:1.5cm;}
 /*.th_descricao { width:5cm; }*/
-.th_valor { width:1.7cm; }
+.th_valor { width:2.0cm; }
 .th_marca { width:1.6cm; }
-.th_ns { width:4.7cm; }
+.th_ns { width:2.5cm; }
 .th_estado { width:1.2cm; }
-.th_localizacao { width:5.5cm; }
+.th_localizacao { width:6.2cm; }
 .th_posicao { width:1.0cm; }
+
+.td_ns {
+	word-wrap: break-word;
+    word-break: break-all;
+}
 
 </style>
 </head>
 <body>
+  <div id="content">
     <h1 repeat="1">Inventário por termo</h1>
-    <h4>Patrimôniodo termo de outorga {{ termo }}</h4>
+    <h4>Patrimônio do termo de outorga {{ termo }}</h4>
     <table border="0" repeat="1" cellpadding="5">
+    <thead>
     <tr>
+        <th class="th_nf">NF</th>
         {% if ver_numero_fmusp %}
             <th class="th_numusp">Patr. Instit.</th>
         {% endif %}
-        <th class="th_nf">NF</th>
         <th colspan="2" class="th_descricao">Descrição - complemento</th>
         <th class="th_valor">Valor</th>
         <th class="th_marca">Marca</th>
@@ -53,29 +84,31 @@ td {font-size: 0.9em;}
         <th class="th_localizacao">Localização</th>
         <th class="th_posicao">Posição</th>
     </tr>
+    </thead>
+    <tbody>
     {% for t in termos %}
         {% for tp in t.tipos %}
            {% for pg in tp.pagamentos %}
               <tr>
-                {% if ver_numero_fmusp %}
-                            <td></td>
-                        {% endif %}
                 <td>{{ pg.pg.protocolo.num_documento }}</td>
+                {% if ver_numero_fmusp %}
+                     <td></td>
+                {% endif %}
                 <td colspan="6"></td>
               </tr>
               {% for p in pg.patrimonios %}
                  <tr>
+                    <td></td>
                     {% if ver_numero_fmusp %}
                         <td>{{ p.numero_fmusp|default_if_none:"" }}</td>
                     {% endif %}
-                    <td></td>
                     <td colspan="2">{% if p.equipamento %}[{{ p.equipamento.tipo }}] {% endif %}{{ p.descricao }} - {{ p.complemento|default:"" }}</td>
-                    <td>{{ p.valor|moeda }}</td>
-                    <td>{{ p.equipamento.entidade_fabricante.sigla }}</td>
-                    <td>{{ p.ns }}</td>
-                    <td>{{ p.historico_atual.estado }}</td>
-                    <td>{{ p.historico_atual.endereco }}</td>
-                    <td>{{ p.historico_atual.posicao|default_if_none:"" }}</td>
+                    <td class="th_valor">{{ p.valor|moeda }}</td>
+                    <td class="th_marca">{{ p.equipamento.entidade_fabricante.sigla }}</td>
+                    <td class="td_ns th_ns">{{ p.ns }}</td>
+                    <td class="th_estado">{{ p.historico_atual.estado }}</td>
+                    <td class="th_localizacao">{{ p.historico_atual.endereco }}</td>
+                    <td class="th_posicao">{{ p.historico_atual.posicao|default_if_none:"" }}</td>
                  </tr>
                  {% if not numero_fmusp %}
                  {% for pf in p.contido.all %}
@@ -99,11 +132,8 @@ td {font-size: 0.9em;}
            {% endfor %}
         {% endfor %}
     {% endfor %}
+    </tbody>
     </table>
-
-  <div id="footerContent">
-      pág <pdf:pagenumber example="00" />
   </div>
-
 </body>
 </html>

@@ -1,15 +1,22 @@
 {% extends "admin/base_site.html" %}
 {% load proto_tags %}
+{% load i18n %}
+{% block breadcrumbs %}
+    <div class="breadcrumbs">Você está em: 
+      <a href="../../">{% trans "Home" %}</a> &rsaquo; 
+      <a href="{% url 'identificacao.views.agenda' %}">Agenda</a>
+    </div>
+{% endblock %}
 {% block content %}
-<p>Selecione uma agenda:</p>
-<form action="" method="GET">
-<label for="id_agenda">Agenda:</label>
-<select name="agenda" id="id_agenda">
-{% for a in agendas %}
-<option value="{{ a.id }}">{{ a.nome }}</option>
-{% endfor %}
-</select>
-<input type="submit" value="Escolher" />
-</form>
+    <p>Selecione uma agenda:</p>
+    <form action="" method="GET">
+        <label for="id_agenda">Agenda:</label>
+        <select name="agenda" id="id_agenda">
+            {% for a in agendas %}
+                <option value="{{ a.id }}">{{ a.nome }}</option>
+            {% endfor %}
+        </select>
+        <input type="submit" value="Escolher" />
+    </form>
 {% endblock %}
 

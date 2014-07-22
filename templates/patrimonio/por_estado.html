@@ -1,8 +1,14 @@
 {% extends "admin/base_site.html" %}
 {% load proto_tags %}
+{% load i18n %}
+{% block breadcrumbs %}
+    <div class="breadcrumbs">Você está em: 
+      <a href="../../">{% trans "Home" %}</a> &rsaquo; 
+      <a href="{% url 'patrimonio.views.por_estado' %}">Patrimônio por estado do item</a>
+    </div>
+{% endblock %}
 {% block content %}
 <h1 repeat="1">Inventário por estado</h1>
-
 {% comment %}
     <form action="{% url 'patrimonio.views.por_estado' 1 %}" method="GET">
        <input type="hidden" value="{{ termo.id }}" name="termo" />

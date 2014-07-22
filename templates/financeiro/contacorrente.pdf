@@ -1,13 +1,21 @@
 {% load proto_tags %}
-<html>
+{% load static %}
+<html xmlns="http://www.w3.org/1999/xhtml" lang="pt-br" xml:lang="pt-br" >
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <style>
 @import url('/var/www/django/media/css/pdf.css');
 @page {
   size: a3;
-  background-image: url('/var/www/django/media/img/papel_timbrado.jpg');
-  margin: 1cm;
+  background-image: url('media:{{papelaria.papel_timbrado_retrato_a3}}');
+  background-size: contain;
+  background-repeat:no-repeat;
+  margin-top:0;
+  margin-right:1cm;
+  margin-bottom:1cm;
+  margin-left:0;
+  padding: {{papelaria.retrato_a3_margem_superior}}cm 1cm {{papelaria.retrato_a3_margem_inferior}}cm 1cm;
+
   @bottom-right {
     content: 'Pág ' counter(page);
     white-space: pre;
@@ -50,7 +58,6 @@ th {
 </head>
 <body>
 <h1 repeat="1">Extrato da conta corrente do projeto em {{ ano }}</h1>
-
     <table border="0" repeat="1" cellpadding="5">
     <thead>
     <tr>

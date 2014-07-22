@@ -1,6 +1,13 @@
 {% extends "admin/base_site.html" %}
+{% load i18n %}
+{% block breadcrumbs %}
+    <div class="breadcrumbs">Você está em: 
+      <a href="../../">{% trans "Home" %}</a> &rsaquo; 
+      <a href="{% url 'utils.views.uso_admin' %}">Registro de uso do sistema</a>
+    </div>
+{% endblock %}
 {% block content %}
-<h1>Log de uso do sistema pela interface web</h1>
+<h1>Registro de uso do sistema pela interface web</h1>
 
 {% for user in users %}
 <h4>{{ user.nome }}</h4>

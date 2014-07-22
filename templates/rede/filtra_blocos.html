@@ -1,5 +1,12 @@
 {% extends "admin/base_site.html" %}
 {% load proto_tags %}
+{% load i18n %}
+{% block breadcrumbs %}
+    <div class="breadcrumbs">Você está em: 
+      <a href="../../">{% trans "Home" %}</a> &rsaquo; 
+      <a href="{% url 'rede.views.blocos_ip' %}">Lista de Blocos IP</a>
+    </div>
+{% endblock %}
 {% block extrahead %}
 <script type="text/javascript" src="/media/js/selects.js"></script>
 {% endblock %}

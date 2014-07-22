@@ -3,8 +3,25 @@
 {% load admin_static admin_list i18n %}
 {% block breadcrumbs %}
     <div class="breadcrumbs">Você está em: 
-      <a href="../../">{% trans "Home" %}</a> &rsaquo; 
-      <a href="{{ request.get_full_path }}">Relatório</a>
+      <a href="../../">{% trans "Home" %}</a> &rsaquo;
+       
+      {% if view == 'financeiro_parciais' %}
+        <a href="{% url 'financeiro.views.financeiro_parciais' %}">Extrato do financeiro por parcial</a>
+      {% elif view == 'extrato_financeiro' %}
+        <a href="{% url 'financeiro.views.financeiro_parciais' %}">Extrato do financeiro por mês</a>
+      {% elif view == 'relatorio_acordos' %}
+        <a href="{% url 'financeiro.views.relatorio_acordos' %}">Relatório de acordos</a>
+      {% elif view == 'relatorio_gerencial' %}
+        <a href="{% url 'financeiro.views.relatorio_gerencial' %}">Relatório gerencial</a>
+      {% elif view == 'parciais' %}
+        <a href="{% url 'financeiro.views.parciais' %}">Diferenças totais</a>
+      {% elif view == 'caixa' %}
+        <a href="{% url 'financeiro.views.parciais' %}">Diferenças de caixa</a>
+      {% elif view == 'presta_contas' %}
+        <a href="{% url 'financeiro.views.presta_contas' %}">Prestação de contas</a>
+      {% else %}
+        <a href="{{ request.get_full_path }}">Relatório</a>
+      {% endif %}
     </div>
 {% endblock %}
 {% block content %}

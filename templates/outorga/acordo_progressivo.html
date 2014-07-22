@@ -1,6 +1,8 @@
 {% extends "admin/base_site.html" %}
 {% load proto_tags %}
-{% block content %}
+{% load static %}
+{% load i18n %}
+{% block extrahead %}
 <style>
     .excedido{
         color:red
@@ -56,6 +58,14 @@
         border-top:1px darkgray solid;
     }
 </style>
+{% endblock %}
+{% block breadcrumbs %}
+    <div class="breadcrumbs">Você está em: 
+      <a href="../../">{% trans "Home" %}</a> &rsaquo; 
+      <a href="{% url 'outorga.views.acordo_progressivo' %}">Relatório gerencial progressivo</a>
+    </div>
+{% endblock %}
+{% block content %}
 <h1 repeat="1"></h1>
 <div id="report_title">
     <h1>Relatório gerencial progressivo</h1>

@@ -1,4 +1,15 @@
 {% extends "admin/base_site.html" %}
+{% load i18n %}
+{% block breadcrumbs %}
+    <div class="breadcrumbs">Você está em: 
+      <a href="../../">{% trans "Home" %}</a> &rsaquo;
+      {% if view == 'pagamentos_mensais' %}
+          <a href="{% url 'financeiro.views.pagamentos_mensais' %}">Pagamentos por mês</a>
+      {% elif view == 'extrato_tarifas' %}
+          <a href="{% url 'financeiro.views.extrato_tarifas' %}">Extrato de tarifas por mês</a>
+      {% endif %}
+    </div>
+{% endblock %}
 {% block content %}
 <form method="GET">
 {% if meses %}

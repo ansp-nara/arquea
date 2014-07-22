@@ -1,4 +1,11 @@
 {% extends "admin/base_site.html" %}
+{% load i18n %}
+{% block breadcrumbs %}
+    <div class="breadcrumbs">Você está em: 
+      <a href="../../">{% trans "Home" %}</a> &rsaquo; 
+      <a href="{% url 'identificacao.views.planilha_ecossistema' 'par'%}">Ecossistema</a>
+    </div>
+{% endblock %}
 {% block extrahead %}
 <style type="text/css">
 .tabnav {
