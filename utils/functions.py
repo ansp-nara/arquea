@@ -101,13 +101,12 @@ def weasy_fetcher(url,**kwargs):
     url('media:{{papelaria.papel_timbrado_paisagem_a4}}');
     
     """
-    print url
     if url.startswith('static:'):
         url = url[len('static:'):]
-        return weasyprint.default_url_fetcher('file://' +settings.STATIC_ROOT + url)
+        return weasyprint.default_url_fetcher('file://' + os.path.join(settings.STATIC_ROOT, url))
     elif url.startswith('media:'):
         url = url[len('media:'):]
-        return weasyprint.default_url_fetcher('file://' +settings.MEDIA_ROOT + url)
+        return weasyprint.default_url_fetcher('file://' + os.path.join(settings.MEDIA_ROOT, url))
     else:
         return weasyprint.default_url_fetcher(url)
 
