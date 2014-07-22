@@ -23,8 +23,8 @@ def processos(request, pdf=False):
         areas.append(area)
 
     if pdf == '2':
-        return render_to_pdf('processo/processos2.pdf', {'areas':areas}, filename='processos.pdf')
+        return render_to_pdf('processo/processos2.pdf', {'areas':areas}, request=request, filename='processos.pdf')
     elif pdf:
-	return render_to_pdf('processo/processos.pdf', {'areas':areas, 'tamanho':pdf}, filename='processos.pdf')
+	return render_to_pdf('processo/processos.pdf', {'areas':areas, 'tamanho':pdf}, request=request, filename='processos.pdf')
     else:
         return TemplateResponse(request, 'processo/processos.html', {'areas':areas})

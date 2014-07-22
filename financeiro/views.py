@@ -180,14 +180,14 @@ def pagamentos_mensais(request, pdf=False):
             dados = estrutura_pagamentos(pagamentos)
 
             if pdf:
-                return render_to_pdf('financeiro/pagamentos.pdf', {'pagamentos':dados['pg'], 'ano':ano, 'mes':mes, 'total':formata_moeda(dados['total']['valor_fapesp__sum'], ','), 'pm':dados['pm']}, filename='pagamentos.pdf')
+                return render_to_pdf('financeiro/pagamentos.pdf', {'pagamentos':dados['pg'], 'ano':ano, 'mes':mes, 'total':formata_moeda(dados['total']['valor_fapesp__sum'], ','), 'pm':dados['pm']}, request=request, filename='pagamentos.pdf')
             else:
                 return render_to_response('financeiro/pagamentos.html', {'pagamentos':dados['pg'], 'ano':ano, 'mes':mes, 'total':formata_moeda(dados['total']['valor_fapesp__sum'], ','), 'pm':dados['pm']}, context_instance=RequestContext(request))
         else:
             meses = range(1,13)
             anos = range(1990,dtime.now().year+1)
             anos.sort(reverse=True)
-            return render_to_response('financeiro/pagamentos_mes.html', {'meses':meses, 'anos':anos}, context_instance=RequestContext(request))
+            return render_to_response('financeiro/pagamentos_mes.html', {'meses':meses, 'anos':anos, 'view':'pagamentos_mensais'}, context_instance=RequestContext(request))
 
 @login_required
 def pagamentos_parciais(request, pdf=False):
@@ -204,7 +204,7 @@ def pagamentos_parciais(request, pdf=False):
             dados = estrutura_pagamentos(pagamentos)
 
             if pdf:
-                return render_to_pdf('financeiro/pagamentos_parciais.pdf', {'pagamentos':dados['pg'], 'parcial':parcial, 'termo':termo, 'total':formata_moeda(dados['total']['valor_fapesp__sum'], ','), 'pm':dados['pm']}, filename='pagamentos.pdf')
+                return render_to_pdf('financeiro/pagamentos_parciais.pdf', {'pagamentos':dados['pg'], 'parcial':parcial, 'termo':termo, 'total':formata_moeda(dados['total']['valor_fapesp__sum'], ','), 'pm':dados['pm']}, request=request, filename='pagamentos.pdf')
             else:
                 return render_to_response('financeiro/pagamentos_parciais.html', {'pagamentos':dados['pg'], 'parcial':parcial, 'termo':termo, 'total':formata_moeda(dados['total']['valor_fapesp__sum'], ','), 'pm':dados['pm']}, context_instance=RequestContext(request))
         else:
@@ -317,13 +317,13 @@ def relatorio_gerencial(request, pdf=False):
                         ano += 1
 
                 retorno.append(item)
-    
+
             if pdf:
-	            return render_to_pdf('financeiro/gerencial.pdf', {'atualizado':ultimo, 'termo':t, 'meses':meses, 'modalidades':retorno, 'totais':totalizador, 'gerais':gerais}, context_instance=RequestContext(request))
+	            return render_to_pdf('financeiro/gerencial.pdf', {'atualizado':ultimo, 'termo':t, 'meses':meses, 'modalidades':retorno, 'totais':totalizador, 'gerais':gerais}, request=request, context_instance=RequestContext(request), filename='relatorio_gerencial.pdf')
             else:
                 return render_to_response('financeiro/gerencial.html', {'atualizado':ultimo, 'termo':t, 'meses':meses, 'modalidades':retorno, 'totais':totalizador, 'gerais':gerais}, context_instance=RequestContext(request))
         else:
-            return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all()}, context_instance=RequestContext(request))
+            return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all(), 'view':'relatorio_gerencial'}, context_instance=RequestContext(request))
 
 @login_required
 def relatorio_acordos(request, pdf=False):
@@ -366,11 +366,11 @@ def relatorio_acordos(request, pdf=False):
                 retorno.append(ac)
 
             if pdf:
-                return render_to_pdf_weasy(template_src='financeiro/acordos_weasy.pdf', context_dict={'termo':t, 'acordos':retorno}, filename='relatorio_de_acordos_da_outorga_%s.pdf'%t,)
+                return render_to_pdf_weasy(template_src='financeiro/acordos_weasy.pdf', context_dict={'termo':t, 'acordos':retorno}, request=request, filename='relatorio_de_acordos_da_outorga_%s.pdf'%t,)
             else:
                 return render_to_response('financeiro/acordos.html', {'termo':t, 'acordos':retorno}, context_instance=RequestContext(request))
         else:
-            return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all()}, context_instance=RequestContext(request))
+            return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all(), 'view':'relatorio_acordos'}, context_instance=RequestContext(request))
 
 @login_required
 def extrato(request, pdf=False):
@@ -397,7 +397,7 @@ def extrato(request, pdf=False):
                 retorno.append({'saldo':e1.saldo, 'data':e1.data_oper})
 
             if pdf:
-                return render_to_pdf_weasy('financeiro/contacorrente.pdf', {'ano':ano, 'extrato':retorno}, filename='extrato_cc_%s.pdf' % ano)
+                return render_to_pdf_weasy('financeiro/contacorrente.pdf', {'ano':ano, 'extrato':retorno}, request=request, filename='extrato_cc_%s.pdf' % ano)
             else:
                 return render_to_response('financeiro/contacorrente.html', {'ano':ano, 'extrato':retorno}, context_instance=RequestContext(request))
         else:
@@ -425,7 +425,7 @@ def extrato_mes(request, pdf=False):
                 retorno.append(e1.saldo)
 
             if pdf:
-                return render_to_pdf('financeiro/contacorrente_mes.pdf', {'ano':ano, 'mes':mes, 'extrato':retorno}, filename='extrato_cc_%s/%s.pdf' % (mes,ano))
+                return render_to_pdf('financeiro/contacorrente_mes.pdf', {'ano':ano, 'mes':mes, 'extrato':retorno}, request=request, filename='extrato_cc_%s/%s.pdf' % (mes,ano))
             else:
                 return render_to_response('financeiro/contacorrente_mes.html', {'ano':ano, 'mes':mes, 'extrato':retorno}, context_instance=RequestContext(request))
         else:
@@ -465,12 +465,12 @@ def extrato_financeiro(request, ano=dtime.now().year, pdf=False):
                 extrato.append(ex)
 
             if pdf:
-                return render_to_pdf('financeiro/financeiro.pdf', {'ano':ano, 'extrato':extrato}, filename='financeiro_%s/%s.pdf' % (mes,ano))
+                return render_to_pdf('financeiro/financeiro.pdf', {'ano':ano, 'extrato':extrato}, request=request, filename='financeiro_%s/%s.pdf' % (mes,ano))
             else:
                 return render_to_response('financeiro/financeiro.html', {'termo':termo, 'mes':mes, 'ano':ano, 'extrato':extrato}, context_instance=RequestContext(request))
         else:
             meses = range(0,13)
-            return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all(), 'meses':meses}, context_instance=RequestContext(request))
+            return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all(), 'meses':meses, 'view':'extrato_financeiro'}, context_instance=RequestContext(request))
 
 @login_required
 def extrato_tarifas(request, pdf=False):
@@ -487,14 +487,14 @@ def extrato_tarifas(request, pdf=False):
             context = {'total':total['valor__sum'], 'ano':ano, 'tarifas':tars}
             if mes > 0: context.update({'mes':mes})
             if pdf:
-                return render_to_pdf('financeiro/tarifas.pdf', context, filename='tarifas_%s/%s.pdf' % (mes,ano))
+                return render_to_pdf('financeiro/tarifas.pdf', context, request=request, filename='tarifas_%s/%s.pdf' % (mes,ano))
             else:
                 return render_to_response('financeiro/tarifas.html', context, context_instance=RequestContext(request))
         else:
             meses = range(0,13)
             anos = range(1990,dtime.now().year+1)
             anos.sort(reverse=True)
-            return render_to_response('financeiro/pagamentos_mes.html', {'anos':anos, 'meses':meses}, context_instance=RequestContext(request))
+            return render_to_response('financeiro/pagamentos_mes.html', {'anos':anos, 'meses':meses, 'view':'extrato_tarifas'}, context_instance=RequestContext(request))
 
 	    
 
@@ -514,7 +514,7 @@ def cheque(request, cc=1):
 	name = None
 
     #return render_to_response('financeiro/cheque.pdf', {'cc':extrato, 'termo':termo})
-    return render_to_pdf('financeiro/cheque.pdf', {'cc':extrato, 'termo':termo, 'pp':name}, filename='capa_%s.pdf' % extrato.cod_oper)
+    return render_to_pdf('financeiro/cheque.pdf', {'cc':extrato, 'termo':termo, 'pp':name}, request=request, filename='capa_%s.pdf' % extrato.cod_oper)
 
 
 @login_required
@@ -662,11 +662,11 @@ def financeiro_parciais(request, pdf=False):
                           'total_concessoes':total_concessoes, }
             
             if pdf:
-                return render_to_pdf_weasy('financeiro/financeiro_parcial.pdf', {'size':pdf, 'termo':termo, 'parciais':retorno, 'totais':totais}, filename='financeiro_parciais_%s.pdf' % termo.__unicode__())
+                return render_to_pdf_weasy('financeiro/financeiro_parcial.pdf', {'size':pdf, 'termo':termo, 'parciais':retorno, 'totais':totais}, request=request, filename='financeiro_parciais_%s.pdf' % termo.__unicode__())
             else:
                 return render_to_response('financeiro/financeiro_parcial.html', {'termo':termo, 'parciais':retorno, 'totais':totais}, context_instance=RequestContext(request))
         else:
-            return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all(), 'rt':False, }, context_instance=RequestContext(request))
+            return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all(), 'rt':False, 'view':'financeiro_parciais'}, context_instance=RequestContext(request))
 
 @login_required
 def parciais(request, caixa=False, pdf=False):
@@ -723,11 +723,14 @@ def parciais(request, caixa=False, pdf=False):
                 retorno.append(parcs)
 
             if pdf:
-                return render_to_pdf('financeiro/parciais.pdf', {'parciais':retorno, 'termo':termo}, filename='parciais.pdf')
+                return render_to_pdf('financeiro/parciais.pdf', {'parciais':retorno, 'termo':termo}, request=request, filename='parciais.pdf')
             else:
                 return render_to_response('financeiro/parciais.html', {'caixa':caixa, 'parciais':retorno, 'termo':termo}, context_instance=RequestContext(request))
         else:
-            return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all()}, context_instance=RequestContext(request))
+            view = 'parciais'
+            if caixa:
+                view = 'caixa'
+            return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all(), 'caixa':caixa, 'view':view}, context_instance=RequestContext(request))
 
 def escolhe_extrato(request):
     if request.method == 'POST':
@@ -769,11 +772,11 @@ def presta_contas(request, pdf=False):
                 mod.update({'parcial':parcs})
                 m.append(mod)
             if pdf:
-               return render_to_pdf('financeiro/presta_contas.pdf', {'modalidades':m, 'termo':termo}, filename='presta_contas_%s.pdf' % termo.__unicode__(), context_instance=RequestContext(request))
+               return render_to_pdf_weasy('financeiro/presta_contas.pdf', {'modalidades':m, 'termo':termo}, request=request, filename='presta_contas_%s.pdf' % termo.__unicode__())
             else:
                return render_to_response('financeiro/presta_contas.html', {'modalidades':m, 'termo':termo}, context_instance=RequestContext(request))
         else:
-            return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all()}, context_instance=RequestContext(request))
+            return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all(), 'view':'presta_contas'}, context_instance=RequestContext(request))
 
 
 @login_required

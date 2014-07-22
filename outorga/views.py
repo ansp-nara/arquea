@@ -13,7 +13,7 @@ import json as simplejson
 from financeiro.models import Pagamento
 from identificacao.models import *
 from outorga.models import Termo, Modalidade, Item, Natureza_gasto, Acordo
-from utils.functions import render_to_pdf
+from utils.functions import render_to_pdf, render_to_pdf_weasy
 
 import logging
 
@@ -239,7 +239,7 @@ def gastos_acordos(request):
             acordo.append(total)
         acordos.append(acordo)
   
-    return render_to_pdf('outorga/acordos.pdf', {'acordos':acordos})
+    return render_to_pdf('outorga/acordos.pdf', {'acordos':acordos}, request=request)
 
 @login_required
 def contratos(request):
@@ -313,9 +313,11 @@ def lista_acordos(request, pdf=False):
         processos.append(processo)
 
     if pdf:
-        return render_to_pdf('outorga/acordos.pdf', {'processos':processos})
+        return render_to_pdf('outorga/acordos.pdf', {'processos':processos}, request=request, filename="distribuicao_das_concessoes_por_acordo.pdf")
     else:
         return render(request, 'outorga/acordos.html', {'processos':processos})
+
+
 
 @login_required
 def item_modalidade(request, pdf=False):
@@ -330,19 +332,40 @@ def item_modalidade(request, pdf=False):
             itens = []
             it_objs = Item.objects.filter(natureza_gasto__termo=termo, natureza_gasto__modalidade=mod)
             entidade_id = request.GET.get('entidade')
+            marca_id = request.GET.get('marca')
+            procedencia_id = request.GET.get('procedencia')
+            
             if entidade_id > '0':
-                it_objs = it_objs.filter(origemfapesp__pagamento__protocolo__procedencia__id=entidade_id).distinct()
+                it_objs = it_objs.filter(origemfapesp__item_outorga__entidade__id=entidade_id)
             for item in it_objs:
                 pags = []
                 total = Decimal('0.0')
                 for p in Pagamento.objects.filter(origem_fapesp__item_outorga=item):
-                    pags.append({'p':p, 'docs':p.auditoria_set.all()})
-                    total += p.valor_fapesp
-                itens.append({'item':item, 'total':total, 'pagtos':pags})
+                    patrimonios = []
+                    if marca_id > '0':
+                        if p.patrimonio_set.filter(equipamento__entidade_fabricante_id=marca_id).exists():
+                            patrimonios = p.patrimonio_set.filter(equipamento__entidade_fabricante_id=marca_id)
+                            pags.append({'p':p, 'docs':p.auditoria_set.all(), 'patrimonios':patrimonios})
+                            total += p.valor_fapesp
+                    elif procedencia_id > '0':
+                        if p.patrimonio_set.filter(entidade_procedencia_id=procedencia_id).exists():
+                            patrimonios = p.patrimonio_set.filter(entidade_procedencia_id=procedencia_id)
+                            pags.append({'p':p, 'docs':p.auditoria_set.all(), 'patrimonios':patrimonios})
+                            total += p.valor_fapesp
+                    else:
+                        patrimonios = p.patrimonio_set.all()
+                        pags.append({'p':p, 'docs':p.auditoria_set.all(), 'patrimonios':patrimonios})
+                        total += p.valor_fapesp
+                    
+                # se for especificado o filtro de marca ou procedencia, somente
+                # adiciona o item de outorga se tiver patrimonios com estes dados.
+                if (marca_id == '0' and procedencia_id == '0') or len(pags) > 0:
+                    itens.append({'item':item, 'total':total, 'pagtos':pags})
+                    
             if pdf:
-                return render_to_pdf('outorga/por_item_modalidade.pdf', {'termo':termo, 'modalidade':mod, 'itens':itens}, filename='%s-%s.pdf' % (termo, mod.sigla))
+                return render_to_pdf_weasy('outorga/por_item_modalidade.pdf', {'termo':termo, 'modalidade':mod, 'itens':itens}, request=request, filename='%s-%s.pdf' % (termo, mod.sigla))
             else:
-                return render(request, 'outorga/por_item_modalidade.html', {'termo':termo, 'modalidade':mod, 'itens':itens, 'entidade':entidade_id})
+                return render(request, 'outorga/por_item_modalidade.html', {'termo':termo, 'modalidade':mod, 'itens':itens, 'entidade':entidade_id, 'marca':marca_id, 'procedencia':procedencia_id})
         else:
             termos = Termo.objects.all()
             termo = request.GET.get('termo')
@@ -465,6 +488,6 @@ def acordo_progressivo(request, pdf=False):
         
         termos = Termo.objects.filter(exibe_rel_ger_progressivo=True).order_by('inicio')
     if pdf:
-        return render_to_pdf('outorga/acordo_progressivo.pdf', {'acordos':acordos, 'termos':termos}, filename='acordo_progressivo.pdf')
+        return render_to_pdf('outorga/acordo_progressivo.pdf', {'acordos':acordos, 'termos':termos}, request=request, filename='acordo_progressivo.pdf')
     else:
         return render(request, 'outorga/acordo_progressivo.html', {'acordos':acordos, 'termos':termos})

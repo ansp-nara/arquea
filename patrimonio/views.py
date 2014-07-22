@@ -333,7 +333,9 @@ def por_tipo(request):
         if pdf:
             return render_to_pdf_weasy('patrimonio/por_tipo_weasy.pdf', {'tipo':tipo,
                                                                   'procedencia':procedencia,
-                                                                  'patrimonios':patrimonios})
+                                                                  'patrimonios':patrimonios}, 
+                                       request=request,
+                                       filename="inventario_por_tipo.pdf")
         elif xls:
             # Export para Excel/XLS
             dataset = RelatorioPorTipoResource().export(queryset=patrimonios)
@@ -363,7 +365,7 @@ def por_marca(request, pdf=0):
     if request.method == 'GET' and request.GET.get('marca'):
         marca = request.GET.get('marca')
         if pdf:
-	           return render_to_pdf('patrimonio/por_marca.pdf', {'marca':marca, 'patrimonios':Patrimonio.objects.filter(equipamento__entidade_fabricante__sigla=marca), 'filename':'inventario_por_marca.pdf'})
+            return render_to_pdf_weasy('patrimonio/por_marca.pdf', {'marca':marca, 'patrimonios':Patrimonio.objects.filter(equipamento__entidade_fabricante__sigla=marca)}, request=request, filename='inventario_por_marca.pdf')
         return TemplateResponse(request, 'patrimonio/por_marca.html', {'marca':marca, 'patrimonios':Patrimonio.objects.filter(equipamento__entidade_fabricante__sigla=marca)})
     else:
         return TemplateResponse(request, 'patrimonio/sel_marca.html', {'marcas':Patrimonio.objects.values_list('equipamento__entidade_fabricante__sigla', flat=True).order_by('equipamento__entidade_fabricante__sigla').distinct()})
@@ -371,7 +373,7 @@ def por_marca(request, pdf=0):
 
 @login_required
 def por_local(request, pdf=0):
-    if request.GET.get('entidade') and request.GET.get('endereco') and request.GET.get('detalhe'):
+    if request.GET.get('entidade') and request.GET.get('endereco'):
         atuais = []
         detalhes = []
 
@@ -382,11 +384,15 @@ def por_local(request, pdf=0):
            detalhe_id = request.GET.get('detalhe1')
         if not detalhe_id:
            detalhe_id = request.GET.get('detalhe')
-           
+   
+        
+        for p in Patrimonio.objects.filter(patrimonio__isnull=True):
+            ht = p.historico_atual
+            if ht:
+                 atuais.append(ht.id)
         
         # Listamos os patrimonios candidatos, a partir do filtro de endereços
         if detalhe_id:
-            
             detalhe = get_object_or_404(EnderecoDetalhe, pk=detalhe_id)
             detalhes = [detalhe]
             i = 0
@@ -400,12 +406,13 @@ def por_local(request, pdf=0):
             # Se não tiver filtro de detalhe, temos que buscar em todos os enderecos possiveis
             endereco = get_object_or_404(Endereco, pk=endereco_id)
 
-            patrimonio_ids = HistoricoLocal.objects.filter(id__in=atuais, endereco__endereco=endereco).values_list('patrimonio', flat=True).order_by('id') \
-                            | HistoricoLocal.objects.filter(id__in=atuais, endereco__detalhe__endereco=endereco).values_list('patrimonio', flat=True).order_by('id') \
-                            | HistoricoLocal.objects.filter(id__in=atuais, endereco__detalhe__detalhe__endereco=endereco).values_list('patrimonio', flat=True).order_by('id')
+            patrimonio_ids = HistoricoLocal.objects.filter(patrimonio__patrimonio__isnull=True, endereco__endereco=endereco).values_list('patrimonio', flat=True).order_by('id') \
+                            | HistoricoLocal.objects.filter(patrimonio__patrimonio__isnull=True, endereco__detalhe__endereco=endereco).values_list('patrimonio', flat=True).order_by('id') \
+                            | HistoricoLocal.objects.filter(patrimonio__patrimonio__isnull=True, endereco__detalhe__detalhe__endereco=endereco).values_list('patrimonio', flat=True).order_by('id')
         
         # Com os patrimonios candidatos, buscamos somente endereços que possuem
         # históricos atuais nos patrimonios
+        atuais = []
         for p in Patrimonio.objects.filter(patrimonio__isnull=True, id__in=patrimonio_ids):
             ht = p.historico_atual
             if ht:
@@ -421,11 +428,10 @@ def por_local(request, pdf=0):
                                     .order_by('descricao', 'complemento')}]}
         else:
             endereco = get_object_or_404(Endereco, pk=endereco_id)
-
+            
             historicos = HistoricoLocal.objects.filter(id__in=atuais, endereco__endereco=endereco
                                            ) | HistoricoLocal.objects.filter(id__in=atuais, endereco__detalhe__endereco=endereco
                                            ) | HistoricoLocal.objects.filter(id__in=atuais, endereco__detalhe__detalhe__endereco=endereco)
-            
             detalhes = []
             detalhes_ids = historicos.values_list('endereco', flat=True)
             for d in EnderecoDetalhe.objects.filter(id__in=detalhes_ids):
@@ -434,10 +440,10 @@ def por_local(request, pdf=0):
                                                             .select_related('equipamento__entidade_fabricante', 'entidade_procedencia', 'pagamento__protocolo')
                                                             .order_by('descricao', 'complemento')
                                 })
-            context = {'endereco':endereco, 'end':endereco_id, 'detalhes':detalhes}
+            context = {'endereco':endereco, 'end':endereco_id, 'detalhes':detalhes, 'detalhe':'', 'det':'' }
         
         if pdf:
-            return render_to_pdf_weasy('patrimonio/por_local_weasy.pdf', context, filename='inventario_por_local.pdf')
+            return render_to_pdf_weasy('patrimonio/por_local_weasy.pdf', context, request=request, filename='inventario_por_local.pdf')
         return render_to_response('patrimonio/por_local.html', context, context_instance=RequestContext(request))
     else:
         entidades = find_entidades_filhas(None)
@@ -513,7 +519,7 @@ def por_local_termo(request, pdf=0):
             context = {'entidade': entidade, 'ent':entidade_id, 'enderecos': enderecos}
             
         if pdf:
-            return render_to_pdf_weasy('patrimonio/por_local_termo_weasy.pdf', context, filename='inventario_por_local.pdf')
+            return render_to_pdf_weasy('patrimonio/por_local_termo_weasy.pdf', context, request=request, filename='inventario_por_local.pdf')
         else:
             return render_to_response('patrimonio/por_local_termo.html', context,  RequestContext(request,context))
     else:
@@ -837,13 +843,14 @@ def por_termo(request, pdf=0):
 
 
     if pdf:
-        vars = {'termos':termos, 
+        vars = {'termo':qs[0],
+                'termos':termos, 
                 'i':itertools.count(1), 
                 'numero_fmusp':numero_fmusp, 
                 'ver_numero_fmusp':ver_numero_fmusp,}
         if termo_id !=0 and len(qs) > 0:
             vars.update({'t':qs[0]})
-	return render_to_pdf('patrimonio/%s.pdf' % template_name, vars, filename='invertario_por_termo.pdf')
+        return render_to_pdf_weasy('patrimonio/%s.pdf' % template_name, vars, request=request, filename='inventario_por_termo.pdf')
     else:
         
         return TemplateResponse(request, 'patrimonio/%s.html' % template_name, {'termos':termos, 
@@ -856,7 +863,6 @@ def por_termo(request, pdf=0):
                                                                                 'marca':marcas,
                                                                                 'numero_fmusp':numero_fmusp,
                                                                                 'ver_numero_fmusp':ver_numero_fmusp,
-                                                                                
                                                                                 'filtro_marcas':filtro_marcas,
                                                                                 'filtro_termos':filtro_termos, 
                                                                                 })
