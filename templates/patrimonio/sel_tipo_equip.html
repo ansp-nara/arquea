@@ -1,6 +1,13 @@
 {% extends "admin/base_site.html" %}
+{% load i18n %}
 {% block extrahead %}
 <script src="/media/js/por_tipo.js"></script>
+{% endblock %}
+{% block breadcrumbs %}
+    <div class="breadcrumbs">Você está em: 
+      <a href="../../">{% trans "Home" %}</a> &rsaquo; 
+      <a href="{% url 'patrimonio.views.por_tipo_equipamento' %}">Inventário por tipo de equipamento</a>
+    </div>
 {% endblock %}
 {% block content %}
 <form method="GET">

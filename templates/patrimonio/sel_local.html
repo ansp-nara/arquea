@@ -1,6 +1,13 @@
 {% extends "admin/base_site.html" %}
+{% load i18n %}
 {% block extrahead %}
 <script type="text/javascript" src="/media/js/selects.js"></script>
+{% endblock %}
+{% block breadcrumbs %}
+    <div class="breadcrumbs">Você está em: 
+      <a href="../../">{% trans "Home" %}</a> &rsaquo; 
+      <a href="{% url 'patrimonio.views.por_local' %}">Patrimônio por localização</a>
+    </div>
 {% endblock %}
 {% block content %}
 <div style="margin:10px; color:red; font-weight:bold;">{{ msg }}</div>

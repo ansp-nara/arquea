@@ -1,5 +1,12 @@
 {% extends "admin/base_site.html" %}
 {% load proto_tags %}
+{% load i18n %}
+{% block breadcrumbs %}
+    <div class="breadcrumbs">Você está em: 
+      <a href="../../">{% trans "Home" %}</a> &rsaquo;
+      <a href="{% url 'financeiro.views.extrato_tarifas' %}">Extrato de tarifas por mês</a>
+    </div>
+{% endblock %}
 {% block content %}
 <h1 repeat="1">Extrato de tarifas do projeto em {% if mes %}{{ mes }}/{% endif %}{{ ano }}</h1>
 

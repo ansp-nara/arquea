@@ -1,5 +1,12 @@
 {% extends "admin/base_site.html" %}
 {% load proto_tags %}
+{% load i18n %}
+{% block breadcrumbs %}
+    <div class="breadcrumbs">Você está em: 
+      <a href="../../">{% trans "Home" %}</a> &rsaquo;
+      <a href="{% url 'financeiro.views.financeiro_parciais' %}">Extrato do financeiro por parcial</a>
+    </div>
+{% endblock %}
 {% block content %}
 <style>
 .tbl_resumo {
@@ -75,9 +82,6 @@
     </form>
 </div>
 <h1 repeat="1" style="text-align:center;clear:both;">Extrato do financeiro do processo {{ termo }}</h1>
-<div class="tbl_sintatico_msg">
-O valor abaixo representa a soma de todas as diferenças apontadas nesta parcial. Diferenças negativas (entre parênteses) representam valores a serem devolvidos para a Fapesp, enquanto diferenças positivas representam valores a favor da ANSP.
-</div>
 <table class="tbl_resumo">
     <thead>
         <tr><td colspan="2">
@@ -92,6 +96,9 @@ O valor abaixo representa a soma de todas as diferenças apontadas nesta parcial
         <tr><td>Diferenças existentes:</td><td>{{ totais.total_diferenca_total|moeda }}</td><td>Total de concessões:</td><td>{{ totais.total_concessoes|moeda }}</td></tr>
     </tbody>
 </table>
+<div class="tbl_sintatico_msg">
+O valor abaixo representa a soma de todas as diferenças apontadas nesta parcial. Diferenças negativas (entre parênteses) representam valores a serem devolvidos para a Fapesp, enquanto diferenças positivas representam valores a favor do projeto.
+</div>
 
 {% for p in parciais %}
 <div class="parciais_wrapper">
@@ -109,6 +116,9 @@ O valor abaixo representa a soma de todas as diferenças apontadas nesta parcial
 			<tr><td>Diferenças existentes:</td><td>{{ p.diferenca_total|moeda }}</td><td>Total de concessões:</td><td>{{ p.concessoes|moeda }}</td></tr>
 	    </tbody>
 	</table>
+	<div class="tbl_sintatico_msg">
+        O valor abaixo representa a soma de todas as diferenças apontadas nesta parcial. Diferenças negativas (entre parênteses) representam valores a serem devolvidos para a Fapesp, enquanto diferenças positivas representam valores a favor do projeto.
+    </div>
     <table border="0" repeat="1" cellpadding="5" id="tbl_dados">
        <tr>
             <th class="th_data">Data<hr>&nbsp;</th>

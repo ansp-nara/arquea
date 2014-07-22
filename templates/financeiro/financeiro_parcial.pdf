@@ -6,16 +6,20 @@
 @page {
 {% if size == '3' %}
     size: a{{ size }};
+    background-image: url('media:{{papelaria.papel_timbrado_retrato_a3}}');
+    padding: {{papelaria.retrato_a3_margem_superior}}cm 1cm {{papelaria.retrato_a3_margem_inferior}}cm 1cm;
 {% elif size == '4' %}
     size: a{{ size }} landscape;
+    background-image: url('media:{{papelaria.papel_timbrado_paisagem_a4}}');
+    padding: {{papelaria.paisagem_a4_margem_superior}}cm 1cm {{papelaria.paisagem_a4_margem_inferior}}cm 1cm;
 {% endif %}
-  margin: 1cm;
-  background-image: url('/var/www/django/media/img/papel_timbrado.jpg');
-  top: 0.5cm;
-  left: 0.5cm;
-  right: 0.5cm;
-  bottom: 0.5cm;
-  
+  background-size: contain;
+  background-repeat:no-repeat;
+  margin-top:0;
+  margin-right:1cm;
+  margin-bottom:1cm;
+  margin-left:0;
+
   @bottom-right {
     content: 'Pág ' counter(page);
     white-space: pre;

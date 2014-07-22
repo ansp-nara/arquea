@@ -1,5 +1,16 @@
 {% extends "admin/base_site.html" %}
 {% load proto_tags %}
+{% load i18n %}
+{% block breadcrumbs %}
+    <div class="breadcrumbs">Você está em: 
+      <a href="../../">{% trans "Home" %}</a> &rsaquo;
+      {% if caixa %} 
+        <a href="{% url 'financeiro.views.parciais' caixa=True %}">Diferenças de caixa</a>
+      {% else %} 
+        <a href="./parciais">Diferenças totais</a>
+      {% endif %}
+    </div>
+{% endblock %}
 {% block content %}
 <h1>Processo {{ termo }}</h1>
 <h1 repeat="1">Saldo {% if caixa %}em caixa {% endif %}a ser devolvido à Fapesp</h1>

@@ -23,16 +23,55 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def render_to_pdf(template_src, context_dict, context_instance=None, filename='file.pdf', attachments=[]):
+"""
+Funções para uso da biblioteca PisaPDF
+"""
+
+"""
+Utilizado para resolver o acesso a imagens relativas.
+Ele resolve automaticamente, se for utilizado os prefixos definidos em STATIC_URL e MEDIA_URL
+
+Ex. de uso no template:
+{% load static %}
+url('{% get_media_prefix %}{{papelaria.papel_timbrado_retrato_a4}}');
+
+"""
+def fetch_resources(uri, rel):
+    # use short variable names
+    sUrl = settings.STATIC_URL      # Typically /static/
+    sRoot = settings.STATIC_ROOT    # Typically /home/userX/project_static/
+    mUrl = settings.MEDIA_URL       # Typically /static/media/
+    mRoot = settings.MEDIA_ROOT     # Typically /home/userX/project_static/media/
+
+    # convert URIs to absolute system paths
+    if uri.startswith(mUrl):
+        path = os.path.join(mRoot, uri.replace(mUrl, ""))
+    elif uri.startswith(sUrl):
+        path = os.path.join(sRoot, uri.replace(sUrl, ""))
+
+    # make sure that file exists
+    if not os.path.isfile(path):
+            raise Exception(
+                    'media URI must start with %s or %s' % \
+                    (sUrl, mUrl))
+    return path
+
+
+def render_to_pdf(template_src, context_dict, request=None, context_instance=None, filename='file.pdf', attachments=[]):
     import ho.pisa as pisa
     from sx.pisa3.pisa_pdf import *
 
     template = loader.get_template(template_src)
-    context = context_instance or Context()
+
+    if request: 
+        context = RequestContext(request)
+    else: 
+        context = Context()
+    
     context.update(context_dict)
     html  = template.render(context)
     pdf = pisaPDF()
-    pdf_princ = pisa.pisaDocument(StringIO.StringIO(html.encode("utf-8"))) #, link_callback=fetch_resources)
+    pdf_princ = pisa.pisaDocument(StringIO.StringIO(html.encode("utf-8")), link_callback=fetch_resources)
     pdf.addDocument(pdf_princ)
     a = 0
     for f,d,t in attachments:
@@ -47,25 +86,48 @@ def render_to_pdf(template_src, context_dict, context_instance=None, filename='f
         return response
     return HttpResponse('We had some errors<pre>%s</pre>' % cgi.escape(html))
 
+
 """
-weasyprint
+Funções para uso da biblioteca WeasyPrint
 """
+
 def weasy_fetcher(url,**kwargs):
-    if url.startswith('graph:'):
-        url = url[len('graph:'):]
+    """
+    Definição de URLs relativas;
+    Para acessar imagens do MEDIA, utilizar media:
+    Para os do STATIC, utilizar static:
+    
+    Ex: 
+    url('media:{{papelaria.papel_timbrado_paisagem_a4}}');
+    
+    """
+    print url
+    if url.startswith('static:'):
+        url = url[len('static:'):]
         return weasyprint.default_url_fetcher('file://' +settings.STATIC_ROOT + url)
+    elif url.startswith('media:'):
+        url = url[len('media:'):]
+        return weasyprint.default_url_fetcher('file://' +settings.MEDIA_ROOT + url)
     else:
         return weasyprint.default_url_fetcher(url)
 
-def render_to_pdf_weasy(template_src, context_dict, context_instance=None, filename='file.pdf'):
+
+def render_to_pdf_weasy(template_src, context_dict, request=None, filename='file.pdf'):
     # Renderiza o HTML
     template = loader.get_template(template_src)
-    context = context_instance or Context()
+    if request: 
+        context = RequestContext(request)
+        base_url = request.build_absolute_uri() 
+    else: 
+        context = Context()
+        base_url = ''
+    
     context.update(context_dict)
     html  = template.render(context)
     
-    
     response = HttpResponse(mimetype="application/pdf")
+    
+    # Necessário passar o base_url para poder resolver os caminhos relativos de imagens
     weasyprint.HTML(string=html, url_fetcher=weasy_fetcher).write_pdf(response)
     response['Content-Disposition'] = 'attachment; filename=%s' % filename
     return response
@@ -137,10 +199,7 @@ def render_wk_to_pdf(template_src, context_dict, context_instance=None, filename
 
     return response
 
-def fetch_resources(uri, rel):
-    path = os.path.join(settings.MEDIA_ROOT, uri.replace(settings.MEDIA_URL, ""))
 
-    return path
 
 def formata_moeda(n, s_d):
     if s_d == '.':
@@ -151,9 +210,9 @@ def formata_moeda(n, s_d):
     num = f.split('.')
     i = num[0]
     if len(num) > 1:
-	d = num[1]
+        d = num[1]
     else:
-	d = '0'
+        d = '0'
     if len(d) == 1: d = d+'0'
     ii = list(i)
     j = 3

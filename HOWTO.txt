@@ -1,0 +1,88 @@
+Subversion
+----------
+- verificar se o Subversion não está instalado com um idioma diferente do inglês. O zest.releaser verifica mensagens de saída dos comandos e espera mensagens em inglês.
+    - executar o comando abaixo e verificar as mensagens na tela
+        svn info
+
+- modificar a estrutura do projeto Sistema
+    Mover o diretório https://www.ansp.br/svn/sistema/
+    para ?? https://www.ansp.br/svn/sistema/src/trunk
+    
+    Criar as estruturas
+    https://www.ansp.br/svn/sistema/src/tags
+    https://www.ansp.br/svn/sistema/src/branch
+    https://www.ansp.br/svn/sistema/carga/trunk
+    https://www.ansp.br/svn/sistema/doc/trunk
+
+    
+Zest.Releaser
+-------------
+- instalar o zest.releaser
+    easy_install zest.releaser zest.pocompile
+    easy_install setuptools-git setuptools_subversion
+    easy_install setuptools_hg
+    
+    
+- criar o arquivo setup.py
+    # -*- coding: utf-8 -*-
+    from setuptools import setup, find_packages
+    import codecs
+
+    version = '1.0'
+
+    def read(filename):
+        return unicode(codecs.open(filename, encoding='utf-8').read())
+
+    long_description = '\n\n'.join([read('README.rst'),
+                                    read('CHANGES.rst')])
+                                    
+    setup(
+            name = 'ansp.poc',
+            version = version,
+            description = "POC para estrutura de projeto para release utilizando zest.releaser",
+            long_description = long_description,
+            keywords = '',
+            author = 'Rogerio Motitsuki',
+            author_email = 'noc@ansp.br',
+            url = 'http://www.ansp.br',
+            license = '',
+            packages = find_packages(exclude=['ez_setup']),
+            namespace_packages = ['ansp'],
+            include_package_data = True,
+            zip_safe = False,
+            install_requires = [
+              'setuptools',
+              # -*- Extra requirements: -*-
+            ]
+         )
+
+- criar arquivo setup.cfg
+    [zest.releaser]
+    # Release do PyPI
+    release = no
+
+    # Disable the <enter> to select the default values
+    no-input = true
+
+    
+- Criar um __init__.py conforme o exemplo se for necessário recuperar a versão dentro do Python
+
+    import pkg_resources
+
+    """
+    Usage:
+    >>> import zest.releaser
+    >>> zest.releaser.__version__
+    """
+    __version__ = pkg_resources.get_distribution("zest.releaser").version
+    
+- Criar um arquivo MANIFEST.in. 
+    Exemplo:
+
+    recursive-include main_directory *
+    recursive-include docs *
+    include *
+    global-exclude *.pyc
+    
+- Criar um arquivo README.rst
+- Criar um arquivo CHANGES.rst    

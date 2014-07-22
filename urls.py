@@ -38,6 +38,8 @@ urlpatterns = patterns('',
     (r'^verificacao/', include('verificacao.urls')),
     (r'^repositorio/', include('repositorio.urls')),
     (r'^carga/', include('carga.urls')),
+    (r'^configuracao/', include('configuracao.urls')),
+    
     (r'^accounts/login/$', 'django_cas.views.login'),
     (r'^accounts/logout/$', 'django_cas.views.logout'),
     (r'^xml_rpc_srv$', 'xmlrpc_srv.rpc_handler', {'SSL':False}),

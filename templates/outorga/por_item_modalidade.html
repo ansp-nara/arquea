@@ -1,8 +1,29 @@
 {% extends "admin/base_site.html" %}
 {% load proto_tags %}
+{% load i18n %}
+{% block breadcrumbs %}
+    <div class="breadcrumbs">Você está em: 
+      <a href="../../">{% trans "Home" %}</a> &rsaquo; 
+      <a href="{% url 'outorga.views.item_modalidade' %}">Itens do orçamento por modalidade</a>
+    </div>
+{% endblock %}
 {% block content %}
 <h1 repeat="1">Pagamentos por item de outorga do processo {{ termo }} e modalidade {{ modalidade }}</h1>
-<h4><a href="{% url 'outorga.views.item_modalidade' 1 %}?termo={{ termo.id }}&modalidade={{ modalidade.id }}{% if entidade %}&entidade={{ entidade }}{% endif %}">Imprimir</a></h4>
+<div id="report_title">
+    <div id="report_toolbar">
+        <form action="{% url 'outorga.views.item_modalidade' 1 %}" method="GET" id="id_form_recurso_pdf">
+            <input type="hidden" name="termo" value="{{ termo.id }}" />
+            <input type="hidden" name="modalidade" value="{{ modalidade.id }}" />
+            <input type="hidden" name="entidade" value="{{ entidade|default:0 }}" />
+            <input type="hidden" name="marca" value="{{ marca|default:0 }}" />
+            <input type="hidden" name="procedencia" value="{{ procedencia|default:0 }}" />
+            <div title="Imprimir" class="btn_print">
+               <input type="submit" title="Versão para impressão" class="btn_print" value="" />
+            </div>
+        </form>
+    </div>
+</div>
+
 
     <table border="0" repeat="1" cellpadding="5">
     {% for it in itens %}
@@ -12,8 +33,8 @@
               {% for a in pg.docs %}
                  <tr><td colspan="3"></td><td>{{ a.tipo.nome }}</td><td>parc. {{ a.parcial }}/pag. {{ a.pagina }}</td><td>{% if a.arquivo %}<a href="{{ a.arquivo.url }}">arquivo</a>{% endif %}</td></tr>
               {% endfor %}
-              {% for pt in pg.p.patrimonio_set.all %}
-                 <tr><td colspan="3"><td>(Patrimônio: marca, modelo e número de série)</td><td>{{ pt.marca }}</td><td>{{ pt.modelo }}</td><td>{{ pt.ns }}<</td></tr>
+              {% for pt in pg.patrimonios %}
+                 <tr><td colspan="3"><td>(Patrimônio: marca, modelo e número de série)</td><td>{{ pt.marca }}</td><td>{{ pt.modelo }}</td><td>{{ pt.ns }}</td></tr>
               {% endfor %}
           {% endfor %}
     {% endfor %}

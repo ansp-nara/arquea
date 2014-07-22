@@ -1,4 +1,11 @@
 {% extends "admin/base_site.html" %}
+{% load i18n %}
+{% block breadcrumbs %}
+    <div class="breadcrumbs">Você está em: 
+      <a href="../../">{% trans "Home" %}</a> &rsaquo; 
+      <a href="{% url 'rede.views.planilha_informacoes_gerais' %}">Dados cadastrais dos participantes</a>
+    </div>
+{% endblock %}
 {% block content %}
 <h2>Entidades ligadas à ANSP</h2>
 <form action="{% url 'rede.views.imprime_informacoes_gerais' %}" method="GET">

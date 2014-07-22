@@ -1,18 +1,83 @@
 {% extends "base.pdf" %}
+{% load static %}
 {% load proto_tags %}
 {% block content %}
+<style>
+@page {
+  size: a4;
+  background-image: url('{% get_media_prefix %}{{papelaria.papel_timbrado_retrato_a4}}');
+  top: {{papelaria.retrato_a4_margem_superior}}cm;
+  bottom: {{papelaria.retrato_a4_margem_inferior}}cm;
+  left: 1.5cm;
+  right: 1.5cm;
+  @frame footer {
+    -pdf-frame-content: footerContent;
+    bottom: 0.5cm;
+    margin-right: 1cm;
+    height: 1cm;
+    left: -2.3cm;
+    } 
+}
+ body {
+    margin: 0;
+    padding: 0;
+    width:100%;
+    height:100%;
+    font-family: Arial;
+    font-size:0.9em;
+}
+th {text-align: left;}
+.th_ano { width: 1.0cm; }
+.th_projeto { width: 1.2cm; }
+.th_contrato { width: 1.8cm; }
+.th_qtd { width: 1.2cm; }
+/*.th_tipo { width: 3.5cm; }*/
+.th_valor { width: 2.0cm; }
+.th_total { width: 2.0cm; }
+.th_instalacao { width: 1.2cm; }
+
+</style>
 <h1>Planejamento de aquisição de recursos</h1>
 <table>
-<tr><th>Ano</th><th>Projeto</th><th>Contrato/OS</th><th>Qtd.</th><th>Tipo - Referente</th><th>Valor unitário</th><th>Valor total</th><th>Instalação?</th></tr>
+<tr>
+    <th class="th_ano">Ano</th>
+    <th class="th_projeto">Projeto</th>
+    <th class="th_contrato">Contrato/OS</th>
+    <th class="th_qtd">Qtd.</th>
+    <th class="th_tipo">Tipo - Referente</th>
+    <th class="th_valor">Valor unitário</th>
+    <th class="th_total">Valor total</th>
+    <th class="th_instalacao">Instalação?</th>
+</tr>
 {% for e in entidades %}
-   <tr><td>{{ ano }}</td></tr>
+   <tr>
+        <td colspan="8">{{ ano }}</td>
+   </tr>
    {% for p in e.projetos %}
-      <tr><td></td><td>{{ p.projeto }}</td></tr>
+      <tr>
+          <td> </td>
+          <td colspan="7">{{ p.projeto }}</td>
+      </tr>
       {% for pl in p.plan %}
-         <tr><td colspan="2"></td><td>{{ pl.contrato|default:pl.os }}</td><td>{{ pl.quantidade }}</td><td>{{ pl.tipo }} - {{ pl.referente }}</td><td>{{ pl.valor_unitario|moeda }}</td><td>{{ pl.valor_total|moeda }}</td><td>{% if pl.instalacao %}Sim{% else %}Não{% endif  %}</td></tr>
-          {% for recurso in pl.recurso_set.all %}
-          <tr><td colspan="3"></td><td><strong>NF:</strong> <a href="{% url 'admin:financeiro_pagamento_change' recurso.pagamento.id %}">{{ recurso.pagamento.protocolo.num_documento }}</a></td><td><strong>Meses pagos:</strong> {{ recurso.quantidade }}</td><td><strong>Valor mensal com imposto:</strong> {{ recurso.valor_imposto_mensal|moeda }}</td><td><strong>Total pago com imposto:</strong> {{ recurso.total_geral|moeda }}</td></tr>
-          {% endfor %}
+         <tr>
+            <td colspan="2"></td>
+            <td>{{ pl.contrato|default:pl.os }}</td>
+            <td>{{ pl.quantidade }}</td>
+            <td>{{ pl.tipo }} - {{ pl.referente }}</td>
+            <td>{{ pl.valor_unitario|moeda }}</td>
+            <td>{{ pl.valor_total|moeda }}</td>
+            <td>{% if pl.instalacao %}Sim{% else %}Não{% endif  %}</td>
+         </tr>
+         {% for recurso in pl.recurso_set.all %}
+            <tr>
+                <td colspan="2"></td>
+                <td><strong>NF:</strong> {{ recurso.pagamento.protocolo.num_documento }}</td>
+                <td colspan="2"><strong>Meses pagos:</strong> {{ recurso.quantidade }}</td>
+                <td><strong>Valor mensal com imposto:</strong> {{ recurso.valor_imposto_mensal|moeda }}</td>
+                <td><strong>Total pago com imposto:</strong> {{ recurso.total_geral|moeda }}</td>
+                <td></td>
+            </tr>
+         {% endfor %}
       {% endfor %}
    {% endfor %}
 {% endfor %}

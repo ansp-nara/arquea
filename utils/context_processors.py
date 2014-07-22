@@ -53,4 +53,24 @@ def debug(context):
    return {'DEBUG': settings.DEBUG}
    
    
-   
+def papelaria(context):
+	"""
+	Disponibiliza o acesso aos arquivos de papel timbrado para o template django.
+	Ver as opções disponíveis em: configuracao.models.papelaria
+	Utilizar:
+	
+	no PisaPdF
+	{% load static %}
+	<img src="{% get_media_prefix %}{{papelaria.papel_timbrado_retrato_a4}}">
+	
+	no WeasyPDF utilizar
+	<img src="media:{{papelaria.papel_timbrado_retrato_a4}}">
+	"""
+	from configuracao.models import Papelaria 
+	arquivos = Papelaria.objects.all()
+	print arquivos
+	for a in arquivos:
+		if a.valido:
+			return {'papelaria': a}
+	return {'papelaria': ''}
+

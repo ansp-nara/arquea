@@ -1,12 +1,13 @@
 {% load proto_tags %}
+{% load static %}
 <html xmlns="http://www.w3.org/1999/xhtml" lang="pt-br" xml:lang="pt-br" >
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <style>
-@import url('/var/www/media/css/pdf.css');
+@import url('{% get_media_prefix %}css/pdf.css');
 @page {
   size: a3 landscape;
-  background-image: url('/var/www/media/img/papel_timbrado_paisagem.jpg');
+  background-image: url('{% get_media_prefix %}{{papelaria.papel_timbrado_paisagem_a3}}');
   top: 5cm;
   left: 1.5cm;
   right: 1.5cm;
@@ -16,7 +17,7 @@
                 bottom: 0.5cm;
                 margin-right: 1cm;
                 height: 1cm;
-		left: -2.3cm;
+                left: -2.3cm;
                 } 
 } 
 

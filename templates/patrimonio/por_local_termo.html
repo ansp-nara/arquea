@@ -1,7 +1,7 @@
 {% extends "admin/base_site.html" %}
 {% load proto_tags %}
 {% load i18n admin_modify admin_static %}
-{% block content %}
+{% block extrahead %}
 <link rel="stylesheet" type="text/css" href="{% static "css/base-print.css" %}" />
 <style>
  .patr a:link,
@@ -62,7 +62,7 @@
  } 
  
  /* ID */
-  #tbl_content td:nth-child(1) { width:25px; }
+  #tbl_content td:nth-child(1) { width:33px; }
  /* PROCESSO */
   #tbl_content td:nth-child(2) { width:65px; }
  /* FMUSP */
@@ -83,21 +83,28 @@
   #tbl_content td:nth-child(10) { width:55px; }
  /* ESTADO */
   #tbl_content td:nth-child(11) { width:75px; }
- 
- 
 </style>
-
+{% endblock %}
+{% block breadcrumbs %}
+    <div class="breadcrumbs">Você está em: 
+      <a href="../../">{% trans "Home" %}</a> &rsaquo; 
+      <a href="{% url 'patrimonio.views.por_local_termo' %}">Patrimônio por localização (com Termo)</a>
+    </div>
+{% endblock %}
+{% block content %}
 <h1 repeat="1">Inventário por local</h1>
-<h4><a href="{% url 'patrimonio.views.por_local_termo' 1 %}?entidade={{request.GET.entidade}}&endereco={{request.GET.endereco}}&detalhe={{request.GET.detalhe}}&com_fmusp={{request.GET.com_fmusp}}">Imprimir</a></h4>
-
-{% comment %}
-    <form action="{% url 'patrimonio.views.por_estado' 1 %}" method="GET">
-       <input type="hidden" value="{{ termo.id }}" name="termo" />
-       <input type="submit" value="Versão para impressão" />
-    </form> 
-{% endcomment %}
-
- 
+<div id="report_toolbar">
+    <form action="{% url 'patrimonio.views.por_local_termo' 1 %}" method="GET" id="id_form_recurso">
+        <input type="hidden" name="entidade" value="{{ request.GET.entidade }}" />
+        <input type="hidden" name="endereco" value="{{ request.GET.endereco }}" />
+        <input type="hidden" name="detalhe" value="{{ request.GET.detalhe }}" />
+        <input type="hidden" name="com_fmusp" value="{{ request.GET.com_fmusp }}" />
+        <div title="Imprimir" class="btn_print">
+           <input type="submit" title="Versão para impressão A4" class="btn_print" name="acao" value="1"  />
+        </div>
+    </form>
+</div>
+<div style="clear:both;"></div>
 {% for end in enderecos %}
     <h4>
         {% if end.endereco %}

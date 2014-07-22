@@ -77,7 +77,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
     'django.contrib.messages.context_processors.messages', 
     'utils.context_processors.applist',
-    'utils.context_processors.debug',)
+    'utils.context_processors.debug',
+    'utils.context_processors.papelaria',)
 
 INSTALLED_APPS = (
     'django.contrib.auth',
@@ -93,6 +94,7 @@ INSTALLED_APPS = (
 )
 PROJECT_APPS = (
     'carga',
+    'configuracao',
     'evento',
     'financeiro',
     'identificacao',
@@ -106,7 +108,9 @@ PROJECT_APPS = (
     'protocolo',
     'questionario',
     'rede',
-    'verificacao'
+    'verificacao',
+    'repositorio',
+    'utils',
 )
 INSTALLED_APPS += PROJECT_APPS
 
