@@ -96,7 +96,7 @@ def agenda(request, tipo=8, pdf=None):
                 entidades.append({'entidade':ef, 'filho':True, 'areas':areas})
 
         if pdf:
-            return render_to_pdf('identificacao/agenda.pdf', {'entidades':entidades}, filename='agenda.pdf')
+            return render_to_pdf('identificacao/agenda.pdf', {'entidades':entidades}, request=request, filename='agenda.pdf')
         return TemplateResponse(request, 'identificacao/agenda.html', {'entidades':entidades, 'tipo':int(tipo), 'tipos':tipos, 'agenda':agenda})
     else:
         agendas = Agenda.objects.order_by('nome')
