@@ -19,23 +19,30 @@
   </style>
 </head>
 <body>
-  <div class="pp-cheque"><p>{{ pp }}</p></div>
-  <img src="/var/www{% if cc.imagem %}{{ cc.imagem.url }}{% else %}/files/extratocc/cheque_branco.jpg{% endif %}">
-
-  <div class="cheque">
-  <hr size="10" color="#999999" />
-  <br />
-  <p>CÓPIA DO CHEQUE Nº:{{ cc.cod_oper }}  /  Processo {{ termo }}</p>
-  <p>DO BANCO: 001</p>
-  <p>UTILIZADO PARA: {{ cc.capa }}</p> 
-  <br/><br/><br/><br/><br />
-  </div>
-  <div id="box" style="float:left;">
-  <table cellpadding="1">	      
-    <tr><th>CHEQUE ASSINADO POR:</th></tr>
-    <tr><td>Prof. Lopez</td></tr>
-    <tr><td>&nbsp;</td></tr>
-  </table>
-  </div>
+{% for pp in pps %}
+    {% if not forloop.first %}
+        <div style="page-break-before: always;" />
+    {% endif %}
+    <div class="pp-cheque" ><p>{{ pp }}</p></div>
+        <div style="line-height:5cm">
+          &nbsp;
+          <img src="/var/www{% if cc.imagem %}{{ cc.imagem.url }}{% else %}/files/extratocc/cheque_branco.jpg{% endif %}">
+        </div>
+    <div class="cheque">
+        <hr size="10" color="#999999" />
+        <br />
+        <p>CÓPIA DO CHEQUE Nº:{{ cc.cod_oper|default:'--' }}  /  Processo {{ termo|default:'--' }}</p>
+        <p>DO BANCO: 001</p>
+        <p>UTILIZADO PARA: {{ cc.capa }}</p> 
+        <br/><br/><br/><br/><br />
+    </div>
+    <div id="box" style="float:left;">
+        <table cellpadding="1">
+            <tr><th>CHEQUE ASSINADO POR:</th></tr>
+            <tr><td>{{assinatura}}</td></tr>
+            <tr><td>&nbsp;</td></tr>
+        </table>
+    </div>
+{% endfor %}
 </body>
 </html>

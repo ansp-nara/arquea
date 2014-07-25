@@ -24,3 +24,10 @@ class PapelariaAdmin(admin.ModelAdmin):
     list_display = ('valido', 'papel_timbrado_retrato_a4', 'papel_timbrado_paisagem_a4','papel_timbrado_retrato_a3', 'papel_timbrado_paisagem_a3')
     
 admin.site.register(Papelaria, PapelariaAdmin)
+
+class ChequeAdmin(admin.ModelAdmin):
+    
+    list_per_page = 10
+    list_display = ('nome_assinatura',)
+    
+admin.site.register(Cheque, ChequeAdmin)

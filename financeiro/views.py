@@ -16,6 +16,7 @@ import logging
 
 from outorga.models import Modalidade, Outorga, Item, Termo, OrigemFapesp, Natureza_gasto, Acordo
 from protocolo.models import Protocolo
+from configuracao.models import Cheque
 from identificacao.models import Entidade, Identificacao
 from rede.models import Recurso, PlanejaAquisicaoRecurso
 from utils.functions import pega_lista, formata_moeda, render_to_pdf, render_to_pdf_weasy
@@ -501,20 +502,32 @@ def extrato_tarifas(request, pdf=False):
 @login_required
 def cheque(request, cc=1):
     extrato = get_object_or_404(ExtratoCC, id=cc)
-    if not extrato.extrato_financeiro: raise Http404
-    termo = extrato.extrato_financeiro.termo
 
-    p = extrato.pagamento_set.all()
-    if p.count() > 0:
-	p = p[0]
-	pp = p.__unicode__()
-	name = pp.split('-')[-1]
-	name = name.split('ID')[0]
+    if not extrato.extrato_financeiro: 
+        termo = None
     else:
-	name = None
+        termo = extrato.extrato_financeiro.termo
+
+    parciais = extrato.pagamento_set.all()
+    pps = []
+    if parciais.count() > 0:
+        for p in parciais:
+            pp = p.__unicode__()
+            name = pp.split('-')[-1]
+            name = name.split('ID')[0]
+            pps.append(name)
+    else:
+        name = ''
+        pps.append(name)
+
+    assinatura = ""
+    assinaturas = Cheque.objects.all()
+    for a in assinaturas:
+        assinatura = a.nome_assinatura
+
 
     #return render_to_response('financeiro/cheque.pdf', {'cc':extrato, 'termo':termo})
-    return render_to_pdf('financeiro/cheque.pdf', {'cc':extrato, 'termo':termo, 'pp':name}, request=request, filename='capa_%s.pdf' % extrato.cod_oper)
+    return render_to_pdf('financeiro/cheque.pdf', {'cc':extrato, 'termo':termo, 'pps':pps, 'assinatura':assinatura}, request=request, filename='capa_%s.pdf' % extrato.cod_oper)
 
 
 @login_required
