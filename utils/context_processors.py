@@ -68,7 +68,7 @@ def papelaria(context):
 	"""
 	from configuracao.models import Papelaria 
 	arquivos = Papelaria.objects.all()
-	print arquivos
+
 	for a in arquivos:
 		if a.valido:
 			return {'papelaria': a}

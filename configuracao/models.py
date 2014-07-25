@@ -23,6 +23,8 @@ class Papelaria(models.Model):
     valido = models.BooleanField(u'Template válido?', default=True)
 
 
+class Cheque(models.Model):
+    nome_assinatura = models.CharField(_(u'Assinatura'), max_length=150)
 
 
 
