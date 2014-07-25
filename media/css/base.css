@@ -409,10 +409,10 @@ input[type=text], input[type=password], textarea, select, .vTextField {
 
 /* MODULES */
 
-.Auth{background: url(../img/admin/bg-auth.jpgx) no-repeat top left;}
+/*.Auth{background: url(../img/admin/bg-auth.jpgx) no-repeat top left;}*/
 .Financeiro{}
-.Identificacao{background: url(../img/admin/bg-id.jpgx) no-repeat top left;}
-.Membro{background: url(../img/admin/bg-membro.jpgx) no-repeat top left;}
+/*.Identificacao{background: url(../img/admin/bg-id.jpgx) no-repeat top left;}*/
+/*.Membro{background: url(../img/admin/bg-membro.jpgx) no-repeat top left;}*/
 .Memorando{}
 .Monitor{}
 .Outorga{}
