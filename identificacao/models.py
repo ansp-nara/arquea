@@ -179,7 +179,7 @@ class Entidade(models.Model):
     #asn = models.IntegerField(_(u'ASN'), blank=True, null=True, help_text=_(u' '))
     cnpj = CNPJField(_(u'CNPJ'), blank=True, help_text=_(u'ex. 00.000.000/0000-00'))
     fisco = models.BooleanField(_(u'Fisco'), help_text=_(u'ex. Ativo no site da Receita Federal?'))
-    recebe_doacao = models.BooleanField(_(u'Recebe doação de equipamentos?'))
+    recebe_doacao = models.BooleanField(_(u'Recebe doação de equipamentos?'), default=False)
     
 
 
