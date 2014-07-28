@@ -10,9 +10,10 @@ from django.contrib.auth.decorators import permission_required, login_required
 from django.db.models import Sum
 import json as simplejson
 
+from patrimonio.models import Patrimonio, Equipamento
 from financeiro.models import Pagamento
 from identificacao.models import *
-from outorga.models import Termo, Modalidade, Item, Natureza_gasto, Acordo
+from outorga.models import Termo, Modalidade, Item, Natureza_gasto, Acordo, Outorga
 from utils.functions import render_to_pdf, render_to_pdf_weasy
 
 import logging
@@ -371,10 +372,21 @@ def item_modalidade(request, pdf=False):
             termo = request.GET.get('termo')
             modalidades = Modalidade.objects.all()
             modalidade = request.GET.get('modalidade')
-            entidades = Entidade.objects.all()
             entidade = request.GET.get('entidade')
             
-            return render(request, 'outorga/termo_mod.html', {'termos':termos, 'termo':termo, 'modalidades':modalidades, 'modalidade':modalidade, 'entidades':entidades, 'entidade':entidade})
+            entidadesProcedencia = Patrimonio.objects.all().values('entidade_procedencia')
+            entidadesFabricante = Equipamento.objects.all().values('entidade_fabricante')
+            entidadesItemOutorga = Item.objects.all().values('entidade')
+            
+            return render(request, 
+                          'outorga/termo_mod.html', 
+                          {'termos':termos, 'termo':termo, 'modalidades':modalidades, 
+                           'modalidade':modalidade, 
+                           'entidadesProcedencia': Entidade.objects.filter(id__in=entidadesProcedencia),
+                           'entidadesFabricante': Entidade.objects.filter(id__in=entidadesFabricante), 
+                           'entidadesItemOutorga': Entidade.objects.filter(id__in=entidadesItemOutorga),
+                           'entidade':entidade})
+
 
 @login_required
 def acordo_progressivo(request, pdf=False):
