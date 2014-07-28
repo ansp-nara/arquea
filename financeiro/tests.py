@@ -379,8 +379,8 @@ class AuditoriaTest(TestCase):
         end1 = Endereco.objects.create(entidade=ent1)
         end2 = Endereco.objects.create(entidade=ent2)
 
-        i1 = Item.objects.create(entidade=ent1, natureza_gasto=n1, descricao='Armazenagem', justificativa='Armazenagem de equipamentos', quantidade=12, valor=2500)
-        i2 = Item.objects.create(entidade=ent2, natureza_gasto=n2, descricao='Serviço de Conexão Internacional', justificativa='Link Internacional', quantidade=12, valor=250000)
+        i1 = Item.objects.create(entidade=ent1, natureza_gasto=n1, descricao='Armazenagem', justificativa='Armazenagem de equipamentos', quantidade=12, valor=2500, rt=False)
+        i2 = Item.objects.create(entidade=ent2, natureza_gasto=n2, descricao='Serviço de Conexão Internacional', justificativa='Link Internacional', quantidade=12, valor=250000, rt=False)
 
         #Cria Protocolo
         ep = EstadoProtocolo.objects.create(nome='Aprovado')

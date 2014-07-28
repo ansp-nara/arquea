@@ -61,6 +61,7 @@ class EnderecoTest(TestCase):
         end = Endereco.objects.create(entidade=ent, rua='Dr. Ovidio', num=215, bairro='Cerqueira Cesar', cep='05403010', estado='SP', pais='Brasil')
         iden = Identificacao.objects.create(endereco=end, contato=c, funcao='Tecnico', area='', ativo=True)
 
+
     def test_unicode(self):
         e = Endereco.objects.get(pk=1)
         self.assertEquals(e.__unicode__(), u'SAC - Dr. Ovidio, 215')
@@ -70,8 +71,28 @@ class EnderecoTest(TestCase):
 class EntidadeTest(TestCase):
     def setUp(self):
         from utils.models import CNPJField
-        e = Entidade.objects.create(sigla='SAC', nome='Global Crossing', cnpj='00.000.000/0000-00', fisco=True, url='')
+        ent = Entidade.objects.create(sigla='SAC', nome='Global Crossing', cnpj='00.000.000/0000-00', fisco=True, recebe_doacao=False, url='')
+        ent2 = Entidade.objects.create(sigla='SAC2', nome='Entidade filha', cnpj='00.000.000/0000-00', fisco=True, entidade=ent, url='')
+
 
     def test_unicode(self):
         e = Entidade.objects.get(pk=1)
+        self.assertEquals(e.__unicode__(), u'SAC')
+        
+    def test_sigla_nome(self):
+        e = Entidade.objects.get(pk=1)
         self.assertEquals(e.sigla_nome(), u'SAC - Global Crossing')
+        
+    def test_sigla_completa(self):
+        e1 = Entidade.objects.get(pk=1)
+        self.assertEquals(e1.sigla_completa(), u'SAC')
+        
+        e2 = Entidade.objects.get(pk=2)
+        self.assertEquals(e2.sigla_completa(), u'SAC - SAC2')
+        
+    def test_sigla_tabulada(self):
+        e1 = Entidade.objects.get(pk=1)
+        self.assertEquals(e1.sigla_tabulada(), u'SAC')
+        
+        e2 = Entidade.objects.get(pk=2)
+        self.assertEquals(e2.sigla_tabulada(), u'    SAC2')

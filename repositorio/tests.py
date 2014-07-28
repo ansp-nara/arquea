@@ -4,18 +4,15 @@ from repositorio.models import Tipo, Estado, Anexo, Repositorio
 from datetime import date
 from membro.models import Membro
 
-# Create your tests here.
-
 class RepositorioTest(TestCase):
-	
-	def setUp(self):
+    def setUp(self):
         tipoPatr = Tipo.objects.create(nome='roteador')
         Patrimonio.objects.create(ns='AF345678GB3489X', modelo='NetIron400', tipo=tipoPatr, apelido="NetIron400", checado=True)
 
         tipoPatr = Tipo.objects.create(nome='placa')
         Patrimonio.objects.create(ns='kjfd1234cdf', modelo='Placa mãe', tipo=tipoPatrFilho, apelido="Placa mãe", checado=True)
 
-	
+
 	def test_save__numero_sequencial(self):
 		tipo = Tipo()
 		tipo.save()
