@@ -22,7 +22,6 @@
 @page acordos_template {
   size: a4;
   /* Este relatorio nao precisa de papel timbrado*/
-  /* background-image: url('{% get_media_prefix %}{{papelaria.papel_timbrado_retrato_a4}}');*/
   top: 3cm;
   left: 1.5cm;
   right: 1.5cm;

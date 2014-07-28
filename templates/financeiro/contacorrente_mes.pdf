@@ -8,10 +8,12 @@
 @page {
   size: a4;
   background-image: url('{% get_media_prefix %}{{papelaria.papel_timbrado_retrato_a4}}');
-  top: 3cm;
+  background-size: contain;
+  background-repeat:no-repeat;
+  top: {{papelaria.retrato_a4_margem_superior}}cm;
   left: 1.5cm;
   right: 1.5cm;
-  bottom: 2cm;
+  bottom: {{papelaria.retrato_a4_margem_inferior}}cm;
   @frame footer {
                 -pdf-frame-content: footerContent;
                 bottom: 0.5cm;
