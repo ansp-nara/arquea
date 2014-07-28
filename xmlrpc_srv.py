@@ -306,3 +306,25 @@ def patrimonio(p_id):
     return patrimonio
 dispatcher.register_function(patrimonio, 'patrimonio')
 
+def patrimonio_contem(rack_id, p_id, pos):
+
+    apelido = ''
+    ok = False
+
+    try:
+        rack = Patrimonio.objects.get(id=rack_id)
+        patrimonio = Patrimonio.objects.get(id=p_id)
+        if patrimonio.patrimonio == rack:
+             hist = patrimonio.historico_atual
+             posicao = hist.posicao
+             posicoes = posicao.split('F')
+             if len(posicoes) > 1:
+                 if int(pos) == int(posicoes[1]):
+                     ok = True
+        apelido = patrimonio.apelido or ''
+    except:
+        apelido = u'Não cadastrado'
+
+    return [apelido, ok]
+dispatcher.register_function(patrimonio_contem, 'patrimonio_contem')
+
