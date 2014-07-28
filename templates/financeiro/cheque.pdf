@@ -33,7 +33,7 @@
         <br />
         <p>CÓPIA DO CHEQUE Nº:{{ cc.cod_oper|default:'--' }}  /  Processo {{ termo|default:'--' }}</p>
         <p>DO BANCO: 001</p>
-        <p>UTILIZADO PARA: {{ cc.capa }}</p> 
+        <p>UTILIZADO PARA: {{ cc.capa|default:'--' }}</p> 
         <br/><br/><br/><br/><br />
     </div>
     <div id="box" style="float:left;">
