@@ -34,15 +34,15 @@
 <label for="id_entidade">Entidade do item de outorga (não obrigatório):</label>
 <select name="entidade" id="id_entidade">
   <option value="0">----------</option>
-  {% for e in entidades %}
+  {% for e in entidadesItemOutorga %}
       <option value="{{ e.id }}" {% if entidade == e.id|safe %} selected {% endif %}>{{ e.sigla }}</option>
   {% endfor %}
 </select>
 <br>
-<label for="id_marca">Marca do patrimônio (não obrigatório):</label>
+<label for="id_marca">Fabricante do patrimônio (não obrigatório):</label>
 <select name="marca" id="id_marca">
   <option value="0">----------</option>
-  {% for e in entidades %}
+  {% for e in entidadesFabricante %}
       <option value="{{ e.id }}" {% if entidade == e.id|safe %} selected {% endif %}>{{ e.sigla }}</option>
   {% endfor %}
 </select>
@@ -50,7 +50,7 @@
 <label for="id_procedencia">Procedência do patrimônio (não obrigatório):</label>
 <select name="procedencia" id="id_procedencia">
   <option value="0">----------</option>
-  {% for e in entidades %}
+  {% for e in entidadesProcedencia %}
       <option value="{{ e.id }}" {% if entidade == e.id|safe %} selected {% endif %}>{{ e.sigla }}</option>
   {% endfor %}
 </select>
