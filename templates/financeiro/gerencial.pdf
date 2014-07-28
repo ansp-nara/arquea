@@ -8,10 +8,12 @@
 @page {
   size: a3 landscape;
   background-image: url('{% get_media_prefix %}{{papelaria.papel_timbrado_paisagem_a3}}');
-  top: 5cm;
+  background-size: contain;
+  background-repeat:no-repeat;
+  top: {{papelaria.paisagem_a3_margem_superior}}cm;
   left: 1.5cm;
   right: 1.5cm;
-  bottom: 2cm;
+  bottom: {{papelaria.paisagem_a3_margem_inferior}}cm;
   @frame footer {
                 -pdf-frame-content: footerContent;
                 bottom: 0.5cm;
