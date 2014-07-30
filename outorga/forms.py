@@ -180,5 +180,22 @@ class TermoAdminForm(forms.ModelForm):
         # mensagens de erro
         self.fields['estado'].error_messages['required'] = u'O campo ESTADO é obrigatório'
 
+    def clean(self):
+        cleaned_data = super(TermoAdminForm, self).clean()
+        
+        if any(self.errors):
+            return self.cleaned_data
 
-#     estado = models.ForeignKey('outorga.Estado', verbose_name=_(u'Estado'))
+        ano = self.cleaned_data.get('ano')
+        if ano == None:
+            self._errors["ano"] = self.error_class([ u'O campo ANO não pode ser vazio.'])
+            del cleaned_data["ano"]
+        elif ano != None and ano < 1900:
+            self._errors["ano"] = self.error_class([ u'O campo ANO deve possuir 4 dígitos.'])
+            del cleaned_data["ano"]
+
+        return self.cleaned_data
+
+
+
+

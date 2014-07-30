@@ -212,20 +212,26 @@ class Termo(models.Model):
 
     # Duracao do termo como um 'timedelta'
     def duracao(self):
-        return self.termino - self.inicio
+        if self.termino != None and self.inicio != None:
+            return self.termino - self.inicio
+        else:
+            return None
 
     # Calcula os meses de duração do processo a partir dos dados do modelo Outorga
     def duracao_meses(self):
         dif = self.duracao()
-        meses = (dif.days) / 30
-        if (dif.days) % 30 >= 28:
-            meses = meses + 1
-
-        if meses > 0:
-            if meses > 1:
-                return u"%s meses" % meses
-            return u"%s mês" % meses
-        return u'-'
+        if dif != None:
+            meses = (dif.days) / 30
+            if (dif.days) % 30 >= 28:
+                meses = meses + 1
+    
+            if meses > 0:
+                if meses > 1:
+                    return u"%s meses" % meses
+                return u"%s mês" % meses
+            return u'-'
+        else:
+            return u'-'
     duracao_meses.short_description=_(u'Vigência')
 
 
