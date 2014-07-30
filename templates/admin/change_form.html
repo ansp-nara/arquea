@@ -53,7 +53,7 @@
 
 {% block after_related_objects %}{% endblock %}
 
-{% submit_row %}
+{% if not user|has_group:"readonly" %}{% submit_row %}{% endif %}
 
 {% if adminform and add %}
    <script type="text/javascript">document.getElementById("{{ adminform.first_field.auto_id }}").focus();</script>
