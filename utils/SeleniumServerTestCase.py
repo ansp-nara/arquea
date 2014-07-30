@@ -56,7 +56,7 @@ class SeleniumServerTestCase(SeleniumTestCase):
         # cls.browser = webdriver.Remote(server_url, dc)
         
         # iniciando conexão com o Selenium Server no modo FIREFOX
-        server_url = "http://%s:%s/wd/hub" % (settings.SELENIUM_HOST , settings.SELENIUM_PORT)
+        server_url = "http://%s:%d/wd/hub" % (settings.SELENIUM_HOST , settings.SELENIUM_PORT)
         fp = webdriver.FirefoxProfile()
         cls.browser = webdriver.Remote(server_url, desired_capabilities=webdriver.DesiredCapabilities.FIREFOX, browser_profile=fp)
         cls.login()

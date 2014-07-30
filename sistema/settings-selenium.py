@@ -54,7 +54,7 @@ LOGGING = {
 # start JENKINS CONFIGURATION
 INSTALLED_APPS += (
     'django_jenkins',
-    'selenium_tests',
+#    'selenium_tests',
 )
 
 JENKINS_TASKS = (
@@ -74,8 +74,10 @@ PROJECT_APPS = (
                 'selenium_tests',
                 
                 )
+
 #JENKINS_TEST_RUNNER = 'django_selenium.jenkins_runner.JenkinsTestRunner'
 TEST_RUNNER = 'django_selenium.selenium_runner.SeleniumTestRunner'
+#JENKINS_TEST_RUNNER = 'django_selenium.selenium_runner.SeleniumTestRunner'
 
 # end JENKINS CONFIGURATION
 
@@ -94,7 +96,10 @@ TEST_RUNNER = 'django_selenium.selenium_runner.SeleniumTestRunner'
 # host do selenium server
 SELENIUM_HOST = '10.0.0.23'
 # port do selenium server
-SELENIUM_PORT = '4443'
+SELENIUM_PORT = 4443
+
+SELENIUM_TESTSERVER_HOST ='10.0.0.23'
+
 # host do sistema a ser testado
 SELENIUM_SISTEMA_HOST ='10.0.0.23'
 
