@@ -1166,6 +1166,7 @@ function ajax_patr_form_get_equipamento(id_equipamento)
            dataType: "json",
            data: {'id_equipamento':id_equipamento},
            success: function(retorno) {
+        	   $('#id_marca').html(retorno.marca);
         	   $('#id_modelo').html(retorno.modelo);
         	   $('#id_part_number').text(retorno.part_number);
         	   $('#id_ean').text(retorno.ean);
@@ -1175,6 +1176,7 @@ function ajax_patr_form_get_equipamento(id_equipamento)
            }
        });
     } else {
+        $('#id_marca').html('');
     	$('#id_modelo').html('');
     	$('#id_part_number').text('');
     	$('#id_ean').text('');
