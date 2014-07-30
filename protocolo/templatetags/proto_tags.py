@@ -2,6 +2,7 @@
 
 from django.template import Library
 from protocolo.models import Protocolo, Cotacao
+from django.contrib.auth.models import Group
 from django.utils.translation import ugettext_lazy as _
 from django.utils.safestring import mark_safe
 from decimal import Decimal
@@ -245,3 +246,18 @@ def get_range( value ):
     Instead of 3 one may use the variable set in the views
   """
   return range( value )
+
+@register.filter
+def has_group(user, group_name):
+  """
+    Filter to check if a user belongs to a certain group.
+    Usage:
+   
+    {% if request.user|has_group:"xxx" %}
+       Do something
+    {% endif %}
+
+  """
+
+  group = Group.objects.get(name=group_name)
+  return True if group in user.groups.all() else False
