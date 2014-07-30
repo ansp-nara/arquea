@@ -541,6 +541,7 @@ class OutorgaViewTest(UnitTestCase):
             # mockin request GET parameters
             mock_request.method = "GET"
             mock_request.GET = QueryDict([])
+            
             # call view
             item_modalidade(mock_request)
             _, args, _ = mock_render.mock_calls[0]
@@ -549,11 +550,17 @@ class OutorgaViewTest(UnitTestCase):
             
             self.assertIsNotNone(args[2]['termos'])
             self.assertIsNotNone(args[2]['modalidades'])
-            self.assertIsNotNone(args[2]['entidades'])
+            self.assertIsNotNone(args[2]['entidadesProcedencia'])
+            self.assertIsNotNone(args[2]['entidadesFabricante'])
+            self.assertIsNotNone(args[2]['entidadesItemOutorga'])
+            
+            self.assertIsNone(args[2]['termo'])
+            self.assertIsNone(args[2]['modalidade'])
+            self.assertIsNone(args[2]['entidade'])
+            
             # Verificando se não entrou no if errado dentro da view, buscando mais informações que deveria
             self.assertFalse('itens' in args[2])
-            
-            
+
 
     def test_call__item_modalidade__sem_entidade(self):
         mock_render = mock.MagicMock()
