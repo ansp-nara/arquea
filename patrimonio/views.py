@@ -210,10 +210,15 @@ def ajax_get_equipamento(request):
     id_equipamento = request.GET.get('id_equipamento') or request.POST.get('id_equipamento')
     p = Equipamento.objects.get(id=id_equipamento)
     
+    marca = ''
+    if p.entidade_fabricante:
+        marca = p.entidade_fabricante.sigla
+    
     retorno = {'pk':p.pk, 
                 'valor':p.__unicode__(), 
                 'modelo':p.modelo,
                 'part_number':p.part_number,
+                'marca':marca,
                 'ean':p.ean,
               }
     

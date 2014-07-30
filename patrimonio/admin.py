@@ -46,7 +46,7 @@ class PatrimonioAdmin(ExportMixin, admin.ModelAdmin):
                       'fields': (('agilis', 'checado',),
                                  ('tipo', 'apelido', 'tem_numero_fmusp', 'numero_fmusp'), 
                                  ('filtro_equipamento', 'equipamento',),
-                                 ('part_number', 'modelo', 'ean',),
+                                 ('marca', 'part_number', 'modelo', 'ean',),
                                  'ns', 
                                  ('ncm', 'ocst', 'cfop', ),
                                  'descricao', 
@@ -65,7 +65,7 @@ class PatrimonioAdmin(ExportMixin, admin.ModelAdmin):
                  }),
     )
     
-    readonly_fields = ('part_number', 'modelo', 'ean')
+    readonly_fields = ('marca', 'part_number', 'modelo', 'ean')
     form = PatrimonioAdminForm
     list_display = ('tipo', 'descricao', 'complemento', 'posicao', 'agilis', 'modelo', 'ns', 'nf', 'valor', 'checado')
     # list_select_related pode ser somente boolean no 1.5
@@ -91,14 +91,20 @@ class PatrimonioAdmin(ExportMixin, admin.ModelAdmin):
         instance = getattr(self, 'instance', None)
         
 
+    def marca(self, instance):
+        entidade_fabricante = '&nbsp;'
+        if instance != None and instance.equipamento and instance.equipamento.entidade_fabricante != None:
+            entidade_fabricante = instance.equipamento.entidade_fabricante.sigla
+        return mark_safe("<span id='id_marca' class='input_readonly'>"+entidade_fabricante+"</span>")
+
     def modelo(self, instance):
-        return mark_safe("<span id='id_modelo' class='input_readonly'>"+instance.modelo+"</span>")
+        return mark_safe("<span id='id_modelo' class='input_readonly'>"+instance.equipamento.modelo+"</span>")
     
     def part_number(self, instance):
-        return mark_safe("<span id='id_part_number' class='input_readonly'>"+instance.part_number+"</span>")
+        return mark_safe("<span id='id_part_number' class='input_readonly'>"+instance.equipamento.part_number+"</span>")
 
     def ean(self, instance):
-        return mark_safe("<span id='id_ean' class='input_readonly'>"+instance.ean+"</span>")
+        return mark_safe("<span id='id_ean' class='input_readonly'>"+instance.equipamento.ean+"</span>")
         
     def action_clone(self, request, queryset):
         objs = clone_objects(queryset)
