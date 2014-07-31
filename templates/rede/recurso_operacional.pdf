@@ -60,7 +60,6 @@ table tbody tr td { border:1; }
  td.td_t_simp span,
  td.td_t_geral span
  {
-     white-space:nowrap;
  }
  
     #tbl_relatorio .td_contrato      { width:1.2cm; }
