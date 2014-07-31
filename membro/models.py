@@ -130,7 +130,7 @@ class Membro(models.Model):
     existe_curriculo.short_description = _(u'Currículo Lattes')
 
     # cargo atual do membro, caso exista, a partir do histórico
-    @cached_property
+    @property
     def cargo_atual(self):
         
         cargos = [h.cargo.nome for h in Historico.ativos.filter(membro=self).select_related('cargo').only('cargo__nome')]
