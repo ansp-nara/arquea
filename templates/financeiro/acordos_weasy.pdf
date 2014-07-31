@@ -122,7 +122,7 @@
         			      <td class="td2">&nbsp;</td>
         			      <td class="td3">
                              {% if pg.p.conta_corrente.imagem %}
-                                 <span style="white-space:nowrap">CHQ {{ pg.p.conta_corrente.cod_oper|default:"-" }}</span>
+                                 <span>CHQ {{ pg.p.conta_corrente.cod_oper|default:"-" }}</span>
                              {% else %}
                                  {{ pg.p.conta_corrente.cod_oper|default:"-" }}
                              {% endif %}
