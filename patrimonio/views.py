@@ -11,8 +11,7 @@ from django.http import Http404, HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.template.response import TemplateResponse
-from django.utils import simplejson
-from utils.functions import render_to_pdf, render_wk_to_pdf, render_to_pdf_weasy
+import json
 import itertools
 import datetime
 import logging
@@ -23,6 +22,7 @@ from identificacao.models import Entidade, EnderecoDetalhe, Endereco
 from outorga.models import Termo, Modalidade, Natureza_gasto, Item
 from protocolo.models import Protocolo, ItemProtocolo
 from financeiro.models import Pagamento
+from utils.functions import render_to_pdf, render_wk_to_pdf, render_to_pdf_weasy
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
