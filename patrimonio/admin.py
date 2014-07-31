@@ -93,18 +93,30 @@ class PatrimonioAdmin(ExportMixin, admin.ModelAdmin):
 
     def marca(self, instance):
         entidade_fabricante = '&nbsp;'
-        if instance != None and instance.equipamento and instance.equipamento.entidade_fabricante != None:
+        if instance != None and instance.equipamento != None and instance.equipamento.entidade_fabricante != None:
             entidade_fabricante = instance.equipamento.entidade_fabricante.sigla
         return mark_safe("<span id='id_marca' class='input_readonly'>"+entidade_fabricante+"</span>")
 
     def modelo(self, instance):
-        return mark_safe("<span id='id_modelo' class='input_readonly'>"+instance.equipamento.modelo+"</span>")
+        modelo = ''
+        if instance != None and instance.equipamento != None:
+            modelo = instance.equipamento.modelo
+         
+        return mark_safe("<span id='id_modelo' class='input_readonly'>"+modelo+"</span>")
     
     def part_number(self, instance):
-        return mark_safe("<span id='id_part_number' class='input_readonly'>"+instance.equipamento.part_number+"</span>")
+        part_number = ''
+        if instance != None and instance.equipamento != None:
+            part_number = instance.equipamento.part_number
+            
+        return mark_safe("<span id='id_part_number' class='input_readonly'>"+part_number+"</span>")
 
     def ean(self, instance):
-        return mark_safe("<span id='id_ean' class='input_readonly'>"+instance.equipamento.ean+"</span>")
+        ean = ''
+        if instance != None and instance.equipamento != None:
+            ean = instance.equipamento.ean
+            
+        return mark_safe("<span id='id_ean' class='input_readonly'>"+ean+"</span>")
         
     def action_clone(self, request, queryset):
         objs = clone_objects(queryset)
