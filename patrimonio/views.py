@@ -11,6 +11,7 @@ from django.http import Http404, HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.template.response import TemplateResponse
+from utils.functions import render_to_pdf, render_wk_to_pdf, render_to_pdf_weasy
 import json
 import itertools
 import datetime
@@ -22,7 +23,6 @@ from identificacao.models import Entidade, EnderecoDetalhe, Endereco
 from outorga.models import Termo, Modalidade, Natureza_gasto, Item
 from protocolo.models import Protocolo, ItemProtocolo
 from financeiro.models import Pagamento
-from utils.functions import render_to_pdf, render_wk_to_pdf, render_to_pdf_weasy
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -47,7 +47,7 @@ def escolhe_termo(request):
     else:
         retorno = [{"pk":"0","valor":"Nenhum registro"}]
 
-    json = simplejson.dumps(retorno)
+    json = json.dumps(retorno)
     return HttpResponse(json,mimetype="application/json")
 
 
@@ -73,7 +73,7 @@ def escolhe_protocolo(request):
         else:
             retorno = [{"pk":"0","valor":"Nenhum registro"}]
 
-        json = simplejson.dumps(retorno)
+        json = json.dumps(retorno)
     return HttpResponse(json,mimetype="application/json")
 
 
@@ -97,7 +97,7 @@ def escolhe_pagamento(request):
 	if not retorno:
 	    retorno = [{"pk":"0","valor":"Nenhum registro"}]
 	    
-        json = simplejson.dumps(retorno)
+        json = json.dumps(retorno)
     else:
         raise Http404
     return HttpResponse(json, mimetype="application/json")
@@ -112,7 +112,7 @@ def escolhe_detalhe(request):
         for ed in EnderecoDetalhe.objects.filter(detalhe=detalhe):
             retorno.append({'pk':ed.pk, 'valor':ed.__unicode__()})
 
-        json = simplejson.dumps(retorno)
+        json = json.dumps(retorno)
     else:
         raise Http404
     return HttpResponse(json, mimetype="application/json")
@@ -132,7 +132,7 @@ def escolhe_entidade(request):
         if not retorno:
             retorno = [{"pk":"0","valor":"Nenhum registro"}]
 
-        json = simplejson.dumps(retorno)
+        json = json.dumps(retorno)
     else:
         raise Http404
     return HttpResponse(json, mimetype="application/json")
@@ -164,7 +164,7 @@ def escolhe_equipamento(request):
                                 |Q(titulo_autor__icontains=filtro)\
                                 |Q(isbn__icontains=filtro))] \
                    or [{"pk":"0","valor":"Nenhum registro"}]
-            json = simplejson.dumps(retorno)
+            json = json.dumps(retorno)
         else:
             retorno = [{'pk':p.pk, 'valor':p.__unicode__(), 'selected':(str(p.pk)==id_equipamento)} \
                        for p in Equipamento.objects.all()]
@@ -175,7 +175,7 @@ def escolhe_equipamento(request):
     else:
         raise Http404
     
-    json = simplejson.dumps(retorno)
+    json = json.dumps(retorno)
     return HttpResponse(json, mimetype="application/json")
 
 
@@ -196,7 +196,7 @@ def ajax_get_marcas_por_termo(request):
     retorno = [{'pk':p.equipamento.entidade_fabricante.pk, 'valor':p.equipamento.entidade_fabricante.__unicode__()} 
            for p in patrimonios]
     
-    json = simplejson.dumps(retorno)
+    json = json.dumps(retorno)
     return HttpResponse(json, mimetype="application/json")
 
     
@@ -222,7 +222,7 @@ def ajax_get_equipamento(request):
                 'ean':p.ean,
               }
     
-    json = simplejson.dumps(retorno)
+    json = json.dumps(retorno)
     return HttpResponse(json, mimetype="application/json")
 
 def ajax_get_procedencia_filter_tipo(request):
@@ -238,7 +238,7 @@ def ajax_get_procedencia_filter_tipo(request):
     retorno = [{'pk':p.pk, 'valor':p.__unicode__()} 
                for p in procedencias]
     
-    json = simplejson.dumps(retorno)
+    json = json.dumps(retorno)
     return HttpResponse(json, mimetype="application/json")
 
 def escolhe_patrimonio(request):
@@ -253,7 +253,7 @@ def escolhe_patrimonio(request):
         
         if num_doc:
             retorno = [{'pk':p.pk, 'valor':p.__unicode__()} for p in Patrimonio.objects.filter(Q(pagamento__protocolo__num_documento__icontains=num_doc)|Q(ns__icontains=num_doc))] or [{"pk":"0","valor":"Nenhum registro"}]
-            json = simplejson.dumps(retorno)
+            json = json.dumps(retorno)
 
         if not retorno:
             retorno = [{"pk":"0","valor":"Nenhum registro"}]
@@ -261,7 +261,7 @@ def escolhe_patrimonio(request):
     else:
         raise Http404
     
-    json = simplejson.dumps(retorno)
+    json = json.dumps(retorno)
     return HttpResponse(json, mimetype="application/json")
 
 
@@ -277,7 +277,7 @@ def patrimonio_existente(request):
             
             retorno = {'marca':p.marca, 'modelo':p.modelo, 'descricao':p.descricao, 'procedencia':p.procedencia}
 
-        json = simplejson.dumps(retorno)
+        json = json.dumps(retorno)
     else:
         raise Http404
     
@@ -749,7 +749,7 @@ def filtra_pn_estado(request):
         estados.append({'pk':e.id, 'value':'%s (%s)' % (e, patrimonios_estado.order_by('id').distinct().count())})
 
     retorno = {'estados':estados, 'pns':pns}
-    json = simplejson.dumps(retorno)
+    json = json.dumps(retorno)
 
     return HttpResponse(json, mimetype="application/json")
 
@@ -1146,7 +1146,7 @@ def abre_arvore(request):
     else:
         for t in Termo.objects.all():
 	    ret.append({'data':t.__unicode__(), 'attr':{'style':'padding-top:6px;', 'o_id':t.id, 'o_model': t._meta.module_name}})
-    json = simplejson.dumps(ret)
+    json = json.dumps(ret)
     return HttpResponse(json, mimetype="application/json")
 
 
@@ -1212,7 +1212,7 @@ def abre_arvore_tipo(request):
 
 
 
-    json = simplejson.dumps(ret)
+    json = json.dumps(ret)
     return HttpResponse(json, mimetype="application/json")
 
 
@@ -1239,7 +1239,7 @@ def patrimonio_historico(request):
                    'memorando_desc': historico.memorando.__unicode__() if historico.memorando_id else '',
                    }
 
-        json = simplejson.dumps(retorno)
+        json = json.dumps(retorno)
     else:
         raise Http404
     
