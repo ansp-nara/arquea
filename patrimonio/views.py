@@ -47,8 +47,8 @@ def escolhe_termo(request):
     else:
         retorno = [{"pk":"0","valor":"Nenhum registro"}]
 
-    json = json.dumps(retorno)
-    return HttpResponse(json,mimetype="application/json")
+    retorno_json = json.dumps(retorno)
+    return HttpResponse(retorno_json,mimetype="application/json")
 
 
 
@@ -73,8 +73,8 @@ def escolhe_protocolo(request):
         else:
             retorno = [{"pk":"0","valor":"Nenhum registro"}]
 
-        json = json.dumps(retorno)
-    return HttpResponse(json,mimetype="application/json")
+        retorno_json = json.dumps(retorno)
+    return HttpResponse(retorno_json,mimetype="application/json")
 
 
 def escolhe_pagamento(request):
@@ -97,10 +97,10 @@ def escolhe_pagamento(request):
 	if not retorno:
 	    retorno = [{"pk":"0","valor":"Nenhum registro"}]
 	    
-        json = json.dumps(retorno)
+        retorno_json = json.dumps(retorno)
     else:
         raise Http404
-    return HttpResponse(json, mimetype="application/json")
+    return HttpResponse(retorno_json, mimetype="application/json")
 
 
 def escolhe_detalhe(request):
@@ -112,10 +112,10 @@ def escolhe_detalhe(request):
         for ed in EnderecoDetalhe.objects.filter(detalhe=detalhe):
             retorno.append({'pk':ed.pk, 'valor':ed.__unicode__()})
 
-        json = json.dumps(retorno)
+        retorno_json = json.dumps(retorno)
     else:
         raise Http404
-    return HttpResponse(json, mimetype="application/json")
+    return HttpResponse(retorno_json, mimetype="application/json")
 
 def escolhe_entidade(request):
     if request.method == 'POST':
@@ -132,10 +132,10 @@ def escolhe_entidade(request):
         if not retorno:
             retorno = [{"pk":"0","valor":"Nenhum registro"}]
 
-        json = json.dumps(retorno)
+        retorno_json = json.dumps(retorno)
     else:
         raise Http404
-    return HttpResponse(json, mimetype="application/json")
+    return HttpResponse(retorno_json, mimetype="application/json")
 
 
 def escolhe_equipamento(request):
@@ -164,7 +164,7 @@ def escolhe_equipamento(request):
                                 |Q(titulo_autor__icontains=filtro)\
                                 |Q(isbn__icontains=filtro))] \
                    or [{"pk":"0","valor":"Nenhum registro"}]
-            json = json.dumps(retorno)
+            retorno_json = json.dumps(retorno)
         else:
             retorno = [{'pk':p.pk, 'valor':p.__unicode__(), 'selected':(str(p.pk)==id_equipamento)} \
                        for p in Equipamento.objects.all()]
@@ -175,8 +175,8 @@ def escolhe_equipamento(request):
     else:
         raise Http404
     
-    json = json.dumps(retorno)
-    return HttpResponse(json, mimetype="application/json")
+    retorno_json = json.dumps(retorno)
+    return HttpResponse(retorno_json, mimetype="application/json")
 
 
 def ajax_get_marcas_por_termo(request):
@@ -196,8 +196,8 @@ def ajax_get_marcas_por_termo(request):
     retorno = [{'pk':p.equipamento.entidade_fabricante.pk, 'valor':p.equipamento.entidade_fabricante.__unicode__()} 
            for p in patrimonios]
     
-    json = json.dumps(retorno)
-    return HttpResponse(json, mimetype="application/json")
+    retorno_json = json.dumps(retorno)
+    return HttpResponse(retorno_json, mimetype="application/json")
 
     
 def ajax_get_equipamento(request):
@@ -222,8 +222,8 @@ def ajax_get_equipamento(request):
                 'ean':p.ean,
               }
     
-    json = json.dumps(retorno)
-    return HttpResponse(json, mimetype="application/json")
+    retorno_json = json.dumps(retorno)
+    return HttpResponse(retorno_json, mimetype="application/json")
 
 def ajax_get_procedencia_filter_tipo(request):
     """
@@ -238,8 +238,8 @@ def ajax_get_procedencia_filter_tipo(request):
     retorno = [{'pk':p.pk, 'valor':p.__unicode__()} 
                for p in procedencias]
     
-    json = json.dumps(retorno)
-    return HttpResponse(json, mimetype="application/json")
+    retorno_json = json.dumps(retorno)
+    return HttpResponse(retorno_json, mimetype="application/json")
 
 def escolhe_patrimonio(request):
     """
@@ -253,7 +253,7 @@ def escolhe_patrimonio(request):
         
         if num_doc:
             retorno = [{'pk':p.pk, 'valor':p.__unicode__()} for p in Patrimonio.objects.filter(Q(pagamento__protocolo__num_documento__icontains=num_doc)|Q(ns__icontains=num_doc))] or [{"pk":"0","valor":"Nenhum registro"}]
-            json = json.dumps(retorno)
+            retorno_json = json.dumps(retorno)
 
         if not retorno:
             retorno = [{"pk":"0","valor":"Nenhum registro"}]
@@ -261,8 +261,8 @@ def escolhe_patrimonio(request):
     else:
         raise Http404
     
-    json = json.dumps(retorno)
-    return HttpResponse(json, mimetype="application/json")
+    retorno_json = json.dumps(retorno)
+    return HttpResponse(retorno_json, mimetype="application/json")
 
 
 def patrimonio_existente(request):
@@ -277,11 +277,11 @@ def patrimonio_existente(request):
             
             retorno = {'marca':p.marca, 'modelo':p.modelo, 'descricao':p.descricao, 'procedencia':p.procedencia}
 
-        json = json.dumps(retorno)
+        retorno_json = json.dumps(retorno)
     else:
         raise Http404
     
-    return HttpResponse(json, mimetype='application/json')
+    return HttpResponse(retorno_json, mimetype='application/json')
 
 @login_required
 def por_estado(request):
@@ -749,9 +749,9 @@ def filtra_pn_estado(request):
         estados.append({'pk':e.id, 'value':'%s (%s)' % (e, patrimonios_estado.order_by('id').distinct().count())})
 
     retorno = {'estados':estados, 'pns':pns}
-    json = json.dumps(retorno)
+    retorno_json = json.dumps(retorno)
 
-    return HttpResponse(json, mimetype="application/json")
+    return HttpResponse(retorno_json, mimetype="application/json")
 
 @login_required
 def por_termo(request, pdf=0):
@@ -1146,8 +1146,8 @@ def abre_arvore(request):
     else:
         for t in Termo.objects.all():
 	    ret.append({'data':t.__unicode__(), 'attr':{'style':'padding-top:6px;', 'o_id':t.id, 'o_model': t._meta.module_name}})
-    json = json.dumps(ret)
-    return HttpResponse(json, mimetype="application/json")
+    retorno_json = json.dumps(ret)
+    return HttpResponse(retorno_json, mimetype="application/json")
 
 
 @login_required
@@ -1212,8 +1212,8 @@ def abre_arvore_tipo(request):
 
 
 
-    json = json.dumps(ret)
-    return HttpResponse(json, mimetype="application/json")
+    retorno_json = json.dumps(ret)
+    return HttpResponse(retorno_json, mimetype="application/json")
 
 
 """
@@ -1239,8 +1239,8 @@ def patrimonio_historico(request):
                    'memorando_desc': historico.memorando.__unicode__() if historico.memorando_id else '',
                    }
 
-        json = json.dumps(retorno)
+        retorno_json = json.dumps(retorno)
     else:
         raise Http404
     
-    return HttpResponse(json, mimetype='application/json')
+    return HttpResponse(retorno_json, mimetype='application/json')
