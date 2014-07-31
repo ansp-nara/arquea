@@ -91,7 +91,6 @@
 .tbl_resumo_msg {
     font-weight: bold;
     font-style: italic;
-    font-size: smaller;
 }
 #tbl_dados {
     margin-top:0.4cm;
