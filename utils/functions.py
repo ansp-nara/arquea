@@ -59,7 +59,7 @@ def fetch_resources(uri, rel):
 
 def render_to_pdf(template_src, context_dict, request=None, context_instance=None, filename='file.pdf', attachments=[]):
     import ho.pisa as pisa
-    from sx.pisa3.pisa_pdf import *
+    from sx.pisa3.pisa_pdf import pisaPdf
 
     template = loader.get_template(template_src)
 
