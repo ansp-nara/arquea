@@ -48,6 +48,8 @@ def fetch_resources(uri, rel):
         path = os.path.join(mRoot, uri.replace(mUrl, ""))
     elif uri.startswith(sUrl):
         path = os.path.join(sRoot, uri.replace(sUrl, ""))
+    else:
+        path = uri
 
     # make sure that file exists
     if not os.path.isfile(path):
