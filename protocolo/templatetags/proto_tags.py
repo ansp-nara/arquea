@@ -1,19 +1,16 @@
 # -*- coding: utf-8 -*-
 
 from django.template import Library
-from protocolo.models import Protocolo, Cotacao
 from django.contrib.auth.models import Group
 from django.utils.translation import ugettext_lazy as _
 from django.utils.safestring import mark_safe
-from decimal import Decimal
 from django.shortcuts import get_object_or_404
-from membro.models import Membro
+from decimal import Decimal
 import math
-
-
 import logging
 
-
+from membro.models import Membro
+from protocolo.models import Protocolo, Cotacao
 
 register = Library()
 
@@ -141,10 +138,6 @@ def moeda_valor_css(value, nac=1):
     
 @register.filter(name='moeda')
 def moeda(value, nac=True, nosep=False, css=False):
-    logger = logging.getLogger('prototags')
-    
-
-
     if nac:
         sep = ','
     else:
@@ -249,15 +242,17 @@ def get_range( value ):
 
 @register.filter
 def has_group(user, group_name):
-  """
-    Filter to check if a user belongs to a certain group.
-    Usage:
-   
-    {% if request.user|has_group:"xxx" %}
-       Do something
-    {% endif %}
+    """
+        Filter to check if a user belongs to a certain group.
+        Usage:
+       
+        {% if request.user|has_group:"xxx" %}
+           Do something
+        {% endif %}
+    
+    """
+    
+    return user.groups.filter(name=group_name).exists()
 
-  """
 
-  group = Group.objects.get(name=group_name)
-  return True if group in user.groups.all() else False
+
