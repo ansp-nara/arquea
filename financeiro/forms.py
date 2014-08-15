@@ -30,17 +30,20 @@ class RecursoInlineAdminForm(forms.ModelForm):
                                                      
         super(RecursoInlineAdminForm, self).__init__(data, files, auto_id, prefix, initial,
                                             error_class, label_suffix, empty_permitted, instance)
-        # Configurando a relação entre Patrimonio e Equipamento para aparecer o botão de +
-        # O self.admin_site foi declarado no admin.py
-        if django.VERSION[0:2] >= (1, 6):
-            rel = ManyToOneRel(field=Recurso._meta.get_field('planejamento'), to=PlanejaAquisicaoRecurso, field_name='id')
-        else:
-            rel = ManyToOneRel(PlanejaAquisicaoRecurso, 'id')
-            
-        self.fields['planejamento'].query = PlanejaAquisicaoRecurso.objects.all().select_related('os', 'os__tipo', 'projeto', 'tipo', )
-        self.fields['planejamento'].widget = RelatedFieldWidgetWrapper(self.fields['planejamento'].widget, rel, self.admin_site)
+
+        # Configurando o campo de 'planejamento', pois o processamento do __unicode__
+        # é muito demorado quando são carregados mais que 5 recursos. Há casos com mais
+        # de 10 recursos no InlineAdminForm 
+        if instance and instance.planejamento.pk:
+            self.fields['planejamento'].query = PlanejaAquisicaoRecurso.objects.filter(pk=instance.planejamento.pk)
+            self.fields['planejamento'].choices = [(p.id, p.__unicode__()) for p in PlanejaAquisicaoRecurso.objects.filter(id=instance.planejamento.pk)]
+
         self.fields['planejamento'].label=mark_safe('<a href="#"  onclick="window.open(\'/admin/rede/planejaaquisicaorecurso/\'+$(\'#\'+$(this).parent().attr(\'for\')).val() + \'/\', \'_blank\');return true;">Planejamento:</a>'\
-                                                                  + '<script type="text/javascript">function get_recursos(obj) {var check = obj.is(":checked")?"Vigente":""; ajax_get_recursos("#"+obj.parent().attr("for"), check); }</script>'\
+                                                                  + '<script type="text/javascript">' \
+                                                                  + '    function get_recursos(obj) {' \
+                                                                  + '    var check = obj.is(":checked")?"Vigente":"";' \
+                                                                  + '    ajax_get_recursos("#"+obj.parent().attr("for"), check); }' \
+                                                                  + '</script>'\
                                                                   + ' <input type="checkbox" onclick="get_recursos($(this));"> Exibir somente os vigentes.')
 
 
