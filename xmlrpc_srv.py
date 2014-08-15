@@ -20,6 +20,7 @@ from outorga.models import Termo, OrigemFapesp, Acordo, Modalidade, Natureza_gas
 from decimal import Decimal
 from financeiro.models import Pagamento
 from datetime import datetime,timedelta
+from patrimonio.models import Patrimonio
 
 # Create a Dispatcher; this handles the calls and translates info to function maps
 #dispatcher = SimpleXMLRPCDispatcher() # Python 2.4
@@ -36,7 +37,7 @@ def rpc_handler(request):
         Empty post assumes you're viewing from a browser and tells you about the service.
         """
 
-        if len(request.POST):
+        if request.method == 'POST':
                 response = HttpResponse(mimetype="application/xml")
                 response.write(dispatcher._marshaled_dispatch(request.raw_post_data))
         else:
@@ -303,7 +304,7 @@ def patrimonio(p_id):
     except:
 	patrimonio = u'Não cadastrado'
 
-    return patrimonio
+    return [patrimonio]
 dispatcher.register_function(patrimonio, 'patrimonio')
 
 def patrimonio_contem(rack_id, p_id, pos):
