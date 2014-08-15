@@ -79,7 +79,7 @@
     /* DESCRICAO */
     #tbl_content td:nth-child(9) { width:8.1cm; }
     /* POSICAO */
-    #tbl_content td:nth-child(10) { width:2cm; }
+    #tbl_content td:nth-child(10) { width:2.5cm; }
     /* ESTADO */
     #tbl_content td:nth-child(11) { width:1.2cm; }
     
