@@ -15,6 +15,7 @@ from protocolo.models import Protocolo
 from memorando.models import Pergunta
 from rede.models import PlanejaAquisicaoRecurso, Recurso
 from financeiro.models import ExtratoPatrocinio, Estado, TipoComprovante
+from utils.request_cache import get_request_cache
 
 
 class RecursoInlineAdminForm(forms.ModelForm):
@@ -34,10 +35,11 @@ class RecursoInlineAdminForm(forms.ModelForm):
         # Configurando o campo de 'planejamento', pois o processamento do __unicode__
         # é muito demorado quando são carregados mais que 5 recursos. Há casos com mais
         # de 10 recursos no InlineAdminForm 
-        if instance and instance.planejamento.pk:
-            self.fields['planejamento'].query = PlanejaAquisicaoRecurso.objects.filter(pk=instance.planejamento.pk)
-            self.fields['planejamento'].choices = [(p.id, p.__unicode__()) for p in PlanejaAquisicaoRecurso.objects.filter(id=instance.planejamento.pk)]
-
+        cache = get_request_cache()
+        if cache.get('rede.PlanejaAquisicaoRecurso.all') is None:
+            cache.set('rede.PlanejaAquisicaoRecurso.all', [('','---------')] + [(p.id, p.__unicode__()) for p in PlanejaAquisicaoRecurso.objects.all().select_related('os', 'os__tipo', 'tipo', 'projeto', )])
+        self.fields['planejamento'].choices =  cache.get('rede.PlanejaAquisicaoRecurso.all')
+            
         self.fields['planejamento'].label=mark_safe('<a href="#"  onclick="window.open(\'/admin/rede/planejaaquisicaorecurso/\'+$(\'#\'+$(this).parent().attr(\'for\')).val() + \'/\', \'_blank\');return true;">Planejamento:</a>'\
                                                                   + '<script type="text/javascript">' \
                                                                   + '    function get_recursos(obj) {' \
@@ -46,9 +48,11 @@ class RecursoInlineAdminForm(forms.ModelForm):
                                                                   + '</script>'\
                                                                   + ' <input type="checkbox" onclick="get_recursos($(this));"> Exibir somente os vigentes.')
 
+    class Meta:
+        model = Recurso
+        
 
 class PagamentoAdminForm(forms.ModelForm):
-
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=':',
                  empty_permitted=False, instance=None):
@@ -66,27 +70,22 @@ class PagamentoAdminForm(forms.ModelForm):
             self.fields['patrocinio'].queryset = ExtratoPatrocinio.objects.all().select_related('localiza')
         
         # Permite selecionar apenas as despesas com valor superior a soma dos valores de suas fontes pagadoras.
+        t = None
         if data:
-            if data.has_key('termo'):
-                termo = data['termo']
-                try:
-                    t = Termo.objects.get(id=termo)
-                    self.fields['protocolo'].queryset = Protocolo.objects.filter(termo=t).select_related('tipo_documento').order_by('tipo_documento', 'num_documento', 'data_vencimento')
-                    self.fields['origem_fapesp'].queryset = OrigemFapesp.objects.filter(item_outorga__natureza_gasto__termo=t).select_related('acordo', 'item_outorga').order_by('acordo__descricao', 'item_outorga__descricao')
-                except:
-                    pass
+            if data.has_key('termo') and data['termo'] is not None and data['termo'] != '':
+                t = Termo.objects.get(id=data['termo'])
         elif instance:
             termo = instance.protocolo.termo
-            try:
-                t = termo #Termo.objects.get(id=termo)
-                self.fields['protocolo'].queryset = Protocolo.objects.filter(termo=t).select_related('tipo_documento').order_by('tipo_documento', 'num_documento', 'data_vencimento')
-                self.fields['origem_fapesp'].queryset = OrigemFapesp.objects.filter(item_outorga__natureza_gasto__termo=t).select_related('acordo', 'item_outorga', 'item_outorga__natureza_gasto', 'item_outorga__natureza_gasto__termo').order_by('acordo__descricao', 'item_outorga__descricao')
-            except:
-                pass
-        else:
-            self.fields['protocolo'].queryset = Protocolo.objects.filter(id__lte=0).select_related('tipo_documento')
-            self.fields['origem_fapesp'].queryset = OrigemFapesp.objects.filter(id__lte=0).select_related('acordo', 'item_outorga')
+            t = termo #Termo.objects.get(id=termo)
             
+        if t:
+            self.fields['protocolo'].choices = [('','---------')] + [(p.id, p.__unicode__()) for p in Protocolo.objects.filter(termo=t).select_related('tipo_documento')]
+            self.fields['origem_fapesp'].choices = [('','---------')] + [(p.id, p.__unicode__()) for p in OrigemFapesp.objects.filter(item_outorga__natureza_gasto__termo=t).select_related('acordo', 'item_outorga', 'item_outorga__natureza_gasto', 'item_outorga__natureza_gasto__termo', )]
+        else:
+            self.fields['protocolo'].choices = [('','---------')] + [(p.id, p.__unicode__()) for p in Protocolo.objects.all().select_related('tipo_documento')]
+            self.fields['origem_fapesp'].choices = [('','---------')] + [(p.id, p.__unicode__()) for p in OrigemFapesp.objects.all().select_related('acordo', 'item_outorga', 'item_outorga__natureza_gasto', 'item_outorga__natureza_gasto__termo', )]
+
+        
         # mensagens de erro
         self.fields['protocolo'].error_messages['required'] = u'O campo PROTOCOLO é obrigatório'
         self.fields['valor_fapesp'].error_messages['required'] = u'O campo VALOR ORIGINÁRIO DA FAPESP é obrigatório'
@@ -95,6 +94,7 @@ class PagamentoAdminForm(forms.ModelForm):
 
     class Meta:
         model = Pagamento
+
         
     class Media:
         js = ('/media/js/selects.js',)
@@ -272,6 +272,16 @@ class PagamentoAuditoriaAdminInlineForm(forms.ModelForm):
         
         super(PagamentoAuditoriaAdminInlineForm, self).__init__(data, files, auto_id, prefix, initial,
                                             error_class, label_suffix, empty_permitted, instance)
+
+        cache = get_request_cache()
+        if cache.get('financeiro.Estado.all') is None:
+            cache.set('financeiro.Estado.all', [('','---------')] + [(p.id, p.__unicode__()) for p in Estado.objects.all()])
+        self.fields['estado'].choices =  cache.get('financeiro.Estado.all')
+
+        if cache.get('financeiro.TipoComprovante.all') is None:
+            cache.set('financeiro.TipoComprovante.all', [('','---------')] + [(p.id, p.__unicode__()) for p in TipoComprovante.objects.all()])
+        self.fields['tipo'].choices =  cache.get('financeiro.TipoComprovante.all')
+
 
             
     class Meta:
