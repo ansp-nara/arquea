@@ -333,15 +333,18 @@ class Protocolo(models.Model):
     def valor(self):
         if self.valor_total is not None:
             return self.valor_total
-        total = Decimal('0.00') 
-        for item in self.itemprotocolo_set.all():
-            total += item.valor
+        total = Decimal('0.00')
+        if self.itemprotocolo_set.exists():
+            for item in self.itemprotocolo_set.all():
+                total += item.valor
         return total
 
 
     # Formata o atributo 'valor' conforme o campo 'moeda_estrangeira'.
     def mostra_valor(self):
-        if self.valor == 0:
+        valor = self.valor
+        
+        if valor == 0:
             return '-'
 
         if self.moeda_estrangeira == False:
@@ -350,7 +353,7 @@ class Protocolo(models.Model):
         else:
             moeda = '$'
             sep_decimal = '.'
-        return moeda + ' ' + formata_moeda(self.valor, sep_decimal)
+        return moeda + ' ' + formata_moeda(valor, sep_decimal)
     mostra_valor.short_description = _(u'Valor')
     mostra_valor.admin_order_field = 'valor_total'
 
