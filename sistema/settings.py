@@ -128,6 +128,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django_cas.middleware.CASMiddleware',
     'middleware.SSLRedirect',
+    'utils.request_cache.RequestCacheMiddleware',
 )
 
 AUTHENTICATION_BACKENDS = (
