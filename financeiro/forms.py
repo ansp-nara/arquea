@@ -82,8 +82,15 @@ class PagamentoAdminForm(forms.ModelForm):
             self.fields['protocolo'].choices = [('','---------')] + [(p.id, p.__unicode__()) for p in Protocolo.objects.filter(termo=t).select_related('tipo_documento')]
             self.fields['origem_fapesp'].choices = [('','---------')] + [(p.id, p.__unicode__()) for p in OrigemFapesp.objects.filter(item_outorga__natureza_gasto__termo=t).select_related('acordo', 'item_outorga', 'item_outorga__natureza_gasto', 'item_outorga__natureza_gasto__termo', )]
         else:
-            self.fields['protocolo'].choices = [('','---------')] + [(p.id, p.__unicode__()) for p in Protocolo.objects.all().select_related('tipo_documento')]
-            self.fields['origem_fapesp'].choices = [('','---------')] + [(p.id, p.__unicode__()) for p in OrigemFapesp.objects.all().select_related('acordo', 'item_outorga', 'item_outorga__natureza_gasto', 'item_outorga__natureza_gasto__termo', )]
+            cache = get_request_cache()
+            if cache.get('protocolo.Protocolo.all') is None:
+                cache.set('protocolo.Protocolo.all', [('','---------')] + [(p.id, p.__unicode__()) for p in Protocolo.objects.all().select_related('tipo_documento')])
+            self.fields['protocolo'].choices =  cache.get('protocolo.Protocolo.all')
+
+            cache = get_request_cache()
+            if cache.get('outorga.OrigemFapesp.all') is None:
+                cache.set('outorga.OrigemFapesp.all', [('','---------')] + [(p.id, p.__unicode__()) for p in OrigemFapesp.objects.all().select_related('acordo', 'item_outorga', 'item_outorga__natureza_gasto', 'item_outorga__natureza_gasto__termo', )])
+            self.fields['origem_fapesp'].choices =  cache.get('outorga.OrigemFapesp.all')
 
         
         # mensagens de erro
