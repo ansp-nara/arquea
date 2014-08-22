@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from models import Item, OrigemFapesp, Termo, Modalidade, Outorga, Natureza_gasto
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.forms.util import ErrorList
+from models import Item, OrigemFapesp, Termo, Modalidade, Outorga, Natureza_gasto, Acordo
 
 class OrigemFapespForm(forms.ModelForm):
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
@@ -16,6 +16,7 @@ class OrigemFapespForm(forms.ModelForm):
         if instance:
             self.fields['item_outorga'].queryset = Item.objects.filter(id=instance.item_outorga.id)
 
+        self.fields['acordo'].choices = [('','---------')] + [(p.id, p.__unicode__()) for p in Acordo.objects.all()]
 
 
 class ItemAdminForm(forms.ModelForm):
