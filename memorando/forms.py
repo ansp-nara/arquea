@@ -1,17 +1,19 @@
 # -*- coding: utf-8 -*-
 
-from financeiro.models import Pagamento
 from django import forms
-from django.forms.util import ErrorList
-from outorga.models import Termo
-from financeiro.models import Pagamento
-from models import *
 from django.forms.models import inlineformset_factory, BaseInlineFormSet
+from django.forms.util import ErrorList
 from django.utils.translation import ugettext_lazy as _
-from tinymce.widgets import TinyMCE
 from django.utils.html import strip_tags
-from utils import widgets
 from ckeditor.widgets import CKEditorWidget
+from tinymce.widgets import TinyMCE
+
+from financeiro.models import Pagamento
+from outorga.models import Termo
+from utils import widgets
+from utils.request_cache import get_request_cache
+from models import *
+
 
 class MemorandoRespostaForm(forms.ModelForm):
     introducao = forms.CharField(required=False, label=u'Introdução', widget=TinyMCE(attrs={'cols': 160, 'rows': 180}, mce_attrs={'height':500}))
@@ -32,6 +34,14 @@ class MemorandoSimplesForm(forms.ModelForm):
     #corpo = forms.CharField(widget=TinyMCE(attrs={'cols': 160, 'rows': 180}, mce_attrs={'height':500}))
     corpo = forms.CharField(widget=CKEditorWidget())
 
+    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
+                 initial=None, error_class=ErrorList, label_suffix=':',
+                 empty_permitted=False, instance=None):
+    
+        super(MemorandoSimplesForm, self).__init__(data, files, auto_id, prefix, initial,
+                                            error_class, label_suffix, empty_permitted, instance)
+
+        self.fields['pai'].choices = [('','---------')] + [(p.id, p.__unicode__()) for p in MemorandoSimples.objects.all().select_related('assunto')]
 
     class Meta:
         model = MemorandoSimples

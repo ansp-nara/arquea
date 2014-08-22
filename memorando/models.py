@@ -141,7 +141,7 @@ class MemorandoSimples(models.Model):
     pai = models.ForeignKey('memorando.MemorandoSimples', verbose_name=u'Memorando pai', null=True, blank=True)
 
     def __unicode__(self):
-        if self.assunto is not None:
+        if self.assunto_id is not None:
             return u'%s/%s - %s' % (self.data.year, self.numero, self.assunto.__unicode__())
         else:
             return u'%s/%s' % (self.data.year, self.numero)
