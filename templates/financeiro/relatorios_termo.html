@@ -27,6 +27,7 @@
 {% block content %}
 </style>
 <form method="GET">
+<p>
 {% if meses %}<label for="id_mes">Mês (escolha '0' para todos os meses):</label>
 <select name="mes" id="id_mes">
   {% for mes in meses %}
@@ -34,17 +35,22 @@
   {% endfor %}
 </select>
 {% endif %}
+</p>
+<p>
 <label for="id_termo">Termo de outorga:</label>
 <select name="termo" id="id_termo">
   {% for t in termos %}
      <option value="{{ t.id }}">{{ t }}</option>
   {% endfor %}
 </select>
+</p>
+<p>
 {% if rt != None %}
 <label for="id_rt">Reserva técnica?</label>
 <input type="checkbox" name="rt">
 </label>
 {% endif %}
+</p>
 <input type="submit" value="Enviar">
 </form>
 {% endblock %}

@@ -66,7 +66,6 @@
 }
 .tbl_resumo td{
     width: 25%;
-    whitespace:nowrap;
 }
 .tbl_resumo td:nth-child(1),
 .tbl_resumo td:nth-child(3){
