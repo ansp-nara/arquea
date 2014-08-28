@@ -78,7 +78,7 @@ class OrigemFapespInline(admin.TabularInline):
     model = OrigemFapesp
     extra = 2
     ordering = ('item_outorga__natureza_gasto__termo', 'item_outorga__descricao')
-    form = OrigemFapespForm
+    form = OrigemFapespInlineForm
 
 class OrigemFapespInlineA(OrigemFapespInline):
     fields = ('termo', 'item_outorga')
@@ -414,10 +414,13 @@ class OrdemDeServicoAdmin(admin.ModelAdmin):
 		return TemplateResponse(request, 'admin/outorga/ordemdeservico/confirma_alteracao.html', {'form_url':form_url})
 
 	return super(OrdemDeServicoAdmin, self).change_view(request, object_id, form_url, extra_context)
-    
-
 admin.site.register(OrdemDeServico,OrdemDeServicoAdmin)
+
+class OrigemFapespAdmin(admin.ModelAdmin):
+    list_per_page = 10
+    form = OrigemFapespAdminForm
+admin.site.register(OrigemFapesp, OrigemFapespAdmin)
+
 #admin.site.register(ArquivoOS)
 admin.site.register(TipoContrato)
-admin.site.register(OrigemFapesp)
 admin.site.register(EstadoOS)
