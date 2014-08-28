@@ -440,13 +440,20 @@ def extrato_financeiro(request, ano=dtime.now().year, pdf=False):
 
     if request.method == 'GET':
         if request.GET.get('termo'):
+            # paramentro para filtrar as Reservas Tecnicas
+            rt = bool(request.GET.get('rt'))
+            if rt:
+                codigo = 'RP'
+            else:
+                codigo = 'MP'
+            
             termo_id = int(request.GET.get('termo'))
             termo = get_object_or_404(Termo, id=termo_id)
             mes = int(request.GET.get('mes'))
             if mes:
-                efs = ExtratoFinanceiro.objects.filter(termo=termo, data_libera__month=mes)
+                efs = ExtratoFinanceiro.objects.filter(termo=termo, data_libera__month=mes, cod__endswith=codigo)
             else:
-                efs = ExtratoFinanceiro.objects.filter(termo=termo)
+                efs = ExtratoFinanceiro.objects.filter(termo=termo, cod__endswith=codigo)
             extrato = []
             for ef in efs.order_by('data_libera'):
                 ex = {'data':ef.data_libera, 'cod':ef.cod, 'historico':ef.historico, 'valor':ef.valor, 'comprovante':ef.comprovante, 'cheques':[]}
@@ -471,7 +478,7 @@ def extrato_financeiro(request, ano=dtime.now().year, pdf=False):
                 return render_to_response('financeiro/financeiro.html', {'termo':termo, 'mes':mes, 'ano':ano, 'extrato':extrato}, context_instance=RequestContext(request))
         else:
             meses = range(0,13)
-            return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all(), 'meses':meses, 'view':'extrato_financeiro'}, context_instance=RequestContext(request))
+            return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all(), 'meses':meses, 'view':'extrato_financeiro', 'rt':False }, context_instance=RequestContext(request))
 
 @login_required
 def extrato_tarifas(request, pdf=False):
@@ -535,11 +542,12 @@ def financeiro_parciais(request, pdf=False):
     if request.method == 'GET':
         if request.GET.get('termo'):
             termo_id = int(request.GET.get('termo'))
+            # paramentro para filtrar as Reservas Tecnicas
             rt = bool(request.GET.get('rt'))
-	    if rt:
-		codigo = 'RP'
-	    else:
-		codigo = 'MP'
+            if rt:
+                codigo = 'RP'
+            else:
+                codigo = 'MP'
             termo = get_object_or_404(Termo, id=termo_id)
             retorno = []
             parciais = ExtratoFinanceiro.objects.filter(termo=termo, cod__endswith=codigo).distinct('parcial').values_list('parcial', flat=True).order_by('parcial')
@@ -595,8 +603,10 @@ def financeiro_parciais(request, pdf=False):
                         #total += c.valor
                         tcheques += c.valor
                         mods = {}
-                        for p in c.pagamento_set.all().prefetch_related('auditoria_set').select_related('origem_fapesp', 'origem_fapesp__item_outorga__natureza_gasto__modalidade'):
-                            if not p.origem_fapesp: continue
+                        for p in c.pagamento_set.all().select_related('origem_fapesp', 'origem_fapesp__item_outorga__natureza_gasto__modalidade'):
+                            
+                            if not p.origem_fapesp_id: continue
+                            
                             v_fapesp += p.valor_fapesp
                             modalidade = p.origem_fapesp.item_outorga.natureza_gasto.modalidade.sigla
                             if modalidade not in mods.keys():
@@ -675,7 +685,7 @@ def financeiro_parciais(request, pdf=False):
                           'total_concessoes':total_concessoes, }
             
             if pdf:
-                return render_to_pdf_weasy('financeiro/financeiro_parcial.pdf', {'size':pdf, 'termo':termo, 'parciais':retorno, 'totais':totais}, request=request, filename='financeiro_parciais_%s.pdf' % termo.__unicode__())
+                return render_to_pdf_weasy('financeiro/financeiro_parcial.pdf', {'size':pdf, 'termo':termo, 'parciais':retorno, 'totais':totais}, request=request, filename='financeiro_parciais_%s_%s.pdf' % (termo.ano, termo.processo))
             else:
                 return render_to_response('financeiro/financeiro_parcial.html', {'termo':termo, 'parciais':retorno, 'totais':totais}, context_instance=RequestContext(request))
         else:
@@ -814,7 +824,6 @@ def ajax_get_recursos_vigentes(request):
     Recebe parametro para filtra por estado (ex: Vigente) ou buscar todos os registros
     """
     estado = request.GET.get('estado') or request.POST.get('estado')
-    print estado
     retorno = []
     if estado and estado != '':
         recursos = PlanejaAquisicaoRecurso.objects.filter(os__estado__nome=estado).select_related('os', 'os__tipo', 'projeto', 'tipo', )
