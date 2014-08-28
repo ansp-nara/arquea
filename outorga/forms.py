@@ -5,18 +5,19 @@ from django.utils.translation import ugettext_lazy as _
 from django.forms.util import ErrorList
 from models import Item, OrigemFapesp, Termo, Modalidade, Outorga, Natureza_gasto, Acordo
 
-class OrigemFapespForm(forms.ModelForm):
+class OrigemFapespInlineForm(forms.ModelForm):
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=':',
                  empty_permitted=False, instance=None):
 
-        super(OrigemFapespForm, self).__init__(data, files, auto_id, prefix, initial,
+        super(OrigemFapespInlineForm, self).__init__(data, files, auto_id, prefix, initial,
                                                error_class, label_suffix, empty_permitted, instance)
 
         if instance:
             self.fields['item_outorga'].queryset = Item.objects.filter(id=instance.item_outorga.id)
 
-        self.fields['acordo'].choices = [('','---------')] + [(p.id, p.__unicode__()) for p in Acordo.objects.all()]
+        self.fields['acordo'].choices = [('','---------')] + [(p.id, p.__unicode__()) for p in Acordo.objects.all().order_by('descricao') ]
+
 
 
 class ItemAdminForm(forms.ModelForm):
@@ -78,28 +79,9 @@ class OrigemFapespAdminForm(forms.ModelForm):
         super(OrigemFapespAdminForm, self).__init__(data, files, auto_id, prefix, initial,
                                             error_class, label_suffix, empty_permitted, instance)
 
-        if instance:
-            # Permite selecionar itens de outorga de um termo e modalidade específicos.
-            i = self.fields['item_outorga']
-            i.queryset = Item.objects.filter(natureza_gasto__termo=instance.item_outorga.natureza_gasto.termo, 
-					     natureza_gasto__modalidade=instance.item_outorga.natureza_gasto.modalidade)
-
-
-            # Permite selecionar modalidades de um termo.
-            m = self.fields['modalidade']
-            m.queryset = Modalidade.modalidades_termo(t=instance.item_outorga.natureza_gasto.termo)
-
-#             self.fields['termo'].initial = instance.item_outorga.natureza_gasto.termo.id
-#             self.fields['modalidade'].initial = instance.item_outorga.natureza_gasto.modalidade.id
-
-
-#     termo = forms.ModelChoiceField(Termo.objects.all(), label=_(u'Termo'), required=False,
-#             widget=forms.Select(attrs={'onchange': 'ajax_filter_modalidade_item_inline("/outorga/escolhe_termo", this.value, this.id);'}))
-
-#     modalidade = forms.ModelChoiceField(Modalidade.modalidades_termo(), label=_(u'Modalidade'), required=False,
-#             widget=forms.Select(attrs={'onchange': 'ajax_filter_inline("/outorga/escolhe_modalidade", this.value, this.id);'}))
-
-    item_outorga = forms.ModelChoiceField(Item.objects.all(), label=_(u'Item'), required=True)
+#
+        self.fields['acordo'].choices = [('','---------')] + [(p.id, p.__unicode__()) for p in Acordo.objects.all().order_by('descricao') ]
+        self.fields['item_outorga'].choices = [('','---------')] + [(p.id, p.__unicode__()) for p in Item.objects.all().select_related('natureza_gasto', 'natureza_gasto__termo') ]
 
 
     # Define o modelo
