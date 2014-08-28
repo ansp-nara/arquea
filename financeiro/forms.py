@@ -79,17 +79,17 @@ class PagamentoAdminForm(forms.ModelForm):
             t = termo #Termo.objects.get(id=termo)
             
         if t:
-            self.fields['protocolo'].choices = [('','---------')] + [(p.id, p.__unicode__()) for p in Protocolo.objects.filter(termo=t).select_related('tipo_documento')]
-            self.fields['origem_fapesp'].choices = [('','---------')] + [(p.id, p.__unicode__()) for p in OrigemFapesp.objects.filter(item_outorga__natureza_gasto__termo=t).select_related('acordo', 'item_outorga', 'item_outorga__natureza_gasto', 'item_outorga__natureza_gasto__termo', )]
+            self.fields['protocolo'].choices = [('','---------')] + [(p.id, p.__unicode__()) for p in Protocolo.objects.filter(termo=t).select_related('tipo_documento').order_by('data_vencimento')]
+            self.fields['origem_fapesp'].choices = [('','---------')] + [(p.id, p.__unicode__()) for p in OrigemFapesp.objects.filter(item_outorga__natureza_gasto__termo=t).select_related('acordo', 'item_outorga', 'item_outorga__natureza_gasto', 'item_outorga__natureza_gasto__termo', ).order_by('acordo__descricao')]
         else:
             cache = get_request_cache()
             if cache.get('protocolo.Protocolo.all') is None:
-                cache.set('protocolo.Protocolo.all', [('','---------')] + [(p.id, p.__unicode__()) for p in Protocolo.objects.all().select_related('tipo_documento')])
+                cache.set('protocolo.Protocolo.all', [('','---------')] + [(p.id, p.__unicode__()) for p in Protocolo.objects.all().select_related('tipo_documento').order_by('data_vencimento')])
             self.fields['protocolo'].choices =  cache.get('protocolo.Protocolo.all')
 
             cache = get_request_cache()
             if cache.get('outorga.OrigemFapesp.all') is None:
-                cache.set('outorga.OrigemFapesp.all', [('','---------')] + [(p.id, p.__unicode__()) for p in OrigemFapesp.objects.all().select_related('acordo', 'item_outorga', 'item_outorga__natureza_gasto', 'item_outorga__natureza_gasto__termo', )])
+                cache.set('outorga.OrigemFapesp.all', [('','---------')] + [(p.id, p.__unicode__()) for p in OrigemFapesp.objects.all().select_related('acordo', 'item_outorga', 'item_outorga__natureza_gasto', 'item_outorga__natureza_gasto__termo', ).order_by('acordo__descricao')])
             self.fields['origem_fapesp'].choices =  cache.get('outorga.OrigemFapesp.all')
 
         
