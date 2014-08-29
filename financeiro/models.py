@@ -140,7 +140,7 @@ class Pagamento(models.Model):
             valor = self.valor_fapesp+self.valor_patrocinio
         else: valor = self.valor_fapesp
         mod = ''
-        if self.origem_fapesp:
+        if self.origem_fapesp_id:
             mod = self.origem_fapesp.item_outorga.natureza_gasto.modalidade.sigla
             if self.auditoria_set.exists():
                 a = self.auditoria_set.only('pagamento', 'parcial', 'pagina')[:1].get()
@@ -226,6 +226,7 @@ class Pagamento(models.Model):
 
     class Meta:
     	ordering = ('conta_corrente',)
+
 
 class LocalizaPatrocinio(models.Model):
     consignado = models.CharField(max_length=50)
