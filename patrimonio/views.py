@@ -875,12 +875,15 @@ def por_termo(request, pdf=0):
 @login_required
 def racks(request):
         
-    # Busca patrimonios do tipo RACK com o estado ATIVO
-    locais = Patrimonio.objects.filter(equipamento__tipo__nome='Rack', historicolocal__estado__id=Estado.PATRIMONIO_ATIVO, historicolocal__endereco__mostra_bayface=True).values_list('historicolocal__endereco', flat=True).order_by('historicolocal__endereco').distinct().only('id')
-
+    # Busca os endereços que possuem Racks no estadoAtivos
+    locais = EnderecoDetalhe.objects.filter(historicolocal__estado__id=Estado.PATRIMONIO_ATIVO, \
+                                            historicolocal__patrimonio__equipamento__tipo__nome='Rack', \
+                                            mostra_bayface=True, ).order_by('id').distinct()
+                                            
+    
     todos_dcs = []
     for local in locais:
-        dc = {'nome':EnderecoDetalhe.objects.get(id=local).complemento, 'id':local}
+        dc = {'nome':local.complemento, 'id':local.id}
         todos_dcs.append(dc)
 
     p_dc = request.GET.get('dc')
@@ -888,11 +891,13 @@ def racks(request):
     dcs = []
     if p_dc != None:
         if int(p_dc) > 0:
-            locais = locais.filter(historicolocal__endereco__id=p_dc)
+            locais = EnderecoDetalhe.objects.filter(id=p_dc)
         
         for local in locais:
             racks = []
-            patrimonio_racks = Patrimonio.objects.filter(equipamento__tipo__nome='Rack', historicolocal__endereco__id=local).select_related('equipamento', 'equipamento__imagem', 'historicolocal', 'contido')
+            
+            
+            patrimonio_racks = Patrimonio.objects.filter(equipamento__tipo__nome='Rack', historicolocal__endereco__id=local.id).select_related('contido').prefetch_related('historicolocal_set')
             patrimonio_racks = list(patrimonio_racks)
             # Ordena os racks pela posição. Ex: R042 - ordena pela fila 042 e depois pela posição R
             patrimonio_racks.sort(key=lambda x: x.historico_atual.posicao_rack_letra, reverse=False)
@@ -924,7 +929,7 @@ def racks(request):
                 # ordena os equipamentos do rack conforme a posição no rack
 #                 pts = list(rack.contido.filter(historicolocal__posicao__isnull=False).values('historicolocal__data').aggregate(Max('historicolocal__data')))
                 hist = rack.contido.annotate(hist=Max('historicolocal__data')).values_list('pk')
-                pts = list(rack.contido.filter(pk__in=hist))
+                pts = list(rack.contido.filter(pk__in=hist).select_related('equipamento', 'equipamento__tipo'))
                 pts.sort(key=lambda x: x.historico_atual.posicao_furo, reverse=True)
     
                 ptAnterior = None
@@ -1051,7 +1056,7 @@ def racks(request):
                 
             dcEntidade = Entidade.objects.filter(endereco__enderecodetalhe=local)
             
-            dc = {'nome':EnderecoDetalhe.objects.get(id=local).complemento, 'fileiras':fileiras, 'id':local, 'entidade': dcEntidade[0].sigla,}
+            dc = {'nome':local.complemento, 'fileiras':fileiras, 'id':local, 'entidade': dcEntidade[0].sigla,}
             dcs.append(dc)
     
     chk_stencil = request.GET.get('chk_stencil') if request.GET.get('chk_stencil') else 1

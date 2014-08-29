@@ -126,7 +126,7 @@ class Patrimonio(models.Model):
     garantia_termino = NARADateField(_(u'Data de término da garantia'), null=True, blank=True)
 
     def __unicode__(self):
-        if self.pagamento:
+        if self.pagamento_id:
             return u'%s - %s  - %s - %s' % (self.pagamento.protocolo.num_documento, self.apelido, self.ns, self.descricao)
         else:
             return u'%s - %s - %s' % (self.apelido, self.ns, self.descricao)
@@ -206,15 +206,9 @@ class Patrimonio(models.Model):
      
     @cached_property
     def historico_atual(self):
-#         ht = self.historicolocal_set.order_by('-data', '-id')
-#         if not ht: return None
-#         return ht[0]
-        ht = HistoricoLocal.objects.filter(patrimonio_id=self.id) \
-                                   .select_related('endereco__endereco__entidade', 'estado', 'memorando') \
-                                   .order_by('-data', '-id')
+        ht = self.historicolocal_set.order_by('-data', '-id')
         if not ht: return None
         return ht[0]
- 
    
 
     def posicao(self):

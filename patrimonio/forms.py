@@ -12,16 +12,17 @@ from django.forms.models import BaseInlineFormSet, inlineformset_factory
 from django.forms import models
 from django.forms.fields import ChoiceField
 from django.forms.models import ModelChoiceIterator, ModelChoiceField
+from django.forms import widgets
+from django.forms.util import flatatt
 
 from models import *
 from financeiro.models import Pagamento
+from memorando.models import MemorandoSimples
 from identificacao.models import Identificacao, Entidade, Endereco, EnderecoDetalhe, EntidadeHistorico
 from outorga.models import Termo
 from patrimonio.models import Equipamento, Patrimonio
+from utils.request_cache import get_request_cache
 
-
-from django.forms import widgets
-from django.forms.util import flatatt
 
 # Exibição de patrimonios filhos em forma de tabela, dentro do form de Patrimonio
 class PatrimonioReadOnlyWidget(forms.Widget):
@@ -43,7 +44,7 @@ class PatrimonioReadOnlyWidget(forms.Widget):
 
     def _has_changed(self, initial, data):
         return False
-    
+
 class PatrimonioReadOnlyField(forms.FileField):
     widget = PatrimonioReadOnlyWidget
     def __init__(self, widget=None, label=None, initial=None, help_text=None):
@@ -67,7 +68,6 @@ class EntidadeModelChoiceField(forms.ModelChoiceField):
             return self._choices
         # Escolhe entre o empty_label ou senão coloca um valor padrão para o item vazio
         choices = [("", self.empty_label or "---------", '')]
-        
         
         # Preenche os valores do compo com o ID, a sigla completa com a entidade pai, e a sigla tabulada
         for item in self.queryset.select_related('entidade', 'entidade__entidade'):
@@ -185,7 +185,7 @@ class PatrimonioAdminForm(forms.ModelForm):
                 
             initial.update({'patrimonio':instance.patrimonio})
             initial.update({'form_filhos': [(p.id, p.apelido, p.ns, p.descricao) for p in Patrimonio.objects.filter(patrimonio=instance)]})
-            if instance.pagamento:
+            if instance.pagamento_id:
                 initial.update({'termo':instance.pagamento.protocolo.termo})
                                                      
         super(PatrimonioAdminForm, self).__init__(data, files, auto_id, prefix, initial,
@@ -368,7 +368,19 @@ class PatrimonioHistoricoLocalAdminForm(forms.ModelForm):
 
         #self.fields['endereco'].queryset = end
         self.fields['endereco'].choices = [(e.id, e.__unicode__()) for e in end]
-        
+
+        # Cache dos valores do campo de memorando do histórico
+        cache = get_request_cache()
+        if cache.get('memorando.MemorandoSimples.all') is None:
+            cache.set('memorando.MemorandoSimples.all', [('','---------')] + [(p.id, p.__unicode__()) for p in MemorandoSimples.objects.all().select_related('assunto', )])
+        self.fields['memorando'].choices =  cache.get('memorando.MemorandoSimples.all')
+
+        # Cache dos valores do campo de estado do patrionio do histórico
+        cache = get_request_cache()
+        if cache.get('patrimonio.Estado.all') is None:
+            cache.set('patrimonio.Estado.all', [('','---------')] + [(p.id, p.__unicode__()) for p in Estado.objects.all()])
+        self.fields['estado'].choices =  cache.get('patrimonio.Estado.all')
+
 
 class BaseHistoricoLocalAdminFormSet(BaseInlineFormSet):
     """
