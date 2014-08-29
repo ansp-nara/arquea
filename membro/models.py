@@ -133,7 +133,11 @@ class Membro(models.Model):
     @property
     def cargo_atual(self):
         
-        cargos = [h.cargo.nome for h in Historico.ativos.filter(membro=self).select_related('cargo').only('cargo__nome')]
+        #cargos = [h.cargo.nome for h in Historico.ativos.filter(membro=self).select_related('cargo').only('cargo__nome')]
+        cargos = []
+        for h in self.historico_set.all():
+            if h.termino == None:
+                cargos.append(h.cargo.nome)
         return ' - '.join(cargos)
 
     # se o membro é atualmente funcionario
