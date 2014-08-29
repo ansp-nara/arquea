@@ -346,10 +346,12 @@ def relatorio_acordos(request, pdf=False):
                     totalDolar = Decimal('0.0')
                     pg = []
                     for p in o.pagamento_set.order_by('conta_corrente__data_oper', 'id') \
-                                            .select_related('conta_corrente', 'protocolo', 'protocolo__descricao2', 'protocolo__tipo_documento',\
-                                                            'protocolo__descricao2__entidade','origem_fapesp__item_outorga__natureza_gasto__modalidade'):
+                                            .prefetch_related('auditoria_set', 'auditoria_set__tipo') \
+                                            .select_related('conta_corrente', 'protocolo', 'protocolo__descricao2', \
+                                                            'protocolo__tipo_documento', 'protocolo__descricao2__entidade', \
+                                                            'origem_fapesp__item_outorga__natureza_gasto__modalidade'):
                         
-                        pags = {'p':p, 'docs':p.auditoria_set.select_related('tipo')}
+                        pags = {'p':p, 'docs':p.auditoria_set.all()}
                         pg.append(pags)
 
                         if p.origem_fapesp and p.origem_fapesp.item_outorga.natureza_gasto.modalidade.moeda_nacional == False:
@@ -603,7 +605,7 @@ def financeiro_parciais(request, pdf=False):
                         #total += c.valor
                         tcheques += c.valor
                         mods = {}
-                        for p in c.pagamento_set.all().select_related('origem_fapesp', 'origem_fapesp__item_outorga__natureza_gasto__modalidade'):
+                        for p in c.pagamento_set.all().prefetch_related('auditoria_set').select_related('origem_fapesp', 'origem_fapesp__item_outorga__natureza_gasto__modalidade'):
                             
                             if not p.origem_fapesp_id: continue
                             

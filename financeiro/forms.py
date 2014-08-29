@@ -79,12 +79,12 @@ class PagamentoAdminForm(forms.ModelForm):
             t = termo #Termo.objects.get(id=termo)
             
         if t:
-            self.fields['protocolo'].choices = [('','---------')] + [(p.id, p.__unicode__()) for p in Protocolo.objects.filter(termo=t).select_related('tipo_documento').order_by('data_vencimento')]
             self.fields['origem_fapesp'].choices = [('','---------')] + [(p.id, p.__unicode__()) for p in OrigemFapesp.objects.filter(item_outorga__natureza_gasto__termo=t).select_related('acordo', 'item_outorga', 'item_outorga__natureza_gasto', 'item_outorga__natureza_gasto__termo', ).order_by('acordo__descricao')]
+            self.fields['protocolo'].choices = [('','---------')] + [(p.id, p.__unicode__()) for p in Protocolo.objects.filter(termo=t).prefetch_related('itemprotocolo_set').select_related('tipo_documento').order_by('data_vencimento')]
         else:
             cache = get_request_cache()
             if cache.get('protocolo.Protocolo.all') is None:
-                cache.set('protocolo.Protocolo.all', [('','---------')] + [(p.id, p.__unicode__()) for p in Protocolo.objects.all().select_related('tipo_documento').order_by('data_vencimento')])
+                cache.set('protocolo.Protocolo.all', [('','---------')] + [(p.id, p.__unicode__()) for p in Protocolo.objects.all().prefetch_related('itemprotocolo_set').select_related('tipo_documento').order_by('data_vencimento')])
             self.fields['protocolo'].choices =  cache.get('protocolo.Protocolo.all')
 
             cache = get_request_cache()
@@ -92,6 +92,10 @@ class PagamentoAdminForm(forms.ModelForm):
                 cache.set('outorga.OrigemFapesp.all', [('','---------')] + [(p.id, p.__unicode__()) for p in OrigemFapesp.objects.all().select_related('acordo', 'item_outorga', 'item_outorga__natureza_gasto', 'item_outorga__natureza_gasto__termo', ).order_by('acordo__descricao')])
             self.fields['origem_fapesp'].choices =  cache.get('outorga.OrigemFapesp.all')
 
+
+        
+        if self.fields.has_key('membro'):
+            self.fields['membro'].choices = [('','---------')] + [(p.id, p.__unicode__()) for p in Membro.objects.all().prefetch_related('historico_set', 'historico_set__cargo').order_by('nome')]
         
         # mensagens de erro
         self.fields['protocolo'].error_messages['required'] = u'O campo PROTOCOLO é obrigatório'
@@ -180,9 +184,9 @@ class ExtratoPatrocinioAdminForm(forms.ModelForm):
         self.fields['historico'].error_messages['required'] = u'O campo HISTÓRICO é obrigatório'
         self.fields['obs'].error_messages['required'] = u'O campo OBS é obrigatório'
 
-
     class Meta:
         model = ExtratoPatrocinio
+
 
 class ExtratoCCAdminForm(forms.ModelForm):
 
@@ -204,7 +208,7 @@ class ExtratoCCAdminForm(forms.ModelForm):
 
 
     class Meta:
-    	model = ExtratoCC
+        model = ExtratoCC
 
     def clean_imagem(self):
         """
