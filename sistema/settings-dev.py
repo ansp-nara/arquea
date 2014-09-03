@@ -23,7 +23,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    'C:/projetos/workspace/sistema/templates',
+    '/home/antonio/develop/sistema/templates',
 )
 
 CKEDITOR_UPLOAD_PATH='/tmp/ckeditor'
@@ -31,13 +31,8 @@ CKEDITOR_UPLOAD_PATH='/tmp/ckeditor'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'HOST': '127.0.0.1',
-        'NAME': 'sistema-bak-20130927',
-#         'NAME': 'sistema',
-        'USER': 'sistema-user',
-        'PASSWORD': '1234'
-        
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': '/home/antonio/develop/db.django', 
 #         'HOST': '10.0.0.97',
 #         'NAME': 'rogerio',
 #         'USER': 'rogerio',
@@ -53,17 +48,12 @@ EMAIL_HOST_PASSWORD='1234'
 EMAIL_USE_TLS=True
 
 STATICFILES_DIRS = (
-     '/projetos/workspace/sistema/staticfiles/',
+     '/home/antonio/develop/sistema/staticfiles/',
      '/var/www/files/',
 )
 
-STATIC_ROOT = '/projetos/workspace/sistema/media/'
+STATIC_ROOT = '/tmp/media/'
 STATIC_URL = '/media/'
-
-
-INSTALLED_APPS += (
-    'django_jenkins',
-)
 
 
 LOGGING = {

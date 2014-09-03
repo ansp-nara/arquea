@@ -366,3 +366,27 @@ class UnicodeWriter:
     def writerows(self, rows):
         for row in rows:
             self.writerow(row)
+
+
+def month_range(start_date, end_date):
+    """
+    Returns all months (with the same day when possible) between
+    start_date and end_date (including both)
+    
+    @param start_date   Date of the beggining
+    @param end_date     Date of the ending
+    """
+    day = start_date.day
+    current_date = start_date
+    
+    while current_date <= end_date:
+        yield current_date
+        carry, new_month = divmod(current_date.month, 12)
+        new_month += 1
+        old_current = current_date
+        new_day = day
+        while old_current == current_date:
+            try:
+                current_date = current_date.replace(year=current_date.year + carry, month=new_month, day=new_day)
+            except ValueError:
+                new_day -= 1

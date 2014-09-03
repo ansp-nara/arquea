@@ -14,7 +14,7 @@ from patrimonio.models import Patrimonio, Equipamento
 from financeiro.models import Pagamento
 from identificacao.models import *
 from outorga.models import Termo, Modalidade, Item, Natureza_gasto, Acordo, Outorga
-from utils.functions import render_to_pdf, render_to_pdf_weasy
+from utils.functions import render_to_pdf, render_to_pdf_weasy, month_range
 
 import logging
 
@@ -503,3 +503,20 @@ def acordo_progressivo(request, pdf=False):
         return render_to_pdf('outorga/acordo_progressivo.pdf', {'acordos':acordos, 'termos':termos}, request=request, filename='acordo_progressivo.pdf')
     else:
         return render(request, 'outorga/acordo_progressivo.html', {'acordos':acordos, 'termos':termos})
+
+@login_required
+def termo_datas(request):
+   
+    if request.method == 'POST':
+	raise Http404
+
+    if not request.GET.has_key('termo'):
+	raise Http404
+
+    termo_id = request.GET.get('termo')
+    termo = get_object_or_404(Termo, pk=termo_id)
+
+    meses = []
+    for m in month_range(termo.inicio, termo.termino):
+        meses.append({'value':'%s-%s' % (m.year, m.month), 'display':'%02d/%s' % (m.month, m.year)})
+    return HttpResponse(simplejson.dumps(meses),	mimetype='application/json')
