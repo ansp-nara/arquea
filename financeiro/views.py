@@ -230,10 +230,10 @@ def relatorio_gerencial(request, pdf=False):
             meses = []
             totalizador = []
             
-            ano = t.inicio.year
-            afinal = (t.inicio+t.duracao()).year
-            mes = t.inicio.month
-            mfinal = (t.inicio+t.duracao()).month
+            inicio = request.GET.get('inicio')
+            termino = request.GET.get('termino')
+            ano,mes = (int(x) for x in inicio.split('-'))
+            afinal,mfinal = (int(x) for x in termino.split('-'))
             
             ultimo = Pagamento.objects.filter(protocolo__termo=t).aggregate(ultimo=Max('conta_corrente__data_oper'))
             ultimo = ultimo['ultimo']
@@ -241,7 +241,7 @@ def relatorio_gerencial(request, pdf=False):
             while ano < afinal or (ano <= afinal and mes <= mfinal):
                 dt = date(ano,mes,1)
                 meses.append(dt.strftime('%B de %Y').decode('latin1'))
-                if ano == afinal and mes == mfinal:
+                if ano == t.termino.year and mes == t.termino.month:
                     dt2 = date(ano+5,mes,1)
                     total_real = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__termo=t,origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional=True, conta_corrente__data_oper__range=(dt,dt2)).aggregate(Sum('valor_fapesp'))
                     total_dolar = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__termo=t,origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional=False, protocolo__data_vencimento__range=(dt,dt2)).aggregate(Sum('valor_fapesp'))

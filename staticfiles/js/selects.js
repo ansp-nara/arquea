@@ -1263,3 +1263,52 @@ function ajax_get_marcas_por_termo(id_retorno, termo_id)
            }
        });
 }
+
+/**
+ * Ajax para preencher os campos de data de inicio e fim no relatório gerencial
+**/
+function termo_datas(termo_id)
+{
+    if (termo_id == "") {
+        $("#id_datas").hide();
+        return;
+    }
+    
+    $("#id_datas").show();
+    $.ajax({
+        type: "GET",
+        url: "/outorga/json/termo_datas",
+        dataType: "json",
+        data: {"termo":termo_id},
+        success: function(retorno) {
+            $("#id_inicio").empty();
+            $("#id_termino").empty();
+            $.each(retorno, function(i, item) {
+                $("#id_inicio").append('<option value="'+item.value+'">'+item.display+'</option>');
+                $("#id_termino").append('<option value="'+item.value+'">'+item.display+'</option>');
+            });
+        },
+        error: function(erro) {
+            alert('termo_datas - Erro: Sem retorno de requisição.');
+        }
+    });
+}
+
+/**
+ * Ajax para retirar as opções inválidas do campo de fim no relatório gerencial
+**/
+function retira_termino(inicio)
+{
+    data_menor = 1;
+    $("#id_termino option").each(function() {
+        if ($(this).val() == inicio) {
+            data_menor = 0;
+            $(this).prop('selected', true);
+        }
+        if (data_menor == 1) {
+            $(this).hide();
+        } else {
+            $(this).show();
+        }
+    });
+}

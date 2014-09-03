@@ -18,4 +18,5 @@ urlpatterns = patterns('outorga.views',
     (r'relatorios/item_modalidade/(?P<pdf>\d)$', 'item_modalidade'),
     (r'relatorios/acordo_progressivo$', 'acordo_progressivo'),
     (r'relatorios/acordo_progressivo/(?P<pdf>\d)$', 'acordo_progressivo'),
+    (r'json/termo_datas$', 'termo_datas'),
 )
