@@ -278,10 +278,7 @@ def relatorio_gerencial(request, pdf=False):
                 for it in ng.item_set.all():
                     item['itens'].update({it:[]})
 
-                ano = t.inicio.year
-                afinal = (t.inicio+t.duracao()).year
-                mes = t.inicio.month
-                mfinal = (t.inicio+t.duracao()).month
+                ano,mes = (int(x) for x in inicio.split('-'))
                 
                 while ano < afinal or (ano <= afinal and mes <= mfinal):
                     total = Decimal('0.0')
@@ -298,7 +295,7 @@ def relatorio_gerencial(request, pdf=False):
                     except:
                         dt = date(ano+1, 1,1)
                     dt2 = date(ano+5,1,1)
-                    if ano == afinal and mes == mfinal:
+                    if ano == t.termino.year and mes == t.termino.month:
                         if ng.modalidade.moeda_nacional:
                             sumFapesp = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto=ng, conta_corrente__data_oper__range=(dt,dt2)).aggregate(Sum('valor_fapesp'))
                         else:
@@ -308,7 +305,7 @@ def relatorio_gerencial(request, pdf=False):
                     item['meses'].append({'ord':dt.strftime('%Y%m'), 'data':dt.strftime('%B de %Y'),'valor':total})
                     for it in item['itens'].keys():
                         after = False
-                        if ano == afinal and mes == mfinal: after = True
+                        if ano == t.termino.year and mes == t.termino.month: after = True
 
                         total = it.calcula_realizado_mes(dt, after)
                         item['itens'][it].append({'ord':dt.strftime('%Y%m'), 'valor': total})
