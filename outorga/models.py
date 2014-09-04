@@ -832,7 +832,6 @@ class Contrato(models.Model):
       anterior = models.ForeignKey('outorga.Contrato', verbose_name=_('Contrato anterior'), null=True, blank=True)
       arquivo = models.FileField(upload_to='contrato')
 
-
       # Retorna a entidade e a data de ínicio do Contrato.
       def __unicode__(self):
           inicio = self.data_inicio.strftime("%d/%m/%Y")
@@ -840,10 +839,9 @@ class Contrato(models.Model):
 
       # Retorna um ícone se o contrato tiver anexo.
       def existe_arquivo(self):
-          a = '<center><a href="/site-media/contrato/%s"><img src="/media/img/arquivo.png" /></a></center>'
           if self.arquivo and self.arquivo.name.find('/') >= 0:
-              aq = str(self.arquivo).split('/')[1]
-              return '<center>%s</center>' % (a % aq)
+              a = '<center><a href="%s"><img src="/media/img/arquivo.png" /></a></center>' % self.arquivo.url
+              return a
           return ' '
       existe_arquivo.allow_tags = True
       existe_arquivo.short_description = _(u'Arquivo')
