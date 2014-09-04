@@ -30,8 +30,8 @@ TEMPLATE_DIRS += (
 )
 
 STATIC_ROOT = '/projetos/workspace/sistema/media/'
-STATIC_URL = '/media/'
-MEDIA_URL = '/files/'
+STATIC_URL = '/files/'
+MEDIA_URL = '/media/'
 MEDIA_ROOT = '/var/www/files/'
 ADMIN_MEDIA_PREFIX = '/media/'
 
