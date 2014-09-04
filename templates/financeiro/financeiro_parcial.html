@@ -93,7 +93,8 @@
         <tr><td>Total devolvido:</td><td>{{ totais.total_devolvido|moeda }}</td><td>Suplementações:</td><td>{{ totais.total_suplementado|moeda }}</td></tr>
         <tr><td>Total estornado:</td><td>{{ totais.total_estornado|moeda }}</td><td>Anulações:</td><td>{{ totais.total_anulado|moeda }}</td></tr>
         <tr><td>Total realizado:</td><td>{{ totais.total_pagamentos|moeda }}</td><td>Cancelamentos:</td><td>{{ totais.total_cancelado|moeda }}</td></tr>
-        <tr><td>Diferenças existentes:</td><td>{{ totais.total_diferenca_total|moeda }}</td><td>Total de concessões:</td><td>{{ totais.total_concessoes|moeda }}</td></tr>
+        <tr><td style="border-top:1px solid;">Total:</td><td style="border-top:1px solid;">{{ totais.total_diferenca|moeda }}</td><td>Total de concessões:</td><td>{{ totais.total_concessoes|moeda }}</td></tr>
+        <tr><td>Somatória das diferenças em pgtos.:</td><td>{{ totais.total_diferenca_total|moeda }}</td><td></td><td></td></tr>
     </tbody>
 </table>
 <div class="tbl_sintatico_msg">
@@ -113,7 +114,9 @@ O valor abaixo representa a soma de todas as diferenças apontadas nesta parcial
 			<tr><td>Total devolvido:</td><td>{{ p.devolvido|moeda }}</td><td>Suplementações:</td><td>{{ p.suplementado|moeda }}</td></tr>
 			<tr><td>Total estornado:</td><td>{{ p.estornado|moeda }}</td><td>Anulações:</td><td>{{ p.anulado|moeda }}</td></tr>
 			<tr><td>Total realizado:</td><td>{{ p.pagamentos|moeda }}</td><td>Cancelamentos:</td><td>{{ p.cancelado|moeda }}</td></tr>
-			<tr><td>Diferenças existentes:</td><td>{{ p.diferenca_total|moeda }}</td><td>Total de concessões:</td><td>{{ p.concessoes|moeda }}</td></tr>
+            <tr><td style="border-top:1px solid;">Total:</td><td style="border-top:1px solid;">{{ p.total_diferenca|moeda }}</td><td>Total de concessões:</td><td>{{ p.concessoes|moeda }}</td></tr>
+            <tr><td>Somatória das diferenças em pgtos.:</td><td>{{ p.diferenca_total|moeda }}</td><td></td><td></td></tr>
+
 	    </tbody>
 	</table>
 	<div class="tbl_sintatico_msg">

@@ -632,7 +632,9 @@ def financeiro_parciais(request, pdf=False):
                         if v_fapesp != c.valor:
                             ch.update({'v_fapesp':v_fapesp})
                         ex['cheques'].append(ch)
-                    if ef.cod == 'PGMP' or ef.cod == 'DVMP' or ef.cod == 'ESMP':
+                    if ef.cod == 'PGMP' or ef.cod == 'DVMP' or ef.cod == 'ESMP' or \
+                       ef.cod == 'PGRP' or ef.cod == 'DVRP' or ef.cod == 'ESRP':
+                        
                         ex['diferenca'] = ef.valor-total
                         diferenca_total += ef.valor-total
                     if total > ef.valor: 
@@ -644,12 +646,17 @@ def financeiro_parciais(request, pdf=False):
                     extrato.append(ex)
                 if exi: 
                     exi.update({'valor_data':tdia})
+                    
+                # OBS: os valores de 'liberado' e 'pagamentos' estão com o sinal invertidos 
+                diferenca = - (-liberado) + devolvido + estornado + (-pagamentos)
+                
+                print "%s %s %s %s" % (liberado, devolvido, estornado, pagamentos)
                 retorno.append({'parcial':str(parcial), 'extrato':extrato, 'liberado':-liberado, 
                                 'devolvido':devolvido, 'pagamentos':-pagamentos, 
                                 'diferenca_total':diferenca_total,  'concedido':concedido, 
                                 'suplementado':suplementado, 'anulado':anulado, 
                                 'cancelado':cancelado, 'concessoes':concessoes, 
-                                'estornado':estornado})
+                                'estornado':estornado, 'total_diferenca':diferenca})
                 
                 total_liberado = 0
                 total_devolvido = 0
@@ -675,13 +682,16 @@ def financeiro_parciais(request, pdf=False):
                     total_anulado += r['anulado']
                     total_cancelado += r['cancelado']
                     total_concessoes += r['concessoes']
+                total_diferenca = - total_liberado + total_devolvido + total_estornado + total_pagamentos
 
                 totais={'total_liberado':total_liberado, 'total_devolvido':total_devolvido,
                           'total_estornado':total_estornado, 'total_pagamentos':total_pagamentos,
                           'total_diferenca_total':total_diferenca_total,
-                        'total_concedido':total_concedido, 'total_suplementado':total_suplementado,
+                          'total_concedido':total_concedido, 'total_suplementado':total_suplementado,
                           'total_anulado':total_anulado, 'total_cancelado':total_cancelado,
-                          'total_concessoes':total_concessoes, }
+                          'total_concessoes':total_concessoes, 
+                          'total_diferenca':total_diferenca
+                          }
             
             if pdf:
                 return render_to_pdf_weasy('financeiro/financeiro_parcial.pdf', {'size':pdf, 'termo':termo, 'parciais':retorno, 'totais':totais}, request=request, filename='financeiro_parciais_%s_%s.pdf' % (termo.ano, termo.processo))
