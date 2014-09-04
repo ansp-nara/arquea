@@ -1283,9 +1283,14 @@ function termo_datas(termo_id)
         success: function(retorno) {
             $("#id_inicio").empty();
             $("#id_termino").empty();
+            lt = retorno.length;
+            selected = '';
             $.each(retorno, function(i, item) {
+                if (i == lt-1) {
+                    selected = 'selected';
+                }
                 $("#id_inicio").append('<option value="'+item.value+'">'+item.display+'</option>');
-                $("#id_termino").append('<option value="'+item.value+'">'+item.display+'</option>');
+                $("#id_termino").append('<option value="'+item.value+'" '+selected+'>'+item.display+'</option>');
             });
         },
         error: function(erro) {
