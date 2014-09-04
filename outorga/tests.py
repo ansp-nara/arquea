@@ -1200,7 +1200,7 @@ class ContratoTest(UnitTestCase):
         ct.arquivo._commited=True
         ct.save()
 
-        self.assertEquals(ct.existe_arquivo(), u'<center><center><a href="/site-media/contrato/teste"><img src="/media/img/arquivo.png" /></a></center></center>')
+        self.assertEquals(ct.existe_arquivo(), u'<center><a href="/media/teste/teste/test_img_file.gif"><img src="/media/img/arquivo.png" /></a></center>')
 
     def test_existe_arquivo__nulo(self):
         ct = Contrato.objects.get(pk=1)
