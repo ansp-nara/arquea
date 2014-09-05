@@ -101,7 +101,7 @@ class Membro(models.Model):
     url_lattes = models.URLField(_(u'Currículo Lattes'), blank=True, help_text=_(u'URL do Currículo Lattes'))
     foto = models.ImageField(upload_to='membro', blank=True, null=True)
     data_nascimento = NARADateField(_(u'Nascimento'), help_text=_(u'Data de nascimento'), blank=True, null=True)
-    site = models.BooleanField(_(u'Exibir no site?'))
+    site = models.BooleanField(_(u'Exibir no site?'), default=False)
     contato = models.ForeignKey('identificacao.Contato', null=True, blank=True)
 
     # Retorna o nome e o cargo.
@@ -218,7 +218,7 @@ class Ferias(models.Model):
     """
     membro = models.ForeignKey('membro.Membro', verbose_name=_(u'Membro'), limit_choices_to=Q(historico__funcionario=True)&Q(historico__termino__isnull=True))
     inicio = NARADateField(_(u'Início do período aquisitivo'), help_text=_(u'Início do período de trabalho'))
-    realizado = models.BooleanField(_(u'Férias já tiradas?'))
+    realizado = models.BooleanField(_(u'Férias já tiradas?'), default=False)
 
     def save(self, *args, **kwargs):
         self.inicio_ferias = self.inicio + timedelta(365)
@@ -298,10 +298,10 @@ class ControleFerias(models.Model):
     ferias = models.ForeignKey('membro.Ferias')
     inicio = NARADateField()
     termino = NARADateField()
-    oficial = models.BooleanField(_(u'Oficial?'))
+    oficial = models.BooleanField(_(u'Oficial?'), default=False)
     obs = models.TextField(null=True, blank=True)
-    vendeu10 = models.BooleanField(_(u'Vendeu 10 dias?'))
-    antecipa13 = models.BooleanField(_(u'Antecipação de 13º salário?'))
+    vendeu10 = models.BooleanField(_(u'Vendeu 10 dias?'), default=False)
+    antecipa13 = models.BooleanField(_(u'Antecipação de 13º salário?'), default=False)
     dias_uteis_fato = models.IntegerField(_(u'Dias úteis tirados de fato'))
     dias_uteis_aberto = models.IntegerField(_(u'Dias úteis em aberto'))
     arquivo_oficial = models.FileField(upload_to='controleferias__arquivooficial', null=True, blank=True)
@@ -338,8 +338,8 @@ class DispensaLegal(models.Model):
     inicio_direito = NARADateField(_(u'Início do direito'))
     dias_uteis = models.IntegerField(_(u'Dias úteis.'), help_text='*mover para dias corridos', null=True, default=0)
     inicio_realizada = NARADateField(_(u'Início da realização da dispensa'), blank=True, null=True)
-    realizada = models.BooleanField(_(u'Já realizada?'))
-    atestado = models.BooleanField(_(u'Há atestado?'))
+    realizada = models.BooleanField(_(u'Já realizada?'), default=False)
+    atestado = models.BooleanField(_(u'Há atestado?'), default=False)
     arquivo = models.FileField(upload_to='dispensas/', null=True, blank=True)
     
     dias_corridos = models.IntegerField(_(u'Duração em dias corridos'), null=True, default=0)
@@ -508,7 +508,7 @@ class AtivoManager(models.Manager):
 class Historico(models.Model):
     inicio = models.DateField(_(u'Início'))
     termino = models.DateField(_(u'Término'), null=True, blank=True)
-    funcionario = models.BooleanField(_(u'Funcionário'))
+    funcionario = models.BooleanField(_(u'Funcionário'), default=False)
     obs = models.TextField(null=True, blank=True)
     cargo = models.ForeignKey('membro.Cargo')
     membro = models.ForeignKey('membro.Membro')

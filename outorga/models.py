@@ -826,7 +826,7 @@ class Contrato(models.Model):
       numero = models.CharField(_(u'Número'), max_length=20)
       descricao = models.TextField(_(u'Descrição'), blank=True)
       data_inicio = NARADateField(_(u'Início'))
-      auto_renova = models.BooleanField(_(u'Auto renovação?'))
+      auto_renova = models.BooleanField(_(u'Auto renovação?'), default=False)
       limite_rescisao = NARADateField(_(u'término'), null=True, blank=True)
       entidade = models.ForeignKey('identificacao.Entidade')
       anterior = models.ForeignKey('outorga.Contrato', verbose_name=_('Contrato anterior'), null=True, blank=True)

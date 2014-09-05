@@ -79,7 +79,7 @@ class MemorandoResposta(models.Model):
     assunto = models.ForeignKey('memorando.Assunto')
     assinatura = models.ForeignKey('membro.Assinatura')
     numero = models.IntegerField(editable=False)
-    anexa_relatorio = models.BooleanField(u'Anexar relatório de inventário?')
+    anexa_relatorio = models.BooleanField(u'Anexar relatório de inventário?', default=False)
     identificacao = models.ForeignKey('identificacao.Identificacao', verbose_name=_(u'Identificação'))
     data = models.DateField()
     arquivo = models.FileField('Documento assinado', upload_to='memorando', null=True, blank=True)
@@ -116,7 +116,7 @@ class Corpo(models.Model):
     pergunta = models.ForeignKey('memorando.Pergunta')
     resposta = models.TextField()
     anexo = models.FileField(u'Anexo (em pdf)', upload_to='memorando', null=True, blank=True)
-    concluido = models.BooleanField('Ok')
+    concluido = models.BooleanField('Ok', default=False)
 
     def __unicode__(self):
         return u'%s' % self.pergunta.numero
@@ -134,8 +134,8 @@ class MemorandoSimples(models.Model):
     numero = models.IntegerField(editable=False)
     assunto = models.ForeignKey('memorando.Assunto', null=True)
     corpo = models.TextField()
-    equipamento = models.BooleanField('Equipamento?')
-    envio = models.BooleanField('Envio?')
+    equipamento = models.BooleanField('Equipamento?', default=False)
+    envio = models.BooleanField('Envio?', default=False)
     assinatura = models.ForeignKey('membro.Membro')
     assinado = models.FileField(_(u'Memorando assinado'), upload_to='memorandos', null=True, blank=True)
     pai = models.ForeignKey('memorando.MemorandoSimples', verbose_name=u'Memorando pai', null=True, blank=True)
