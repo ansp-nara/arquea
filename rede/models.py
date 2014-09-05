@@ -85,7 +85,7 @@ class Rota(models.Model):
     blocoip = models.ForeignKey('rede.BlocoIP', verbose_name='Bloco IP')
     nexthop = models.IPAddressField()
     provedor = models.ForeignKey('rede.Provedor')
-    preferencial = models.BooleanField()
+    preferencial = models.BooleanField(default=False)
     local_pref = models.IntegerField(null=True, blank=True)
     historico = models.ForeignKey('rede.Historico')
 
@@ -163,7 +163,7 @@ class EnlaceOperadora(models.Model):
     ip_borda = models.ManyToManyField('rede.IPBorda')
     data_ativacao = models.DateField(null=True, blank=True)
     data_desativacao = models.DateField(null=True, blank=True)
-    link_redundante = models.BooleanField()
+    link_redundante = models.BooleanField(default=False)
     obs = models.TextField(null=True, blank=True)
 	
     def __unicode__(self):
@@ -176,7 +176,7 @@ class Segmento(models.Model):
     #ip_borda = models.ManyToManyField('rede.IPBorda')
     data_ativacao = models.DateField(u'Data de ativação', null=True, blank=True)
     data_desativacao = models.DateField(u'Data de desativação', null=True, blank=True)
-    link_redundante = models.BooleanField(u'Link redundante?')
+    link_redundante = models.BooleanField(u'Link redundante?', default=False)
     obs = models.TextField(null=True, blank=True)
     canal = models.ForeignKey('rede.Canal', null=True, blank=True)
     uso = models.ForeignKey('rede.Uso', null=True, blank=True)
@@ -255,7 +255,7 @@ class PlanejaAquisicaoRecurso(models.Model):
     referente = models.CharField(max_length=150, null=True, blank=True)
     projeto = models.ForeignKey('rede.Projeto')
     unidade = models.ForeignKey('rede.Unidade')
-    instalacao = models.BooleanField(u'Instalação')
+    instalacao = models.BooleanField(u'Instalação', default=False)
     obs = models.TextField(null=True, blank=True)
     ano = models.IntegerField()
     beneficiados = models.ManyToManyField('identificacao.Entidade', through='Beneficiado')

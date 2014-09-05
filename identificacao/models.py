@@ -66,7 +66,7 @@ class EnderecoDetalhe(models.Model):
     complemento = models.TextField()
     detalhe = models.ForeignKey('identificacao.EnderecoDetalhe', verbose_name=u'ou Detalhe pai', null=True, blank=True)
     ordena = models.CharField(editable=False, max_length=1000, null=True)
-    mostra_bayface = models.BooleanField(_(u'Mostra no bayface'), help_text=_(u''))
+    mostra_bayface = models.BooleanField(_(u'Mostra no bayface'), help_text=_(u''), default=False)
 
     def save(self, *args, **kwargs):
         if self.endereco == None and self.detalhe == None:
@@ -178,7 +178,7 @@ class Entidade(models.Model):
     sigla = models.CharField(_(u'Sigla'), max_length=20, help_text=_(u'Nome Fantasia (ex. TELEFÔNICA)'), unique=True)
     #asn = models.IntegerField(_(u'ASN'), blank=True, null=True, help_text=_(u' '))
     cnpj = CNPJField(_(u'CNPJ'), blank=True, help_text=_(u'ex. 00.000.000/0000-00'))
-    fisco = models.BooleanField(_(u'Fisco'), help_text=_(u'ex. Ativo no site da Receita Federal?'))
+    fisco = models.BooleanField(_(u'Fisco'), help_text=_(u'ex. Ativo no site da Receita Federal?'), default=False)
     recebe_doacao = models.BooleanField(_(u'Recebe doação de equipamentos?'), default=False)
     
 
@@ -232,7 +232,7 @@ class Entidade(models.Model):
 class EntidadeHistorico(models.Model):
     inicio = models.DateField()
     termino = models.DateField(null=True, blank=True)
-    ativo = models.BooleanField(_(u'Ativo'))
+    ativo = models.BooleanField(_(u'Ativo'), default=False)
     obs = models.TextField(_(u'Observação'), blank=True, null=True)
     entidade = models.ForeignKey('identificacao.Entidade')
     tipo = models.ForeignKey('identificacao.TipoEntidade')
@@ -259,7 +259,7 @@ class Identificacao(models.Model):
     historico = models.DateTimeField(_(u'Histórico'), default=datetime.now(), editable=False)
     area = models.CharField(_(u'Área'), max_length=50, blank=True, help_text=_(u'ex. Administração'))
     funcao = models.CharField(_(u'Função'), max_length=50, blank=True, help_text=_(u'ex. Gerente Administrativo'))
-    ativo = models.BooleanField(_(u'Ativo'))
+    ativo = models.BooleanField(_(u'Ativo'), default=False)
 
 
     # Define a descrição do modelo, a ordenação dos dados pela entidade e a unicidade dos dados.
@@ -331,7 +331,7 @@ class Agenda(models.Model):
 class Agendado(models.Model):
     agenda = models.ForeignKey('identificacao.Agenda')
     entidade = models.ForeignKey('identificacao.Entidade')
-    ativo = models.BooleanField()
+    ativo = models.BooleanField(default=False)
 
     def __unicode__(self):
         return u'%s - %s' % (self.agenda.nome, self.entidade.sigla)
@@ -366,11 +366,11 @@ class NivelAcesso(models.Model):
 
 class Ecossistema(models.Model):
     identificacao = models.ForeignKey('identificacao.Identificacao', verbose_name=u'Entidade/contato')
-    incentivo = models.BooleanField(u'Incentivar a dar palestra?')
-    monitora = models.BooleanField(u'Monitorar o convite?')
+    incentivo = models.BooleanField(u'Incentivar a dar palestra?', default=False)
+    monitora = models.BooleanField(u'Monitorar o convite?', default=False)
     data_envio = models.DateField(u'Data de envio do e-mail', null=True, blank=True)
     data_resposta = models.DateField(u'Data de resposta ao e-mail', null=True, blank=True)
-    dar_palestra = models.BooleanField(u'Vai dar palestra?')
+    dar_palestra = models.BooleanField(u'Vai dar palestra?', default=False)
     palestrante = models.CharField(max_length=50, null=True, blank=True)
     tema = models.CharField(max_length=50, null=True, blank=True)
     temas_adicionais = models.TextField(u'Temas adicionais sugeridos', null=True, blank=True)
@@ -378,12 +378,12 @@ class Ecossistema(models.Model):
     inscricoes_solicitadas = models.IntegerField(u'Número de inscrições solicitadas', null=True, blank=True)
     inscricoes_aceitas = models.IntegerField(u'Número de inscrições aceitas', null=True, blank=True)
     comentarios = models.TextField(u'Comentários', null=True, blank=True)
-    hotel = models.BooleanField(u'Quer hotel?')
+    hotel = models.BooleanField(u'Quer hotel?', default=False)
     
-    contato_pat = models.BooleanField(u'Contato para patrocínio?')
-    vip = models.BooleanField()
+    contato_pat = models.BooleanField(u'Contato para patrocínio?', default=False)
+    vip = models.BooleanField(default=False)
     chaser = models.CharField(max_length=40, null=True, blank=True)
-    vai_pat = models.BooleanField(u'Vai patrocinar?')
+    vai_pat = models.BooleanField(u'Vai patrocinar?', default=False)
 
     def __unicode__(self):
         return u'%s' % self.identificacao.endereco.entidade.sigla

@@ -92,10 +92,10 @@ class Origem(models.Model):
 
 class TipoFeriado(models.Model):
     nome = models.CharField(max_length=45)
-    movel = models.BooleanField(u'Móvel')
+    movel = models.BooleanField(u'Móvel', default=False)
     dia = models.IntegerField(_(u'Dia'), null=True, blank=True)
     mes = models.IntegerField(_(u'Mes'), null=True, blank=True)
-    subtrai_banco_hrs = models.BooleanField(_(u'Subtrai do banco de horas?'))
+    subtrai_banco_hrs = models.BooleanField(_(u'Subtrai do banco de horas?'), default=False)
     
 
     def __unicode__(self):
@@ -213,7 +213,7 @@ class Protocolo(models.Model):
     data_validade = models.DateField(_(u'Data de validade'), blank=True, null=True, help_text=_(u'ex. Data da validade de uma cotação/contrato'))
     descricao = models.CharField(_(u'Descrição antiga'), max_length=200, help_text=_(u'ex. Conta telefônica da linha 3087-1500'), default='x-x-x')
     obs = models.TextField(_(u'Observação'), blank=True)
-    moeda_estrangeira = models.BooleanField(_(u'Dólar?'), help_text=_(u'O valor do documento está em dolar?'))
+    moeda_estrangeira = models.BooleanField(_(u'Dólar?'), help_text=_(u'O valor do documento está em dolar?'), default=False)
     valor_total = models.DecimalField(_(u'Valor total'), max_digits=12, decimal_places=2, blank=True, null=True, help_text=_(u'Atenção: só preencher este campo caso haja algum erro na soma dos itens deste protocolo'))
     referente = models.CharField(_(u'Referente'), max_length=100, blank=True, null=True)
     procedencia = models.ForeignKey('identificacao.Entidade', verbose_name=_(u'Procedência'), null=True, blank=True)
@@ -413,7 +413,7 @@ class Cotacao(Protocolo):
     """
     
     parecer = models.TextField(_(u'Parecer Técnico'), help_text=_(u'Justificativa para aceitar ou rejeitar esta cotação'), blank=True)
-    aceito = models.BooleanField(_(u'Aceito?'), help_text=_(u'Essa cotação foi aceita?'))
+    aceito = models.BooleanField(_(u'Aceito?'), help_text=_(u'Essa cotação foi aceita?'), default=False)
     entrega = models.CharField(_(u'Entrega'), max_length=20, help_text=_(u' '), blank=True)
 
 
