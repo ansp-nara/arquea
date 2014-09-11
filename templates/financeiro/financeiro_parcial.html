@@ -95,13 +95,14 @@
         <tr><td>Total liberado:</td><td>{{ totais.total_liberado|moeda }}</td><td>Concessões:</td><td>{{ totais.total_concedido|moeda }}</td></tr>
         <tr><td>Total devolvido:</td><td>{{ totais.total_devolvido|moeda }}</td><td>Suplementações:</td><td>{{ totais.total_suplementado|moeda }}</td></tr>
         <tr><td>Total estornado:</td><td>{{ totais.total_estornado|moeda }}</td><td>Anulações:</td><td>{{ totais.total_anulado|moeda }}</td></tr>
-        <tr><td>Total realizado:</td><td>{{ totais.total_pagamentos|moeda }}</td><td>Cancelamentos:</td><td>{{ totais.total_cancelado|moeda }}</td></tr>
-        <tr><td class="td_total">Total:</td><td class="td_total">{{ totais.total_diferenca|moeda }}</td><td class="td_total">Total de concessões:</td><td class="td_total">{{ totais.total_concessoes|moeda }}</td></tr>
-        <tr><td>Somatória das diferenças em pgtos.:</td><td>{{ totais.total_diferenca_total|moeda }}</td><td></td><td></td></tr>
+        <tr><td class="td_total">= Total disponibilizado:</td><td class="td_total">{{ totais.total_disponibilizado|moeda }}</td><td>Cancelamentos:</td><td>{{ totais.total_cancelado|moeda }}</td></tr>
+        <tr><td>Total realizado:</td><td>{{ totais.total_pagamentos|moeda }}</td><td></td><td></td></tr>
+        <tr><td class="td_total">= Diferença:</td><td class="td_total">{{ totais.total_processo|moeda }}</td><td class="td_total">= Total de concessões:</td><td class="td_total">{{ totais.total_concessoes|moeda }}</td></tr>
+        <tr><td>Somatória das diferenças em pgtos.:</td><td>{{ totais.total_somatoria_diferenca|moeda }}</td><td></td><td></td></tr>
     </tbody>
 </table>
 <div class="tbl_sintatico_msg">
-O valor abaixo representa a soma de todas as diferenças apontadas nesta parcial. Diferenças negativas (entre parênteses) representam valores a serem devolvidos para a Fapesp, enquanto diferenças positivas representam valores a favor do projeto.
+O valor da 'Diferença' representa a soma de todas as diferenças apontadas nesta parcial. Diferenças negativas (entre parênteses) representam valores a serem devolvidos para a Fapesp, enquanto diferenças positivas representam valores a favor do projeto.
 </div>
 
 {% for p in parciais %}
@@ -116,14 +117,15 @@ O valor abaixo representa a soma de todas as diferenças apontadas nesta parcial
 			<tr><td>Total liberado:</td><td>{{ p.liberado|moeda }}</td><td>Concessões:</td><td>{{ p.concedido|moeda }}</td></tr>
 			<tr><td>Total devolvido:</td><td>{{ p.devolvido|moeda }}</td><td>Suplementações:</td><td>{{ p.suplementado|moeda }}</td></tr>
 			<tr><td>Total estornado:</td><td>{{ p.estornado|moeda }}</td><td>Anulações:</td><td>{{ p.anulado|moeda }}</td></tr>
-			<tr><td>Total realizado:</td><td>{{ p.pagamentos|moeda }}</td><td>Cancelamentos:</td><td>{{ p.cancelado|moeda }}</td></tr>
-            <tr><td class="td_total">Total:</td><td class="td_total">{{ p.total_diferenca|moeda }}</td><td class="td_total">Total de concessões:</td><td class="td_total">{{ p.concessoes|moeda }}</td></tr>
-            <tr><td>Somatória das diferenças em pgtos.:</td><td>{{ p.diferenca_total|moeda }}</td><td></td><td></td></tr>
+			<tr><td class="td_total">= Total disponibilizado:</td><td class="td_total">{{ p.disponibilizado|moeda }}</td><td>Cancelamentos:</td><td>{{ p.cancelado|moeda }}</td></tr>
+			<tr><td>Total realizado:</td><td>{{ p.pagamentos|moeda }}</td><td></td><td></td></tr>
+            <tr><td class="td_total">= Diferença:</td><td class="td_total">{{ p.total_processo|moeda }}</td><td class="td_total">= Total de concessões:</td><td class="td_total">{{ p.concessoes|moeda }}</td></tr>
+            <tr><td>Somatória das diferenças em pgtos.:</td><td>{{ p.somatoria_diferenca|moeda }}</td><td></td><td></td></tr>
 
 	    </tbody>
 	</table>
 	<div class="tbl_sintatico_msg">
-        O valor abaixo representa a soma de todas as diferenças apontadas nesta parcial. Diferenças negativas (entre parênteses) representam valores a serem devolvidos para a Fapesp, enquanto diferenças positivas representam valores a favor do projeto.
+        O valor da 'Diferença' representa a soma de todas as diferenças apontadas nesta parcial. Diferenças negativas (entre parênteses) representam valores a serem devolvidos para a Fapesp, enquanto diferenças positivas representam valores a favor do projeto.
     </div>
     <table border="0" repeat="1" cellpadding="5" id="tbl_dados">
        <tr>

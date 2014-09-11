@@ -3,7 +3,7 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.models import Group
 from django.contrib import admin
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, HttpResponseNotAllowed
 from django.db.models import Q, Max
 from django.contrib.auth.decorators import permission_required, login_required
 from django.db.models import Sum
@@ -12,7 +12,9 @@ from decimal import Decimal
 import json as simplejson
 from datetime import datetime as dtime
 from datetime import date
+import math
 import logging
+
 
 from outorga.models import Modalidade, Outorga, Item, Termo, OrigemFapesp, Natureza_gasto, Acordo
 from protocolo.models import Protocolo
@@ -48,8 +50,8 @@ def termo_escolhido(request):
 
             retorno = {'protocolos':prot, 'origens':orig}
         json = simplejson.dumps(retorno)
-    return HttpResponse(json,content_type="application/json")
-
+    else:
+        return HttpResponseNotAllowed(permitted_methods=['POST',])
 
 def numero_escolhido(request):
     if request.method == 'POST':
@@ -72,7 +74,9 @@ def numero_escolhido(request):
             prot.append({'pk':p.id, 'valor':p.__unicode__()})
         retorno = {'protocolos':prot}
         json = simplejson.dumps(retorno)
-    return HttpResponse(json,content_type="application/json")
+        return HttpResponse(json, content_type="application/json")
+    else:
+        return HttpResponseNotAllowed(permitted_methods=['POST',])
 
 def codigo_escolhido(request):
     if request.method == 'POST':
@@ -89,7 +93,9 @@ def codigo_escolhido(request):
         retorno = {'ccs': ccs}
         json = simplejson.dumps(retorno)
     
-    return HttpResponse(json, content_type="application/json")
+        return HttpResponse(json, content_type="application/json")
+    else:
+        return HttpResponseNotAllowed(permitted_methods=['POST',])
 
 def estrutura_pagamentos(pagamentos):
 
@@ -156,7 +162,9 @@ def parcial_pagina(request):
         json = simplejson.dumps(retorno)
 
         return HttpResponse(json, content_type="application/json")
-
+    else:
+        return HttpResponseNotAllowed(permitted_methods=['POST',])
+    
 @login_required
 def nova_pagina(request):
     if request.method == 'POST':
@@ -557,10 +565,13 @@ def financeiro_parciais(request, pdf=False):
                 
                 liberado = Decimal('0.0')
                 devolvido = Decimal('0.0')
+                estornado = Decimal('0.0')
+                disponibilizado = Decimal('0.0')
+                pagamentos = Decimal('0.0')
+                
                 concedido = Decimal('0.0')
                 suplementado = Decimal('0.0')
                 anulado = Decimal('0.0')
-                estornado = Decimal('0.0')
                 cancelado = Decimal('0.0')
                 
                 liberacoes = ExtratoFinanceiro.objects.filter(termo=termo, cod__endswith=codigo, parcial=parcial).values('cod').annotate(Sum('valor')).order_by()
@@ -574,9 +585,11 @@ def financeiro_parciais(request, pdf=False):
                     elif t['cod'] == 'ESMP' or t['cod'] == 'ESRP': estornado= t['valor__sum'] or Decimal('0.0')
                     elif t['cod'] == 'CAMP' or t['cod'] == 'CARP': cancelado= t['valor__sum'] or Decimal('0.0')
                     
-                pagamentos = liberado+devolvido+estornado
-                concessoes = concedido+suplementado+anulado+cancelado
-                diferenca_total = Decimal('0.0')
+                disponibilizado = - liberado.copy_abs() + devolvido.copy_abs() + estornado.copy_abs()
+                
+                concessoes = concedido.copy_abs() + suplementado.copy_abs() - anulado.copy_abs() - cancelado.copy_abs()
+                
+                somatoria_diferenca = Decimal('0.0')
                 anterior = date(1971,1,1)
                 tdia = Decimal('0.0')
                 exi = {}
@@ -602,7 +615,9 @@ def financeiro_parciais(request, pdf=False):
                         #total += c.valor
                         tcheques += c.valor
                         mods = {}
-                        for p in c.pagamento_set.all().prefetch_related('auditoria_set').select_related('origem_fapesp', 'origem_fapesp__item_outorga__natureza_gasto__modalidade'):
+                        for p in c.pagamento_set.all().prefetch_related('auditoria_set') \
+                            .select_related('origem_fapesp', 'origem_fapesp__item_outorga__natureza_gasto__modalidade') \
+                            .only('origem_fapesp_id', 'valor_fapesp', 'origem_fapesp__item_outorga__natureza_gasto__modalidade__sigla', 'conta_corrente'):
                             
                             if not p.origem_fapesp_id: continue
                             
@@ -636,33 +651,37 @@ def financeiro_parciais(request, pdf=False):
                        ef.cod == 'PGRP' or ef.cod == 'DVRP' or ef.cod == 'ESRP':
                         
                         ex['diferenca'] = ef.valor-total
-                        diferenca_total += ef.valor-total
+                        somatoria_diferenca += ex['diferenca']
                     if total > ef.valor: 
                         ex['cor'] = 'red'
                     else: 
                         ex['cor'] = 'blue'
                     if tcheques != ef.valor and ef.cod == 'PGMP':
                         ex['patrocinio'] = tcheques - ef.valor
+                        
+                    pagamentos += total
                     extrato.append(ex)
                 if exi: 
                     exi.update({'valor_data':tdia})
-                    
-                # OBS: os valores de 'liberado' e 'pagamentos' estão com o sinal invertidos 
-                diferenca = - (-liberado) + devolvido + estornado + (-pagamentos)
                 
-                print "%s %s %s %s" % (liberado, devolvido, estornado, pagamentos)
-                retorno.append({'parcial':str(parcial), 'extrato':extrato, 'liberado':-liberado, 
-                                'devolvido':devolvido, 'pagamentos':-pagamentos, 
-                                'diferenca_total':diferenca_total,  'concedido':concedido, 
+                
+                # OBS: os valores de 'liberado' e 'pagamentos' estão com o sinal negativo 
+                total_processo = - liberado.copy_abs() + devolvido.copy_abs() + estornado.copy_abs() + pagamentos.copy_abs()
+                
+                retorno.append({'parcial':str(parcial), 'extrato':extrato, 'liberado':liberado, 
+                                'devolvido':devolvido, 'disponibilizado':disponibilizado,
+                                'pagamentos': -pagamentos,
+                                'somatoria_diferenca':somatoria_diferenca,  'concedido':concedido, 
                                 'suplementado':suplementado, 'anulado':anulado, 
                                 'cancelado':cancelado, 'concessoes':concessoes, 
-                                'estornado':estornado, 'total_diferenca':diferenca})
+                                'estornado':estornado, 'total_processo':total_processo})
                 
                 total_liberado = 0
                 total_devolvido = 0
                 total_estornado = 0
+                total_disponibilizado = 0
                 total_pagamentos = 0
-                total_diferenca_total = 0
+                total_somatoria_diferenca = 0
                 
                 total_concedido = 0
                 total_suplementado = 0
@@ -674,23 +693,26 @@ def financeiro_parciais(request, pdf=False):
                     total_liberado += r['liberado']
                     total_devolvido += r['devolvido']
                     total_estornado += r['estornado']
+                    total_disponibilizado += r['disponibilizado']
                     total_pagamentos += r['pagamentos']
-                    total_diferenca_total += r['diferenca_total']
+                    print r['pagamentos']
+                    
+                    total_somatoria_diferenca += r['somatoria_diferenca']
                     
                     total_concedido += r['concedido']
                     total_suplementado += r['suplementado']
                     total_anulado += r['anulado']
                     total_cancelado += r['cancelado']
                     total_concessoes += r['concessoes']
-                total_diferenca = - total_liberado + total_devolvido + total_estornado + total_pagamentos
+                total_processo = - total_liberado.copy_abs() + total_devolvido.copy_abs() + total_estornado.copy_abs() + total_pagamentos.copy_abs()
 
                 totais={'total_liberado':total_liberado, 'total_devolvido':total_devolvido,
                           'total_estornado':total_estornado, 'total_pagamentos':total_pagamentos,
-                          'total_diferenca_total':total_diferenca_total,
+                          'total_disponibilizado':total_disponibilizado, 'total_somatoria_diferenca':total_somatoria_diferenca,
                           'total_concedido':total_concedido, 'total_suplementado':total_suplementado,
                           'total_anulado':total_anulado, 'total_cancelado':total_cancelado,
                           'total_concessoes':total_concessoes, 
-                          'total_diferenca':total_diferenca
+                          'total_processo':total_processo
                           }
             
             if pdf:
@@ -769,14 +791,15 @@ def escolhe_extrato(request):
         termo_id = request.POST.get('termo')
         termo = get_object_or_404(Termo, id=termo_id)
 
-    ef = ExtratoFinanceiro.objects.filter(termo=termo)
-    extratos = []
-    for e in ef:
-        extratos.append({'pk':e.id, 'valor':e.__unicode__()})
-
-    json = simplejson.dumps(extratos)
-    return HttpResponse(json, content_type="application/json")
-
+        ef = ExtratoFinanceiro.objects.filter(termo=termo)
+        extratos = []
+        for e in ef:
+            extratos.append({'pk':e.id, 'valor':e.__unicode__()})
+    
+        json = simplejson.dumps(extratos)
+        return HttpResponse(json, content_type="application/json")
+    else:
+        return HttpResponseNotAllowed(permitted_methods=['POST',])
 
 @login_required
 def presta_contas(request, pdf=False):
