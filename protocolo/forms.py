@@ -4,10 +4,10 @@ from django import forms
 from django.forms.util import ErrorList
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ObjectDoesNotExist
-from models import Cotacao, TipoDocumento, Protocolo, Estado, Feriado, Arquivo
+from models import Cotacao, TipoDocumento, Protocolo, Estado, Feriado, Arquivo, Descricao
 
 from outorga.models import Termo
-from identificacao.models import Entidade
+from identificacao.models import Entidade, Identificacao
 
 import logging
 
@@ -93,6 +93,7 @@ class CotacaoAdminForm(forms.ModelForm):
 
     class Meta:
         model = Cotacao
+        fields = ['estado', 'termo', 'entidade', 'identificacao', 'descricao2', 'moeda_estrangeira', 'data_validade', 'data_chegada', 'origem', 'valor_total', 'obs', 'aceito', 'entrega', 'protocolo', 'parecer',]
 
     class Media:
         js = ('/media/js/selects.js', '/media/js/protocolo.js')
@@ -125,6 +126,14 @@ class CotacaoAdminForm(forms.ModelForm):
         iden = self.fields['identificacao']
         iden.label = u'Contato'
 
+        self.fields['protocolo'].choices = [('','---------')] + [(p.id, p.__unicode__()) for p in Protocolo.objects.all().prefetch_related('itemprotocolo_set').select_related('tipo_documento').order_by('data_vencimento')]
+        
+        self.fields['identificacao'].choices = [('','---------')] + [(p.id, p.__unicode__()) for p in Identificacao.objects.all().select_related('endereco', 'endereco__entidade', 'contato')]
+        
+        self.fields['descricao2'].choices = [('','---------')] + [(p.id, p.__unicode__()) for p in Descricao.objects.all().select_related('entidade',)]
+
+        
+
 
 
 class ProtocoloAdminForm(forms.ModelForm):
@@ -144,6 +153,7 @@ class ProtocoloAdminForm(forms.ModelForm):
 
     class Meta:
         model = Protocolo
+        fields = ['data_chegada', 'origem', 'valor_total', 'obs', 'estado', 'termo', 'descricao2', 'tipo_documento', 'num_documento', 'moeda_estrangeira', 'referente', 'procedencia', 'data_validade', 'data_vencimento', 'responsavel',]
 
     class Media:
         js = ('/media/js/selects.js', '/media/js/protocolo.js',)
@@ -252,6 +262,7 @@ class ArquivoAdminForm(forms.ModelForm):
 
     class Meta:
         model = Arquivo
+        fields = ['protocolo', 'arquivo',]
 
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=':',

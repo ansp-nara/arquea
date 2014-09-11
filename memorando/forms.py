@@ -23,12 +23,15 @@ class MemorandoRespostaForm(forms.ModelForm):
 
     class Meta:
         model = MemorandoResposta
+        fields = ['memorando', 'assunto', 'identificacao', 'estado', 'introducao', 'conclusao', 'assinatura', 'data', 'arquivo', 'protocolo', 'anexa_relatorio', 'obs']
+
 
 class PerguntaAdminForm(forms.ModelForm):
     questao = forms.CharField(label=u'Questão', widget=TinyMCE(attrs={'cols': 100, 'rows': 30}, mce_attrs={'height':120}))    
 
     class Meta:
         model = Pergunta
+        fields = ['numero', 'questao',]
 
 class MemorandoSimplesForm(forms.ModelForm):
     #corpo = forms.CharField(widget=TinyMCE(attrs={'cols': 160, 'rows': 180}, mce_attrs={'height':500}))
@@ -45,6 +48,7 @@ class MemorandoSimplesForm(forms.ModelForm):
 
     class Meta:
         model = MemorandoSimples
+        fields = ['superior', 'inferior', 'direita', 'esquerda', 'destinatario', 'assunto', 'corpo', 'equipamento', 'envio', 'assinatura', 'assinado', 'pai',]
 
 
 class CorpoAdminForm(forms.ModelForm):
@@ -69,6 +73,7 @@ class CorpoAdminForm(forms.ModelForm):
 
     class Meta:
         model = Corpo
+        fields = ['pergunta', 'perg', 'resposta', 'anexo', 'concluido',]
 
     class Media:
         js = ('/media/js/selects.js', )
@@ -103,4 +108,4 @@ class BaseCorpoInlineFormSet(BaseInlineFormSet):
                 
 
 
-CorpoFormSet = inlineformset_factory(MemorandoResposta, Corpo, formset=BaseCorpoInlineFormSet)
+CorpoFormSet = inlineformset_factory(MemorandoResposta, Corpo, formset=BaseCorpoInlineFormSet, fields=['pergunta', 'resposta', 'anexo', 'concluido',])

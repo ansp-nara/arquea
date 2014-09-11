@@ -253,8 +253,8 @@ def pega_lista(request, obj, filtro):
         kwargs = {filtro:id}
         lista = obj.objects.filter(**kwargs)
         retorno = []
-	for o in lista:
-	    retorno.append({'pk':o.pk, 'valor':o.__unicode__()})
+        for o in lista:
+            retorno.append({'pk':o.pk, 'valor':o.__unicode__()})
         if lista.count() > 0:
             json = simplejson.dumps(retorno)
         else:

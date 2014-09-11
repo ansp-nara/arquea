@@ -141,7 +141,7 @@ class AuditoriaAdmin(admin.ModelAdmin):
     search_fields = ('parcial', 'pagina')
     form = AuditoriaAdminForm
 
-    def queryset(self, request):
+    def get_queryset(self, request):
         queryset = super(AuditoriaAdmin, self).queryset(request)
         return queryset
         

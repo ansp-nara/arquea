@@ -12,8 +12,10 @@ from financeiro.models import Pagamento
 class PlanejaAquisicaoRecursoAdminForm(forms.ModelForm):
 
     referente = forms.CharField(widget=forms.TextInput(attrs={'size':'150'}), required=False)
+    
     class Meta:
-	model = PlanejaAquisicaoRecurso
+        model = PlanejaAquisicaoRecurso
+        fields = ['os', 'ano', 'tipo', 'referente', 'quantidade', 'valor_unitario', 'projeto', 'unidade', 'instalacao', 'banda', 'obs',]
 
 
 class RecursoAdminForm(forms.ModelForm):
@@ -63,6 +65,9 @@ class RecursoAdminForm(forms.ModelForm):
 
     class Meta:
         model = Recurso
+        fields = ['planejamento', 'termo', 'pagamento', 'obs', 'quantidade', 'mes_referencia', 'ano_referencia', 'valor_imposto_mensal', 'valor_mensal_sem_imposto',]
+        
+
 
     class Media:
         js = ('/media/js/selects.js',)

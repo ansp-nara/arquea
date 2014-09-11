@@ -25,6 +25,8 @@ class RepositorioAdminForm(forms.ModelForm):
 			
 	class Meta:
 		model = Repositorio
+		fields = ['data_ocorrencia', 'tipo', 'natureza', 'estado', 'servicos', 'ocorrencia', 'anterior', 'memorandos', 'filtra_patrimonio', 'patrimonios', 'responsavel', 'demais', 'obs',]
+
 		
 	class Media:
 		js = ('/media/js/selects.js',)

@@ -192,7 +192,7 @@ class ControleAdmin(admin.ModelAdmin):
     format_saida.short_description = 'Saída'
 
 
-    def queryset(self, request):
+    def get_queryset(self, request):
         qs = super(ControleAdmin, self).queryset(request)
         if request.user.is_superuser == False: 
             qs = qs.filter(membro__email=request.user.email)
