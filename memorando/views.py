@@ -42,7 +42,7 @@ def escolhe_pagamentos(request):
 
         json = simplejson.dumps(pagamentos)
 
-        return HttpResponse(json, mimetype="application/json")
+        return HttpResponse(json, content_type="application/json")
 
 @login_required
 def escolhe_pergunta(request):
@@ -50,7 +50,7 @@ def escolhe_pergunta(request):
         pergunta_id = request.POST.get('pergunta')
         pergunta = get_object_or_404(Pergunta, pk=pergunta_id)
         json = simplejson.dumps(pergunta.questao)
-        return HttpResponse(json, mimetype="application/json")
+        return HttpResponse(json, content_type="application/json")
 
 @login_required
 def filtra_perguntas(request):
@@ -62,7 +62,7 @@ def filtra_perguntas(request):
         for p in memorando.pergunta_set.all():
             perguntas.append({'pk':p.id, 'valor':p.__unicode__()})
 
-        return HttpResponse(simplejson.dumps(perguntas), mimetype="application/json")
+        return HttpResponse(simplejson.dumps(perguntas), content_type="application/json")
 
 @login_required
 def fapesp(request, mem):

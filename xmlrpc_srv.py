@@ -38,8 +38,8 @@ def rpc_handler(request):
         """
 
         if request.method == 'POST':
-                response = HttpResponse(mimetype="application/xml")
-                response.write(dispatcher._marshaled_dispatch(request.raw_post_data))
+                response = HttpResponse(content_type="application/xml")
+                response.write(dispatcher._marshaled_dispatch(request.body))
         else:
                 response = HttpResponse()
                 response.write("<b>This is an XML-RPC Service.</b><br>")

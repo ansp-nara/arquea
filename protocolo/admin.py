@@ -166,7 +166,7 @@ class ProtocoloAdmin(admin.ModelAdmin):
 
 
     # Encaminha o usuário para a tela de cadastramento da Fonte Pagadora quando uma despesa é adicionada.
-    def response_add(self, request, obj, post_url_continue='../%s/'):
+    def response_add(self, request, obj, post_url_continue=None):
         if self.muda_estado:
             self.muda_estado = 0
             if obj.estado.nome == u'Autorizada':
@@ -301,7 +301,7 @@ class CotacaoAdmin(admin.ModelAdmin):
 
 
     # Redireciona o usuário para uma tela onde mostra todas as cotações de um determinado pedido após a inclusão da cotação.
-    def response_add(self, request, obj, post_url_continue='../%s/'):
+    def response_add(self, request, obj, post_url_continue=None):
         if request.REQUEST.has_key('return_to'):
             super(CotacaoAdmin,self).response_add(request, obj)
             return HttpResponseRedirect(request.REQUEST['return_to'])

@@ -27,7 +27,7 @@ def escolhe_entidade(request):
         json = simplejson.dumps(retorno)
     else:
         raise Http404
-    return HttpResponse(json, mimetype="application/json")
+    return HttpResponse(json, content_type="application/json")
 
 
 def escolhe_entidade_filhos(request):
@@ -52,7 +52,7 @@ def escolhe_entidade_filhos(request):
         json = simplejson.dumps(retorno)
     else:
         raise Http404
-    return HttpResponse(json, mimetype="application/json")
+    return HttpResponse(json, content_type="application/json")
 
 def escolhe_endereco(request):
     if request.method == 'POST':
@@ -70,7 +70,7 @@ def escolhe_endereco(request):
         json = simplejson.dumps(retorno)
     else:
         raise Http404
-    return HttpResponse(json, mimetype="application/json")
+    return HttpResponse(json, content_type="application/json")
 
 @login_required
 def arquivos_entidade(request):
@@ -122,7 +122,7 @@ def acessos_terremark(request):
 
     import csv
 
-    response = HttpResponse(mimetype='text/csv')
+    response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="acessos.csv"'
     
     writer = csv.writer(response, delimiter=';', quotechar='"')

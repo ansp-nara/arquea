@@ -16,7 +16,7 @@ class OrigemFapespInlineForm(forms.ModelForm):
         if instance:
             self.fields['item_outorga'].queryset = Item.objects.filter(id=instance.item_outorga.id)
 
-        self.fields['acordo'].choices = [('','---------')] + [(p.id, p.__unicode__()) for p in Acordo.objects.all().order_by('descricao') ]
+        #self.fields['acordo'].choices = [('','---------')] + [(p.id, p.__unicode__()) for p in Acordo.objects.all().order_by('descricao') ]
 
 
 

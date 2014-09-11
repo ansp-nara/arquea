@@ -48,7 +48,7 @@ def termo_escolhido(request):
 
             retorno = {'protocolos':prot, 'origens':orig}
         json = simplejson.dumps(retorno)
-    return HttpResponse(json,mimetype="application/json")
+    return HttpResponse(json,content_type="application/json")
 
 
 def numero_escolhido(request):
@@ -72,7 +72,7 @@ def numero_escolhido(request):
             prot.append({'pk':p.id, 'valor':p.__unicode__()})
         retorno = {'protocolos':prot}
         json = simplejson.dumps(retorno)
-    return HttpResponse(json,mimetype="application/json")
+    return HttpResponse(json,content_type="application/json")
 
 def codigo_escolhido(request):
     if request.method == 'POST':
@@ -89,7 +89,7 @@ def codigo_escolhido(request):
         retorno = {'ccs': ccs}
         json = simplejson.dumps(retorno)
     
-    return HttpResponse(json, mimetype="application/json")
+    return HttpResponse(json, content_type="application/json")
 
 def estrutura_pagamentos(pagamentos):
 
@@ -155,7 +155,7 @@ def parcial_pagina(request):
         retorno = {'parcial':parcial, 'pagina':pagina+1}
         json = simplejson.dumps(retorno)
 
-        return HttpResponse(json, mimetype="application/json")
+        return HttpResponse(json, content_type="application/json")
 
 @login_required
 def nova_pagina(request):
@@ -168,7 +168,7 @@ def nova_pagina(request):
         pagina = 0 if pagina['pagina__max'] is None else pagina['pagina__max']
 
         retorno = pagina+1
-        return HttpResponse(simplejson.dumps(retorno), mimetype="application/json")
+        return HttpResponse(simplejson.dumps(retorno), content_type="application/json")
   
 @login_required
 def pagamentos_mensais(request, pdf=False):
@@ -775,7 +775,7 @@ def escolhe_extrato(request):
         extratos.append({'pk':e.id, 'valor':e.__unicode__()})
 
     json = simplejson.dumps(extratos)
-    return HttpResponse(json, mimetype="application/json")
+    return HttpResponse(json, content_type="application/json")
 
 
 @login_required
@@ -843,4 +843,4 @@ def ajax_get_recursos_vigentes(request):
                for r in recursos]
     
     json = simplejson.dumps(retorno)
-    return HttpResponse(json, mimetype="application/json")
+    return HttpResponse(json, content_type="application/json")

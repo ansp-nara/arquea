@@ -82,7 +82,7 @@ def render_to_pdf(template_src, context_dict, request=None, context_instance=Non
         if t == 1: pdf.addFromFile(open(f, "rb"))
         elif t == 2: pdf.addFromString(f)
     if not pdf_princ.err:
-        response = HttpResponse(mimetype='application/pdf')
+        response = HttpResponse(content_type='application/pdf')
         response.write(pdf.getvalue())
         response['Content-Disposition'] = 'attachment; filename=%s' % filename
         return response
@@ -126,7 +126,7 @@ def render_to_pdf_weasy(template_src, context_dict, request=None, filename='file
     context.update(context_dict)
     html  = template.render(context)
     
-    response = HttpResponse(mimetype="application/pdf")
+    response = HttpResponse(content_type="application/pdf")
     
     # Necessário passar o base_url para poder resolver os caminhos relativos de imagens
     weasyprint.HTML(string=html, url_fetcher=weasy_fetcher).write_pdf(response)
@@ -154,7 +154,7 @@ def render_to_pdfxhtml2pdf(template_src, context_dict, context_instance=None, fi
         elif t == 2: pdf.addFromString(f)
         
     if not pdf_princ.err:
-        response = HttpResponse(mimetype='application/pdf')
+        response = HttpResponse(content_type='application/pdf')
         response.write(pdf.getvalue())
         response['Content-Disposition'] = 'attachment; filename=%s' % filename
         return response
