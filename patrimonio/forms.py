@@ -59,6 +59,26 @@ class PatrimonioReadOnlyField(forms.FileField):
 Classe para exibição da Entidade no formato Select, ordenado pelo sigla_completa
 que inclui a Entidade pai, no formato "<sigla entidade pai> - <sigla entidade>"
 """
+class AdvancedModelChoiceIterator(forms.models.ModelChoiceIterator):
+    def __iter__(self):
+        if self.field.empty_label is not None:
+            yield ("", self.field.empty_label)
+        else:
+            yield ("", "---------")
+            
+        choices = []
+        # Preenche os valores do compo com o ID, a sigla completa com a entidade pai, e a sigla tabulada
+        for item in self.queryset.select_related('entidade', 'entidade__entidade'):
+
+            label = mark_safe(item.sigla_tabulada().replace(' ', '&nbsp;'))
+            sortValue = item.sigla_completa()
+            choices.append((item.pk, label, sortValue))
+        # Reordena os itens utilizando a sigla completa
+        choices = sorted(choices, key=lambda obj: obj[2])
+
+        for item in choices:
+            yield (item[0], item[1])
+
 class EntidadeModelChoiceField(forms.ModelChoiceField):
     def __init__(self, *args, **kwargs):
         super(EntidadeModelChoiceField, self).__init__(*args, **kwargs)
@@ -67,24 +87,8 @@ class EntidadeModelChoiceField(forms.ModelChoiceField):
         if hasattr(self, '_choices'):
             return self._choices
         # Escolhe entre o empty_label ou senão coloca um valor padrão para o item vazio
-        choices = [("", self.empty_label or "---------", '')]
+        return AdvancedModelChoiceIterator(self)
         
-        # Preenche os valores do compo com o ID, a sigla completa com a entidade pai, e a sigla tabulada
-        for item in self.queryset.select_related('entidade', 'entidade__entidade'):
-
-            label = mark_safe(item.sigla_tabulada().replace(' ', '&nbsp;'))
-            sortValue = item.sigla_completa()
-            choices.append((item.pk, label, sortValue))
-            
-        # Reordena os itens utilizando a sigla completa
-        choices = sorted(choices, key=lambda obj: obj[2])
-        
-        # Remonta o Select com o ID e o valor tabulado
-        result = []
-        for item in choices:
-            result.append((item[0], item[1]))
-        
-        return result
 
     choices = property(_get_choices, ChoiceField._set_choices)
 
@@ -251,6 +255,10 @@ class PatrimonioAdminForm(forms.ModelForm):
                 
     class Meta:
         model = Patrimonio
+        fields = ['termo', 'npgto', 'pagamento', 'valor', 'agilis', 'checado','tipo', 'apelido', 'tem_numero_fmusp', 'numero_fmusp', \
+                  'filtro_equipamento', 'equipamento', 'ns', 'ncm', 'ocst', 'cfop', \
+                  'descricao', 'complemento', 'tamanho', 'entidade_procedencia', 'nf', 'patrimonio', 'obs', 'titulo_autor', 'isbn', \
+                  'revision', 'version', 'garantia_termino', 'form_filhos',]
 
     class Media:
         js = ('/media/js/selects.js', '/media/js/patrimonio.js')
@@ -270,6 +278,7 @@ class HistoricoLocalAdminForm(forms.ModelForm):
     
     class Meta:
         model = HistoricoLocal
+        fields = ['data', 'patrimonio', 'endereco', 'descricao',]
 
     class Media:
         js = ('/media/js/selects.js',)
@@ -321,6 +330,7 @@ class PatrimonioHistoricoLocalAdminForm(forms.ModelForm):
     
     class Meta:
         model = HistoricoLocal
+        fields = ['entidade', 'endereco', 'posicao', 'descricao', 'data', 'estado', 'memorando',]
 
     class Media:
         js = ('/media/js/selects.js',)
@@ -435,7 +445,7 @@ class BaseHistoricoLocalAdminFormSet(BaseInlineFormSet):
         
         return cleaned_data
 
-HistoricoLocalAdminFormSet = inlineformset_factory(Patrimonio, HistoricoLocal, formset=BaseHistoricoLocalAdminFormSet, fk_name='patrimonio')
+HistoricoLocalAdminFormSet = inlineformset_factory(Patrimonio, HistoricoLocal, formset=BaseHistoricoLocalAdminFormSet, fk_name='patrimonio', fields=['data', 'patrimonio', 'endereco', 'descricao',],)
 
 
 
