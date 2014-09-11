@@ -37,7 +37,7 @@ def cotacoes(request, prot_id):
 
 @permission_required('protocolo.protocolo')
 def escolhe_termo(request):
-    return HttpResponse(pega_lista(request,Protocolo,'termo'),mimetype="application/json")
+    return HttpResponse(pega_lista(request,Protocolo,'termo'),content_type="application/json")
 
 
 @permission_required('protocolo.protocolo')

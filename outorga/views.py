@@ -95,7 +95,7 @@ logger = logging.getLogger(__name__)
 #             retorno['item'] = [{"pk":"0","valor":"Nenhum registro"}]
 # 
 #         json = simplejson.dumps(retorno)
-#     return HttpResponse(json,mimetype="application/json")
+#     return HttpResponse(json,content_type="application/json")
 
 
 
@@ -119,7 +119,7 @@ logger = logging.getLogger(__name__)
 #             retorno = [{"pk":"0","valor":"Nenhum registro"}]
 # 
 #         json = simplejson.dumps(retorno)
-#     return HttpResponse(json,mimetype="application/json")
+#     return HttpResponse(json,content_type="application/json")
 
 
 # def seleciona_termo_natureza(request):
@@ -142,7 +142,7 @@ logger = logging.getLogger(__name__)
 #             retorno = [{"pk":"0","valor":"Nenhum registro"}]
 # 
 #         json = simplejson.dumps(retorno)
-#     return HttpResponse(json,mimetype="application/json")
+#     return HttpResponse(json,content_type="application/json")
 # 
 # 
 # # Gera listas modalidade, item e natureza conforme termo selecionado.
@@ -183,7 +183,7 @@ logger = logging.getLogger(__name__)
 #             retorno['natureza'] = [{"pk":"0","valor":"Nenhum registro"}]
 # 
 #         json = simplejson.dumps(retorno)
-#     return HttpResponse(json,mimetype="application/json")
+#     return HttpResponse(json,content_type="application/json")
 # 
 # 
 # 
@@ -218,7 +218,7 @@ logger = logging.getLogger(__name__)
 #             retorno['natureza'] = [{"pk":"0","valor":"Nenhum registro"}]
 # 
 #         json = simplejson.dumps(retorno)
-#     return HttpResponse(json,mimetype="application/json")
+#     return HttpResponse(json,content_type="application/json")
 
 
 #### ROGERIO: VERIFICAR SE EXISTE ALGUMA CHAMADA PARA ESTA VIEW
@@ -519,4 +519,4 @@ def termo_datas(request):
     meses = []
     for m in month_range(termo.inicio, termo.termino):
         meses.append({'value':'%s-%s' % (m.year, m.month), 'display':'%02d/%s' % (m.month, m.year)})
-    return HttpResponse(simplejson.dumps(meses),	mimetype='application/json')
+    return HttpResponse(simplejson.dumps(meses),	content_type='application/json')

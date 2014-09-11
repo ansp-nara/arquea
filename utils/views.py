@@ -75,7 +75,7 @@ def serve_files(request, filename):
         raise Http404
 
     # monta a resposta sem conteúdo, apenas com o header do x-sendfile
-    response = HttpResponse(mimetype=mime)
+    response = HttpResponse(content_type=mime)
     response['X-Sendfile-encoding'] = 'url'
     response['X-Sendfile'] = urllib.quote(path.encode('utf-8'))
     response['Content-length'] = os.path.getsize(path)

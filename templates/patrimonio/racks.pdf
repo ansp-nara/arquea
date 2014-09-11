@@ -1,5 +1,4 @@
 {% load proto_tags %}
-{% load url from future %}
 {% load i18n proto_tags admin_static %}
 <html>
 <head>

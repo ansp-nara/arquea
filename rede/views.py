@@ -35,7 +35,7 @@ def escolhe_pagamento(request):
         json = simplejson.dumps(retorno)
     else:
         raise Http404
-    return HttpResponse(json, mimetype="application/json")
+    return HttpResponse(json, content_type="application/json")
 
 @login_required
 def planejamento(request, pdf=0):
@@ -129,7 +129,7 @@ def planeja_contrato(request):
         oss = [{'pk':o.id, 'valor':'%s - %s' % (o.contrato, o)} for o in OrdemDeServico.objects.filter(id__in=os_ids)]
         json = simplejson.dumps({'oss':oss})
 
-        return HttpResponse(json,mimetype="application/json")
+        return HttpResponse(json,content_type="application/json")
 
 @login_required
 def planejamento2(request, pdf=0):

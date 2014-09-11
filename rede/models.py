@@ -72,7 +72,7 @@ class RIR(models.Model):
 
 
 class Provedor(models.Model):
-    ip = models.IPAddressField()
+    ip = models.GenericIPAddressField()
     mask = models.IntegerField()
     provedor = models.CharField(max_length=40)
 
@@ -83,7 +83,7 @@ class Provedor(models.Model):
 class Rota(models.Model):
     aspath = models.CharField(u'AS path', max_length=255)
     blocoip = models.ForeignKey('rede.BlocoIP', verbose_name='Bloco IP')
-    nexthop = models.IPAddressField()
+    nexthop = models.GenericIPAddressField()
     provedor = models.ForeignKey('rede.Provedor')
     preferencial = models.BooleanField(default=False)
     local_pref = models.IntegerField(null=True, blank=True)
@@ -131,7 +131,7 @@ class Operadora(models.Model):
         ordering = ('nome',)
 
 class IPBorda(models.Model):
-    ip = models.IPAddressField('IP de borda')
+    ip = models.GenericIPAddressField('IP de borda')
 	
     def __unicode__(self):
         return u'%s' % self.ip

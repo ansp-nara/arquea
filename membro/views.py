@@ -241,7 +241,7 @@ def controle_mudar_almoco(request):
     controle.save()
     
     json = simplejson.dumps('ok')
-    return HttpResponse(json, mimetype="application/json")
+    return HttpResponse(json, content_type="application/json")
 
 
 @login_required
@@ -259,7 +259,7 @@ def controle_avancar_bloco(request):
     controle.save()
     
     json = simplejson.dumps('ok')
-    return HttpResponse(json, mimetype="application/json")
+    return HttpResponse(json, content_type="application/json")
 
 
 @login_required
@@ -277,7 +277,7 @@ def controle_voltar_bloco(request):
     controle.save()
     
     json = simplejson.dumps('ok')
-    return HttpResponse(json, mimetype="application/json")
+    return HttpResponse(json, content_type="application/json")
 
 
 @login_required
@@ -294,7 +294,7 @@ def controle_adicionar_tempo_final(request):
     controle.save()
     
     json = simplejson.dumps('ok')
-    return HttpResponse(json, mimetype="application/json")
+    return HttpResponse(json, content_type="application/json")
 
 @login_required
 def controle_adicionar_tempo_inicial(request):
@@ -310,4 +310,4 @@ def controle_adicionar_tempo_inicial(request):
     controle.save()
     
     json = simplejson.dumps('ok')
-    return HttpResponse(json, mimetype="application/json")
+    return HttpResponse(json, content_type="application/json")
