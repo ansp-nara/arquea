@@ -120,14 +120,14 @@ def escolhe_detalhe(request):
 def escolhe_entidade(request):
     if request.method == 'POST':
         ent_id = request.POST.get('entidade')
-	entidade = get_object_or_404(Entidade, pk=ent_id)
+        entidade = get_object_or_404(Entidade, pk=ent_id)
 
         retorno = []
-	for ed in EnderecoDetalhe.objects.all():
-	    if ed.end.entidade == entidade:
-    	        #descricao = '%s - %s' % (ed.end.__unicode__(), ed.complemento)
+        for ed in EnderecoDetalhe.objects.all().order_by('endereco', 'detalhe__complemento', 'complemento'):
+            if ed.end.entidade == entidade:
                 descricao = ed.__unicode__()
-	        retorno.append({'pk':ed.pk, 'valor':descricao})
+                
+                retorno.append({'pk':ed.pk, 'valor':descricao})
 
         if not retorno:
             retorno = [{"pk":"0","valor":"Nenhum registro"}]

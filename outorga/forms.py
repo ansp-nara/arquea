@@ -5,6 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.forms.util import ErrorList
 from models import Item, OrigemFapesp, Termo, Modalidade, Outorga, Natureza_gasto, Acordo
 
+
 class OrigemFapespInlineForm(forms.ModelForm):
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=':',
@@ -16,8 +17,9 @@ class OrigemFapespInlineForm(forms.ModelForm):
         if instance:
             self.fields['item_outorga'].queryset = Item.objects.filter(id=instance.item_outorga.id)
 
-        #self.fields['acordo'].choices = [('','---------')] + [(p.id, p.__unicode__()) for p in Acordo.objects.all().order_by('descricao') ]
-
+    class Meta:
+        model = OrigemFapesp
+        fields = ['item_outorga',]
 
 
 class ItemAdminForm(forms.ModelForm):
@@ -53,6 +55,7 @@ class ItemAdminForm(forms.ModelForm):
     # Define o modelo
     class Meta:
         model = Item
+        fields = ['natureza_gasto', 'rt', 'descricao', 'entidade', 'quantidade', 'valor', 'justificativa', 'obs',]
 
 
     # Define os arquivos .js que serão utilizados.
@@ -87,7 +90,7 @@ class OrigemFapespAdminForm(forms.ModelForm):
     # Define o modelo
     class Meta:
         model = OrigemFapesp
-
+        fields = ['acordo', 'item_outorga',]
 
     # Define os arquivos .js que serão utilizados.
     class Media:

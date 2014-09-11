@@ -26,7 +26,7 @@ class ContatoAdminForm(forms.ModelForm):
     # Define o modelo
     class Meta:
         model = Contato
-
+        fields = ['primeiro_nome', 'ultimo_nome', 'ativo', 'email', 'tel', 'documento',]
 
     # Verifica se os e-mail são válidos.
     def clean_email(self):
@@ -50,10 +50,9 @@ class EnderecoAdminForm(forms.ModelForm):
     entidade = forms.ModelChoiceField(Entidade.objects.all(), required=False,
             widget=forms.Select(attrs={'onchange': 'ajax_select_endereco2();'}))
 
-
     class Meta:
         model = Endereco
-
+        fields = ['entidade', 'rua', 'num', 'compl', 'cep', 'bairro', 'cidade', 'estado', 'pais',]
 
     class Media:
         js = ('/site-media/js/selects.js', '/site-media/js/identificacao.js')
@@ -74,12 +73,12 @@ class EnderecoDetalheAdminForm(forms.ModelForm):
         elif endereco and detalhe:
             raise forms.ValidationError(u'Endereço e detalhe do endereço não podem ser ambos utilizados')
 
-
         return cleaned_data
 
 
     class Meta:
         model = EnderecoDetalhe
+        fields = ['entidade', 'endereco', 'detalhe', 'tipo', 'complemento',]
 
     class Media:
         js = ('/media/js/selects.js',)

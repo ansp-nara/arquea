@@ -16,6 +16,7 @@ class PesquisaAdminForm(forms.ModelForm):
     
     class Meta:
         model = Pesquisa
-        
+        fields = ['rede', 'laboratorio', 'endereco', 'cidade', 'instituicao', 'responsavel1', 'emailresp1', 'responsavel2', 'emailresp2', 'contato1', 'emailcontato1', 'telefone1', 'contato2', 'emailcontato2', 'telefone2', 'estado_equipamento', 'equipamento', 'fabricante', 'modelo', 'cobre', 'otica', 'l2', 'l2_outro', 'l3', 'l3_outro', 'obs',]
+
     class Media:
         js = ('/media/js/pesquisa.js',)

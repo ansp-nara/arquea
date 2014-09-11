@@ -5,7 +5,6 @@ from django.core.exceptions import ValidationError
 from django.contrib.admin.widgets import FilteredSelectMultiple, RelatedFieldWidgetWrapper
 from django.db.models.fields.related import ManyToOneRel
 from django.forms.util import ErrorList
-from django.forms.models import inlineformset_factory, BaseInlineFormSet
 from django.utils.html import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
@@ -50,6 +49,7 @@ class RecursoInlineAdminForm(forms.ModelForm):
 
     class Meta:
         model = Recurso
+        fields = ['planejamento', 'quantidade', 'valor_mensal_sem_imposto', 'valor_imposto_mensal', 'obs',]
         
 
 class PagamentoAdminForm(forms.ModelForm):
@@ -105,6 +105,7 @@ class PagamentoAdminForm(forms.ModelForm):
 
     class Meta:
         model = Pagamento
+        fields = ['termo', 'valor_fapesp', 'protocolo', 'origem_fapesp', 'valor_patrocinio',]
 
         
     class Media:
@@ -165,6 +166,7 @@ class ExtratoFinanceiroAdminForm(forms.ModelForm):
 
     class Meta:
         model = ExtratoFinanceiro
+        fields = ['termo', 'data_libera', 'cod', 'valor', 'comprovante', 'tipo_comprovante', 'parcial',]
 
 
 class ExtratoPatrocinioAdminForm(forms.ModelForm):
@@ -186,6 +188,7 @@ class ExtratoPatrocinioAdminForm(forms.ModelForm):
 
     class Meta:
         model = ExtratoPatrocinio
+        fields = ['localiza', 'data_oper', 'cod_oper', 'historico', 'valor', 'obs']
 
 
 class ExtratoCCAdminForm(forms.ModelForm):
@@ -209,6 +212,7 @@ class ExtratoCCAdminForm(forms.ModelForm):
 
     class Meta:
         model = ExtratoCC
+        fields = ['termo', 'extrato_financeiro', 'despesa_caixa', 'data_oper', 'cod_oper', 'historico', 'valor',]
 
     def clean_imagem(self):
         """
@@ -263,6 +267,7 @@ class AuditoriaAdminForm(forms.ModelForm):
 
     class Meta:
         model = Auditoria
+        fields = ['estado', 'pagamento', 'tipo', 'parcial', 'pagina', 'arquivo', 'obs']
 
 
 class PagamentoAuditoriaAdminInlineForm(forms.ModelForm):
@@ -297,5 +302,5 @@ class PagamentoAuditoriaAdminInlineForm(forms.ModelForm):
             
     class Meta:
         model = Auditoria
-
+        fields = ['estado', 'pagamento', 'tipo', 'parcial', 'pagina', 'arquivo', 'obs']
 

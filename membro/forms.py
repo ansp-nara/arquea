@@ -82,7 +82,7 @@ class MembroAdminForm(forms.ModelForm):
 
     class Meta:
         model = Membro
-
+        fields = ['nome', 'email', 'ramal', 'foto', 'site', 'contato', 'data_nascimento', 'rg', 'cpf', 'url_lattes', 'obs',]
 
 
 class DadoBancarioAdminForm(forms.ModelForm):
@@ -96,10 +96,9 @@ class DadoBancarioAdminForm(forms.ModelForm):
     A class 'Media'		Define os arquivo .js que serão utilizados.
     """
 
-
-
     class Meta:
         model = DadoBancario
+        fields = ['membro', 'banco', 'agencia', 'ag_digito', 'conta', 'cc_digito',]
 
 
     class Media:
@@ -110,7 +109,6 @@ class FeriasAdminForm(forms.ModelForm):
     """
     Inicializar o 'queryset' do campo membro com os valores corretos (apenas funcionarios)
     """
-
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=':',
                  empty_permitted=False, instance=None):
@@ -125,6 +123,7 @@ class FeriasAdminForm(forms.ModelForm):
 
     class Meta:
         model = Ferias
+        fields = ['membro', 'inicio', 'realizado']
 
 
 class ControleFeriasAdminForm(forms.ModelForm):
@@ -160,6 +159,8 @@ class ControleFeriasAdminForm(forms.ModelForm):
 
     class Meta:
         model = ControleFerias
+        fields = ['ferias', 'inicio', 'termino', 'oficial', 'obs', 'vendeu10', 'antecipa13', 'dias_uteis_fato', 'dias_uteis_aberto', 'arquivo_oficial']
+
 
 class BaseControleFeriasAdminFormSet(BaseInlineFormSet):
 
@@ -181,7 +182,7 @@ class BaseControleFeriasAdminFormSet(BaseInlineFormSet):
 #         if oficiais > 1 or nao_oficiais > 2:
 #             raise forms.ValidationError(u'No máximo um período oficial e dois não oficiais')
 
-ControleFeriasAdminFormSet = inlineformset_factory(Ferias, ControleFerias, formset=BaseControleFeriasAdminFormSet)
+ControleFeriasAdminFormSet = inlineformset_factory(Ferias, ControleFerias, formset=BaseControleFeriasAdminFormSet, fields=['ferias', 'inicio', 'termino', 'oficial', 'obs', 'vendeu10', 'antecipa13', 'dias_uteis_fato', 'dias_uteis_aberto', 'arquivo_oficial',],)
 
 
 class ControleObs(forms.ModelForm):
