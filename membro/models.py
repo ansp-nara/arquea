@@ -230,11 +230,15 @@ class Ferias(models.Model):
         return u'%s | Início período: %s' % (self.membro, self.inicio.strftime('%d/%m/%Y'))
 
     def inicio_ferias(self):
-        return (self.inicio + timedelta(365)).strftime('%d/%m/%Y')
+        if self.inicio != None:
+            return (self.inicio + timedelta(365)).strftime('%d/%m/%Y')
+        return ''
     inicio_ferias.short_description = u'Início do período para férias'
 
     def fim_ferias(self):
-	return (self.inicio + timedelta(730)).strftime('%d/%m/%Y')
+        if self.inicio != None:
+            return (self.inicio + timedelta(730)).strftime('%d/%m/%Y')
+        return ''
     fim_ferias.short_description = u'Final do período para férias'
 
     def link_edit(self):
@@ -502,7 +506,7 @@ class Cargo(models.Model):
         ordering = ('nome',)
 
 class AtivoManager(models.Manager):
-    def get_query_set(self):
+    def get_queryset(self):
         return super(AtivoManager, self).get_query_set().filter(termino__isnull=True)
 
 class Historico(models.Model):
