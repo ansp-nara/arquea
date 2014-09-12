@@ -507,7 +507,7 @@ class Cargo(models.Model):
 
 class AtivoManager(models.Manager):
     def get_queryset(self):
-        return super(AtivoManager, self).get_query_set().filter(termino__isnull=True)
+        return super(AtivoManager, self).get_queryset().filter(termino__isnull=True)
 
 class Historico(models.Model):
     inicio = models.DateField(_(u'Início'))

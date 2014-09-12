@@ -111,7 +111,7 @@ class CotacaoAdminForm(forms.ModelForm):
         nomes = []
         tipo = TipoDocumento.objects.all()
         for t in tipo:
-            if t.nome.lower() != 'contrato' and t.nome.lower() != 'ordem de serviço' and t.nome.lower() != 'cotação':
+            if t.nome.lower() != u'contrato' and t.nome.lower() != u'ordem de serviço' and t.nome.lower() != u'cotação':
                 nomes.append(t.nome)
 
 
