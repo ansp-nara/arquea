@@ -59,7 +59,7 @@ def protocolos(request, termo_id):
 
 @login_required
 def protocolos_descricao(request, pdf=False):
-    if request.method == 'GET':
+    if request.method in ['GET', 'HEAD']:
         if request.GET.get('termo'):
 	    termo_id = request.GET.get('termo')
             termo = get_object_or_404(Termo, pk=termo_id)

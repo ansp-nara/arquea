@@ -180,8 +180,7 @@ def nova_pagina(request):
   
 @login_required
 def pagamentos_mensais(request, pdf=False):
-
-    if request.method == 'GET':
+    if request.method in ['GET', 'HEAD']:
         if request.GET.get('ano'):
             ano = int(request.GET.get('ano'))
             mes = int(request.GET.get('mes'))
@@ -200,7 +199,7 @@ def pagamentos_mensais(request, pdf=False):
 
 @login_required
 def pagamentos_parciais(request, pdf=False):
-    if request.method == 'GET':
+    if request.method in ['GET', 'HEAD']:
         if request.GET.get('parcial'):
             parcial = int(request.GET.get('parcial'))
             termo_id = int(request.GET.get('termo'))
@@ -223,7 +222,7 @@ def pagamentos_parciais(request, pdf=False):
   
 @login_required
 def relatorio_gerencial(request, pdf=False):
-    if request.method == 'GET':
+    if request.method in ['GET', 'HEAD']:
         if request.GET.get('termo'):
             try:
                 import locale
@@ -333,7 +332,7 @@ def relatorio_gerencial(request, pdf=False):
 
 @login_required
 def relatorio_acordos(request, pdf=False):
-    if request.method == 'GET':
+    if request.method in ['GET', 'HEAD']:
         if request.GET.get('termo'):
             id = int(request.GET.get('termo'))
             t = get_object_or_404(Termo,id=id)
@@ -382,8 +381,7 @@ def relatorio_acordos(request, pdf=False):
 
 @login_required
 def extrato(request, pdf=False):
-
-    if request.method == 'GET':
+    if request.method in ['GET', 'HEAD']:
         if request.GET.get('ano'):
             ano = int(request.GET.get('ano'))
             retorno = []
@@ -417,7 +415,7 @@ def extrato(request, pdf=False):
 @login_required
 def extrato_mes(request, pdf=False):
 
-    if request.method == 'GET':
+    if request.method in ['GET', 'HEAD']:
         if request.GET.get('ano'):
             ano = int(request.GET.get('ano'))
             mes = int(request.GET.get('mes'))
@@ -445,7 +443,7 @@ def extrato_mes(request, pdf=False):
 @login_required
 def extrato_financeiro(request, ano=dtime.now().year, pdf=False):
 
-    if request.method == 'GET':
+    if request.method in ['GET', 'HEAD']:
         if request.GET.get('termo'):
             # paramentro para filtrar as Reservas Tecnicas
             rt = bool(request.GET.get('rt'))
@@ -489,7 +487,7 @@ def extrato_financeiro(request, ano=dtime.now().year, pdf=False):
 
 @login_required
 def extrato_tarifas(request, pdf=False):
-    if request.method == 'GET':
+    if request.method in ['GET', 'HEAD']:
         if request.GET.get('ano'):
             ano = int(request.GET.get('ano'))
             mes = int(request.GET.get('mes'))
@@ -546,7 +544,7 @@ def cheque(request, cc=1):
 
 @login_required
 def financeiro_parciais(request, pdf=False):
-    if request.method == 'GET':
+    if request.method in ['GET', 'HEAD']:
         if request.GET.get('termo'):
             termo_id = int(request.GET.get('termo'))
             # paramentro para filtrar as Reservas Tecnicas
@@ -724,7 +722,7 @@ def financeiro_parciais(request, pdf=False):
 
 @login_required
 def parciais(request, caixa=False, pdf=False):
-    if request.method == 'GET':
+    if request.method in ['GET', 'HEAD']:
         if request.GET.get('termo'):
             termo_id = int(request.GET.get('termo'))
             termo = get_object_or_404(Termo, id=termo_id)
@@ -803,7 +801,7 @@ def escolhe_extrato(request):
 
 @login_required
 def presta_contas(request, pdf=False):
-    if request.method == 'GET':
+    if request.method in ['GET', 'HEAD']:
         if request.GET.get('termo'):
             termo_id = request.GET.get('termo')
             termo = get_object_or_404(Termo, id=termo_id)

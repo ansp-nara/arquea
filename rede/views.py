@@ -188,8 +188,8 @@ def planejamento2(request, pdf=0):
 
 @login_required
 def blocos_ip(request):
-    if request.method != 'GET':
-	raise Http404
+    if request.method not in ['GET', 'HEAD']:
+        raise Http404
 
     if len(request.GET) < 4:
         ent_usuario_ids = BlocoIP.objects.values_list('usuario', flat=True).distinct()
