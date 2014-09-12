@@ -270,7 +270,7 @@ def contratos(request):
 ####         PARA A SUA REMOÇÃO DO SISTEMA
 @login_required 
 def por_item(request):
-    if request.method == 'GET':
+    if request.method in ['GET', 'HEAD']:
         termo = request.GET.get('termo')
         entidade = request.GET.get('entidade')
 
@@ -292,7 +292,7 @@ def por_item(request):
 
 @login_required
 def relatorio_termos(request):
-    if request.method == 'GET':
+    if request.method in ['GET', 'HEAD']:
         termos = Termo.objects.order_by('-ano')
         return render(request, 'outorga/termos.html', {'termos':termos})
 
@@ -322,7 +322,7 @@ def lista_acordos(request, pdf=False):
 
 @login_required
 def item_modalidade(request, pdf=False):
-    if request.method == 'GET':
+    if request.method in ['GET', 'HEAD']:
         if request.GET.get('termo') and request.GET.get('termo') != '0' and \
            request.GET.get('modalidade') and request.GET.get('modalidade') != '0':
             

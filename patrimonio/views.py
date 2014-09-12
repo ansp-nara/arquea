@@ -614,7 +614,7 @@ def iterate_patrimonio(p_pts, nivel=0, filtro_com_fmusp=False):
 
 @login_required
 def por_tipo_equipamento(request, pdf=0):
-    if request.method != 'GET':
+    if request.method not in ['GET', 'HEAD']:
         raise Http404
 
     if len(request.GET) < 1:
@@ -671,7 +671,7 @@ def por_tipo_equipamento(request, pdf=0):
 
 @login_required
 def por_tipo_equipamento_old(request, pdf=0):
-    if request.method != 'GET':
+    if request.method not in ['GET', 'HEAD']:
         raise Http404
 
     if len(request.GET) < 1:
@@ -1225,7 +1225,7 @@ def abre_arvore_tipo(request):
 Retorna os dados de um Historico Atual dado o ID de um patrimonio
 """
 def patrimonio_historico(request):
-    if request.method == 'GET':
+    if request.method in ['GET', 'HEAD']:
         retorno = {}
         patr_id = request.GET.get('id')
         patr = Patrimonio.objects.get(id=patr_id)
