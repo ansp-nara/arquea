@@ -142,7 +142,7 @@ class AuditoriaAdmin(admin.ModelAdmin):
     form = AuditoriaAdminForm
 
     def get_queryset(self, request):
-        queryset = super(AuditoriaAdmin, self).queryset(request)
+        queryset = super(AuditoriaAdmin, self).get_queryset(request)
         return queryset
         
     def __init__(self, model, admin_site):

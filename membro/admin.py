@@ -193,7 +193,7 @@ class ControleAdmin(admin.ModelAdmin):
 
 
     def get_queryset(self, request):
-        qs = super(ControleAdmin, self).queryset(request)
+        qs = super(ControleAdmin, self).get_queryset(request)
         if request.user.is_superuser == False: 
             qs = qs.filter(membro__email=request.user.email)
   
