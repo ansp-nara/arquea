@@ -693,7 +693,6 @@ def financeiro_parciais(request, pdf=False):
                     total_estornado += r['estornado']
                     total_disponibilizado += r['disponibilizado']
                     total_pagamentos += r['pagamentos']
-                    print r['pagamentos']
                     
                     total_somatoria_diferenca += r['somatoria_diferenca']
                     
