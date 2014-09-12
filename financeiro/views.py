@@ -50,6 +50,7 @@ def termo_escolhido(request):
 
             retorno = {'protocolos':prot, 'origens':orig}
         json = simplejson.dumps(retorno)
+        return HttpResponse(json, content_type="application/json")
     else:
         return HttpResponseNotAllowed(permitted_methods=['POST',])
 
