@@ -240,12 +240,14 @@ def relatorio_gerencial(request, pdf=False):
             
             inicio = request.GET.get('inicio')
             termino = request.GET.get('termino')
-            ano,mes = (int(x) for x in inicio.split('-'))
+            ainicio,minicio = (int(x) for x in inicio.split('-'))
             afinal,mfinal = (int(x) for x in termino.split('-'))
             
             ultimo = Pagamento.objects.filter(protocolo__termo=t).aggregate(ultimo=Max('conta_corrente__data_oper'))
             ultimo = ultimo['ultimo']
             
+            ano = ainicio
+            mes = minicio
             while ano < afinal or (ano <= afinal and mes <= mfinal):
                 dt = date(ano,mes,1)
                 meses.append(dt.strftime('%B de %Y').decode('latin1'))
@@ -282,7 +284,7 @@ def relatorio_gerencial(request, pdf=False):
             
             for ng in Natureza_gasto.objects.filter(termo=t).exclude(modalidade__sigla='REI').select_related('modalidade__moeda_nacional'):
 
-                item = {'modalidade':ng.modalidade, 'concedido':ng.valor_concedido, 'realizado':ng.total_realizado, 'saldo':ng.valor_saldo(), 'meses':[], 'itens':{}, 'obs':ng.obs}
+                item = {'modalidade':ng.modalidade, 'concedido':ng.valor_concedido, 'realizado_parcial':ng.total_realizado_parcial(minicio,ainicio,mfinal,afinal), 'realizado':ng.total_realizado, 'saldo':ng.valor_saldo(), 'meses':[], 'itens':{}, 'obs':ng.obs}
                 for it in ng.item_set.all():
                     item['itens'].update({it:[]})
 
@@ -311,12 +313,14 @@ def relatorio_gerencial(request, pdf=False):
                         total += sumFapesp['valor_fapesp__sum'] or Decimal('0.0')
                     dt = date(ano,mes,1)
                     item['meses'].append({'ord':dt.strftime('%Y%m'), 'data':dt.strftime('%B de %Y'),'valor':total})
+                    total_parcial = Decimal('0.0')
                     for it in item['itens'].keys():
                         after = False
                         if ano == t.termino.year and mes == t.termino.month: after = True
 
                         total = it.calcula_realizado_mes(dt, after)
-                        item['itens'][it].append({'ord':dt.strftime('%Y%m'), 'valor': total})
+                        total_parcial += total
+                        item['itens'][it].append({'ord':dt.strftime('%Y%m'), 'valor': total, 'total_parcial':total_parcial})
                     mes += 1
                     if mes > 12:
                         mes = 1

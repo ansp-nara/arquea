@@ -520,13 +520,29 @@ class Natureza_gasto(models.Model):
 
 
     # Calcula o total de despesas realizadas de uma modalidade e termo.
-    @ cached_property
+    @cached_property
     def total_realizado(self):
         total = Decimal('0.00')
         for item in self.todos_itens():
             total += item.valor_realizado_acumulado
         return total
 
+    def total_realizado_parcial(self, m1, a1, m2, a2):
+        from financeiro.models import Pagamento
+
+        inicio = datetime.date(a1,m1,1)
+        fim = datetime.date(a2,m2,28)
+        while True:
+            try:
+                fim = fim.replace(day=fim.day+1)
+            except:
+                break
+                
+        if self.modalidade.moeda_nacional:
+            total = Pagamento.objects.filter(conta_corrente__data_oper__range=(inicio,fim), origem_fapesp__item_outorga__natureza_gasto=self).aggregate(Sum('valor_fapesp'))
+        else:
+            total = Pagamento.objects.filter(protocolo__data_vencimento__range=(inicio,fim), origem_fapesp__item_outorga__natureza_gasto=self).aggregate(Sum('valor_fapesp'))
+        return total['valor_fapesp__sum'] or Decimal('0.00')
 
     # Retorna o total de despesas realizadas em formato moeda.
     def formata_total_realizado(self):

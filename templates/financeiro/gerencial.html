@@ -146,6 +146,7 @@
 		    {% for m in meses %}
 		      <th class="tit_vert"><span>{{ m }}</span></th>
 		    {% endfor %}
+            <th class="sp_real"><span>Total realizado parcial</span></th>
 		    <th class="sp_real"><span>Total realizado</span></th>
 		    <th class="sp_sald"><span>Saldo</span></th>
 	    </tr>
@@ -156,8 +157,10 @@
 			{% for v in m.meses|dictsort:"ord" %}
 			  <td>{{ v.valor|moeda_valor:m.modalidade.moeda_nacional }}</td>
 			{% endfor %}
+            <td class="sp_real"><span>{{ m.realizado_parcial|moeda_css:m.modalidade.moeda_nacional}}</span></b></td>
 	        <td class="sp_real"><span>{{ m.realizado|moeda_css:m.modalidade.moeda_nacional}}</span></b></td>
-	        <td class="sp_sald"><span>{{ m.saldo|moeda_css:m.modalidade.moeda_nacional }}</span></td></tr>
+            <td class="sp_sald"><span>{{ m.saldo|moeda_css:m.modalidade.moeda_nacional }}</span></td>
+        </tr>
 	    {% endfor %}
 	    <tr>
 	        <td class="sp_moda"><span>Total (R$)</span></td>
@@ -165,6 +168,7 @@
 		    {% for t in totais|dictsort:"ord" %}
 		        <td><b>{{ t.total_real|moeda_valor_css }}</b></td>
 		    {% endfor %}
+            <td class="sp_real"></td>
 		    <td class="sp_real"><span>{{ gerais.gasto_real|moeda_css }}</span></td>
 		    <td class="sp_sald"><span>{{ gerais.saldo_real|moeda_css }}</span></td>
 	    </tr>
@@ -189,6 +193,9 @@
 	  <th class="sp_conc"><span>Concessão</span></th>
 	    {% for mes in meses %}
 	      <th class="tit_vert"><span>{{ mes }}</span></th>
+          {% if forloop.last %}
+             <th class="sp_real"><span>Total realizado parcial</span></th>
+          {% endif %}
 	    {% endfor %}
 	  <th class="sp_real"><span>Total realizado</span></th>
 	  <th class="sp_sald"><span>Saldo</span></th>
@@ -201,6 +208,9 @@
         <td class="sp_conc"><b><span>{{ it.valor|default:0.00|moeda_css:m.modalidade.moeda_nacional }}</span></b></td>
 	     {% for v in valores|dictsort:"ord" %}
 	        <td>{{ v.valor|moeda_valor_css:m.modalidade.moeda_nacional }}</td>
+            {% if forloop.last %}
+                <td class="sp_real"><span>{{ v.total_parcial|moeda_css:m.modalidade.moeda_nacional }}</span</td>
+            {% endif %}
 	     {% endfor %}
 	     <td class="sp_real"><span>{{ it.valor_realizado_acumulado|moeda_css:m.modalidade.moeda_nacional }}</span</td>
 	     <td class="sp_sald"><span>{{ it.saldo|moeda_css:m.modalidade.moeda_nacional }}</span></td>

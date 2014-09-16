@@ -148,7 +148,11 @@ def moeda(value, nac=True, nosep=False, css=False):
     except:
         return value
 
-    i, d = str(value).split('.')
+    try:
+        i, d = str(value).split('.')
+    except ValueError:
+        i = str(value)
+        d = '00'
     
     # Corrigindo o tamanho da decimal para 2 dígitos
     if len(d) > 2: d = d[:2]
