@@ -666,7 +666,7 @@ class Natureza_gastoTest(UnitTestCase):
         ef1 = EstadoOutorga.objects.create(nome='Aprovado')
         ef2 = EstadoOutorga.objects.create(nome='Concluído')
 
-        ex1 = ExtratoCC.objects.create(data_extrato=date(2008,10,30), data_oper=date(2008,10,5), cod_oper=333333, valor='2650', historico='TED', despesa_caixa=False)
+        ex1 = ExtratoCC.objects.create(data_extrato=date(2008,10,30), data_oper=date(2008,9,25), cod_oper=333333, valor='2650', historico='TED', despesa_caixa=False)
         ex2 = ExtratoCC.objects.create(data_extrato=date(2008,10,30), data_oper=date(2008,10,15), cod_oper=5555, valor='100000', historico='TED', despesa_caixa=False)
 
         a1 = Acordo.objects.create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e GTech')
@@ -678,7 +678,7 @@ class Natureza_gastoTest(UnitTestCase):
 
         fp1 = Pagamento.objects.create(protocolo=p1, conta_corrente=ex1, origem_fapesp=of1, valor_fapesp='2650')
         fp2 = Pagamento.objects.create(protocolo=p2, conta_corrente=ex2, origem_fapesp=of2, valor_fapesp='100000')
-        fp2 = Pagamento.objects.create(protocolo=p2, conta_corrente=ex2, origem_fapesp=of3, valor_fapesp='100000')
+        fp3 = Pagamento.objects.create(protocolo=p2, conta_corrente=ex2, origem_fapesp=of3, valor_fapesp='100000')
 
 
     def tearDown(self):
@@ -708,6 +708,12 @@ class Natureza_gastoTest(UnitTestCase):
         n1 = Natureza_gasto.objects.get(pk=1)
         self.assertEquals(n1.total_realizado, Decimal('102650'))
 
+    def test_total_realizado_parcial(self):
+        n1 = Natureza_gasto.objects.get(pk=1)
+        self.assertEqual(n1.total_realizado_parcial(5,2008,9,2008), Decimal('2650'))
+        self.assertEqual(n1.total_realizado_parcial(5,2008,12,2008), Decimal('102650'))
+        self.assertEqual(n1.total_realizado_parcial(10,2008,12,2008), Decimal('100000'))
+        
     def test_formata_total_realizado__zero(self):
         pg1 = Pagamento.objects.get(pk=1)
         pg1.valor_fapesp = 0
