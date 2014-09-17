@@ -1,18 +1,17 @@
 # -*- coding: utf-8 -*-
 
-# Create your views here.
-
-from django.shortcuts import render_to_response, get_object_or_404
-from protocolo.models import Protocolo, Cotacao, Descricao
-from outorga.models import Termo
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.models import Group
 from django.contrib import admin
-from django.http import Http404, HttpResponse
-from utils.functions import pega_lista, render_to_pdf
 from django.contrib.auth.decorators import permission_required, login_required
+from django.http import Http404, HttpResponse
+from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
+from django.views.decorators.http import require_safe
 
+from outorga.models import Termo
+from protocolo.models import Protocolo, Cotacao, Descricao
+from utils.functions import pega_lista, render_to_pdf
 """
 Verifica se o usuário tem autorização (pertence ao grupo 'tecnico') e retorna uma lista das cotações de um 
 determinado protocolo.
@@ -58,19 +57,20 @@ def protocolos(request, termo_id):
     return render_to_pdf('protocolo/protocolos.pdf', {'termo':termo, 'protocolos':termo.protocolo_set.order_by('descricao2')}, filename='protocolos.pdf')
 
 @login_required
+@require_safe
 def protocolos_descricao(request, pdf=False):
-    if request.method in ['GET', 'HEAD']:
-        if request.GET.get('termo'):
-	    termo_id = request.GET.get('termo')
-            termo = get_object_or_404(Termo, pk=termo_id)
-            retorno = []
-            for d in Descricao.objects.all():
-                desc = {'descricao':d.__unicode__(), 'protocolos':Protocolo.objects.filter(descricao2=d, termo=termo).order_by('-termo__ano', 'referente')}
-                retorno.append(desc)
+    if request.GET.get('termo'):
+        termo_id = request.GET.get('termo')
+        termo = get_object_or_404(Termo, pk=termo_id)
+        retorno = []
+        for d in Descricao.objects.all():
+            desc = {'descricao':d.__unicode__(), 'protocolos':Protocolo.objects.filter(descricao2=d, termo=termo).order_by('-termo__ano', 'referente')}
+            retorno.append(desc)
 
-	    if pdf:
-                return render_to_pdf('protocolo/descricoes.pdf', {'protocolos':retorno})
-	    else:
-	        return render_to_response('protocolo/descricoes.html', {'protocolos':retorno}, context_instance=RequestContext(request))
-	else:
-  	    return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all()}, context_instance=RequestContext(request))
+        if pdf:
+            return render_to_pdf('protocolo/descricoes.pdf', {'protocolos':retorno})
+        else:
+            return render_to_response('protocolo/descricoes.html', {'protocolos':retorno}, context_instance=RequestContext(request))
+    else:
+        return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all()}, context_instance=RequestContext(request))
+

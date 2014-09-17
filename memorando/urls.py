@@ -5,9 +5,9 @@ urlpatterns = patterns('memorando.views',
     (r'fapesp/(?P<mem>\d+)$', 'fapesp'),
     (r'relatorio/(?P<mem>\d+)$', 'relatorio'),
     (r'relatorio$', 'relatorio'),
-    (r'pagamentos$', 'escolhe_pagamentos'),
-    (r'perguntas$', 'filtra_perguntas'),
-    (r'escolhe_pergunta$', 'escolhe_pergunta'),
+    (r'pagamentos$', 'ajax_escolhe_pagamentos'),
+    (r'perguntas$', 'ajax_filtra_perguntas'),
+    (r'escolhe_pergunta$', 'ajax_escolhe_pergunta'),
 
 )
 

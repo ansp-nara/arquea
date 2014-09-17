@@ -1,20 +1,20 @@
 # -* coding: utf-8 -*-
-from django.shortcuts import render_to_response, get_object_or_404
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.models import Group
 from django.contrib import admin
-from django.http import Http404, HttpResponse, HttpResponseNotAllowed
-from django.db.models import Q, Max
 from django.contrib.auth.decorators import permission_required, login_required
-from django.db.models import Sum
+from django.db.models import Q, Max, Sum
+from django.http import Http404, HttpResponse, HttpResponseNotAllowed
+from django.shortcuts import render_to_response, get_object_or_404
 from django.template import Context, loader, RequestContext
+from django.views.decorators.http import require_safe, require_POST
+
 from decimal import Decimal
 import json as simplejson
 from datetime import datetime as dtime
 from datetime import date
 import math
 import logging
-
 
 from outorga.models import Modalidade, Outorga, Item, Termo, OrigemFapesp, Natureza_gasto, Acordo
 from protocolo.models import Protocolo
@@ -28,78 +28,81 @@ from models import *
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
-def termo_escolhido(request):
-    if request.method == 'POST':
-        termo_id = request.POST.get('termo_id')
-        t = None
+
+@login_required
+@require_safe
+def ajax_termo_escolhido(request):
+    termo_id = request.GET.get('termo_id')
+    t = None
+    try:
+        t = Termo.objects.get(id=termo_id)
+    except Termo.DoesNotExist:
+        pass
+
+    retorno = {}
+    if t:
+        protocolos = Protocolo.objects.filter(termo=t).order_by('tipo_documento', 'num_documento', 'data_vencimento')
+        origens = OrigemFapesp.objects.filter(item_outorga__natureza_gasto__termo=t).order_by('acordo', 'item_outorga')
+        prot = []
+        for p in protocolos:
+            prot.append({'pk':p.id, 'valor':p.__unicode__()})
+        orig = []
+        for o in origens:
+            orig.append({'pk':o.id, 'valor':'%s - %s' % (o.acordo, o.item_outorga)})
+
+        retorno = {'protocolos':prot, 'origens':orig}
+    json = simplejson.dumps(retorno)
+    return HttpResponse(json, content_type="application/json")
+
+
+@login_required
+@require_safe
+def ajax_numero_escolhido(request):
+    termo_id = request.GET.get('termo_id')
+    numero = request.GET.get('numero')
+    t = None
+    if termo_id:
         try:
             t = Termo.objects.get(id=termo_id)
         except Termo.DoesNotExist:
             pass
 
-        retorno = {}
-        if t:
-            protocolos = Protocolo.objects.filter(termo=t).order_by('tipo_documento', 'num_documento', 'data_vencimento')
-            origens = OrigemFapesp.objects.filter(item_outorga__natureza_gasto__termo=t).order_by('acordo', 'item_outorga')
-            prot = []
-            for p in protocolos:
-                prot.append({'pk':p.id, 'valor':p.__unicode__()})
-            orig = []
-            for o in origens:
-                orig.append({'pk':o.id, 'valor':'%s - %s' % (o.acordo, o.item_outorga)})
-
-            retorno = {'protocolos':prot, 'origens':orig}
-        json = simplejson.dumps(retorno)
-        return HttpResponse(json, content_type="application/json")
+    retorno = {}
+    if t:
+        protocolos = Protocolo.objects.filter(termo=t, num_documento__icontains=numero).order_by('tipo_documento', 'num_documento', 'data_vencimento')
     else:
-        return HttpResponseNotAllowed(permitted_methods=['POST',])
+        protocolos = Protocolo.objects.filter(num_documento__icontains=numero).order_by('tipo_documento', 'num_documento', 'data_vencimento')
+    prot = []
+    for p in protocolos:
+        prot.append({'pk':p.id, 'valor':p.__unicode__()})
+    retorno = {'protocolos':prot}
+    json = simplejson.dumps(retorno)
+    return HttpResponse(json, content_type="application/json")
 
-def numero_escolhido(request):
-    if request.method == 'POST':
-        termo_id = request.POST.get('termo_id')
-        numero = request.POST.get('numero')
-        t = None
-        if termo_id:
-            try:
-                t = Termo.objects.get(id=termo_id)
-            except Termo.DoesNotExist:
-                pass
 
-        retorno = {}
-        if t:
-            protocolos = Protocolo.objects.filter(termo=t, num_documento__icontains=numero).order_by('tipo_documento', 'num_documento', 'data_vencimento')
-        else:
-            protocolos = Protocolo.objects.filter(num_documento__icontains=numero).order_by('tipo_documento', 'num_documento', 'data_vencimento')
-        prot = []
-        for p in protocolos:
-            prot.append({'pk':p.id, 'valor':p.__unicode__()})
-        retorno = {'protocolos':prot}
-        json = simplejson.dumps(retorno)
-        return HttpResponse(json, content_type="application/json")
-    else:
-        return HttpResponseNotAllowed(permitted_methods=['POST',])
+@login_required
+@require_safe
+def ajax_codigo_escolhido(request):
+    codigo = request.GET.get('codigo')
 
-def codigo_escolhido(request):
-    if request.method == 'POST':
-        codigo = request.POST.get('codigo')
+    retorno = {}
 
-        retorno = {}
+    contas = ExtratoCC.objects.filter(cod_oper__icontains=codigo)
+    ccs = []
 
-        contas = ExtratoCC.objects.filter(cod_oper__icontains=codigo)
-        ccs = []
+    for c in contas:
+        ccs.append({'pk':c.id, 'valor':c.__unicode__()})
 
-        for c in contas:
-            ccs.append({'pk':c.id, 'valor':c.__unicode__()})
+    retorno = {'ccs': ccs}
+    json = simplejson.dumps(retorno)
 
-        retorno = {'ccs': ccs}
-        json = simplejson.dumps(retorno)
-    
-        return HttpResponse(json, content_type="application/json")
-    else:
-        return HttpResponseNotAllowed(permitted_methods=['POST',])
+    return HttpResponse(json, content_type="application/json")
 
-def estrutura_pagamentos(pagamentos):
 
+def _estrutura_pagamentos(pagamentos):
+    """
+    Função para montar a estrutura de dados utilizado nos relatórios de pagamentos
+    """
     total = pagamentos.aggregate(Sum('valor_fapesp'))
     por_modalidade = pagamentos.values('origem_fapesp__item_outorga__natureza_gasto').order_by('origem_fapesp__item_outorga__natureza_gasto').annotate(Sum('valor_fapesp'))
     pm = []
@@ -150,371 +153,373 @@ def estrutura_pagamentos(pagamentos):
         pg.append(pp)
 
     return {'pg':sorted(pg, key=itemgetter('modalidade', 'pagina')), 'pm':pm, 'total':total}
-  
-def parcial_pagina(request):
-    if request.method == 'POST':
-        orig = request.POST.get('orig_id')
-        origem = get_object_or_404(OrigemFapesp, pk=orig)
-        a = Auditoria.objects.filter(pagamento__origem_fapesp__item_outorga__natureza_gasto=origem.item_outorga.natureza_gasto).aggregate(Max('parcial'))
-        parcial = a['parcial__max']
-        a = Auditoria.objects.filter(pagamento__origem_fapesp__item_outorga__natureza_gasto=origem.item_outorga.natureza_gasto, parcial=parcial).aggregate(Max('pagina'))
-        pagina = a['pagina__max']
-        retorno = {'parcial':parcial, 'pagina':pagina+1}
-        json = simplejson.dumps(retorno)
 
-        return HttpResponse(json, content_type="application/json")
-    else:
-        return HttpResponseNotAllowed(permitted_methods=['POST',])
-    
+
 @login_required
-def nova_pagina(request):
-    if request.method == 'POST':
-        origem_id = request.POST.get('orig_id')
-        parcial = request.POST.get('parcial')
+@require_safe
+def ajax_parcial_pagina(request):
+    orig = request.GET.get('orig_id')
+    origem = get_object_or_404(OrigemFapesp, pk=orig)
+    a = Auditoria.objects.filter(pagamento__origem_fapesp__item_outorga__natureza_gasto=origem.item_outorga.natureza_gasto).aggregate(Max('parcial'))
+    parcial = a['parcial__max']
+    a = Auditoria.objects.filter(pagamento__origem_fapesp__item_outorga__natureza_gasto=origem.item_outorga.natureza_gasto, parcial=parcial).aggregate(Max('pagina'))
+    pagina = a['pagina__max']
+    retorno = {'parcial':parcial, 'pagina':pagina+1}
+    json = simplejson.dumps(retorno)
 
-        origem = get_object_or_404(OrigemFapesp, pk=origem_id)
-        pagina = Auditoria.objects.filter(pagamento__origem_fapesp__item_outorga__natureza_gasto=origem.item_outorga.natureza_gasto, parcial=parcial).aggregate(Max('pagina'))
-        pagina = 0 if pagina['pagina__max'] is None else pagina['pagina__max']
+    return HttpResponse(json, content_type="application/json")
 
-        retorno = pagina+1
-        return HttpResponse(simplejson.dumps(retorno), content_type="application/json")
-  
+
 @login_required
+@require_safe
+def ajax_nova_pagina(request):
+    origem_id = request.GET.get('orig_id')
+    parcial = request.GET.get('parcial')
+
+    origem = get_object_or_404(OrigemFapesp, pk=origem_id)
+    pagina = Auditoria.objects.filter(pagamento__origem_fapesp__item_outorga__natureza_gasto=origem.item_outorga.natureza_gasto, parcial=parcial).aggregate(Max('pagina'))
+    pagina = 0 if pagina['pagina__max'] is None else pagina['pagina__max']
+
+    retorno = pagina+1
+    return HttpResponse(simplejson.dumps(retorno), content_type="application/json")
+
+
+@login_required
+@require_safe
 def pagamentos_mensais(request, pdf=False):
-    if request.method in ['GET', 'HEAD']:
-        if request.GET.get('ano'):
-            ano = int(request.GET.get('ano'))
-            mes = int(request.GET.get('mes'))
-            pagamentos = Pagamento.objects.filter(conta_corrente__data_oper__month=mes,conta_corrente__data_oper__year=ano)
-            dados = estrutura_pagamentos(pagamentos)
+    if request.GET.get('ano'):
+        ano = int(request.GET.get('ano'))
+        mes = int(request.GET.get('mes'))
+        pagamentos = Pagamento.objects.filter(conta_corrente__data_oper__month=mes,conta_corrente__data_oper__year=ano)
+        dados = _estrutura_pagamentos(pagamentos)
 
-            if pdf:
-                return render_to_pdf('financeiro/pagamentos.pdf', {'pagamentos':dados['pg'], 'ano':ano, 'mes':mes, 'total':formata_moeda(dados['total']['valor_fapesp__sum'], ','), 'pm':dados['pm']}, request=request, filename='pagamentos.pdf')
-            else:
-                return render_to_response('financeiro/pagamentos.html', {'pagamentos':dados['pg'], 'ano':ano, 'mes':mes, 'total':formata_moeda(dados['total']['valor_fapesp__sum'], ','), 'pm':dados['pm']}, context_instance=RequestContext(request))
+        if pdf:
+            return render_to_pdf('financeiro/pagamentos.pdf', {'pagamentos':dados['pg'], 'ano':ano, 'mes':mes, 'total':formata_moeda(dados['total']['valor_fapesp__sum'], ','), 'pm':dados['pm']}, request=request, filename='pagamentos.pdf')
         else:
-            meses = range(1,13)
-            anos = range(1990,dtime.now().year+1)
-            anos.sort(reverse=True)
-            return render_to_response('financeiro/pagamentos_mes.html', {'meses':meses, 'anos':anos, 'view':'pagamentos_mensais'}, context_instance=RequestContext(request))
+            return render_to_response('financeiro/pagamentos.html', {'pagamentos':dados['pg'], 'ano':ano, 'mes':mes, 'total':formata_moeda(dados['total']['valor_fapesp__sum'], ','), 'pm':dados['pm']}, context_instance=RequestContext(request))
+    else:
+        meses = range(1,13)
+        anos = range(1990,dtime.now().year+1)
+        anos.sort(reverse=True)
+        return render_to_response('financeiro/pagamentos_mes.html', {'meses':meses, 'anos':anos, 'view':'pagamentos_mensais'}, context_instance=RequestContext(request))
+
 
 @login_required
+@require_safe
 def pagamentos_parciais(request, pdf=False):
-    if request.method in ['GET', 'HEAD']:
-        if request.GET.get('parcial'):
-            parcial = int(request.GET.get('parcial'))
-            termo_id = int(request.GET.get('termo'))
-            termo = Termo.objects.get(pk=termo_id)
-            ids = [p.id for p in Pagamento.objects.filter(protocolo__termo=termo,auditoria__parcial=parcial).distinct()]
-            pagamentos = Pagamento.objects.filter(id__in=ids)
-            #for p in pagamentos:
-            #	if p.auditoria_set.filter(parcial=parcial).count() == 0:
-            #	    pagamentos = pagamentos.exclude(id=p.id)
-            dados = estrutura_pagamentos(pagamentos)
+    if request.GET.get('parcial'):
+        parcial = int(request.GET.get('parcial'))
+        termo_id = int(request.GET.get('termo'))
+        termo = Termo.objects.get(pk=termo_id)
+        ids = [p.id for p in Pagamento.objects.filter(protocolo__termo=termo,auditoria__parcial=parcial).distinct()]
+        pagamentos = Pagamento.objects.filter(id__in=ids)
+        #for p in pagamentos:
+        #	if p.auditoria_set.filter(parcial=parcial).count() == 0:
+        #	    pagamentos = pagamentos.exclude(id=p.id)
+        dados = _estrutura_pagamentos(pagamentos)
 
-            if pdf:
-                return render_to_pdf('financeiro/pagamentos_parciais.pdf', {'pagamentos':dados['pg'], 'parcial':parcial, 'termo':termo, 'total':formata_moeda(dados['total']['valor_fapesp__sum'], ','), 'pm':dados['pm']}, request=request, filename='pagamentos.pdf')
-            else:
-                return render_to_response('financeiro/pagamentos_parciais.html', {'pagamentos':dados['pg'], 'parcial':parcial, 'termo':termo, 'total':formata_moeda(dados['total']['valor_fapesp__sum'], ','), 'pm':dados['pm']}, context_instance=RequestContext(request))
+        if pdf:
+            return render_to_pdf('financeiro/pagamentos_parciais.pdf', {'pagamentos':dados['pg'], 'parcial':parcial, 'termo':termo, 'total':formata_moeda(dados['total']['valor_fapesp__sum'], ','), 'pm':dados['pm']}, request=request, filename='pagamentos.pdf')
         else:
-            parciais = range(1,21)
-            termos = Termo.objects.all()
-            return render_to_response('financeiro/pagamentos_parcial.html', {'parciais':parciais, 'termos':termos}, context_instance=RequestContext(request))
-  
+            return render_to_response('financeiro/pagamentos_parciais.html', {'pagamentos':dados['pg'], 'parcial':parcial, 'termo':termo, 'total':formata_moeda(dados['total']['valor_fapesp__sum'], ','), 'pm':dados['pm']}, context_instance=RequestContext(request))
+    else:
+        parciais = range(1,21)
+        termos = Termo.objects.all()
+        return render_to_response('financeiro/pagamentos_parcial.html', {'parciais':parciais, 'termos':termos}, context_instance=RequestContext(request))
+
+
 @login_required
+@require_safe
 def relatorio_gerencial(request, pdf=False):
-    if request.method in ['GET', 'HEAD']:
-        if request.GET.get('termo'):
-            try:
-                import locale
-                locale.setlocale(locale.LC_ALL, 'pt_BR')
-            except Exception:
-                print ''
-                
-            id = int(request.GET.get('termo'))
-            t = get_object_or_404(Termo,id=id)
+    if request.GET.get('termo'):
+        try:
+            import locale
+            locale.setlocale(locale.LC_ALL, 'pt_BR')
+        except Exception:
+            print ''
             
-            retorno = []
-            meses = []
-            totalizador = []
+        id = int(request.GET.get('termo'))
+        t = get_object_or_404(Termo,id=id)
+        
+        retorno = []
+        meses = []
+        totalizador = []
+        
+        inicio = request.GET.get('inicio')
+        termino = request.GET.get('termino')
+        ainicio,minicio = (int(x) for x in inicio.split('-'))
+        afinal,mfinal = (int(x) for x in termino.split('-'))
+        
+        ultimo = Pagamento.objects.filter(protocolo__termo=t).aggregate(ultimo=Max('conta_corrente__data_oper'))
+        ultimo = ultimo['ultimo']
+        
+        ano = ainicio
+        mes = minicio
+        while ano < afinal or (ano <= afinal and mes <= mfinal):
+            dt = date(ano,mes,1)
+            meses.append(dt.strftime('%B de %Y').decode('latin1'))
+            if ano == t.termino.year and mes == t.termino.month:
+                dt2 = date(ano+5,mes,1)
+                total_real = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__termo=t,origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional=True, conta_corrente__data_oper__range=(dt,dt2)).aggregate(Sum('valor_fapesp'))
+                total_dolar = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__termo=t,origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional=False, protocolo__data_vencimento__range=(dt,dt2)).aggregate(Sum('valor_fapesp'))
+            else:
+                total_real = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__termo=t,origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional=True, conta_corrente__data_oper__year=ano,conta_corrente__data_oper__month=mes).aggregate(Sum('valor_fapesp'))
+                total_dolar = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__termo=t,origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional=False, protocolo__data_vencimento__year=ano,protocolo__data_vencimento__month=mes).aggregate(Sum('valor_fapesp'))
             
-            inicio = request.GET.get('inicio')
-            termino = request.GET.get('termino')
-            ainicio,minicio = (int(x) for x in inicio.split('-'))
-            afinal,mfinal = (int(x) for x in termino.split('-'))
+            totalizador.append({'ord':dt.strftime('%Y%m'), 'total_real':total_real['valor_fapesp__sum'] or Decimal('0.0'), 'total_dolar':total_dolar['valor_fapesp__sum'] or Decimal('0.0')})
             
-            ultimo = Pagamento.objects.filter(protocolo__termo=t).aggregate(ultimo=Max('conta_corrente__data_oper'))
-            ultimo = ultimo['ultimo']
+            mes += 1
+            if mes > 12:
+                mes = 1
+                ano += 1
+
+        cr = Natureza_gasto.objects.filter(termo=t, modalidade__moeda_nacional=True).exclude(modalidade__sigla='REI').aggregate(Sum('valor_concedido'))
+        cr = cr['valor_concedido__sum'] or Decimal('0.0')
+        
+        cd = Natureza_gasto.objects.filter(termo=t, modalidade__moeda_nacional=False).exclude(modalidade__sigla='REI').aggregate(Sum('valor_concedido'))
+        cd = cd ['valor_concedido__sum'] or Decimal('0.0')
+        
+        gr = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__termo=t,origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional=True).aggregate(Sum('valor_fapesp'))
+        gr = gr['valor_fapesp__sum']  or Decimal('0.0')
+
+        gd = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__termo=t,origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional=False).aggregate(Sum('valor_fapesp'))
+        gd = gd['valor_fapesp__sum']  or Decimal('0.0')
+        
+        gerais = {'concedido_real': cr, 'concedido_dolar': cd, 'gasto_real': gr, 'gasto_dolar': gd, 'saldo_real': cr-gr, 'saldo_dolar': cd-gd}
+        treal = {}
+        tdolar = {}
+        
+        for ng in Natureza_gasto.objects.filter(termo=t).exclude(modalidade__sigla='REI').select_related('modalidade__moeda_nacional'):
+
+            item = {'modalidade':ng.modalidade, 'concedido':ng.valor_concedido, 'realizado_parcial':ng.total_realizado_parcial(minicio,ainicio,mfinal,afinal), 'realizado':ng.total_realizado, 'saldo':ng.valor_saldo(), 'meses':[], 'itens':{}, 'obs':ng.obs}
+            for it in ng.item_set.all():
+                item['itens'].update({it:[]})
+
+            ano,mes = (int(x) for x in inicio.split('-'))
             
-            ano = ainicio
-            mes = minicio
             while ano < afinal or (ano <= afinal and mes <= mfinal):
-                dt = date(ano,mes,1)
-                meses.append(dt.strftime('%B de %Y').decode('latin1'))
-                if ano == t.termino.year and mes == t.termino.month:
-                    dt2 = date(ano+5,mes,1)
-                    total_real = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__termo=t,origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional=True, conta_corrente__data_oper__range=(dt,dt2)).aggregate(Sum('valor_fapesp'))
-                    total_dolar = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__termo=t,origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional=False, protocolo__data_vencimento__range=(dt,dt2)).aggregate(Sum('valor_fapesp'))
+                total = Decimal('0.0')
+
+                if ng.modalidade.moeda_nacional:
+                    sumFapesp = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto=ng, conta_corrente__data_oper__year=ano, conta_corrente__data_oper__month=mes).aggregate(Sum('valor_fapesp'))
                 else:
-                    total_real = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__termo=t,origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional=True, conta_corrente__data_oper__year=ano,conta_corrente__data_oper__month=mes).aggregate(Sum('valor_fapesp'))
-                    total_dolar = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__termo=t,origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional=False, protocolo__data_vencimento__year=ano,protocolo__data_vencimento__month=mes).aggregate(Sum('valor_fapesp'))
-                
-                totalizador.append({'ord':dt.strftime('%Y%m'), 'total_real':total_real['valor_fapesp__sum'] or Decimal('0.0'), 'total_dolar':total_dolar['valor_fapesp__sum'] or Decimal('0.0')})
-                
+                    sumFapesp = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto=ng, protocolo__data_vencimento__year=ano, protocolo__data_vencimento__month=mes).aggregate(Sum('valor_fapesp'))
+
+                total += sumFapesp['valor_fapesp__sum'] or Decimal('0.0')
+       
+                try:
+                    dt = date(ano,mes+1,1)
+                except:
+                    dt = date(ano+1, 1,1)
+                dt2 = date(ano+5,1,1)
+                if ano == t.termino.year and mes == t.termino.month:
+                    if ng.modalidade.moeda_nacional:
+                        sumFapesp = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto=ng, conta_corrente__data_oper__range=(dt,dt2)).aggregate(Sum('valor_fapesp'))
+                    else:
+                        sumFapesp = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto=ng, protocolo__data_vencimento__range=(dt,dt2)).aggregate(Sum('valor_fapesp'))
+                    total += sumFapesp['valor_fapesp__sum'] or Decimal('0.0')
+                dt = date(ano,mes,1)
+                item['meses'].append({'ord':dt.strftime('%Y%m'), 'data':dt.strftime('%B de %Y'),'valor':total})
+                total_parcial = Decimal('0.0')
+                for it in item['itens'].keys():
+                    after = False
+                    if ano == t.termino.year and mes == t.termino.month: after = True
+
+                    total = it.calcula_realizado_mes(dt, after)
+                    total_parcial += total
+                    item['itens'][it].append({'ord':dt.strftime('%Y%m'), 'valor': total, 'total_parcial':total_parcial})
                 mes += 1
                 if mes > 12:
                     mes = 1
                     ano += 1
-    
-            cr = Natureza_gasto.objects.filter(termo=t, modalidade__moeda_nacional=True).exclude(modalidade__sigla='REI').aggregate(Sum('valor_concedido'))
-            cr = cr['valor_concedido__sum'] or Decimal('0.0')
-            
-            cd = Natureza_gasto.objects.filter(termo=t, modalidade__moeda_nacional=False).exclude(modalidade__sigla='REI').aggregate(Sum('valor_concedido'))
-            cd = cd ['valor_concedido__sum'] or Decimal('0.0')
-            
-            gr = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__termo=t,origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional=True).aggregate(Sum('valor_fapesp'))
-            gr = gr['valor_fapesp__sum']  or Decimal('0.0')
 
-            gd = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__termo=t,origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional=False).aggregate(Sum('valor_fapesp'))
-            gd = gd['valor_fapesp__sum']  or Decimal('0.0')
-            
-            gerais = {'concedido_real': cr, 'concedido_dolar': cd, 'gasto_real': gr, 'gasto_dolar': gd, 'saldo_real': cr-gr, 'saldo_dolar': cd-gd}
-            treal = {}
-            tdolar = {}
-            
-            for ng in Natureza_gasto.objects.filter(termo=t).exclude(modalidade__sigla='REI').select_related('modalidade__moeda_nacional'):
+            retorno.append(item)
 
-                item = {'modalidade':ng.modalidade, 'concedido':ng.valor_concedido, 'realizado_parcial':ng.total_realizado_parcial(minicio,ainicio,mfinal,afinal), 'realizado':ng.total_realizado, 'saldo':ng.valor_saldo(), 'meses':[], 'itens':{}, 'obs':ng.obs}
-                for it in ng.item_set.all():
-                    item['itens'].update({it:[]})
-
-                ano,mes = (int(x) for x in inicio.split('-'))
-                
-                while ano < afinal or (ano <= afinal and mes <= mfinal):
-                    total = Decimal('0.0')
-
-                    if ng.modalidade.moeda_nacional:
-                        sumFapesp = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto=ng, conta_corrente__data_oper__year=ano, conta_corrente__data_oper__month=mes).aggregate(Sum('valor_fapesp'))
-                    else:
-                        sumFapesp = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto=ng, protocolo__data_vencimento__year=ano, protocolo__data_vencimento__month=mes).aggregate(Sum('valor_fapesp'))
-
-                    total += sumFapesp['valor_fapesp__sum'] or Decimal('0.0')
-           
-                    try:
-                        dt = date(ano,mes+1,1)
-                    except:
-                        dt = date(ano+1, 1,1)
-                    dt2 = date(ano+5,1,1)
-                    if ano == t.termino.year and mes == t.termino.month:
-                        if ng.modalidade.moeda_nacional:
-                            sumFapesp = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto=ng, conta_corrente__data_oper__range=(dt,dt2)).aggregate(Sum('valor_fapesp'))
-                        else:
-                            sumFapesp = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto=ng, protocolo__data_vencimento__range=(dt,dt2)).aggregate(Sum('valor_fapesp'))
-                        total += sumFapesp['valor_fapesp__sum'] or Decimal('0.0')
-                    dt = date(ano,mes,1)
-                    item['meses'].append({'ord':dt.strftime('%Y%m'), 'data':dt.strftime('%B de %Y'),'valor':total})
-                    total_parcial = Decimal('0.0')
-                    for it in item['itens'].keys():
-                        after = False
-                        if ano == t.termino.year and mes == t.termino.month: after = True
-
-                        total = it.calcula_realizado_mes(dt, after)
-                        total_parcial += total
-                        item['itens'][it].append({'ord':dt.strftime('%Y%m'), 'valor': total, 'total_parcial':total_parcial})
-                    mes += 1
-                    if mes > 12:
-                        mes = 1
-                        ano += 1
-
-                retorno.append(item)
-
-            if pdf:
-	            return render_to_pdf('financeiro/gerencial.pdf', {'atualizado':ultimo, 'termo':t, 'meses':meses, 'modalidades':retorno, 'totais':totalizador, 'gerais':gerais}, request=request, context_instance=RequestContext(request), filename='relatorio_gerencial.pdf')
-            else:
-                return render_to_response('financeiro/gerencial.html', {'atualizado':ultimo, 'termo':t, 'meses':meses, 'modalidades':retorno, 'totais':totalizador, 'gerais':gerais}, context_instance=RequestContext(request))
+        if pdf:
+            return render_to_pdf('financeiro/gerencial.pdf', {'atualizado':ultimo, 'termo':t, 'meses':meses, 'modalidades':retorno, 'totais':totalizador, 'gerais':gerais}, request=request, context_instance=RequestContext(request), filename='relatorio_gerencial.pdf')
         else:
-            return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all(), 'view':'relatorio_gerencial'}, context_instance=RequestContext(request))
+            return render_to_response('financeiro/gerencial.html', {'atualizado':ultimo, 'termo':t, 'meses':meses, 'modalidades':retorno, 'totais':totalizador, 'gerais':gerais}, context_instance=RequestContext(request))
+    else:
+        return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all(), 'view':'relatorio_gerencial'}, context_instance=RequestContext(request))
+
 
 @login_required
+@require_safe
 def relatorio_acordos(request, pdf=False):
-    if request.method in ['GET', 'HEAD']:
-        if request.GET.get('termo'):
-            id = int(request.GET.get('termo'))
-            t = get_object_or_404(Termo,id=id)
-            retorno = []
-            
-            for a in  Acordo.objects.all():
-                ac = {'desc':a.__unicode__()}
-                totalGeralReal = Decimal('0.0')
-                totalGeralDolar = Decimal('0.0')
-                itens = []
+    if request.GET.get('termo'):
+        id = int(request.GET.get('termo'))
+        t = get_object_or_404(Termo,id=id)
+        retorno = []
+        
+        for a in  Acordo.objects.all():
+            ac = {'desc':a.__unicode__()}
+            totalGeralReal = Decimal('0.0')
+            totalGeralDolar = Decimal('0.0')
+            itens = []
 
-                for o in  a.origemfapesp_set.filter(item_outorga__natureza_gasto__termo=t).select_related('item_outorga', 'item_outorga__entidade'):
-                    it = {'desc':'%s - %s' % (o.item_outorga.entidade, o.item_outorga.descricao), 'id':o.id}
-                    totalReal = Decimal('0.0')
-                    totalDolar = Decimal('0.0')
-                    pg = []
-                    for p in o.pagamento_set.order_by('conta_corrente__data_oper', 'id') \
-                                            .prefetch_related('auditoria_set', 'auditoria_set__tipo') \
-                                            .select_related('conta_corrente', 'protocolo', 'protocolo__descricao2', \
-                                                            'protocolo__tipo_documento', 'protocolo__descricao2__entidade', \
-                                                            'origem_fapesp__item_outorga__natureza_gasto__modalidade'):
-                        
-                        pags = {'p':p, 'docs':p.auditoria_set.all()}
-                        pg.append(pags)
+            for o in  a.origemfapesp_set.filter(item_outorga__natureza_gasto__termo=t).select_related('item_outorga', 'item_outorga__entidade'):
+                it = {'desc':'%s - %s' % (o.item_outorga.entidade, o.item_outorga.descricao), 'id':o.id}
+                totalReal = Decimal('0.0')
+                totalDolar = Decimal('0.0')
+                pg = []
+                for p in o.pagamento_set.order_by('conta_corrente__data_oper', 'id') \
+                                        .prefetch_related('auditoria_set', 'auditoria_set__tipo') \
+                                        .select_related('conta_corrente', 'protocolo', 'protocolo__descricao2', \
+                                                        'protocolo__tipo_documento', 'protocolo__descricao2__entidade', \
+                                                        'origem_fapesp__item_outorga__natureza_gasto__modalidade'):
+                    
+                    pags = {'p':p, 'docs':p.auditoria_set.all()}
+                    pg.append(pags)
 
-                        if p.origem_fapesp and p.origem_fapesp.item_outorga.natureza_gasto.modalidade.moeda_nacional == False:
-                            totalDolar += p.valor_fapesp
-                        else:
-                            totalReal += p.valor_fapesp
+                    if p.origem_fapesp and p.origem_fapesp.item_outorga.natureza_gasto.modalidade.moeda_nacional == False:
+                        totalDolar += p.valor_fapesp
+                    else:
+                        totalReal += p.valor_fapesp
 
-                    it.update({'totalReal':totalReal, 'totalDolar':totalDolar, 'pg':pg})
+                it.update({'totalReal':totalReal, 'totalDolar':totalDolar, 'pg':pg})
 
-                    totalGeralReal += totalReal
-                    totalGeralDolar += totalDolar
-                    itens.append(it)
+                totalGeralReal += totalReal
+                totalGeralDolar += totalDolar
+                itens.append(it)
 
-                ac.update({'totalGeralReal':totalGeralReal, 'totalGeralDolar':totalGeralDolar, 'itens':itens})		
-                retorno.append(ac)
+            ac.update({'totalGeralReal':totalGeralReal, 'totalGeralDolar':totalGeralDolar, 'itens':itens})		
+            retorno.append(ac)
 
-            if pdf:
-                return render_to_pdf_weasy(template_src='financeiro/acordos_weasy.pdf', context_dict={'termo':t, 'acordos':retorno}, request=request, filename='relatorio_de_acordos_da_outorga_%s.pdf'%t,)
-            else:
-                return render_to_response('financeiro/acordos.html', {'termo':t, 'acordos':retorno}, context_instance=RequestContext(request))
+        if pdf:
+            return render_to_pdf_weasy(template_src='financeiro/acordos_weasy.pdf', context_dict={'termo':t, 'acordos':retorno}, request=request, filename='relatorio_de_acordos_da_outorga_%s.pdf'%t,)
         else:
-            return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all(), 'view':'relatorio_acordos'}, context_instance=RequestContext(request))
+            return render_to_response('financeiro/acordos.html', {'termo':t, 'acordos':retorno}, context_instance=RequestContext(request))
+    else:
+        return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all(), 'view':'relatorio_acordos'}, context_instance=RequestContext(request))
 
 @login_required
+@require_safe
 def extrato(request, pdf=False):
-    if request.method in ['GET', 'HEAD']:
-        if request.GET.get('ano'):
-            ano = int(request.GET.get('ano'))
-            retorno = []
-            mes = 0
-            for e in ExtratoCC.objects.filter(data_oper__year=ano).select_related('extrato_financeiro', 'extrato_financeiro__termo').order_by('data_oper', 'id'):
-                if mes == 0:
-                    mes = e.data_oper.month
-                    retorno.append({'saldo_mes_anterior':e.saldo_anterior, 'data':e.data_oper})
-                if e.data_oper.month==mes:
-                    retorno.append(e)
-                else:
-                    if retorno:
-                        e1 = retorno[-1]
-                        retorno.append({'saldo':e1.saldo, 'data':e1.data_oper})
-                    retorno.append(e)
-                    mes = e.data_oper.month
-            if retorno:
-                e1 = retorno[-1]
-                retorno.append({'saldo':e1.saldo, 'data':e1.data_oper})
-
-            if pdf:
-                return render_to_pdf_weasy('financeiro/contacorrente.pdf', {'ano':ano, 'extrato':retorno}, request=request, filename='extrato_cc_%s.pdf' % ano)
-            else:
-                return render_to_response('financeiro/contacorrente.html', {'ano':ano, 'extrato':retorno}, context_instance=RequestContext(request))
-        else:
-            anos = range(1990,dtime.now().year+1)
-            anos.sort(reverse=True)
-            return render_to_response('financeiro/sel_contacorrente.html', {'anos':anos}, context_instance=RequestContext(request))	    
-
-
-@login_required
-def extrato_mes(request, pdf=False):
-
-    if request.method in ['GET', 'HEAD']:
-        if request.GET.get('ano'):
-            ano = int(request.GET.get('ano'))
-            mes = int(request.GET.get('mes'))
-            retorno = []
-            sa = True
-            for e in ExtratoCC.objects.filter(data_oper__year=ano, data_oper__month=mes).order_by('data_oper', 'id'):
-                if sa:
-                    sa = False
-                    retorno.append(e.saldo_anterior)
-                retorno.append(e)
-            if retorno:
-                e1 = retorno[-1]
-                retorno.append(e1.saldo)
-
-            if pdf:
-                return render_to_pdf('financeiro/contacorrente_mes.pdf', {'ano':ano, 'mes':mes, 'extrato':retorno}, request=request, filename='extrato_cc_%s/%s.pdf' % (mes,ano))
-            else:
-                return render_to_response('financeiro/contacorrente_mes.html', {'ano':ano, 'mes':mes, 'extrato':retorno}, context_instance=RequestContext(request))
-        else:
-            meses = range(1,13)
-            anos = range(1990,dtime.now().year+1)
-            anos.sort(reverse=True)
-            return render_to_response('financeiro/sel_contacorrente_mes.html', {'anos':anos, 'meses':meses}, context_instance=RequestContext(request))	    
-
-@login_required
-def extrato_financeiro(request, ano=dtime.now().year, pdf=False):
-
-    if request.method in ['GET', 'HEAD']:
-        if request.GET.get('termo'):
-            # paramentro para filtrar as Reservas Tecnicas
-            rt = bool(request.GET.get('rt'))
-            if rt:
-                codigo = 'RP'
-            else:
-                codigo = 'MP'
-            
-            termo_id = int(request.GET.get('termo'))
-            termo = get_object_or_404(Termo, id=termo_id)
-            mes = int(request.GET.get('mes'))
-            if mes:
-                efs = ExtratoFinanceiro.objects.filter(termo=termo, data_libera__month=mes, cod__endswith=codigo)
-            else:
-                efs = ExtratoFinanceiro.objects.filter(termo=termo, cod__endswith=codigo)
-            extrato = []
-            for ef in efs.order_by('data_libera'):
-                ex = {'data':ef.data_libera, 'cod':ef.cod, 'historico':ef.historico, 'valor':ef.valor, 'comprovante':ef.comprovante, 'cheques':[]}
-                total = Decimal('0.0')
-                for c in ef.extratocc_set.all():
-                    valor = c.pagamento_set.aggregate(Sum('valor_fapesp'))
-                    total += valor['valor_fapesp__sum'] or Decimal('0.0')
-                    parciais = []
-                    for p in c.pagamento_set.all():
-                        for a in p.auditoria_set.all():
-                            if not a.parcial in parciais:
-                                parciais.append(a.parcial)
-
-                    ch = {'id':c.id, 'valor':c.valor, 'cod': c.cod_oper, 'parciais':', '.join([str(p) for p in parciais])}
-                    ex['cheques'].append(ch)
-                ex['diferenca'] = ef.valor+total
-                extrato.append(ex)
-
-            if pdf:
-                return render_to_pdf('financeiro/financeiro.pdf', {'ano':ano, 'extrato':extrato}, request=request, filename='financeiro_%s/%s.pdf' % (mes,ano))
-            else:
-                return render_to_response('financeiro/financeiro.html', {'termo':termo, 'mes':mes, 'ano':ano, 'extrato':extrato}, context_instance=RequestContext(request))
-        else:
-            meses = range(0,13)
-            return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all(), 'meses':meses, 'view':'extrato_financeiro', 'rt':False }, context_instance=RequestContext(request))
-
-@login_required
-def extrato_tarifas(request, pdf=False):
-    if request.method in ['GET', 'HEAD']:
-        if request.GET.get('ano'):
-            ano = int(request.GET.get('ano'))
-            mes = int(request.GET.get('mes'))
+    if request.GET.get('ano'):
+        ano = int(request.GET.get('ano'))
+        retorno = []
+        mes = 0
+        for e in ExtratoCC.objects.filter(data_oper__year=ano).select_related('extrato_financeiro', 'extrato_financeiro__termo').order_by('data_oper', 'id'):
             if mes == 0:
-                tars = ExtratoCC.objects.filter(Q(data_oper__year=ano), Q(historico__icontains='tar')|Q(historico__icontains='crédito aut')|Q(historico__icontains='juro')).order_by('data_oper')
+                mes = e.data_oper.month
+                retorno.append({'saldo_mes_anterior':e.saldo_anterior, 'data':e.data_oper})
+            if e.data_oper.month==mes:
+                retorno.append(e)
             else:
-                tars = ExtratoCC.objects.filter(Q(data_oper__month=mes), Q(data_oper__year=ano), Q(historico__icontains='tar')|Q(historico__icontains='créditto aut')|Q(historico__icontains='juro')).order_by('data_oper')
-            total = tars.aggregate(Sum('valor'))
+                if retorno:
+                    e1 = retorno[-1]
+                    retorno.append({'saldo':e1.saldo, 'data':e1.data_oper})
+                retorno.append(e)
+                mes = e.data_oper.month
+        if retorno:
+            e1 = retorno[-1]
+            retorno.append({'saldo':e1.saldo, 'data':e1.data_oper})
 
-            context = {'total':total['valor__sum'], 'ano':ano, 'tarifas':tars}
-            if mes > 0: context.update({'mes':mes})
-            if pdf:
-                return render_to_pdf('financeiro/tarifas.pdf', context, request=request, filename='tarifas_%s/%s.pdf' % (mes,ano))
-            else:
-                return render_to_response('financeiro/tarifas.html', context, context_instance=RequestContext(request))
+        if pdf:
+            return render_to_pdf_weasy('financeiro/contacorrente.pdf', {'ano':ano, 'extrato':retorno}, request=request, filename='extrato_cc_%s.pdf' % ano)
         else:
-            meses = range(0,13)
-            anos = range(1990,dtime.now().year+1)
-            anos.sort(reverse=True)
-            return render_to_response('financeiro/pagamentos_mes.html', {'anos':anos, 'meses':meses, 'view':'extrato_tarifas'}, context_instance=RequestContext(request))
+            return render_to_response('financeiro/contacorrente.html', {'ano':ano, 'extrato':retorno}, context_instance=RequestContext(request))
+    else:
+        anos = range(1990,dtime.now().year+1)
+        anos.sort(reverse=True)
+        return render_to_response('financeiro/sel_contacorrente.html', {'anos':anos}, context_instance=RequestContext(request))	    
 
-	    
+
+@login_required
+@require_safe
+def extrato_mes(request, pdf=False):
+    if request.GET.get('ano'):
+        ano = int(request.GET.get('ano'))
+        mes = int(request.GET.get('mes'))
+        retorno = []
+        sa = True
+        for e in ExtratoCC.objects.filter(data_oper__year=ano, data_oper__month=mes).order_by('data_oper', 'id'):
+            if sa:
+                sa = False
+                retorno.append(e.saldo_anterior)
+            retorno.append(e)
+        if retorno:
+            e1 = retorno[-1]
+            retorno.append(e1.saldo)
+
+        if pdf:
+            return render_to_pdf('financeiro/contacorrente_mes.pdf', {'ano':ano, 'mes':mes, 'extrato':retorno}, request=request, filename='extrato_cc_%s/%s.pdf' % (mes,ano))
+        else:
+            return render_to_response('financeiro/contacorrente_mes.html', {'ano':ano, 'mes':mes, 'extrato':retorno}, context_instance=RequestContext(request))
+    else:
+        meses = range(1,13)
+        anos = range(1990,dtime.now().year+1)
+        anos.sort(reverse=True)
+        return render_to_response('financeiro/sel_contacorrente_mes.html', {'anos':anos, 'meses':meses}, context_instance=RequestContext(request))	    
+
+@login_required
+@require_safe
+def extrato_financeiro(request, ano=dtime.now().year, pdf=False):
+    if request.GET.get('termo'):
+        # paramentro para filtrar as Reservas Tecnicas
+        rt = bool(request.GET.get('rt'))
+        if rt:
+            codigo = 'RP'
+        else:
+            codigo = 'MP'
+        
+        termo_id = int(request.GET.get('termo'))
+        termo = get_object_or_404(Termo, id=termo_id)
+        mes = int(request.GET.get('mes'))
+        if mes:
+            efs = ExtratoFinanceiro.objects.filter(termo=termo, data_libera__month=mes, cod__endswith=codigo)
+        else:
+            efs = ExtratoFinanceiro.objects.filter(termo=termo, cod__endswith=codigo)
+        extrato = []
+        for ef in efs.order_by('data_libera'):
+            ex = {'data':ef.data_libera, 'cod':ef.cod, 'historico':ef.historico, 'valor':ef.valor, 'comprovante':ef.comprovante, 'cheques':[]}
+            total = Decimal('0.0')
+            for c in ef.extratocc_set.all():
+                valor = c.pagamento_set.aggregate(Sum('valor_fapesp'))
+                total += valor['valor_fapesp__sum'] or Decimal('0.0')
+                parciais = []
+                for p in c.pagamento_set.all():
+                    for a in p.auditoria_set.all():
+                        if not a.parcial in parciais:
+                            parciais.append(a.parcial)
+
+                ch = {'id':c.id, 'valor':c.valor, 'cod': c.cod_oper, 'parciais':', '.join([str(p) for p in parciais])}
+                ex['cheques'].append(ch)
+            ex['diferenca'] = ef.valor+total
+            extrato.append(ex)
+
+        if pdf:
+            return render_to_pdf('financeiro/financeiro.pdf', {'ano':ano, 'extrato':extrato}, request=request, filename='financeiro_%s/%s.pdf' % (mes,ano))
+        else:
+            return render_to_response('financeiro/financeiro.html', {'termo':termo, 'mes':mes, 'ano':ano, 'extrato':extrato}, context_instance=RequestContext(request))
+    else:
+        meses = range(0,13)
+        return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all(), 'meses':meses, 'view':'extrato_financeiro', 'rt':False }, context_instance=RequestContext(request))
+
+@login_required
+@require_safe
+def extrato_tarifas(request, pdf=False):
+    if request.GET.get('ano'):
+        ano = int(request.GET.get('ano'))
+        mes = int(request.GET.get('mes'))
+        if mes == 0:
+            tars = ExtratoCC.objects.filter(Q(data_oper__year=ano), Q(historico__icontains='tar')|Q(historico__icontains='crédito aut')|Q(historico__icontains='juro')).order_by('data_oper')
+        else:
+            tars = ExtratoCC.objects.filter(Q(data_oper__month=mes), Q(data_oper__year=ano), Q(historico__icontains='tar')|Q(historico__icontains='créditto aut')|Q(historico__icontains='juro')).order_by('data_oper')
+        total = tars.aggregate(Sum('valor'))
+
+        context = {'total':total['valor__sum'], 'ano':ano, 'tarifas':tars}
+        if mes > 0: context.update({'mes':mes})
+        if pdf:
+            return render_to_pdf('financeiro/tarifas.pdf', context, request=request, filename='tarifas_%s/%s.pdf' % (mes,ano))
+        else:
+            return render_to_response('financeiro/tarifas.html', context, context_instance=RequestContext(request))
+    else:
+        meses = range(0,13)
+        anos = range(1990,dtime.now().year+1)
+        anos.sort(reverse=True)
+        return render_to_response('financeiro/pagamentos_mes.html', {'anos':anos, 'meses':meses, 'view':'extrato_tarifas'}, context_instance=RequestContext(request))
+
 
 @login_required
 def cheque(request, cc=1):
@@ -549,193 +554,193 @@ def cheque(request, cc=1):
 
 @login_required
 def financeiro_parciais(request, pdf=False):
-    if request.method in ['GET', 'HEAD']:
-        if request.GET.get('termo'):
-            termo_id = int(request.GET.get('termo'))
-            # paramentro para filtrar as Reservas Tecnicas
-            rt = bool(request.GET.get('rt'))
-            if rt:
-                codigo = 'RP'
-            else:
-                codigo = 'MP'
-            termo = get_object_or_404(Termo, id=termo_id)
-            retorno = []
-            parciais = ExtratoFinanceiro.objects.filter(termo=termo, cod__endswith=codigo).distinct('parcial').values_list('parcial', flat=True).order_by('parcial')
-            totais = {}
-
-            for parcial in parciais:
-                extrato = []
-                
-                liberado = Decimal('0.0')
-                devolvido = Decimal('0.0')
-                estornado = Decimal('0.0')
-                disponibilizado = Decimal('0.0')
-                pagamentos = Decimal('0.0')
-                
-                concedido = Decimal('0.0')
-                suplementado = Decimal('0.0')
-                anulado = Decimal('0.0')
-                cancelado = Decimal('0.0')
-                
-                liberacoes = ExtratoFinanceiro.objects.filter(termo=termo, cod__endswith=codigo, parcial=parcial).values('cod').annotate(Sum('valor')).order_by()
-                
-                for t in liberacoes:
-                    if t['cod'] == 'PGMP' or t['cod'] == 'PGRP': liberado = t['valor__sum'] or Decimal('0.0')
-                    elif t['cod'] == 'DVMP' or t['cod'] == 'DVRP': devolvido= t['valor__sum'] or Decimal('0.0')
-                    elif t['cod'] == 'COMP' or t['cod'] == 'CORP': concedido= t['valor__sum'] or Decimal('0.0')
-                    elif t['cod'] == 'SUMP' or t['cod'] == 'SURP': suplementado= t['valor__sum'] or Decimal('0.0')
-                    elif t['cod'] == 'ANMP' or t['cod'] == 'ANRP': anulado= t['valor__sum'] or Decimal('0.0')
-                    elif t['cod'] == 'ESMP' or t['cod'] == 'ESRP': estornado= t['valor__sum'] or Decimal('0.0')
-                    elif t['cod'] == 'CAMP' or t['cod'] == 'CARP': cancelado= t['valor__sum'] or Decimal('0.0')
-                    
-                disponibilizado = - liberado.copy_abs() + devolvido.copy_abs() + estornado.copy_abs()
-                
-                concessoes = concedido.copy_abs() + suplementado.copy_abs() - anulado.copy_abs() - cancelado.copy_abs()
-                
-                somatoria_diferenca = Decimal('0.0')
-                anterior = date(1971,1,1)
-                tdia = Decimal('0.0')
-                exi = {}
-                for ef in ExtratoFinanceiro.objects.filter(termo=termo, cod__endswith=codigo, parcial=parcial).prefetch_related('extratocc_set').order_by('data_libera', '-historico'):
-                    if ef.data_libera > anterior:
-                        ex = {'data':ef.data_libera}
-                        anterior = ef.data_libera
-                        if exi:
-                            exi.update({'valor_data':tdia})
-                        exi = ex
-                        tdia = ef.valor
-                    else:
-                        ex = {'data':''}
-                        if ef.cod == 'PGMP':
-                            tdia += ef.valor
-                        else:
-                            ex = {'data':ef.data_libera}
-                    ex.update({'cod':ef.cod, 'historico':ef.historico, 'valor':ef.valor, 'comprovante':ef.comprovante, 'cheques':[]})
-                    total = Decimal('0.0')
-                    tcheques = Decimal('0.0')
-                    for c in ef.extratocc_set.all():
-                        v_fapesp = Decimal('0.0')
-                        #total += c.valor
-                        tcheques += c.valor
-                        mods = {}
-                        for p in c.pagamento_set.all().prefetch_related('auditoria_set') \
-                            .select_related('origem_fapesp', 'origem_fapesp__item_outorga__natureza_gasto__modalidade') \
-                            .only('origem_fapesp_id', 'valor_fapesp', 'origem_fapesp__item_outorga__natureza_gasto__modalidade__sigla', 'conta_corrente'):
-                            
-                            if not p.origem_fapesp_id: continue
-                            
-                            v_fapesp += p.valor_fapesp
-                            modalidade = p.origem_fapesp.item_outorga.natureza_gasto.modalidade.sigla
-                            if modalidade not in mods.keys():
-                                mods[modalidade] = {}
-                            for a in p.auditoria_set.all():
-                                if not a.parcial in mods[modalidade].keys():
-                                    mods[modalidade][a.parcial] = []
-                                if not a.pagina in mods[modalidade][a.parcial]:
-                                    mods[modalidade][a.parcial].append(a.pagina)
-                        total -= v_fapesp
-                        parc = ''
-                        for modalidade in mods.keys():
-                            parc += '%s [parcial ' % modalidade
-                            pags = []
-                            if len(mods[modalidade].keys()) > 0:
-                                for p in mods[modalidade].keys():
-                                    pags= mods[modalidade][p]
-                                    pags.sort()
-                            parc += '%s (%s)' % (p, ','.join([str(k) for k in pags]))
-                            parc += ']       '
-                            
-                        ch = {'id':c.id, 'valor':c.valor, 'cod': c.cod_oper, 'parciais':parc, 'obs':c.obs}
-
-                        if v_fapesp != c.valor:
-                            ch.update({'v_fapesp':v_fapesp})
-                        ex['cheques'].append(ch)
-                    if ef.cod == 'PGMP' or ef.cod == 'DVMP' or ef.cod == 'ESMP' or \
-                       ef.cod == 'PGRP' or ef.cod == 'DVRP' or ef.cod == 'ESRP':
-                        
-                        ex['diferenca'] = ef.valor-total
-                        somatoria_diferenca += ex['diferenca']
-                    if total > ef.valor: 
-                        ex['cor'] = 'red'
-                    else: 
-                        ex['cor'] = 'blue'
-                    if tcheques != ef.valor and ef.cod == 'PGMP':
-                        ex['patrocinio'] = tcheques - ef.valor
-                        
-                    pagamentos += total
-                    extrato.append(ex)
-                if exi: 
-                    exi.update({'valor_data':tdia})
-                
-                
-                # OBS: os valores de 'liberado' e 'pagamentos' estão com o sinal negativo 
-                total_processo = - liberado.copy_abs() + devolvido.copy_abs() + estornado.copy_abs() + pagamentos.copy_abs()
-                
-                retorno.append({'parcial':str(parcial), 'extrato':extrato, 'liberado':liberado, 
-                                'devolvido':devolvido, 'disponibilizado':disponibilizado,
-                                'pagamentos': -pagamentos,
-                                'somatoria_diferenca':somatoria_diferenca,  'concedido':concedido, 
-                                'suplementado':suplementado, 'anulado':anulado, 
-                                'cancelado':cancelado, 'concessoes':concessoes, 
-                                'estornado':estornado, 'total_processo':total_processo})
-                
-                total_liberado = 0
-                total_devolvido = 0
-                total_estornado = 0
-                total_disponibilizado = 0
-                total_pagamentos = 0
-                total_somatoria_diferenca = 0
-                
-                total_concedido = 0
-                total_suplementado = 0
-                total_anulado = 0
-                total_cancelado = 0
-                total_concessoes = 0
-                
-                for r in retorno:
-                    total_liberado += r['liberado']
-                    total_devolvido += r['devolvido']
-                    total_estornado += r['estornado']
-                    total_disponibilizado += r['disponibilizado']
-                    total_pagamentos += r['pagamentos']
-                    
-                    total_somatoria_diferenca += r['somatoria_diferenca']
-                    
-                    total_concedido += r['concedido']
-                    total_suplementado += r['suplementado']
-                    total_anulado += r['anulado']
-                    total_cancelado += r['cancelado']
-                    total_concessoes += r['concessoes']
-                total_processo = - total_liberado.copy_abs() + total_devolvido.copy_abs() + total_estornado.copy_abs() + total_pagamentos.copy_abs()
-
-                totais={'total_liberado':total_liberado, 'total_devolvido':total_devolvido,
-                          'total_estornado':total_estornado, 'total_pagamentos':total_pagamentos,
-                          'total_disponibilizado':total_disponibilizado, 'total_somatoria_diferenca':total_somatoria_diferenca,
-                          'total_concedido':total_concedido, 'total_suplementado':total_suplementado,
-                          'total_anulado':total_anulado, 'total_cancelado':total_cancelado,
-                          'total_concessoes':total_concessoes, 
-                          'total_processo':total_processo
-                          }
-            
-            if pdf:
-                return render_to_pdf_weasy('financeiro/financeiro_parcial.pdf', {'size':pdf, 'termo':termo, 'parciais':retorno, 'totais':totais}, request=request, filename='financeiro_parciais_%s_%s.pdf' % (termo.ano, termo.processo))
-            else:
-                return render_to_response('financeiro/financeiro_parcial.html', {'termo':termo, 'parciais':retorno, 'totais':totais}, context_instance=RequestContext(request))
+    if request.GET.get('termo'):
+        termo_id = int(request.GET.get('termo'))
+        # paramentro para filtrar as Reservas Tecnicas
+        rt = bool(request.GET.get('rt'))
+        if rt:
+            codigo = 'RP'
         else:
-            return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all(), 'rt':False, 'view':'financeiro_parciais'}, context_instance=RequestContext(request))
+            codigo = 'MP'
+        termo = get_object_or_404(Termo, id=termo_id)
+        retorno = []
+        parciais = ExtratoFinanceiro.objects.filter(termo=termo, cod__endswith=codigo).distinct('parcial').values_list('parcial', flat=True).order_by('parcial')
+        totais = {}
+
+        for parcial in parciais:
+            extrato = []
+            
+            liberado = Decimal('0.0')
+            devolvido = Decimal('0.0')
+            estornado = Decimal('0.0')
+            disponibilizado = Decimal('0.0')
+            pagamentos = Decimal('0.0')
+            
+            concedido = Decimal('0.0')
+            suplementado = Decimal('0.0')
+            anulado = Decimal('0.0')
+            cancelado = Decimal('0.0')
+            
+            liberacoes = ExtratoFinanceiro.objects.filter(termo=termo, cod__endswith=codigo, parcial=parcial).values('cod').annotate(Sum('valor')).order_by()
+            
+            for t in liberacoes:
+                if t['cod'] == 'PGMP' or t['cod'] == 'PGRP': liberado = t['valor__sum'] or Decimal('0.0')
+                elif t['cod'] == 'DVMP' or t['cod'] == 'DVRP': devolvido= t['valor__sum'] or Decimal('0.0')
+                elif t['cod'] == 'COMP' or t['cod'] == 'CORP': concedido= t['valor__sum'] or Decimal('0.0')
+                elif t['cod'] == 'SUMP' or t['cod'] == 'SURP': suplementado= t['valor__sum'] or Decimal('0.0')
+                elif t['cod'] == 'ANMP' or t['cod'] == 'ANRP': anulado= t['valor__sum'] or Decimal('0.0')
+                elif t['cod'] == 'ESMP' or t['cod'] == 'ESRP': estornado= t['valor__sum'] or Decimal('0.0')
+                elif t['cod'] == 'CAMP' or t['cod'] == 'CARP': cancelado= t['valor__sum'] or Decimal('0.0')
+                
+            disponibilizado = - liberado.copy_abs() + devolvido.copy_abs() + estornado.copy_abs()
+            
+            concessoes = concedido.copy_abs() + suplementado.copy_abs() - anulado.copy_abs() - cancelado.copy_abs()
+            
+            somatoria_diferenca = Decimal('0.0')
+            anterior = date(1971,1,1)
+            tdia = Decimal('0.0')
+            exi = {}
+            for ef in ExtratoFinanceiro.objects.filter(termo=termo, cod__endswith=codigo, parcial=parcial).prefetch_related('extratocc_set').order_by('data_libera', '-historico'):
+                if ef.data_libera > anterior:
+                    ex = {'data':ef.data_libera}
+                    anterior = ef.data_libera
+                    if exi:
+                        exi.update({'valor_data':tdia})
+                    exi = ex
+                    tdia = ef.valor
+                else:
+                    ex = {'data':''}
+                    if ef.cod == 'PGMP':
+                        tdia += ef.valor
+                    else:
+                        ex = {'data':ef.data_libera}
+                ex.update({'cod':ef.cod, 'historico':ef.historico, 'valor':ef.valor, 'comprovante':ef.comprovante, 'cheques':[]})
+                total = Decimal('0.0')
+                tcheques = Decimal('0.0')
+                for c in ef.extratocc_set.all():
+                    v_fapesp = Decimal('0.0')
+                    #total += c.valor
+                    tcheques += c.valor
+                    mods = {}
+                    for p in c.pagamento_set.all().prefetch_related('auditoria_set') \
+                        .select_related('origem_fapesp', 'origem_fapesp__item_outorga__natureza_gasto__modalidade') \
+                        .only('origem_fapesp_id', 'valor_fapesp', 'origem_fapesp__item_outorga__natureza_gasto__modalidade__sigla', 'conta_corrente'):
+                        
+                        if not p.origem_fapesp_id: continue
+                        
+                        v_fapesp += p.valor_fapesp
+                        modalidade = p.origem_fapesp.item_outorga.natureza_gasto.modalidade.sigla
+                        if modalidade not in mods.keys():
+                            mods[modalidade] = {}
+                        for a in p.auditoria_set.all():
+                            if not a.parcial in mods[modalidade].keys():
+                                mods[modalidade][a.parcial] = []
+                            if not a.pagina in mods[modalidade][a.parcial]:
+                                mods[modalidade][a.parcial].append(a.pagina)
+                    total -= v_fapesp
+                    parc = ''
+                    for modalidade in mods.keys():
+                        parc += '%s [parcial ' % modalidade
+                        pags = []
+                        if len(mods[modalidade].keys()) > 0:
+                            for p in mods[modalidade].keys():
+                                pags= mods[modalidade][p]
+                                pags.sort()
+                        parc += '%s (%s)' % (p, ','.join([str(k) for k in pags]))
+                        parc += ']       '
+                        
+                    ch = {'id':c.id, 'valor':c.valor, 'cod': c.cod_oper, 'parciais':parc, 'obs':c.obs}
+
+                    if v_fapesp != c.valor:
+                        ch.update({'v_fapesp':v_fapesp})
+                    ex['cheques'].append(ch)
+                if ef.cod == 'PGMP' or ef.cod == 'DVMP' or ef.cod == 'ESMP' or \
+                   ef.cod == 'PGRP' or ef.cod == 'DVRP' or ef.cod == 'ESRP':
+                    
+                    ex['diferenca'] = ef.valor-total
+                    somatoria_diferenca += ex['diferenca']
+                if total > ef.valor: 
+                    ex['cor'] = 'red'
+                else: 
+                    ex['cor'] = 'blue'
+                if tcheques != ef.valor and ef.cod == 'PGMP':
+                    ex['patrocinio'] = tcheques - ef.valor
+                    
+                pagamentos += total
+                extrato.append(ex)
+            if exi: 
+                exi.update({'valor_data':tdia})
+            
+            
+            # OBS: os valores de 'liberado' e 'pagamentos' estão com o sinal negativo 
+            total_processo = - liberado.copy_abs() + devolvido.copy_abs() + estornado.copy_abs() + pagamentos.copy_abs()
+            
+            retorno.append({'parcial':str(parcial), 'extrato':extrato, 'liberado':liberado, 
+                            'devolvido':devolvido, 'disponibilizado':disponibilizado,
+                            'pagamentos': -pagamentos,
+                            'somatoria_diferenca':somatoria_diferenca,  'concedido':concedido, 
+                            'suplementado':suplementado, 'anulado':anulado, 
+                            'cancelado':cancelado, 'concessoes':concessoes, 
+                            'estornado':estornado, 'total_processo':total_processo})
+            
+            total_liberado = 0
+            total_devolvido = 0
+            total_estornado = 0
+            total_disponibilizado = 0
+            total_pagamentos = 0
+            total_somatoria_diferenca = 0
+            
+            total_concedido = 0
+            total_suplementado = 0
+            total_anulado = 0
+            total_cancelado = 0
+            total_concessoes = 0
+            
+            for r in retorno:
+                total_liberado += r['liberado']
+                total_devolvido += r['devolvido']
+                total_estornado += r['estornado']
+                total_disponibilizado += r['disponibilizado']
+                total_pagamentos += r['pagamentos']
+                
+                total_somatoria_diferenca += r['somatoria_diferenca']
+                
+                total_concedido += r['concedido']
+                total_suplementado += r['suplementado']
+                total_anulado += r['anulado']
+                total_cancelado += r['cancelado']
+                total_concessoes += r['concessoes']
+            total_processo = - total_liberado.copy_abs() + total_devolvido.copy_abs() + total_estornado.copy_abs() + total_pagamentos.copy_abs()
+
+            totais={'total_liberado':total_liberado, 'total_devolvido':total_devolvido,
+                      'total_estornado':total_estornado, 'total_pagamentos':total_pagamentos,
+                      'total_disponibilizado':total_disponibilizado, 'total_somatoria_diferenca':total_somatoria_diferenca,
+                      'total_concedido':total_concedido, 'total_suplementado':total_suplementado,
+                      'total_anulado':total_anulado, 'total_cancelado':total_cancelado,
+                      'total_concessoes':total_concessoes, 
+                      'total_processo':total_processo
+                      }
+        
+        if pdf:
+            return render_to_pdf_weasy('financeiro/financeiro_parcial.pdf', {'size':pdf, 'termo':termo, 'parciais':retorno, 'totais':totais}, request=request, filename='financeiro_parciais_%s_%s.pdf' % (termo.ano, termo.processo))
+        else:
+            return render_to_response('financeiro/financeiro_parcial.html', {'termo':termo, 'parciais':retorno, 'totais':totais}, context_instance=RequestContext(request))
+    else:
+        return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all(), 'rt':False, 'view':'financeiro_parciais'}, context_instance=RequestContext(request))
+
 
 @login_required
+@require_safe
 def parciais(request, caixa=False, pdf=False):
-    if request.method in ['GET', 'HEAD']:
-        if request.GET.get('termo'):
-            termo_id = int(request.GET.get('termo'))
-            termo = get_object_or_404(Termo, id=termo_id)
-            retorno = []
+    if request.GET.get('termo'):
+        termo_id = int(request.GET.get('termo'))
+        termo = get_object_or_404(Termo, id=termo_id)
+        retorno = []
 
-            for parcial in Auditoria.objects.filter(pagamento__protocolo__termo=termo).values_list('parcial', flat=True).distinct():
-                parcs = {'parcial':parcial}
-                ads = Auditoria.objects.filter(parcial=parcial, pagamento__protocolo__termo=termo) 
-    
+        for parcial in Auditoria.objects.filter(pagamento__protocolo__termo=termo).values_list('parcial', flat=True).distinct():
+            parcs = {'parcial':parcial}
+            ads = Auditoria.objects.filter(parcial=parcial, pagamento__protocolo__termo=termo) 
+
 #                 pgs = []
 #                 for a in ads:
 #                     if caixa:
@@ -745,95 +750,96 @@ def parciais(request, caixa=False, pdf=False):
 #                             if a.pagamento not in pgs:
 #                                 pgs.append(a.pagamento)
 
-                ch = ExtratoCC.objects.filter(extrato_financeiro__parcial=parcial, extrato_financeiro__termo=termo)
-                if caixa: ch = ch.filter(despesa_caixa=True)
+            ch = ExtratoCC.objects.filter(extrato_financeiro__parcial=parcial, extrato_financeiro__termo=termo)
+            if caixa: ch = ch.filter(despesa_caixa=True)
 
-        #for p in pgs:
-        #    if p.conta_corrente and p.conta_corrente not in ch:
-    #        ch.append(p.conta_corrente)
-            
-            
-                ret = []
-                total_diff = Decimal('0.0')
-                for ecc in ch:
-                    pagos = ecc.pagamento_set.aggregate(Sum('valor_fapesp'))
-                    pago = pagos['valor_fapesp__sum'] or Decimal('0.0')
-                    pagos = ecc.pagamento_set.aggregate(Sum('valor_patrocinio'))
-                    #pago = pago + (pagos['valor_patrocinio__sum'] or Decimal('0.0'))
-                    diff = ecc.valor+pago
-                    total_diff += diff
-                    este = {'cheque':ecc, 'diff':-diff}
-                    pgtos = []
-                    for p in ecc.pagamento_set.all().select_related('protocolo', 'origem_fapesp__item_outorga__natureza_gasto', 'origem_fapesp__item_outorga__natureza_gasto__modalidade', 'origem_fapesp__item_outorga__natureza_gasto__modalidade__sigla'):
-                        ok = True
-                        for a in p.auditoria_set.distinct('parcial'):
-                            if a.parcial != parcial:
-                                ok = False
-                                break
-                        pgtos.append({'pg':p, 'naparcial':ok})
-                    este.update({'pgtos':pgtos})
-                    
-                    ret.append(este)
-    
-                parcs.update({'dados':ret, 'diff':-total_diff})
-                retorno.append(parcs)
+    #for p in pgs:
+    #    if p.conta_corrente and p.conta_corrente not in ch:
+#        ch.append(p.conta_corrente)
+        
+        
+            ret = []
+            total_diff = Decimal('0.0')
+            for ecc in ch:
+                pagos = ecc.pagamento_set.aggregate(Sum('valor_fapesp'))
+                pago = pagos['valor_fapesp__sum'] or Decimal('0.0')
+                pagos = ecc.pagamento_set.aggregate(Sum('valor_patrocinio'))
+                #pago = pago + (pagos['valor_patrocinio__sum'] or Decimal('0.0'))
+                diff = ecc.valor+pago
+                total_diff += diff
+                este = {'cheque':ecc, 'diff':-diff}
+                pgtos = []
+                for p in ecc.pagamento_set.all().select_related('protocolo', 'origem_fapesp__item_outorga__natureza_gasto', 'origem_fapesp__item_outorga__natureza_gasto__modalidade', 'origem_fapesp__item_outorga__natureza_gasto__modalidade__sigla'):
+                    ok = True
+                    for a in p.auditoria_set.distinct('parcial'):
+                        if a.parcial != parcial:
+                            ok = False
+                            break
+                    pgtos.append({'pg':p, 'naparcial':ok})
+                este.update({'pgtos':pgtos})
+                
+                ret.append(este)
 
-            if pdf:
-                return render_to_pdf('financeiro/parciais.pdf', {'parciais':retorno, 'termo':termo}, request=request, filename='parciais.pdf')
-            else:
-                return render_to_response('financeiro/parciais.html', {'caixa':caixa, 'parciais':retorno, 'termo':termo}, context_instance=RequestContext(request))
+            parcs.update({'dados':ret, 'diff':-total_diff})
+            retorno.append(parcs)
+
+        if pdf:
+            return render_to_pdf('financeiro/parciais.pdf', {'parciais':retorno, 'termo':termo}, request=request, filename='parciais.pdf')
         else:
-            view = 'parciais'
-            if caixa:
-                view = 'caixa'
-            return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all(), 'caixa':caixa, 'view':view}, context_instance=RequestContext(request))
-
-def escolhe_extrato(request):
-    if request.method == 'POST':
-        termo_id = request.POST.get('termo')
-        termo = get_object_or_404(Termo, id=termo_id)
-
-        ef = ExtratoFinanceiro.objects.filter(termo=termo)
-        extratos = []
-        for e in ef:
-            extratos.append({'pk':e.id, 'valor':e.__unicode__()})
-    
-        json = simplejson.dumps(extratos)
-        return HttpResponse(json, content_type="application/json")
+            return render_to_response('financeiro/parciais.html', {'caixa':caixa, 'parciais':retorno, 'termo':termo}, context_instance=RequestContext(request))
     else:
-        return HttpResponseNotAllowed(permitted_methods=['POST',])
+        view = 'parciais'
+        if caixa:
+            view = 'caixa'
+        return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all(), 'caixa':caixa, 'view':view}, context_instance=RequestContext(request))
+
 
 @login_required
+@require_safe
+def ajax_escolhe_extrato(request):
+    termo_id = request.GET.get('termo')
+    termo = get_object_or_404(Termo, id=termo_id)
+
+    ef = ExtratoFinanceiro.objects.filter(termo=termo)
+    extratos = []
+    for e in ef:
+        extratos.append({'pk':e.id, 'valor':e.__unicode__()})
+
+    json = simplejson.dumps(extratos)
+    return HttpResponse(json, content_type="application/json")
+
+
+@login_required
+@require_safe
 def presta_contas(request, pdf=False):
-    if request.method in ['GET', 'HEAD']:
-        if request.GET.get('termo'):
-            termo_id = request.GET.get('termo')
-            termo = get_object_or_404(Termo, id=termo_id)
-            m = []
-            for ng in Natureza_gasto.objects.filter(termo=termo).select_related('modalidade'):
-                mod = {'modalidade':ng.modalidade.nome}
-                parcs = []
-                for p in Auditoria.objects.filter(pagamento__origem_fapesp__item_outorga__natureza_gasto=ng).values_list('parcial', flat=True).distinct():
-                    pgtos = []
-                    pag = None
-                    for a in Auditoria.objects.filter(pagamento__origem_fapesp__item_outorga__natureza_gasto=ng, parcial=p).order_by('pagina').select_related('pagamento', 'pagamento__protocolo', 'pagamento__origem_fapesp__item_outorga', 'pagamento__conta_corrente', 'pagamento__extrato_financeiro', 'pagamento__conta_corrente__extrato_financeiro__comprovante'):
-                        auditorias = []
-                        if a.pagamento != pag:
-                            pgtos.append({'pg':a.pagamento, 'pagina':a.pagina, 'auditorias':auditorias})
-                            pag = a.pagamento
-                        
-                            for auditoria in a.pagamento.auditoria_set.all().select_related('tipo', 'estado', 'arquivo'):
-                                auditorias.append({'auditoria':auditoria}) 
-                        
-                    parcs.append({'num':p, 'pgtos':pgtos})
-                mod.update({'parcial':parcs})
-                m.append(mod)
-            if pdf:
-               return render_to_pdf_weasy('financeiro/presta_contas.pdf', {'modalidades':m, 'termo':termo}, request=request, filename='presta_contas_%s.pdf' % termo.__unicode__())
-            else:
-               return render_to_response('financeiro/presta_contas.html', {'modalidades':m, 'termo':termo}, context_instance=RequestContext(request))
+    if request.GET.get('termo'):
+        termo_id = request.GET.get('termo')
+        termo = get_object_or_404(Termo, id=termo_id)
+        m = []
+        for ng in Natureza_gasto.objects.filter(termo=termo).select_related('modalidade'):
+            mod = {'modalidade':ng.modalidade.nome}
+            parcs = []
+            for p in Auditoria.objects.filter(pagamento__origem_fapesp__item_outorga__natureza_gasto=ng).values_list('parcial', flat=True).distinct():
+                pgtos = []
+                pag = None
+                for a in Auditoria.objects.filter(pagamento__origem_fapesp__item_outorga__natureza_gasto=ng, parcial=p).order_by('pagina').select_related('pagamento', 'pagamento__protocolo', 'pagamento__origem_fapesp__item_outorga', 'pagamento__conta_corrente', 'pagamento__extrato_financeiro', 'pagamento__conta_corrente__extrato_financeiro__comprovante'):
+                    auditorias = []
+                    if a.pagamento != pag:
+                        pgtos.append({'pg':a.pagamento, 'pagina':a.pagina, 'auditorias':auditorias})
+                        pag = a.pagamento
+                    
+                        for auditoria in a.pagamento.auditoria_set.all().select_related('tipo', 'estado', 'arquivo'):
+                            auditorias.append({'auditoria':auditoria}) 
+                    
+                parcs.append({'num':p, 'pgtos':pgtos})
+            mod.update({'parcial':parcs})
+            m.append(mod)
+        if pdf:
+           return render_to_pdf_weasy('financeiro/presta_contas.pdf', {'modalidades':m, 'termo':termo}, request=request, filename='presta_contas_%s.pdf' % termo.__unicode__())
         else:
-            return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all(), 'view':'presta_contas'}, context_instance=RequestContext(request))
+           return render_to_response('financeiro/presta_contas.html', {'modalidades':m, 'termo':termo}, context_instance=RequestContext(request))
+    else:
+        return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all(), 'view':'presta_contas'}, context_instance=RequestContext(request))
 
 
 @login_required
@@ -852,12 +858,15 @@ def tipos_documentos(context):
 
     return render_to_response('financeiro/tipos.html', {'protocolos':protocolos})
 
+
+@login_required
+@require_safe
 def ajax_get_recursos_vigentes(request):
     """
     AJAX para buscar os dados dos recursos.
     Recebe parametro para filtra por estado (ex: Vigente) ou buscar todos os registros
     """
-    estado = request.GET.get('estado') or request.POST.get('estado')
+    estado = request.GET.get('estado')
     retorno = []
     if estado and estado != '':
         recursos = PlanejaAquisicaoRecurso.objects.filter(os__estado__nome=estado).select_related('os', 'os__tipo', 'projeto', 'tipo', )
@@ -869,3 +878,5 @@ def ajax_get_recursos_vigentes(request):
     
     json = simplejson.dumps(retorno)
     return HttpResponse(json, content_type="application/json")
+
+

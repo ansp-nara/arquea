@@ -1,7 +1,7 @@
 from django.conf.urls import *
 
 urlpatterns = patterns('rede.views',
-    (r'escolhe_pagamento$', 'escolhe_pagamento'),
+    (r'escolhe_pagamento$', 'ajax_escolhe_pagamento'),
     (r'planejamento$', 'planejamento'),
     (r'planejamento2$', 'planejamento2'),
     (r'planejamento/(?P<pdf>\d)$', 'planejamento'),

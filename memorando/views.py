@@ -1,19 +1,21 @@
 # -*- coding: utf-8 -*-
 
-from django.shortcuts import get_object_or_404, render_to_response
-from financeiro.models import Pagamento
-from outorga.models import Termo
-import json as simplejson
-from django.http import Http404, HttpResponse
-from utils.functions import render_to_pdf
-from models import *
 from django.contrib.auth.decorators import permission_required, login_required
-from django.utils.html import strip_tags
+from django.http import Http404, HttpResponse
+from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
+from django.utils.html import strip_tags
+from django.views.decorators.http import require_safe, require_POST
+
 import os
+import json as simplejson
 import settings
 
-# Create your views here.
+from models import *
+from financeiro.models import Pagamento
+from outorga.models import Termo
+from utils.functions import render_to_pdf
+
 
 @login_required
 def simples(request, mem):
@@ -21,48 +23,50 @@ def simples(request, mem):
 
     return render_to_pdf('memorando/simples.pdf', {'m':m, 't':Termo.termo_ativo()}, filename='memorando_%s.pdf' % m.__unicode__())
 
-@login_required
-def escolhe_pagamentos(request):
-
-    if request.method == 'POST':
-        termo_id = request.POST.get('termo')
-        termo = get_object_or_404(Termo, pk=termo_id)
-
-	pagamentos = []
-
-        for p in Pagamento.objects.filter(protocolo__termo=termo).order_by('protocolo__num_documento'):
-            a = p.auditoria_set.all()
-            if a.count():
-                a = a[0]
-                valor = u'%s - %s, parcial %s, página %s' % (p.protocolo.num_documento, p.valor_fapesp, a.parcial, a.pagina)
-            else:
-                valor = u'%s %s' % (p.protocolo.num_documento, p.valor_fapesp)
-
-	    pagamentos.append({'pk':p.id, 'valor':valor})
-
-        json = simplejson.dumps(pagamentos)
-
-        return HttpResponse(json, content_type="application/json")
 
 @login_required
-def escolhe_pergunta(request):
-    if request.method == 'POST':
-        pergunta_id = request.POST.get('pergunta')
-        pergunta = get_object_or_404(Pergunta, pk=pergunta_id)
-        json = simplejson.dumps(pergunta.questao)
-        return HttpResponse(json, content_type="application/json")
+@require_safe
+def ajax_escolhe_pagamentos(request):
+    termo_id = request.GET.get('termo')
+    termo = get_object_or_404(Termo, pk=termo_id)
+
+    pagamentos = []
+
+    for p in Pagamento.objects.filter(protocolo__termo=termo).order_by('protocolo__num_documento'):
+        a = p.auditoria_set.all()
+        if a.count():
+            a = a[0]
+            valor = u'%s - %s, parcial %s, página %s' % (p.protocolo.num_documento, p.valor_fapesp, a.parcial, a.pagina)
+        else:
+            valor = u'%s %s' % (p.protocolo.num_documento, p.valor_fapesp)
+
+            pagamentos.append({'pk':p.id, 'valor':valor})
+
+    json = simplejson.dumps(pagamentos)
+    return HttpResponse(json, content_type="application/json")
+
 
 @login_required
-def filtra_perguntas(request):
-    if request.method == 'POST':
-        memorando_id = request.POST.get('memorando')
-        memorando = get_object_or_404(MemorandoFAPESP, pk=memorando_id)
-        
-        perguntas = [{'pk':'', 'valor':'-----------'}]
-        for p in memorando.pergunta_set.all():
-            perguntas.append({'pk':p.id, 'valor':p.__unicode__()})
+@require_safe
+def ajax_escolhe_pergunta(request):
+    pergunta_id = request.GET.get('pergunta')
+    pergunta = get_object_or_404(Pergunta, pk=pergunta_id)
+    json = simplejson.dumps(pergunta.questao)
+    return HttpResponse(json, content_type="application/json")
 
-        return HttpResponse(simplejson.dumps(perguntas), content_type="application/json")
+
+@login_required
+@require_safe
+def ajax_filtra_perguntas(request):
+    memorando_id = request.GET.get('memorando')
+    memorando = get_object_or_404(MemorandoFAPESP, pk=memorando_id)
+    
+    perguntas = [{'pk':'', 'valor':'-----------'}]
+    for p in memorando.pergunta_set.all():
+        perguntas.append({'pk':p.id, 'valor':p.__unicode__()})
+
+    return HttpResponse(simplejson.dumps(perguntas), content_type="application/json")
+
 
 @login_required
 def fapesp(request, mem):
@@ -93,7 +97,6 @@ def fapesp(request, mem):
             corpos.append({'numero':c.pergunta.numero, 'pergunta':c.pergunta.questao, 'respostas':[c.resposta]})
 
     return render_to_pdf('memorando/fapesp.pdf', {'m':m, 'corpos':corpos}, filename='memorando_%s.pdf' % m.data.strftime('%d_%m_%Y'), attachments=anexos)
-
 
 
 @login_required

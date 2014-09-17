@@ -1,25 +1,26 @@
 # -*- coding: utf-8 -*-
 
-# Create your views here.
-
-from datetime import date, timedelta, datetime
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
+from django.db.models import Max, Min
 from django.http import HttpResponseRedirect, Http404, HttpResponseForbidden, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
-from django.db.models import Max, Min
-from forms import *
-from models import *
-from protocolo.models import Feriado
-from utils.functions import render_to_pdf
+from django.views.decorators.http import require_safe, require_POST
+
+from datetime import date, timedelta, datetime
 import calendar
 import logging
 import json as simplejson
 
+from forms import *
+from models import *
+from protocolo.models import Feriado
+from utils.functions import render_to_pdf
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
+
 
 def ferias(context):
     now = datetime.now()
@@ -50,24 +51,22 @@ def ferias(context):
     return render_to_pdf('membro/ferias.pdf', {'funcionarios':funcionarios, 'ano':now.year+1})
 
 @login_required
+@require_POST
 def controle(request):
     user = request.user
     membro = get_object_or_404(Membro, contato__email=user.email)
 
-    if request.method == 'POST':
-        acao = request.POST.get('acao')
-        if acao == u'entrada':
-            controle = Controle()
-            controle.membro = membro
-            controle.entrada = datetime.now()
-        else:
-            controle = membro.controle_set.all()[0]
-            controle.saida = datetime.now()
-        controle.save()
-        messages.info(request, u'Sua %s foi registrada com sucesso.' % acao)
-        return HttpResponseRedirect(reverse('membro.views.observacao', kwargs={'id':controle.id}))
-
-    raise Http404
+    acao = request.POST.get('acao')
+    if acao == u'entrada':
+        controle = Controle()
+        controle.membro = membro
+        controle.entrada = datetime.now()
+    else:
+        controle = membro.controle_set.all()[0]
+        controle.saida = datetime.now()
+    controle.save()
+    messages.info(request, u'Sua %s foi registrada com sucesso.' % acao)
+    return HttpResponseRedirect(reverse('membro.views.observacao', kwargs={'id':controle.id}))
 
 
 @login_required
@@ -88,12 +87,14 @@ def mensal(request, ano=2012, mes=7):
 
     return TemplateResponse(request, 'membro/mensal.html', {'dados':dados, 'dias':dias, 'ano':ano, 'mes':mes})
 
+
 @login_required
 def detalhes(request):
     membro = get_object_or_404(Membro, contato__email=request.user.email)
     agora = datetime.now()
 
     return TemplateResponse(request, 'membro/detalhes.html', {'membro':membro, 'dados':Controle.objects.filter(membro=membro, entrada__month=agora.month)})
+
 
 @login_required
 def mensal_func(request):
@@ -165,7 +166,6 @@ def mensal_func(request):
             else:
                 total_banco_horas_str = '-%2dh %02dmin' % (-m['total_banco_horas']/3600, -m['total_banco_horas']/60%60)
             m.update({'total_banco_horas':total_banco_horas_str})
-            
         
         if total_horas_restante >= 0:
              total_horas_restante_str = '%2dh %02dmin' % (total_horas_restante/3600, total_horas_restante/60%60)
@@ -176,7 +176,6 @@ def mensal_func(request):
              total_banco_horas_str = '%2dh %02dmin' % (total_banco_horas/3600, total_banco_horas/60%60)
         else:
              total_banco_horas_str = '-%2dh %02dmin' % (-total_banco_horas/3600, -total_banco_horas/60%60)
-        
         
         total_horas_str = '%2dh %02dmin' % (total_horas/3600, total_horas/60%60)
         total_horas_periodo_str = '%2dh %02dmin' % (total_horas_periodo/3600, total_horas_periodo/60%60)
@@ -208,6 +207,7 @@ def mensal_func(request):
 
         return TemplateResponse(request, 'membro/sel_func.html', {'anos':anos, 'meses':meses, 'funcionarios':retorno})
 
+
 @login_required
 def observacao(request, id):
     controle = get_object_or_404(Controle, pk=id)
@@ -227,7 +227,8 @@ def observacao(request, id):
 
 
 @login_required
-def controle_mudar_almoco(request):
+@require_safe
+def ajax_controle_mudar_almoco(request):
     controle_id = request.GET.get('id')
     almoco = request.GET.get('almoco')
     
@@ -245,7 +246,8 @@ def controle_mudar_almoco(request):
 
 
 @login_required
-def controle_avancar_bloco(request):
+@require_safe
+def ajax_controle_avancar_bloco(request):
     controle_id = request.GET.get('id')
     tempo = request.GET.get('tempo')
     
@@ -263,7 +265,8 @@ def controle_avancar_bloco(request):
 
 
 @login_required
-def controle_voltar_bloco(request):
+@require_safe
+def ajax_controle_voltar_bloco(request):
     controle_id = request.GET.get('id')
     tempo = request.GET.get('tempo')
     
@@ -281,7 +284,8 @@ def controle_voltar_bloco(request):
 
 
 @login_required
-def controle_adicionar_tempo_final(request):
+@require_safe
+def ajax_controle_adicionar_tempo_final(request):
     controle_id = request.GET.get('id')
     tempo = request.GET.get('tempo')
     
@@ -296,8 +300,9 @@ def controle_adicionar_tempo_final(request):
     json = simplejson.dumps('ok')
     return HttpResponse(json, content_type="application/json")
 
+
 @login_required
-def controle_adicionar_tempo_inicial(request):
+def ajax_controle_adicionar_tempo_inicial(request):
     controle_id = request.GET.get('id')
     tempo = request.GET.get('tempo')
     
