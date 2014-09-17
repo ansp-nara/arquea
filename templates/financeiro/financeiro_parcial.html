@@ -67,7 +67,7 @@
 </style>
 
 <div id="report_toolbar">
-    <form action="{% url 'financeiro.views.financeiro_parciais' 3 %}" method="GET" id="id_form_recurso">
+    <form action="{% url 'financeiro.views.financeiro_parciais' '3' %}" method="GET" id="id_form_recurso">
         <input type="hidden" name="termo" value="{{ termo.id }}" />
         <input type="hidden" name="rt" value="{{ request.GET.rt }}" />
         <div title="Imprimir" class="btn_print">
@@ -75,7 +75,7 @@
         </div>
         <span>Imprimir em A3</span>
     </form>
-    <form action="{% url 'financeiro.views.financeiro_parciais' 4 %}" method="GET" id="id_form_recurso">
+    <form action="{% url 'financeiro.views.financeiro_parciais' '4' %}" method="GET" id="id_form_recurso">
         <input type="hidden" name="termo" value="{{ termo.id }}" />
         <input type="hidden" name="rt" value="{{ request.GET.rt }}" />
         <div title="Imprimir" class="btn_print">
