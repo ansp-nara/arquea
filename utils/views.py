@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-# Create your views here.
 from django.contrib.admin.models import LogEntry
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import permission_required, login_required
 from django.conf import settings
 from django.http import HttpResponse, Http404
 from django.template.response import TemplateResponse
+
 import os
 import datetime
 import logging

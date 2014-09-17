@@ -723,7 +723,7 @@ function ajax_select_endereco(id_field)
        e_id = "#id_historicolocal_set-"+partes[1]+"-endereco";
        $(e_id).html('<option value="">Carregando...</option>');
        $.ajax({
-       	   type: "POST",
+       	   type: "GET",
 	   url: "/patrimonio/escolhe_entidade",
 	   dataType: "json",
 	   data: {'entidade':entidade},
@@ -768,7 +768,7 @@ function ajax_select_endereco2()
 function ajax_patrimonio_existente(pn)
 {
        $.ajax({
-           type: "POST",
+           type: "GET",
 	   url: "/patrimonio/patrimonio_existente",
 	   dataType: "json",
 	   data: {'part_number':pn},
@@ -840,7 +840,7 @@ function ajax_filter_nivel(nivel, ed_id) {
      $("#id_detalhe_"+nivel).html('<option value="0">Carregando</option>');
 
      $.ajax({
-       type: "POST",
+       type: "GET",
        url: "/patrimonio/escolhe_detalhe",
        dataType: "json",
        data: {'detalhe': ed_id},
@@ -988,7 +988,7 @@ function ajax_filter_equipamento(num_doc, id_patrimonio, id_equipamento)
        p_id = "#id_equipamento";
        $(p_id).html('Carregando...');
        $.ajax({
-           type: "POST",
+           type: "GET",
            url: "/patrimonio/escolhe_equipamento",
            dataType: "json",
            data: {'num_doc':num_doc, 'id_patrimonio':id_patrimonio, 'id_equipamento':id_equipamento},
@@ -1014,7 +1014,7 @@ function ajax_filter_patrimonio(num_doc)
        p_id = "#id_patrimonio";
        $(p_id).html('Carregando...');
        $.ajax({
-           type: "POST",
+           type: "GET",
            url: "/patrimonio/escolhe_patrimonio",
            dataType: "json",
            data: {'num_doc':num_doc},
@@ -1144,7 +1144,7 @@ function ajax_patr_form_get_equipamento(id_equipamento)
 {
        p_id = "#id_equipamento";
        $.ajax({
-           type: "POST",
+           type: "GET",
            url: "/patrimonio/ajax_get_equipamento",
            dataType: "json",
            data: {'id_equipamento':id_equipamento},

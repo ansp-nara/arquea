@@ -116,7 +116,7 @@ function ajax_soma_valores(url, objHtmlReturn, select)
 
     dados = {'despesas':d};
     $.ajax({
-      type: "POST",
+      type: "GET",
       url: url,
       dataType: "json",
       data: dados,
@@ -148,7 +148,7 @@ function ajax_soma_valor_descricao(url, total, descricao, select)
 
     dados = {'despesas':d};
     $.ajax({
-      type: "POST",
+      type: "GET",
       url: url,
       dataType: "json",
       data: dados,
@@ -171,7 +171,7 @@ function ajax_gera_despesas_internas(url, objHtmlReturn, pagina, select, auditor
     $("#"+objHtmlReturn).html('<select multiple>');
     $("#"+objHtmlReturn).html('<option value="">Carregando...</option>');
     $.ajax({
-      type: "POST",
+      type: "GET",
       url: url,
       dataType: "json",
       data: dados,
@@ -202,7 +202,7 @@ function ajax_gera_despesas_fapesp(url, objHtmlReturn, parcial, pagina, select, 
     $("#"+objHtmlReturn).html('<select multiple>');
     $("#"+objHtmlReturn).html('<option value="">Carregando...</option>');
     $.ajax({
-      type: "POST",
+      type: "GET",
       url: url,
       dataType: "json",
       data: dados,
@@ -231,7 +231,7 @@ function ajax_proxima_parcial(url, parcial, pagina, select)
 
     dados = {'fontepagadora': id};
     $.ajax({
-      type: "POST",
+      type: "GET",
       url: url,
       dataType: "json",
       data: dados,
@@ -253,7 +253,7 @@ function ajax_filter(url, objHtmlReturn, id)
 //    $("#"+objHtmlReturn).html('<option value="0">Carregando...</option>');
     $("#"+objHtmlReturn).html('<option value="">Carregando...</option>');
     $.ajax({
-      type: "POST",
+      type: "GET",
       url: url,
       dataType: "json",
       data: dados,
@@ -280,7 +280,7 @@ function ajax_filter2(url, objHtmlReturn, id, objHtmlPrevious)
 //    $("#"+objHtmlReturn).html('<option value="0">Carregando...</option>');
     $("#"+objHtmlReturn).html('<option value="">Carregando...</option>');
     $.ajax({
-      type: "POST",
+      type: "GET",
       url: url,
       dataType: "json",
       data: dados,
@@ -307,7 +307,7 @@ function ajax_seleciona_extrato(url, objHtmlReturn, id, previous)
 
     $("#"+objHtmlReturn).html('<option value="">Carregando...</option>');
     $.ajax({
-      type: "POST",
+      type: "GET",
       url: url,
       dataType: "json",
       data: dados,
@@ -341,7 +341,7 @@ function ajax_filter_inline(url, id, name)
     $("#"+item_outorga).html('<option value="">Carregando...</option>');
 
     $.ajax({
-      type: "POST",
+      type: "GET",
       url: url,
       dataType: "json",
       data: dados,
@@ -379,7 +379,7 @@ function ajax_filter_item_natureza(url, termo, item_anterior, natureza, id, name
     $("#"+natureza).html('<option value="">Carregando...</option>');
 
     $.ajax({
-      type: "POST",
+      type: "GET",
       url: url,
       dataType: "json",
       data: dados,
@@ -427,7 +427,7 @@ function ajax_filter_mod_item_natureza(url, modalidade, item_anterior, natureza,
 
 
     $.ajax({
-      type: "POST",
+      type: "GET",
       url: url,
       dataType: "json",
       data: dados,
@@ -480,7 +480,7 @@ function ajax_filter_modalidade_item_inline(url, id, name)
 
 
     $.ajax({
-      type: "POST",
+      type: "GET",
       url: url,
       dataType: "json",
       data: dados,
@@ -517,7 +517,7 @@ function ajax_filter_termo_natureza(url, natureza, id, name)
     $("#"+natureza).html('<option value="">Carregando...</option>');
 
     $.ajax({
-      type: "POST",
+      type: "GET",
       url: url,
       dataType: "json",
       data: dados,
@@ -547,7 +547,7 @@ function ajax_filtra_item(url, item_pedido, modalidade, termo, select)
     $("#"+modalidade).html('<option value="">Carregando...</option>');
 
     $.ajax({
-      type: "POST",
+      type: "GET",
       url: url,
       dataType: "json",
       data: dados,
@@ -589,7 +589,7 @@ function ajax_filter_origem_protocolo(termo_campo, termo)
       $(nomes+"origem_fapesp").html('<option value="">Carregando...</option>');
 
       $.ajax({
-	  type: "POST",
+	  type: "GET",
 	  url: "/financeiro/pagamento_termo",
 	  dataType: "json",
 	  data: {'termo_id':termo},
@@ -611,7 +611,7 @@ function ajax_filter_origem_protocolo(termo_campo, termo)
       });
 /*      if (!$("#id_auditoria_set-0-pagina").val()){
        $.ajax({
-	  type: "POST",
+	  type: "GET",
 	  url: "/financeiro/parcial_pagina_termo",
 	  dataType: "json",
 	  data: {'termo_id':termo},
@@ -632,7 +632,7 @@ function ajax_filter_protocolo_numero(numero)
       termo = $("#id_termo").val()
 
       $.ajax({
-	  type: "POST",
+	  type: "GET",
 	  url: "/financeiro/pagamento_numero",
 	  dataType: "json",
 	  data: {'termo_id':termo, 'numero':numero},
@@ -654,7 +654,7 @@ function ajax_filter_cc_cod(codigo)
       $("#id_conta_corrente").html('<option value="">Carregando...</option>');
 
       $.ajax({
-      	  type: "POST",
+      	  type: "GET",
 	  url: "/financeiro/pagamento_cc",
 	  dataType: "json",
 	  data: {'codigo':codigo},
@@ -676,7 +676,7 @@ function ajax_filter_pagamentos(url, numero)
       $("#id_pagamento").html('<option value="">Carregando...</option>');
       termo = $("#id_termo").val()
       $.ajax({
-      	  type: "POST",
+      	  type: "GET",
 	  url: url,
 	  dataType: "json",
 	  data: {'numero':numero, 'termo':termo},
@@ -698,7 +698,7 @@ function ajax_filter_financeiro(termo_id)
 {
        $("#id_extrato_financeiro").html('<option value="">Carregando...</option>');
        $.ajax({
-       	   type: "POST",
+       	   type: "GET",
 	   url: "/financeiro/sel_extrato",
 	   dataType: "json",
 	   data: {'termo':termo_id},
@@ -723,7 +723,7 @@ function ajax_select_endereco(id_field)
        e_id = "#id_historicolocal_set-"+partes[1]+"-endereco";
        $(e_id).html('<option value="">Carregando...</option>');
        $.ajax({
-       	   type: "POST",
+       	   type: "GET",
 	   url: "/patrimonio/escolhe_entidade",
 	   dataType: "json",
 	   data: {'entidade':entidade},
@@ -746,7 +746,7 @@ function ajax_select_endereco2()
        e_id = "#id_endereco";
        $(e_id).html('<option value="">Carregando...</option>');
        $.ajax({
-           type: "POST",
+           type: "GET",
            url: "/identificacao/escolhe_entidade",
            dataType: "json",
            data: {'entidade':entidade},
@@ -768,7 +768,7 @@ function ajax_select_endereco2()
 function ajax_patrimonio_existente(pn)
 {
        $.ajax({
-           type: "POST",
+           type: "GET",
 	   url: "/patrimonio/patrimonio_existente",
 	   dataType: "json",
 	   data: {'part_number':pn},
@@ -792,7 +792,7 @@ function ajax_filter_enderecos(id_ent) {
      $("#id_endereco").html('<option value="0">Carregando...</option>');
 
      $.ajax({
-       type: "POST",
+       type: "GET",
        url: "/identificacao/escolhe_entidade_filhos",
        dataType: "json",
        data: {'entidade': ent_id},
@@ -822,7 +822,7 @@ function ajax_filter_locais() {
      $("#id_detalhe").html('<option value="0">Carregando...</option>');
 
      $.ajax({
-       type: "POST",
+       type: "GET",
        url: "/identificacao/escolhe_endereco",
        dataType: "json",
        data: {'endereco': end_id},
@@ -840,7 +840,7 @@ function ajax_filter_nivel(nivel, ed_id) {
      $("#id_detalhe_"+nivel).html('<option value="0">Carregando</option>');
 
      $.ajax({
-       type: "POST",
+       type: "GET",
        url: "/patrimonio/escolhe_detalhe",
        dataType: "json",
        data: {'detalhe': ed_id},
@@ -862,7 +862,7 @@ function ajax_filter_pagamentos_memorando(termo)
         $("#id_corpo_set-"+j+"-pagamento_from").empty();
      }
      $.ajax({
-       type: "POST",
+       type: "GET",
        url: "/memorando/pagamentos",
        dataType: "json",
        data: {'termo':termo},
@@ -893,7 +893,7 @@ function ajax_init_pagamentos()
    termo = $("#id_termo").val();
    if (termo) {
      $.ajax({
-       type: "POST",
+       type: "GET",
        url: "/memorando/pagamentos",
        dataType: "json",
        data: {'termo':termo},
@@ -920,7 +920,7 @@ function ajax_filter_perguntas(memorando)
    }
 
    $.ajax({
-       type: "POST",
+       type: "GET",
        url: "/memorando/perguntas",
        dataType: "json",
        data: {'memorando':memorando},
@@ -946,7 +946,7 @@ function ajax_select_pergunta(id_field)
        e_id = "#id_corpo_set-"+partes[1]+"-perg";
        $(e_id).html('Carregando...');
        $.ajax({
-           type: "POST",
+           type: "GET",
            url: "/memorando/escolhe_pergunta",
            dataType: "json",
            data: {'pergunta':pergunta},
@@ -968,7 +968,7 @@ function ajax_filter_pagamentos2(url)
 {
       termo = $("#id_termo").val()
       $.ajax({
-          type: "POST",
+          type: "GET",
           url: url,
           dataType: "json",
           data: {'termo':termo},
@@ -990,7 +990,7 @@ function ajax_filter_equipamento(num_doc, id_patrimonio, id_equipamento)
        p_id = "#id_equipamento";
        $(p_id).html('Carregando...');
        $.ajax({
-           type: "POST",
+           type: "GET",
            url: "/patrimonio/escolhe_equipamento",
            dataType: "json",
            data: {'num_doc':num_doc, 'id_patrimonio':id_patrimonio, 'id_equipamento':id_equipamento},
@@ -1016,7 +1016,7 @@ function ajax_filter_patrimonio(num_doc)
        p_id = "#id_patrimonio";
        $(p_id).html('Carregando...');
        $.ajax({
-           type: "POST",
+           type: "GET",
            url: "/patrimonio/escolhe_patrimonio",
            dataType: "json",
            data: {'num_doc':num_doc},
@@ -1043,7 +1043,7 @@ function ajax_prox_audit(origem)
     if (origem != "" && ($("#id_auditoria_set-0-estado").val() || $("#id_auditoria_set-0-tipo").val())){
     	if (!$("#id_auditoria_set-0-pagina").val()) {
 	       $.ajax({
-	          type: "POST",
+	          type: "GET",
 	          url: "/financeiro/parcial_pagina_termo",
 	          dataType: "json",
 	          data: {'orig_id':origem},
@@ -1065,7 +1065,7 @@ function ajax_prox_audit(origem)
 function ajax_nova_pagina(parcial)
 {
     $.ajax({
-       type:"POST",
+       type:"GET",
        url:"/financeiro/nova_pagina",
        dataType:"json",
        data: {'orig_id':$("#id_origem_fapesp").val(), 'parcial':parcial.value},
@@ -1084,7 +1084,7 @@ function ajax_select_ano_proj()
        proj_id = partes[1];
        $("#id_os").html('Carregando...');
        $.ajax({
-           type: "POST",
+           type: "GET",
            url: "/rede/planeja_contrato",
            dataType: "json",
            data: {'ano':ano, 'proj_id':proj_id},
@@ -1161,7 +1161,7 @@ function ajax_patr_form_get_equipamento(id_equipamento)
 {
     if (id_equipamento != '') {
        $.ajax({
-           type: "POST",
+           type: "GET",
            url: "/patrimonio/ajax_get_equipamento",
            dataType: "json",
            data: {'id_equipamento':id_equipamento},

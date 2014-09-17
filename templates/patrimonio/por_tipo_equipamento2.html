@@ -93,9 +93,9 @@ $(function() {
             ajax: {
 		url: function(node) {
                          if (node == -1){
-                             return '{% url "patrimonio.views.abre_arvore_tipo" %}';
+                             return '{% url "patrimonio.views.ajax_abre_arvore_tipo" %}';
                          }
-		         return '{% url "patrimonio.views.abre_arvore_tipo" %}?id='+node.attr("o_id")+'&model='+node.attr("o_model");
+		         return '{% url "patrimonio.views.ajax_abre_arvore_tipo" %}?id='+node.attr("o_id")+'&model='+node.attr("o_model");
 	             },
                 type:"get",
 		success: function(ops) {

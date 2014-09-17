@@ -1,75 +1,74 @@
 # -*- coding: utf-8 -*-
 
-# Create your views here.
-
-from django.shortcuts import render_to_response, get_object_or_404
-import json as simplejson
-from models import *
-from django.http import Http404, HttpResponse
 from django.contrib.auth.decorators import login_required
+from django.http import Http404, HttpResponse
+from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.template.response import TemplateResponse
+from django.views.decorators.http import require_safe
+
+import json as simplejson
+from models import *
 from utils.functions import render_to_pdf
 
-def escolhe_entidade(request):
-    if request.method == 'POST':
-        ent_id = request.POST.get('entidade')
-	entidade = get_object_or_404(Entidade, pk=ent_id)
+@login_required
+@require_safe
+def ajax_escolhe_entidade(request):
+    ent_id = request.GET.get('entidade')
+    entidade = get_object_or_404(Entidade, pk=ent_id)
 
-	retorno = []
-	for ed in Endereco.objects.filter(entidade=entidade):
-	    descricao = '%s' % (ed.__unicode__())
-	    retorno.append({'pk':ed.pk, 'valor':descricao})
+    retorno = []
+    for ed in Endereco.objects.filter(entidade=entidade):
+        descricao = '%s' % (ed.__unicode__())
+        retorno.append({'pk':ed.pk, 'valor':descricao})
 
-        if not retorno:
-            retorno = [{"pk":"0","valor":"Nenhum registro"}]
+    if not retorno:
+        retorno = [{"pk":"0","valor":"Nenhum registro"}]
 
-        json = simplejson.dumps(retorno)
-    else:
-        raise Http404
+    json = simplejson.dumps(retorno)
     return HttpResponse(json, content_type="application/json")
 
 
-def escolhe_entidade_filhos(request):
-    if request.method == 'POST':
-        ent_id = request.POST.get('entidade')
-        entidade = get_object_or_404(Entidade, pk=ent_id)
+@login_required
+@require_safe
+def ajax_escolhe_entidade_filhos(request):
+    ent_id = request.GET.get('entidade')
+    entidade = get_object_or_404(Entidade, pk=ent_id)
 
-        enderecos = []
-        filhos = []
+    enderecos = []
+    filhos = []
 
-        for ed in Endereco.objects.filter(entidade=entidade):
-            descricao = '%s' % (ed.__unicode__())
-            enderecos.append({'pk':ed.pk, 'valor':descricao})
+    for ed in Endereco.objects.filter(entidade=entidade):
+        descricao = '%s' % (ed.__unicode__())
+        enderecos.append({'pk':ed.pk, 'valor':descricao})
 
-        if not enderecos:
-            enderecos = [{"pk":"0","valor":"Nenhum registro"}]
+    if not enderecos:
+        enderecos = [{"pk":"0","valor":"Nenhum registro"}]
 
-        for f in entidade.entidade_em.all():
-	    filhos.append({'pk':f.id, 'valor':f.sigla})
+    for f in entidade.entidade_em.all():
+        filhos.append({'pk':f.id, 'valor':f.sigla})
 
-        retorno = {'enderecos': enderecos, 'filhos':filhos}
-        json = simplejson.dumps(retorno)
-    else:
-        raise Http404
+    retorno = {'enderecos': enderecos, 'filhos':filhos}
+    
+    json = simplejson.dumps(retorno)
     return HttpResponse(json, content_type="application/json")
 
-def escolhe_endereco(request):
-    if request.method == 'POST':
-        end_id = request.POST.get('endereco')
-        endereco = get_object_or_404(Endereco, pk=end_id)
 
-        retorno = []
-        for d in endereco.enderecodetalhe_set.all():
-            descricao = '%s' % (d.__unicode__())
-            retorno.append({'pk':d.pk, 'valor':descricao})
+@login_required
+@require_safe
+def ajax_escolhe_endereco(request):
+    end_id = request.GET.get('endereco')
+    endereco = get_object_or_404(Endereco, pk=end_id)
 
-        if not retorno:
-            retorno = [{"pk":"0","valor":"Nenhum registro"}]
+    retorno = []
+    for d in endereco.enderecodetalhe_set.all():
+        descricao = '%s' % (d.__unicode__())
+        retorno.append({'pk':d.pk, 'valor':descricao})
 
-        json = simplejson.dumps(retorno)
-    else:
-        raise Http404
+    if not retorno:
+        retorno = [{"pk":"0","valor":"Nenhum registro"}]
+
+    json = simplejson.dumps(retorno)
     return HttpResponse(json, content_type="application/json")
 
 @login_required
