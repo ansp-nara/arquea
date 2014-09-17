@@ -154,16 +154,15 @@ def _estrutura_pagamentos(pagamentos):
 
     return {'pg':sorted(pg, key=itemgetter('modalidade', 'pagina')), 'pm':pm, 'total':total}
 
-
 @login_required
 @require_safe
 def ajax_parcial_pagina(request):
     orig = request.GET.get('orig_id')
     origem = get_object_or_404(OrigemFapesp, pk=orig)
     a = Auditoria.objects.filter(pagamento__origem_fapesp__item_outorga__natureza_gasto=origem.item_outorga.natureza_gasto).aggregate(Max('parcial'))
-    parcial = a['parcial__max']
+    parcial = a['parcial__max'] or 1
     a = Auditoria.objects.filter(pagamento__origem_fapesp__item_outorga__natureza_gasto=origem.item_outorga.natureza_gasto, parcial=parcial).aggregate(Max('pagina'))
-    pagina = a['pagina__max']
+    pagina = a['pagina__max'] or 0
     retorno = {'parcial':parcial, 'pagina':pagina+1}
     json = simplejson.dumps(retorno)
 
