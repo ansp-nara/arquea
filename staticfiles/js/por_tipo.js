@@ -4,7 +4,7 @@ function sel_tipo_equip() {
     part_number = document.getElementById('id_partnumber')
 
     $.ajax({
-      type: "POST",
+      type: "GET",
       url: '/patrimonio/filtra_pn_estado',
       dataType: "json",
       data: {'id':$("#id_tipo").val()},
