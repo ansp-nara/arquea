@@ -209,8 +209,25 @@ class Patrimonio(models.Model):
         ht = self.historicolocal_set.order_by('-data', '-id')
         if not ht: return None
         return ht[0]
-   
 
+    @cached_property
+    def historico_atual_prefetched(self):
+        """
+        Utilizar este método ao invés de historico_atual se for feito o prefetch_related antecipadamente.
+        Em caso de dúvida, ou se não for utilizado o prefetch, utilizar o método historico_atual, pois 
+        o tempo de execução deste método será o dobro do normal.
+        
+        Exemplo de utilização, com select_related:
+            from django.db.models import Prefetch
+            Patrimonio.objects.all().prefetch_related(Prefetch('historicolocal_set', queryset=HistoricoLocal.objects.select_related('estado')))
+        """
+        #ht = self.historicolocal_set.order_by('-data', '-id')
+        ht = sorted(self.historicolocal_set.all(), key=lambda x: x.id, reverse=True)
+        ht = sorted(self.historicolocal_set.all(), key=lambda x: x.data, reverse=True) 
+        
+        if not ht: return None
+        return ht[0]
+    
     def posicao(self):
         ht = self.historico_atual
         if not ht: return u''
