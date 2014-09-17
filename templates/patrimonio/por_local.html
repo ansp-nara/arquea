@@ -53,7 +53,7 @@
               <td>{{ p.modelo }}</td><td>{{ p.part_number }}</td>
               <td>{{ p.descricao }} - {{ p.complemento }}</td>
               <td>{{ p.ns }}</td>
-              <td>{{ p.historico_atual.estado }}</td>
+              <td>{{ p.historico_atual_prefetched.estado }}</td>
               </tr>
               {% for f in p.contido.all %}
                  <tr style="color:#0000ff;">
@@ -65,7 +65,7 @@
 	                 <td>{{ f.part_number }}</td>
 	                 <td>{{ f.descricao }}</td>
 	                 <td>{{ f.ns }}</td>
-	                 <td>{{ f.historico_atual.estado }}</td>
+	                 <td>{{ f.historico_atual_prefetched.estado }}</td>
                  </tr>
                   {% for g in f.contido.all %}
                      <tr style="color:#ff0000;">
@@ -77,7 +77,7 @@
 	                     <td>{{ g.part_number }}</td>
 	                     <td>{{ g.descricao }}</td>
 	                     <td>{{ g.ns }}</td>
-	                     <td>{{ g.historico_atual.estado }}</td>
+	                     <td>{{ g.historico_atual_prefetched.estado }}</td>
                      </tr>
                      {% for h in g.contido.all %}
                         <tr style="color:#00ff00;">
@@ -89,7 +89,7 @@
 	                        <td>{{ h.part_number }}</td>
 	                        <td>{{ h.descricao }}</td>
 	                        <td>{{ h.ns }}</td>
-	                        <td>{{ h.historico_atual.estado }}</td>
+	                        <td>{{ h.historico_atual_prefetched.estado }}</td>
                         </tr>
                      {% endfor %}
                  {% endfor %}
