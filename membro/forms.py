@@ -200,7 +200,7 @@ class ControleAdminForms(forms.ModelForm):
         saida = cleaned_data.get("saida")
         
         # Checar horarios de entrada e saida
-        if saida and entrada > saida:
+        if entrada and saida and entrada > saida:
             msg = _(u"Entrada não pode ser depois que a saída.")
             self._errors["entrada"] = self.error_class([msg])
             self._errors["saida"] = self.error_class([msg])
@@ -209,7 +209,7 @@ class ControleAdminForms(forms.ModelForm):
             del cleaned_data["entrada"]
             del cleaned_data["saida"]
 
-        if saida:
+        if entrada and saida:
             almoco = cleaned_data.get("almoco")
             tempo_de_trabalho = saida - entrada
             try:
