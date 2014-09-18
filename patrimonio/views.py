@@ -947,7 +947,7 @@ def racks(request):
                     tam = int(round(tamanho * 3))
     
                     # calculo da posição em pixel do eixoY, top-down
-                    eixoY = int(round(((rack_altura - (pos) - tam) * 19) / 3))
+                    eixoY = int(round(((rack_altura - (pos) - tam) * 19.0) / 3.0)) -5.0
                     
                     # Setando Imagem do equipamento
                     imagem = None
@@ -970,7 +970,7 @@ def racks(request):
                     if pt.historico_atual.posicao_colocacao in ('TD', 'TE', 'T', 'T01', 'T02', 'T03'):
                         flag_traseiro = True
                         
-                    last_equipamento = {'id': pt.id, 'pos':pos, 'tam': tam, 'eixoY': eixoY, 'altura':(tam * 19 / 3),
+                    last_equipamento = {'id': pt.id, 'pos':pos, 'tam': tam, 'eixoY': eixoY, 'altura':(tam * 19.0 / 3.0),
                                               'pos_original':pt.historico_atual.posicao_furo,
                                               'imagem':imagem, 'imagem_traseira':imagem_traseira,
                                               'profundidade':profundidade,

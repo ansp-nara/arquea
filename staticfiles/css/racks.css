@@ -78,15 +78,31 @@
 }
 .interno div a img {
     position:absolute;
+    top: 0;
     z-index: 5;
     width:100%;
     height:100%;
 }
-.interno div {
+.interno > div {
     position:absolute;
-    top: 0;
+    top: 15px;
     z-index: 10;
 }
+
+/* hack para acerto do posicionamento para o Chrome */
+@media screen and (-webkit-min-device-pixel-ratio:0) { 
+    .interno > div {
+        position:absolute;
+        top: 5px;
+        z-index: 10;
+    }
+}
+/* hack para acerto do posicionamento para Firefox */
+.interno > div,  x:-moz-any-link {
+    top: 15px;
+}
+
+
 .interno a div div div:nth-child(1) {
     position:relative;
     display: table-cell;
@@ -94,6 +110,7 @@
     line-height: 1.5em;
     width: 199px;
     text-align: center;
+    z-index:20;
 }
 
 .interno a div div div:nth-child(2) {
@@ -105,10 +122,13 @@
     width: 199px;
     text-align: center;
     display:none;
+    z-index:10;
 }
 	
 .equip {
     display:table-cell;
+    position:absolute;
+    top: 0;
     background:#81878b;
     width:199px;
     border-bottom:1px solid #fff;
@@ -118,6 +138,8 @@
     vertical-align:middle; 
     line-height:1.5em;
 }
+
+
 
 .interno a {
     position:relative;
@@ -133,6 +155,19 @@
 	width:97px;
 	font-size: 9px;
 }
+.interno div a div div div:nth-child(1).pos_01_label,
+.interno div a div div div:nth-child(2).pos_01_label,
+.equip.pos_01_label, 
+.interno div a div div div:nth-child(1).pos_01_label,
+.interno div a div div div:nth-child(2).pos_01_label,
+.interno a div div div:nth-child(1).pos_01_label,
+.interno a div div div:nth-child(2).pos_01_label,
+.pos_01_label
+ {
+    width:97px;
+    font-size: 9px;
+}
+
 .interno div a div div div:nth-child(1).pos_T02,
 .interno div a div div div:nth-child(2).pos_T02,
 .equip.pos_T02,
@@ -143,8 +178,21 @@
 	width:97px;
 	padding-right: 0;
 	margin-right: 0;
-	font-size: 9px;    
+	font-size: 9px;
 }
+
+.interno div a div div div:nth-child(1).pos_02_label,
+.interno div a div div div:nth-child(2).pos_02_label,
+.equip.pos_T02.pos_02_label,
+.interno div a div div div:nth-child(1).pos_02_label,
+.interno div a div div div:nth-child(2).pos_02_label,
+.equip.pos_02_label {
+    left:0;
+    width:97px;
+    font-size: 9px;
+}
+
+
 
 .interno div a div div div:nth-child(1).pos_T03,
 .interno div a div div div:nth-child(2).pos_T03,
@@ -241,6 +289,7 @@ img.profundidade_curta {
     padding:0;
     width: 305px;
     float:left;
+    position:relative;
  }
  .rack_traseiro {
     margin:0 0 0 10px;
@@ -249,6 +298,7 @@ img.profundidade_curta {
     float:left;
     vertical-align: top;
     display:none;
+    position:relative;
  }
  
  .rack_lateral {
@@ -258,6 +308,7 @@ img.profundidade_curta {
     margin: 0;
     font-size:12px;
     vertical-align: top;
+    position:relative;
  }
  
  .div_pdu {
@@ -265,14 +316,19 @@ img.profundidade_curta {
     width: 30px;
     color: black;
     font-size: 5px;
+    position:relative;
 }
  .div_pdu a .equip {
+    position: absolute;
+    top: 0;
     width: 20px;
     margin-left: 4px;
     margin-right: 5px;
     position:absolute;
  }
  .div_pdu a .equip img {
+    position: absolute;
+    top: 0;
     width: 100%;
     height: 100%;
  }
