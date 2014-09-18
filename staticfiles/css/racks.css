@@ -84,6 +84,7 @@
 }
 .interno div {
     position:absolute;
+    top: 0;
     z-index: 10;
 }
 .interno a div div div:nth-child(1) {
