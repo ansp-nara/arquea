@@ -113,7 +113,7 @@
 			      {{ rack.nome|default:'' }} ({{ rack.vazio }} ocupado)
 			      </a>
 			    </h2>
-			    <div class="div_pdu" style="height: {{ rack.altura_pxs }}px;">
+			    <div class="div_pdu">
 				    {% for eq in rack.equipamentos_pdu %}
 				        {% if eq.pos_col == 'LE' %}
 						   {% if eq.id %}
@@ -144,7 +144,7 @@
 			       <div class="{% if eq.pos_col %} pos_{{eq.pos_col}} {% endif %} {% if eq.conflito %}conflito{% endif %} equip {% if eq.flag_traseiro and eq.profundidade < 1.0 %}profundidade_curta{% endif %}" rel="tooltip" title="{% if eq.nome %}{{ eq.nome|default:'' }} - {% endif %}{{ eq.descricao }} - pos:{{eq.pos_original|default:'0'}} pt" 
 			           style="margin-top:{{ eq.eixoY }}px; height:{{ eq.altura }}px;">
 		               <div>
-			               <div class="{% if eq.pos_col %} pos_{{eq.pos_col}} {% endif %}" style="height:{{ eq.altura }}px;">
+			               <div class="{% if eq.pos_col %} pos_{{eq.pos_col}}_label {% endif %}" style="height:{{ eq.altura }}px;">
 			                {% if eq.pos_col %}
 	                            {% if eq.tam >= 9 %}{{ eq.nome|default:""|truncatechars:50 }}
 	                            {% elif eq.tam >= 6 %}{{ eq.nome|default:""|truncatechars:35 }}
@@ -158,7 +158,7 @@
 					            {% endif %}
 	                        {% endif %}
 				            </div>
-	                       <div class="{% if eq.pos_col %} pos_{{eq.pos_col}} {% endif %}" style="height:{{ eq.altura }}px;" style="position:absolute">
+	                       <div class="{% if eq.pos_col %} pos_{{eq.pos_col}}_label {% endif %}" style="height:{{ eq.altura }}px;" style="position:absolute">
 	                        {% if eq.pos_col %}
 	                            {% if eq.tam >= 15 %}{{ eq.descricao|truncatechars:80 }}
 	                            {% elif eq.tam >= 12 %}{{ eq.descricao|truncatechars:65 }}
@@ -189,7 +189,7 @@
 			    {% endfor %}
 			    </div>
 			    <div class="u" style="height: {{ rack.altura_pxs }}px;"></div>
-			    <div class="div_pdu" style="height: {{ rack.altura_pxs }}px;">
+			    <div class="div_pdu">
 			    {% for eq in rack.equipamentos_pdu %}
                     {% if eq.pos_col == 'LD' %}
                         {% if eq.id %}
@@ -212,7 +212,7 @@
 			<div class="rack_traseiro_E rack_lateral"> </div>
             <div class="rack_traseiro">
                 <h2>{{ rack.nome|default:'' }} (Visão traseira)</h2>
-                <div class="div_pdu" style="height: {{ rack.altura_pxs }}px;">
+                <div class="div_pdu">
                     {% for eq in rack.equipamentos_pdu %}
                         {% if eq.pos_col == 'TE' %}
                            {% if eq.id %}
@@ -243,7 +243,7 @@
                    <div class="{% if eq.pos_col %} pos_{{eq.pos_col}} {% endif %} {% if eq.conflito %}conflito{% endif %} equip {% if not eq.flag_traseiro and eq.profundidade < 1.0 %}profundidade_curta{% endif %}" rel="tooltip" title="{% if eq.nome %}{{ eq.nome|default:'' }} - {% endif %}{{ eq.descricao }} - pos:{{eq.pos_original|default:'0'}} pt" 
                        style="margin-top:{{ eq.eixoY }}px; height:{{ eq.altura }}px;">
                        <div>
-                           <div class="{% if eq.pos_col %} pos_{{eq.pos_col}} {% endif %}" style="height:{{ eq.altura }}px;">
+                           <div class="{% if eq.pos_col %} pos_{{eq.pos_col}}_label {% endif %}" style="height:{{ eq.altura }}px;">
                             {% if eq.pos_col %}
                                 {% if eq.tam >= 9 %}{{ eq.nome|default:""|truncatechars:50 }}
                                 {% elif eq.tam >= 6 %}{{ eq.nome|default:""|truncatechars:35 }}
@@ -257,7 +257,7 @@
                                 {% endif %}
                             {% endif %}
                             </div>
-                           <div class="{% if eq.pos_col %} pos_{{eq.pos_col}} {% endif %}" style="height:{{ eq.altura }}px;" style="position:absolute">
+                           <div class="{% if eq.pos_col %} pos_{{eq.pos_col}}_label {% endif %}" style="height:{{ eq.altura }}px;" style="position:absolute">
                             {% if eq.pos_col %}
                                 {% if eq.tam >= 15 %}{{ eq.descricao|truncatechars:80 }}
                                 {% elif eq.tam >= 12 %}{{ eq.descricao|truncatechars:65 }}
@@ -288,7 +288,7 @@
                 {% endfor %}
                 </div>
                 <div class="u" style="height: {{ rack.altura_pxs }}px;"></div>
-                <div class="div_pdu" style="height: {{ rack.altura_pxs }}px;">
+                <div class="div_pdu">
                     {% for eq in rack.equipamentos_pdu %}
                         {% if eq.pos_col == 'TD' %}
                            {% if eq.id %}
