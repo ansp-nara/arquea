@@ -245,7 +245,6 @@ def ajax_escolhe_patrimonio(request):
     Faz a busca de patrimonios que estao relacionados a NFs.
     Utilizado para fazer o filtro de "Patrimonios Contidos em" durante a tela de cadastro/modificação de patrimonio. 
     """
-    
     retorno = []
     num_doc = request.GET.get('num_doc')
     
@@ -253,9 +252,9 @@ def ajax_escolhe_patrimonio(request):
         retorno = [{'pk':p.pk, 'valor':p.__unicode__()} for p in Patrimonio.objects.filter(Q(pagamento__protocolo__num_documento__icontains=num_doc) | Q(ns__icontains=num_doc))] or [{"pk":"0", "valor":"Nenhum registro"}]
         retorno_json = json.dumps(retorno)
 
-    if not retorno:
+    if not retorno or len(retorno) == 0:
         retorno = [{"pk":"0", "valor":"Nenhum registro"}]
-
+    
     retorno_json = json.dumps(retorno)
     return HttpResponse(retorno_json, content_type="application/json")
 

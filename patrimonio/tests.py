@@ -1,12 +1,5 @@
 # -*- coding: utf-8 -*-
 
-"""
-This file demonstrates two different styles of tests (one doctest and one
-unittest). These will both pass when you run "manage.py test".
-
-Replace these with more appropriate tests for your application.
-"""
-
 from django.core.urlresolvers import resolve, reverse
 from django.test import TestCase
 from django.test import Client
@@ -15,13 +8,11 @@ from datetime import date, timedelta, datetime
 
 from patrimonio.models import HistoricoLocal, Tipo, Patrimonio, Equipamento, Estado
 from patrimonio.views import *
-
 from protocolo.models import TipoDocumento, Origem, Protocolo, ItemProtocolo
 from protocolo.models import Estado as EstadoProtocolo
 from identificacao.models import Entidade, Contato, Endereco, Identificacao, TipoDetalhe
 from membro.models import Membro
 from outorga.models import Termo
-
 
 import re
 import logging
@@ -195,6 +186,16 @@ class PatrimonioTest(TestCase):
 
 
 class ViewTest(TestCase):
+ 
+    # Fixture para carregar dados de autenticação de usuário
+    fixtures = ['auth_user.yaml',]
+    
+    def setUp(self):
+        super(ViewTest, self).setUp()
+        # Comando de login para passar pelo decorator @login_required
+        self.response = self.client.login(username='john', password='123456')
+
+        
     def setUpPatrimonio(self, num_documento='', ns=''):
         protocolo = Protocolo.objects.create(id=1, num_documento=num_documento, tipo_documento_id=0, estado_id=0, termo_id=0, data_chegada=date(year=2000, month=01, day=01), moeda_estrangeira=False)
         pagamento = Pagamento.objects.create(id=1, protocolo=protocolo, valor_fapesp=0)
@@ -202,30 +203,35 @@ class ViewTest(TestCase):
         patrimonio = Patrimonio.objects.create(id=1, pagamento=pagamento, tipo=tipoPatr, checado=True)
         patrimonio = Patrimonio.objects.create(id=2, ns=ns, tipo=tipoPatr, checado=True)
         
+    
     def test_escolhe_patrimonio_ajax_empty(self):
         """
         Verifica chamanda do escolhe_patrimonio com a base vazia
         """
-        url = reverse("patrimonio.views.escolhe_patrimonio")
-        response = self.client.post(url)
-        self.assertIn(b'Nenhum registro', response.content)
+        url = reverse("patrimonio.views.ajax_escolhe_patrimonio")
+        self.response = self.client.get(url)
+        self.assertTrue(200, self.response.status_code)
+        
+        self.assertIn(b'Nenhum registro', self.response.content)
+
 
     def test_escolhe_patrimonio_ajax_not_found(self):
         """
         Verifica chamanda do escolhe_patrimonio sem encontrar registro
         """
         self.setUpPatrimonio('1134', '')
-        url = reverse("patrimonio.views.escolhe_patrimonio")
-        response = self.client.post(url, {'num_doc': '789'})
+        url = reverse("patrimonio.views.ajax_escolhe_patrimonio")
+        response = self.client.get(url, {'num_doc': '789'})
         self.assertIn(b'Nenhum registro', response.content)
+
 
     def test_escolhe_patrimonio_ajax_nf_pagamento(self):
         """
         Verifica chamanda do escolhe_patrimonio encontrando registro pelo num_documento do Protocolo
         """
         self.setUpPatrimonio('1234', '')
-        url = reverse("patrimonio.views.escolhe_patrimonio")
-        response = self.client.post(url, {'num_doc': '1234'})
+        url = reverse("patrimonio.views.ajax_escolhe_patrimonio")
+        response = self.client.get(url, {'num_doc': '1234'})
         self.assertIn(b'"pk": 1', response.content)
 
     def test_escolhe_patrimonio_ajax_ns_patrimonio(self):
@@ -233,8 +239,8 @@ class ViewTest(TestCase):
         Verifica chamanda do escolhe_patrimonio encontrando registro pelo numero de serie do Patrimonio
         """
         self.setUpPatrimonio('', '7890')
-        url = reverse("patrimonio.views.escolhe_patrimonio")
-        response = self.client.post(url, {'num_doc': '789'})
+        url = reverse("patrimonio.views.ajax_escolhe_patrimonio")
+        response = self.client.get(url, {'num_doc': '789'})
         self.assertIn(b'"pk": 2', response.content)
         
 
