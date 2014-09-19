@@ -2,40 +2,44 @@ from settings import *
 
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = '/var/www/media/'
+ADMIN_MEDIA_PREFIX = '/media/'
+
+SECRET_KEY = 'blablabla'
+
+
+TEMPLATE_DIRS += (
+    'C:/projetos/workspace/sistema-novo-svn/templates',
+    '/var/lib/sistema/templates/',
+)
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': ':memory:',
-        'USER': '', # Not used with sqlite3.
-        'PASSWORD': '', # Not used with sqlite3.
-        'HOST': '', # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '', # Set to empty string for default. Not used with sqlite3.
+        'TEST_NAME': ':memory:',
     }
 }
 
-SECRET_KEY = 'blablabla'
+#pip install pyyaml
+FIXTURE_DIRS = (
+   '/projetos/workspace/sistema-novo-svn/fixtures/',
+   '/var/www/fixtures/'
+)
+
+STATICFILES_DIRS = (
+     '/projetos/workspace/sistema-novo-svn/staticfiles/',
+     '/var/www/files/',
+)
+
+STATIC_ROOT = '/var/sistema-novo-svn/staticfiles/'
+STATIC_URL = '/files/'
 
 
 INSTALLED_APPS += (
     'django_jenkins',
 )
-
-STATICFILES_DIRS = (
-     '/projetos/workspace/sistema/staticfiles/',
-     '/var/www/files/',
-)
-
-TEMPLATE_DIRS += (
-    '/projetos/workspace/sistema/templates/',
-    '/var/lib/sistema/templates/',
-    '/var/lib/sistema/templates',
-)
-
-STATIC_ROOT = '/projetos/workspace/sistema/media/'
-STATIC_URL = '/files/'
-MEDIA_URL = '/media/'
-MEDIA_ROOT = '/var/www/files/'
-ADMIN_MEDIA_PREFIX = '/media/'
 
 
 
@@ -80,7 +84,7 @@ LOGGING = {
 # start JENKINS CONFIGURATION
 JENKINS_TASKS = (
     'django_jenkins.tasks.with_coverage',
- #   'django_jenkins.tasks.django_tests',   # select one django or
+    'django_jenkins.tasks.django_tests',   # select one django or
  #    'django_jenkins.tasks.dir_tests',      # directory tests discovery
  #    'django_jenkins.tasks.run_pep8',
  #    'django_jenkins.tasks.run_pyflakes',
