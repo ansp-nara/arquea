@@ -63,7 +63,7 @@ class Command(BaseCommand):
                 inte = str(valor)
             dec = 0
 
-            if f.cod == 'PGMP':
+            if f.cod == 'PGMP' or f.cod == 'PGRP':
                 codigo = 'L' 
             else:
                 codigo = 'D'
