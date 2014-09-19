@@ -3,7 +3,7 @@
 from setuptools import setup, find_packages
 import codecs
 
-version = '2.1.2.dev0'
+version = '2.1.2'
 
 """
 zest.releaser available commands
