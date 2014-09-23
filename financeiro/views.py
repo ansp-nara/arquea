@@ -344,7 +344,7 @@ def relatorio_gerencial(request, pdf=False):
         if pdf:
             return render_to_pdf('financeiro/gerencial.pdf', {'atualizado':ultimo, 'termo':t, 'meses':meses, 'modalidades':retorno, 'totais':totalizador, 'gerais':gerais}, request=request, context_instance=RequestContext(request), filename='relatorio_gerencial.pdf')
         else:
-            return render_to_response('financeiro/gerencial.html', {'atualizado':ultimo, 'termo':t, 'meses':meses, 'modalidades':retorno, 'totais':totalizador, 'gerais':gerais}, context_instance=RequestContext(request))
+            return render_to_response('financeiro/gerencial.html', {'inicio':inicio, 'termino':termino, 'atualizado':ultimo, 'termo':t, 'meses':meses, 'modalidades':retorno, 'totais':totalizador, 'gerais':gerais}, context_instance=RequestContext(request))
     else:
         return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all(), 'view':'relatorio_gerencial'}, context_instance=RequestContext(request))
 
