@@ -122,14 +122,18 @@ def _estrutura_pagamentos(pagamentos):
         pp['data'] = p.conta_corrente.data_oper.strftime('%d/%m/%Y')
         pp['termo'] = p.protocolo.termo.__unicode__()
         pp['oper'] = p.conta_corrente.cod_oper
+        
         if p.protocolo.tipo_documento.nome.lower().find('anexo') == 0:
             pp['documento'] = '%s %s' % (p.protocolo.tipo_documento.nome, p.protocolo.num_documento)
         else:
             pp['documento'] = p.protocolo.num_documento
         pp['valor'] = formata_moeda(p.valor_fapesp, ',')
+        
         try:
             pp['modalidade'] = p.origem_fapesp.item_outorga.natureza_gasto.modalidade.sigla
-        except: pp['modalidade'] = ''
+        except: 
+            pp['modalidade'] = ''
+        
         pag = 0
         ane = 0
         out = 0
@@ -149,6 +153,9 @@ def _estrutura_pagamentos(pagamentos):
         elif out:
             pp['parcial'] = out.parcial
             pp['pagina'] = out.pagina
+        else:
+            pp['parcial'] = ''
+            pp['pagina'] = ''
 
         pg.append(pp)
 
