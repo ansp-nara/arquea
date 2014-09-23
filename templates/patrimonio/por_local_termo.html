@@ -99,6 +99,9 @@
         <input type="hidden" name="endereco" value="{{ request.GET.endereco }}" />
         <input type="hidden" name="detalhe" value="{{ request.GET.detalhe }}" />
         <input type="hidden" name="com_fmusp" value="{{ request.GET.com_fmusp }}" />
+        <input type="hidden" name="nivel1" value="{{ request.GET.nivel1 }}" />
+        <input type="hidden" name="nivel2" value="{{ request.GET.nivel2 }}" />
+        <input type="hidden" name="nivel3" value="{{ request.GET.nivel3 }}" />
         <div title="Imprimir" class="btn_print">
            <input type="submit" title="Versão para impressão A4" class="btn_print" name="acao" value="1"  />
         </div>
@@ -147,6 +150,7 @@
                 <td class="clickable">{{ p.posicao|default:'' }}</td>
                 <td class="clickable">{{ p.estado }}</td>
               </tr>
+              {% if nivel1 == 'on' %}
               {% for f in p.contido %}
                  <tr class="patr level1 {% if forloop.last %} tr_border{% endif %}" id="tr_{{f.id}}">
                     <td><div class="level_btn"></div><a href="{% url 'admin:patrimonio_patrimonio_change' f.id %}"></a></td>
@@ -161,6 +165,7 @@
                     <td class="clickable">{{ f.posicao|default:'' }}</td>
                     <td class="clickable">{{ f.estado }}</td>
                   </tr>
+                  {% if nivel2 == 'on' %}
                   {% for g in f.contido %}
                      <tr class="patr level2 {% if forloop.last %} tr_border{% endif %}" id="tr_{{g.id}}">
                         <td><div class="level_btn"></div><a href="{% url 'admin:patrimonio_patrimonio_change' g.id %}"></a></td>
@@ -175,6 +180,7 @@
                         <td class="clickable">{{ g.posicao|default:'' }}</td>
                         <td class="clickable">{{ g.estado }}</td>
                       </tr>
+                     {% if nivel3 == 'on' %}
                      {% for h in g.contido %}
                         <tr class="patr level3 {% if forloop.last %} tr_border{% endif %}" id="tr_{{h.id}}">
                             <td><div class="level_btn"></div><a href="{% url 'admin:patrimonio_patrimonio_change' h.id %}"></a></td>
@@ -190,8 +196,11 @@
                             <td class="clickable">{{ h.estado }}</td>
                          </tr>
                      {% endfor %}
+                     {% endif %}
                  {% endfor %}
+                 {% endif %}
               {% endfor %}
+              {% endif %}
            {% endfor %}
     </table>
     {% endfor %}

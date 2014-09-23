@@ -478,6 +478,10 @@ def por_local_termo(request, pdf=0):
            detalhe_id = request.GET.get('detalhe1')
         if not detalhe_id:
            detalhe_id = request.GET.get('detalhe')
+
+        nivel1 = request.GET.get('nivel1')
+        nivel2 = request.GET.get('nivel2')
+        nivel3 = request.GET.get('nivel3')
            
         endereco_id = request.GET.get('endereco')
         filtro_com_fmusp = request.GET.get('com_fmusp') or False
@@ -501,7 +505,7 @@ def por_local_termo(request, pdf=0):
             endereco = get_object_or_404(Endereco, pk=endereco_id)
             enderecos = []
             enderecos.append({'endereco':endereco, 'end':endereco_id, 'detalhes':[{'detalhe':detalhe, 'det':detalhe_id, 'patrimonio':iterate_patrimonio(ps, 0, filtro_com_fmusp)}]})
-            context = {'detalhe':detalhe, 'det':detalhe_id, 'enderecos': enderecos}
+            context = {'nivel1':nivel1, 'nivel2':nivel2, 'nivel3':nivel3, 'detalhe':detalhe, 'det':detalhe_id, 'enderecos': enderecos}
             
         elif endereco_id and endereco_id != "":
             endereco_id = request.GET.get('endereco')
@@ -509,7 +513,7 @@ def por_local_termo(request, pdf=0):
             enderecos = []
             endereco = find_endereco(atuais, endereco_id, filtro_com_fmusp)
             enderecos.append(endereco)
-            context = {'enderecos': enderecos}
+            context = {'nivel1':nivel1, 'nivel2':nivel2, 'nivel3':nivel3, 'enderecos': enderecos}
             
         else:
             entidade_id = request.GET.get('entidade')
@@ -526,7 +530,7 @@ def por_local_termo(request, pdf=0):
                 endereco = find_endereco(atuais, endereco.id, filtro_com_fmusp)
                 if endereco:
                     enderecos.append(endereco)
-            context = {'entidade': entidade, 'ent':entidade_id, 'enderecos': enderecos}
+            context = {'nivel1':nivel1, 'nivel2':nivel2, 'nivel3':nivel3, 'entidade': entidade, 'ent':entidade_id, 'enderecos': enderecos}
             
         if pdf:
             return render_to_pdf_weasy('patrimonio/por_local_termo_weasy.pdf', context, request=request, filename='inventario_por_local.pdf')
@@ -537,7 +541,6 @@ def por_local_termo(request, pdf=0):
         entidades = find_entidades_filhas(None)
         msg = "A seleção da Entidade é obrigatória."
         return render_to_response('patrimonio/sel_local_termo.html', {'entidades':entidades, 'msg':msg}, context_instance=RequestContext(request))
-
 
 # Usado para criar o filtro de entidades.
 # Caso o parametro seja None, busca todas as entidades de primeiro nível, seguidas pela busca de todas as entidades abaixo.
