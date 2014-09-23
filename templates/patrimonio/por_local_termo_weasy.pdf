@@ -169,6 +169,7 @@
                         <td>{{ p.posicao|default:'' }}</td>
                         <td>{{ p.estado }}</td>
                       </tr>
+                      {% if nivel1 == 'on' %}
                       {% for f in p.contido %}
                          <tr class="patr level1 {% if forloop.last %} tr_border{% endif %}" id="tr_{{f.id}}">
                             <td><div class="level_btn"></div></td>
@@ -183,6 +184,7 @@
                             <td>{{ f.posicao|default:'' }}</td>
                             <td>{{ f.estado }}</td>
                           </tr>
+                          {% if nivel2 == 'on' %}
                           {% for g in f.contido %}
                              <tr class="patr level2 {% if forloop.last %} tr_border{% endif %}" id="tr_{{g.id}}">
                                 <td><div class="level_btn"></div></td>
@@ -197,6 +199,7 @@
                                 <td>{{ g.posicao|default:'' }}</td>
                                 <td>{{ g.estado }}</td>
                               </tr>
+                             {% if nivel3 == 'on' %}
                              {% for h in g.contido %}
                                 <tr class="patr level3 {% if forloop.last %} tr_border{% endif %}" id="tr_{{h.id}}">
                                     <td><div class="level_btn"></div></td>
@@ -212,8 +215,11 @@
                                     <td>{{ h.estado }}</td>
                                  </tr>
                              {% endfor %}
+                             {% endif %}
                          {% endfor %}
+                         {% endif %}
                       {% endfor %}
+                      {% endif %}
                       </tbody>
                    {% endfor %}
             {% endfor %}

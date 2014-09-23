@@ -38,9 +38,21 @@
      <option value="">----</option>
 </select>
 <br />
-<label for="com_fmusp">Exibir somente com N. FMUSP</label>
 <input type="checkbox" name="com_fmusp">
+<label for="com_fmusp">Exibir somente com N. FMUSP</label>
 <br />
+<br/>
+Exibição de patrimônios contidos:<br/>
+<input type="checkbox" name="nivel1" checked="true">
+<label for="nivel1">Exibir 1º nível.</label>
+<br/>
+<input type="checkbox" name="nivel2" checked="true">
+<label for="nivel2">Exibir 2º nível.</label>
+<br/>
+<input type="checkbox" name="nivel3" checked="true">
+<label for="nivel3">Exibir 3º nível.</label>
+<br />
+<br/>
 <input type="submit" value="Enviar">
 </form>
 {% endblock %}
