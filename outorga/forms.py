@@ -14,13 +14,13 @@ class OrigemFapespInlineForm(forms.ModelForm):
         super(OrigemFapespInlineForm, self).__init__(data, files, auto_id, prefix, initial,
                                                error_class, label_suffix, empty_permitted, instance)
 
-        if instance:
-            self.fields['item_outorga'].queryset = Item.objects.filter(id=instance.item_outorga.id)
+    
+        self.fields['acordo'].choices = [('','---------')] + [(p.id, p.__unicode__()) for p in Acordo.objects.all().order_by('descricao') ]
+        self.fields['item_outorga'].choices = [('','---------')] + [(p.id, p.__unicode__()) for p in Item.objects.all().select_related('natureza_gasto', 'natureza_gasto__termo') ]
 
     class Meta:
         model = OrigemFapesp
-        fields = ['item_outorga',]
-
+        
 
 class ItemAdminForm(forms.ModelForm):
 
