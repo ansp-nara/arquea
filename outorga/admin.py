@@ -111,7 +111,7 @@ class AcordoAdmin(admin.ModelAdmin):
     list_display = ('descricao', 'estado', )
     search_fields = ('descricao', 'estado__nome', )
     list_per_page = 10
-    inlines = [OrigemFapespInlineA]
+    inlines = [OrigemFapespInline]
 
 admin.site.register(Acordo,AcordoAdmin)
 
