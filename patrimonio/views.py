@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+from operator import itemgetter, attrgetter
 from django.contrib import admin
 from django.contrib.auth.decorators import permission_required, login_required
 from django.core.urlresolvers import reverse
@@ -463,13 +463,72 @@ def por_local(request, pdf=0):
         return render_to_response('patrimonio/sel_local.html', {'entidades':entidades, 'msg':msg}, context_instance=RequestContext(request))
 
 
+
+@login_required
+def por_local_rack(request, pdf=0):
+    entidade = request.GET.get('entidade')
+    endereco_id = request.GET.get('endereco')
+    detalhe_id = request.GET.get('detalhe')
+    
+    if entidade and detalhe_id and endereco_id:
+        atuais = []
+        # Buscando os históricos atuais de patrimonios de primeiro nível
+        for p in Patrimonio.objects.filter(patrimonio__isnull=True).prefetch_related('historicolocal_set'):
+            ht = p.historico_atual_prefetched
+            if ht:
+                 atuais.append(ht.id)
+
+        if detalhe_id:
+            detalhe = get_object_or_404(EnderecoDetalhe, pk=detalhe_id)
+            detalhes = [detalhe]
+            
+            i = 0
+            while i < len(detalhes):
+                for ed in detalhes[i].enderecodetalhe_set.all():
+                    detalhes.append(ed)
+                i += 1
+            
+            historicos = HistoricoLocal.objects.filter(id__in=atuais, endereco__in=detalhes)
+            
+            ps = Patrimonio.objects.filter(historicolocal__in=historicos) \
+                                    .select_related('equipamento', 'equipamento__tipo', 'entidade_procedencia', 'pagamento__protocolo', 'pagamento__protocolo__termo',) \
+                                    .prefetch_related(Prefetch('historicolocal_set', queryset=HistoricoLocal.objects.select_related('estado'))) \
+                                    .prefetch_related(Prefetch('contido', queryset=Patrimonio.objects.select_related('pagamento__protocolo', 'pagamento__protocolo__termo', 'equipamento', 'equipamento__tipo', ))) \
+                                    .prefetch_related(Prefetch('contido__historicolocal_set', queryset=HistoricoLocal.objects.select_related('estado'))) \
+                                    .prefetch_related(Prefetch('contido__contido', queryset=Patrimonio.objects.select_related('pagamento__protocolo', 'pagamento__protocolo__termo', 'equipamento', 'equipamento__tipo', ))) \
+                                    .prefetch_related(Prefetch('contido__contido__historicolocal_set', queryset=HistoricoLocal.objects.select_related('estado')))
+            ps = list(ps)
+            # Ordena os racks pela posição. Ex: R042 - ordena pela fila 042 e depois pela posição R
+#             patrimonio_racks.sort(key=lambda x: x.historico_atual.posicao_rack_letra, reverse=False)
+#             patrimonio_racks.sort(key=lambda x: x.historico_atual.posicao_rack_numero, reverse=True)
+
+            
+            endereco = get_object_or_404(Endereco, pk=endereco_id)
+            enderecos = []
+            enderecos.append({'endereco':endereco, 'end':endereco_id, \
+                              'detalhes':[{'detalhe':detalhe, 'det':detalhe_id, \
+                                           'patrimonio':iterate_patrimonio(ps, 0, False, False, False, 2)}]})
+            context = {'detalhe':detalhe, 'det':detalhe_id, 'enderecos': enderecos}
+            
+        
+        if pdf:
+            return render_to_pdf_weasy('patrimonio/por_local_rack_weasy.pdf', context, request=request, filename='inventario_por_local.pdf')
+        else:
+            return render_to_response('patrimonio/por_local_rack.html', context, RequestContext(request, context))
+    else:
+        # Cria a lista para o SELECT de filtro de Entidades, buscando as Entidades que possuem EnderecoDetalhe
+        entidades = find_entidades_filhas(None)
+        msg = "A seleção da Entidade, Endereço e Localização são obrigatórios."
+        return render_to_response('patrimonio/sel_local_rack.html', {'entidades':entidades, 'msg':msg}, context_instance=RequestContext(request))
+
+
 @login_required
 def por_local_termo(request, pdf=0):
     if request.GET.get('entidade'):
         atuais = []
         # Buscando os históricos atuais de patrimonios de primeiro nível
-        for p in Patrimonio.objects.filter(patrimonio__isnull=True):
-            ht = p.historico_atual
+        for p in Patrimonio.objects.filter(patrimonio__isnull=True).prefetch_related('historicolocal_set'):
+            ht = p.historico_atual_prefetched
             if ht:
                  atuais.append(ht.id)
         
@@ -498,7 +557,20 @@ def por_local_termo(request, pdf=0):
             
             historicos = HistoricoLocal.objects.filter(id__in=atuais, endereco__in=detalhes)
             
-            ps = Patrimonio.objects.filter(historicolocal__in=historicos)
+            ps = Patrimonio.objects.filter(historicolocal__in=historicos) \
+                                    .select_related('equipamento', 'equipamento__tipo', 'entidade_procedencia', 'pagamento__protocolo', 'pagamento__protocolo__termo',) \
+                                    .prefetch_related(Prefetch('historicolocal_set', queryset=HistoricoLocal.objects.select_related('estado'))) \
+                                    .prefetch_related(Prefetch('contido', queryset=Patrimonio.objects.select_related('pagamento__protocolo', 'pagamento__protocolo__termo', 'equipamento', 'equipamento__tipo', ))) \
+                                    .prefetch_related(Prefetch('contido__historicolocal_set', queryset=HistoricoLocal.objects.select_related('estado'))) \
+                                    .prefetch_related(Prefetch('contido__contido', queryset=Patrimonio.objects.select_related('pagamento__protocolo', 'pagamento__protocolo__termo', 'equipamento', 'equipamento__tipo', ))) \
+                                    .prefetch_related(Prefetch('contido__contido__historicolocal_set', queryset=HistoricoLocal.objects.select_related('estado'))) \
+                                    .prefetch_related(Prefetch('contido__contido__contido', queryset=Patrimonio.objects.select_related('pagamento__protocolo', 'pagamento__protocolo__termo', 'equipamento', 'equipamento__tipo', ))) \
+                                    .prefetch_related(Prefetch('contido__contido__contido__historicolocal_set', queryset=HistoricoLocal.objects.select_related('estado'))) \
+                                    .prefetch_related(Prefetch('contido__contido__contido__contido', queryset=Patrimonio.objects.select_related('pagamento__protocolo', 'pagamento__protocolo__termo', 'equipamento', 'equipamento__tipo', ))) \
+                                    .prefetch_related(Prefetch('contido__contido__contido__contido__historicolocal_set', queryset=HistoricoLocal.objects.select_related('estado')))
+
+            
+            
             if filtro_com_fmusp:
                 ps = ps.filter(numero_fmusp__isnull=False)
             
@@ -587,9 +659,10 @@ def find_endereco(atuais, endereco_id, filtro_com_fmusp=False):
     return context
 
 
-def iterate_patrimonio(p_pts, nivel=0, filtro_com_fmusp=False):
-    if nivel == 4 or len(p_pts) == 0:
+def iterate_patrimonio(p_pts, nivel=0, filtro_com_fmusp=False, order_fmusp=True, order_termo=True, nivel_maximo=4):
+    if nivel == nivel_maximo:# or len(p_pts) == 0:
         return
+    
     
     patrimonios = []
     
@@ -601,24 +674,32 @@ def iterate_patrimonio(p_pts, nivel=0, filtro_com_fmusp=False):
         patrimonio = {}
         patrimonio.update({'id':p.id, 'termo':'', 'fmusp':p.numero_fmusp, 'num_documento':'',
                             'apelido':p.apelido, 'modelo':p.modelo, 'part_number':p.part_number, 'descricao':p.descricao,
-                            'ns':p.ns, 'estado':'', 'posicao':'', 'contido':[]})
+                            'ns':p.ns, 'estado':'', 'posicao':'', 'contido':[], 'tipo':'',})
         if p.pagamento and p.pagamento.protocolo:
             patrimonio.update({'termo': str(p.pagamento.protocolo.termo)})
             patrimonio.update({'num_documento': p.pagamento.protocolo.num_documento})
             
-        if p.historico_atual:
-            patrimonio.update({'estado': p.historico_atual.estado})
-            patrimonio.update({'posicao': p.historico_atual.posicao})
-            
+        if p.historico_atual_prefetched:
+            patrimonio.update({'estado': p.historico_atual_prefetched.estado})
+            if p.historico_atual_prefetched.posicao:
+                patrimonio.update({'posicao': p.historico_atual_prefetched.posicao.upper().ljust(15, ' ')})
+            else:
+                patrimonio.update({'posicao': ''})
         
-        contido = iterate_patrimonio(p.contido.all(), nivel + 1, filtro_com_fmusp)
+        if p.equipamento_id and p.equipamento.tipo_id:
+            patrimonio.update({'tipo': p.equipamento.tipo.nome})
+        
+        
+        contido = iterate_patrimonio(p.contido.all(), nivel + 1, filtro_com_fmusp, order_fmusp, order_termo, nivel_maximo)
         patrimonio.update({'contido': contido})
         
         patrimonios.append(patrimonio)
         
-    patrimonios.sort(key=lambda p: p['posicao'], reverse=False)
-    patrimonios.sort(key=lambda p: p['fmusp'], reverse=True)
-    patrimonios.sort(key=lambda p: p['termo'], reverse=True)
+    patrimonios.sort(key = itemgetter('posicao'), reverse=True)
+    if order_fmusp == True:
+        patrimonios.sort(key=lambda p: p['fmusp'], reverse=True)
+    if order_termo == True:
+        patrimonios.sort(key=lambda p: p['termo'], reverse=True)
 
     return patrimonios
 
