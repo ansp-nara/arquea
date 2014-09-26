@@ -86,6 +86,7 @@ def lista_relatorios():
     tecnicos.append({'url':'/patrimonio/relatorio/por_estado', 'nome':u'Patrimônio por estado do item'})
     tecnicos.append({'url':'/patrimonio/relatorio/por_local', 'nome':u'Patrimônio por localização'})
     tecnicos.append({'url':'/patrimonio/relatorio/por_local_termo', 'nome':u'Patrimônio por localização (com Termo)'})
+    tecnicos.append({'url':'/patrimonio/relatorio/por_local_rack', 'nome':u'Patrimônios por local e rack'})
     tecnicos.append({'url':'/patrimonio/relatorio/por_tipo', 'nome':u'Patrimônio por tipo'})
     tecnicos.append({'url':'/rede/planejamento', 'nome':u'Planejamento por ano'})
     tecnicos.append({'url':'/rede/planejamento2', 'nome':u'Serviços contratados por processo'})
