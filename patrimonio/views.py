@@ -364,9 +364,14 @@ def por_tipo(request):
 def por_marca(request, pdf=0):
     if request.method == 'GET' and request.GET.get('marca'):
         marca = request.GET.get('marca')
+        
+        patrimonios = Patrimonio.objects.filter(equipamento__entidade_fabricante__sigla=marca) \
+                                .select_related('tipo', 'equipamento', 'pagamento__protocolo', 'entidade_procedencia') \
+                                .prefetch_related(Prefetch('historicolocal_set', queryset=HistoricoLocal.objects.select_related('estado', 'endereco__enderecodetalhe__entidade', 'endereco__endereco__entidade'))) \
+        
         if pdf:
-            return render_to_pdf_weasy('patrimonio/por_marca.pdf', {'marca':marca, 'patrimonios':Patrimonio.objects.filter(equipamento__entidade_fabricante__sigla=marca)}, request=request, filename='inventario_por_marca.pdf')
-        return TemplateResponse(request, 'patrimonio/por_marca.html', {'marca':marca, 'patrimonios':Patrimonio.objects.filter(equipamento__entidade_fabricante__sigla=marca)})
+            return render_to_pdf_weasy('patrimonio/por_marca.pdf', {'marca':marca, 'patrimonios':patrimonios}, request=request, filename='inventario_por_marca.pdf')
+        return TemplateResponse(request, 'patrimonio/por_marca.html', {'marca':marca, 'patrimonios':patrimonios})
     else:
         return TemplateResponse(request, 'patrimonio/sel_marca.html', {'marcas':Patrimonio.objects.values_list('equipamento__entidade_fabricante__sigla', flat=True).order_by('equipamento__entidade_fabricante__sigla').distinct()})
 
@@ -626,12 +631,13 @@ def find_entidades_filhas(entidade_id):
     entidades_retorno = []
     for entidade in entidades:
         entidades_filhas = find_entidades_filhas(entidade.id)
-        entidade_valida = Entidade.objects.filter(id=entidade.id, endereco__isnull=False, endereco__enderecodetalhe__isnull=False,)
+        entidade_valida = Entidade.objects.filter(id=entidade.id, endereco__isnull=False, endereco__enderecodetalhe__isnull=False,).exists()
         
-        if entidade_valida or len(entidades_filhas) > 0:
+        if len(entidades_filhas) > 0 or entidade_valida:
             entidades_retorno.append({"entidade": entidade, "filhas":entidades_filhas})
     
     return entidades_retorno
+
 
 
 # Usado no disparo da view por_local_termo
