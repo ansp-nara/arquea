@@ -102,6 +102,13 @@
         display:table-cell;
         width:15px;
     }
+    .level1 div {
+        display:table-cell;
+    }
+    .level1.tr_border td {
+        border-top:1px lightgray solid;
+    }
+    
     .level0.tr_border td {
         border-top:1px darkgray solid;
     }
@@ -153,8 +160,8 @@
                         <td>{{ p.estado }}</td>
                       </tr>
                       {% for f in p.contido %}
-                         <tr class="patr level1 {% if forloop.last %} tr_border{% endif %}" id="tr_{{f.id}}">
-                            <td><div class="level_btn"></div></td>
+                         <tr class="patr level1 tr_border " id="tr_{{f.id}}">
+                            <td><div class="level_btn"></div><div>{{ f.id }}<div></td>
                             <td>{{ f.tipo }}</td>
                             <td>{{ f.modelo }}</td>
                             <td>{{ f.part_number }}</td>
