@@ -7,6 +7,34 @@
       <a href="{% url 'patrimonio.views.por_marca' %}">Patrimônio por marca</a>
     </div>
 {% endblock %}
+{% block extrahead %}
+<style>
+ /* CHECADO */
+  #tbl_content td:nth-child(1) { width:45px; }
+ /* ID */
+  #tbl_content td:nth-child(2) { width:30px; }
+ /* PROCEDENCIA */
+  #tbl_content td:nth-child(3) { width:70px; }
+ /* MODELO */
+  #tbl_content td:nth-child(4) { width:145px; }
+ /* PART NUMBER */
+  #tbl_content td:nth-child(5) { width:105px; }
+  /* DESCRICAO com largura variável*/
+  /*#tbl_content td:nth-child(6) { width:50px; }*/
+ /* NS */
+  #tbl_content td:nth-child(7) { width:105px; }
+ /* TIPO */
+  #tbl_content td:nth-child(8) { width:65px; }
+ /* LOCAL */
+  #tbl_content td:nth-child(9) { width:75px; }
+ /* POSICAO */
+  #tbl_content td:nth-child(10) { width:125px; }
+ /* ESTADO */
+  #tbl_content td:nth-child(11) { width:70px; }
+ /* NF */
+  #tbl_content td:nth-child(12) { width:90px; }
+</style>
+{% endblock %}
 {% block content %}
 <h1 repeat="1">Inventário por marca</h1>
 <div id="report_toolbar">
@@ -19,7 +47,7 @@
 </div>
 <div style="clear:both;"></div>
 <h4>Patrimonios da marca {{ marca }}</h4>
-<table border="0" repeat="1" cellpadding="5">
+<table border="0" repeat="1" cellpadding="5" id="tbl_content">
     <tr>
         <th>Checado</th>
         <th>ID</th>
@@ -44,9 +72,9 @@
             <td>{{ p.descricao }}</td>
             <td>{{ p.ns }}</td>
             <td>{{ p.tipo }}</td>
-            <td>{{ p.historico_atual.endereco.end.entidade|default:'' }}</td>
-            <td>{{ p.historico_atual.endereco.complemento }}</td>
-            <td>{{ p.historico_atual.estado }}</td>
+            <td>{{ p.historico_atual_prefetched.endereco.end.entidade|default:'' }}</td>
+            <td>{{ p.historico_atual_prefetched.endereco.complemento }}</td>
+            <td>{{ p.historico_atual_prefetched.estado }}</td>
             <td>{{ p.pagamento.protocolo.num_documento }}</td>
         </tr>
     {% endfor %}

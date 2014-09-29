@@ -141,13 +141,15 @@ class Feriado(models.Model):
     #    df = (data.month, data.day) in [(f.feriado.month, f.feriado.day) for f in cls.objects.filter(movel=False)]
     #    return (dm or df)
         #dm = data in [f.feriado for f in cls.objects.all()]
+        feriado_existe = Feriado.objects.filter(feriado=data).exists()
         
-        dm = Feriado.objects.filter(feriado=data)
-        if len(dm) > 1:
-            raise ValueError("Há mais de um feriado em um único dia.")
-        
-        if len(dm) == 1:
-            return dm.filter()[:1].get()
+        if feriado_existe:
+            dm = Feriado.objects.filter(feriado=data).select_related('tipo')
+            if len(dm) > 1:
+                raise ValueError("Há mais de um feriado em um único dia.")
+            
+            if len(dm) == 1:
+                return dm.filter()[:1].get()
         else:
             return None 
 

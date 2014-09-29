@@ -39,6 +39,7 @@
     padding:0;
     margin:0;
  }
+ 
  h1, h4 {
     font-size:1.5em;
  }
@@ -50,11 +51,43 @@
  #tbl_conteudo td {
     padding: 0.5em;
  }
+ #tbl_conteudo thead {
+        background-color:lightgray;
+        font-weight:bold;
+        
+    }
+#tbl_conteudo thead th {
+    border:1px black solid;
+    padding:0.5em;
+}
  td p {
     line-height:inherit;
     margin:0;
  }
  th {text-align: left;}
+ 
+ /* ID */
+  #tbl_conteudo td:nth-child(1) { width:0.7cm; }
+ /* PROCEDENCIA */
+  #tbl_conteudo td:nth-child(2) { width:1.7cm; }
+ /* MODELO */
+  #tbl_conteudo td:nth-child(3) { width:2.7cm; }
+ /* PART NUMBER */
+  #tbl_conteudo td:nth-child(4) { width:2.2cm; }
+  /* DESCRICAO com largura variável*/
+  #tbl_conteudo td:nth-child(5) { width:5.5cm; }
+ /* NS */
+  #tbl_conteudo td:nth-child(6) { width:2.7cm; }
+ /* TIPO */
+  #tbl_conteudo td:nth-child(7) { width:1.5cm; }
+ /* LOCAL */
+  #tbl_conteudo td:nth-child(8) { width:2.5cm; }
+ /* POSICAO */
+  #tbl_conteudo td:nth-child(9) { width:2.8cm; }
+ /* ESTADO */
+  #tbl_conteudo td:nth-child(10) { width:1.0cm; }
+ /* NF */
+  #tbl_conteudo td:nth-child(11) { width:2.0cm; }
 </style>
 </head>
 <body>
@@ -63,11 +96,35 @@
     <h4>Patrimonios da marca {{ marca }}</h4>
     <table id="tbl_conteudo" border="0" repeat="1">
         <thead>
-            <tr><th>ID</th><th>Procedência</th><th>Modelo</th><th>Part number</th><th width="30%">Descrição</th><th>NS</th><th>Tipo</th><th width="20%">Local</th><th>Posição</th><th>Estado</th><th>NF</th></tr>
+            <tr>
+                <th>ID</th>
+                <th>Procedência</th>
+                <th>Modelo</th>
+                <th>Part number</th>
+                <th width="30%">Descrição</th>
+                <th>NS</th>
+                <th>Tipo</th>
+                <th>Local</th>
+                <th>Posição</th>
+                <th>Estado</th>
+                <th>NF</th>
+            </tr>
         </thead>
         <tbody>
         {% for p in patrimonios %}
-            <tr><td>{{ p.id }}</td><td>{{ p.procedencia }}</td><td>{{ p.modelo }}</td><td>{{ p.part_number }}</td><td>{{ p.descricao }}</td><td>{{ p.ns }}</td><td>{{ p.tipo }}</td><td>{{ p.historico_atual.endereco.end.entidade|default:'' }}</td><td>{{ p.historico_atual.endereco.complemento }}</td><td>{{ p.historico_atual.estado }}</td><td>{{ p.pagamento.protocolo.num_documento }}</td></tr>
+            <tr>
+                <td>{{ p.id }}</td>
+                <td>{{ p.procedencia }}</td>
+                <td>{{ p.modelo }}</td>
+                <td>{{ p.part_number }}</td>
+                <td>{{ p.descricao }}</td>
+                <td>{{ p.ns }}</td>
+                <td>{{ p.tipo }}</td>
+                <td>{{ p.historico_atual_prefetched.endereco.end.entidade|default:'' }}</td>
+                <td>{{ p.historico_atual_prefetched.endereco.complemento }}</td>
+                <td>{{ p.historico_atual_prefetched.estado }}</td>
+                <td>{{ p.pagamento.protocolo.num_documento }}</td>
+            </tr>
         {% endfor %}
         </tbody>
     </table>
