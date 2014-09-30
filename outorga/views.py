@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from django.db.models import Sum
+from django.db.models import Sum, Prefetch
 from django.contrib import admin
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import permission_required, login_required
@@ -12,7 +12,7 @@ from decimal import Decimal
 import json as simplejson
 
 from patrimonio.models import Patrimonio, Equipamento
-from financeiro.models import Pagamento
+from financeiro.models import Pagamento, Auditoria
 from identificacao.models import *
 from outorga.models import Termo, Modalidade, Item, Natureza_gasto, Acordo, Outorga
 from utils.functions import render_to_pdf, render_to_pdf_weasy, month_range
@@ -344,22 +344,28 @@ def item_modalidade(request, pdf=False):
         for item in it_objs:
             pags = []
             total = Decimal('0.0')
-            for p in Pagamento.objects.filter(origem_fapesp__item_outorga=item):
+            
+            pagamentos_qs = Pagamento.objects.filter(origem_fapesp__item_outorga=item) \
+                                .select_related('conta_corrente', 'protocolo', 'protocolo__descricao2', 'protocolo__descricao2__entidade', 'protocolo__tipo_documento') \
+                                .prefetch_related(Prefetch('auditoria_set', queryset=Auditoria.objects.select_related('tipo')))
+            for p in pagamentos_qs:
                 patrimonios = []
+                pag = {'p':p, 'docs':p.auditoria_set.all(), 'patrimonios':''}
                 if marca_id > '0':
                     if p.patrimonio_set.filter(equipamento__entidade_fabricante_id=marca_id).exists():
                         patrimonios = p.patrimonio_set.filter(equipamento__entidade_fabricante_id=marca_id)
-                        pags.append({'p':p, 'docs':p.auditoria_set.all(), 'patrimonios':patrimonios})
                         total += p.valor_fapesp
                 elif procedencia_id > '0':
                     if p.patrimonio_set.filter(entidade_procedencia_id=procedencia_id).exists():
                         patrimonios = p.patrimonio_set.filter(entidade_procedencia_id=procedencia_id)
-                        pags.append({'p':p, 'docs':p.auditoria_set.all(), 'patrimonios':patrimonios})
                         total += p.valor_fapesp
                 else:
                     patrimonios = p.patrimonio_set.all()
-                    pags.append({'p':p, 'docs':p.auditoria_set.all(), 'patrimonios':patrimonios})
                     total += p.valor_fapesp
+                
+                patrimonios = patrimonios.select_related('equipamento__entidade_fabricante')
+                pag.update({'patrimonios':patrimonios})
+                pags.append(pag)
                 
             # se for especificado o filtro de marca ou procedencia, somente
             # adiciona o item de outorga se tiver patrimonios com estes dados.
