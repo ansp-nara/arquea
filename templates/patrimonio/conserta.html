@@ -1,0 +1,22 @@
+{% extends "admin/base_site.html" %}
+{% load proto_tags %}
+{% load i18n %}
+
+{% block content %}
+<form method="POST" enctype="multipart/form-data">{% csrf_token %}
+    <input id="racks_id" name="racks" type="file">
+    <input type="submit" value="Enviar">
+</form>
+
+<p>Ok com:</p>
+{% for l in ok %}
+<p>{{ l.apelido }} {{ l }}</p>
+{% endfor %}
+
+<p>Falha com:</p>
+{% for l in failed %}
+<p>{{ l.apelido }} {{ l }}</p>
+{% endfor %}
+
+{% endblock %}
+
