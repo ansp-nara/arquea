@@ -13,6 +13,7 @@ from django.views.decorators.http import require_safe, require_POST
 
 from utils.functions import render_to_pdf, render_wk_to_pdf, render_to_pdf_weasy
 import json
+import csv
 import itertools
 import datetime
 import logging
@@ -1249,6 +1250,37 @@ def ajax_abre_arvore(request):
     retorno_json = json.dumps(ret)
     return HttpResponse(retorno_json, content_type="application/json")
 
+@login_required
+def conserta_posicionamento(request):
+    
+    if request.method == 'GET':
+        return TemplateResponse(request, 'patrimonio/conserta.html')
+    ok = []
+    failed = []
+    if request.FILES:
+        with request.FILES['racks'] as racksfile:
+            rackscsv = csv.DictReader(racksfile, delimiter=';', quotechar='"')
+            for row in rackscsv:
+                try:
+                    rack = Patrimonio.objects.get(id=row['rack_id'])
+                    p = Patrimonio.objects.get(id=row['id'])
+                    hl_rack = rack.historico_atual
+                    if p.patrimonio == rack and p.historico_atual.posicao and p.historico_atual.posicao.endswith('%03d' % int(row['posicao'])):
+                        continue
+                    hl = HistoricoLocal()
+                    hl.endereco = hl_rack.endereco
+                    hl.estado = hl_rack.estado
+                    hl.data = datetime.datetime.now()
+                    hl.posicao = '%s.F%03d' % (rack.apelido.split()[-1], int(row['posicao']))
+                    hl.patrimonio = p
+                    p.patrimonio = rack
+                    p.save()
+                    hl.save()
+                    ok.append(row)
+                except:
+                    failed.append(row)
+                    
+    return TemplateResponse(request, 'patrimonio/conserta.html', {'ok':ok, 'failed':failed})
 
 @login_required
 def por_tipo_equipamento2(request):
