@@ -25,12 +25,14 @@ DATABASES = {
 #pip install pyyaml
 FIXTURE_DIRS = (
    '/projetos/workspace/sistema-novo-svn/fixtures/',
-   '/var/www/fixtures/'
+   '/var/www/fixtures/',
+   '/var/lib/jenkins/jobs/sistema-testes/workspace/sistema/fixtures/'
 )
 
 STATICFILES_DIRS = (
      '/projetos/workspace/sistema-novo-svn/staticfiles/',
      '/var/www/files/',
+     '/var/lib/jenkins/jobs/sistema-testes/workspace/sistema/staticfiles/'
 )
 
 STATIC_ROOT = '/var/sistema-novo-svn/staticfiles/'
