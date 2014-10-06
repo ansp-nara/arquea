@@ -201,3 +201,26 @@ class DimensaoAdmin(admin.ModelAdmin):
 		)
 
 admin.site.register(Dimensao, DimensaoAdmin)
+
+
+class PlantaBaixaObjetoAdmin(admin.ModelAdmin):
+    form = PlantaBaixaObjetoForm
+    list_display = ('data_center', 'patrimonio', 'titulo',)
+
+admin.site.register(PlantaBaixaObjeto, PlantaBaixaObjetoAdmin)
+
+
+class PlantaBaixaDataCenterAdmin(admin.ModelAdmin):
+    form = PlantaBaixaDataCenterForm
+
+admin.site.register(PlantaBaixaDataCenter, PlantaBaixaDataCenterAdmin)
+
+
+class PlantaBaixaPosicaoAdmin(admin.ModelAdmin):
+    form = PlantaBaixaObjetoForm
+    list_display = ('objeto', 'descricao', 'x', 'y', 'w', 'h', 'cor')
+    
+
+admin.site.register(PlantaBaixaPosicao, PlantaBaixaPosicaoAdmin)
+
+
