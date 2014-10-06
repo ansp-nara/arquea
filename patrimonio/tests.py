@@ -6,7 +6,7 @@ from django.test import Client
 from django.http import HttpRequest
 from datetime import date, timedelta, datetime
 
-from patrimonio.models import HistoricoLocal, Tipo, Patrimonio, Equipamento, Estado
+from patrimonio.models import HistoricoLocal, Tipo, Patrimonio, Equipamento, Estado, TipoEquipamento
 from patrimonio.views import *
 from protocolo.models import TipoDocumento, Origem, Protocolo, ItemProtocolo
 from protocolo.models import Estado as EstadoProtocolo
@@ -165,24 +165,102 @@ class HistoricoLocalTest(TestCase):
 
 class PatrimonioTest(TestCase):
     def setUp(self):
+        tipoPatr = Tipo.objects.create(nome='roteador')
+        tipoEquipamento = TipoEquipamento.objects.create(nome="Rack")
+        entidade_fabricante = Entidade.objects.create(sigla='DELL', nome='Dell', cnpj='00.000.000/0000-00', fisco=True, url='')
+        equipamento = Equipamento.objects.create(tipo=tipoEquipamento, part_number="PN001", modelo="MODEL001", ncm="NCM001", \
+                                                 ean="EAN001", entidade_fabricante=entidade_fabricante)
+        
+        rt = Patrimonio.objects.create(equipamento=equipamento, ns='AF345678GB3489X', modelo='NetIron400', tipo=tipoPatr, apelido="NetIron400", checado=True)
+
+    def _setUpHistorico(self, patrimonio):
         ent= Entidade.objects.create(sigla='SAC', nome='Global Crossing', cnpj='00.000.000/0000-00', fisco=True, url='')
         end = Endereco.objects.create(entidade=ent, rua='Dr. Ovidio', num=215, bairro='Cerqueira Cesar', cep='05403010', estado='SP', pais='Brasil')
         tipoDetalhe = TipoDetalhe.objects.create()
         endDet = EnderecoDetalhe.objects.create(endereco=end, tipo=tipoDetalhe, mostra_bayface=True)
-        tipoPatr = Tipo.objects.create(nome='roteador')
-        rt = Patrimonio.objects.create(ns='AF345678GB3489X', modelo='NetIron400', tipo=tipoPatr, apelido="NetIron400", checado=True)
         est = Estado.objects.create()
-        hl = HistoricoLocal.objects.create(patrimonio=rt, endereco= endDet, descricao='Emprestimo', data= datetime.date(2009,2,5), estado=est, posicao='S042')
-        hl = HistoricoLocal.objects.create(patrimonio=rt, endereco= endDet, descricao='Emprestimo 2', data= datetime.date(2010,2,5), estado=est, posicao='S043')
-
-
+        hl = HistoricoLocal.objects.create(patrimonio=patrimonio, endereco= endDet, descricao='Emprestimo', data= datetime.date(2009,2,5), estado=est, posicao='S042')
+        hl = HistoricoLocal.objects.create(patrimonio=patrimonio, endereco= endDet, descricao='Emprestimo 2', data= datetime.date(2010,2,5), estado=est, posicao='S043')
+        
+        
     def test_historico_atual(self):
         """
         Verifica chamanda do historico atual do patrimonio
         """
         patr = Patrimonio.objects.get(ns='AF345678GB3489X')
+        self._setUpHistorico(patr)
+
         hist = patr.historico_atual
         self.assertEquals('Emprestimo 2', hist.descricao)
+        
+    def test_historico_atual_vazio(self):
+        """
+        Verifica chamanda do historico atual do patrimonio
+        """
+        patr = Patrimonio.objects.get(ns='AF345678GB3489X')
+
+        hist = patr.historico_atual
+        self.assertIsNone(hist)
+
+    def test_historico_atual_prefetched(self):
+        """
+        Verifica chamanda do historico atual do patrimonio
+        """
+        patr = Patrimonio.objects.get(ns='AF345678GB3489X')
+        self._setUpHistorico(patr)
+        hist = patr.historico_atual
+        self.assertEquals('Emprestimo 2', hist.descricao)
+
+
+    def test_marca(self):
+        patr = Patrimonio.objects.get(ns='AF345678GB3489X')
+        marca = patr.marca
+        self.assertEquals('DELL', marca)
+
+
+    def test_marca_vazia(self):
+        patr = Patrimonio.objects.get(ns='AF345678GB3489X')
+        patr.equipamento.entidade_fabricante.sigla = None
+        self.assertEquals('', patr.marca)
+        
+        patr.equipamento.entidade_fabricante = None
+        self.assertEquals('', patr.marca)
+        
+        patr.equipamento = None
+        self.assertEquals('', patr.marca)
+
+
+    def test_modelo(self):
+        patr = Patrimonio.objects.get(ns='AF345678GB3489X')
+        modelo = patr.modelo
+        self.assertEquals('MODEL001', modelo)
+
+    def test_modelo_vazio(self):
+        patr = Patrimonio.objects.get(ns='AF345678GB3489X')
+        patr.equipamento = None
+        self.assertEquals('', patr.modelo)
+
+    def test_part_number(self):
+        patr = Patrimonio.objects.get(ns='AF345678GB3489X')
+        part_number = patr.part_number
+        self.assertEquals('PN001', part_number)
+    
+    def test_part_number_vazio(self):
+        patr = Patrimonio.objects.get(ns='AF345678GB3489X')
+        patr.equipamento = None
+        self.assertEquals('', patr.part_number)
+
+    def test_ean(self):
+        patr = Patrimonio.objects.get(ns='AF345678GB3489X')
+        ean = patr.ean
+        self.assertEquals('EAN001', ean)
+
+    def test_ean_vazio(self):
+        patr = Patrimonio.objects.get(ns='AF345678GB3489X')
+        patr.equipamento = None
+        self.assertEquals('', patr.ean)
+
+
 
 
 class ViewTest(TestCase):
@@ -244,5 +322,31 @@ class ViewTest(TestCase):
         self.assertIn(b'"pk": 2', response.content)
         
 
-
-
+# class ViewTest(TestCase):
+#  
+#     # Fixture para carregar dados de autenticação de usuário
+#     fixtures = ['auth_user.yaml',]
+#     
+#     def setUp(self):
+#         super(ViewTest, self).setUp()
+#         # Comando de login para passar pelo decorator @login_required
+#         self.response = self.client.login(username='john', password='123456')
+# 
+#         
+#     def setUpRack(self, num_documento='', ns=''):
+#         protocolo = Protocolo.objects.create(id=1, num_documento=num_documento, tipo_documento_id=0, estado_id=0, termo_id=0, data_chegada=date(year=2000, month=01, day=01), moeda_estrangeira=False)
+#         pagamento = Pagamento.objects.create(id=1, protocolo=protocolo, valor_fapesp=0)
+#         tipoPatr = Tipo.objects.create(id=1)
+#         patrimonio = Patrimonio.objects.create(id=1, pagamento=pagamento, tipo=tipoPatr, checado=True)
+#         patrimonio = Patrimonio.objects.create(id=2, ns=ns, tipo=tipoPatr, checado=True)
+#         
+# 
+#     def test_planta_baixa_get(self):
+#         """
+#         Verifica chamanda do escolhe_patrimonio encontrando registro pelo numero de serie do Patrimonio
+#         """
+#         self.setUpPatrimonio('', '7890')
+#         url = reverse("patrimonio.views.ajax_escolhe_patrimonio")
+#         response = self.client.get(url, {'num_doc': '789'})
+#         self.assertIn(b'"pk": 2', response.content)
+#         

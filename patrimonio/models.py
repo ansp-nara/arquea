@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 
-
 from django.db import models
-from utils.models import NARADateField
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import cached_property
-from django.db.models import Q
 import datetime
 import re
 import logging
+
+from identificacao.models import EnderecoDetalhe
+from utils.models import NARADateField
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -442,6 +443,7 @@ class Dimensao(models.Model):
 		verbose_name = u'Dimensão'
 		verbose_name_plural = u'Dimensões'
 
+
 class TipoEquipamento(models.Model):
     nome = models.CharField(max_length=45)
 
@@ -449,7 +451,8 @@ class TipoEquipamento(models.Model):
         return u'%s' % self.nome
 
     class Meta:
-	ordering = ('nome',)
+        ordering = ('nome',)
+
 
 class Equipamento(models.Model):
     tipo = models.ForeignKey('patrimonio.TipoEquipamento', null=True, blank=True)
@@ -481,4 +484,58 @@ class Equipamento(models.Model):
         return u'%s - %s' % (self.descricao, self.part_number)
 
     class Meta:
-	ordering = ('descricao',)
+        ordering = ('descricao',)
+
+
+class PlantaBaixaDataCenter(models.Model):
+    endereco = models.ForeignKey(EnderecoDetalhe, verbose_name=_(u'Data center'))
+    w = models.IntegerField(default=800)
+    h = models.IntegerField(default=600)
+    cor =  models.CharField(max_length=7, null=True, blank=True, default='#fff')
+
+    def __unicode__(self):
+        return u'%s' % (self.endereco.complemento)
+
+    class Meta:
+        verbose_name = u'Planta baixa - Data Center'
+        verbose_name_plural = u'Planta baixa - Data Centers'
+
+
+class PlantaBaixaObjeto(models.Model):
+    data_center = models.ForeignKey(PlantaBaixaDataCenter, verbose_name=_(u'Data center'))
+    patrimonio = models.ForeignKey(Patrimonio, verbose_name=_(u'Patrimônio'), null=True, blank=True)
+    titulo = models.CharField(max_length=80)
+    
+    def __unicode__(self):
+        retorno = ''
+        if self.data_center:
+            retorno = '%s' % (self.data_center)
+        if self.patrimonio:
+            retorno = '%s - %s' % (retorno, self.patrimonio.apelido)
+        if self.titulo:
+            retorno = '%s - %s' % (retorno, self.titulo)
+        else:
+            retorno = '%s - <sem_titulo>' % (retorno)
+        return retorno
+
+    class Meta:
+        verbose_name = u'Planta baixa - Objeto'
+        verbose_name_plural = u'Planta baixa - Objetos'
+
+
+class PlantaBaixaPosicao(models.Model):
+    objeto = models.ForeignKey(PlantaBaixaObjeto)
+    descricao = models.CharField(max_length=80, null=True, blank=True)
+    x = models.IntegerField(default=0)
+    y = models.IntegerField(default=0)
+    w = models.IntegerField(default=100)
+    h = models.IntegerField(default=100)
+    cor =  models.CharField(max_length=6, null=True, blank=True, default='EEEEEE')
+
+    def __unicode__(self):
+        return u'%s' % (self.objeto.titulo)
+
+    class Meta:
+        verbose_name = u'Planta baixa - Posição'
+        verbose_name_plural = u'Planta baixa - Posições'
+

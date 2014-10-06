@@ -92,6 +92,7 @@ def lista_relatorios():
     tecnicos.append({'url':'/rede/planejamento2', 'nome':u'Serviços contratados por processo'})
     tecnicos.append({'url':'/rede/info', 'nome':u'Dados cadastrais dos participantes'})
     tecnicos.append({'url':'/patrimonio/racks', 'nome':u'Racks (em construção)'})
+    tecnicos.append({'url':'/patrimonio/planta_baixa_edit', 'nome':u'Planta Baixa - Racks (em construção)'})
     tecnicos.append({'url':'/patrimonio/relatorio/por_marca', 'nome':u'Patrimônio por marca'})
     tecnicos.append({'url':'/rede/blocosip', 'nome':u'Lista de blocos IP'})
     tecnicos.append({'url':'/patrimonio/relatorio/por_tipo_equipamento2', 'nome':u'Patrimônio por tipo de equipamento'})

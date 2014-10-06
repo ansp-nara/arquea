@@ -33,5 +33,7 @@ urlpatterns = patterns('patrimonio.views',
     (r'ajax_get_equipamento$', 'ajax_get_equipamento'),
     (r'ajax_get_procedencia_filter_tipo$', 'ajax_get_procedencia_filter_tipo'),
     (r'ajax_get_marcas_por_termo$', 'ajax_get_marcas_por_termo'),
+    (r'planta_baixa_edit$', 'planta_baixa_edit'),
+    
 )
 

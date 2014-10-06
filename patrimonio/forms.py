@@ -476,3 +476,37 @@ class EquipamentoAdminForm(forms.ModelForm):
         cleaned_data = super(EquipamentoAdminForm, self).clean()
         
         return cleaned_data
+
+
+class PlantaBaixaObjetoForm(forms.ModelForm):
+    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
+                 initial=None, error_class=ErrorList, label_suffix=':',
+                 empty_permitted=False, instance=None):
+    
+        super(PlantaBaixaObjetoForm, self).__init__(data, files, auto_id, prefix, initial,
+                                            error_class, label_suffix, empty_permitted, instance)
+
+            
+        if self.fields.has_key('patrimonio'):
+            self.fields['patrimonio'].choices = [('','---------')] + [(p.id, "%s - %s"%(p.id, p.apelido)) for p in Patrimonio.objects.filter(equipamento__tipo__nome='Rack')]
+            self.fields['patrimonio'].label=mark_safe('<a href="#" onclick="window.open(\'/patrimonio/patrimonio/\'+$(\'#id_patrimonio\').val() + \'/\', \'_blank\');return true;">Patrimônio</a>')
+
+
+
+class PlantaBaixaDataCenterForm(forms.ModelForm):
+    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
+                 initial=None, error_class=ErrorList, label_suffix=':',
+                 empty_permitted=False, instance=None):
+    
+        super(PlantaBaixaDataCenterForm, self).__init__(data, files, auto_id, prefix, initial,
+                                            error_class, label_suffix, empty_permitted, instance)
+
+            
+        if self.fields.has_key('endereco'):
+            self.fields['endereco'].choices = [('','---------')] + \
+                                                 [(p.id, "%s - %s"%(p.id, p.complemento)) for p in EnderecoDetalhe.objects.filter(historicolocal__estado__id=Estado.PATRIMONIO_ATIVO, \
+                                                        historicolocal__patrimonio__equipamento__tipo__nome='Rack', \
+                                                        mostra_bayface=True,).order_by('id').distinct()]
+
+
+

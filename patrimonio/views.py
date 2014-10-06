@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.contrib.auth.decorators import permission_required, login_required
 from django.core.urlresolvers import reverse
 from django.db.models import Max, Q, F, Prefetch
-from django.db.models import Q
+from django.db import transaction
 from django.http import Http404, HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
@@ -17,6 +17,7 @@ import csv
 import itertools
 import datetime
 import logging
+from decimal import Decimal
 
 from models import *
 from modelsResource import RelatorioPorTipoResource
@@ -991,16 +992,19 @@ def racks(request):
             racks = []
             
             
-            patrimonio_racks = Patrimonio.objects.filter(equipamento__tipo__nome='Rack', historicolocal__endereco__id=local.id).select_related('contido').prefetch_related('historicolocal_set')
+            patrimonio_racks = Patrimonio.objects.filter(equipamento__tipo__nome='Rack', historicolocal__endereco__id=local.id) \
+                                                .select_related('contido', 'equipamento') \
+                                                .prefetch_related('historicolocal_set')
+            
             patrimonio_racks = list(patrimonio_racks)
             # Ordena os racks pela posição. Ex: R042 - ordena pela fila 042 e depois pela posição R
-            patrimonio_racks.sort(key=lambda x: x.historico_atual.posicao_rack_letra, reverse=False)
-            patrimonio_racks.sort(key=lambda x: x.historico_atual.posicao_rack_numero, reverse=True)
+            patrimonio_racks.sort(key=lambda x: x.historico_atual_prefetched.posicao_rack_letra, reverse=False)
+            patrimonio_racks.sort(key=lambda x: x.historico_atual_prefetched.posicao_rack_numero, reverse=True)
                 
             fileiras = []
             rack_anterior = None
             for rack in patrimonio_racks:
-                if not rack_anterior or rack.historico_atual.posicao_rack_numero != rack_anterior.historico_atual.posicao_rack_numero:
+                if not rack_anterior or rack.historico_atual_prefetched.posicao_rack_numero != rack_anterior.historico_atual_prefetched.posicao_rack_numero:
                     racks = []
                     fileiras.append({'racks': racks})
                     rack_anterior = rack
@@ -1023,12 +1027,12 @@ def racks(request):
                 # ordena os equipamentos do rack conforme a posição no rack
 #                 pts = list(rack.contido.filter(historicolocal__posicao__isnull=False).values('historicolocal__data').aggregate(Max('historicolocal__data')))
                 hist = rack.contido.annotate(hist=Max('historicolocal__data')).values_list('pk')
-                pts = list(rack.contido.filter(pk__in=hist).select_related('equipamento', 'equipamento__tipo'))
-                pts.sort(key=lambda x: x.historico_atual.posicao_furo, reverse=True)
+                pts = list(rack.contido.filter(pk__in=hist).select_related('equipamento', 'equipamento__tipo').prefetch_related('historicolocal_set'))
+                pts.sort(key=lambda x: x.historico_atual_prefetched.posicao_furo, reverse=True)
     
                 ptAnterior = None
                 for pt in pts:
-                    pos = pt.historico_atual.posicao_furo - 1 
+                    pos = pt.historico_atual_prefetched.posicao_furo - 1 
                     
                     tamanho = 0
                     if pt.tamanho:
@@ -1057,23 +1061,23 @@ def racks(request):
                             profundidade = 0.5
                     
                     flag_traseiro = False
-                    if pt.historico_atual.posicao_colocacao in ('TD', 'TE', 'T', 'T01', 'T02', 'T03'):
+                    if pt.historico_atual_prefetched.posicao_colocacao in ('TD', 'TE', 'T', 'T01', 'T02', 'T03'):
                         flag_traseiro = True
                         
                     last_equipamento = {'id': pt.id, 'pos':pos, 'tam': tam, 'eixoY': eixoY, 'altura':(tam * 19.0 / 3.0),
-                                              'pos_original':pt.historico_atual.posicao_furo,
+                                              'pos_original':pt.historico_atual_prefetched.posicao_furo,
                                               'imagem':imagem, 'imagem_traseira':imagem_traseira,
                                               'profundidade':profundidade,
                                               'nome':pt.apelido, 'descricao':pt.descricao or u'Sem descrição',
-                                              'conflito':False, 'pos_col':pt.historico_atual.posicao_colocacao,
+                                              'conflito':False, 'pos_col':pt.historico_atual_prefetched.posicao_colocacao,
                                               'flag_traseiro':flag_traseiro}
                         
                     if pt.equipamento and pt.equipamento.tipo and 'tomada' in pt.equipamento.tipo.nome and \
-                        pt.historico_atual.posicao_colocacao in ('TD', 'TE', 'lD', 'lE', 'LD', 'LE'):
+                        pt.historico_atual_prefetched.posicao_colocacao in ('TD', 'TE', 'lD', 'lE', 'LD', 'LE'):
                         
                         # Guardando as calhas de tomadas para apresentar nas laterais do Rack
                         equipamentos_pdu.append(last_equipamento)
-                    elif pos < 0 or pt.historico_atual.posicao_colocacao in ('TD', 'TE', 'piso', 'lD', 'lE'):
+                    elif pos < 0 or pt.historico_atual_prefetched.posicao_colocacao in ('TD', 'TE', 'piso', 'lD', 'lE'):
                         if pos < 0: 
                             pos = '-'
                             last_equipamento['pos'] = pos
@@ -1130,7 +1134,7 @@ def racks(request):
                         conflitos.append({'obs': obs, 'eq1':last_equipamento})
                         last_equipamento['conflito'] = True
                     elif len(equipamentos) > 0 and last_equipamento['pos_col'] and last_equipamento['pos_col'] not in ('01', '02', 'T', 'TD', 'TE', 'T01', 'T02', 'piso', 'lD', 'lE', 'LD', 'LE'):
-                        obs = 'Posicao inválida %s' % pt.historico_atual.posicao_colocacao
+                        obs = 'Posicao inválida %s' % pt.historico_atual_prefetched.posicao_colocacao
                         conflitos.append({'obs': obs, 'eq1':last_equipamento},)
                         last_equipamento['conflito'] = True
                         
@@ -1138,7 +1142,7 @@ def racks(request):
 
                 rack = {'id':rack.id,
                         'altura':int(rack.tamanho) * 3.0, 'altura_pts': rack.tamanho, 'altura_pxs': int(rack.tamanho) * 19.0,
-                        'nome':rack.apelido, 'marca': rack.marca, 'local': pt.historico_atual.posicao,
+                        'nome':rack.apelido, 'marca': rack.marca, 'local': pt.historico_atual_prefetched.posicao,
                         'equipamentos':equipamentos, 'equipamentos_fora_visao':equipamentos_fora_visao,
                         'equipamentos_pdu':equipamentos_pdu,
                         'conflitos':conflitos}
@@ -1373,3 +1377,143 @@ def ajax_patrimonio_historico(request):
 
     retorno_json = json.dumps(retorno)
     return HttpResponse(retorno_json, content_type='application/json')
+
+
+
+"""
+Página para configurar o design de Planta baixa dos cages
+"""
+@login_required
+def planta_baixa_edit(request):
+    # Busca os endereços que possuem Racks no estadoAtivos
+    locais = PlantaBaixaDataCenter.objects.all()
+    
+    todos_dcs = []
+    for local in locais:
+        dc = {'nome':local.endereco.complemento, 'id':local.id}
+        todos_dcs.append(dc)
+
+    # Se for um POST, executar a funcionalidade de salvar os dados
+    if request.POST:
+        with transaction.atomic():
+            dc_id = request.POST.get('dc_id')
+            dc = PlantaBaixaDataCenter.objects.get(id=dc_id)
+            
+            dc.w = request.POST.get('dc_w') or 0
+            dc.h = request.POST.get('dc_h') or 0
+            # salvando parametros de datacenter
+            dc.save()
+            
+            length = request.POST.get('obj_length')
+            for index in xrange(int(length)):
+                post_patrimonio_id = request.POST.get('obj_patrimonio_id_%s' % (index))
+                post_objeto_id = request.POST.get('obj_objeto_id_%s' % (index))
+                post_posicao_id = request.POST.get('obj_posicao_id_%s' % (index))
+                post_x = request.POST.get('obj_x_id_%s' % (index)) or ''
+                post_y = request.POST.get('obj_y_id_%s' % (index)) or ''
+                post_h = request.POST.get('obj_h_id_%s' % (index)) or ''
+                post_w = request.POST.get('obj_w_id_%s' % (index)) or ''
+                post_cor = request.POST.get('obj_cor_id_%s' % (index))
+                post_desc = request.POST.get('obj_desc_%s' % (index))
+                
+                objeto = None
+                posicao = None
+                
+                if post_posicao_id:
+                    # recuperando uma posição de objeto 
+                    posicao = PlantaBaixaPosicao.objects.get(id=post_posicao_id)
+                    objeto = posicao.objeto
+                elif post_objeto_id:
+                    # recuperando um objeto e buscando sua posição
+                    objeto = PlantaBaixaObjeto.objects.get(id=post_objeto_id)
+                    posicao = PlantaBaixaPosicao(objeto=objeto)
+                elif post_patrimonio_id:
+                    if post_patrimonio_id and PlantaBaixaObjeto.objects.filter(patrimonio=post_patrimonio_id).exists():
+                        # recuperando um objeto a partir do patrimonio e buscando sua posição
+                        objeto = PlantaBaixaObjeto.objects.get(patrimonio=post_patrimonio_id)
+                        posicao = PlantaBaixaPosicao(objeto=objeto)
+                    else:
+                        # Criando um objeto novo a partir de um patrimonio (ex: racks novos)
+                        patrimonio = Patrimonio.objects.get(id=post_patrimonio_id)
+                        objeto = PlantaBaixaObjeto(data_center=dc, patrimonio=patrimonio)
+                        objeto.titulo = patrimonio.apelido
+                        
+                if not posicao:
+                    # se não foi recuperada uma posição, cria um objeto novo
+                    posicao = PlantaBaixaPosicao(objeto=objeto)
+                
+                # se não for definido as coordenadas de posição, o objeto de posição deve ser removido
+                if post_x != '' and post_y != '':
+                    posicao.x = Decimal(post_x)
+                    posicao.y = Decimal(post_y)
+                    posicao.h = Decimal(post_h)
+                    posicao.w = Decimal(post_w)
+                    posicao.cor = post_cor
+                    posicao.descricao = post_desc
+    
+                    if objeto:
+                        objeto.save()
+                    if posicao:
+                        posicao.objeto = objeto
+                        posicao.save()
+                elif posicao.id != None:
+                    posicao.delete()
+
+
+
+    # Independente de salvar, devemos carregar os dados de exibição.
+    p_dc = request.GET.get('dc')
+    
+    dcs = []
+    objetos = []
+    if p_dc != None and p_dc != 0:
+        planta_datacenter = PlantaBaixaDataCenter.objects.get(id=p_dc)
+        # Recuperando lista de racks que estão no datacenter
+        patrimonio_racks = Patrimonio.objects.filter(equipamento__tipo__nome='Rack', historicolocal__endereco__id=planta_datacenter.endereco_id) \
+                                            .select_related('equipamento')
+        
+        patrimonio_racks = list(patrimonio_racks)
+        # Ordena os racks pela posição. Ex: R042 - ordena pela fila 042 e depois pela posição R
+        patrimonio_racks.sort(key=lambda x: x.historico_atual_prefetched.posicao_rack_letra, reverse=False)
+        patrimonio_racks.sort(key=lambda x: x.historico_atual_prefetched.posicao_rack_numero, reverse=True)
+            
+        fileiras = []
+        rack_anterior = None
+        for rack in patrimonio_racks:
+            posicao = ''
+            objeto = ''
+            cor = ''
+            desc = ''
+            
+            # Verifica se o rack já tem uma posição na planta baixa
+            if PlantaBaixaPosicao.objects.filter(objeto__patrimonio = rack.id).exists():
+                posicao = PlantaBaixaPosicao.objects.get(objeto__patrimonio = rack.id)
+                objeto = posicao.objeto
+                cor = posicao.cor
+                desc = posicao.descricao
+                
+            rack = {'patrimonio_id':rack.id, 'nome':rack.apelido, 'objeto':objeto, 'posicao':posicao, 'cor':cor, 'desc':desc}
+            # Adicionando patrimonios do tipo rack
+            objetos.append(rack)
+            
+        dc = {'id':planta_datacenter.id, 'nome':planta_datacenter.endereco.complemento, 'w':planta_datacenter.w, 'h':planta_datacenter.h}
+
+
+        # Adicionando outros objetos que não estão com posição definida
+        for outro in PlantaBaixaObjeto.objects.filter(patrimonio__isnull=True, data_center=planta_datacenter.id):
+            posicao = ''
+            cor = ''
+            desc = ''
+            if PlantaBaixaPosicao.objects.filter(objeto=outro).exists():
+                posicao = PlantaBaixaPosicao.objects.get(objeto=outro)
+                cor = posicao.cor
+                desc = posicao.descricao
+            outro = {'patrimonio_id':'', 'nome':outro.titulo, 'objeto':outro, 'posicao':posicao, 'cor':cor, 'desc':desc}
+            objetos.append(outro)
+    
+    context = {'dc':dc, 'todos_dcs':todos_dcs, 'objetos':objetos}
+    
+    return render_to_response('patrimonio/planta_baixa_racks.html', context, RequestContext(request, context))
+
+
+
