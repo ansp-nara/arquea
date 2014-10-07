@@ -71,8 +71,10 @@
         border: 0;
         margin: 0 0 0 10px;
     }
-    .icon_width { background: url({% static "img/icon_width.png" %}) 0 .25em no-repeat; }
-    .icon_height { background: url({% static "img/icon_height.png" %}) 0 .25em no-repeat; }
+    .icon_width { background: url({% static "img/icon_width_alfa.png" %}) 0 .25em no-repeat; }
+    .icon_height { background: url({% static "img/icon_height_alfa.png" %}) 0 .25em no-repeat; }
+    .icon_width.disabled { background: url({% static "img/icon_width_alfa_disabled.png" %}) 0 .25em no-repeat; }
+    .icon_height.disabled  { background: url({% static "img/icon_height_alfa_disabled.png" %}) 0 .25em no-repeat; }
     
     .ui-spinner-button  { display:inline-block; }
     .ui-spinner  { border:0; }
@@ -147,11 +149,11 @@
                              {{r.posicao.objeto.titulo|default:r.nome|default:'sem_titulo'}}
                         {% endif %}
                     </span>
-                    <div class="icon_height" title="Altura"></div>
+                    <div class="icon_height {% if r.posicao == '' %}disabled{% endif %}" id="icon_height_{{forloop.counter0}}" title="Altura"></div>
                     
                     <input type="hidden" id="obj_h_id_{{forloop.counter0}}" name="obj_h_id_{{forloop.counter0}}" class="input_drag_value spinner_height {% if r.posicao == '' %}disabled{% endif %}" value="{{r.posicao.h}}" readonly />
                     
-                    <div class="icon_width" title="Largura"></div>
+                    <div class="icon_width {% if r.posicao == '' %}disabled{% endif %}" id="icon_width_{{forloop.counter0}}" title="Largura"></div>
                     <input type="hidden" id="obj_w_id_{{forloop.counter0}}" name="obj_w_id_{{forloop.counter0}}" class="input_drag_value spinner_width {% if r.posicao == '' %}disabled{% endif %}" value="{{r.posicao.w}}" readonly />
                     
                     <input type="text" maxlength="6" size="6" class="input_color_picker" id='color_picker_{{forloop.counter0}}' name="obj_cor_id_{{forloop.counter0}}" value="{{r.cor|default:''}}" style="background:#{{r.posicao.cor}};" title="Cor" {% if r.posicao == '' %}disabled=true{% endif %} />

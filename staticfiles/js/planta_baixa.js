@@ -186,6 +186,8 @@
         // habilitando a edição dos campos.
         $('#obj_w_id_' + id).removeClass("disabled");
         $('#obj_h_id_' + id).removeClass("disabled");
+        $('#icon_width_' + id).removeClass("disabled");
+        $('#icon_height_' + id).removeClass("disabled");
         
         $('#obj_w_id_' + id).spinner("enable");
         $('#obj_h_id_' + id).spinner("enable");
@@ -217,6 +219,9 @@
         // habilitando a edição dos campos.
         $('#obj_w_id_' + id).addClass("disabled");
         $('#obj_h_id_' + id).addClass("disabled");
+        $('#icon_width_' + id).addClass("disabled");
+        $('#icon_height_' + id).addClass("disabled");
+
         
         $('#obj_w_id_' + id).spinner("disable");
         $('#obj_h_id_' + id).spinner("disable");
