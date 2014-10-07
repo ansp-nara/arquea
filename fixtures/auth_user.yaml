@@ -1,11 +1,11 @@
 #
-# Fixtures para colocar os dados iniciais para testes 
+# Fixtures para colocar os dados iniciais para testes
 #
 # Deve estar mapeado no settings-test.py
 # FIXTURE_DIRS = (
 #   '/projetos/workspace/sistema-novo-svn/fixtures/',
 # )
-#
+# Deve instalar o PyYAML
 #
 # Ex: de uso de fixtures para login de usuário
 #
@@ -31,3 +31,4 @@
     password: sha1$250a8$cd1b6de868bb32e22fecc358ccd5b4cf6154e1ea
     email: john.michael@gmail.com
     date_joined: 2012-03-27 14:22:53
+    
