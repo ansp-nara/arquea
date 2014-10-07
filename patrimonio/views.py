@@ -1464,6 +1464,7 @@ def planta_baixa_edit(request):
     # Independente de salvar, devemos carregar os dados de exibição.
     p_dc = request.GET.get('dc')
     
+    dc = {}
     dcs = []
     objetos = []
     if p_dc != None and p_dc != 0:
