@@ -54,6 +54,8 @@
                 dimension_operation(index, 'height', ui.value);
           }
         });
+        $( ".spinner_height.disabled" ).spinner( "disable" );
+        
         // Spinner para aumentar e diminur a largura de objetos
         $( ".spinner_width" ).spinner({
           step: 20,
@@ -65,6 +67,7 @@
                 dimension_operation(index, 'width', ui.value);
           }
         });
+        $( ".spinner_width.disabled" ).spinner( "disable" );
         
         // Spinner para aumentar e diminur a largura e altura do data center
         $( ".spinner_height_dc" ).spinner({
@@ -174,11 +177,20 @@
                 drag_stop(this);
             }
         });
-        
+        // Valores iniciais
         $( '#obj_x_id_' + id ).attr("value", 0);
         $( '#obj_y_id_' + id ).attr("value", 0);
         $( '#obj_h_id_' + id ).attr("value", 80);
         $( '#obj_w_id_' + id ).attr("value", 80);
+        
+        // habilitando a edição dos campos.
+        $('#obj_w_id_' + id).removeClass("disabled");
+        $('#obj_h_id_' + id).removeClass("disabled");
+        
+        $('#obj_w_id_' + id).spinner("enable");
+        $('#obj_h_id_' + id).spinner("enable");
+        $('#color_picker_' + id).removeAttr("disabled");
+        $('#obj_desc_' + id).removeAttr("disabled");
     }
     /**
     Remove um objeto no desenho
@@ -197,7 +209,18 @@
         $( '#obj_y_id_' + id ).attr("value", '');
         $( '#obj_h_id_' + id ).attr("value", '');
         $( '#obj_w_id_' + id ).attr("value", '');
-        $( '#color_picker_' + id ).attr("value", '');
-        $('#color_picker_' + id).css('background', '#fff');
-        $( '#obj_desc_' + id ).attr("value", '');
+        
+        $('#color_picker_' + id).val('');
+        $('#color_picker_' + id).css('background', '');
+        $('#obj_desc_' + id).val('');
+        
+        // habilitando a edição dos campos.
+        $('#obj_w_id_' + id).addClass("disabled");
+        $('#obj_h_id_' + id).addClass("disabled");
+        
+        $('#obj_w_id_' + id).spinner("disable");
+        $('#obj_h_id_' + id).spinner("disable");
+        
+        $('#color_picker_' + id).attr('disabled', true);
+        $('#obj_desc_' + id).attr('disabled', true);
     }
