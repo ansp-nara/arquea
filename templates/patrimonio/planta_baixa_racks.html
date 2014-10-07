@@ -123,10 +123,10 @@
     <div id="objects_wrapper">
         <div id="div_dc_objs">
             <span class="span_obj_title">Data center</span>
-            <div class="icon_width" title="Largura"></div>
-            <input type="hidden" id="dc_w" name="dc_w" class="input_drag_value spinner_width_dc" value="{{dc.w}}" readonly />
             <div class="icon_height" title="Altura"></div>
             <input type="hidden" id="dc_h" name="dc_h" class="input_drag_value spinner_height_dc" value="{{dc.h}}" readonly />
+            <div class="icon_width" title="Largura"></div>
+            <input type="hidden" id="dc_w" name="dc_w" class="input_drag_value spinner_width_dc" value="{{dc.w}}" readonly />
         </div>
         <hr />
         <ul>
@@ -149,17 +149,18 @@
                     </span>
                     <div class="icon_height" title="Altura"></div>
                     
-                    <input type="hidden" id="obj_h_id_{{forloop.counter0}}" name="obj_h_id_{{forloop.counter0}}" class="input_drag_value spinner_height" value="{{r.posicao.h}}" readonly />
+                    <input type="hidden" id="obj_h_id_{{forloop.counter0}}" name="obj_h_id_{{forloop.counter0}}" class="input_drag_value spinner_height {% if r.posicao == '' %}disabled{% endif %}" value="{{r.posicao.h}}" readonly />
                     
                     <div class="icon_width" title="Largura"></div>
-                    <input type="hidden" id="obj_w_id_{{forloop.counter0}}" name="obj_w_id_{{forloop.counter0}}" class="input_drag_value spinner_width" value="{{r.posicao.w}}" readonly />
+                    <input type="hidden" id="obj_w_id_{{forloop.counter0}}" name="obj_w_id_{{forloop.counter0}}" class="input_drag_value spinner_width {% if r.posicao == '' %}disabled{% endif %}" value="{{r.posicao.w}}" readonly />
                     
-                    <input type="text" maxlength="6" size="6" class="input_color_picker" id='color_picker_{{forloop.counter0}}' name="obj_cor_id_{{forloop.counter0}}" value="{{r.cor|default:''}}" style="background:#{{r.posicao.cor}};" title="Cor"/>
-                    <input type="text" maxlength="80" size="10" class="input_desc" id='obj_desc_{{forloop.counter0}}' name='obj_desc_{{forloop.counter0}}' value="{{r.desc|default:''}}" title="Descrição" />
-                    {% if r.posicao == '' %}
-                        <input type="button" onclick="add_obj(this, '{{forloop.counter0}}', '{{r.nome}}');" class="addlink"  title="Adicionar objeto." />
+                    <input type="text" maxlength="6" size="6" class="input_color_picker" id='color_picker_{{forloop.counter0}}' name="obj_cor_id_{{forloop.counter0}}" value="{{r.cor|default:''}}" style="background:#{{r.posicao.cor}};" title="Cor" {% if r.posicao == '' %}disabled=true{% endif %} />
+                    <input type="text" maxlength="80" size="10" class="input_desc" id='obj_desc_{{forloop.counter0}}' name='obj_desc_{{forloop.counter0}}' value="{{r.desc|default:''}}" title="Descrição" {% if r.posicao == '' %}disabled=true{% endif %} />
+                    
+                    {% if r.posicao %}
+                        <input type="button" onclick="delete_obj(this, '{{forloop.counter0}}', '{{r.posicao.objeto.titulo|default:r.nome}}');" class="deletelink"  title="Remover objeto." />
                     {% else %}
-                        <input type="button" onclick="delete_obj(this, '{{forloop.counter0}}', '{{r.nome}}');" class="deletelink"  title="Remover objeto." />
+                        <input type="button" onclick="add_obj(this, '{{forloop.counter0}}', '{{r.posicao.objeto.titulo|default:r.nome}}');" class="addlink"  title="Adicionar objeto." />
                     {% endif %}
                 </li>
             {% endfor %}
