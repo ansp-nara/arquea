@@ -140,11 +140,11 @@
                     
                     <span class="span_obj_title" style="width:65px;display:inline-block;">
                         {% if r.objeto %}
-                            <a href="{% url "admin:patrimonio_plantabaixaobjeto_change" r.objeto.id %}" target="_blank">{{r.nome}}</a>
+                            <a href="{% url "admin:patrimonio_plantabaixaobjeto_change" r.objeto.id %}" target="_blank"> {{r.posicao.objeto.titulo|default:r.nome}}</a>
                         {% elif r.patrimonio_id %}
                             <a href="{% url "admin:patrimonio_patrimonio_change" r.patrimonio_id %}" target="_blank">{{r.nome}}</a>
                         {% else %}
-                            {{r.nome}}
+                             {{r.posicao.objeto.titulo|default:r.nome}}
                         {% endif %}
                     </span>
                     <div class="icon_height" title="Altura"></div>
