@@ -128,15 +128,19 @@
         <ul>
             {% for r in objetos %}
                 <li id="li_obj_{{forloop.counter0}}" class="li_obj">
-                    <span class="span_obj_title" style="width:65px;display:inline-block;">{{r.nome}}</span>
-                    
                     <input type="hidden" id="obj_patrimonio_id_{{forloop.counter0}}" name="obj_patrimonio_id_{{forloop.counter0}}" value="{{r.patrimonio_id|default:''}}" />
                     <input type="hidden" id="obj_posicao_id_{{forloop.counter0}}" name="obj_posicao_id_{{forloop.counter0}}" value="{{r.posicao.id|default:''}}" />
                     <input type="hidden" id="obj_objeto_id_{{forloop.counter0}}" name="obj_objeto_id_{{forloop.counter0}}" value="{{r.objeto.id|default:''}}" />
-                    
                     <input type="hidden" id="obj_x_id_{{forloop.counter0}}" name="obj_x_id_{{forloop.counter0}}" class="input_drag_value" value="{{r.posicao.x}}" />
                     <input type="hidden" id="obj_y_id_{{forloop.counter0}}" name="obj_y_id_{{forloop.counter0}}" class="input_drag_value" value="{{r.posicao.y}}" />
                     
+                    <span class="span_obj_title" style="width:65px;display:inline-block;">
+                        {% if r.objeto %}
+                            <a href="{% url "admin:patrimonio_plantabaixaobjeto_change" r.objeto.id %}" target="_blank">{{r.nome}}</a>
+                        {% else %}
+                            {{r.nome}}
+                        {% endif %}
+                    </span>
                     <div class="icon_height" title="Altura"></div>
                     
                     <input type="hidden" id="obj_h_id_{{forloop.counter0}}" name="obj_h_id_{{forloop.counter0}}" class="input_drag_value spinner_height" value="{{r.posicao.h}}" readonly />
