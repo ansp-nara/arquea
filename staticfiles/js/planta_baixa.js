@@ -4,7 +4,7 @@
     $(function() {
         // Adiciona o comportamento de draggable para os objetos, por exemplo, racks.
         $( ".draggable" ).draggable({
-            containment: "#containment-wrapper",
+            containment: "#draggable_wrapper",
             scroll: false,
             grid: [ 20, 20 ],
             start: function() {
@@ -143,7 +143,7 @@
         if(dimension == 'height') { dim = 'h'; }
         else if(dimension == 'width') { dim = 'w'; }
     
-        $( '#containment-wrapper' ).css(dimension, value + "px");
+        $( '#draggable_wrapper' ).css(dimension, value + "px");
         $( '#dc_' + dim ).attr("value", value);
     }
     /**
@@ -162,9 +162,9 @@
                 '  <p id="obj_drag_desc_' + id +'"></p>'+
                 '</div>'+
             '</div>';
-        $('#containment-wrapper').append(html);
+        $('#draggable_wrapper').append(html);
         $( '#obj_drag_id_' + id ).draggable({
-            containment: "#containment-wrapper",
+            containment: "#draggable_wrapper",
             scroll: false,
             grid: [ 20, 20 ],
             start: function() {
