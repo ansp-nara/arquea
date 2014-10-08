@@ -42,7 +42,14 @@
     #planta_container { position:relative; }
     #planta_container #draggable_wrapper { position:relative; display:inline-block; vertical-align:top; margin-left:30px; border:5px solid lightgray; }
 
-    .draggable { padding: 0px; margin: 0; font-size: .9em; }
+    .draggable { 
+        padding: 0px;
+        margin: 0;
+        font-size: .9em;
+        -webkit-box-sizing:border-box;
+        -moz-box-sizing:border-box;
+        box-sizing:border-box;
+    }
     .draggable-content { margin:5px; text-align:center;}
     .draggable-content .obj_drag_title {font-weight:bold;}
     
