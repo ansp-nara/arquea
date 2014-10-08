@@ -77,7 +77,7 @@
                 id_split = id.split('_');
                 index = id_split[id_split.length -1];
                 
-                dc_dimension_operation('height', ui.value);
+                return dc_dimension_operation('height', ui.value);
           }
         });
         $( ".spinner_width_dc" ).spinner({
