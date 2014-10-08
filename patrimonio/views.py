@@ -1514,7 +1514,11 @@ def planta_baixa_edit(request):
     
     context = {'dc':dc, 'todos_dcs':todos_dcs, 'objetos':objetos}
     
-    return render_to_response('patrimonio/planta_baixa_racks.html', context, RequestContext(request, context))
+    if request.GET.get('pdf') == "2":
+        return render_to_pdf_weasy('patrimonio/planta_baixa_racks.pdf', context, request=request, filename='diagrama_de_planta_baixa.pdf',)
+    else:
+        
+        return render_to_response('patrimonio/planta_baixa_racks.html', context, RequestContext(request, context))
 
 
 

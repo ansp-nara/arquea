@@ -44,7 +44,7 @@
         });
         
         // Spinner para aumentar e diminur a altura de objetos
-        $( ".spinner_height" ).spinner({
+        $(".spinner_height").spinner({
           step: 20,
           spin: function( event, ui ) {
                 id = $(this).attr('id');
@@ -54,7 +54,7 @@
                 dimension_operation(index, 'height', ui.value);
           }
         });
-        $( ".spinner_height.disabled" ).spinner( "disable" );
+        $(".spinner_height.disabled").spinner( "disable" );
         
         // Spinner para aumentar e diminur a largura de objetos
         $( ".spinner_width" ).spinner({
@@ -87,7 +87,7 @@
                 id_split = id.split('_');
                 index = id_split[id_split.length -1];
                 
-                dc_dimension_operation('width', ui.value);
+                return dc_dimension_operation('width', ui.value);
           }
         });
     });
@@ -140,14 +140,27 @@
     
     /**
     * Function para alterar a largura e altura do datacenter
+    * Se ultrapassar o limite da página não seta o valor e retorna False.
     */
     var dc_dimension_operation = function(dimension, value) {
         var dim = ''
         if(dimension == 'height') { dim = 'h'; }
         else if(dimension == 'width') { dim = 'w'; }
-    
+        
+        if( (dimension == 'height' && value > 500) || (dimension == 'width' && value > 930) ) {
+            //var html = '<div id="div_dc_msg">Largura ou altura passaram o limite de impressão.</div>';
+            if ($('#div_dc_msg').length == 0) {
+                //$('#div_dc_objs').append(html);
+                return false;
+            }
+        } else {
+            $('#div_dc_msg').remove();
+        }
+        
         $( '#draggable_wrapper' ).css(dimension, value + "px");
         $( '#dc_' + dim ).attr("value", value);
+        
+        return true;
     }
     /**
     Adiciona um objeto no desenho
