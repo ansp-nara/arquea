@@ -6,7 +6,7 @@
         $( ".draggable" ).draggable({
             containment: "#draggable_wrapper",
             scroll: false,
-            grid: [ 20, 20 ],
+            grid: [ 10, 10 ],
             start: function() {
                 drag_start(this);
             },
@@ -45,33 +45,33 @@
         
         // Spinner para aumentar e diminur a altura de objetos
         $(".spinner_height").spinner({
-          step: 20,
+          step: 10,
           spin: function( event, ui ) {
                 id = $(this).attr('id');
                 id_split = id.split('_');
                 index = id_split[id_split.length -1];
                 
-                dimension_operation(index, 'height', ui.value);
+                return dimension_operation(index, 'height', ui.value);
           }
         });
         $(".spinner_height.disabled").spinner( "disable" );
         
         // Spinner para aumentar e diminur a largura de objetos
         $( ".spinner_width" ).spinner({
-          step: 20,
+          step: 10,
           spin: function( event, ui ) {
                 id = $(this).attr('id');
                 id_split = id.split('_');
                 index = id_split[id_split.length -1];
                 
-                dimension_operation(index, 'width', ui.value);
+                return dimension_operation(index, 'width', ui.value);
           }
         });
         $( ".spinner_width.disabled" ).spinner( "disable" );
         
         // Spinner para aumentar e diminur a largura e altura do data center
         $( ".spinner_height_dc" ).spinner({
-          step: 20,
+          step: 10,
           spin: function( event, ui ) {
                 id = $(this).attr('id');
                 id_split = id.split('_');
@@ -81,7 +81,7 @@
           }
         });
         $( ".spinner_width_dc" ).spinner({
-          step: 20,
+          step: 10,
           spin: function( event, ui ) {
                 id = $(this).attr('id');
                 id_split = id.split('_');
@@ -131,11 +131,16 @@
     * Function para alterar a largura e altura de racks e outros objetos.
     */
     var dimension_operation = function(id, dimension, value) {
+        if (value < 0) {
+            return false;
+        }
         var dim = ''
         if(dimension == 'height') { dim = 'h'; }
         else if(dimension == 'width') { dim = 'w'; }
     
         $( '#obj_drag_id_' + id ).css(dimension, value + "px");
+        
+        return true;
     }
     
     /**
@@ -143,6 +148,9 @@
     * Se ultrapassar o limite da página não seta o valor e retorna False.
     */
     var dc_dimension_operation = function(dimension, value) {
+        if (value < 0) {
+            return false;
+        }
         var dim = ''
         if(dimension == 'height') { dim = 'h'; }
         else if(dimension == 'width') { dim = 'w'; }
@@ -182,7 +190,7 @@
         $( '#obj_drag_id_' + id ).draggable({
             containment: "#draggable_wrapper",
             scroll: false,
-            grid: [ 20, 20 ],
+            grid: [ 10, 10 ],
             start: function() {
                 drag_start(this);
             },
