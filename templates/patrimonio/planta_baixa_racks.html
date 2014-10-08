@@ -134,10 +134,10 @@
         </form>
 	{% endif %}
 </div>
+{% if request.GET.dc %}
 <div id="icons">
     <a href="{{ request.get_full_path  }}&pdf=2" class="printlink"><img src="{{ STATIC_URL }}img/icon-pdf.png" title="Exportar para PDF." /></a>
 </div>
-{% if request.GET.dc %}
 <form method="POST">
 {% csrf_token %}
 <input type="hidden" name="obj_length" value="{{objetos|length}}" />
