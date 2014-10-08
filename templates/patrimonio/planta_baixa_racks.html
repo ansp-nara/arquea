@@ -24,9 +24,7 @@
     #planta_container { position:relative; }
     #planta_container hr { color:black; margin:15px 0 15px 0; }
     #planta_container #objects_wrapper { position:relative; display:inline-block; border:1px lightgray solid; padding:10px; }
-    #planta_container #draggable_wrapper { position:relative; border:5px solid lightgray; }
-    
-    #planta_container #draggable_border { 
+    #planta_container #draggable_wrapper { 
         position:relative; 
         display:inline-block; 
         margin-left:30px; 
@@ -36,6 +34,7 @@
         width:930px;
         height:510px;
     }
+    #planta_container #draggable_wrapper #datacenter_wrapper { position:relative; border:5px solid lightgray; }
 
     .draggable { 
         padding: 0px;
@@ -200,8 +199,8 @@
         </div>
     </div>
     
-    <div id="draggable_border">
-        <div id="draggable_wrapper" style="width:{{dc.w}}px; height:{{dc.h}}px;">
+    <div id="draggable_wrapper">
+        <div id="datacenter_wrapper" style="width:{{dc.w}}px; height:{{dc.h}}px;">
             {% for r in objetos %}
                 {% if r.posicao %}
                     <div id="obj_drag_id_{{forloop.counter0}}" class="draggable ui-widget-content" style="position:absolute;top:{{r.posicao.y}}px;left:{{r.posicao.x}}px;width:{{r.posicao.w}}px;height:{{r.posicao.h}}px;background:#{{r.posicao.cor}};">
