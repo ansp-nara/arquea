@@ -157,7 +157,7 @@
             $('#div_dc_msg').remove();
         }
         
-        $( '#draggable_wrapper' ).css(dimension, value + "px");
+        $( '#datacenter_wrapper' ).css(dimension, value + "px");
         $( '#dc_' + dim ).attr("value", value);
         
         return true;
