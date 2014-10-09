@@ -307,7 +307,6 @@ class HistoricoLocalAdminForm(forms.ModelForm):
             initial = {}
             if instance and instance.endereco and instance.endereco.endereco and instance.endereco.endereco.entidade:
                 initial['entidade'] = instance.endereco.endereco.entidade
-                logger.debug(initial['entidade'] )
             if instance and instance.patrimonio:
                 initial['patrimonio'] = instance.patrimonio
             if instance and instance.endereco:
@@ -405,29 +404,43 @@ class BaseHistoricoLocalAdminFormSet(BaseInlineFormSet):
             raise forms.ValidationError(u'Erro sistema %s'%self.errors)
         
         form_mais_recente = None
+        patrimonio = None
+        
         for i in range(0, self.total_form_count()):
             form = self.forms[i]
             
+            # guardando o patrimonio relacionado a este histórico para posterior verificação
+            if not patrimonio and form.cleaned_data.get("patrimonio"):
+                patrimonio = form.cleaned_data.get("patrimonio")
+            
             data = form.cleaned_data.get('data')
-            if data:
-                if (not form_mais_recente) or (form_mais_recente and data > form_mais_recente.cleaned_data.get('data')):
+            # Verifica o historico mais recente, que não foi removido
+            if data and (form.cleaned_data.get('DELETE') == None or form.cleaned_data.get('DELETE') == False):
+                if (form_mais_recente):
+                    if (data > form_mais_recente.cleaned_data.get('data')):
+                        form_mais_recente = form;
+                else:
                     form_mais_recente = form;
-                     
+            
         if form_mais_recente:
             cleaned_data = form_mais_recente.cleaned_data
-             
+            
             if cleaned_data.get("patrimonio") and cleaned_data.get("patrimonio").patrimonio:
                 contido_em = cleaned_data.get("patrimonio").patrimonio
                 endereco = cleaned_data.get("endereco")
                 
-                logger.debug(contido_em.historico_atual.endereco)
-                logger.debug(endereco)
+                # Verifica se o patrimonio atual não tem endereço/localidade e está dentro de um patrimonio com endereço/localidade
+                if (contido_em.historico_atual and not endereco):
+                    raise forms.ValidationError(u'Patrimônio deve estar na mesma localização do patrimônio em que está contido.')
                 
                 # Verifica se está no mesmo endereço do patrimonio pai
                 if (contido_em.historico_atual and contido_em.historico_atual.endereco != endereco):
                     raise forms.ValidationError(u'Patrimônio deve estar na mesma localização do patrimônio em que está contido.')
-                        
+                
                 historicolocal = HistoricoLocal(posicao=cleaned_data.get("posicao"))
+                # Verifica se o patrimonio atual não tem posicao/rack e está dentro de um patrimonio com posicao/rack
+                if (contido_em.historico_atual.posicao_rack and (not historicolocal.posicao_rack or historicolocal.posicao_rack== '' )):
+                    raise forms.ValidationError(u'Patrimônio deve estar no mesmo rack do patrimônio em que está contido.')
                 
                 # Verifica se está no mesmo rack do patrimonio pai
                 if (contido_em.historico_atual and \
@@ -436,17 +449,22 @@ class BaseHistoricoLocalAdminFormSet(BaseInlineFormSet):
                     
                    raise forms.ValidationError(u'Patrimônio deve estar no mesmo rack do patrimônio em que está contido.')
 
-                # Verifica o furo para os patrimonios que estiverem dentro de um Rack
+                # Verifica se o patrimonio está no mesmo rack/furo do patrimonio pai
+                # Não verifica se o patrimonio pai for Rack, pois o Rack não tem posição de furo
                 if (contido_em.equipamento.tipo.nome != 'Rack' and \
                     contido_em.historico_atual.posicao_furo != historicolocal.posicao_furo):
                     
                     raise forms.ValidationError(u'Patrimônio deve estar no mesmo furo do patrimônio em que está contido.')
-
+        else:
+            if patrimonio:
+                contido_em = patrimonio.patrimonio
+                if contido_em:
+                    # Esse caso deve ocorrer se o patrimonio está contido em outro e o histórico atual foi removido 
+                    raise forms.ValidationError(u'Patrimônio deve estar na mesma localização do patrimônio em que está contido.')
         
         return cleaned_data
 
 HistoricoLocalAdminFormSet = inlineformset_factory(Patrimonio, HistoricoLocal, formset=BaseHistoricoLocalAdminFormSet, fk_name='patrimonio', fields=['data', 'patrimonio', 'endereco', 'descricao',],)
-
 
 
 
