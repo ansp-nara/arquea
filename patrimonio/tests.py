@@ -8,17 +8,35 @@ from datetime import date, timedelta, datetime
 
 from patrimonio.models import HistoricoLocal, Tipo, Patrimonio, Equipamento, Estado, TipoEquipamento
 from patrimonio.views import *
-from protocolo.models import TipoDocumento, Origem, Protocolo, ItemProtocolo
-from protocolo.models import Estado as EstadoProtocolo
+from protocolo.models import TipoDocumento, Origem, Protocolo, ItemProtocolo, Estado as EstadoProtocolo
 from identificacao.models import Entidade, Contato, Endereco, Identificacao, TipoDetalhe
 from membro.models import Membro
-from outorga.models import Termo
+from outorga.models import Termo, Estado as EstadoOutorga, Acordo, OrigemFapesp, Categoria, Outorga
+from financeiro.models import ExtratoCC, Estado as EstadoFinanceiro, TipoComprovante, Auditoria
 
 import re
 import logging
 
+
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
+
+
+class EstadoTest(TestCase):
+    def test_nome(self):
+        est = Estado.objects.create(nome="ESTADO_NOME")
+        
+        self.assertEquals(u'ESTADO_NOME', est.__unicode__())
+
+
+class TipoTest(TestCase):
+    def test_nome(self):
+        tipo = Tipo.objects.create(nome="TIPO_NOME")
+        
+        self.assertEquals(u'TIPO_NOME', tipo.__unicode__())
+
+
+
 
 
 class HistoricoLocalTest(TestCase):
@@ -168,10 +186,12 @@ class PatrimonioTest(TestCase):
         tipoPatr = Tipo.objects.create(nome='roteador')
         tipoEquipamento = TipoEquipamento.objects.create(nome="Rack")
         entidade_fabricante = Entidade.objects.create(sigla='DELL', nome='Dell', cnpj='00.000.000/0000-00', fisco=True, url='')
+        entidade_procedencia = Entidade.objects.create(sigla='PROC', nome='Entidade_Procedencia', cnpj='00.000.000/0000-00', fisco=True, url='')
         equipamento = Equipamento.objects.create(tipo=tipoEquipamento, part_number="PN001", modelo="MODEL001", ncm="NCM001", \
                                                  ean="EAN001", entidade_fabricante=entidade_fabricante)
         
-        rt = Patrimonio.objects.create(equipamento=equipamento, ns='AF345678GB3489X', modelo='NetIron400', tipo=tipoPatr, apelido="NetIron400", checado=True)
+        rt = Patrimonio.objects.create(equipamento=equipamento, ns='AF345678GB3489X', modelo='NetIron400', tipo=tipoPatr, \
+                                       apelido="NetIron400", checado=True, entidade_procedencia=entidade_procedencia)
 
     def _setUpHistorico(self, patrimonio):
         ent= Entidade.objects.create(sigla='SAC', nome='Global Crossing', cnpj='00.000.000/0000-00', fisco=True, url='')
@@ -260,6 +280,97 @@ class PatrimonioTest(TestCase):
         patr.equipamento = None
         self.assertEquals('', patr.ean)
 
+    def test_procedencia(self):
+        patr = Patrimonio.objects.get(ns='AF345678GB3489X')
+        procedencia = patr.procedencia
+        self.assertEquals('PROC', procedencia)
+
+    def test_procedencia_vazio(self):
+        patr = Patrimonio.objects.get(ns='AF345678GB3489X')
+        patr.entidade_procedencia = None
+        self.assertEquals('', patr.procedencia)
+
+    def test_posicao(self):
+        patr = Patrimonio.objects.get(ns='AF345678GB3489X')
+        self._setUpHistorico(patr)
+        self.assertEquals(' - S043', patr.posicao())
+
+    def test_posicao_vazio(self):
+        patr = Patrimonio.objects.get(ns='AF345678GB3489X')
+        self.assertEquals('', patr.posicao())
+
+    def test_nf(self):
+        patr = Patrimonio.objects.get(ns='AF345678GB3489X')
+        
+        protocolo = Protocolo.objects.create(id=1, num_documento='00001', tipo_documento_id=0, estado_id=0, termo_id=0, data_chegada=date(year=2000, month=01, day=01), moeda_estrangeira=False)
+        pagamento = Pagamento.objects.create(id=1, protocolo=protocolo, valor_fapesp=0)
+        patr.pagamento = pagamento
+        
+        self.assertEquals('00001', patr.nf())
+
+    def test_nf_vazio_pagamento_vazio(self):
+        patr = Patrimonio.objects.get(ns='AF345678GB3489X')
+        patr.pagamento = None
+        
+        self.assertEquals('', patr.nf())
+
+    def test_auditoria(self):
+        #Cria Termo
+        e = EstadoOutorga.objects.create(nome='Vigente')
+        t = Termo.objects.create(ano=2008, processo=22222, digito=2, inicio=date(2008,1,1), estado=e)
+        #Cria Outorga
+        c1 = Categoria.objects.create()
+        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007,12,1), termino=date(2008,12,31), data_presta_contas=date(2008,2,28))
+
+        #Cria Natureza de gasto
+        m1 = Modalidade.objects.create(sigla='STB', )
+        n1 = Natureza_gasto.objects.create(modalidade=m1, termo=t, valor_concedido='1500000.00')
+
+        #Cria Item de Outorga
+        ent1 = Entidade.objects.create(sigla='GTECH', cnpj='00.000.000/0000-00', fisco=True, url='')
+        end1 = Endereco.objects.create(entidade=ent1)
+        i1 = Item.objects.create(entidade=ent1, natureza_gasto=n1, quantidade=12, valor=2500)
+
+        #Cria Protocolo
+        ep = EstadoProtocolo.objects.create()
+        td = TipoDocumento.objects.create()
+        og = Origem.objects.create()
+        cot1 = Contato.objects.create()
+        
+        iden1 = Identificacao.objects.create(endereco=end1, contato=cot1, ativo=True)
+        
+        p1 = Protocolo.objects.create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=date(2008,9,30), \
+                                      origem=og, estado=ep, num_documento=8888)
+
+        #Criar Fonte Pagadora
+        ef1 = EstadoOutorga.objects.create()
+        ex1 = ExtratoCC.objects.create(data_extrato=date(2008,10,30), data_oper=date(2008,10,5), cod_oper=333333, valor='2650', historico='TED', despesa_caixa=False)
+        a1 = Acordo.objects.create(estado=ef1)
+        of1 = OrigemFapesp.objects.create(acordo=a1, item_outorga=i1)
+        fp1 = Pagamento.objects.create(protocolo=p1, conta_corrente=ex1, origem_fapesp=of1, valor_fapesp='2650')
+        
+        efi1 = EstadoFinanceiro.objects.create()
+        tcomprov1 = TipoComprovante.objects.create()
+
+        audit1 = Auditoria.objects.create(estado=efi1, pagamento=fp1, tipo=tcomprov1, parcial=101.0, pagina=102.0, obs='observacao')
+
+        patr = Patrimonio.objects.get(ns='AF345678GB3489X')
+        patr.pagamento = fp1
+        
+        self.assertEquals('STB (101/102)', patr.auditoria())
+
+    def test_auditoria_vazia(self):
+        patr = Patrimonio.objects.get(ns='AF345678GB3489X')
+        patr.pagamento = None
+        
+        self.assertEquals('', patr.auditoria())
+
+
+    def nf(self):
+        if self.pagamento is not None and self.pagamento.protocolo is not None:
+            return u'%s' % self.pagamento.protocolo.num_documento
+        else:
+            return ''
 
 
 
