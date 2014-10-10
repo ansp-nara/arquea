@@ -6,10 +6,38 @@ from utils.functions import formata_moeda
 from models import *
 
 
+"""
 
+Definição de ModelResource utilizados no import_export para fazer a exportação de dados para CSV, XSL, etc.
+
+"""
 class PatrimonioResource(resources.ModelResource):
     class Meta:
         model = Patrimonio
+        fields = ('id',
+                  'pagamento',
+                  'ns',
+                  'complemento',
+                  'obs',
+                  'equipamento__part_number',
+                  'equipamento__modelo',
+                  'equipamento__entidade_fabricante__sigla',
+                  'checado',
+                  'apelido',
+                  'descricao',
+                  'tem_numero_fmusp',
+                  'numero_fmusp',
+                  'entidade_procedencia__sigla',
+                  'tipo',
+                  'descricao_tecnica',
+                  'especificacao',
+                  'tamanho',
+                  'revision',
+                  'version',
+                  'ncm',
+                  'ocst',
+                  'cfop',
+                  'garantia_termino')
 
 
 class RelatorioPorTipoResource(resources.ModelResource):

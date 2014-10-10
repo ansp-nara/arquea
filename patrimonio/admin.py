@@ -90,6 +90,12 @@ class PatrimonioAdmin(ExportMixin, admin.ModelAdmin):
         
         instance = getattr(self, 'instance', None)
         
+    def get_export_queryset(self, request):
+        """
+        Gera o queryset utilizado na geração da exportação para Excell
+        """
+        queryset = super(PatrimonioAdmin, self).get_export_queryset(request)
+        return queryset.select_related('tipo', 'equipamento', 'pagamento__protocolo__termo')
 
     def marca(self, instance):
         entidade_fabricante = '&nbsp;'
