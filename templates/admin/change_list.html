@@ -58,6 +58,7 @@
     {% block object-tools %}
       {% if has_add_permission %}
         <ul class="object-tools">
+          {% block object-tools-items %}
           {% if pdf %}
           <li>
             <a href="{{ cl.get_query_string }}&pdf=1" class="printlink">Imprimir esta lista</a>
@@ -68,6 +69,7 @@
               {% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}
             </a>
           </li>
+          {% endblock %}
         </ul>
       {% endif %}
     {% endblock %}
