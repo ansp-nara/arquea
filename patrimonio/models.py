@@ -237,7 +237,7 @@ class Patrimonio(models.Model):
     # Retorna os patrimônios de um termo.
     @classmethod
     def patrimonios_termo(cls, t):
-        return cls.objects.filter(pagamento_protocolo__termo=t)
+        return cls.objects.filter(pagamento__protocolo__termo=t)
 
     def nf(self):
         if self.pagamento is not None and self.pagamento.protocolo is not None:
