@@ -91,17 +91,6 @@ INSTALLED_APPS = (
     'tinymce',
     'ckeditor',
     'import_export',
-    'django.contrib.humanize',
-    'south',
-    'django_notify',
-    'mptt',
-    'sekizai',
-    'sorl.thumbnail',
-    'wiki',
-    'wiki.plugins.attachments',
-    'wiki.plugins.notifications',
-    'wiki.plugins.images',
-    'wiki.plugins.macros',
 )
 
 PROJECT_APPS = (
