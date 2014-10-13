@@ -23,20 +23,67 @@ logger = logging.getLogger(__name__)
 
 
 class EstadoTest(TestCase):
-    def test_nome(self):
+    def test_unicode(self):
         est = Estado.objects.create(nome="ESTADO_NOME")
         
         self.assertEquals(u'ESTADO_NOME', est.__unicode__())
 
 
 class TipoTest(TestCase):
-    def test_nome(self):
+    def test_unicode(self):
         tipo = Tipo.objects.create(nome="TIPO_NOME")
         
         self.assertEquals(u'TIPO_NOME', tipo.__unicode__())
 
 
+class DirecaoTest(TestCase):
+    def test_unicode(self):
+        direcao = Direcao.objects.create(origem="ORIGEM", destino="DESTINO")
+        
+        self.assertEquals(u'ORIGEM - DESTINO', direcao.__unicode__())
 
+    def test_meta(self):
+        self.assertEquals(u'Direção', Direcao._meta.verbose_name)
+        self.assertEquals(u'Direções', Direcao._meta.verbose_name_plural)
+
+
+class DistribuicaoUnidadeTest(TestCase):
+    def test_unicode(self):
+        distribuicaoUnidade = DistribuicaoUnidade.objects.create(nome="NOME", sigla="SIGLA")
+        
+        self.assertEquals(u'SIGLA - NOME', distribuicaoUnidade.__unicode__())
+
+class DistribuicaoTest(TestCase):
+    def test_unicode(self):
+        distribuicaoUnidade = DistribuicaoUnidade.objects.create(nome="NOME", sigla="SIGLA")
+        direcao = Direcao.objects.create(origem="ORIGEM", destino="DESTINO")
+        distribuicao = Distribuicao.objects.create(inicio=1, final=2, unidade=distribuicaoUnidade, direcao=direcao)
+        
+        self.assertEquals(u'1 - 2', distribuicao.__unicode__())
+
+
+class UnidadeDimensaoTest(TestCase):
+    def test_unicode(self):
+        unidadeDimensao = UnidadeDimensao.objects.create(nome="NOME")
+        
+        self.assertEquals(u'NOME', unidadeDimensao.__unicode__())
+
+    def test_meta(self):
+        self.assertEquals(u'Unidade da dimensão', UnidadeDimensao._meta.verbose_name)
+        self.assertEquals(u'Unidade das dimensões', UnidadeDimensao._meta.verbose_name_plural)
+
+
+
+class DimensaoTest(TestCase):
+    def test_unicode(self):
+        unidadeDimensao = UnidadeDimensao.objects.create(nome="UNIDADE")
+        dimensao = Dimensao.objects.create(altura=1, largura=2, profundidade=3, peso=4, unidade=unidadeDimensao)
+        
+        self.assertEquals(u'1 x 2 x 3 UNIDADE - 4 kg', dimensao.__unicode__())
+
+    def test_meta(self):
+        self.assertEquals(u'Dimensão', Dimensao._meta.verbose_name)
+        self.assertEquals(u'Dimensões', Dimensao._meta.verbose_name_plural)
 
 
 class HistoricoLocalTest(TestCase):

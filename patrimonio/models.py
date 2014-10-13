@@ -427,7 +427,7 @@ class UnidadeDimensao(models.Model):
 		
 	class Meta:
 		verbose_name = u'Unidade da dimensão'
-		verbose_name_plural = u'Unidades das dimensões'
+		verbose_name_plural = u'Unidade das dimensões'
 		
 class Dimensao(models.Model):
 	altura = models.DecimalField(max_digits=6, decimal_places=3, null=True, blank=True)
