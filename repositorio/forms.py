@@ -32,4 +32,4 @@ class RepositorioAdminForm(forms.ModelForm):
 		js = ('/media/js/selects.js',)
 		
 	filtra_patrimonio = forms.CharField(label=u'Filtro do patrimônio', required=False,
-							widget=forms.TextInput(attrs={'onchange':'ajax_filter_patrimonios();'}))
+							widget=forms.TextInput(attrs={'onchange':'ajax_filter_patrimonio();'}))
