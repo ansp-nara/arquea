@@ -60,6 +60,11 @@ class PatrimonioResource(resources.ModelResource):
                   'obs',
                   'checado',
                  )
+    def dehydrate_pagamento__protocolo__termo(self, p):
+        if p.pagamento_id and p.pagamento.protocolo_id and p.pagamento.protocolo.termo_id:
+            return '%s' % (p.pagamento.protocolo.termo)
+        return ''
+
 
 
 class RelatorioPorTipoResource(resources.ModelResource):
