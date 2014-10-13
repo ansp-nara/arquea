@@ -39,9 +39,9 @@ STATIC_ROOT = '/var/sistema-novo-svn/staticfiles/'
 STATIC_URL = '/files/'
 
 
-INSTALLED_APPS += (
+INSTALLED_APPS = (
     'django_jenkins',
-)
+) + INSTALLED_APPS
 
 
 
