@@ -12,6 +12,16 @@ Definição de ModelResource utilizados no import_export para fazer a exportaç�
 
 """
 class PatrimonioResource(resources.ModelResource):
+    pagamento__protocolo__termo = fields.Field(column_name='termo')
+    equipamento__part_number = fields.Field(column_name='part number')
+    equipamento__modelo = fields.Field(column_name='modelo')
+    equipamento__entidade_fabricante__sigla = fields.Field(column_name='fabricante')
+    ns = fields.Field(column_name='serial number')
+    tipo__nome = fields.Field(column_name='tipo')
+    numero_fmusp = fields.Field(column_name='num fmusp')
+    entidade_procedencia__sigla = fields.Field(column_name='procedencia')
+    garantia_termino = fields.Field(column_name='termino de garantia')
+                  
     class Meta:
         model = Patrimonio
         fields = ('id',
