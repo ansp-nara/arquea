@@ -3,20 +3,30 @@
 {% load i18n %}
 
 {% block content %}
+<h2>Carregar posicionamento de equipamentos a partir de um arquivo csv</h2>
+
+{% if request.method == 'GET' %}
 <form method="POST" enctype="multipart/form-data">{% csrf_token %}
     <input id="racks_id" name="racks" type="file">
     <input type="submit" value="Enviar">
 </form>
 
-<p>Ok com:</p>
+{% else %}
+<h4>Ok com:</h4>
+<ul>
 {% for l in ok %}
-<p>{{ l.apelido }} {{ l }}</p>
+<li>{{ l.apelido }} {{ l }}</li>
 {% endfor %}
+</ul>
 
-<p>Falha com:</p>
+<h4>Falha com:</h4>
+<ul>
 {% for l in failed %}
-<p>{{ l.apelido }} {{ l }}</p>
+<li>{{ l.apelido }} {{ l }}</li>
 {% endfor %}
+</ul>
+
+{% endif %}
 
 {% endblock %}
 

@@ -6,6 +6,10 @@ from utils.functions import clone_objects
 from models import *
 from modelsResource import *
 from forms import *
+from django.conf.urls import *
+from django.contrib.admin.views.decorators import staff_member_required
+from django.template.response import TemplateResponse
+import csv
 
 from import_export.admin import ExportMixin
 from import_export.admin import ImportExportModelAdmin,ExportMixin
@@ -67,6 +71,7 @@ class PatrimonioAdmin(ExportMixin, admin.ModelAdmin):
     
     readonly_fields = ('marca', 'part_number', 'modelo', 'ean')
     form = PatrimonioAdminForm
+    change_list_template = 'admin/patrimonio/patrimonio/change_list.html'
     list_display = ('tipo', 'descricao', 'complemento', 'posicao', 'agilis', 'modelo', 'ns', 'nf', 'valor', 'checado')
     # list_select_related pode ser somente boolean no 1.5
     if django.VERSION[0:2] >= (1, 6):
@@ -147,7 +152,14 @@ class PatrimonioAdmin(ExportMixin, admin.ModelAdmin):
         queryset.update(checado=True)
     action_mark_checado.short_description = _(u'Marcar como checado')
 
-
+    def get_urls(self):
+        urls = super(PatrimonioAdmin, self).get_urls()
+        
+        my_urls = patterns("",
+            url("^conserta/$", conserta_posicoes)
+        )
+        return my_urls+urls
+            
 admin.site.register(Patrimonio,PatrimonioAdmin)
 
 class HistoricoLocalAdmin(admin.ModelAdmin):
@@ -191,7 +203,15 @@ class EquipamentoAdmin(admin.ModelAdmin):
         """
         self.form.admin_site = admin_site
         super(EquipamentoAdmin, self).__init__(model, admin_site)
-
+        
+    def get_urls(self):
+        urls = super(EquipamentoAdmin, self).get_urls()
+        
+        my_urls = patterns("",
+            url("^conserta/$", conserta_posicoes)
+        )
+        return my_urls+urls
+        
 admin.site.register(Equipamento, EquipamentoAdmin)
 
 
@@ -229,4 +249,34 @@ class PlantaBaixaPosicaoAdmin(admin.ModelAdmin):
 
 admin.site.register(PlantaBaixaPosicao, PlantaBaixaPosicaoAdmin)
 
-
+@staff_member_required
+def conserta_posicoes(request):
+    
+    if request.method == 'GET':
+        return TemplateResponse(request, 'patrimonio/conserta.html')
+    ok = []
+    failed = []
+    if request.FILES:
+        with request.FILES['racks'] as racksfile:
+            rackscsv = csv.DictReader(racksfile, delimiter=';', quotechar='"')
+            for row in rackscsv:
+                try:
+                    rack = Patrimonio.objects.get(id=row['rack_id'])
+                    p = Patrimonio.objects.get(id=row['id'])
+                    hl_rack = rack.historico_atual
+                    if p.patrimonio == rack and p.historico_atual.posicao and p.historico_atual.posicao.endswith('%03d' % int(row['posicao'])):
+                        continue
+                    hl = HistoricoLocal()
+                    hl.endereco = hl_rack.endereco
+                    hl.estado = hl_rack.estado
+                    hl.data = datetime.datetime.now()
+                    hl.posicao = '%s.F%03d' % (rack.apelido.split()[-1], int(row['posicao']))
+                    hl.patrimonio = p
+                    p.patrimonio = rack
+                    p.save()
+                    hl.save()
+                    ok.append('%s - %s' % (p.apelido or p.id, row['posicao']))
+                except:
+                    failed.append('%s - %s' % (row['id'], row['posicao']))
+                    
+    return TemplateResponse(request, 'patrimonio/conserta.html', {'ok':ok, 'failed':failed})
