@@ -2,6 +2,7 @@
 import django
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
+from utils.admin import AdminImageWidget
 from utils.functions import clone_objects
 from models import *
 from modelsResource import *
@@ -23,7 +24,6 @@ admin.site.register(DistribuicaoUnidade)
 admin.site.register(UnidadeDimensao)
 admin.site.register(Direcao)
 admin.site.register(TipoEquipamento)
-
 
 
 class HistoricoLocalInline(admin.StackedInline):
@@ -212,6 +212,14 @@ class EquipamentoAdmin(admin.ModelAdmin):
         )
         return my_urls+urls
         
+    def formfield_for_dbfield(self, db_field, **kwargs):
+        # Sobrescrevendo os campos de imagens para poder apresentar um preview na tela do admin
+        if db_field.name == 'imagem' or db_field.name == 'imagem_traseira':
+            request = kwargs.pop("request", None)
+            kwargs['widget'] = AdminImageWidget
+            return db_field.formfield(**kwargs)
+        return super(EquipamentoAdmin,self).formfield_for_dbfield(db_field, **kwargs)
+
 admin.site.register(Equipamento, EquipamentoAdmin)
 
 
