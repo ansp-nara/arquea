@@ -2,11 +2,14 @@
 from django.contrib import admin
 import operator
 from widgets import ForeignKeySearchInput
+from django.contrib.admin.widgets import AdminFileWidget
 from django.db import models
-from django.http import HttpResponse, HttpResponseNotFound
 from django.db.models.query import QuerySet
-from django.utils.encoding import smart_str
+from django.http import HttpResponse, HttpResponseNotFound
 from django.template.response import TemplateResponse
+from django.utils.encoding import smart_str
+from django.utils.translation import ugettext as _
+from django.utils.safestring import mark_safe
 from functions import render_to_pdf
 
 class AutoCompleteAdmin(admin.ModelAdmin):
@@ -102,4 +105,16 @@ class PrintModelAdmin(admin.ModelAdmin):
             else: extra_context = {'pdf':True}
             page = super(PrintModelAdmin,self).changelist_view(request, extra_context)
         return page
+
+
+class AdminImageWidget(AdminFileWidget):
+    def render(self, name, value, attrs=None):
+        output = []
+        if value and getattr(value, "url", None):
+            image_url = value.url
+            file_name=str(value)
+            output.append(u'<br><img src="%s" alt="%s" style="max-width:400px;max-height:400px;"/><br> %s ' % \
+                (image_url, image_url,'',))
+        output.append(super(AdminFileWidget, self).render(name, value, attrs))
+        return mark_safe(u''.join(output))
 
