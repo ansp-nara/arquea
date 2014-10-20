@@ -89,6 +89,18 @@
     z-index: 10;
 }
 
+.interno .rack_grid {
+    position:absolute;
+    width:202px;
+    top:1px;
+}
+.interno .rack_grid .rack_grid_item {
+    position:relative;
+    border-bottom:1px solid #eee;
+    height:18px;
+    width:100%;
+}
+
 /* hack para acerto do posicionamento para o Chrome */
 @media screen and (-webkit-min-device-pixel-ratio:0) { 
     .interno > div {

@@ -844,6 +844,7 @@ def ajax_filtra_pn_estado(request):
 
         estados.append({'pk':e.id, 'value':'%s (%s)' % (e, patrimonios_estado.order_by('id').distinct().count())})
 
+
     retorno = {'estados':estados, 'pns':pns}
     retorno_json = json.dumps(retorno)
 
@@ -981,180 +982,10 @@ def racks(request):
         dc = {'nome':local.complemento, 'id':local.id}
         todos_dcs.append(dc)
 
-    p_dc = request.GET.get('dc')
+    p_dc = request.GET.get('dc_id')
+    p_rack = request.GET.get('rack_id')
     
-    dcs = []
-    if p_dc != None:
-        if int(p_dc) > 0:
-            locais = EnderecoDetalhe.objects.filter(id=p_dc)
-        
-        for local in locais:
-            racks = []
-            
-            
-            patrimonio_racks = Patrimonio.objects.filter(equipamento__tipo__nome='Rack', historicolocal__endereco__id=local.id) \
-                                                .select_related('contido', 'equipamento') \
-                                                .prefetch_related('historicolocal_set')
-            
-            patrimonio_racks = list(patrimonio_racks)
-            # Ordena os racks pela posição. Ex: R042 - ordena pela fila 042 e depois pela posição R
-            patrimonio_racks.sort(key=lambda x: x.historico_atual_prefetched.posicao_rack_letra, reverse=False)
-            patrimonio_racks.sort(key=lambda x: x.historico_atual_prefetched.posicao_rack_numero, reverse=True)
-                
-            fileiras = []
-            rack_anterior = None
-            for rack in patrimonio_racks:
-                if not rack_anterior or rack.historico_atual_prefetched.posicao_rack_numero != rack_anterior.historico_atual_prefetched.posicao_rack_numero:
-                    racks = []
-                    fileiras.append({'racks': racks})
-                    rack_anterior = rack
-                    
-                espaco_ocupado = 0
-                equipamentos = []
-                equipamentos_fora_visao = []
-                equipamentos_pdu = []
-                conflitos = []
-                
-                eixoY = 0
-                if rack.tamanho:
-                    rack_altura = int(rack.tamanho) * 3
-                else:
-                    # ISSO É UM PROBLEMA DE DADOS INVÁLIDOS. PRECISA SER TRATADO
-                    rack_altura = 126
-                    rack.tamanho = 42
-                    conflitos.append({'obs': 'Rack não possui tamanho.'})
-                
-                # ordena os equipamentos do rack conforme a posição no rack
-#                 pts = list(rack.contido.filter(historicolocal__posicao__isnull=False).values('historicolocal__data').aggregate(Max('historicolocal__data')))
-                hist = rack.contido.annotate(hist=Max('historicolocal__data')).values_list('pk')
-                pts = list(rack.contido.filter(pk__in=hist).select_related('equipamento', 'equipamento__tipo').prefetch_related('historicolocal_set'))
-                pts.sort(key=lambda x: x.historico_atual_prefetched.posicao_furo, reverse=True)
-    
-                ptAnterior = None
-                for pt in pts:
-                    pos = pt.historico_atual_prefetched.posicao_furo - 1 
-                    
-                    tamanho = 0
-                    if pt.tamanho:
-                        tamanho = pt.tamanho
-                    # calculando a altura em furos
-                    tam = int(round(tamanho * 3))
-    
-                    # calculo da posição em pixel do eixoY, top-down
-                    eixoY = int(round(((rack_altura - (pos) - tam) * 19.0) / 3.0)) -5.0
-                    
-                    # Setando Imagem do equipamento
-                    imagem = None
-                    imagem_traseira = None 
-                    if pt.equipamento and pt.equipamento.imagem:
-                        imagem = pt.equipamento.imagem.url
-                    if pt.equipamento and pt.equipamento.imagem_traseira:
-                        imagem_traseira = pt.equipamento.imagem_traseira.url
-                        
-                    # Verificando profundidade
-                    # Assinala somente se ocupa a profundidade toda, ou somente metade 
-                    # da profundidade do rack
-                    profundidade = 1.0
-                    if rack.equipamento.dimensao_id and pt.equipamento.dimensao_id:
-                        if pt.equipamento.dimensao.profundidade < \
-                            rack.equipamento.dimensao.profundidade / 2:
-                            profundidade = 0.5
-                    
-                    flag_traseiro = False
-                    if pt.historico_atual_prefetched.posicao_colocacao in ('TD', 'TE', 'T', 'T01', 'T02', 'T03'):
-                        flag_traseiro = True
-                        
-                    last_equipamento = {'id': pt.id, 'pos':pos, 'tam': tam, 'eixoY': eixoY, 'altura':(tam * 19.0 / 3.0),
-                                              'pos_original':pt.historico_atual_prefetched.posicao_furo,
-                                              'imagem':imagem, 'imagem_traseira':imagem_traseira,
-                                              'profundidade':profundidade,
-                                              'nome':pt.apelido, 'descricao':pt.descricao or u'Sem descrição',
-                                              'conflito':False, 'pos_col':pt.historico_atual_prefetched.posicao_colocacao,
-                                              'flag_traseiro':flag_traseiro}
-                        
-                    if pt.equipamento and pt.equipamento.tipo and 'tomada' in pt.equipamento.tipo.nome and \
-                        pt.historico_atual_prefetched.posicao_colocacao in ('TD', 'TE', 'lD', 'lE', 'LD', 'LE'):
-                        
-                        # Guardando as calhas de tomadas para apresentar nas laterais do Rack
-                        equipamentos_pdu.append(last_equipamento)
-                    elif pos < 0 or pt.historico_atual_prefetched.posicao_colocacao in ('TD', 'TE', 'piso', 'lD', 'lE'):
-                        if pos < 0: 
-                            pos = '-'
-                            last_equipamento['pos'] = pos
-                        equipamentos_fora_visao.append(last_equipamento)
-                        continue
-                    else:
-                        # x a partir do topo do container
-                        # Adiciona os equipamentos frontais e traseiros. 
-                        # O layout deve ser tratado no template
-                        equipamentos.append(last_equipamento)
-                        espaco_ocupado += tam
-                    
-                    # # CHECAGEM DE PROBLEMAS
-#                     if pos <= 0:
-#                         obs = 'Equip. com problema de posicionamento.'
-#                         conflitos.append({'obs': obs, 'eq1':last_equipamento})
-#                         last_equipamento['conflito'] = True 
-#                     elif pt.tamanho is None:
-
-                    if pt.tamanho is None:
-                        obs = 'Equip. com tamanho ZERO.'
-                        conflitos.append({'obs': obs, 'eq1':last_equipamento})
-                        last_equipamento['conflito'] = True 
-                    elif pos + (tam) > rack_altura:
-                        # Ocorre quando um equipamento está passando do limite máximo do rack
-                        # obs = '{!s} + {!s} > {!s}'.format(pos, (tam), 126)
-                        obs = 'Equip. acima do limite do rack.'
-                        conflitos.append({'obs': obs, 'eq1':last_equipamento})
-                        last_equipamento['conflito'] = True
-                
-                    elif len(equipamentos) >= 2 and eixoY:
-                        # Ocorre quando um equipamento sobrepoe o outro
-                        # Caso estejam na mesma posição 01 ou 02, ou então, haja um equipamento que ocupe toda largura do rack
-                        # Não ocorre quando os equipamentos estiverem lado a lado (marcados no attr pos_col, por exemplo, 01 com 02)
-
-                        if ptAnterior and \
-                            ptAnterior['profundidade'] + last_equipamento['profundidade'] <= 1.0 and \
-                            ptAnterior['eixoY'] + ptAnterior['tam'] > eixoY and \
-                            (ptAnterior['pos_col'] == last_equipamento['pos_col'] or not ptAnterior['pos_col'] or not last_equipamento['pos_col']):
-                        
-                            obs = 'Equipamentos sobrepostos.'
-                            conflitos.append({'obs': obs, 'eq1':ptAnterior, 'eq2':last_equipamento})
-                            last_equipamento['conflito'] = True
-                            equipamentos[-2]['conflito'] = True
-                    elif pos == -2:
-                        # Posição -2 significa que o patrimonio não possui furo.
-                        obs = 'Equip. sem posição definida.'
-                        conflitos.append({'obs': obs, 'eq1':last_equipamento})
-                        last_equipamento['conflito'] = True
-                    elif pos < 0:
-                        # Posição negativa
-                        # Ocorre quando o equipamento não tem uma posição válida
-                        obs = 'Equip. abaixo do limite do rack.'
-                        conflitos.append({'obs': obs, 'eq1':last_equipamento})
-                        last_equipamento['conflito'] = True
-                    elif len(equipamentos) > 0 and last_equipamento['pos_col'] and last_equipamento['pos_col'] not in ('01', '02', 'T', 'TD', 'TE', 'T01', 'T02', 'piso', 'lD', 'lE', 'LD', 'LE'):
-                        obs = 'Posicao inválida %s' % pt.historico_atual_prefetched.posicao_colocacao
-                        conflitos.append({'obs': obs, 'eq1':last_equipamento},)
-                        last_equipamento['conflito'] = True
-                        
-                    ptAnterior = last_equipamento
-
-                rack = {'id':rack.id,
-                        'altura':int(rack.tamanho) * 3.0, 'altura_pts': rack.tamanho, 'altura_pxs': int(rack.tamanho) * 19.0,
-                        'nome':rack.apelido, 'marca': rack.marca, 'local': pt.historico_atual_prefetched.posicao,
-                        'equipamentos':equipamentos, 'equipamentos_fora_visao':equipamentos_fora_visao,
-                        'equipamentos_pdu':equipamentos_pdu,
-                        'conflitos':conflitos}
-                
-                # Calculo de uso do rack                
-                rack['vazio'] = '%.2f%%' % ((espaco_ocupado * 100.0) / (rack['altura'])) 
-                racks.append(rack)
-                
-            dcEntidade = Entidade.objects.filter(endereco__enderecodetalhe=local)
-            
-            dc = {'nome':local.complemento, 'fileiras':fileiras, 'id':local, 'entidade': dcEntidade[0].sigla, }
-            dcs.append(dc)
+    dcs = __rack_data(p_dc, p_rack)
     
     chk_stencil = request.GET.get('chk_stencil') if request.GET.get('chk_stencil') else 1
     chk_legenda = request.GET.get('chk_legenda') if request.GET.get('chk_legenda') else 1
@@ -1171,51 +1002,184 @@ def racks(request):
         return TemplateResponse(request, 'patrimonio/racks.html', {'dcs':dcs, 'todos_dcs':todos_dcs, 'chk_legenda':chk_legenda, 'chk_legenda_desc':chk_legenda_desc, 'chk_stencil':chk_stencil, 'chk_outros':chk_outros, 'chk_avisos':chk_avisos, 'chk_traseira':chk_traseira})
 
 
-@login_required
-def racks1(request):
-    detalhes = [ed for ed in EnderecoDetalhe.objects.filter(complemento__contains='.F', tipo__nome__startswith='Posi').order_by('-complemento') if len(ed.complemento.split('.')) == 2 and ed.end.id == 60]
-    racks = []
-    r = ''
-    rack = ''
-    alt = 0
-    vazio = 0
-    for ed in detalhes:
-        equipamentos = []
-        info = ed.complemento.split('.')
-        if info[0] != r:
-            if alt > 1: 
-                equipamentos.append({'tamanho':alt - 1, 'range':range(alt - 2)})
-		vazio += alt - 1
-            r = info[0]
-            if rack:
-                rack['vazio'] = '%.2f%%' % ((rack['altura'] - vazio) * 100.0 / rack['altura'],)
-                racks.append(rack)
-            equipamentos = []
-            rack = {'nome':r, 'altura':126, 'equipamentos':equipamentos}
-            alt = 127
-            vazio = 0
-        hl = HistoricoLocal.objects.filter(endereco=ed, patrimonio__patrimonio__isnull=True)
-        if hl.count() > 0:
-            pt = hl[0].patrimonio
-            try:
-                pos = int(info[1][1:])
-            except: continue
-            if pos == 1 or pt.tamanho is None: continue
-            if alt > pos + int(round(pt.tamanho * 3)):
-                tam = alt - (pos + int(round(pt.tamanho * 3)))
-                alt -= tam
-                equipamentos.append({'tamanho':tam, 'range':range(tam - 1)})
-                vazio += tam
-            tam = int(round(pt.tamanho * 3))
-            alt -= tam
-            imagem = None
-            if pt.equipamento:
-                if pt.equipamento.imagem:
-		    imagem = pt.equipamento.imagem.url
-            equipamentos.append({'tamanho':tam, 'imagem':imagem, 'descricao':pt.descricao or u'Sem descrição', 'range':range(tam - 1)})
+def __rack_data(datacenter_id, rack_id):
+    dcs = []
+    if datacenter_id != None and int(datacenter_id) > 0:
+        if int(datacenter_id) > 0:
+            locais = EnderecoDetalhe.objects.filter(id=datacenter_id)
+        
+        for local in locais:
+            racks = []
+            
+            if rack_id:
+                patrimonio_racks = PatrimonioRack.objects.filter(id=rack_id, historicolocal__endereco__id=local.id)
+            else:
+                patrimonio_racks = PatrimonioRack.get_racks_as_list(local.id)
+            
+            fileiras = []
+            rack_anterior = None
+            for rack in patrimonio_racks:
+                if not rack_anterior or rack.historico_atual_prefetched.posicao_rack_numero != rack_anterior.historico_atual_prefetched.posicao_rack_numero:
+                    racks = []
+                    fileiras.append({'racks': racks})
+                    rack_anterior = rack
+                    
+                espaco_ocupado = 0
+                equipamentos = []
+                equipamentos_fora_visao = []
+                equipamentos_pdu = []
+                conflitos = []
+                
+                eixoY = 0
+                if not rack.tamanho:
+                    rack.tamanho = 42
+                    conflitos.append({'obs': u'Rack não possui tamanho.'})
+                
+                # recupera os equipamentos do rack ordenados pela posição no rack
+                pts = rack.get_patrimonios()
+    
+                ptAnterior = None
+                for pt in pts:
+                    tamanho = 0
+                    if pt.tamanho:
+                        tamanho = pt.tamanho
+                    # calculando a altura em furos
+                    tam = int(round(tamanho * 3))
+    
+                    # Setando Imagem do equipamento
+                    imagem = None
+                    imagem_traseira = None 
+                    if pt.equipamento and pt.equipamento.imagem:
+                        imagem = pt.equipamento.imagem.url
+                    if pt.equipamento and pt.equipamento.imagem_traseira:
+                        imagem_traseira = pt.equipamento.imagem_traseira.url
+                        
+                    # Verificando profundidade
+                    # Assinala somente se ocupa a profundidade toda, ou somente metade 
+                    # da profundidade do rack
+                    profundidade = 1.0
+                    if rack.equipamento.dimensao_id and pt.equipamento.dimensao_id:
+                        if pt.equipamento.dimensao.profundidade < (rack.equipamento.dimensao.profundidade / 2):
+                            profundidade = 0.5
+                    
+                    pos = pt.historico_atual_prefetched.posicao_furo - 1
+                    
+                    last_equipamento = {'id': pt.id, 'tam': tam, 'eixoY': pt.eixoy_em_px(),
+                                              'tam_u':tamanho,
+                                              'altura':pt.altura_em_px(), 'profundidade':profundidade,
+                                              'pos_original':pt.historico_atual_prefetched.posicao_furo,
+                                              'pos_col':pt.historico_atual_prefetched.posicao_colocacao,
+                                              'imagem':imagem, 'imagem_traseira':imagem_traseira,
+                                              'sn':pt.ns, 'pn':pt.part_number, 'modelo':pt.modelo,
+                                              'nome':pt.apelido, 'descricao':pt.descricao or u'Sem descrição',
+                                              'conflito':False, 'flag_traseiro':pt.is_posicao_traseira()}
+                    if pt.is_pdu():
+                        # Guardando as calhas de tomadas para apresentar nas laterais do Rack
+                        equipamentos_pdu.append(last_equipamento)
+                    elif pos < 0 or pt.historico_atual_prefetched.posicao_colocacao in ('TD', 'TE', 'piso', 'lD', 'lE'):
+                        # Verifica equipamentos posicionados de forma errada no rack
+                        if pos < 0: 
+                            pos = '-'
+                            last_equipamento['pos'] = pos
+                        equipamentos_fora_visao.append(last_equipamento)
+                        continue
+                    else:
+                        # x a partir do topo do container
+                        # Adiciona os equipamentos frontais e traseiros. 
+                        # O layout deve ser tratado no template
+                        equipamentos.append(last_equipamento)
+                        espaco_ocupado += tam
+                    
+                    # CHECAGEM DE PROBLEMAS
+                    if pt.tamanho is None:
+                        obs = u'Equip. com tamanho ZERO.'
+                        conflitos.append({'obs': obs, 'eq1':last_equipamento})
+                        last_equipamento['conflito'] = True 
+                    elif pos + (tam) > rack.altura_furos:
+                        # Ocorre quando um equipamento está passando do limite máximo do rack
+                        # obs = '{!s} + {!s} > {!s}'.format(pos, (tam), 126)
+                        obs = u'Equip. acima do limite do rack.'
+                        conflitos.append({'obs': obs, 'eq1':last_equipamento})
+                        last_equipamento['conflito'] = True
+                
+                    elif len(equipamentos) >= 2 and eixoY:
+                        # Ocorre quando um equipamento sobrepoe o outro
+                        # Caso estejam na mesma posição 01 ou 02, ou então, haja um equipamento que ocupe toda largura do rack
+                        # Não ocorre quando os equipamentos estiverem lado a lado (marcados no attr pos_col, por exemplo, 01 com 02)
 
-    return TemplateResponse(request, 'patrimonio/racks.html', {'racks':racks})
-    # return render_to_pdf('patrimonio/racks.pdf', {'racks':racks})
+                        if ptAnterior and \
+                            ptAnterior['profundidade'] + last_equipamento['profundidade'] <= 1.0 and \
+                            ptAnterior['eixoY'] + ptAnterior['tam'] > eixoY and \
+                            (ptAnterior['pos_col'] == last_equipamento['pos_col'] or not ptAnterior['pos_col'] or not last_equipamento['pos_col']):
+                        
+                            obs = u'Equipamentos sobrepostos.'
+                            conflitos.append({'obs': obs, 'eq1':ptAnterior, 'eq2':last_equipamento})
+                            last_equipamento['conflito'] = True
+                            equipamentos[-2]['conflito'] = True
+                    elif pos == -2:
+                        # Posição -2 significa que o patrimonio não possui furo.
+                        obs = u'Equip. sem posição definida.'
+                        conflitos.append({'obs': obs, 'eq1':last_equipamento})
+                        last_equipamento['conflito'] = True
+                    elif pos < 0:
+                        # Posição negativa
+                        # Ocorre quando o equipamento não tem uma posição válida
+                        obs = u'Equip. abaixo do limite do rack.'
+                        conflitos.append({'obs': obs, 'eq1':last_equipamento})
+                        last_equipamento['conflito'] = True
+                    elif len(equipamentos) > 0 and last_equipamento['pos_col'] and last_equipamento['pos_col'] not in ('01', '02', 'T', 'TD', 'TE', 'T01', 'T02', 'piso', 'lD', 'lE', 'LD', 'LE'):
+                        obs = u'Posicao inválida %s' % pt.historico_atual_prefetched.posicao_colocacao
+                        conflitos.append({'obs': obs, 'eq1':last_equipamento},)
+                        last_equipamento['conflito'] = True
+                        
+                    ptAnterior = last_equipamento
+
+                rack = {'id':rack.id,
+                        'altura':int(rack.tamanho) * 3.0, 'altura_pts': rack.tamanho, 'altura_pxs': int(rack.tamanho) * 19.0,
+                        'nome':rack.apelido, 'marca': rack.marca, 
+                        'equipamentos':equipamentos, 'equipamentos_fora_visao':equipamentos_fora_visao,
+                        'equipamentos_pdu':equipamentos_pdu,
+                        'conflitos':conflitos}
+                
+                # Calculo de uso do rack
+                rack['vazio'] = '%.2f%%' % ((espaco_ocupado * 100.0) / (rack['altura'])) 
+                racks.append(rack)
+                
+            dcEntidade = Entidade.objects.filter(endereco__enderecodetalhe=local)
+            
+            dc = {'nome':local.complemento, 'fileiras':fileiras, 'id':local, 'entidade': dcEntidade[0].sigla, }
+            dcs.append(dc)
+    return dcs
+    
+    
+@login_required
+def relatorio_rack(request):
+    p_dc = request.GET.get('dc')
+    p_rack = request.GET.get('rack')
+    
+    # Busca os endereços que possuem Racks no estadoAtivos
+    locais = EnderecoDetalhe.objects.filter(historicolocal__estado__id=Estado.PATRIMONIO_ATIVO, \
+                                            historicolocal__patrimonio__equipamento__tipo__nome='Rack', \
+                                            mostra_bayface=True,).order_by('id').distinct()
+    todos_dcs = []
+    for local in locais:
+        dc = {'nome':local.complemento, 'id':local.id}
+        todos_dcs.append(dc)
+        
+        
+    patrimonio_racks = []
+    if p_dc:
+        patrimonio_racks = PatrimonioRack.get_racks_as_list(p_dc)
+
+    dcs = __rack_data(p_dc, p_rack)
+    
+    if request.GET.get('pdf') == "2":
+        return render_wk_to_pdf('patrimonio/relatorio-racks-wk.pdf', {'dcs':dcs, 'todos_dcs':todos_dcs, 'patrimonio_racks':patrimonio_racks}, request=request, filename='diagrama_de_racks.pdf',)
+    elif request.GET.get('pdf'):
+        return TemplateResponse(request, 'patrimonio/relatorio-racks-wk.pdf', {'dcs':dcs, 'todos_dcs':todos_dcs, 'patrimonio_racks':patrimonio_racks})
+    else:
+        return TemplateResponse(request, 'patrimonio/relatorio-racks.html', {'dcs':dcs, 'todos_dcs':todos_dcs, 'patrimonio_racks':patrimonio_racks})
+
 
 
 @login_required

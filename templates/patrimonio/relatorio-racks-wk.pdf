@@ -1,0 +1,595 @@
+{% load proto_tags %}
+{% load i18n proto_tags admin_static %}
+{% load static %}
+{% get_static_prefix as STATIC_PREFIX %}
+
+<style type="text/css">
+@page {
+    size:a4 landscape;
+}
+
+
+h1 {
+    font-size: 16px;
+    color:#134089;
+    font-family: Arial, Verdana, Helvetica, sans-serif;
+    font-weight: bold;
+    postion:relative;
+    margin:0;
+    display:block;
+}
+h2 {
+    font-family: Arial, Verdana, Helvetica, sans-serif;
+    font-size: 15px;
+    font-weight: bold;
+    color:#333;
+}
+
+.rack h2 {
+    margin-left:42px;
+} 
+
+.tabela tr { height:5px; }
+
+.u {
+    background:white repeat-y;
+    display: table-cell;
+    width:7px;
+    max-width:7px;
+    min-width:7px;
+    vertical-align:top;
+    background-image: url('{{ STATIC_PREFIX }}img/1u.png');
+}
+.bloco-n {
+    display: table-cell;
+    width:20px;
+    background-color:white;
+    margin-right:7px;
+    vertical-align:top;
+    border-bottom:1px solid;
+    border-color: #999a9a;
+    
+}
+.bloco-n>div {
+    position:relative;
+}
+
+.bloco-n .u-n {
+    background:#d8d8d8;
+    color:#636363;
+    font:8px Verdana,Arial;
+    border-top:0;
+    border-right:1px;
+    border-bottom:0;
+    border-left:1px; 
+    border-style:solid; 
+    font-size:9px;
+    min-height:19px;
+}
+.bloco-n .u-n div {
+    border-top: 1px solid;
+    vertical-align: middle;
+    text-align: center;
+    line-height: 18px;
+}
+/**
+Coluna de furos do rack
+*/
+.u-n-left {
+    width:7px; 
+    display:block; 
+    background-color:#eee; 
+    position:absolute; 
+    left:24px; 
+    height: 20px; 
+    top:-1px; 
+    border-left:#aaa 2px solid; 
+    border-right: #888 2px solid;
+    border-top:0;
+    border-bottom:0;
+}
+.u-n-right {
+    width:7px; 
+    display:block; 
+    background-color:#eee; 
+    position:absolute; 
+    left:239px; 
+    height: 21px; 
+    top:0; 
+    border-left:#aaa 2px solid; 
+    border-right: #888 2px solid;
+}
+.u-n-f {
+    background:black; 
+    position:absolute; 
+    width:1px; 
+    height:1px;
+    padding-top:1px;
+    padding-left:1px;
+    left:1px;
+    border:0; 
+}
+.f1 {
+    top:3px;
+}
+.f2 {
+    top:9px;
+}
+.f3 {
+    top:15px;
+}
+
+.rack {
+    display:inline-block;
+    margin-right:25px;
+    margin-bottom:30px;
+    font-size:0;
+    top:20px;
+    position:relative;
+}
+.outros,
+.conflitos {
+    display:inline-block;
+    width:255px;
+}
+.equip.profundidade_curta {
+    background-color:#ccc;
+}
+img.profundidade_curta {
+    opacity:0.3;
+    filter: alpha(opacity=30); /* For IE8 and earlier */
+}
+.interno {
+    position:relative;
+    display: table-cell;
+    width:199px;
+    padding-left:17px;
+    font-size:10px;
+    top:-3px;
+}
+.interno img {
+    position:absolute;
+    z-index: 5;
+    width:100%;
+    height:100%;
+}
+.interno div {
+    position:absolute;
+    z-index: 1;
+}
+.interno div div div:nth-child(2) {
+    position: absolute;
+    top: 0;
+    left: 0;
+    vertical-align:middle;
+    line-height: 1.5em;
+    text-align: center;
+    color:#FFF;
+    display:none;
+}
+
+.interno div div div {
+    width:199px;
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black, -2px 0 1px black, 0 2px 1px black, 2px 0 1px black, 0 -2px 1px black;
+    color:white;
+    text-align:center;
+    z-index:10;
+}
+.equip {
+    display:inline-block;
+    background:#81878b;
+    border-bottom:1px solid #fff;
+    border-top:1px solid #fff;
+    padding-right:1px; 
+    padding-left:1px;
+    vertical-align:middle; 
+    line-height:1.5em;
+    width: 199px;
+    z-index:1;
+}
+.equip.pos_T01,
+.equip.pos_T01 div,
+.equip.pos_01,
+.equip.pos_01 div {
+    width:97px;
+    font-size: 9px;
+}
+.equip.pos_T02,
+.equip.pos_T02 div div,
+.equip.pos_02,
+.equip.pos_02 div div {
+    left: 11.3em;
+    right:43px;
+    width:97px;
+    padding-right: 0;
+    margin-right: 0;
+    font-size: 9px;
+}
+.equip.pos_T03,
+.equip.pos_T03 div,
+.equip.pos_03,
+.equip.pos_03 div {
+}
+.dc {
+    margin-top:5px;
+}
+.outros caption {
+    display:block;
+    text-align: left;
+    font-size: 12px;
+    font-weight: bold;
+}
+.outros table {
+    margin-left:0;
+    margin-right:0;
+    margin-bottom:10px;
+    margin-top:10px;
+    width:100%;
+    border-spacing:0;
+    border-collapse: collapse;
+}
+.outros th,
+.outros td {
+    border: 1px solid;
+    font-family: Arial, Verdana, Helvetica, sans-serif;
+    font-size:11px;
+}
+ .div_pdu {
+    display: table-cell;
+    width: 30px;
+    color: black;
+    font-size: 5px;
+    padding-left:15px;
+}
+ .div_pdu .equip {
+    width: 18px;
+    margin-left: 4px;
+    margin-right: 5px;
+    position:absolute;
+ }
+ .div_pdu .equip img {
+    width: 100%;
+    height: 100%;
+ }
+
+.page-break {
+    page-break-before:always;
+    display: block;
+    clear: both;
+}
+
+.outros th, .outros td {font-size:11px;}
+.rack { margin-top:0; vertical-align:top; }
+.rack_frontal, .rack_traseiro {display:initial; width:245px;}
+#wrap-form { width:initial; }
+.div_pdu { display:block; padding-left:0;}
+.outros caption { font-size: 14px; }
+.conflitos-content table { margin:0; width:100%; }
+.conflitos-content tbody { border:1px solid;  border-collapse: collapse;}
+.conflitos caption {
+    display: block;
+    text-align: left;
+    font-size: 14px;
+    font-weight: bold;
+}
+.outros { display:inline; }
+.interno {padding-left:0;padding-top:3px;width:203px;}
+.rack_lateral {display:table-cell; width:30px;}
+
+body { font-family: Arial, Verdana, Helvetica, sans-serif; }
+.conflitos { width:100%; }
+.conflitos-content table { border-collapse: collapse; font-size: 11px;}
+.conflitos th {
+    text-align: left;
+    font-weight: bold;
+    border: 1px black solid;
+}
+.conflitos td {
+    line-height: 13px;
+    border: 1px solid #ccc;
+    vertical-align: top;
+    padding: 3px 5px;
+}
+.conflitos .conflito-tbl-obs {
+    border-top: 1px black solid;
+    font-weight: bold;
+}
+
+.interno .rack_grid {
+    position:absolute;
+    width:202px;
+    top:42px;/* ajuste de posicao para o pdf*/
+}
+.interno .rack_grid .rack_grid_item {
+    position:relative;
+    border-bottom:1px solid #eee;
+    height:18px;
+    width:100%;
+}
+</style>
+<h1>Relatório de Rack</h1>
+{% for dc in dcs %}
+    {% if not forloop.first %}
+       <div class="page-break"></div>
+    {% endif %}
+    <div class="dc" style="display:table;">
+    <h1>{{ dc.entidade }} - {{ dc.nome|default:'' }}</h1>
+    {% for fileira in dc.fileiras %}
+        <p style="height:10px;"></p>
+        {% for rack in fileira.racks %}
+            {% with ''|center:2 as range %}
+            {% for _ in range %}
+                {% with forloop.counter as flag_traseiro %}
+                <div class="rack">
+                  {% if flag_traseiro == 1 %}
+                      <h2>{{ rack.nome|default:'' }} ({{ rack.vazio }} ocupado)</h2>
+                      <div style="display:inline-table">
+                        <div class="rack_frontal_E rack_lateral">
+                            <div class="div_pdu">
+                                {% for eq in rack.equipamentos_pdu %}
+                                    {% if eq.pos_col == 'LE' %}
+                                       <div class="equip " rel="tooltip" title="{{ eq.descricao }}" 
+                                            style="margin-top:{{ eq.eixoY }}px; height:{{ eq.altura }}px;">
+                                            {% if eq.imagem %}<img src="{{ eq.imagem }}" />{% endif %}
+                                       </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="rack_frontal" style="display:table-cell;">
+                            <div id="rack{{ dc.id }}_{{forloop.counter}}" class="bloco-n" style="height: {{ rack.altura_pxs }}px;">
+                                {% for i in rack.altura_pts|get_range reversed %}
+                                    <div class="u-n"><div>{{ i|add:"1" }}</div></div>
+                                {% endfor %}
+                            </div>
+                            <div class="u" style="height: {{ rack.altura_pxs }}px;"></div>
+                            <div class="interno" style="">
+                                <div class="rack_grid">
+                                    {% for i in rack.altura_pts|get_range %}
+                                        <div class="rack_grid_item" style="{% if forloop.first %}border-top:1px solid lightgray;{% endif %}"></div>
+                                    {% endfor %}
+                                </div>
+                            {% for eq in rack.equipamentos %}
+                               <div {% if not eq.flag_traseiro %} style="z-index:10;"{% endif %}>
+                               <div class="{% if eq.pos_col %} pos_{{eq.pos_col}} {% endif %} {% if eq.conflito %}conflito{% endif %} equip {% if eq.flag_traseiro and eq.profundidade < 1.0 %}profundidade_curta{% endif %}" rel="tooltip" title="{% if eq.nome %}{{ eq.nome|default:'' }} - {% endif %}{{ eq.descricao }} - pos:{{eq.pos_original|default:'0'}} pt" 
+                                   style="margin-top:{{ eq.eixoY }}px; height:{{ eq.altura }}px;">
+                                   <div>
+                                       <div class="{% if eq.pos_col %} pos_{{eq.pos_col}}_label {% endif %}" style="height:{{ eq.altura }}px;">
+                                        {% if eq.pos_col %}
+                                            {% if eq.tam >= 9 %}{{ eq.nome|default:""|truncatechars:50 }}
+                                            {% elif eq.tam >= 6 %}{{ eq.nome|default:""|truncatechars:35 }}
+                                            {% else %}{{ eq.nome|default:""|truncatechars:20 }}{% endif %}
+                                        {% else %}
+                                            {% if eq.tam >= 9 %}{{ eq.nome|default:""|truncatechars:90 }}
+                                            {% elif eq.tam >= 6 %}
+                                                {{ eq.nome|default:""|truncatechars:60 }}
+                                            {% else %}
+                                                {{ eq.nome|default:""|truncatechars:30 }}
+                                            {% endif %}
+                                        {% endif %}
+                                        </div>
+                                    </div>
+                                    {% if eq.flag_traseiro %}
+                                        {% if eq.imagem_traseira %}<img src="{{ eq.imagem_traseira }}" {% if eq.profundidade < 1.0 %}class="profundidade_curta"{% endif %}/>{% endif %}
+                                    {% else %}
+                                        {% if eq.imagem %}<img src="{{ eq.imagem }}" />{% endif %}
+                                    {% endif %}
+                               </div>
+                               </div>
+                            {% endfor %}
+                            </div>
+                            <div class="u" style="height: {{ rack.altura_pxs }}px;"></div>
+                        </div>
+                        <div class="rack_frontal_D rack_lateral">
+                            <div class="div_pdu">
+                            {% for eq in rack.equipamentos_pdu %}
+                                {% if eq.pos_col == 'LD' %}
+                                   <div class="equip " rel="tooltip" title="{{ eq.descricao }}" 
+                                        style="margin-top:{{ eq.eixoY }}px; height:{{ eq.altura }}px;">
+                                        {% if eq.imagem %}<img src="{{ eq.imagem }}" />{% endif %}
+                                   </div>
+                                {% endif %}
+                            {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display:table-cell;min-width:20px;"></div>
+                {% endif %}
+                {% if flag_traseiro == 2 %}
+                    {# rack visão traseira #}
+                    <h2>{{ rack.nome|default:'' }} (Visão traseira)</h2>
+                    <div style="display:inline-table">
+                        <div class="rack_traseiro_E rack_lateral">
+                            <div class="div_pdu">
+                                {% for eq in rack.equipamentos_pdu %}
+                                    {% if eq.pos_col == 'TE' %}
+                                       <div class="equip " rel="tooltip" title="{{ eq.descricao }}" 
+                                            style="margin-top:{{ eq.eixoY }}px; height:{{ eq.altura }}px;">
+                                            {% if eq.imagem %}<img src="{{ eq.imagem }}" />{% endif %}
+                                       </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="rack_traseiro">
+                            <div id="rack{{ dc.id }}_{{forloop.counter}}" class="bloco-n" style="height: {{ rack.altura_pxs }}px;">
+                                {% for i in rack.altura_pts|get_range reversed %}
+                                    <div class="u-n"><div>{{ i|add:"1" }}</div></div>
+                                {% endfor %}
+                            </div>
+                            <div class="u" style="height: {{ rack.altura_pxs }}px;"></div>
+                            <div class="interno">
+                                <div class="rack_grid">
+                                    {% for i in rack.altura_pts|get_range %}
+                                        <div class="rack_grid_item" style="{% if forloop.first %}border-top:1px solid lightgray;{% endif %}"></div>
+                                    {% endfor %}
+                                </div>
+                            {% for eq in rack.equipamentos %}
+                               <div {% if eq.flag_traseiro %} style="z-index:10;"{% endif %}>
+                               <div class="{% if eq.pos_col %} pos_{{eq.pos_col}} {% endif %} {% if eq.conflito %}conflito{% endif %} equip {% if not eq.flag_traseiro and eq.profundidade < 1.0 %}profundidade_curta{% endif %}" rel="tooltip" title="{% if eq.nome %}{{ eq.nome|default:'' }} - {% endif %}{{ eq.descricao }} - pos:{{eq.pos_original|default:'0'}} pt" 
+                                   style="margin-top:{{ eq.eixoY }}px; height:{{ eq.altura }}px;">
+                                   <div>
+                                       <div class="{% if eq.pos_col %} pos_{{eq.pos_col}}_label {% endif %}" style="height:{{ eq.altura }}px;">
+                                        {% if eq.pos_col %}
+                                            {% if eq.tam >= 9 %}{{ eq.nome|default:""|truncatechars:50 }}
+                                            {% elif eq.tam >= 6 %}{{ eq.nome|default:""|truncatechars:35 }}
+                                            {% else %}{{ eq.nome|default:""|truncatechars:20 }}{% endif %}
+                                        {% else %}
+                                            {% if eq.tam >= 9 %}{{ eq.nome|default:""|truncatechars:90 }}
+                                            {% elif eq.tam >= 6 %}
+                                                {{ eq.nome|default:""|truncatechars:60 }}
+                                            {% else %}
+                                                {{ eq.nome|default:""|truncatechars:30 }}
+                                            {% endif %}
+                                        {% endif %}
+                                        </div>
+                                    </div>
+                                    {% if eq.flag_traseiro %}
+                                        {% if eq.imagem %}<img src="{{ eq.imagem }}" />{% endif %}
+                                    {% else %}
+                                        {% if eq.imagem_traseira %}<img src="{{ eq.imagem_traseira }}" {% if eq.profundidade < 1.0 %}class="profundidade_curta"{% endif %} />{% endif %}
+                                    {% endif %}
+                               </div>
+                               </div>
+                            {% endfor %}
+                            </div>
+                            <div class="u" style="height: {{ rack.altura_pxs }}px;"></div>
+                        </div>
+                        <div class="rack_frontal_D rack_lateral">
+                            <div class="div_pdu">
+                                {% for eq in rack.equipamentos_pdu %}
+                                    {% if eq.pos_col == 'TD' %}
+                                       <div class="equip " rel="tooltip" title="{{ eq.descricao }}" 
+                                            style="margin-top:{{ eq.eixoY }}px; height:{{ eq.altura }}px;">
+                                            {% if eq.imagem %}<img src="{{ eq.imagem }}" />{% endif %}
+                                       </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}{# rack traseiro #}
+                </div>{# div do rack #}
+                    
+                {% endwith %}
+            {% endfor %}{# ENDFOR RACK #}
+            {% endwith %}
+        {% endfor %}
+        
+        {% for rack in fileira.racks %}
+            <div style="display:inline-table; width:950px;margin-bottom: 50px;margin-top:30px;">
+                    <div class="outros">
+                        <div class="outros-content">
+                        <table>
+                            <caption class="outros-title" style="width:10px;">Equipamentos.</caption>
+                            <tr>
+                                <th>ID</th>
+                                <th style="width:75px;">Nome</th>
+                                <th>Desc</th>
+                                <th>SN</th>
+                                <th style="width:80px;">PN</th>
+                                <th style="width:110px;">Modelo</th>
+                                <th>Tam(U)</th>
+                                <th>Pos(F)</th>
+                                <th>Col</th>
+                            </tr>
+                            {% for eq in rack.equipamentos %}
+                                <tr>
+                                    <td>{{ eq.id }}</td>
+                                    <td>{{ eq.nome|default:'' }}</td>
+                                    <td>{{ eq.nome|default:'' }}{{ eq.descricao|truncatechars:105 }}</td>
+                                    <td>{{ eq.sn|default:'' }}</td>
+                                    <td>{{ eq.pn|default:'' }}</td>
+                                    <td>{{ eq.modelo|default:'' }}</td>
+                                    <td>{{ eq.tam_u }}</td>
+                                    <td>{{ eq.pos_original }}</td>
+                                    <td>{{ eq.pos_col|default:'-' }}</td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                        </div>
+                    </div>{# pdus #}
+                    <div class="outros">
+                        <div class="outros-content">
+                        <table>
+                            <caption class="outros-title">PDUs.</caption>
+                            <tr>
+                                <th>Desc</th>
+                                <th>Tam</th>
+                                <th>Pos</th>
+                                <th>Col</th>
+                            </tr>
+                            {% for eq in rack.equipamentos_pdu %}
+                                <tr>
+                                    <td>{{ eq.nome|default:'' }}{{ eq.descricao }}</td>
+                                    <td>{{ eq.tam_u }}</td>
+                                    <td>{{ eq.pos_original }}</td>
+                                    <td>{{ eq.pos_col|default:'-' }}</td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                        </div>
+                    </div>{# pdus #}
+                    {% if rack.equipamentos_fora_visao %}
+                    <div class="outros">
+                        <div class="outros-content">
+                        <table>
+                            <caption class="outros-title">Outros equipamentos.</caption>
+                            <tr>
+                                <th>Desc</th>
+                                <th>Tam</th>
+                                <th>Pos</th>
+                                <th>Col</th>
+                            </tr>
+                            {% for eq in rack.equipamentos_fora_visao %}
+                                <tr>
+                                    <td>{{ eq.nome|default:'' }}{{ eq.descricao }}</td>
+                                    <td>{{ eq.tam_u }}</td>
+                                    <td>{{ eq.pos }}</td>
+                                    <td>{{ eq.pos_col|default:'-' }}</td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                        </div>
+                    </div>
+                {% endif %}{# fora de visão #}
+                {% if rack.conflitos %}
+                    <div class="conflitos">
+                        <div class="conflitos-content" style="display:block;">
+                        <table>
+                            <caption class="outros-title">Conflitos.</caption>
+                            <tr>
+                                <th>EQ</th>
+                                <th>Pos</th>
+                                <th>Alt</th>
+                            </tr>
+                            {% for conflito in rack.conflitos %}
+                                <tr class="conflito-tbl-obs">
+                                   <td colspan=3>{{ conflito.obs }}</td>
+                                </tr>
+                                <tr>
+                                   {% if conflito.eq1 %}
+                                    <td>{{ conflito.eq1.descricao }}</td>
+                                    <td>{{ conflito.eq1.pos }}</td>
+                                    <td>{{ conflito.eq1.tam_u }}</td>
+                                    {% endif %}
+                                </tr>
+                                <tr>
+                                    {% if conflito.eq2 %}
+                                    <td>{{ conflito.eq2.descricao }}</td>
+                                    <td>{{ conflito.eq2.pos }}</td>
+                                    <td>{{ conflito.eq2.tam_u }}</td>
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                        </table>
+                        </div>
+                    </div>
+                {% endif %}{# conflitos #}
+                </div>{# div dos conflitos #}
+            {% endfor %}
+        
+    {% endfor %}{# ENDFOR FILEIRA #}
+
+    </div>
+{% endfor %}{# ENDFOR DC #}
