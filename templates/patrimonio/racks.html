@@ -73,10 +73,10 @@
 <div id="wrap-form">
 	<form id="form_racks" method="GET">
 	Data Centers
-	<select name="dc" onchange="this.form.submit();">
+	<select name="dc_id" onchange="this.form.submit();">
 	    <option value="0">Todos</option>
 	{% for dc in todos_dcs %}
-	   <option value="{{ dc.id }}" {% if request.GET.dc == dc.id|lower %}selected{% endif %}>{{ dc.nome|default:'' }}</option>
+	   <option value="{{ dc.id }}" {% if request.GET.dc_id == dc.id|lower %}selected{% endif %}>{{ dc.nome|default:'' }}</option>
 	{% endfor %}
 	</select>
 	</form>
@@ -136,6 +136,11 @@
 			    </div>
 			    <div class="u" style="height: {{ rack.altura_pxs }}px;"></div>
 			    <div class="interno" style="">
+                    <div class="rack_grid">
+                        {% for i in rack.altura_pts|get_range %}
+                            <div class="rack_grid_item" style="{% if forloop.first %}border-top:1px solid lightgray;{% endif %}"></div>
+                        {% endfor %}
+                    </div>
 			    {% for eq in rack.equipamentos %}
 			       <div {% if not eq.flag_traseiro %} style="z-index:10;"{% endif %}>
 			       {% if eq.id %}
@@ -235,6 +240,12 @@
                 </div>
                 <div class="u" style="height: {{ rack.altura_pxs }}px;"></div>
                 <div class="interno">
+                    <div class="rack_grid">
+                        {% for i in rack.altura_pts|get_range %}
+                            <div class="rack_grid_item" style="{% if forloop.first %}border-top:1px solid lightgray;{% endif %}"></div>
+                        {% endfor %}
+                    </div>
+                
                 {% for eq in rack.equipamentos %}
                    <div {% if eq.flag_traseiro %} style="z-index:10;"{% endif %}>
                    {% if eq.id %}

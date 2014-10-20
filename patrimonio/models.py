@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, Max
 from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import cached_property
 import datetime
@@ -256,12 +256,102 @@ class Patrimonio(models.Model):
         return u'%s (%s/%s)' % (modalidade, self.pagamento.parcial(), self.pagamento.pagina())
     auditoria.short_description = u'Material (par/pág)'
 
+
+    def altura_em_px(self):
+        if self.tamanho:
+            tamanho = self.tamanho
+        else:
+            tamanho = 0
+            
+        # calculando a altura em furos
+        tam = int(round(tamanho * 3))
+        return (tam * 19.0 / 3.0)
+    
+    # Retorna a posição Y em pixels.
+    def eixoy_em_px(self):
+        eixoY = 0
+         
+        # Este patrimonio precisa estar contido em um Rack para definirmos a posição 
+        if self.patrimonio_id != None and self.patrimonio.equipamento_id and self.patrimonio.equipamento.tipo_id and self.patrimonio.equipamento.tipo.nome == 'Rack':
+            rack = self.patrimonio
+            if rack.tamanho:
+                rack_altura = int(rack.tamanho) * 3
+            else:
+                # ISSO É UM PROBLEMA DE DADOS INVÁLIDOS. PRECISA SER TRATADO
+                rack_altura = 126
+            pos = self.historico_atual_prefetched.posicao_furo - 1
+        
+            if self.tamanho:
+                tamanho = self.tamanho
+            else:
+                tamanho = 0
+                
+            # calculando a altura em furos
+            tam = int(round(tamanho * 3))
+            
+            # calculando a posição em pixels
+            eixoY = int(round(((rack_altura - (pos) - tam) * 19.0) / 3.0)) -5.0
+        
+        return eixoY
+
+    # Verifica se o patrimonio está em posição traseira no rack
+    def is_posicao_traseira(self):
+        flag_traseiro = False
+        if self.historico_atual_prefetched.posicao_colocacao in ('TD', 'TE', 'T', 'T01', 'T02', 'T03'):
+            flag_traseiro = True
+            
+        return flag_traseiro
+
+    # Verifica se o patrimonio é uma régua de tomadas lateral
+    def is_pdu(self):
+        if self.equipamento_id \
+            and self.equipamento.tipo_id \
+            and 'tomada' in self.equipamento.tipo.nome \
+            and self.historico_atual_prefetched.posicao_colocacao in ('TD', 'TE', 'lD', 'lE', 'LD', 'LE'):
+            
+            return True
+        return False
+
     # Define a descrição do modelo.
     class Meta:
         verbose_name = _(u'Patrimônio')
         verbose_name_plural = _(u'Patrimônio')
         ordering = ('tipo', 'descricao')
 
+
+class PatrimonioRack(Patrimonio):
+
+    @staticmethod
+    def get_racks_as_list(endereco_id):
+            patrimonio_racks = PatrimonioRack.objects.filter(equipamento__tipo__nome='Rack', historicolocal__endereco__id=endereco_id)
+
+            patrimonio_racks = list(patrimonio_racks)
+            # Ordena os racks pela posição. Ex: R042 - ordena pela fila 042 e depois pela posição R
+            patrimonio_racks.sort(key=lambda x: x.historico_atual_prefetched.posicao_rack_letra, reverse=False)
+            patrimonio_racks.sort(key=lambda x: x.historico_atual_prefetched.posicao_rack_numero, reverse=True)
+            
+            return patrimonio_racks
+
+
+    def get_patrimonios(self):
+        # ordena os equipamentos do rack conforme a posição no rack
+        hist = self.contido.annotate(hist=Max('historicolocal__data')).values_list('pk')
+        pts = list(self.contido.filter(pk__in=hist).select_related('equipamento', 'equipamento__tipo').prefetch_related('historicolocal_set'))
+        pts.sort(key=lambda x: x.historico_atual_prefetched.posicao_furo, reverse=True)
+        
+        return pts
+
+
+    def altura_furos(self):
+        if self.tamanho:
+            rack_altura = int(self.tamanho) * 3
+        else:
+            # ISSO É UM PROBLEMA DE DADOS INVÁLIDOS. PRECISA SER TRATADO
+            rack_altura = 126
+        return rack_altura
+        
+    class Meta:
+        proxy = True
 
 class HistoricoLocal(models.Model):
 
