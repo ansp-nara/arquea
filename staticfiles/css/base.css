@@ -463,6 +463,10 @@ input[type=text], input[type=password], textarea, select, .vTextField {
     border-collapse: collapse;
 }
 
+#menu_config_top_title {
+    cursor:pointer;
+}
+
 .modal-close{
 	display:block;
 	width:25px;

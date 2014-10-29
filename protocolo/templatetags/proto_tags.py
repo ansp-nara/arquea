@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.template import Library
+from django.core.urlresolvers import resolve
 from django.contrib.auth.models import Group
 from django.utils.translation import ugettext_lazy as _
 from django.utils.safestring import mark_safe
@@ -261,6 +262,64 @@ def has_group(user, group_name):
     """
     
     return user.groups.filter(name=group_name).exists()
+
+
+@register.filter
+def has_permission(user, url):
+    """
+        Verifica se o usuário tem permissão de acesso a URL
+        Usage:
+       
+        {% if request.user|has_permission:"url" %}
+           Do something
+        {% endif %}
+    """
+    try:
+        if url:
+            myurl = resolve(url)
+            url_splitted = myurl.url_name.split("_")
+            if len(url_splitted) == 3:
+                permission_name = url_splitted[0] + ".change_" + url_splitted[1]
+                retorno = user.has_perm(permission_name)
+                return retorno
+    except:
+        return False
+
+    return False 
+
+
+
+def menu_has_permission(context, menuitem):
+    """
+        Verifica o menu possui algum sub-menu com permissão de acesso.
+        Usage:
+        {% menu_has_permission menu_item as permitted %}
+    """
+    retorno = False
+    try:
+        if menuitem.url:
+            myurl = resolve(menuitem.url)
+            url_splitted = myurl.url_name.split("_")
+            if len(url_splitted) == 3:
+                permission_name = url_splitted[0] + ".change_" + url_splitted[1]
+                retorno = context['user'].has_perm(permission_name)
+            
+        if not retorno and menuitem.has_children():
+            for child in menuitem.children():
+                retorno = retorno or menu_has_permission(context, child)
+
+    except Exception as e:
+        print '%s (%s)' % (e.message, type(e))
+        retorno = False
+
+    return retorno
+register.assignment_tag(takes_context=True)(menu_has_permission)
+
+
+
+
+
+
 
 
 

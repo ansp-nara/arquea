@@ -91,6 +91,8 @@ INSTALLED_APPS = (
     'tinymce',
     'ckeditor',
     'import_export',
+    'treemenus',
+    'menuextension'
 )
 
 PROJECT_APPS = (
