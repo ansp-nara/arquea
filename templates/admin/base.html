@@ -1,7 +1,5 @@
 {% load proto_tags admin_static %}
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
-
 <html xmlns="http://www.w3.org/1999/xhtml" lang="{{ LANGUAGE_CODE }}" xml:lang="{{ LANGUAGE_CODE }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
 <head>
 	<title>{% block title %}{% endblock %}</title>
@@ -24,7 +22,7 @@
 		$(function(){ 
 			$('#efeito').accordion({ 
 			autoheight:false 
-			}); 
+			});
 		}); 
 	</script>-->
 	
@@ -48,21 +46,32 @@
             $.unblockUI(); 
             return false; 
 			});
-			
-		}); 
-		
-		$(document).ready(function(){
+
 		 	$(".btn-slide-actions").click(function(){
 			$("#content-actions").slideToggle("default").css("z-index",1000);
-			$(this).toggleClass("active"); return false;
+			 $(this).toggleClass("active"); return false;
 			});
+
+            // Evento para abrir e fechar o menu de configuração/administração
+            $('#menu_config_top').width('105px');
+            $('#menu_config_top_items').hide();
+            $('#menu_config_top_title').click(function(e){
+                if ($('#menu_config_top').width() < 300) {
+                    $('#menu_config_top').width('100%');
+                    $('#menu_config_top_items').toggle();
+                } else {
+                    $('#menu_config_top_items').toggle();
+                    $('#menu_config_top').width('105px');
+                }
+                
+            });
 		});
 
-                document.onreadystatechange = function() {
-                        if (document.readyState == "complete") {
-                                parent.scroll(0,0);
-                        }
+        document.onreadystatechange = function() {
+                if (document.readyState == "complete") {
+                        parent.scroll(0,0);
                 }
+        }
 
 $(document).ajaxSend(function(event, xhr, settings) {
     function getCookie(name) {
@@ -172,51 +181,59 @@ $(document).ajaxSend(function(event, xhr, settings) {
     {% endblock %}
     
 <!-- END Header -->
-
 <!-- Container -->
 <div id="container">
-
-		<!-- ABAS -->
+<!-- ABAS -->
+	{#% if user.is_superuser %#}
+    	<div class="content-abas" id="menu_config_top">
+    		<h2 id="menu_config_top_title">Config.</h2>
+    		  <div id="menu_config_top_items">
+    			{% if adm_app_list %}
+    				{% for app in adm_app_list %}
+    					<div class="module-header">
+    					
+    						<a href="#" class="modal-call-header {{app.name}}" app="{{app.name}}">{% blocktrans with app.verbose_name as name %}{{ name }}{% endblocktrans %}</a>
+    				
+    						<div class="modal-box" id="mod-{{app.name}}" style="display:none;">
+    							<h2>{{app.verbose_name}}</h2><a class="modal-close" title="Fechar" name="fechar" >fechar</a>
+    							<table summary="{% blocktrans with app.name as name %}Models available in the {{ name }} application.{% endblocktrans %}">
+    								{% for model in app.models %}
+    								<tr>
+    								{% if model.perms.change %}
+    									<th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
+    								{% else %}
+    									<th scope="row">{{ model.name }}</th>
+    								{% endif %}
+    
+    								{% if model.perms.add %}
+    									<td><a href="{{ model.admin_url }}add/" class="addlink">{% trans 'Add' %}</a></td>
+    								{% else %}
+    									<td>&nbsp;</td>
+    								{% endif %}
+    
+    								{% if model.perms.change %}
+    									<td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
+    								{% else %}
+    									<td>&nbsp;</td>
+    								{% endif %}
+    								</tr>
+    								{% endfor %}
+    							</table>
+    						</div><!-- end modal-box -->
+    					</div><!-- end module-header -->
+    				{% endfor %}
+    			{% else %}
+    				<p>{% trans "You don't have permission to edit anything." %}</p>
+    			{% endif %}
+    		</div>
+    	</div>
+	{#% endif %#}
 	{% block abas %}
 	<div class="content-abas">
 		<h2>Módulos</h2>
-		{% if adm_app_list %}
-				{% for app in adm_app_list %}
-					<div class="module-header">
-					
-						<a href="#" class="modal-call-header {{app.name}}" app="{{app.name}}">{% blocktrans with app.verbose_name as name %}{{ name }}{% endblocktrans %}</a>
-				
-						<div class="modal-box" id="mod-{{app.name}}" style="display:none;">
-							<h2>{{app.verbose_name}}</h2><a class="modal-close" title="Fechar" name="fechar" >fechar</a>
-							<table summary="{% blocktrans with app.name as name %}Models available in the {{ name }} application.{% endblocktrans %}">
-								{% for model in app.models %}
-								<tr>
-								{% if model.perms.change %}
-									<th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
-								{% else %}
-									<th scope="row">{{ model.name }}</th>
-								{% endif %}
-
-								{% if model.perms.add %}
-									<td><a href="{{ model.admin_url }}add/" class="addlink">{% trans 'Add' %}</a></td>
-								{% else %}
-									<td>&nbsp;</td>
-								{% endif %}
-
-								{% if model.perms.change %}
-									<td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
-								{% else %}
-									<td>&nbsp;</td>
-								{% endif %}
-								</tr>
-								{% endfor %}
-							</table>
-						</div><!-- end modal-box -->
-					</div><!-- end module-header -->
-				{% endfor %}
-			{% else %}
-				<p>{% trans "You don't have permission to edit anything." %}</p>
-			{% endif %}
+		{{menu_type }}
+		{% load tree_menu_tags %}
+		{% show_menu "root" "ordered-list" %}
 	</div>
 	
 	{% endblock %}
