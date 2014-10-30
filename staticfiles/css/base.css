@@ -194,6 +194,15 @@ p.mini {
     color: #999;
 }
 
+form .wide .form-row p.help {
+    margin-left:0;
+    padding-left:0;
+}
+form .wide .field-box p.help {
+    margin-left:0;
+    padding-left:0;
+}
+
 p img, h1 img, h2 img, h3 img, h4 img, td img {
     vertical-align: middle;
 }
