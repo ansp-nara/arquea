@@ -100,8 +100,8 @@ class Patrimonio(models.Model):
     checado = models.BooleanField(default=False)
     apelido = models.CharField(max_length=30, null=True, blank=True)
     descricao = models.TextField(_(u'Descrição NF'))
-    tem_numero_fmusp = models.BooleanField('Tem nº de patrimônio FMUSP?', default=False)
-    numero_fmusp = models.IntegerField('Nº de patrimônio FMUSP', null=True, blank=True)
+    tem_numero_fmusp = models.BooleanField('Tem nº de patrimônio oficial?', default=False)
+    numero_fmusp = models.IntegerField('Nº de patrimônio oficial', null=True, blank=True)
     entidade_procedencia = models.ForeignKey('identificacao.Entidade', verbose_name=_(u'Procedência'), null=True, blank=True, help_text=u"Representa a Entidade que fornece este patrimônio.")
 
 # Campos duplicados que existem no Model de Equipamento
@@ -595,7 +595,8 @@ class PlantaBaixaObjeto(models.Model):
     data_center = models.ForeignKey(PlantaBaixaDataCenter, verbose_name=_(u'Data center'))
     patrimonio = models.ForeignKey(Patrimonio, verbose_name=_(u'Patrimônio'), null=True, blank=True)
     titulo = models.CharField(max_length=80)
-    
+    imagem = models.FileField(u'Planta Baixa', upload_to='planta_baixa', null=True, blank=True)
+
     def __unicode__(self):
         retorno = ''
         if self.data_center:
