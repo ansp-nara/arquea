@@ -134,7 +134,7 @@ class PatrimonioAdminForm(forms.ModelForm):
             widget=forms.TextInput(attrs={'onkeydown':'if (event.keyCode == 13) {$(\'#id_patrimonio\').focus(); return false;}', 
                                           'onchange': 'ajax_filter_patrimonio(this.value);'}))
 
-    tem_numero_fmusp = forms.BooleanField(label=u'Tem nº de patrimônio FMUSP?', required=False, 
+    tem_numero_fmusp = forms.BooleanField(label=u'Tem nº de patrimônio oficial?', required=False, 
             widget=forms.CheckboxInput(attrs={'onchange':'ajax_numero_fmusp();'}))
 
     descricao = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows':'2', 'cols':'152'}))
