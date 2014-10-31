@@ -462,12 +462,7 @@ def extrato_mes(request, pdf=False):
 @require_safe
 def extrato_financeiro(request, ano=dtime.now().year, pdf=False):
     if request.GET.get('termo'):
-        # paramentro para filtrar as Reservas Tecnicas
-        rt = bool(request.GET.get('rt'))
-        if rt:
-            codigo = 'RP'
-        else:
-            codigo = 'MP'
+        codigo = 'MP'
         
         termo_id = int(request.GET.get('termo'))
         termo = get_object_or_404(Termo, id=termo_id)
@@ -562,12 +557,9 @@ def cheque(request, cc=1):
 def financeiro_parciais(request, pdf=False):
     if request.GET.get('termo'):
         termo_id = int(request.GET.get('termo'))
-        # paramentro para filtrar as Reservas Tecnicas
-        rt = bool(request.GET.get('rt'))
-        if rt:
-            codigo = 'RP'
-        else:
-            codigo = 'MP'
+ 
+        codigo = 'MP'
+        
         termo = get_object_or_404(Termo, id=termo_id)
         retorno = []
         parciais = ExtratoFinanceiro.objects.filter(termo=termo, cod__endswith=codigo).distinct('parcial').values_list('parcial', flat=True).order_by('parcial')
