@@ -62,9 +62,13 @@ form ul.inline li {
 /* ALIGNED FIELDSETS */
 
 .aligned label {
-    display: block;
+    display: inline-block;
 	margin:5px 10px 5px 0;
-    float: left;
+	vertical-align:top;
+}
+.aligned .div_field {
+    display: inline-block;
+    vertical-align:top;
 }
 
 .aligned ul label {
@@ -88,7 +92,8 @@ form .aligned table p {
 }
 
 form .aligned p.help {
-    padding-left: 38px;
+    padding-left: 0;
+    margin-left: 0;
 }
 
 .aligned .vCheckboxLabel {
@@ -111,10 +116,24 @@ fieldset .field-box {
     margin-right: 20px;
 }
 
+fieldset .field-box .div_field p {
+    /*Tratamento para os campos read-only*/
+    margin: 2px 0;
+    padding: 2px 3px;
+    vertical-align: middle;
+}
+
+form .aligned .div_field p.file-upload {
+    /*Tratamento para os campos de file upload*/
+    margin: 0;
+    padding: 0;
+}
+
 /* WIDE FIELDSETS */
 
 .wide label {
-    display:block;
+    display: inline-block;
+    vertical-align:top;
 }
 
 form .wide p {
@@ -122,12 +141,20 @@ form .wide p {
 }
 
 form .wide p.help {
-    padding-left: 38px;
+    padding-left: 0;
+    margin-left: 0;
 }
 
 .colM fieldset.wide .vLargeTextField, .colM fieldset.wide .vXMLLargeTextField {
     width: 450px;
 }
+
+form .wide .div_field p.file-upload {
+    /*Tratamento para os campos de file upload*/
+    margin: 0;
+    padding: 0;
+}
+
 
 /* COLLAPSED FIELDSETS */
 
