@@ -4,7 +4,7 @@ from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.forms.util import ErrorList
 from models import Item, OrigemFapesp, Termo, Modalidade, Outorga, Natureza_gasto, Acordo
-
+from utils.request_cache import get_request_cache
 
 class OrigemFapespInlineForm(forms.ModelForm):
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
@@ -15,8 +15,16 @@ class OrigemFapespInlineForm(forms.ModelForm):
                                                error_class, label_suffix, empty_permitted, instance)
 
     
-        self.fields['acordo'].choices = [('','---------')] + [(p.id, p.__unicode__()) for p in Acordo.objects.all().order_by('descricao') ]
-        self.fields['item_outorga'].choices = [('','---------')] + [(p.id, p.__unicode__()) for p in Item.objects.all().select_related('natureza_gasto', 'natureza_gasto__termo') ]
+        cache = get_request_cache()
+        if cache.get('outorga.Acordo.all') is None:
+            cache.set('outorga.Acordo.all', [('','---------')] + [(p.id, p.__unicode__()) for p in Acordo.objects.all().order_by('descricao') ])
+        self.fields['acordo'].choices =  cache.get('outorga.Acordo.all')
+
+        cache = get_request_cache()
+        if cache.get('outorga.Item.all') is None:
+            cache.set('outorga.Item.all', [('','---------')] + [(p.id, p.__unicode__()) for p in Item.objects.all().select_related('natureza_gasto', 'natureza_gasto__termo') ])
+        self.fields['item_outorga'].choices =  cache.get('outorga.Item.all')
+        
 
     class Meta:
         model = OrigemFapesp
@@ -55,7 +63,7 @@ class ItemAdminForm(forms.ModelForm):
     # Define o modelo
     class Meta:
         model = Item
-        fields = ['natureza_gasto', 'rt', 'descricao', 'entidade', 'quantidade', 'valor', 'justificativa', 'obs',]
+        fields = ['natureza_gasto', 'descricao', 'entidade', 'quantidade', 'valor', 'justificativa', 'obs',]
 
 
     # Define os arquivos .js que serão utilizados.

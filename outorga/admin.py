@@ -43,7 +43,7 @@ class ArquivoOSInline(admin.TabularInline):
 class ItemInline(admin.StackedInline):
     fieldsets = (
                  (None, {
-                     'fields': (('natureza_gasto', 'rt'), ('descricao', 'entidade', 'quantidade'), 'valor'),
+                     'fields': (('natureza_gasto'), ('descricao', 'entidade', 'quantidade'), 'valor'),
                  }),
                  (_(u'Justificativa/Observação'), {
                      'fields': ('justificativa', 'obs',),
@@ -303,7 +303,7 @@ class ItemAdmin(admin.ModelAdmin):
 
     fieldsets = (
                  (None, {
-                     'fields': (('termo', 'natureza_gasto', 'rt'), ('descricao', 'entidade', 'quantidade'), 'valor'),
+                     'fields': (('termo', 'natureza_gasto'), ('descricao', 'entidade', 'quantidade'), 'valor'),
                  }),
                  (_(u'Justificativa/Observação'), {
                      'fields': ('justificativa', 'obs',),
