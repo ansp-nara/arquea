@@ -11,6 +11,8 @@
                         <th scope="row">
                             {% if menu_item.level >= 3 %}&nbsp;&nbsp;&nbsp;{% endif %}
                             {% if menu_item.level >= 4 %}&nbsp;&nbsp;&nbsp;{% endif %}
+                            {% if menu_item.level >= 5 %}&nbsp;&nbsp;&nbsp;{% endif %}
+                            {% if menu_item.level >= 6 %}&nbsp;&nbsp;&nbsp;{% endif %}
     
                             {% if menu_item.url and user|has_permission:menu_item.url %}
                                 <a href="{{ menu_item.url }}" style="{{menu_item.extension.css|default:''}}">{{ menu_item.caption }}</a>
@@ -36,6 +38,8 @@
                     <tr><th scope="row">
                         {% if menu_item.level >= 3 %}&nbsp;&nbsp;&nbsp;{% endif %}
                         {% if menu_item.level >= 4 %}&nbsp;&nbsp;&nbsp;{% endif %}
+                        {% if menu_item.level >= 5 %}&nbsp;&nbsp;&nbsp;{% endif %}
+                        {% if menu_item.level >= 6 %}&nbsp;&nbsp;&nbsp;{% endif %}
                         <a href="{{ menu_item.url }}" style="{{menu_item.extension.css|default:''}}">{{ menu_item.caption }}</a>
                         </th>
                     </tr>
