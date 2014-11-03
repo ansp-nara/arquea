@@ -595,7 +595,7 @@ class PlantaBaixaObjeto(models.Model):
     data_center = models.ForeignKey(PlantaBaixaDataCenter, verbose_name=_(u'Data center'))
     patrimonio = models.ForeignKey(Patrimonio, verbose_name=_(u'Patrimônio'), null=True, blank=True)
     titulo = models.CharField(max_length=80)
-    imagem = models.FileField(u'Planta Baixa', upload_to='planta_baixa', null=True, blank=True)
+#    imagem = models.FileField(u'Planta Baixa', upload_to='planta_baixa', null=True, blank=True)
 
     def __unicode__(self):
         retorno = ''
