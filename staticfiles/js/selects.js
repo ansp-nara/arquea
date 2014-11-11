@@ -1013,7 +1013,7 @@ function ajax_filter_equipamento(num_doc, id_patrimonio, id_equipamento)
 
 function ajax_filter_patrimonio(num_doc)
 {
-       p_id = "#id_patrimonios";
+       p_id = "#id_patrimonio";
        $(p_id).html('Carregando...');
        $.ajax({
            type: "GET",
