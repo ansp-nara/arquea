@@ -1,14 +1,19 @@
+{% load proto_tags %}
+{% load static %}
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <style>
 @import url('/var/www/django/media/css/pdf.css');
 @page {
-  background-image: url('/var/www/django/media/img/papel_timbrado.jpg');
-  top: 3cm;
+  size: a4;
+  background-image: url('{% get_media_prefix %}{{papelaria.papel_timbrado_retrato_a4}}');
+  background-size: contain;
+  background-repeat:no-repeat;
+  top: {{papelaria.retrato_a4_margem_superior}}cm;
   left: 1.5cm;
   right: 1.5cm;
-  bottom: 2cm;
+  bottom: {{papelaria.retrato_a4_margem_inferior}}cm;
   @frame footer {
                 -pdf-frame-content: footerContent;
                 bottom: 0.5cm;
@@ -16,31 +21,54 @@
                 height: 1cm;
 		left: -2.3cm;
                 } 
-} 
+}
+
+th {
+	text-align:left;
+	border-bottom: 1px solid lightgray;
+	background:#eee;
+}
+ 
 </style> 
 </head>
 <body>
 <h1 repeat="1">Pagamentos de {{ mes }} de {{ ano }}</h1>
 
-    <table border="1" repeat="1" cellpadding="5">
-    <tr><th>Processo</th><th>Documento</th><th>Data</th><th>Número da operação</th><th>Valor</th><th>Modalidade</th><th>Parcial</th><th>Página</th></tr>
-    {% for p in pagamentos %}
-	<tr><td>{{ p.termo }}</td><td class="peq">{{ p.documento }}</td><td>{{ p.data }}</td>
-	<td class="peq">{{ p.oper }}</td><td class="num peq">{{ p.valor }}</td>
-	<td>{{ p.modalidade }}</td><td>{{ p.parcial }}</td><td>{{ p.pagina }}</td></tr>
-    {% endfor %}
+    <table border="0" repeat="1" cellpadding="5">
+    	<tr>
+		    <th>Processo</th>
+			<th>Documento</th>
+			<th>Data</th>
+			<th>Número da operação</th>
+			<th>Valor</th>
+			<th>Modalidade</th>
+			<th>Parcial</th>
+			<th>Página</th>
+		</tr>
+	    {% for p in pagamentos %}
+			<tr>
+				<td style="width:2cm;">{{ p.termo }}</td>
+				<td style="width:7cm;" class="peq">{{ p.documento }}</td>
+				<td style="width:2.5cm;">{{ p.data }}</td>
+				<td style="width:2.5cm;" class="peq">{{ p.oper }}</td>
+				<td style="width:2.5cm;" class="num peq">{{ p.valor }}</td>
+				<td style="width:2cm;">{{ p.modalidade }}</td>
+				<td style="width:1.4cm;">{{ p.parcial }}</td>
+				<td style="width:1.4cm;">{{ p.pagina }}</td>
+			</tr>
+	    {% endfor %}
+	    <tr style="font-weight:bolder; border-top:1px black solid;">
+	    	<td colspan="4"><p>Total: </p></td>
+	    	<td colspan="4"><p>{{ total }}</p></td>
+	    </tr>
     </table>
-
-   
-    <p>Total: {{ total }}</p>
-
     <br />
-    Por modalidade
-    <ul>
-    {% for p in pm %}
-       <li>{{ p.modalidade }}: R$ {{ p.total }}</li>
-    {% endfor %}
-    </ul>
+    <h3>Total por modalidade</h3>
+    <table id="tbl_modalidade">
+        {% for p in pm %}
+	       <tr><td style="width:5cm;">{{ p.modalidade }}:</td><td>R$ {{ p.total }}</td></tr>
+	    {% endfor %}
+    </table>
   <div id="footerContent">
       pág <pdf:pagenumber example="00" />
   </div> 

@@ -190,6 +190,7 @@ def ajax_nova_pagina(request):
     return HttpResponse(simplejson.dumps(retorno), content_type="application/json")
 
 
+
 @login_required
 @require_safe
 def pagamentos_mensais(request, pdf=False):
@@ -200,7 +201,7 @@ def pagamentos_mensais(request, pdf=False):
         dados = _estrutura_pagamentos(pagamentos)
 
         if pdf:
-            return render_to_pdf('financeiro/pagamentos.pdf', {'pagamentos':dados['pg'], 'ano':ano, 'mes':mes, 'total':formata_moeda(dados['total']['valor_fapesp__sum'], ','), 'pm':dados['pm']}, request=request, filename='pagamentos.pdf')
+            return render_to_pdf('financeiro/pagamentos.pdf', {'pagamentos':dados['pg'], 'ano':ano, 'mes':mes, 'total':formata_moeda(dados['total']['valor_fapesp__sum'], ','), 'pm':dados['pm']}, request=request, filename='pagamentos_mensais.pdf')
         else:
             return render_to_response('financeiro/pagamentos.html', {'pagamentos':dados['pg'], 'ano':ano, 'mes':mes, 'total':formata_moeda(dados['total']['valor_fapesp__sum'], ','), 'pm':dados['pm']}, context_instance=RequestContext(request))
     else:
@@ -225,7 +226,7 @@ def pagamentos_parciais(request, pdf=False):
         dados = _estrutura_pagamentos(pagamentos)
 
         if pdf:
-            return render_to_pdf('financeiro/pagamentos_parciais.pdf', {'pagamentos':dados['pg'], 'parcial':parcial, 'termo':termo, 'total':formata_moeda(dados['total']['valor_fapesp__sum'], ','), 'pm':dados['pm']}, request=request, filename='pagamentos.pdf')
+            return render_to_pdf('financeiro/pagamentos_parciais.pdf', {'pagamentos':dados['pg'], 'parcial':parcial, 'termo':termo, 'total':formata_moeda(dados['total']['valor_fapesp__sum'], ','), 'pm':dados['pm']}, request=request, filename='pagamentos_parciais.pdf')
         else:
             return render_to_response('financeiro/pagamentos_parciais.html', {'pagamentos':dados['pg'], 'parcial':parcial, 'termo':termo, 'total':formata_moeda(dados['total']['valor_fapesp__sum'], ','), 'pm':dados['pm']}, context_instance=RequestContext(request))
     else:
@@ -235,6 +236,7 @@ def pagamentos_parciais(request, pdf=False):
 
 
 @login_required
+#@permission_required('financeiro.relatorio_ger_gerencial', raise_exception=True)
 @require_safe
 def relatorio_gerencial(request, pdf=False):
     if request.GET.get('termo'):
