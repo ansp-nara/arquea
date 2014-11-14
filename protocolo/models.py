@@ -216,7 +216,7 @@ class Protocolo(models.Model):
     descricao = models.CharField(_(u'Descrição antiga'), max_length=200, help_text=_(u'ex. Conta telefônica da linha 3087-1500'), default='x-x-x')
     obs = models.TextField(_(u'Observação'), blank=True)
     moeda_estrangeira = models.BooleanField(_(u'Dólar?'), help_text=_(u'O valor do documento está em dolar?'), default=False)
-    valor_total = models.DecimalField(_(u'Valor total'), max_digits=12, decimal_places=2, blank=True, null=True, help_text=_(u'Atenção: só preencher este campo caso haja algum erro na soma dos itens deste protocolo'))
+    valor_total = models.DecimalField(_(u'Valor total'), max_digits=12, decimal_places=2, blank=True, null=True, help_text=_(u'É a soma dos valores dos documentos tratados por este protocolo.'))
     referente = models.CharField(_(u'Referente'), max_length=100, blank=True, null=True)
     procedencia = models.ForeignKey('identificacao.Entidade', verbose_name=_(u'Procedência'), null=True, blank=True)
 
