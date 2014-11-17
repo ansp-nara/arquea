@@ -693,3 +693,15 @@ class Descricao(models.Model):
 
     def __unicode__(self):
 	return "%s - %s" % (self.entidade.__unicode__(), self.descricao)
+
+
+
+# Classe para definição de permissões de views e relatórios da app Protocolo
+class Permission(models.Model):
+    class Meta:
+        # remover as permissões padrões, pois essa é uma classe para configurar permissões customizadas
+        default_permissions = ()
+        permissions = (
+                    ("rel_adm_descricao", u"Rel. Adm. - Protocolos por descrição"),     #/protocolo/descricao
+                )
+

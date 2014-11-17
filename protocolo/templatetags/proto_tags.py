@@ -48,75 +48,169 @@ def link_cotacao(pk):
     
     return mark_safe('<a href="/protocolo/%s/cotacoes">%s</a>' % (pk, _(u'Ver cotações')))
 
-@register.inclusion_tag('admin/relatorios.html')
-def lista_relatorios():
+
+## @register.inclusion_tag()
+# Definindo abaixo do método para poder receber o context
+def lista_relatorios(context):
     gerenciais = []
     administrativos = []
     tecnicos = []
     verificacoes = []
     
-    administrativos.append({'url':'/financeiro/relatorios/pagamentos_mes', 'nome':u'Pagamentos por mês'})
-    administrativos.append({'url':'/financeiro/relatorios/pagamentos_parcial', 'nome':u'Pagamentos por parcial'})
-    administrativos.append({'url':'/financeiro/relatorios/parciais', 'nome':u'Diferenças totais'})
-    administrativos.append({'url':'/financeiro/relatorios/caixa', 'nome':u'Diferenças de caixa'})
-    administrativos.append({'url':'/financeiro/extrato', 'nome':u'Extrato da conta corrente'})
-    administrativos.append({'url':'/financeiro/extrato_mes', 'nome':u'Extrato da conta corrente por mês'})
-    administrativos.append({'url':'/financeiro/extrato_tarifas', 'nome':u'Extrato de tarifas por mês'})
-    administrativos.append({'url':'/financeiro/extrato_financeiro', 'nome':u'Extrato do financeiro por mês'})
-    administrativos.append({'url':'/financeiro/extrato_financeiro_parciais', 'nome':u'Extrato do financeiro por parcial'})
-    administrativos.append({'url':'/financeiro/relatorios/prestacao', 'nome':u'Prestação de contas'})
-    administrativos.append({'url':'/protocolo/descricao', 'nome':u'Protocolos por descrição'})
-    administrativos.append({'url':'/memorando/relatorio', 'nome':u'Memorandos FAPESP'})
-    administrativos.append({'url':'/outorga/relatorios/item_modalidade', 'nome':u'Itens do orçamento por modalidade'})
-    administrativos.append({'url':'/identificacao/agenda', 'nome':u'Agenda'})
-    administrativos.append({'url':'/identificacao/ecossistema/par', 'nome':u'Ecossistema'})
-    administrativos.append({'url':'/membro/mensalf', 'nome':u'Controle de horário mensal'})
-    administrativos.append({'url':'/patrimonio/relatorio/por_termo', 'nome':u'Patrimônio por termo de outorga'})
-    administrativos.append({'url':'/logs', 'nome':u'Registro de uso do sistema por ano'})
-    administrativos.append({'url':'/patrimonio/relatorio/presta_contas', 'nome':u'Prestação de contas patrimonial (em construção)'})
-
-    gerenciais.append({'url':'/financeiro/relatorios/gerencial', 'nome':u'Gerencial'})
-    gerenciais.append({'url':'/financeiro/relatorios/acordos', 'nome':u'Acordos'})
-    gerenciais.append({'url':'/outorga/relatorios/contratos', 'nome':u'Contratos'})
-    gerenciais.append({'url':'/outorga/relatorios/lista_acordos', 'nome':u'Concessões por  acordo'})
-    gerenciais.append({'url':'/outorga/relatorios/acordo_progressivo', 'nome':u'Gerencial progressivo'})
-    gerenciais.append({'url':'/processo/processos', 'nome':u'Processos'})
-    gerenciais.append({'url':'/rede/custo_terremark', 'nome':u'Custos dos recursos contratados'})
-
-    tecnicos.append({'url':'/identificacao/relatorios/arquivos', 'nome':u'Documentos por entidade'})
-    tecnicos.append({'url':'/patrimonio/relatorio/por_estado', 'nome':u'Patrimônio por estado do item'})
-    tecnicos.append({'url':'/patrimonio/relatorio/por_local', 'nome':u'Patrimônio por localização'})
-    tecnicos.append({'url':'/patrimonio/relatorio/por_local_termo', 'nome':u'Patrimônio por localização (com Termo)'})
-    tecnicos.append({'url':'/patrimonio/relatorio/por_local_rack', 'nome':u'Patrimônios por local e rack'})
-    tecnicos.append({'url':'/patrimonio/relatorio/por_tipo', 'nome':u'Patrimônio por tipo'})
-    tecnicos.append({'url':'/rede/planejamento', 'nome':u'Planejamento por ano'})
-    tecnicos.append({'url':'/rede/planejamento2', 'nome':u'Serviços contratados por processo'})
-    tecnicos.append({'url':'/rede/info', 'nome':u'Dados cadastrais dos participantes'})
-    tecnicos.append({'url':'/patrimonio/racks', 'nome':u'Racks (em construção)'})
-    tecnicos.append({'url':'/patrimonio/relatorio_rack', 'nome':u'Relatorio por rack (em construção)'})
+    user = context['user']
     
-    tecnicos.append({'url':'/patrimonio/planta_baixa_edit', 'nome':u'Planta Baixa - Racks (em construção)'})
-    tecnicos.append({'url':'/patrimonio/relatorio/por_marca', 'nome':u'Patrimônio por marca'})
-    tecnicos.append({'url':'/rede/blocosip', 'nome':u'Lista de blocos IP'})
-    tecnicos.append({'url':'/patrimonio/relatorio/por_tipo_equipamento2', 'nome':u'Patrimônio por tipo de equipamento'})
-    tecnicos.append({'url':'/patrimonio/relatorio/por_tipo_equipamento', 'nome':u'Busca por tipo de equipamento'})
-    tecnicos.append({'url':'/rede/relatorio_recursos_operacional', 'nome':u'Relatório de recursos'})
+    if user.is_superuser or user.has_perm('financeiro.rel_adm_pagamentos_mes'):
+        administrativos.append({'url':'/financeiro/relatorios/pagamentos_mes', 'nome':u'Pagamentos por mês'})
     
-    verificacoes.append({'url':'/verificacao/relatorio/equipamento_consolidado', 'nome':u'Verificação de equipamentos'})
-    verificacoes.append({'url':'/verificacao/relatorio/patrimonio_consolidado', 'nome':u'Verificação de patrimônio'})
-    verificacoes.append({'url':'/carga/', 'nome':u'Carga de planilha de patrimônio'})
-    verificacoes.append({'url':'/verificacao/versao', 'nome':u'Verificação de versão'})
+    if user.is_superuser or user.has_perm('financeiro.rel_adm_pagamentos_parcial'):
+        administrativos.append({'url':'/financeiro/relatorios/pagamentos_parcial', 'nome':u'Pagamentos por parcial'})
+    
+    if user.is_superuser or user.has_perm('financeiro.rel_adm_parciais'):
+        administrativos.append({'url':'/financeiro/relatorios/parciais', 'nome':u'Diferenças totais'})
+    
+    if user.is_superuser or user.has_perm('financeiro.rel_adm_caixa'):
+        administrativos.append({'url':'/financeiro/relatorios/caixa', 'nome':u'Diferenças de caixa'})
+    
+    if user.is_superuser or user.has_perm('financeiro.rel_adm_extrato'):
+        administrativos.append({'url':'/financeiro/extrato', 'nome':u'Extrato da conta corrente'})
+    
+    if user.is_superuser or user.has_perm('financeiro.rel_adm_extrato_mes'):
+        administrativos.append({'url':'/financeiro/extrato_mes', 'nome':u'Extrato da conta corrente por mês'})
+    
+    if user.is_superuser or user.has_perm('financeiro.rel_adm_extrato_tarifas'):
+        administrativos.append({'url':'/financeiro/extrato_tarifas', 'nome':u'Extrato de tarifas por mês'})
+    
+    if user.is_superuser or user.has_perm('financeiro.rel_adm_extrato_financeiro'):
+        administrativos.append({'url':'/financeiro/extrato_financeiro', 'nome':u'Extrato do financeiro por mês'})
+    
+    if user.is_superuser or user.has_perm('financeiro.rel_adm_extrato_financeiro_parciais'):
+        administrativos.append({'url':'/financeiro/extrato_financeiro_parciais', 'nome':u'Extrato do financeiro por parcial'})
+    
+    if user.is_superuser or user.has_perm('financeiro.rel_adm_prestacao'):
+        administrativos.append({'url':'/financeiro/relatorios/prestacao', 'nome':u'Prestação de contas'})
+    
+    if user.is_superuser or user.has_perm('protocolo.rel_adm_descricao'):
+        administrativos.append({'url':'/protocolo/descricao', 'nome':u'Protocolos por descrição'})
+        
+    if user.is_superuser or user.has_perm('memorando.rel_adm_memorando'):
+        administrativos.append({'url':'/memorando/relatorio', 'nome':u'Memorandos FAPESP'})
+    
+    if user.is_superuser or user.has_perm('outorga.rel_adm_item_modalidade'):
+        administrativos.append({'url':'/outorga/relatorios/item_modalidade', 'nome':u'Itens do orçamento por modalidade'})
+        
+    if user.is_superuser or user.has_perm('identificacao.rel_adm_agenda'):
+        administrativos.append({'url':'/identificacao/agenda', 'nome':u'Agenda'})
+        
+    if user.is_superuser or user.has_perm('identificacao.rel_adm_ecossistema'):
+        administrativos.append({'url':'/identificacao/ecossistema/par', 'nome':u'Ecossistema'})
+        
+    if user.is_superuser or user.has_perm('membro.rel_adm_mensalf'):
+        administrativos.append({'url':'/membro/mensalf', 'nome':u'Controle de horário mensal'})
+    
+    if user.is_superuser or user.has_perm('patrimonio.rel_adm_por_termo'):
+        administrativos.append({'url':'/patrimonio/relatorio/por_termo', 'nome':u'Patrimônio por termo de outorga'})
+    
+    if user.is_superuser or user.has_perm('membro.rel_adm_logs'):
+        administrativos.append({'url':'/logs', 'nome':u'Registro de uso do sistema por ano'})
+    
+    if user.is_superuser or user.has_perm('patrimonio.rel_adm_presta_contas'):
+        administrativos.append({'url':'/patrimonio/relatorio/presta_contas', 'nome':u'Prestação de contas patrimonial (em construção)'})
+
+    if user.is_superuser or user.has_perm('financeiro.rel_ger_gerencial'):
+        gerenciais.append({'url':'/financeiro/relatorios/gerencial', 'nome':u'Gerencial'})
+    
+    if user.is_superuser or user.has_perm('financeiro.rel_ger_acordos'):
+        gerenciais.append({'url':'/financeiro/relatorios/acordos', 'nome':u'Acordos'})
+        
+    if user.is_superuser or user.has_perm('outorga.rel_ger_contratos'):
+        gerenciais.append({'url':'/outorga/relatorios/contratos', 'nome':u'Contratos'})
+    
+    if user.is_superuser or user.has_perm('outorga.rel_ger_lista_acordos'):
+        gerenciais.append({'url':'/outorga/relatorios/lista_acordos', 'nome':u'Concessões por  acordo'})
+    
+    if user.is_superuser or user.has_perm('outorga.rel_ger_acordo_progressivo'):
+        gerenciais.append({'url':'/outorga/relatorios/acordo_progressivo', 'nome':u'Gerencial progressivo'})
+    
+    if user.is_superuser or user.has_perm('processo.rel_ger_processos'):
+        gerenciais.append({'url':'/processo/processos', 'nome':u'Processos'})
+    
+    if user.is_superuser or user.has_perm('rede.rel_ger_custo_terremark'):
+        gerenciais.append({'url':'/rede/custo_terremark', 'nome':u'Custos dos recursos contratados'})
+
+    if user.is_superuser or user.has_perm('identificacao.rel_tec_arquivos'):
+        tecnicos.append({'url':'/identificacao/relatorios/arquivos', 'nome':u'Documentos por entidade'})
+    
+    if user.is_superuser or user.has_perm('patrimonio.rel_tec_por_estado'):
+        tecnicos.append({'url':'/patrimonio/relatorio/por_estado', 'nome':u'Patrimônio por estado do item'})
+    
+    if user.is_superuser or user.has_perm('patrimonio.rel_tec_por_local'):
+        tecnicos.append({'url':'/patrimonio/relatorio/por_local', 'nome':u'Patrimônio por localização'})
+    
+    if user.is_superuser or user.has_perm('patrimonio.rel_tec_por_local_termo'):
+        tecnicos.append({'url':'/patrimonio/relatorio/por_local_termo', 'nome':u'Patrimônio por localização (com Termo)'})
+    
+    if user.is_superuser or user.has_perm('patrimonio.rel_tec_por_local_rack'):
+        tecnicos.append({'url':'/patrimonio/relatorio/por_local_rack', 'nome':u'Patrimônios por local e rack'})
+        
+    if user.is_superuser or user.has_perm('patrimonio.rel_tec_por_tipo'):
+        tecnicos.append({'url':'/patrimonio/relatorio/por_tipo', 'nome':u'Patrimônio por tipo'})
+    
+    if user.is_superuser or user.has_perm('rede.rel_tec_planejamento'):
+        tecnicos.append({'url':'/rede/planejamento', 'nome':u'Planejamento por ano'})
+        
+    if user.is_superuser or user.has_perm('rede.rel_tec_servico_processo'):
+        tecnicos.append({'url':'/rede/planejamento2', 'nome':u'Serviços contratados por processo'})
+    
+    if user.is_superuser or user.has_perm('rede.rel_tec_info'):
+        tecnicos.append({'url':'/rede/info', 'nome':u'Dados cadastrais dos participantes'})
+    if user.is_superuser or user.has_perm('patrimonio.rel_tec_relatorio_rack'):
+        tecnicos.append({'url':'/patrimonio/racks', 'nome':u'Racks (em construção)'})
+    if user.is_superuser or user.has_perm('patrimonio.rel_tec_racks'):
+        tecnicos.append({'url':'/patrimonio/relatorio_rack', 'nome':u'Relatorio por rack (em construção)'})
+    if user.is_superuser or user.has_perm('patrimonio.rel_tec_planta_baixa_edit'):
+        tecnicos.append({'url':'/patrimonio/planta_baixa_edit', 'nome':u'Planta Baixa - Racks (em construção)'})
+    if user.is_superuser or user.has_perm('patrimonio.rel_tec_por_marca'):
+        tecnicos.append({'url':'/patrimonio/relatorio/por_marca', 'nome':u'Patrimônio por marca'})
+    if user.is_superuser or user.has_perm('rede.rel_tec_blocosip'):
+        tecnicos.append({'url':'/rede/blocosip', 'nome':u'Lista de blocos IP'})
+    if user.is_superuser or user.has_perm('patrimonio.rel_tec_patr_tipo_equipamento'):
+        tecnicos.append({'url':'/patrimonio/relatorio/por_tipo_equipamento2', 'nome':u'Patrimônio por tipo de equipamento'})
+    if user.is_superuser or user.has_perm('patrimonio.rel_tec_por_tipo_equipamento'):
+        tecnicos.append({'url':'/patrimonio/relatorio/por_tipo_equipamento', 'nome':u'Busca por tipo de equipamento'})
+    if user.is_superuser or user.has_perm('rede.rel_tec_recursos_operacional'):
+        tecnicos.append({'url':'/rede/relatorio_recursos_operacional', 'nome':u'Relatório de recursos'})
+    
+    if user.is_superuser:
+        verificacoes.append({'url':'/verificacao/relatorio/equipamento_consolidado', 'nome':u'Verificação de equipamentos'})
+        
+    if user.is_superuser:
+        verificacoes.append({'url':'/verificacao/relatorio/patrimonio_consolidado', 'nome':u'Verificação de patrimônio'})
+        
+    if user.is_superuser:
+        verificacoes.append({'url':'/carga/', 'nome':u'Carga de planilha de patrimônio'})
+        
+    if user.is_superuser:
+        verificacoes.append({'url':'/verificacao/versao', 'nome':u'Verificação de versão'})
 
     gerenciais.sort(key=lambda x: x['nome'])
     administrativos.sort(key=lambda x: x['nome'])
     tecnicos.sort(key=lambda x: x['nome'])
     verificacoes.sort(key=lambda x: x['nome'])
     
-    return {'relatorios':[{'nome':u'gerenciais', 'rel':gerenciais}, 
-                          {'nome':u'administrativos', 'rel':administrativos}, 
-                          {'nome':u'técnicos', 'rel':tecnicos},
-                          {'nome':u'de verificações (Acesso restrito)', 'rel':verificacoes}], 
-            }
+    retorno = {'relatorios':[]}
+    if len(gerenciais) > 0:
+        retorno['relatorios'].append({'nome':u'gerenciais', 'rel':gerenciais})
+    if len(administrativos) > 0:
+        retorno['relatorios'].append({'nome':u'administrativos', 'rel':administrativos})
+    if len(tecnicos) > 0:
+        retorno['relatorios'].append({'nome':u'técnicos', 'rel':tecnicos})
+    if len(verificacoes) > 0:
+        retorno['relatorios'].append({'nome':u'de verificações (Acesso restrito)', 'rel':verificacoes})
+    
+    return retorno
+
+# Register the custom tag as an inclusion tag with takes_context=True.
+register.inclusion_tag('admin/relatorios.html', takes_context=True)(lista_relatorios)
 
 
 
@@ -293,7 +387,11 @@ def menu_has_permission(context, menuitem):
     """
         Verifica o menu possui algum sub-menu com permissão de acesso.
         Usage:
-        {% menu_has_permission menu_item as permitted %}
+        {% menu_has_permission "codigo_permissao" as permitted %}
+        
+        O codigo_permissao precisa ser o identificador completo da permissão. Ex:
+            patrimonio.change_historicolocal
+            
     """
     retorno = False
     try:

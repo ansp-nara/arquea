@@ -292,12 +292,37 @@ class TipoComprovante(models.Model):
     nome = models.CharField(max_length=100)
     
     class Meta:
-	verbose_name = _(u'Tipo de comprovante')
-	verbose_name_plural = _(u'Tipos de comprovante')
+    	verbose_name = _(u'Tipo de comprovante')
+    	verbose_name_plural = _(u'Tipos de comprovante')
         ordering = ('nome',)
 
     def __unicode__(self):
 	    return self.nome
+
+
+# Classe para definição de permissões de views e relatórios da app financeiro
+class Permission(models.Model):
+    class Meta:
+        # remover as permissões padrões, pois essa é uma classe para configurar permissões customizadas
+        default_permissions = ()
+        permissions = (
+                       ("rel_adm_extrato", "Rel. admin. - Extrato da conta corrente"),     #/financeiro/extrato
+                       ("rel_adm_extrato_financeiro", "Rel. admin. - Extrato do financeiro por mês"),     #/financeiro/extrato_financeiro
+                       ("rel_adm_extrato_financeiro_parciais", "Rel. admin. - Extrato do financeiro por parcial"),     #/financeiro/extrato_financeiro_parciais
+                       ("rel_adm_extrato_mes", "Rel. admin. - Extrato da conta corrente por mês"),     #/financeiro/extrato_mes
+                       ("rel_adm_extrato_tarifas", "Rel. admin. - Extrato de tarifas por mês"),     #/financeiro/extrato_tarifas
+                       ("rel_ger_acordos", "Rel. ger. - Acordos"),     #/financeiro/relatorios/acordos
+                       ("rel_adm_caixa", "Rel. admin. - Diferenças de caixa"),     #/financeiro/relatorios/caixa
+                       ("rel_ger_gerencial",  "Rel. ger. - Gerencial"),     #/financeiro/relatorios/gerencial
+                       ("rel_adm_pagamentos_mes", "Rel. admin. - Pagamentos po mês"),     #/financeiro/relatorios/pagamentos_mes
+                       ("rel_adm_pagamentos_parcial", "Rel. admin. - Pagamentos por parcial"),     #/financeiro/relatorios/pagamentos_parcial
+                       ("rel_adm_parciais", "Rel. admin. - Diferenças totais"),     #/financeiro/relatorios/parciais
+                       ("rel_adm_prestacao", "Rel. admin. - Prestação de contas"),     #/financeiro/relatorios/prestacao
+                      )
+
+
+
+
 
 
 

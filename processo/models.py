@@ -160,3 +160,15 @@ class Procedimento(models.Model):
 
     class Meta:
 	ordering = ('nome',)
+
+
+
+# Classe para definição de permissões de views e relatórios da app Processo
+class Permission(models.Model):
+    class Meta:
+        # remover as permissões padrões, pois essa é uma classe para configurar permissões customizadas
+        default_permissions = ()
+        permissions = (
+                    ("rel_ger_processos", "Rel. Ger. - Processos"),     #/processo/processos
+                )
+

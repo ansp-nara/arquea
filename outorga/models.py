@@ -959,3 +959,16 @@ class ArquivoOS(models.Model):
 	      return u'%s' % self.arquivo.name.split('/')[-1]
 	  
 	  
+
+# Classe para definição de permissões de views e relatórios da app patrimonio
+class Permission(models.Model):
+    class Meta:
+        # remover as permissões padrões, pois essa é uma classe para configurar permissões customizadas
+        default_permissions = ()
+        permissions = (
+                    ("rel_ger_acordo_progressivo", "Rel. Ger. - Gerencial progressivo"),     #/outorga/relatorios/acordo_progressivo
+                    ("rel_ger_contratos", "Rel. Ger. - Contratos"),     #/outorga/relatorios/contratos
+                    ("rel_adm_item_modalidade", "Rel. Adm. - Itens do orçamento por modalidade"),     #/outorga/relatorios/item_modalidade
+                    ("rel_ger_lista_acordos", "Rel. Ger. - Concessões por acordo"),     #/outorga/relatorios/lista_acordos
+                )
+

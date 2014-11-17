@@ -391,3 +391,17 @@ class Ecossistema(models.Model):
     class Meta:
         ordering = ('identificacao__endereco__entidade__sigla',)
                                                                          
+
+
+# Classe para definição de permissões de views e relatórios da app identificação
+class Permission(models.Model):
+    class Meta:
+        # remover as permissões padrões, pois essa é uma classe para configurar permissões customizadas
+        default_permissions = ()
+        permissions = (
+                    ("rel_adm_agenda", "Rel. Adm. - Agenda"),     #/identificacao/agenda
+                    ("rel_adm_ecossistema", "Rel. Adm. - Ecossistema"),     #/identificacao/ecossistema/par
+                    ("rel_tec_arquivos", "Rel. Téc. - Documentos por entidade"),     #/identificacao/relatorios/arquivos
+                )
+
+
