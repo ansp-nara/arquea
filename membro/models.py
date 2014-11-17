@@ -756,3 +756,15 @@ class ItemControle:
    
     def __unicode__(self):
        return u'%s' % (self.dia)
+
+
+# Classe para definição de permissões de views e relatórios da app Membro
+class Permission(models.Model):
+    class Meta:
+        # remover as permissões padrões, pois essa é uma classe para configurar permissões customizadas
+        default_permissions = ()
+        permissions = (
+                    ("rel_adm_logs", "Rel. Adm. - Registro de uso do sistema por ano"),     #/logs
+                    ("rel_adm_mensalf", "Rel. Adm. - Controle de horário mensal"),     #/membro/mensalf
+                )
+

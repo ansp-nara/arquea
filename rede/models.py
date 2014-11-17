@@ -362,3 +362,20 @@ class Estado(models.Model):
 
     class Meta:
 	ordering = ('nome',)
+
+
+# Classe para definição de permissões de views e relatórios da app rede
+class Permission(models.Model):
+    class Meta:
+        # remover as permissões padrões, pois essa é uma classe para configurar permissões customizadas
+        default_permissions = ()
+        permissions = (
+                ("rel_tec_blocosip", u"Rel. Téc. - Lista de blocos IP"),     #/rede/blocosip
+                ("rel_ger_custo_terremark", u"Rel. Ger. - Custos dos recursos contratados"),     #/rede/custo_terremark
+                ("rel_tec_info", u"Rel. Téc. - Dados cadastrais dos participantes"),     #/rede/info
+                ("rel_tec_planejamento", u"Rel. Téc. - Planejamento por ano"),     #/rede/planejamento
+                ("rel_tec_servico_processo", u"Rel. Téc. - Serviços contratados por processo"),     #/rede/planejamento2
+                ("rel_tec_recursos_operacional", u"Rel. Téc. - Relatório de recursos"),     #/rede/relatorio_recursos_operacional
+            )
+
+

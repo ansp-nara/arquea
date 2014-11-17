@@ -236,7 +236,7 @@ def pagamentos_parciais(request, pdf=False):
 
 
 @login_required
-#@permission_required('financeiro.relatorio_ger_gerencial', raise_exception=True)
+@permission_required('financeiro.relatorio_ger_gerencial', raise_exception=True)
 @require_safe
 def relatorio_gerencial(request, pdf=False):
     if request.GET.get('termo'):

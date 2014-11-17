@@ -630,3 +630,25 @@ class PlantaBaixaPosicao(models.Model):
         verbose_name = u'Planta baixa - Posição'
         verbose_name_plural = u'Planta baixa - Posições'
 
+
+# Classe para definição de permissões de views e relatórios da app patrimonio
+class Permission(models.Model):
+    class Meta:
+        # remover as permissões padrões, pois essa é uma classe para configurar permissões customizadas
+        default_permissions = ()
+        permissions = (
+                    ("rel_tec_planta_baixa_edit", u"Rel. Téc. - Planta baixa - Racks"),     #/patrimonio/planta_baixa_edit
+                    ("rel_tec_racks", u"Rel. Téc. - Racks "),     #/patrimonio/racks
+                    ("rel_tec_por_estado", u"Rel. Téc. - Patr por estado do item"),     #/patrimonio/relatorio/por_estado
+                    ("rel_tec_por_local", u"Rel. Téc. - Patr por localização"),     #/patrimonio/relatorio/por_local
+                    ("rel_tec_por_local_rack", u"Rel. Téc. - Patr por local e rack"),     #/patrimonio/relatorio/por_local_rack
+                    ("rel_tec_por_local_termo", u"Rel. Téc. - Patr por localização (com Termo)"),     #/patrimonio/relatorio/por_local_termo
+                    ("rel_tec_por_marca", u"Rel. Téc. - Patr por marca"),     #/patrimonio/relatorio/por_marca
+                    ("rel_adm_por_termo", u"Rel. Adm. - Patr por termo de outorga"),     #/patrimonio/relatorio/por_termo
+                    ("rel_tec_por_tipo", u"Rel. Téc. - Patr por tipo"),     #/patrimonio/relatorio/por_tipo
+                    ("rel_tec_por_tipo_equipamento", u"Rel. Téc. - Busca por tipo de equip"),     #/patrimonio/relatorio/por_tipo_equipamento
+                    ("rel_tec_patr_tipo_equipamento", u"Rel. Téc. - Patr por tipo de equip"),     #/patrimonio/relatorio/por_tipo_equipamento2
+                    ("rel_adm_presta_contas", u"Rel. Adm. - Prestação de contas patrimonial"),     #/patrimonio/relatorio/presta_contas
+                    ("rel_tec_relatorio_rack", u"Rel. Téc. - Relatório por rack"),     #/patrimonio/relatorio_rack
+                )
+

@@ -174,3 +174,15 @@ class Arquivo(models.Model):
 
     def __unicode__(self):
         return self.arquivo.name
+
+
+# Classe para definição de permissões de views e relatórios da app Memorando
+class Permission(models.Model):
+    class Meta:
+        # remover as permissões padrões, pois essa é uma classe para configurar permissões customizadas
+        default_permissions = ()
+        permissions = (
+                    ("rel_adm_memorando", "Rel. Adm. - Memorandos FAPESP"),     #/memorando/relatorio
+                )
+
+
