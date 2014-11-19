@@ -192,6 +192,7 @@ def ajax_nova_pagina(request):
 
 
 @login_required
+@permission_required('financeiro.rel_adm_pagamentos_mes', raise_exception=True)
 @require_safe
 def pagamentos_mensais(request, pdf=False):
     if request.GET.get('ano'):
@@ -212,6 +213,7 @@ def pagamentos_mensais(request, pdf=False):
 
 
 @login_required
+@permission_required('financeiro.rel_adm_pagamentos_parcial', raise_exception=True)
 @require_safe
 def pagamentos_parciais(request, pdf=False):
     if request.GET.get('parcial'):
@@ -236,7 +238,7 @@ def pagamentos_parciais(request, pdf=False):
 
 
 @login_required
-@permission_required('financeiro.relatorio_ger_gerencial', raise_exception=True)
+@permission_required('financeiro.rel_ger_gerencial', raise_exception=True)
 @require_safe
 def relatorio_gerencial(request, pdf=False):
     if request.GET.get('termo'):
@@ -352,6 +354,7 @@ def relatorio_gerencial(request, pdf=False):
 
 
 @login_required
+@permission_required('financeiro.rel_ger_acordos', raise_exception=True)
 @require_safe
 def relatorio_acordos(request, pdf=False):
     if request.GET.get('termo'):
@@ -401,6 +404,7 @@ def relatorio_acordos(request, pdf=False):
         return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all(), 'view':'relatorio_acordos'}, context_instance=RequestContext(request))
 
 @login_required
+@permission_required('financeiro.rel_adm_extrato', raise_exception=True)
 @require_safe
 def extrato(request, pdf=False):
     if request.GET.get('ano'):
@@ -434,6 +438,7 @@ def extrato(request, pdf=False):
 
 
 @login_required
+@permission_required('financeiro.rel_adm_extrato_mes', raise_exception=True)
 @require_safe
 def extrato_mes(request, pdf=False):
     if request.GET.get('ano'):
@@ -461,6 +466,7 @@ def extrato_mes(request, pdf=False):
         return render_to_response('financeiro/sel_contacorrente_mes.html', {'anos':anos, 'meses':meses}, context_instance=RequestContext(request))	    
 
 @login_required
+@permission_required('financeiro.rel_adm_extrato_financeiro', raise_exception=True)
 @require_safe
 def extrato_financeiro(request, ano=dtime.now().year, pdf=False):
     if request.GET.get('termo'):
@@ -500,6 +506,7 @@ def extrato_financeiro(request, ano=dtime.now().year, pdf=False):
         return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all(), 'meses':meses, 'view':'extrato_financeiro', 'rt':False }, context_instance=RequestContext(request))
 
 @login_required
+@permission_required('financeiro.rel_adm_extrato_tarifas', raise_exception=True)
 @require_safe
 def extrato_tarifas(request, pdf=False):
     if request.GET.get('ano'):
@@ -555,7 +562,10 @@ def cheque(request, cc=1):
     return render_to_pdf('financeiro/cheque.pdf', {'cc':extrato, 'termo':termo, 'pps':pps, 'assinatura':assinatura}, request=request, filename='capa_%s.pdf' % extrato.cod_oper)
 
 
+
 @login_required
+@permission_required('financeiro.rel_adm_extrato_financeiro_parciais', raise_exception=True)
+@require_safe
 def financeiro_parciais(request, pdf=False):
     if request.GET.get('termo'):
         termo_id = int(request.GET.get('termo'))
@@ -729,9 +739,22 @@ def financeiro_parciais(request, pdf=False):
         return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all(), 'rt':False, 'view':'financeiro_parciais'}, context_instance=RequestContext(request))
 
 
+
 @login_required
+@permission_required('financeiro.rel_adm_caixa', raise_exception=True)
 @require_safe
-def parciais(request, caixa=False, pdf=False):
+def caixa(request, pdf=False):
+    return _parciais_or_caixa(request, True, pdf)
+
+@login_required
+@permission_required('financeiro.rel_adm_parciais', raise_exception=True)
+@require_safe
+def parciais(request, pdf=False):
+    return _parciais_or_caixa(request, False, pdf)
+
+# Utilizado nos requests de caixa e de parciais.
+# Foi feito isso para fazer o tratamento separado das permissões de acesso aos relatórios
+def _parciais_or_caixa(request, caixa=False, pdf=False):
     if request.GET.get('termo'):
         termo_id = int(request.GET.get('termo'))
         termo = get_object_or_404(Termo, id=termo_id)
@@ -810,6 +833,7 @@ def ajax_escolhe_extrato(request):
 
 
 @login_required
+@permission_required('financeiro.rel_adm_prestacao', raise_exception=True)
 @require_safe
 def presta_contas(request, pdf=False):
     if request.GET.get('termo'):

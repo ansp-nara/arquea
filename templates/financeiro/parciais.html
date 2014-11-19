@@ -5,7 +5,7 @@
     <div class="breadcrumbs">Você está em: 
       <a href="../../">{% trans "Home" %}</a> &rsaquo;
       {% if caixa %} 
-        <a href="{% url 'financeiro.views.parciais' caixa=True %}">Diferenças de caixa</a>
+        <a href="{% url 'financeiro.views.caixa' %}">Diferenças de caixa</a>
       {% else %} 
         <a href="./parciais">Diferenças totais</a>
       {% endif %}
