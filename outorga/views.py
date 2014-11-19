@@ -245,6 +245,8 @@ def gastos_acordos(request):
 
 
 @login_required
+@permission_required('outorga.rel_ger_contratos', raise_exception=True)
+@require_safe
 def contratos(request):
     
     entidades = []
@@ -301,6 +303,8 @@ def relatorio_termos(request):
 
 
 @login_required
+@permission_required('outorga.rel_ger_lista_acordos', raise_exception=True)
+@require_safe
 def lista_acordos(request, pdf=False):
     processos = []
     for t in Termo.objects.filter(ano__gte=2004).order_by('-ano'):
@@ -324,6 +328,7 @@ def lista_acordos(request, pdf=False):
 
 
 @login_required
+@permission_required('outorga.rel_adm_item_modalidade', raise_exception=True)
 @require_safe
 def item_modalidade(request, pdf=False):
     if request.GET.get('termo') and request.GET.get('termo') != '0' and \
@@ -398,6 +403,8 @@ def item_modalidade(request, pdf=False):
 
 
 @login_required
+@permission_required('outorga.rel_ger_acordo_progressivo', raise_exception=True)
+@require_safe
 def acordo_progressivo(request, pdf=False):
     acordos = []
     
