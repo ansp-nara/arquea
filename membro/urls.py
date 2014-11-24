@@ -6,6 +6,8 @@ urlpatterns = patterns('membro.views',
     (r'detalhes$', 'detalhes'),
     (r'obs/(?P<id>\d+)$', 'observacao'),
     (r'mensalf$', 'mensal_func'),
+    (r'logs$', 'uso_admin'),
+    
     (r'ajax_controle_mudar_almoco$', 'ajax_controle_mudar_almoco'),
 
     (r'ajax_controle_avancar_bloco$', 'ajax_controle_avancar_bloco'),

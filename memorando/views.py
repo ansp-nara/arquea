@@ -100,6 +100,8 @@ def fapesp(request, mem):
 
 
 @login_required
+@permission_required('memorando.rel_adm_memorando', raise_exception=True)
+@require_safe
 def relatorio(request):
     mem = request.GET.get('mem')
     if not mem:

@@ -111,7 +111,7 @@ def lista_relatorios(context):
         administrativos.append({'url':'/patrimonio/relatorio/por_termo', 'nome':u'Patrimônio por termo de outorga'})
     
     if user.is_superuser or user.has_perm('membro.rel_adm_logs'):
-        administrativos.append({'url':'/logs', 'nome':u'Registro de uso do sistema por ano'})
+        administrativos.append({'url':'/membro/logs', 'nome':u'Registro de uso do sistema por ano'})
     
     if user.is_superuser or user.has_perm('patrimonio.rel_adm_presta_contas'):
         administrativos.append({'url':'/patrimonio/relatorio/presta_contas', 'nome':u'Prestação de contas patrimonial (em construção)'})
@@ -163,10 +163,12 @@ def lista_relatorios(context):
     
     if user.is_superuser or user.has_perm('rede.rel_tec_info'):
         tecnicos.append({'url':'/rede/info', 'nome':u'Dados cadastrais dos participantes'})
-    if user.is_superuser or user.has_perm('patrimonio.rel_tec_relatorio_rack'):
+    if user.is_superuser or user.has_perm('patrimonio.rel_tec_racks'):
         tecnicos.append({'url':'/patrimonio/racks', 'nome':u'Racks (em construção)'})
+        
     if user.is_superuser or user.has_perm('patrimonio.rel_tec_racks'):
         tecnicos.append({'url':'/patrimonio/relatorio_rack', 'nome':u'Relatorio por rack (em construção)'})
+        
     if user.is_superuser or user.has_perm('patrimonio.rel_tec_planta_baixa_edit'):
         tecnicos.append({'url':'/patrimonio/planta_baixa_edit', 'nome':u'Planta Baixa - Racks (em construção)'})
     if user.is_superuser or user.has_perm('patrimonio.rel_tec_por_marca'):
