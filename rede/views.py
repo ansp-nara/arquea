@@ -38,6 +38,8 @@ def ajax_escolhe_pagamento(request):
 
 
 @login_required
+@permission_required('rede.rel_tec_planejamento', raise_exception=True)
+@require_safe
 def planejamento(request, pdf=0):
 
     anoproj = request.GET.get('anoproj')
@@ -73,6 +75,8 @@ def planejamento(request, pdf=0):
 
 
 @login_required
+@permission_required('rede.rel_tec_info', raise_exception=True)
+@require_safe
 def planilha_informacoes_gerais(request):
     info = Enlace.objects.filter(participante__entidade__entidadehistorico__ativo=True)
     return TemplateResponse(request, 'rede/informacoes_gerais.html', {'info': info})
@@ -135,6 +139,8 @@ def planeja_contrato(request):
 
 
 @login_required
+@permission_required('rede.rel_tec_servico_processo', raise_exception=True)
+@require_safe
 def planejamento2(request, pdf=0):
     
     entidade_id = request.GET.get('entidade')
@@ -190,6 +196,7 @@ def planejamento2(request, pdf=0):
 
 
 @login_required
+@permission_required('rede.rel_tec_blocosip', raise_exception=True)
 @require_safe
 def blocos_ip(request):
     if len(request.GET) < 4:
@@ -235,6 +242,8 @@ def blocos_ip(request):
 
 
 @login_required
+@permission_required('rede.rel_ger_custo_terremark', raise_exception=True)
+@require_safe
 def custo_terremark(request, pdf=0, xls=0):
     
     # Filtrando por Entidade
@@ -280,6 +289,8 @@ def custo_terremark(request, pdf=0, xls=0):
 
 
 @login_required
+@permission_required('rede.rel_tec_recursos_operacional', raise_exception=True)
+@require_safe
 def relatorio_recursos_operacional(request, pdf=0, xls=0):
     """
     Relatório operacional para visualização dos recursos.

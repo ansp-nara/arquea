@@ -279,6 +279,7 @@ def ajax_patrimonio_existente(request):
 
 
 @login_required
+@permission_required('patrimonio.rel_tec_por_estado', raise_exception=True)
 def por_estado(request):
     if request.method == 'POST':
         if request.POST.get('estado'):
@@ -313,6 +314,8 @@ def por_estado(request):
 
 
 @login_required
+@permission_required('patrimonio.rel_tec_por_tipo', raise_exception=True)
+@require_safe
 def por_tipo(request):
     if request.method == 'GET' and request.GET.get('tipo'):
         tipo_id = request.GET.get('tipo')
@@ -363,6 +366,8 @@ def por_tipo(request):
 
 
 @login_required
+@permission_required('patrimonio.rel_tec_por_marca', raise_exception=True)
+@require_safe
 def por_marca(request, pdf=0):
     if request.method == 'GET' and request.GET.get('marca'):
         marca = request.GET.get('marca')
@@ -379,6 +384,8 @@ def por_marca(request, pdf=0):
 
 
 @login_required
+@permission_required('patrimonio.rel_tec_por_local', raise_exception=True)
+@require_safe
 def por_local(request, pdf=0):
     if request.GET.get('entidade') and request.GET.get('endereco'):
         atuais = []
@@ -472,6 +479,8 @@ def por_local(request, pdf=0):
 
 
 @login_required
+@permission_required('patrimonio.rel_tec_por_local_rack', raise_exception=True)
+@require_safe
 def por_local_rack(request, pdf=0):
     entidade = request.GET.get('entidade')
     endereco_id = request.GET.get('endereco')
@@ -530,6 +539,8 @@ def por_local_rack(request, pdf=0):
 
 
 @login_required
+@permission_required('patrimonio.rel_tec_por_local_termo', raise_exception=True)
+@require_safe
 def por_local_termo(request, pdf=0):
     if request.GET.get('entidade'):
         atuais = []
@@ -713,6 +724,7 @@ def iterate_patrimonio(p_pts, nivel=0, filtro_com_fmusp=False, order_fmusp=True,
 
 
 @login_required
+@permission_required('patrimonio.rel_tec_por_tipo_equipamento', raise_exception=True)
 @require_safe
 def por_tipo_equipamento(request, pdf=0):
     if len(request.GET) < 1:
@@ -852,6 +864,8 @@ def ajax_filtra_pn_estado(request):
 
 
 @login_required
+@permission_required('patrimonio.rel_adm_por_termo', raise_exception=True)
+@require_safe
 def por_termo(request, pdf=0):
     termo_id = request.GET.get('termo') or request.POST.get('termo') 
     modalidade = request.GET.get('modalidade') or request.POST.get('modalidade')
@@ -969,6 +983,8 @@ def por_termo(request, pdf=0):
 
 
 @login_required
+@permission_required('patrimonio.rel_tec_racks', raise_exception=True)
+@require_safe
 def racks(request):
         
     # Busca os endereços que possuem Racks no estadoAtivos
@@ -1153,6 +1169,7 @@ def __rack_data(datacenter_id, rack_id):
     
     
 @login_required
+@permission_required('patrimonio.rel_tec_relatorio_rack', raise_exception=True)
 def relatorio_rack(request):
     p_dc = request.GET.get('dc')
     p_rack = request.GET.get('rack')
@@ -1183,6 +1200,7 @@ def relatorio_rack(request):
 
 
 @login_required
+@permission_required('patrimonio.rel_adm_presta_contas', raise_exception=True)
 def presta_contas(request):
     termos = []
     for t in Termo.objects.all():
@@ -1220,6 +1238,7 @@ def ajax_abre_arvore(request):
 
 
 @login_required
+@permission_required('patrimonio.rel_tec_patr_tipo_equipamento', raise_exception=True)
 def por_tipo_equipamento2(request):
     return TemplateResponse(request, 'patrimonio/por_tipo_equipamento2.html')
 
@@ -1317,6 +1336,7 @@ def ajax_patrimonio_historico(request):
 Página para configurar o design de Planta baixa dos cages
 """
 @login_required
+@permission_required('patrimonio.rel_tec_planta_baixa_edit', raise_exception=True)
 def planta_baixa_edit(request):
     # Busca os endereços que possuem Racks no estadoAtivos
     locais = PlantaBaixaDataCenter.objects.all()

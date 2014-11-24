@@ -45,7 +45,7 @@ urlpatterns = patterns('',
     (r'^xml_rpc_srv$', 'xmlrpc_srv.rpc_handler', {'SSL':False}),
     (r'^verifica$', 'utils.views.verifica', {'SSL':False}),
     (r'^sempermissao$', TemplateView.as_view(template_name="401.html")),
-    (r'^logs$', 'utils.views.uso_admin'),
+
 
     # necessário instalar o django_localflavor
     # No Django 1.6 o django.contrib.localflavor foi desabilitado

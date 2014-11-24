@@ -2,11 +2,15 @@
 
 from django.template.response import TemplateResponse
 from django.contrib.auth.decorators import permission_required, login_required
+from django.views.decorators.http import require_safe
 
 from models import *
 from utils.functions import render_to_pdf
 
 
+@login_required
+@permission_required('processo.rel_ger_processos', raise_exception=True)
+@require_safe
 def processos(request, pdf=False):
     
     areas = []

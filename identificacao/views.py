@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import permission_required, login_required
 from django.http import Http404, HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
@@ -71,11 +71,17 @@ def ajax_escolhe_endereco(request):
     json = simplejson.dumps(retorno)
     return HttpResponse(json, content_type="application/json")
 
+
 @login_required
+@permission_required('identificacao.rel_tec_arquivos', raise_exception=True)
+@require_safe
 def arquivos_entidade(request):
     return render_to_response('identificacao/arquivos_entidade.html', {'entidades': [e for e in Entidade.objects.all() if e.arquivoentidade_set.count() > 0]}, context_instance=RequestContext(request))
 
+
 @login_required
+@permission_required('identificacao.rel_adm_agenda', raise_exception=True)
+@require_safe
 def agenda(request, tipo=8, pdf=None):
     agenda = request.GET.get('agenda')
     if agenda:
@@ -103,13 +109,16 @@ def agenda(request, tipo=8, pdf=None):
 
 
 @login_required
+@permission_required('identificacao.rel_adm_ecossistema', raise_exception=True)
+@require_safe
 def planilha_ecossistema(request, tipo='par'):
 
     if tipo == 'par':
-	return TemplateResponse(request, 'identificacao/ecossistema_par.html', {'ec':Ecossistema.objects.filter(identificacao__endereco__entidade__entidadehistorico__tipo__nome__in=['Participante', 'Equipe'])})
+        return TemplateResponse(request, 'identificacao/ecossistema_par.html', {'ec':Ecossistema.objects.filter(identificacao__endereco__entidade__entidadehistorico__tipo__nome__in=['Participante', 'Equipe'])})
     elif tipo == 'tic':
         return TemplateResponse(request, 'identificacao/ecossistema_tic.html', {'ec':Ecossistema.objects.filter(identificacao__endereco__entidade__entidadehistorico__tipo__nome__in=['TIC'])})
     else: raise Http404
+
 
 @login_required
 def acessos_terremark(request):
