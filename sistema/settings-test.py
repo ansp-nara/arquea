@@ -95,4 +95,8 @@ JENKINS_TASKS = (
  #    'django_jenkins.tasks.run_sloccount',    
  #    'django_jenkins.tasks.lettuce_tests',
 )
+
+COVERAGE_MODULE_EXCLUDES = ['tests$', 'settings$', 'urls$', 'common.views.test', 'init', 'django',]
+
+
 # end JENKINS CONFIGURATION
