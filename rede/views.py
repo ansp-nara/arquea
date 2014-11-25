@@ -135,6 +135,12 @@ def blocos_texto(request):
 @login_required
 @require_safe
 def planeja_contrato(request):
+    """
+    Ajax utilizado na tela de filtro do relatório em #Relatório Técnico - Relatório de Planejamento por ano.
+        
+    Retorna as OSs de um dado Ano - Projeto. 
+    
+    """
     ano = request.GET.get('ano')
     proj_id = request.GET.get('proj_id')
 

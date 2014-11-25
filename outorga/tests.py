@@ -410,7 +410,11 @@ class OutorgaViewTest(UnitTestCase):
              
             from outorga.views import contratos
             mock_request = mock.Mock()
+            mock_request.method = "GET"
             contratos(mock_request)
+            
+            print mock_render.mock_calls
+            
             _, args, _ = mock_render.mock_calls[0]
 
             self.assertEquals(args[1], 'outorga/contratos.html', 'Template errado.')
@@ -434,6 +438,7 @@ class OutorgaViewTest(UnitTestCase):
              
             from outorga.views import contratos
             mock_request = mock.Mock()
+            mock_request.method = "GET"
             # call view
             contratos(mock_request)
             _, args, _ = mock_render.mock_calls[0]
@@ -442,6 +447,7 @@ class OutorgaViewTest(UnitTestCase):
 
 
     def test_call__relatorio_termos(self):
+        
         mock_render = mock.MagicMock()
         with mock.patch.multiple('outorga.views',
             render=mock_render,
