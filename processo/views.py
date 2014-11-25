@@ -12,7 +12,9 @@ from utils.functions import render_to_pdf
 @permission_required('processo.rel_ger_processos', raise_exception=True)
 @require_safe
 def processos(request, pdf=False):
-    
+    """
+     Relatório Gerencial - Relatório de processos.
+    """
     areas = []
     for a in Area.objects.all():
         area = {'area':a}
@@ -29,8 +31,10 @@ def processos(request, pdf=False):
         areas.append(area)
 
     if pdf == '2':
+        # Gera arquivo PDF em A3
         return render_to_pdf('processo/processos2.pdf', {'areas':areas}, request=request, filename='processos.pdf')
     elif pdf:
+        # Gera arquivo PDF em A3 ou A4. O parametro pdf é o que define o tamanho. 
         return render_to_pdf('processo/processos.pdf', {'areas':areas, 'tamanho':pdf}, request=request, filename='processos.pdf')
     else:
         return TemplateResponse(request, 'processo/processos.html', {'areas':areas})

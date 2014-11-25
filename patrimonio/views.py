@@ -281,6 +281,10 @@ def ajax_patrimonio_existente(request):
 @login_required
 @permission_required('patrimonio.rel_tec_por_estado', raise_exception=True)
 def por_estado(request):
+    """
+     Relatório Técnico - Relatório de Patrimônio por estado do item.
+    
+    """
     if request.method == 'POST':
         if request.POST.get('estado'):
             estado_id = request.POST.get('estado')
@@ -317,6 +321,10 @@ def por_estado(request):
 @permission_required('patrimonio.rel_tec_por_tipo', raise_exception=True)
 @require_safe
 def por_tipo(request):
+    """
+     Relatório Técnico - Relatório de Patrimônio por tipo.
+    
+    """
     if request.method == 'GET' and request.GET.get('tipo'):
         tipo_id = request.GET.get('tipo')
         tipo = get_object_or_404(Tipo, pk=tipo_id)
@@ -369,6 +377,10 @@ def por_tipo(request):
 @permission_required('patrimonio.rel_tec_por_marca', raise_exception=True)
 @require_safe
 def por_marca(request, pdf=0):
+    """
+     Relatório Técnico - Relatório de Patrimônio por marca.
+    
+    """
     if request.method == 'GET' and request.GET.get('marca'):
         marca = request.GET.get('marca')
         
@@ -387,6 +399,10 @@ def por_marca(request, pdf=0):
 @permission_required('patrimonio.rel_tec_por_local', raise_exception=True)
 @require_safe
 def por_local(request, pdf=0):
+    """
+     Relatório Técnico - Relatório de Patrimônio por localização.    
+    
+    """
     if request.GET.get('entidade') and request.GET.get('endereco'):
         atuais = []
         detalhes = []
@@ -482,6 +498,10 @@ def por_local(request, pdf=0):
 @permission_required('patrimonio.rel_tec_por_local_rack', raise_exception=True)
 @require_safe
 def por_local_rack(request, pdf=0):
+    """
+     Relatório Técnico - Relatório de Patrimônio por local e rack.
+    
+    """
     entidade = request.GET.get('entidade')
     endereco_id = request.GET.get('endereco')
     detalhe_id = request.GET.get('detalhe')
@@ -542,6 +562,10 @@ def por_local_rack(request, pdf=0):
 @permission_required('patrimonio.rel_tec_por_local_termo', raise_exception=True)
 @require_safe
 def por_local_termo(request, pdf=0):
+    """
+     Relatório Técnico - Relatório de Patrimônio por localização (com Termo).
+    
+    """
     if request.GET.get('entidade'):
         atuais = []
         # Buscando os históricos atuais de patrimonios de primeiro nível
@@ -727,6 +751,11 @@ def iterate_patrimonio(p_pts, nivel=0, filtro_com_fmusp=False, order_fmusp=True,
 @permission_required('patrimonio.rel_tec_por_tipo_equipamento', raise_exception=True)
 @require_safe
 def por_tipo_equipamento(request, pdf=0):
+    """
+     Relatório Técnico - Relatório de Busca por tipo de equipamento.
+    
+    """
+    
     if len(request.GET) < 1:
         return TemplateResponse(request, 'patrimonio/sel_tipo_equip.html', {'tipos':TipoEquipamento.objects.all(), 'estados':Estado.objects.all(), 'pns':Equipamento.objects.values_list('part_number', flat=True).order_by('part_number').distinct()})
 
@@ -867,6 +896,10 @@ def ajax_filtra_pn_estado(request):
 @permission_required('patrimonio.rel_adm_por_termo', raise_exception=True)
 @require_safe
 def por_termo(request, pdf=0):
+    """
+     Relatório Administrativo - Relatório de Patrimônio por termo de outorga.
+     
+    """
     termo_id = request.GET.get('termo') or request.POST.get('termo') 
     modalidade = request.GET.get('modalidade') or request.POST.get('modalidade')
     agilis = request.GET.get('agilis') or request.POST.get('agilis')
@@ -986,6 +1019,10 @@ def por_termo(request, pdf=0):
 @permission_required('patrimonio.rel_tec_racks', raise_exception=True)
 @require_safe
 def racks(request):
+    """
+     Relatório Técnico - Relatório de racks (bayface).
+    
+    """
         
     # Busca os endereços que possuem Racks no estadoAtivos
     locais = EnderecoDetalhe.objects.filter(historicolocal__estado__id=Estado.PATRIMONIO_ATIVO, \
@@ -1171,6 +1208,15 @@ def __rack_data(datacenter_id, rack_id):
 @login_required
 @permission_required('patrimonio.rel_tec_relatorio_rack', raise_exception=True)
 def relatorio_rack(request):
+    """
+     Relatório Técnico - Relatório por rack.
+     
+     Relatório de patrimônio separados por rack.
+     Exibe o bayface de visão frontal e traseira, além de uma lista dos equipamentos que estão
+     localizados no rack e que não são exibidos no bayface.
+     
+    """
+    
     p_dc = request.GET.get('dc')
     p_rack = request.GET.get('rack')
     
@@ -1202,6 +1248,10 @@ def relatorio_rack(request):
 @login_required
 @permission_required('patrimonio.rel_adm_presta_contas', raise_exception=True)
 def presta_contas(request):
+    """
+     Relatório Administrativo - Relatório de Prestação de contas patrimonial.
+    
+    """
     termos = []
     for t in Termo.objects.all():
         termo = {'termo':t}
@@ -1240,6 +1290,10 @@ def ajax_abre_arvore(request):
 @login_required
 @permission_required('patrimonio.rel_tec_patr_tipo_equipamento', raise_exception=True)
 def por_tipo_equipamento2(request):
+    """
+     Relatório Técnico - Relatório de Patrimônio por tipo de equipamento.
+    
+    """
     return TemplateResponse(request, 'patrimonio/por_tipo_equipamento2.html')
 
 
@@ -1332,12 +1386,16 @@ def ajax_patrimonio_historico(request):
 
 
 
-"""
-Página para configurar o design de Planta baixa dos cages
-"""
 @login_required
 @permission_required('patrimonio.rel_tec_planta_baixa_edit', raise_exception=True)
 def planta_baixa_edit(request):
+    """
+     Relatório Técnico - Relatório de Planta baixa - racks.
+     
+     Página para configurar o design de Planta baixa dos cages
+     
+    """
+    
     # Busca os endereços que possuem Racks no estadoAtivos
     locais = PlantaBaixaDataCenter.objects.all()
     

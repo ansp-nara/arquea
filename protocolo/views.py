@@ -62,6 +62,10 @@ def protocolos(request, termo_id):
 @permission_required('protocolo.rel_adm_descricao', raise_exception=True)
 @require_safe
 def protocolos_descricao(request, pdf=False):
+    """
+     Relatório Administrativo - Relatório de Protocolos por descrição.
+    
+    """
     if request.GET.get('termo'):
         termo_id = request.GET.get('termo')
         termo = get_object_or_404(Termo, pk=termo_id)

@@ -103,6 +103,10 @@ def fapesp(request, mem):
 @permission_required('memorando.rel_adm_memorando', raise_exception=True)
 @require_safe
 def relatorio(request):
+    """
+     Relatório Administrativo - Relatório de Memorandos FAPESP.
+     
+    """
     mem = request.GET.get('mem')
     if not mem:
         return render_to_response('memorando/escolhe_memorando.html', {'memorandos':MemorandoFAPESP.objects.all()}, context_instance=RequestContext(request))

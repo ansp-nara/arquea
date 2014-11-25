@@ -41,7 +41,10 @@ def ajax_escolhe_pagamento(request):
 @permission_required('rede.rel_tec_planejamento', raise_exception=True)
 @require_safe
 def planejamento(request, pdf=0):
-
+    """
+     Relatório Técnico - Relatório de Planejamento por ano.
+    
+    """
     anoproj = request.GET.get('anoproj')
     if anoproj:
         ano, proj = anoproj.split('/')
@@ -78,6 +81,10 @@ def planejamento(request, pdf=0):
 @permission_required('rede.rel_tec_info', raise_exception=True)
 @require_safe
 def planilha_informacoes_gerais(request):
+    """
+     Relatório Técnico - Relatório de Dados cadastrais dos participantes.  
+    
+    """
     info = Enlace.objects.filter(participante__entidade__entidadehistorico__ativo=True)
     return TemplateResponse(request, 'rede/informacoes_gerais.html', {'info': info})
 
@@ -142,7 +149,11 @@ def planeja_contrato(request):
 @permission_required('rede.rel_tec_servico_processo', raise_exception=True)
 @require_safe
 def planejamento2(request, pdf=0):
-    
+    """
+     Relatório Técnico - Relatório de Serviços contratados por processo.
+     
+      
+    """
     entidade_id = request.GET.get('entidade')
     termo_id = request.GET.get('termo')
     if entidade_id and termo_id:
@@ -199,6 +210,10 @@ def planejamento2(request, pdf=0):
 @permission_required('rede.rel_tec_blocosip', raise_exception=True)
 @require_safe
 def blocos_ip(request):
+    """
+     Relatório Técnico - Relatório de Lista de blocos IP.
+    
+    """
     if len(request.GET) < 4:
         ent_usuario_ids = BlocoIP.objects.values_list('usuario', flat=True).distinct()
         ent_designado_ids = BlocoIP.objects.values_list('designado', flat=True).distinct()
@@ -245,7 +260,14 @@ def blocos_ip(request):
 @permission_required('rede.rel_ger_custo_terremark', raise_exception=True)
 @require_safe
 def custo_terremark(request, pdf=0, xls=0):
+    """
+     Relatório Gerencial - Relatório de Custo dos recursos contratados.
     
+     OBS:
+     O relatório filtra implicitamente pela entidade Terremark.
+ 
+    """
+   
     # Filtrando por Entidade
     recursos = Recurso.objects.filter(planejamento__os__contrato__entidade_id=Entidade.TERREMARK_ID) \
                               .order_by('planejamento__projeto__nome', \
@@ -293,6 +315,8 @@ def custo_terremark(request, pdf=0, xls=0):
 @require_safe
 def relatorio_recursos_operacional(request, pdf=0, xls=0):
     """
+    Relatório Técnico - Relatório de recursos. 
+    
     Relatório operacional para visualização dos recursos.
     """
     # Filtrando por Entidade

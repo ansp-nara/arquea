@@ -98,13 +98,14 @@ def detalhes(request):
 
 
 
-"""
-Relatório de lançamento de horas dos funcionários. 
-"""
 @login_required
 @permission_required('membro.rel_adm_mensalf', raise_exception=True)
 @require_safe
 def mensal_func(request):
+    """
+     Relatório Administrativo - Relatório com o lançamento de horas dos funcionários. 
+    
+    """
     if request.GET.get('ano'):
         meses = []
         funcionario = request.GET.get('funcionario')
@@ -326,14 +327,17 @@ def ajax_controle_adicionar_tempo_inicial(request):
 
 
 
-"""
-Relatório de logs de uso da área administrativa do sistema.
-Exibe informação de quantidade de inclusões, alterações e exclusões feitas por cada usuário, por ano.
-"""
 @login_required
 @permission_required('membro.rel_adm_logs', raise_exception=True)
 @require_safe
 def uso_admin(request):
+    """
+     Relatório Administrativo - Relatório de registro de uso do sistema por ano.
+    
+     Relatório de logs de uso da área administrativa do sistema.
+     Exibe informação de quantidade de inclusões, alterações e exclusões feitas por cada usuário, por ano.
+    
+    """
     if 'inicial' not in request.GET:
         return TemplateResponse(request, 'admin/logs_escolha.html', {'anos':range(2008, datetime.now().year+1)})
 
