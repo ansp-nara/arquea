@@ -76,6 +76,10 @@ def ajax_escolhe_endereco(request):
 @permission_required('identificacao.rel_tec_arquivos', raise_exception=True)
 @require_safe
 def arquivos_entidade(request):
+    """
+     Relatório Técnico - Relatório de Documentos por entidade.
+    
+    """
     return render_to_response('identificacao/arquivos_entidade.html', {'entidades': [e for e in Entidade.objects.all() if e.arquivoentidade_set.count() > 0]}, context_instance=RequestContext(request))
 
 
@@ -83,6 +87,10 @@ def arquivos_entidade(request):
 @permission_required('identificacao.rel_adm_agenda', raise_exception=True)
 @require_safe
 def agenda(request, tipo=8, pdf=None):
+    """
+     Relatório Administrativo - Relatório de Agenda
+    
+    """
     agenda = request.GET.get('agenda')
     if agenda:
         entidades = []
@@ -112,7 +120,10 @@ def agenda(request, tipo=8, pdf=None):
 @permission_required('identificacao.rel_adm_ecossistema', raise_exception=True)
 @require_safe
 def planilha_ecossistema(request, tipo='par'):
-
+    """
+    Relatório Administrativo - Relatório de Ecossistema
+    
+    """
     if tipo == 'par':
         return TemplateResponse(request, 'identificacao/ecossistema_par.html', {'ec':Ecossistema.objects.filter(identificacao__endereco__entidade__entidadehistorico__tipo__nome__in=['Participante', 'Equipe'])})
     elif tipo == 'tic':

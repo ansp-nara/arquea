@@ -248,7 +248,10 @@ def gastos_acordos(request):
 @permission_required('outorga.rel_ger_contratos', raise_exception=True)
 @require_safe
 def contratos(request):
+    """
+     Relatório Gerencial - Relatório de Contratos por Entidade.
     
+    """
     entidades = []
     for e in Entidade.objects.order_by('sigla'):
         cts = e.contrato_set.order_by('-data_inicio')
@@ -306,6 +309,13 @@ def relatorio_termos(request):
 @permission_required('outorga.rel_ger_lista_acordos', raise_exception=True)
 @require_safe
 def lista_acordos(request, pdf=False):
+    """
+     Relatório Gerencial - Relatório de Concessões por Acordo.
+    
+     Distribuição das concessões por acordo nos processos a partir de 2005.
+     Exibe os acordos de todos os processos. 
+    
+    """
     processos = []
     for t in Termo.objects.filter(ano__gte=2004).order_by('-ano'):
         processo = {'processo':t}
@@ -331,6 +341,10 @@ def lista_acordos(request, pdf=False):
 @permission_required('outorga.rel_adm_item_modalidade', raise_exception=True)
 @require_safe
 def item_modalidade(request, pdf=False):
+    """
+     Relatório Administrativo - Relatório de Itens do orçamento por modalidade.
+     
+    """
     if request.GET.get('termo') and request.GET.get('termo') != '0' and \
        request.GET.get('modalidade') and request.GET.get('modalidade') != '0':
         
@@ -406,6 +420,10 @@ def item_modalidade(request, pdf=False):
 @permission_required('outorga.rel_ger_acordo_progressivo', raise_exception=True)
 @require_safe
 def acordo_progressivo(request, pdf=False):
+    """
+     Relatório Gerencial - Relatório gerencial progressivo
+    
+    """
     acordos = []
     
     totalAcordoRealizadoReal = 0 
@@ -524,7 +542,12 @@ def acordo_progressivo(request, pdf=False):
 @login_required
 @require_safe
 def ajax_termo_datas(request):
-   
+    """
+     Ajax utilizado para retornar os dados de mês/ano de início e término de um dado termo.
+     Utilizado em diversos relatórios para fazer o filtro inicial antes de gerar os dados de relatório.
+    
+     Ex: Relatório Gerencial, Relatório de Acordos, etc.
+    """
     if not request.GET.has_key('termo'):
         raise Http404
 
