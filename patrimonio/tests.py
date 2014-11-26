@@ -424,7 +424,7 @@ class PatrimonioTest(TestCase):
 class ViewTest(TestCase):
  
     # Fixture para carregar dados de autenticação de usuário
-    fixtures = ['auth_user.yaml',]
+    fixtures = ['auth_user_superuser.yaml',]
     
     def setUp(self):
         super(ViewTest, self).setUp()
@@ -480,31 +480,33 @@ class ViewTest(TestCase):
         self.assertIn(b'"pk": 2', response.content)
         
 
-# class ViewTest(TestCase):
-#  
-#     # Fixture para carregar dados de autenticação de usuário
-#     fixtures = ['auth_user.yaml',]
-#     
-#     def setUp(self):
-#         super(ViewTest, self).setUp()
-#         # Comando de login para passar pelo decorator @login_required
-#         self.response = self.client.login(username='john', password='123456')
-# 
-#         
-#     def setUpRack(self, num_documento='', ns=''):
-#         protocolo = Protocolo.objects.create(id=1, num_documento=num_documento, tipo_documento_id=0, estado_id=0, termo_id=0, data_chegada=date(year=2000, month=01, day=01), moeda_estrangeira=False)
-#         pagamento = Pagamento.objects.create(id=1, protocolo=protocolo, valor_fapesp=0)
-#         tipoPatr = Tipo.objects.create(id=1)
-#         patrimonio = Patrimonio.objects.create(id=1, pagamento=pagamento, tipo=tipoPatr, checado=True)
-#         patrimonio = Patrimonio.objects.create(id=2, ns=ns, tipo=tipoPatr, checado=True)
-#         
-# 
-#     def test_planta_baixa_get(self):
-#         """
-#         Verifica chamanda do escolhe_patrimonio encontrando registro pelo numero de serie do Patrimonio
-#         """
-#         self.setUpPatrimonio('', '7890')
-#         url = reverse("patrimonio.views.ajax_escolhe_patrimonio")
-#         response = self.client.get(url, {'num_doc': '789'})
-#         self.assertIn(b'"pk": 2', response.content)
-#         
+    def test_por_estado(self):
+        """
+        View por estado.
+        """
+        self.setUpPatrimonio('', '7890')
+        url = reverse("patrimonio.views.por_estado")
+        response = self.client.get(url, {'estado': '1'})
+        
+        self.assertTrue(200, response.status_code)
+        
+
+class ViewPermissionTest(TestCase):
+    """
+    Teste das permissões das views. Utilizando um usuário sem permissão de superusuário.
+    """
+ 
+    # Fixture para carregar dados de autenticação de usuário
+    fixtures = ['auth_user.yaml',]
+    
+    def setUp(self):
+        super(ViewPermissionTest, self).setUp()
+        # Comando de login para passar pelo decorator @login_required
+        self.response = self.client.login(username='john', password='123456')
+
+    def test_por_estado(self):
+        url = reverse("patrimonio.views.por_estado")
+        response = self.client.get(url)
+        
+        self.assertContains(response, '403 Forbidden', status_code=403)
+        
