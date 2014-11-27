@@ -479,7 +479,6 @@ class ViewTest(TestCase):
         response = self.client.get(url, {'num_doc': '789'})
         self.assertIn(b'"pk": 2', response.content)
         
-
     def test_por_estado(self):
         """
         View por estado.
@@ -491,22 +490,35 @@ class ViewTest(TestCase):
         self.assertTrue(200, response.status_code)
         
 
-class ViewPermissionTest(TestCase):
+class ViewPermissionDeniedTest(TestCase):
     """
     Teste das permissões das views. Utilizando um usuário sem permissão de superusuário.
     """
- 
-    # Fixture para carregar dados de autenticação de usuário
     fixtures = ['auth_user.yaml',]
     
     def setUp(self):
-        super(ViewPermissionTest, self).setUp()
-        # Comando de login para passar pelo decorator @login_required
+        super(ViewPermissionDeniedTest, self).setUp()
         self.response = self.client.login(username='john', password='123456')
 
     def test_por_estado(self):
         url = reverse("patrimonio.views.por_estado")
         response = self.client.get(url)
-        
         self.assertContains(response, '403 Forbidden', status_code=403)
-        
+    
+    
+class ViewParcialPermissionTest(TestCase):
+    """
+    Teste das permissões das views. Utilizando um usuário com permissão individual por view.
+    """
+    fixtures = ['auth_user_patrimonio_permission.yaml',]
+    
+    def setUp(self):
+        super(ViewParcialPermissionTest, self).setUp()
+        self.response = self.client.login(username='paul', password='123456')
+
+    def test_por_estado(self):
+        url = reverse("patrimonio.views.por_estado")
+        response = self.client.get(url)
+        self.assertContains(response, 'breadcrumbs', status_code=200)
+    
+    
