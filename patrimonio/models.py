@@ -354,7 +354,6 @@ class PatrimonioRack(Patrimonio):
         proxy = True
 
 class HistoricoLocal(models.Model):
-
     """
     Uma instância dessa classe representa o histórico de um patrimônio.
 
