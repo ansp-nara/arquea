@@ -438,7 +438,14 @@ class ViewTest(TestCase):
         tipoPatr = Tipo.objects.create(id=1)
         patrimonio = Patrimonio.objects.create(id=1, pagamento=pagamento, tipo=tipoPatr, checado=True)
         patrimonio = Patrimonio.objects.create(id=2, ns=ns, tipo=tipoPatr, checado=True)
-        
+
+        ent= Entidade.objects.create(sigla='SAC', nome='Global Crossing', cnpj='00.000.000/0000-00', fisco=True, url='')
+        end = Endereco.objects.create(entidade=ent, rua='Dr. Ovidio', num=215, bairro='Cerqueira Cesar', cep='05403010', estado='SP', pais='Brasil')
+        tipoDetalhe = TipoDetalhe.objects.create()
+        endDet = EnderecoDetalhe.objects.create(endereco=end, tipo=tipoDetalhe, mostra_bayface=True)
+        est = Estado.objects.create(nome="Ativo")
+        hl = HistoricoLocal.objects.create(patrimonio=patrimonio, endereco= endDet, descricao='Emprestimo', data= datetime.date(2009,2,5), estado=est, posicao='S042')
+
     
     def test_escolhe_patrimonio_ajax_empty(self):
         """
@@ -483,11 +490,15 @@ class ViewTest(TestCase):
         """
         View por estado.
         """
-        self.setUpPatrimonio('', '7890')
+        self.setUpPatrimonio()
+        
         url = reverse("patrimonio.views.por_estado")
-        response = self.client.get(url, {'estado': '1'})
+        response = self.client.post(url, {'estado': '1'})
         
         self.assertTrue(200, response.status_code)
+        self.assertContains(response, '<h4>Estado Ativo</h4>')
+        self.assertContains(response, '/admin/patrimonio/patrimonio/2/')
+        
         
 
 class ViewPermissionDeniedTest(TestCase):
