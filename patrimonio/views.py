@@ -31,54 +31,60 @@ logger = logging.getLogger(__name__)
 
 
 # Gera uma lista dos protocolos conforme o termo selecionado.
-@login_required
-@require_safe
-def ajax_escolhe_termo(request):
-    retorno = []
-     
-    t = request.GET.get('id')
-    if t:
-        termo = Termo.objects.get(pk=int(t))
-        protocolos = Protocolo.objects.filter(termo=termo)
-
-        for p in protocolos:
-            descricao = '%s: %s - %s' % (p.doc_num(), p.descricao2.__unicode__(), p.mostra_valor())
-            retorno.append({'pk':p.pk, 'valor':descricao})
-    
-    if not retorno:
-        retorno = [{"pk":"0", "valor":"Nenhum registro"}]
-
-    retorno_json = json.dumps(retorno)
-    return HttpResponse(retorno_json, content_type="application/json")
+# @login_required
+# @require_safe
+# def ajax_escolhe_termo(request):
+#     retorno = []
+#      
+#     t = request.GET.get('id')
+#     if t:
+#         termo = Termo.objects.get(pk=int(t))
+#         protocolos = Protocolo.objects.filter(termo=termo)
+# 
+#         for p in protocolos:
+#             descricao = '%s: %s - %s' % (p.doc_num(), p.descricao2.__unicode__(), p.mostra_valor())
+#             retorno.append({'pk':p.pk, 'valor':descricao})
+#     
+#     if not retorno:
+#         retorno = [{"pk":"0", "valor":"Nenhum registro"}]
+# 
+#     retorno_json = json.dumps(retorno)
+#     return HttpResponse(retorno_json, content_type="application/json")
 
 
 
 # Gera uma lista dos itens do protocolo conforme protocolo selecionado.
-@login_required
-@require_safe
-def ajax_escolhe_protocolo(request):
-    retorno = []
-    id = request.GET.get('id')
-    previous = request.GET.get('previous')
-
-    if id and previous:
-        t = Termo.objects.get(pk=int(previous))
-        itens = ItemProtocolo.objects.filter(protocolo__id=int(id), protocolo__termo=t)
-
-        for i in itens:
-            descricao = '%s - %s (%s)' % (i.quantidade, i.descricao, i.mostra_valor())
-            retorno.append({'pk':i.pk, 'valor': descricao})
-
-        if not retorno:
-            retorno = [{"pk":"0", "valor":"Nenhum registro"}]
-
-    retorno_json = json.dumps(retorno)
-    return HttpResponse(retorno_json, content_type="application/json")
+# @login_required
+# @require_safe
+# def ajax_escolhe_protocolo(request):
+#     retorno = []
+#     id = request.GET.get('id')
+#     previous = request.GET.get('previous')
+# 
+#     if id and previous:
+#         t = Termo.objects.get(pk=int(previous))
+#         itens = ItemProtocolo.objects.filter(protocolo__id=int(id), protocolo__termo=t)
+# 
+#         for i in itens:
+#             descricao = '%s - %s (%s)' % (i.quantidade, i.descricao, i.mostra_valor())
+#             retorno.append({'pk':i.pk, 'valor': descricao})
+# 
+#         if not retorno:
+#             retorno = [{"pk":"0", "valor":"Nenhum registro"}]
+# 
+#     retorno_json = json.dumps(retorno)
+#     return HttpResponse(retorno_json, content_type="application/json")
 
 
 @login_required
 @require_safe
 def ajax_escolhe_pagamento(request):
+    """
+    Retorna os dados de pagamento, filtrado por termo e número de documento.
+    
+    Utilizado no PatrimonioAdminForm, ou seja, no form do admin - patrimonio,
+    para preencher os valores do combo do campo de Pagamento.
+    """
     retorno = []
     termo = request.GET.get('termo')
     numero = request.GET.get('numero')

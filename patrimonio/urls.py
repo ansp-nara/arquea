@@ -1,8 +1,8 @@
 from django.conf.urls import *
 
 urlpatterns = patterns('patrimonio.views',
-    (r'escolhe_termo$', 'ajax_escolhe_termo'),
-    (r'escolhe_protocolo$', 'ajax_escolhe_protocolo'),
+#    (r'escolhe_termo$', 'ajax_escolhe_termo'),
+#    (r'escolhe_protocolo$', 'ajax_escolhe_protocolo'),
     (r'escolhe_pagamento$', 'ajax_escolhe_pagamento'),
     (r'escolhe_entidade$', 'ajax_escolhe_entidade'),
     (r'escolhe_patrimonio$', 'ajax_escolhe_patrimonio'),

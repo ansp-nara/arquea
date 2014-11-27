@@ -433,8 +433,15 @@ class ViewTest(TestCase):
 
         
     def setUpPatrimonio(self, num_documento='', ns=''):
-        protocolo = Protocolo.objects.create(id=1, num_documento=num_documento, tipo_documento_id=0, estado_id=0, termo_id=0, data_chegada=date(year=2000, month=01, day=01), moeda_estrangeira=False)
-        pagamento = Pagamento.objects.create(id=1, protocolo=protocolo, valor_fapesp=0)
+
+        #Cria Termo
+        estadoOutorga = EstadoOutorga.objects.create(nome='Vigente')
+        termo = Termo.objects.create(ano=2008, processo=22222, digito=2, inicio=date(2008,1,1), estado=estadoOutorga)
+
+        protocolo = Protocolo.objects.create(id=1, num_documento=num_documento, tipo_documento_id=0, estado_id=0, termo=termo, data_chegada=date(year=2000, month=01, day=01), moeda_estrangeira=False)
+        ex1 = ExtratoCC.objects.create(data_extrato=date(2008,10,30), data_oper=date(2008,10,5), cod_oper=333333, valor='2650', historico='TED', despesa_caixa=False)
+        pagamento = Pagamento.objects.create(id=1, protocolo=protocolo, valor_fapesp=1000, conta_corrente=ex1)
+        
         tipoPatr = Tipo.objects.create(id=1)
         patr1 = Patrimonio.objects.create(id=1, pagamento=pagamento, tipo=tipoPatr, checado=True)
         patr2 = Patrimonio.objects.create(id=2, ns=ns, tipo=tipoPatr, checado=True)
@@ -515,7 +522,7 @@ class ViewTest(TestCase):
     
     def test_ajax_patrimonio_historico(self):
         """
-        View por estado.
+        Teste de View de ajax de histórico de patrimonio.
         """
         self.setUpPatrimonio()
         
@@ -533,7 +540,18 @@ class ViewTest(TestCase):
         self.assertContains(response, '"descricao": "Emprestimo"')
         self.assertContains(response, '"posicao": "S042"')
         self.assertContains(response, '"localizacao_desc": "SAC - Dr. Ovidio, 215 - "')
+    
+    def test_ajax_escolhe_pagamento(self):
+        """
+        Teste de View de ajax de pagamentos
+        """
+        self.setUpPatrimonio('1234', '')
         
+        url = reverse("patrimonio.views.ajax_escolhe_pagamento")
+        response = self.client.get(url, {'termo': '1', 'numero':'1234'})
+        
+        self.assertTrue(200, response.status_code)
+        self.assertContains(response, '"valor": "Doc. 1234, cheque 333333, valor 1000"')
     
 
 class ViewPermissionDeniedTest(TestCase):
