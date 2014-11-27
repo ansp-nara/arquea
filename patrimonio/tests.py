@@ -436,15 +436,15 @@ class ViewTest(TestCase):
         protocolo = Protocolo.objects.create(id=1, num_documento=num_documento, tipo_documento_id=0, estado_id=0, termo_id=0, data_chegada=date(year=2000, month=01, day=01), moeda_estrangeira=False)
         pagamento = Pagamento.objects.create(id=1, protocolo=protocolo, valor_fapesp=0)
         tipoPatr = Tipo.objects.create(id=1)
-        patrimonio = Patrimonio.objects.create(id=1, pagamento=pagamento, tipo=tipoPatr, checado=True)
-        patrimonio = Patrimonio.objects.create(id=2, ns=ns, tipo=tipoPatr, checado=True)
+        patr1 = Patrimonio.objects.create(id=1, pagamento=pagamento, tipo=tipoPatr, checado=True)
+        patr2 = Patrimonio.objects.create(id=2, ns=ns, tipo=tipoPatr, checado=True)
 
         ent= Entidade.objects.create(sigla='SAC', nome='Global Crossing', cnpj='00.000.000/0000-00', fisco=True, url='')
         end = Endereco.objects.create(entidade=ent, rua='Dr. Ovidio', num=215, bairro='Cerqueira Cesar', cep='05403010', estado='SP', pais='Brasil')
         tipoDetalhe = TipoDetalhe.objects.create()
         endDet = EnderecoDetalhe.objects.create(endereco=end, tipo=tipoDetalhe, mostra_bayface=True)
         est = Estado.objects.create(nome="Ativo")
-        hl = HistoricoLocal.objects.create(patrimonio=patrimonio, endereco= endDet, descricao='Emprestimo', data= datetime.date(2009,2,5), estado=est, posicao='S042')
+        hl = HistoricoLocal.objects.create(patrimonio=patr1, endereco= endDet, descricao='Emprestimo', data= datetime.date(2009,2,5), estado=est, posicao='S042')
 
     
     def test_escolhe_patrimonio_ajax_empty(self):
@@ -493,11 +493,11 @@ class ViewTest(TestCase):
         self.setUpPatrimonio()
         
         url = reverse("patrimonio.views.por_estado")
-        response = self.client.post(url, {'estado': '1'})
+        response = self.client.get(url, {'estado': '1'})
         
         self.assertTrue(200, response.status_code)
         self.assertContains(response, '<h4>Estado Ativo</h4>')
-        self.assertContains(response, '/admin/patrimonio/patrimonio/2/')
+        self.assertContains(response, '/admin/patrimonio/patrimonio/1/')
         
         
     def test_por_estado__parametro_estado_vazio(self):
@@ -508,12 +508,33 @@ class ViewTest(TestCase):
         self.setUpPatrimonio()
         
         url = reverse("patrimonio.views.por_estado")
-        response = self.client.post(url)
+        response = self.client.get(url)
         
         self.assertTrue(200, response.status_code)
         self.assertContains(response, '<option value="1">Ativo (1)</option>')
+    
+    def test_ajax_patrimonio_historico(self):
+        """
+        View por estado.
+        """
+        self.setUpPatrimonio()
         
+        url = reverse("patrimonio.views.ajax_patrimonio_historico")
+        response = self.client.get(url, {'id': '1'})
+                
+        self.assertTrue(200, response.status_code)
         
+        self.assertContains(response, '"estado_desc": "Ativo"')
+        self.assertContains(response, '"entidade_id": 1')
+        self.assertContains(response, '"estado_id": 1')
+        self.assertContains(response, '"localizacao_id": 1')
+        self.assertContains(response, '"data": "2014-11-27"') 
+        self.assertContains(response, '"entidade_desc": "SAC"')
+        self.assertContains(response, '"descricao": "Emprestimo"')
+        self.assertContains(response, '"posicao": "S042"')
+        self.assertContains(response, '"localizacao_desc": "SAC - Dr. Ovidio, 215 - "')
+        
+    
 
 class ViewPermissionDeniedTest(TestCase):
     """

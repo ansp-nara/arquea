@@ -280,13 +280,14 @@ def ajax_patrimonio_existente(request):
 
 @login_required
 @permission_required('patrimonio.rel_tec_por_estado', raise_exception=True)
+@require_safe
 def por_estado(request):
     """
      Relatório Técnico - Relatório de Patrimônio por estado do item.
     
     """
-    if request.method == 'POST' and request.POST.get('estado'):
-            estado_id = request.POST.get('estado')
+    if request.method == 'GET' and request.GET.get('estado'):
+            estado_id = request.GET.get('estado')
             estado = get_object_or_404(Estado, pk=estado_id)
 
             no_estado = []
@@ -1356,12 +1357,14 @@ def ajax_abre_arvore_tipo(request):
     return HttpResponse(retorno_json, content_type="application/json")
 
 
-"""
-Retorna os dados de um Historico Atual dado o ID de um patrimonio
-"""
 @login_required
 @require_safe
 def ajax_patrimonio_historico(request):
+    """
+    Retorna os dados de um Historico Atual dado o ID de um patrimonio.
+    
+    Utilizado no PatrimonioAdminForm, ou seja, no form do admin - patrimonio.
+    """
     retorno = {}
     patr_id = request.GET.get('id')
     patr = Patrimonio.objects.get(id=patr_id)
