@@ -553,6 +553,37 @@ class ViewTest(TestCase):
         self.assertTrue(200, response.status_code)
         self.assertContains(response, '"valor": "Doc. 1234, cheque 333333, valor 1000"')
     
+    def test_ajax_escolhe_pagamento__nao_encontrado(self):
+        """
+        Teste de View de ajax de pagamentos
+        """
+        self.setUpPatrimonio('1234', '')
+        
+        url = reverse("patrimonio.views.ajax_escolhe_pagamento")
+        response = self.client.get(url, {'termo': '1', 'numero':'7777777'})
+        
+        self.assertTrue(200, response.status_code)
+        self.assertContains(response, '"valor": "Nenhum registro"')
+    
+    def test_ajax_escolhe_pagamento__sem_contacorrente(self):
+        """
+        Teste de View de ajax de pagamentos
+        """
+        self.setUpPatrimonio('1234', '')
+        # setup para remover a conta_corrente e forçar outro response
+        pgt = Pagamento.objects.get(pk=1)
+        pgt.conta_corrente = None
+        pgt.save()
+        
+        url = reverse("patrimonio.views.ajax_escolhe_pagamento")
+        response = self.client.get(url, {'termo': '1', 'numero':'1234'})
+        
+        self.assertTrue(200, response.status_code)
+        self.assertContains(response, '"valor": "Doc. 1234, valor None"')
+    
+    
+    
+    
 
 class ViewPermissionDeniedTest(TestCase):
     """
