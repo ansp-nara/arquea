@@ -19,22 +19,22 @@ td a { line-height: normal; }
 
 <h4>Patrimonios do tipo {{ tipo }}</h4>
 <form id="filtro" method="GET">
-<p>
-<label for="id_tipo">Tipo</label>:
-<select name="tipo" id="id_tipo" onchange="ajax_get_procedencia_filter_tipo(this.value)">
-  {% for t in tipos %}
-     <option value="{{ t.id }}" {% if t.id == tipo.id %}selected{% endif %}>{{ t }}</option>
-  {% endfor %}
-</select>
-<label for="id_procedencia">Procedencia</label>:
-<select name="procedencia" id="id_procedencia">
-    <option value="">Todos</option>
-  {% for p in procedencias %}
-     <option value="{{ p.id }}" {% if p.id == procedencia.id %}selected{% endif %}>{{ p }}</option>
-  {% endfor %}
-</select>
-<input type="submit" value="Filtrar">
-</p>
+	<p>
+		<label for="id_tipo">Tipo</label>:
+		<select name="tipo" id="id_tipo" onchange="ajax_get_procedencia_filter_tipo(this.value)">
+			{% for t in tipos %}
+		    	<option value="{{ t.id }}" {% if t.id == tipo.id %}selected{% endif %}>{{ t }}</option>
+			{% endfor %}
+		</select>
+		<label for="id_procedencia">Procedencia</label>:
+		<select name="procedencia" id="id_procedencia">
+		    <option value="">Todos</option>
+		  	{% for p in procedencias %}
+		    	<option value="{{ p.id }}" {% if p.id == procedencia.id %}selected{% endif %}>{{ p }}</option>
+		  	{% endfor %}
+		</select>
+		<input type="submit" value="Filtrar">
+	</p>
 </form>
 <div id="report_toolbar">
     <form action="{% url 'patrimonio.views.por_tipo' %}" method="GET" id="id_form_recurso">

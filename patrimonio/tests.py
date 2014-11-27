@@ -169,7 +169,7 @@ class HistoricoLocalTest(TestCase):
         
 
         
-    def test_posicao_rack(self):
+    def test_posicao_rack__letra_numero(self):
         historico = HistoricoLocal(posicao="R042.F085.TD")
         self.assertEquals(historico.posicao_rack_letra, 'R')
         self.assertEquals(historico.posicao_rack_numero, '042')
