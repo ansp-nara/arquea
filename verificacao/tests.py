@@ -251,7 +251,7 @@ class TestEquipamentoPNvsModelo(TestCase):
             self.assertEqual(len(retorno[0]), 2)
             
     # teste com dois PN vazio
-    def test_com_dois_pn_modelos_diferentes(self):
+    def test_com_dois_pn_modelos_diferentes_e_modelos_iguais(self):
             eq = Equipamento.objects.create(part_number="", modelo="m1", descricao="")
             eq = Equipamento.objects.create(part_number="", modelo="m2", descricao="")
             eq = Equipamento.objects.create(part_number="", modelo="m2", descricao="")
