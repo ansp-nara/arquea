@@ -500,6 +500,20 @@ class ViewTest(TestCase):
         self.assertContains(response, '/admin/patrimonio/patrimonio/2/')
         
         
+    def test_por_estado__parametro_estado_vazio(self):
+        """
+        View por estado. 
+        Sem o envio de parametro de estado, deve ir para a tela de filtro de seleção do estado.
+        """
+        self.setUpPatrimonio()
+        
+        url = reverse("patrimonio.views.por_estado")
+        response = self.client.post(url)
+        
+        self.assertTrue(200, response.status_code)
+        self.assertContains(response, '<option value="1">Ativo (1)</option>')
+        
+        
 
 class ViewPermissionDeniedTest(TestCase):
     """

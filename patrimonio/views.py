@@ -285,8 +285,7 @@ def por_estado(request):
      Relatório Técnico - Relatório de Patrimônio por estado do item.
     
     """
-    if request.method == 'POST':
-        if request.POST.get('estado'):
+    if request.method == 'POST' and request.POST.get('estado'):
             estado_id = request.POST.get('estado')
             estado = get_object_or_404(Estado, pk=estado_id)
 
