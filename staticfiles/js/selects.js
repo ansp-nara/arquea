@@ -765,26 +765,26 @@ function ajax_select_endereco2()
 }
 
 
-function ajax_patrimonio_existente(pn)
-{
-       $.ajax({
-           type: "GET",
-	   url: "/patrimonio/patrimonio_existente",
-	   dataType: "json",
-	   data: {'part_number':pn},
-	   success: function(retorno) {
-	      if (retorno.marca) {
-	         $("#id_marca").val(retorno.marca);
-	         $("#id_modelo").val(retorno.modelo);
-	         $("#id_descricao").val(retorno.descricao);
-	         $("#id_procedencia").val(retorno.procedencia);
-	      }
-	   },
-	   error: function(erro) {
-	      alert('ajax_patrimonio_existente Erro: Sem retonro de requisição.');
-	   }
-       });
-}
+//function ajax_patrimonio_existente(pn)
+//{
+//       $.ajax({
+//           type: "GET",
+//	   url: "/patrimonio/patrimonio_existente",
+//	   dataType: "json",
+//	   data: {'part_number':pn},
+//	   success: function(retorno) {
+//	      if (retorno.marca) {
+//	         $("#id_marca").val(retorno.marca);
+//	         $("#id_modelo").val(retorno.modelo);
+//	         $("#id_descricao").val(retorno.descricao);
+//	         $("#id_procedencia").val(retorno.procedencia);
+//	      }
+//	   },
+//	   error: function(erro) {
+//	      alert('ajax_patrimonio_existente Erro: Sem retonro de requisição.');
+//	   }
+//       });
+//}
 
 
 function ajax_filter_enderecos(id_ent) {
@@ -836,24 +836,24 @@ function ajax_filter_locais() {
      });
 }
 
-function ajax_filter_nivel(nivel, ed_id) {
-     $("#id_detalhe_"+nivel).html('<option value="0">Carregando</option>');
-
-     $.ajax({
-       type: "GET",
-       url: "/patrimonio/escolhe_detalhe",
-       dataType: "json",
-       data: {'detalhe': ed_id},
-       success: function(retorno){
-          $("#id_detalhe_"+nivel).empty();
-          $("#id_detalhe_"+nivel).append('<option value="">------------</option>');
-          $.each(retorno, function(i, item){
-              $("#id_detalhe_"+nivel).append('<option value="'+item.pk+'">'+item.valor+'</option>');
-          });
-
-       },
-     });
-}
+//function ajax_filter_nivel(nivel, ed_id) {
+//     $("#id_detalhe_"+nivel).html('<option value="0">Carregando</option>');
+//
+//     $.ajax({
+//       type: "GET",
+//       url: "/patrimonio/escolhe_detalhe",
+//       dataType: "json",
+//       data: {'detalhe': ed_id},
+//       success: function(retorno){
+//          $("#id_detalhe_"+nivel).empty();
+//          $("#id_detalhe_"+nivel).append('<option value="">------------</option>');
+//          $.each(retorno, function(i, item){
+//              $("#id_detalhe_"+nivel).append('<option value="'+item.pk+'">'+item.valor+'</option>');
+//          });
+//
+//       },
+//     });
+//}
     
 function ajax_filter_pagamentos_memorando(termo)
 {

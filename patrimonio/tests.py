@@ -443,8 +443,10 @@ class ViewTest(TestCase):
         pagamento = Pagamento.objects.create(id=1, protocolo=protocolo, valor_fapesp=1000, conta_corrente=ex1)
         
         tipoPatr = Tipo.objects.create(id=1)
-        patr1 = Patrimonio.objects.create(id=1, pagamento=pagamento, tipo=tipoPatr, checado=True)
-        patr2 = Patrimonio.objects.create(id=2, ns=ns, tipo=tipoPatr, checado=True)
+        entidade_procedencia = Entidade.objects.create(sigla='PROC', nome='Entidade_Procedencia', cnpj='00.000.000/0000-00', fisco=True, url='')
+        
+        patr1 = Patrimonio.objects.create(id=1, pagamento=pagamento, tipo=tipoPatr, checado=True, entidade_procedencia=entidade_procedencia)
+        patr2 = Patrimonio.objects.create(id=2, ns=ns, tipo=tipoPatr, checado=True, entidade_procedencia=entidade_procedencia)
 
         ent= Entidade.objects.create(sigla='SAC', nome='Global Crossing', cnpj='00.000.000/0000-00', fisco=True, url='')
         end = Endereco.objects.create(entidade=ent, rua='Dr. Ovidio', num=215, bairro='Cerqueira Cesar', cep='05403010', estado='SP', pais='Brasil')
@@ -454,7 +456,7 @@ class ViewTest(TestCase):
         hl = HistoricoLocal.objects.create(patrimonio=patr1, endereco= endDet, descricao='Emprestimo', data= datetime.date(2009,2,5), estado=est, posicao='S042')
 
     
-    def test_escolhe_patrimonio_ajax_empty(self):
+    def test_ajax_escolhe_patrimonio__empty(self):
         """
         Verifica chamanda do escolhe_patrimonio com a base vazia
         """
@@ -465,7 +467,7 @@ class ViewTest(TestCase):
         self.assertIn(b'Nenhum registro', self.response.content)
 
 
-    def test_escolhe_patrimonio_ajax_not_found(self):
+    def test_ajax_escolhe_patrimonio__not_found(self):
         """
         Verifica chamanda do escolhe_patrimonio sem encontrar registro
         """
@@ -475,7 +477,7 @@ class ViewTest(TestCase):
         self.assertIn(b'Nenhum registro', response.content)
 
 
-    def test_escolhe_patrimonio_ajax_nf_pagamento(self):
+    def test_ajax_escolhe_patrimonio__nf_pagamento(self):
         """
         Verifica chamanda do escolhe_patrimonio encontrando registro pelo num_documento do Protocolo
         """
@@ -484,7 +486,7 @@ class ViewTest(TestCase):
         response = self.client.get(url, {'num_doc': '1234'})
         self.assertIn(b'"pk": 1', response.content)
 
-    def test_escolhe_patrimonio_ajax_ns_patrimonio(self):
+    def test_ajax_escolhe_patrimonio___ns_patrimonio(self):
         """
         Verifica chamanda do escolhe_patrimonio encontrando registro pelo numero de serie do Patrimonio
         """
@@ -493,7 +495,7 @@ class ViewTest(TestCase):
         response = self.client.get(url, {'num_doc': '789'})
         self.assertIn(b'"pk": 2', response.content)
         
-    def test_por_estado(self):
+    def test_view__por_estado(self):
         """
         View por estado.
         """
@@ -507,7 +509,7 @@ class ViewTest(TestCase):
         self.assertContains(response, '/admin/patrimonio/patrimonio/1/')
         
         
-    def test_por_estado__parametro_estado_vazio(self):
+    def test_view__por_estado__parametro_estado_vazio(self):
         """
         View por estado. 
         Sem o envio de parametro de estado, deve ir para a tela de filtro de seleção do estado.
@@ -532,7 +534,7 @@ class ViewTest(TestCase):
         self.assertTrue(200, response.status_code)
         
         self.assertContains(response, '"estado_desc": "Ativo"')
-        self.assertContains(response, '"entidade_id": 1')
+        self.assertContains(response, '"entidade_id": 2')
         self.assertContains(response, '"estado_id": 1')
         self.assertContains(response, '"localizacao_id": 1')
         self.assertContains(response, '"entidade_desc": "SAC"')
@@ -564,7 +566,7 @@ class ViewTest(TestCase):
         self.assertTrue(200, response.status_code)
         self.assertContains(response, '"valor": "Nenhum registro"')
     
-    def test_ajax_escolhe_pagamento__sem_contacorrente(self):
+    def test_ajax_escolhe_entidade(self):
         """
         Teste de View de ajax de pagamentos
         """
@@ -580,9 +582,45 @@ class ViewTest(TestCase):
         self.assertTrue(200, response.status_code)
         self.assertContains(response, '"valor": "Doc. 1234, valor None"')
     
-    
-    
-    
+    def test_view__por_tipo(self):
+        """
+        View de relatório por tipo.
+         
+        """
+        self.setUpPatrimonio()
+        url = reverse("patrimonio.views.por_tipo")
+        response = self.client.get(url, {'tipo': '1', 'procedencia': '1'})
+         
+        self.assertTrue(200, response.status_code)
+        self.assertContains(response, '<h1 repeat="1">Inventário por tipo</h1>')
+        self.assertContains(response, '<h4>Patrimonios do tipo </h4>')
+        self.assertContains(response, '<td>PROC</td>')
+        
+    def test_view__por_tipo__pdf(self):
+        """
+        View de relatório por tipo. Resposta em PDF.
+         
+        """
+        self.setUpPatrimonio()
+        url = reverse("patrimonio.views.por_tipo")
+        response = self.client.get(url, {'tipo': '1', 'procedencia': '1', 'acao':'1'})
+        
+        self.assertTrue(200, response.status_code)
+        self.assertContains(response, '%PDF-')
+        
+    def test_view__por_tipo__xls(self):
+        """
+        View de relatório por tipo. Resposta em XLS.
+         
+        """
+        self.setUpPatrimonio()
+        url = reverse("patrimonio.views.por_tipo")
+        response = self.client.get(url, {'tipo': '1', 'procedencia': '1', 'acao':'2'})
+
+        self.assertTrue(200, response.status_code)
+        self.assertContains(response, 'Tablib') # identifica a biblioteca que gera o xls
+        self.assertContains(response, 'PROC')
+            
 
 class ViewPermissionDeniedTest(TestCase):
     """
