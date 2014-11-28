@@ -106,23 +106,28 @@ def ajax_escolhe_pagamento(request):
     return HttpResponse(retorno_json, content_type="application/json")
 
 
-@login_required
-@require_safe
-def ajax_escolhe_detalhe(request):
-    ed_id = request.GET.get('detalhe')
-    detalhe = get_object_or_404(EnderecoDetalhe, pk=ed_id)
-
-    retorno = []
-    for ed in EnderecoDetalhe.objects.filter(detalhe=detalhe):
-        retorno.append({'pk':ed.pk, 'valor':ed.__unicode__()})
-
-    retorno_json = json.dumps(retorno)
-    return HttpResponse(retorno_json, content_type="application/json")
+# @login_required
+# @require_safe
+# def ajax_escolhe_detalhe(request):
+#     ed_id = request.GET.get('detalhe')
+#     detalhe = get_object_or_404(EnderecoDetalhe, pk=ed_id)
+# 
+#     retorno = []
+#     for ed in EnderecoDetalhe.objects.filter(detalhe=detalhe):
+#         retorno.append({'pk':ed.pk, 'valor':ed.__unicode__()})
+# 
+#     retorno_json = json.dumps(retorno)
+#     return HttpResponse(retorno_json, content_type="application/json")
 
 
 @login_required
 @require_safe
 def ajax_escolhe_entidade(request):
+    """
+    Disparadao do atributo de entidade em PatrimonioHistoricoLocalAdminForm.
+    
+    Utilizado para buscar dados de endereço a partir da escolha de uma entidade.
+    """
     ent_id = request.GET.get('entidade')
     entidade = get_object_or_404(Entidade, pk=ent_id)
 
@@ -267,21 +272,21 @@ def ajax_escolhe_patrimonio(request):
     return HttpResponse(retorno_json, content_type="application/json")
 
 
-@login_required
-@require_safe
-def ajax_patrimonio_existente(request):
-    retorno = {'marca':'', 'modelo':'', 'descricao':'', 'procedencia':''}
-    part_number = request.GET.get('part_number')
-    
-    existentes = Patrimonio.objects.filter(equipamento__part_number__iexact=part_number)
-
-    if part_number and existentes.count():
-        p = existentes[0]
-        
-        retorno = {'marca':p.marca, 'modelo':p.modelo, 'descricao':p.descricao, 'procedencia':p.procedencia}
-
-    retorno_json = json.dumps(retorno)
-    return HttpResponse(retorno_json, content_type='application/json')
+# @login_required
+# @require_safe
+# def ajax_patrimonio_existente(request):
+#     retorno = {'marca':'', 'modelo':'', 'descricao':'', 'procedencia':''}
+#     part_number = request.GET.get('part_number')
+#     
+#     existentes = Patrimonio.objects.filter(equipamento__part_number__iexact=part_number)
+# 
+#     if part_number and existentes.count():
+#         p = existentes[0]
+#         
+#         retorno = {'marca':p.marca, 'modelo':p.modelo, 'descricao':p.descricao, 'procedencia':p.procedencia}
+# 
+#     retorno_json = json.dumps(retorno)
+#     return HttpResponse(retorno_json, content_type='application/json')
 
 
 @login_required
@@ -342,8 +347,6 @@ def por_tipo(request):
             patrimonios = patrimonios.filter(entidade_procedencia=procedencia_id)
             procedencia = Entidade.objects.get(id=procedencia_id)
             
-#         patrimonios.select_related('entidade_procedencia', 'equipamento')
-
         patrimonios = patrimonios.select_related('entidade_procedencia', 'equipamento', 'equipamento__entidade_fabricante', 'pagamento', 'pagamento__protocolo')
         
         pdf = request.GET.get('acao') == '1'
