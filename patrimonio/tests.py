@@ -441,11 +441,17 @@ class ViewTest(TestCase):
         protocolo = Protocolo.objects.create(id=1, num_documento=num_documento, tipo_documento_id=0, estado_id=0, termo=termo, data_chegada=date(year=2000, month=01, day=01), moeda_estrangeira=False)
         ex1 = ExtratoCC.objects.create(data_extrato=date(2008,10,30), data_oper=date(2008,10,5), cod_oper=333333, valor='2650', historico='TED', despesa_caixa=False)
         pagamento = Pagamento.objects.create(id=1, protocolo=protocolo, valor_fapesp=1000, conta_corrente=ex1)
+
+
+        tipoEquipamento = TipoEquipamento.objects.create(nome="Rack")
+        entidade_fabricante = Entidade.objects.create(sigla='DELL', nome='Dell', cnpj='00.000.000/0000-00', fisco=True, url='')
+        equipamento = Equipamento.objects.create(tipo=tipoEquipamento, part_number="PN001", modelo="MODEL001", ncm="NCM001", \
+                                                 ean="EAN001", entidade_fabricante=entidade_fabricante)
         
         tipoPatr = Tipo.objects.create(id=1, nome="TIPO")
         entidade_procedencia = Entidade.objects.create(sigla='PROC', nome='Entidade_Procedencia', cnpj='00.000.000/0000-00', fisco=True, url='')
         
-        patr1 = Patrimonio.objects.create(id=1, pagamento=pagamento, tipo=tipoPatr, checado=True, entidade_procedencia=entidade_procedencia)
+        patr1 = Patrimonio.objects.create(id=1, pagamento=pagamento, tipo=tipoPatr, checado=True, entidade_procedencia=entidade_procedencia, equipamento=equipamento)
         patr2 = Patrimonio.objects.create(id=2, ns=ns, tipo=tipoPatr, checado=True, entidade_procedencia=entidade_procedencia)
 
         ent= Entidade.objects.create(sigla='SAC', nome='Global Crossing', cnpj='00.000.000/0000-00', fisco=True, url='')
@@ -534,7 +540,7 @@ class ViewTest(TestCase):
         self.assertTrue(200, response.status_code)
         
         self.assertContains(response, '"estado_desc": "Ativo"')
-        self.assertContains(response, '"entidade_id": 2')
+        self.assertContains(response, '"entidade_id": 3')
         self.assertContains(response, '"estado_id": 1')
         self.assertContains(response, '"localizacao_id": 1')
         self.assertContains(response, '"entidade_desc": "SAC"')
@@ -589,13 +595,13 @@ class ViewTest(TestCase):
         """
         self.setUpPatrimonio()
         url = reverse("patrimonio.views.por_tipo")
-        response = self.client.get(url, {'tipo': '1', 'procedencia': '1'})
+        response = self.client.get(url, {'tipo': '1', 'procedencia': '2'})
         
         self.assertTrue(200, response.status_code)
         
         # asssert dos filtros
         self.assertContains(response, '<option value="1" selected>TIPO</option>')
-        self.assertContains(response, '<option value="1" selected>PROC</option>')
+        self.assertContains(response, '<option value="2" selected>PROC</option>')
         
         # asssert dos botões de PDF e XLS
         self.assertContains(response, 'name="acao" value="2"')
@@ -605,6 +611,24 @@ class ViewTest(TestCase):
         self.assertContains(response, '<h1 repeat="1">Inventário por tipo</h1>')
         self.assertContains(response, '<h4>Patrimonios do tipo TIPO</h4>')
         self.assertContains(response, '<td>PROC</td>')
+        
+    def test_view__por_tipo__sem_parametro_de_tipo(self):
+        """
+        View de relatório por tipo.
+        Sem envio do parametro de tipo para a resposta cair na página de filtro de tipo. 
+         
+        """
+        self.setUpPatrimonio()
+        url = reverse("patrimonio.views.por_tipo")
+        response = self.client.get(url)
+        
+        self.assertTrue(200, response.status_code)
+
+        self.assertContains(response, '<option value="1">TIPO</option>')
+
+        self.assertNotContains(response, '<h1 repeat="1">Inventário por tipo</h1>')
+        self.assertNotContains(response, '<h4>Patrimonios do tipo TIPO</h4>')
+
         
     def test_view__por_tipo__pdf(self):
         """
@@ -625,12 +649,46 @@ class ViewTest(TestCase):
         """
         self.setUpPatrimonio()
         url = reverse("patrimonio.views.por_tipo")
-        response = self.client.get(url, {'tipo': '1', 'procedencia': '1', 'acao':'2'})
+        response = self.client.get(url, {'tipo': '1', 'procedencia': '2', 'acao':'2'})
 
         self.assertTrue(200, response.status_code)
         self.assertContains(response, 'Tablib') # identifica a biblioteca que gera o xls
         self.assertContains(response, 'PROC')
-            
+    
+    def test_view__por_marca(self):
+        """
+        View de relatório por marca.
+         
+        """
+        self.setUpPatrimonio()
+        url = reverse("patrimonio.views.por_marca")
+        response = self.client.get(url, {'marca': 'DELL'})
+        
+        self.assertTrue(200, response.status_code)
+        
+        # asssert dos botões de PDF
+        self.assertContains(response, 'name="acao" value="1"')
+         
+        # asssert dos dados do relatório
+        self.assertContains(response, '<h1 repeat="1">Inventário por marca</h1>')
+        self.assertContains(response, '<td>PROC</td>')
+        self.assertContains(response, '<td>MODEL001</td>')
+        self.assertContains(response, '<td>Ativo</td>')
+
+        self.assertContains(response, '<td>PROC</td>')
+    
+    def test_view__por_marca__pdf(self):
+        """
+        View de relatório por marca. Resposta em PDF.
+         
+        """
+        self.setUpPatrimonio()
+        url = reverse("patrimonio.views.por_marca", kwargs={'pdf':1})
+        response = self.client.get(url, {'marca': 'DELL'})
+        
+        self.assertTrue(200, response.status_code)
+        self.assertContains(response, '%PDF-')
+
 
 class ViewPermissionDeniedTest(TestCase):
     """
