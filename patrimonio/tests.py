@@ -442,7 +442,7 @@ class ViewTest(TestCase):
         ex1 = ExtratoCC.objects.create(data_extrato=date(2008,10,30), data_oper=date(2008,10,5), cod_oper=333333, valor='2650', historico='TED', despesa_caixa=False)
         pagamento = Pagamento.objects.create(id=1, protocolo=protocolo, valor_fapesp=1000, conta_corrente=ex1)
         
-        tipoPatr = Tipo.objects.create(id=1)
+        tipoPatr = Tipo.objects.create(id=1, nome="TIPO")
         entidade_procedencia = Entidade.objects.create(sigla='PROC', nome='Entidade_Procedencia', cnpj='00.000.000/0000-00', fisco=True, url='')
         
         patr1 = Patrimonio.objects.create(id=1, pagamento=pagamento, tipo=tipoPatr, checado=True, entidade_procedencia=entidade_procedencia)
@@ -590,10 +590,20 @@ class ViewTest(TestCase):
         self.setUpPatrimonio()
         url = reverse("patrimonio.views.por_tipo")
         response = self.client.get(url, {'tipo': '1', 'procedencia': '1'})
-         
+        
         self.assertTrue(200, response.status_code)
+        
+        # asssert dos filtros
+        self.assertContains(response, '<option value="1" selected>TIPO</option>')
+        self.assertContains(response, '<option value="1" selected>PROC</option>')
+        
+        # asssert dos botões de PDF e XLS
+        self.assertContains(response, 'name="acao" value="2"')
+        self.assertContains(response, 'name="acao" value="1"')
+        
+        # asssert dos dados do relatório
         self.assertContains(response, '<h1 repeat="1">Inventário por tipo</h1>')
-        self.assertContains(response, '<h4>Patrimonios do tipo </h4>')
+        self.assertContains(response, '<h4>Patrimonios do tipo TIPO</h4>')
         self.assertContains(response, '<td>PROC</td>')
         
     def test_view__por_tipo__pdf(self):
