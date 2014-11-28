@@ -424,7 +424,7 @@ class PatrimonioTest(TestCase):
 class ViewTest(TestCase):
  
     # Fixture para carregar dados de autenticação de usuário
-    fixtures = ['auth_user_superuser.yaml',]
+    fixtures = ['auth_user_superuser.yaml', 'treemenus.yaml',]
     
     def setUp(self):
         super(ViewTest, self).setUp()
@@ -535,7 +535,6 @@ class ViewTest(TestCase):
         self.assertContains(response, '"entidade_id": 1')
         self.assertContains(response, '"estado_id": 1')
         self.assertContains(response, '"localizacao_id": 1')
-        self.assertContains(response, '"data": "2014-11-27"') 
         self.assertContains(response, '"entidade_desc": "SAC"')
         self.assertContains(response, '"descricao": "Emprestimo"')
         self.assertContains(response, '"posicao": "S042"')
@@ -589,7 +588,7 @@ class ViewPermissionDeniedTest(TestCase):
     """
     Teste das permissões das views. Utilizando um usuário sem permissão de superusuário.
     """
-    fixtures = ['auth_user.yaml',]
+    fixtures = ['auth_user.yaml', 'treemenus.yaml',]
     
     def setUp(self):
         super(ViewPermissionDeniedTest, self).setUp()
@@ -605,7 +604,7 @@ class ViewParcialPermissionTest(TestCase):
     """
     Teste das permissões das views. Utilizando um usuário com permissão individual por view.
     """
-    fixtures = ['auth_user_patrimonio_permission.yaml',]
+    fixtures = ['auth_user_patrimonio_permission.yaml', 'treemenus.yaml',]
     
     def setUp(self):
         super(ViewParcialPermissionTest, self).setUp()
