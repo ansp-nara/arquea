@@ -37,7 +37,7 @@ class ExtratoCC(models.Model):
     valor = models.DecimalField(_(u'Valor'), max_digits=12, decimal_places=2)
     historico = models.CharField(_(u'Histórico'), max_length=30)
     data_extrato = NARADateField(_(u'Data do extrato'), null=True, blank=True)
-    imagem = models.ImageField(_(u'Imagem do cheque'), upload_to='extratocc', null=True, blank=True, help_text=u'Somente imagem .jpeg', validators=[RegexValidator(regex=".+((\.jpg)|.+(\.jpeg))$", message="Enviar somente imagem .jpeg"),])
+    imagem = models.ImageField(_(u'Imagem do cheque'), upload_to='extratocc', null=True, blank=True, help_text=u'Somente imagem .jpeg', validators=[RegexValidator(regex=".+((\.jpg)|.+(\.jpeg))$", message="Enviar somente imagem jpeg. A proporção da largura / altura deve ser maior que 2."),])
     capa = models.TextField(null=True, blank=True)
     obs = models.TextField(null=True, blank=True)
     
