@@ -8,6 +8,10 @@ from django.forms.util import ErrorList
 from django.utils.html import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from PIL import Image as Img
+import StringIO
+
 from models import *
 from outorga.models import Termo, OrigemFapesp
 from protocolo.models import Protocolo
@@ -215,13 +219,10 @@ class ExtratoCCAdminForm(forms.ModelForm):
         fields = ['termo', 'extrato_financeiro', 'despesa_caixa', 'data_oper', 'cod_oper', 'historico', 'valor',]
 
     def clean_imagem(self):
-        """
-        Verificando a extensão do arquivo de imagem. Pode conter somente JPEG.
-        """
         imagem = self.cleaned_data.get('imagem', False)
         if imagem and imagem.name:
+            # Verificando a extensão do arquivo de imagem. Pode conter somente JPEG.
             imagem_split = imagem.name.split('.')
-            
             extensao = ''
             if len(imagem_split) > 1:
                 extensao = imagem_split[-1]
@@ -229,6 +230,13 @@ class ExtratoCCAdminForm(forms.ModelForm):
             if not (extensao.lower() in ['jpeg', 'jpg']):
                 raise forms.ValidationError(_(u'Somente utilizar imagens JPEG.'))
 
+            # Verificando se a proporção das dimensões da imagem parecem ser a de um cheque
+            image_read = Img.open(StringIO.StringIO(imagem.read()))
+            (imw, imh) = image_read.size
+            ratio = Decimal(imw) / Decimal(imh)
+            if (ratio < 2):
+                raise forms.ValidationError(_(u'Dimensões da imagem do cheque incorreta. (Proporção = %.3f)' % ratio))
+            
         return imagem
 
 
