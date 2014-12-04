@@ -7,11 +7,11 @@
 {% if size == '3' %}
     size: a{{ size }};
     background-image: url('media:{{papelaria.papel_timbrado_retrato_a3}}');
-    padding: {{papelaria.retrato_a3_margem_superior}}cm 1cm {{papelaria.retrato_a3_margem_inferior}}cm 1cm;
+    padding: {{papelaria.retrato_a3_margem_superior|default:0.5}}cm 1cm {{papelaria.retrato_a3_margem_inferior|default:0.5}}cm 1cm;
 {% elif size == '4' %}
     size: a{{ size }} landscape;
     background-image: url('media:{{papelaria.papel_timbrado_paisagem_a4}}');
-    padding: {{papelaria.paisagem_a4_margem_superior}}cm 1cm {{papelaria.paisagem_a4_margem_inferior}}cm 1cm;
+    padding: {{papelaria.paisagem_a4_margem_superior|default:0.5}}cm 1cm {{papelaria.paisagem_a4_margem_inferior|default:0.5}}cm 1cm;
 {% endif %}
   background-size: contain;
   background-repeat:no-repeat;
