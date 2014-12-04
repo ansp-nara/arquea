@@ -819,6 +819,68 @@ class ViewPermissionDeniedTest(TestCase):
         url = reverse("patrimonio.views.por_estado")
         response = self.client.get(url)
         self.assertContains(response, '403 Forbidden', status_code=403)
+        
+
+    def test_por_tipo(self):
+        url = reverse("patrimonio.views.por_tipo")
+        response = self.client.get(url)
+        self.assertContains(response, '403 Forbidden', status_code=403)
+        
+    def test_por_marca(self):
+        url = reverse("patrimonio.views.por_marca")
+        response = self.client.get(url)
+        self.assertContains(response, '403 Forbidden', status_code=403)
+        
+    def test_por_local(self):
+        url = reverse("patrimonio.views.por_local")
+        response = self.client.get(url)
+        self.assertContains(response, '403 Forbidden', status_code=403)
+        
+    def test_por_local_rack(self):
+        url = reverse("patrimonio.views.por_local_rack")
+        response = self.client.get(url)
+        self.assertContains(response, '403 Forbidden', status_code=403)
+        
+    def test_por_local_termo(self):
+        url = reverse("patrimonio.views.por_local_termo")
+        response = self.client.get(url)
+        self.assertContains(response, '403 Forbidden', status_code=403)
+        
+    def test_por_tipo_equipamento(self):
+        url = reverse("patrimonio.views.por_tipo_equipamento")
+        response = self.client.get(url)
+        self.assertContains(response, '403 Forbidden', status_code=403)
+        
+    def test_por_termo(self):
+        url = reverse("patrimonio.views.por_termo")
+        response = self.client.get(url)
+        self.assertContains(response, '403 Forbidden', status_code=403)
+        
+    def test_racks(self):
+        url = reverse("patrimonio.views.racks")
+        response = self.client.get(url)
+        self.assertContains(response, '403 Forbidden', status_code=403)
+        
+    def test_relatorio_rack(self):
+        url = reverse("patrimonio.views.relatorio_rack")
+        response = self.client.get(url)
+        self.assertContains(response, '403 Forbidden', status_code=403)
+        
+    def test_presta_contas(self):
+        url = reverse("patrimonio.views.presta_contas")
+        response = self.client.get(url)
+        self.assertContains(response, '403 Forbidden', status_code=403)
+        
+    def test_por_tipo_equipamento2(self):
+        url = reverse("patrimonio.views.por_tipo_equipamento2")
+        response = self.client.get(url)
+        self.assertContains(response, '403 Forbidden', status_code=403)
+        
+    def test_planta_baixa_edit(self):
+        url = reverse("patrimonio.views.planta_baixa_edit")
+        response = self.client.get(url)
+        self.assertContains(response, '403 Forbidden', status_code=403)
+        
     
     
 class ViewParcialPermissionTest(TestCase):
