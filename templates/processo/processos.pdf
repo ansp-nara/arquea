@@ -10,14 +10,14 @@
 
 {% if tamanho == '3' %}
   background-image: url('{% get_media_prefix %}{{papelaria.papel_timbrado_retrato_a3}}');
-  top: {{papelaria.retrato_a3_margem_superior}}cm;
-  bottom: {{papelaria.retrato_a3_margem_inferior}}cm;
+  top: {{papelaria.retrato_a3_margem_superior|default:0.5}}cm;
+  bottom: {{papelaria.retrato_a3_margem_inferior|default:0.5}}cm;
 {% endif %}
 {% if tamanho == '4' %}
   
   background-image: url('{% get_media_prefix %}{{papelaria.papel_timbrado_retrato_a4}}');
-  top: {{papelaria.retrato_a4_margem_superior}}cm;
-  bottom: {{papelaria.retrato_a4_margem_inferior}}cm;
+  top: {{papelaria.retrato_a4_margem_superior|default:0.5}}cm;
+  bottom: {{papelaria.retrato_a4_margem_inferior|default:0.5}}cm;
 {% endif %}
 
   background-size: contain;

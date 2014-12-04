@@ -13,7 +13,7 @@
     margin-right:1cm;
     margin-bottom:1cm;
     margin-left:0;
-    padding: {{papelaria.retrato_a3_margem_superior}}cm 1cm {{papelaria.retrato_a3_margem_inferior}}cm 1cm;
+    padding: {{papelaria.retrato_a3_margem_superior|default:0.5}}cm 1cm {{papelaria.retrato_a3_margem_inferior|default:0.5}}cm 1cm;
 
   @bottom-right {
     content: 'Pág ' counter(page);
