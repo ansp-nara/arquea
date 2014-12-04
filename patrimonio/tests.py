@@ -677,6 +677,24 @@ class ViewTest(TestCase):
 
         self.assertContains(response, '<td>PROC</td>')
     
+    def test_view__por_marca__sem_filtro(self):
+        """
+        View de relatório por marca. Teste sem passar o filtro, que deve cair na página de seleção de filtros
+         
+        """
+        self.setUpPatrimonio()
+        url = reverse("patrimonio.views.por_marca")
+        response = self.client.get(url, {})
+        
+        self.assertTrue(200, response.status_code)
+        
+        # assert breadcrumb
+        self.assertContains(response, '<a href="/patrimonio/relatorio/por_marca">Patrimônio por marca</a>')
+        
+        # assert filtro
+        self.assertContains(response, '<option value="DELL">DELL</option>')
+
+        
     def test_view__por_marca__pdf(self):
         """
         View de relatório por marca. Resposta em PDF.
@@ -688,6 +706,103 @@ class ViewTest(TestCase):
         
         self.assertTrue(200, response.status_code)
         self.assertContains(response, '%PDF-')
+
+    def test_view__por_local(self):
+        """
+        View de relatório por local.
+         
+        """
+        self.setUpPatrimonio()
+        url = reverse("patrimonio.views.por_local")
+        response = self.client.get(url, {'entidade': '1','endereco': '1', 'detalhe2': '1'})
+        
+        self.assertTrue(200, response.status_code)
+        
+        # assert breadcrumb
+        self.assertContains(response, '<a href="/patrimonio/relatorio/por_local">Patrimônio por localização</a>')
+        
+        # assert filtro
+        self.assertContains(response, '<form action="/patrimonio/relatorio/por_local/1" method="GET" id="id_form_recurso">')
+        self.assertContains(response, '<input type="hidden" name="entidade" value="1" />')
+        self.assertContains(response, '<input type="hidden" name="endereco" value="1" />')
+        self.assertContains(response, '<input type="hidden" name="detalhe2" value="1" />')
+        self.assertContains(response, '<input type="hidden" name="detalhe1" value="" />')
+        self.assertContains(response, '<input type="hidden" name="detalhe" value="" />')
+        
+        # asssert dos botões de PDF
+        self.assertContains(response, 'name="acao" value="1"')
+         
+        # asssert dos dados do relatório
+        self.assertContains(response, '<h4 style="clear:both;">SAC - Dr. Ovidio, 215 - SAC - Dr. Ovidio, 215 - </h4>')
+        self.assertContains(response, '<td>PROC</td>')
+        self.assertContains(response, '<td>DELL</td>')
+        self.assertContains(response, '<td>MODEL001</td>')
+        self.assertContains(response, '<td>Ativo</td>')
+
+    def test_view__por_local__sem_detalhe(self):
+        """
+        View de relatório por local.
+         
+        """
+        self.setUpPatrimonio()
+        url = reverse("patrimonio.views.por_local")
+        response = self.client.get(url, {'entidade': '1','endereco': '1'})
+        
+        self.assertTrue(200, response.status_code)
+        
+        # assert breadcrumb
+        self.assertContains(response, '<a href="/patrimonio/relatorio/por_local">Patrimônio por localização</a>')
+        
+        # assert filtro
+        self.assertContains(response, '<form action="/patrimonio/relatorio/por_local/1" method="GET" id="id_form_recurso">')
+        self.assertContains(response, '<input type="hidden" name="entidade" value="1" />')
+        self.assertContains(response, '<input type="hidden" name="endereco" value="1" />')
+        self.assertContains(response, '<input type="hidden" name="detalhe2" value="" />')
+        self.assertContains(response, '<input type="hidden" name="detalhe1" value="" />')
+        self.assertContains(response, '<input type="hidden" name="detalhe" value="" />')
+        
+        # asssert dos botões de PDF
+        self.assertContains(response, 'name="acao" value="1"')
+         
+        # asssert dos dados do relatório
+        self.assertContains(response, '<h4 style="clear:both;">SAC - Dr. Ovidio, 215</h4>')
+        self.assertContains(response, '<td>PROC</td>')
+        self.assertContains(response, '<td>DELL</td>')
+        self.assertContains(response, '<td>MODEL001</td>')
+        self.assertContains(response, '<td>Ativo</td>')
+        
+    def test_view__por_local__pdf(self):
+        """
+        View de relatório por marca. Resposta em PDF.
+         
+        """
+        self.setUpPatrimonio()
+        url = reverse("patrimonio.views.por_local", kwargs={'pdf':1})
+        response = self.client.get(url, {'entidade': '1','endereco': '1'})
+        
+        self.assertTrue(200, response.status_code)
+        
+        self.assertContains(response, '%PDF-')
+        
+        
+    def test_view__por_local__sem_filtro(self):
+        """
+        View de relatório por local.
+         
+        """
+        self.setUpPatrimonio()
+        url = reverse("patrimonio.views.por_local")
+        response = self.client.get(url, {})
+        
+        self.assertTrue(200, response.status_code)
+        
+        # assert breadcrumb
+        self.assertContains(response, '<a href="/patrimonio/relatorio/por_local">Patrimônio por localização</a>')
+        
+
+        # assert filtro
+        self.assertContains(response, '<option value="3">SAC</option>')
+
 
 
 class ViewPermissionDeniedTest(TestCase):
