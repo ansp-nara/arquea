@@ -497,7 +497,7 @@ def por_local(request, pdf=0):
             return render_to_pdf_weasy('patrimonio/por_local_weasy.pdf', context, request=request, filename='inventario_por_local.pdf')
         return render_to_response('patrimonio/por_local.html', context, context_instance=RequestContext(request))
     else:
-        entidades = find_entidades_filhas(None)
+        entidades = _find_entidades_filhas(None)
         msg = "A seleção da Entidade, Endereço e Localização são obrigatórios."
         return render_to_response('patrimonio/sel_local.html', {'entidades':entidades, 'msg':msg}, context_instance=RequestContext(request))
 
@@ -552,7 +552,7 @@ def por_local_rack(request, pdf=0):
             enderecos = []
             enderecos.append({'endereco':endereco, 'end':endereco_id, \
                               'detalhes':[{'detalhe':detalhe, 'det':detalhe_id, \
-                                           'patrimonio':iterate_patrimonio(ps, 0, False, False, False, 2)}]})
+                                           'patrimonio':_iterate_patrimonio(ps, 0, False, False, False, 2)}]})
             context = {'detalhe':detalhe, 'det':detalhe_id, 'enderecos': enderecos}
             
         
@@ -562,7 +562,7 @@ def por_local_rack(request, pdf=0):
             return render_to_response('patrimonio/por_local_rack.html', context, RequestContext(request, context))
     else:
         # Cria a lista para o SELECT de filtro de Entidades, buscando as Entidades que possuem EnderecoDetalhe
-        entidades = find_entidades_filhas(None)
+        entidades = _find_entidades_filhas(None)
         msg = "A seleção da Entidade, Endereço e Localização são obrigatórios."
         return render_to_response('patrimonio/sel_local_rack.html', {'entidades':entidades, 'msg':msg}, context_instance=RequestContext(request))
 
@@ -627,14 +627,14 @@ def por_local_termo(request, pdf=0):
             
             endereco = get_object_or_404(Endereco, pk=endereco_id)
             enderecos = []
-            enderecos.append({'endereco':endereco, 'end':endereco_id, 'detalhes':[{'detalhe':detalhe, 'det':detalhe_id, 'patrimonio':iterate_patrimonio(ps, 0, filtro_com_fmusp)}]})
+            enderecos.append({'endereco':endereco, 'end':endereco_id, 'detalhes':[{'detalhe':detalhe, 'det':detalhe_id, 'patrimonio':_iterate_patrimonio(ps, 0, filtro_com_fmusp)}]})
             context = {'nivel1':nivel1, 'nivel2':nivel2, 'nivel3':nivel3, 'detalhe':detalhe, 'det':detalhe_id, 'enderecos': enderecos}
             
         elif endereco_id and endereco_id != "":
             endereco_id = request.GET.get('endereco')
             
             enderecos = []
-            endereco = find_endereco(atuais, endereco_id, filtro_com_fmusp)
+            endereco = _find_endereco(atuais, endereco_id, filtro_com_fmusp)
             enderecos.append(endereco)
             context = {'nivel1':nivel1, 'nivel2':nivel2, 'nivel3':nivel3, 'enderecos': enderecos}
             
@@ -650,7 +650,7 @@ def por_local_termo(request, pdf=0):
                 entidade = Entidade.objects.filter(pk=entidade_id) | Entidade.objects.filter(entidade=entidade_id)
             enderecos = []
             for endereco in Endereco.objects.filter(entidade__in=entidade):    
-                endereco = find_endereco(atuais, endereco.id, filtro_com_fmusp)
+                endereco = _find_endereco(atuais, endereco.id, filtro_com_fmusp)
                 if endereco:
                     enderecos.append(endereco)
             context = {'nivel1':nivel1, 'nivel2':nivel2, 'nivel3':nivel3, 'entidade': entidade, 'ent':entidade_id, 'enderecos': enderecos}
@@ -661,14 +661,14 @@ def por_local_termo(request, pdf=0):
             return render_to_response('patrimonio/por_local_termo.html', context, RequestContext(request, context))
     else:
         # Cria a lista para o SELECT de filtro de Entidades, buscando as Entidades que possuem EnderecoDetalhe
-        entidades = find_entidades_filhas(None)
+        entidades = _find_entidades_filhas(None)
         msg = "A seleção da Entidade é obrigatória."
         return render_to_response('patrimonio/sel_local_termo.html', {'entidades':entidades, 'msg':msg}, context_instance=RequestContext(request))
 
 # Usado para criar o filtro de entidades.
 # Caso o parametro seja None, busca todas as entidades de primeiro nível, seguidas pela busca de todas as entidades abaixo.
 # Somente são consideradas Entidades válidas para a exibição no filtro as que possuirem EnderecoDetalhe, de qualquer nível de Entidade
-def find_entidades_filhas(entidade_id):
+def _find_entidades_filhas(entidade_id):
     if entidade_id:
         entidades = Entidade.objects.filter(entidade=entidade_id)
     else:
@@ -676,7 +676,7 @@ def find_entidades_filhas(entidade_id):
         
     entidades_retorno = []
     for entidade in entidades:
-        entidades_filhas = find_entidades_filhas(entidade.id)
+        entidades_filhas = _find_entidades_filhas(entidade.id)
         entidade_valida = Entidade.objects.filter(id=entidade.id, endereco__isnull=False, endereco__enderecodetalhe__isnull=False,).exists()
         
         if len(entidades_filhas) > 0 or entidade_valida:
@@ -688,7 +688,7 @@ def find_entidades_filhas(entidade_id):
 
 # Usado no disparo da view por_local_termo
 # Busca patrimonios de um endereco
-def find_endereco(atuais, endereco_id, filtro_com_fmusp=False):
+def _find_endereco(atuais, endereco_id, filtro_com_fmusp=False):
     endereco = get_object_or_404(Endereco, pk=endereco_id)
 
     # busca os historicos de localizacao de patrimonio baseado no endereco
@@ -703,7 +703,7 @@ def find_endereco(atuais, endereco_id, filtro_com_fmusp=False):
         ps = Patrimonio.objects.filter(historicolocal__in=historicos.filter(endereco=d))
         if filtro_com_fmusp:
             ps = ps.filter(numero_fmusp__isnull=False)
-        detalhes.append({'detalhe':d, 'patrimonio':iterate_patrimonio(ps, 0, filtro_com_fmusp)})
+        detalhes.append({'detalhe':d, 'patrimonio':_iterate_patrimonio(ps, 0, filtro_com_fmusp)})
     
     context = None
     if len(detalhes) > 0:
@@ -711,7 +711,7 @@ def find_endereco(atuais, endereco_id, filtro_com_fmusp=False):
     return context
 
 
-def iterate_patrimonio(p_pts, nivel=0, filtro_com_fmusp=False, order_fmusp=True, order_termo=True, nivel_maximo=4):
+def _iterate_patrimonio(p_pts, nivel=0, filtro_com_fmusp=False, order_fmusp=True, order_termo=True, nivel_maximo=4):
     if nivel == nivel_maximo:# or len(p_pts) == 0:
         return
     
@@ -742,7 +742,7 @@ def iterate_patrimonio(p_pts, nivel=0, filtro_com_fmusp=False, order_fmusp=True,
             patrimonio.update({'tipo': p.equipamento.tipo.nome})
         
         
-        contido = iterate_patrimonio(p.contido.all(), nivel + 1, filtro_com_fmusp, order_fmusp, order_termo, nivel_maximo)
+        contido = _iterate_patrimonio(p.contido.all(), nivel + 1, filtro_com_fmusp, order_fmusp, order_termo, nivel_maximo)
         patrimonio.update({'contido': contido})
         
         patrimonios.append(patrimonio)
@@ -1047,7 +1047,7 @@ def racks(request):
     p_dc = request.GET.get('dc_id')
     p_rack = request.GET.get('rack_id')
     
-    dcs = __rack_data(p_dc, p_rack)
+    dcs = _rack_data(p_dc, p_rack)
     
     chk_stencil = request.GET.get('chk_stencil') if request.GET.get('chk_stencil') else 1
     chk_legenda = request.GET.get('chk_legenda') if request.GET.get('chk_legenda') else 1
@@ -1064,7 +1064,7 @@ def racks(request):
         return TemplateResponse(request, 'patrimonio/racks.html', {'dcs':dcs, 'todos_dcs':todos_dcs, 'chk_legenda':chk_legenda, 'chk_legenda_desc':chk_legenda_desc, 'chk_stencil':chk_stencil, 'chk_outros':chk_outros, 'chk_avisos':chk_avisos, 'chk_traseira':chk_traseira})
 
 
-def __rack_data(datacenter_id, rack_id):
+def _rack_data(datacenter_id, rack_id):
     dcs = []
     if datacenter_id != None and int(datacenter_id) > 0:
         if int(datacenter_id) > 0:
