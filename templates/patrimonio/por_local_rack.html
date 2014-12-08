@@ -113,14 +113,14 @@
            {% for p in d.patrimonio %}
               <tr class="patr level0 tr_border" id="tr_{{p.id}}">
                 <td><div class="level_btn"></div><a href="{% url 'admin:patrimonio_patrimonio_change' p.id %}">{{ p.id }}</a></td>
-                <td class="clickable">{{ p.tipo }}</td>
-                <td class="clickable">{{ p.modelo }}</td>
-                <td class="clickable">{{ p.part_number }}</td>
-                <td class="clickable">{{ p.ns }}</td>
+                <td class="clickable">{{ p.tipo|default:'' }}</td>
+                <td class="clickable">{{ p.modelo|default:'' }}</td>
+                <td class="clickable">{{ p.part_number|default:'' }}</td>
+                <td class="clickable">{{ p.ns|default:'' }}</td>
                 <td class="clickable">{{ p.apelido|default:'' }}</td>
-                <td class="clickable">{{ p.descricao }} - {{ p.complemento }}</td>
+                <td class="clickable">{{ p.descricao|default:'' }} - {{ p.complemento|default:'' }}</td>
                 <td class="clickable">{{ p.posicao|default:'' }}</td>
-                <td class="clickable">{{ p.estado }}</td>
+                <td class="clickable">{{ p.estado|default:'' }}</td>
               </tr>
               {% for f in p.contido %}
                  <tr class="patr level1 {% if forloop.last %} tr_border{% endif %}" id="tr_{{f.id}}">
