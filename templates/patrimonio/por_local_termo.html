@@ -139,61 +139,61 @@
            {% for p in d.patrimonio %}
               <tr class="patr level0 tr_border" id="tr_{{p.id}}">
                 <td><div class="level_btn"></div><a href="{% url 'admin:patrimonio_patrimonio_change' p.id %}">{{ p.id }}</a></td>
-                <td class="clickable">{{ p.termo }}</td>
+                <td class="clickable">{{ p.termo|default:'' }}</td>
                 <td class="clickable">{{ p.fmusp|default:'' }}</td>
-                <td class="clickable">{{ p.num_documento }}</td>
-                <td class="clickable">{{ p.modelo }}</td>
-                <td class="clickable">{{ p.part_number }}</td>
-                <td class="clickable">{{ p.ns }}</td>
+                <td class="clickable">{{ p.num_documento|default:'' }}</td>
+                <td class="clickable">{{ p.modelo|default:'' }}</td>
+                <td class="clickable">{{ p.part_number|default:'' }}</td>
+                <td class="clickable">{{ p.ns|default:'' }}</td>
                 <td class="clickable">{{ p.apelido|default:'' }}</td>
-                <td class="clickable">{{ p.descricao }} - {{ p.complemento }}</td>
+                <td class="clickable">{{ p.descricao|default:'' }} - {{ p.complemento|default:'' }}</td>
                 <td class="clickable">{{ p.posicao|default:'' }}</td>
-                <td class="clickable">{{ p.estado }}</td>
+                <td class="clickable">{{ p.estado|default:'' }}</td>
               </tr>
               {% if nivel1 == 'on' %}
               {% for f in p.contido %}
                  <tr class="patr level1 {% if forloop.last %} tr_border{% endif %}" id="tr_{{f.id}}">
                     <td><div class="level_btn"></div><a href="{% url 'admin:patrimonio_patrimonio_change' f.id %}"></a></td>
-	                <td class="clickable">{{ f.termo }}</td>
+	                <td class="clickable">{{ f.termo|default:'' }}</td>
 	                <td class="clickable">{{ f.fmusp|default:'' }}</td>
-                    <td class="clickable">{{ f.num_documento }}</td>
-                    <td class="clickable">{{ f.modelo }}</td>
-                    <td class="clickable">{{ f.part_number }}</td>
-                    <td class="clickable">{{ f.ns }}</td>
+                    <td class="clickable">{{ f.num_documento|default:'' }}</td>
+                    <td class="clickable">{{ f.modelo|default:'' }}</td>
+                    <td class="clickable">{{ f.part_number|default:'' }}</td>
+                    <td class="clickable">{{ f.ns|default:'' }}</td>
                     <td class="clickable">{{ f.apelido|default:'' }}</td>
-                    <td class="clickable">{{ f.descricao }}</td>
+                    <td class="clickable">{{ f.descricao|default:'' }}</td>
                     <td class="clickable">{{ f.posicao|default:'' }}</td>
-                    <td class="clickable">{{ f.estado }}</td>
+                    <td class="clickable">{{ f.estado|default:'' }}</td>
                   </tr>
                   {% if nivel2 == 'on' %}
                   {% for g in f.contido %}
                      <tr class="patr level2 {% if forloop.last %} tr_border{% endif %}" id="tr_{{g.id}}">
                         <td><div class="level_btn"></div><a href="{% url 'admin:patrimonio_patrimonio_change' g.id %}"></a></td>
-	                    <td class="clickable">{{ g.termo }}</td>
+	                    <td class="clickable">{{ g.termo|default:'' }}</td>
 	                    <td class="clickable">{{ g.fmusp|default:'' }}</td>
-                        <td class="clickable">{{ g.num_documento }}</td>
-                        <td class="clickable">{{ g.modelo }}</td>
-                        <td class="clickable">{{ g.part_number }}</td>
-                        <td class="clickable">{{ g.ns }}</td>
+                        <td class="clickable">{{ g.num_documento|default:'' }}</td>
+                        <td class="clickable">{{ g.modelo|default:'' }}</td>
+                        <td class="clickable">{{ g.part_number|default:'' }}</td>
+                        <td class="clickable">{{ g.ns|default:'' }}</td>
                         <td class="clickable">{{ g.apelido|default:'' }}</td>
-                        <td class="clickable">{{ g.descricao }}</td>
+                        <td class="clickable">{{ g.descricao|default:'' }}</td>
                         <td class="clickable">{{ g.posicao|default:'' }}</td>
-                        <td class="clickable">{{ g.estado }}</td>
+                        <td class="clickable">{{ g.estado|default:'' }}</td>
                       </tr>
                      {% if nivel3 == 'on' %}
                      {% for h in g.contido %}
                         <tr class="patr level3 {% if forloop.last %} tr_border{% endif %}" id="tr_{{h.id}}">
                             <td><div class="level_btn"></div><a href="{% url 'admin:patrimonio_patrimonio_change' h.id %}"></a></td>
-		                    <td class="clickable">{{ h.termo }}</td>
+		                    <td class="clickable">{{ h.termo|default:'' }}</td>
 		                    <td class="clickable">{{ h.fmusp|default:'' }}</td>
-                            <td class="clickable">{{ h.num_documento }}</td>
-                            <td class="clickable">{{ h.modelo }}</td>
-                            <td class="clickable">{{ h.part_number }}</td>
-                            <td class="clickable">{{ h.ns }}</td>
+                            <td class="clickable">{{ h.num_documento|default:'' }}</td>
+                            <td class="clickable">{{ h.modelo|default:'' }}</td>
+                            <td class="clickable">{{ h.part_number|default:'' }}</td>
+                            <td class="clickable">{{ h.ns|default:'' }}</td>
                             <td class="clickable">{{ h.apelido|default:'' }}</td>
-                            <td class="clickable">{{ h.descricao }}</td>
+                            <td class="clickable">{{ h.descricao|default:'' }}</td>
                             <td class="clickable">{{ h.posicao|default:'' }}</td>
-                            <td class="clickable">{{ h.estado }}</td>
+                            <td class="clickable">{{ h.estado|default:'' }}</td>
                          </tr>
                      {% endfor %}
                      {% endif %}
