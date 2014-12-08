@@ -511,8 +511,29 @@ class ViewTest(TestCase):
         response = self.client.get(url, {'estado': '1'})
         
         self.assertTrue(200, response.status_code)
+        
+        # assert breadcrumb
+        self.assertContains(response, '<a href="/patrimonio/relatorio/por_estado">Patrimônio por estado do item</a>')
+
+        # asssert dos dados do relatório
         self.assertContains(response, '<h4>Estado Ativo</h4>')
-        self.assertContains(response, '/admin/patrimonio/patrimonio/1/')
+        self.assertContains(response, '<th>Entidade</th>')
+        self.assertContains(response, '<th>Local</th>')
+        self.assertContains(response, '<th>Procedência</th>')
+        self.assertContains(response, '<th>Marca</th>')
+        self.assertContains(response, '<th>Modelo</th>')
+        self.assertContains(response, '<th>Part number</th>')
+        self.assertContains(response, '<th>Descrição</th>')
+        self.assertContains(response, '<th>NS</th>')
+    
+        self.assertContains(response, '<td>SAC</td>')
+        self.assertContains(response, '<td>PROC</td>')
+        self.assertContains(response, '<td>DELL</td>')
+        self.assertContains(response, '<td>MODEL001</td>')
+        self.assertContains(response, '<td>PN001</td>')
+        self.assertContains(response, '<td><a href="/admin/patrimonio/patrimonio/1/"></a></td>')
+
+
         
         
     def test_view__por_estado__parametro_estado_vazio(self):
@@ -526,6 +547,10 @@ class ViewTest(TestCase):
         response = self.client.get(url)
         
         self.assertTrue(200, response.status_code)
+        
+        # assert breadcrumb
+        self.assertContains(response, '<a href="/patrimonio/relatorio/por_estado">Patrimônio por estado do item</a>')
+
         self.assertContains(response, '<option value="1">Ativo (1)</option>')
     
     def test_ajax_patrimonio_historico(self):
@@ -598,6 +623,9 @@ class ViewTest(TestCase):
         response = self.client.get(url, {'tipo': '1', 'procedencia': '2'})
         
         self.assertTrue(200, response.status_code)
+                
+        # assert breadcrumb
+        self.assertContains(response, '<a href="/patrimonio/relatorio/por_tipo">Patrimônio por tipo</a>')
         
         # asssert dos filtros
         self.assertContains(response, '<option value="1" selected>TIPO</option>')
@@ -610,7 +638,28 @@ class ViewTest(TestCase):
         # asssert dos dados do relatório
         self.assertContains(response, '<h1 repeat="1">Inventário por tipo</h1>')
         self.assertContains(response, '<h4>Patrimonios do tipo TIPO</h4>')
+                
+        self.assertContains(response, '<th>Checado</th>')
+        self.assertContains(response, '<th>ID</th>')
+        self.assertContains(response, '<th>Procedência</th>')
+        self.assertContains(response, '<th>Marca</th>')
+        self.assertContains(response, '<th>Modelo</th>')
+        self.assertContains(response, '<th>Part number</th>')
+        self.assertContains(response, '<th>Descrição</th>')
+        self.assertContains(response, '<th>NS</th>')
+        self.assertContains(response, '<th>Local</th>')
+        self.assertContains(response, '<th>Posição</th>')
+        self.assertContains(response, '<th>Estado</th>')
+        self.assertContains(response, '<th>NF</th>')
+        
+        self.assertContains(response, '<td><a href="/admin/patrimonio/patrimonio/1/">1</a></td>')
         self.assertContains(response, '<td>PROC</td>')
+        self.assertContains(response, '<td>DELL</td>')
+        self.assertContains(response, '<td>MODEL001</td>')
+        self.assertContains(response, '<td>PN001</td>')
+        self.assertContains(response, '<td>SAC - Dr. Ovidio, 215</td>')
+        self.assertContains(response, '<td>Ativo</td>')
+        
         
     def test_view__por_tipo__sem_parametro_de_tipo(self):
         """
@@ -623,11 +672,15 @@ class ViewTest(TestCase):
         response = self.client.get(url)
         
         self.assertTrue(200, response.status_code)
+                
+        # assert breadcrumb
+        self.assertContains(response, '<a href="/patrimonio/relatorio/por_tipo">Patrimônio por tipo</a>')
 
         self.assertContains(response, '<option value="1">TIPO</option>')
 
         self.assertNotContains(response, '<h1 repeat="1">Inventário por tipo</h1>')
         self.assertNotContains(response, '<h4>Patrimonios do tipo TIPO</h4>')
+
 
         
     def test_view__por_tipo__pdf(self):
@@ -666,6 +719,9 @@ class ViewTest(TestCase):
         
         self.assertTrue(200, response.status_code)
         
+        # assert breadcrumb
+        self.assertContains(response, '<a href="/patrimonio/relatorio/por_marca">Patrimônio por marca</a>')
+        
         # asssert dos botões de PDF
         self.assertContains(response, 'name="acao" value="1"')
          
@@ -693,6 +749,8 @@ class ViewTest(TestCase):
         
         # assert filtro
         self.assertContains(response, '<option value="DELL">DELL</option>')
+        
+        self.assertNotContains(response, '<h1 repeat="1">Inventário por marca</h1>')
 
         
     def test_view__por_marca__pdf(self):
@@ -773,7 +831,7 @@ class ViewTest(TestCase):
         
     def test_view__por_local__pdf(self):
         """
-        View de relatório por marca. Resposta em PDF.
+        View de relatório por local. Resposta em PDF.
          
         """
         self.setUpPatrimonio()
@@ -799,11 +857,187 @@ class ViewTest(TestCase):
         # assert breadcrumb
         self.assertContains(response, '<a href="/patrimonio/relatorio/por_local">Patrimônio por localização</a>')
         
-
         # assert filtro
         self.assertContains(response, '<option value="3">SAC</option>')
+        
+        self.assertNotContains(response, '<h4>') 
 
 
+    def test_view__por_local_rack(self):
+        """
+        View de relatório por local e rack.
+         
+        """
+        self.setUpPatrimonio()
+        url = reverse("patrimonio.views.por_local_rack")
+        response = self.client.get(url, {'entidade': '1','endereco': '1', 'detalhe': '1'})
+        
+        self.assertTrue(200, response.status_code)
+        
+        # assert breadcrumb
+        self.assertContains(response, '<a href="/patrimonio/relatorio/por_local_rack">Patrimônio por local e rack</a>')
+        
+        # assert filtro
+        self.assertContains(response, '<form action="/patrimonio/relatorio/por_local_rack/1" method="GET" id="id_form_recurso">')
+        self.assertContains(response, '<input type="hidden" name="entidade" value="1" />')
+        self.assertContains(response, '<input type="hidden" name="endereco" value="1" />')
+        self.assertContains(response, '<input type="hidden" name="detalhe" value="1" />')
+        self.assertContains(response, '<input type="hidden" name="com_fmusp" value="" />')
+        
+        # asssert dos botões de PDF
+        self.assertContains(response, 'name="acao" value="1"')
+         
+        # asssert dos dados do relatório
+        self.assertContains(response, 'SAC - Dr. Ovidio, 215')
+        self.assertContains(response, '<th>ID</th>')
+        self.assertContains(response, '<th>Tipo</th>')
+        self.assertContains(response, '<th>Modelo</th>')
+        self.assertContains(response, '<th>Part number</th>')
+        self.assertContains(response, '<th>NS</th>')
+        self.assertContains(response, '<th>Apelido</th>')
+        self.assertContains(response, '<th>Descrição</th>')
+        self.assertContains(response, '<th>Posição</th>')
+        self.assertContains(response, '<th>Estado</th>')
+        
+        self.assertContains(response, '<td><div class="level_btn"></div><a href="/admin/patrimonio/patrimonio/1/">1</a></td>')
+        self.assertContains(response, '<td class="clickable">Rack</td>')
+        self.assertContains(response, '<td class="clickable">MODEL001</td>')
+        self.assertContains(response, '<td class="clickable">PN001</td>')
+        self.assertContains(response, '<td class="clickable"></td>')
+        self.assertContains(response, '<td class="clickable"></td>')
+        self.assertContains(response, '<td class="clickable"> - </td>')
+        self.assertContains(response, '<td class="clickable">S042           </td>')
+        self.assertContains(response, '<td class="clickable">Ativo</td>')
+        
+
+    def test_view__por_local_rack__sem_filtro(self):
+        """
+        View de relatório por local e rack.
+         
+        """
+        self.setUpPatrimonio()
+        url = reverse("patrimonio.views.por_local_rack", kwargs={'pdf':0})
+        response = self.client.get(url, {})
+        
+        self.assertTrue(200, response.status_code)
+        
+        # assert breadcrumb
+        self.assertContains(response, '<a href="/patrimonio/relatorio/por_local_rack">Patrimônio por local e rack</a>')
+        
+        # assert filtro
+        self.assertContains(response, 'select name="entidade" id="id_entidade"')
+        self.assertContains(response, '<option value="3">SAC</option>')
+        self.assertContains(response, 'select name="endereco" id="id_endereco"')
+        self.assertContains(response, 'select name="detalhe" id="id_detalhe"')
+
+
+    def test_view__por_local_rack__pdf(self):
+        """
+        View de relatório por local e rack. Resposta em PDF.
+         
+        """
+        self.setUpPatrimonio()
+        url = reverse("patrimonio.views.por_local_rack", kwargs={'pdf':1})
+        response = self.client.get(url, {'entidade': '1','endereco': '1', 'detalhe': '1'})
+        
+        self.assertTrue(200, response.status_code)
+        
+        self.assertContains(response, '%PDF-')
+
+
+    def test_view__por_local_termo(self):
+        """
+        View de relatório por local e termo.
+         
+        """
+        self.setUpPatrimonio()
+        url = reverse("patrimonio.views.por_local_termo")
+        response = self.client.get(url, {'entidade': '1','endereco': '1', 'detalhe': '1'})
+        
+        self.assertTrue(200, response.status_code)
+
+        # assert breadcrumb
+        self.assertContains(response, '<a href="/patrimonio/relatorio/por_local_termo">Patrimônio por localização (com Termo)</a>')
+        
+        # assert filtro
+        self.assertContains(response, '<input type="hidden" name="entidade" value="1" />')
+        self.assertContains(response, '<input type="hidden" name="endereco" value="1" />')
+        self.assertContains(response, '<input type="hidden" name="detalhe" value="1" />')
+        self.assertContains(response, '<input type="hidden" name="com_fmusp" value="" />')
+        self.assertContains(response, '<input type="hidden" name="nivel1" value="" />')
+        self.assertContains(response, '<input type="hidden" name="nivel2" value="" />')
+        self.assertContains(response, '<input type="hidden" name="nivel3" value="" />')
+
+        # asssert dos botões de PDF
+        self.assertContains(response, 'name="acao" value="1"')
+         
+        # asssert dos dados do relatório
+        self.assertContains(response, 'SAC - Dr. Ovidio, 215')
+        
+        self.assertContains(response, '<th>ID</th>')
+        self.assertContains(response, '<th>Processo</th>')
+        self.assertContains(response, '<th>Patr. Oficial</th>')
+        self.assertContains(response, '<th>NF</th>')
+        self.assertContains(response, '<th>Modelo</th>')
+        self.assertContains(response, '<th>Part number</th>')
+        self.assertContains(response, '<th>NS</th>')
+        self.assertContains(response, '<th>Apelido</th>')
+        self.assertContains(response, '<th>Descrição</th>')
+        self.assertContains(response, '<th>Posição</th>')
+        self.assertContains(response, '<th>Estado</th>')
+        
+        self.assertContains(response, '<td><div class="level_btn"></div><a href="/admin/patrimonio/patrimonio/1/">1</a></td>')
+        self.assertContains(response, '<td class="clickable">08/22222-2</td>')
+        self.assertContains(response, '<td class="clickable">MODEL001</td>')
+        self.assertContains(response, '<td class="clickable">PN001</td>')
+        self.assertContains(response, '<td class="clickable"> - </td>')
+        self.assertContains(response, '<td class="clickable">S042           </td>')
+        self.assertContains(response, '<td class="clickable">Ativo</td>')
+
+
+    def test_view__por_local_termo__sem_filtro(self):
+        """
+        View de relatório por local e termo.
+         
+        """
+        self.setUpPatrimonio()
+        url = reverse("patrimonio.views.por_local_termo", kwargs={'pdf':0})
+        response = self.client.get(url, {})
+        
+        self.assertTrue(200, response.status_code)
+        
+        # assert breadcrumb
+        self.assertContains(response, '<a href="/patrimonio/relatorio/por_local_termo">Patrimônio por localização (com Termo)</a>')
+
+        # assert filtro
+        self.assertContains(response, '<form method="GET">')
+        self.assertContains(response, '<select name="entidade" id="id_entidade"')
+        self.assertContains(response, '<option value="3">SAC</option>')
+        self.assertContains(response, '<select name="endereco" id="id_endereco"')
+        self.assertContains(response, '<select name="detalhe" id="id_detalhe"')
+        self.assertContains(response, '<input type="checkbox" name="com_fmusp"')
+        self.assertContains(response, '<input type="checkbox" name="nivel1"')
+        self.assertContains(response, '<input type="checkbox" name="nivel2"')
+        self.assertContains(response, '<input type="checkbox" name="nivel3"')
+        
+        
+
+
+    def test_view__por_local_termo__pdf(self):
+        """
+        View de relatório por local e termo. Resposta em PDF.
+         
+        """
+        self.setUpPatrimonio()
+        url = reverse("patrimonio.views.por_local_termo", kwargs={'pdf':1})
+        response = self.client.get(url, {'entidade': '1','endereco': '1', 'detalhe': '1'})
+        
+        self.assertTrue(200, response.status_code)
+        
+        self.assertContains(response, '%PDF-') 
+        
+        
+        
 
 class ViewPermissionDeniedTest(TestCase):
     """
