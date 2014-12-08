@@ -513,25 +513,25 @@ class ViewTest(TestCase):
         self.assertTrue(200, response.status_code)
         
         # assert breadcrumb
-        self.assertContains(response, '<a href="/patrimonio/relatorio/por_estado">Patrimônio por estado do item</a>')
+        self.assertContains(response, u'<a href="/patrimonio/relatorio/por_estado">Patrimônio por estado do item</a>')
 
         # asssert dos dados do relatório
-        self.assertContains(response, '<h4>Estado Ativo</h4>')
-        self.assertContains(response, '<th>Entidade</th>')
-        self.assertContains(response, '<th>Local</th>')
-        self.assertContains(response, '<th>Procedência</th>')
-        self.assertContains(response, '<th>Marca</th>')
-        self.assertContains(response, '<th>Modelo</th>')
-        self.assertContains(response, '<th>Part number</th>')
-        self.assertContains(response, '<th>Descrição</th>')
-        self.assertContains(response, '<th>NS</th>')
+        self.assertContains(response, u'<h4>Estado Ativo</h4>')
+        self.assertContains(response, u'<th>Entidade</th>')
+        self.assertContains(response, u'<th>Local</th>')
+        self.assertContains(response, u'<th>Procedência</th>')
+        self.assertContains(response, u'<th>Marca</th>')
+        self.assertContains(response, u'<th>Modelo</th>')
+        self.assertContains(response, u'<th>Part number</th>')
+        self.assertContains(response, u'<th>Descrição</th>')
+        self.assertContains(response, u'<th>NS</th>')
     
-        self.assertContains(response, '<td>SAC</td>')
-        self.assertContains(response, '<td>PROC</td>')
-        self.assertContains(response, '<td>DELL</td>')
-        self.assertContains(response, '<td>MODEL001</td>')
-        self.assertContains(response, '<td>PN001</td>')
-        self.assertContains(response, '<td><a href="/admin/patrimonio/patrimonio/1/"></a></td>')
+        self.assertContains(response, u'<td>SAC</td>')
+        self.assertContains(response, u'<td>PROC</td>')
+        self.assertContains(response, u'<td>DELL</td>')
+        self.assertContains(response, u'<td>MODEL001</td>')
+        self.assertContains(response, u'<td>PN001</td>')
+        self.assertContains(response, u'<td><a href="/admin/patrimonio/patrimonio/1/"></a></td>')
 
 
         
@@ -549,9 +549,9 @@ class ViewTest(TestCase):
         self.assertTrue(200, response.status_code)
         
         # assert breadcrumb
-        self.assertContains(response, '<a href="/patrimonio/relatorio/por_estado">Patrimônio por estado do item</a>')
+        self.assertContains(response, u'<a href="/patrimonio/relatorio/por_estado">Patrimônio por estado do item</a>')
 
-        self.assertContains(response, '<option value="1">Ativo (1)</option>')
+        self.assertContains(response, u'<option value="1">Ativo (1)</option>')
     
     def test_ajax_patrimonio_historico(self):
         """
@@ -564,14 +564,14 @@ class ViewTest(TestCase):
                 
         self.assertTrue(200, response.status_code)
         
-        self.assertContains(response, '"estado_desc": "Ativo"')
-        self.assertContains(response, '"entidade_id": 3')
-        self.assertContains(response, '"estado_id": 1')
-        self.assertContains(response, '"localizacao_id": 1')
-        self.assertContains(response, '"entidade_desc": "SAC"')
-        self.assertContains(response, '"descricao": "Emprestimo"')
-        self.assertContains(response, '"posicao": "S042"')
-        self.assertContains(response, '"localizacao_desc": "SAC - Dr. Ovidio, 215 - "')
+        self.assertContains(response, u'"estado_desc": "Ativo"')
+        self.assertContains(response, u'"entidade_id": 3')
+        self.assertContains(response, u'"estado_id": 1')
+        self.assertContains(response, u'"localizacao_id": 1')
+        self.assertContains(response, u'"entidade_desc": "SAC"')
+        self.assertContains(response, u'"descricao": "Emprestimo"')
+        self.assertContains(response, u'"posicao": "S042"')
+        self.assertContains(response, u'"localizacao_desc": "SAC - Dr. Ovidio, 215 - "')
     
     def test_ajax_escolhe_pagamento(self):
         """
@@ -583,7 +583,7 @@ class ViewTest(TestCase):
         response = self.client.get(url, {'termo': '1', 'numero':'1234'})
         
         self.assertTrue(200, response.status_code)
-        self.assertContains(response, '"valor": "Doc. 1234, cheque 333333, valor 1000"')
+        self.assertContains(response, u'"valor": "Doc. 1234, cheque 333333, valor 1000"')
     
     def test_ajax_escolhe_pagamento__nao_encontrado(self):
         """
@@ -595,7 +595,7 @@ class ViewTest(TestCase):
         response = self.client.get(url, {'termo': '1', 'numero':'7777777'})
         
         self.assertTrue(200, response.status_code)
-        self.assertContains(response, '"valor": "Nenhum registro"')
+        self.assertContains(response, u'"valor": "Nenhum registro"')
     
     def test_ajax_escolhe_entidade(self):
         """
@@ -611,7 +611,7 @@ class ViewTest(TestCase):
         response = self.client.get(url, {'termo': '1', 'numero':'1234'})
         
         self.assertTrue(200, response.status_code)
-        self.assertContains(response, '"valor": "Doc. 1234, valor None"')
+        self.assertContains(response, u'"valor": "Doc. 1234, valor None"')
     
     def test_view__por_tipo(self):
         """
@@ -625,40 +625,40 @@ class ViewTest(TestCase):
         self.assertTrue(200, response.status_code)
                 
         # assert breadcrumb
-        self.assertContains(response, '<a href="/patrimonio/relatorio/por_tipo">Patrimônio por tipo</a>')
+        self.assertContains(response, u'<a href="/patrimonio/relatorio/por_tipo">Patrimônio por tipo</a>')
         
         # asssert dos filtros
-        self.assertContains(response, '<option value="1" selected>TIPO</option>')
-        self.assertContains(response, '<option value="2" selected>PROC</option>')
+        self.assertContains(response, u'<option value="1" selected>TIPO</option>')
+        self.assertContains(response, u'<option value="2" selected>PROC</option>')
         
         # asssert dos botões de PDF e XLS
-        self.assertContains(response, 'name="acao" value="2"')
-        self.assertContains(response, 'name="acao" value="1"')
+        self.assertContains(response, u'name="acao" value="2"')
+        self.assertContains(response, u'name="acao" value="1"')
         
         # asssert dos dados do relatório
-        self.assertContains(response, '<h1 repeat="1">Inventário por tipo</h1>')
-        self.assertContains(response, '<h4>Patrimonios do tipo TIPO</h4>')
+        self.assertContains(response, u'<h1 repeat="1">Inventário por tipo</h1>')
+        self.assertContains(response, u'<h4>Patrimonios do tipo TIPO</h4>')
                 
-        self.assertContains(response, '<th>Checado</th>')
-        self.assertContains(response, '<th>ID</th>')
-        self.assertContains(response, '<th>Procedência</th>')
-        self.assertContains(response, '<th>Marca</th>')
-        self.assertContains(response, '<th>Modelo</th>')
-        self.assertContains(response, '<th>Part number</th>')
-        self.assertContains(response, '<th>Descrição</th>')
-        self.assertContains(response, '<th>NS</th>')
-        self.assertContains(response, '<th>Local</th>')
-        self.assertContains(response, '<th>Posição</th>')
-        self.assertContains(response, '<th>Estado</th>')
-        self.assertContains(response, '<th>NF</th>')
+        self.assertContains(response, u'<th>Checado</th>')
+        self.assertContains(response, u'<th>ID</th>')
+        self.assertContains(response, u'<th>Procedência</th>')
+        self.assertContains(response, u'<th>Marca</th>')
+        self.assertContains(response, u'<th>Modelo</th>')
+        self.assertContains(response, u'<th>Part number</th>')
+        self.assertContains(response, u'<th>Descrição</th>')
+        self.assertContains(response, u'<th>NS</th>')
+        self.assertContains(response, u'<th>Local</th>')
+        self.assertContains(response, u'<th>Posição</th>')
+        self.assertContains(response, u'<th>Estado</th>')
+        self.assertContains(response, u'<th>NF</th>')
         
-        self.assertContains(response, '<td><a href="/admin/patrimonio/patrimonio/1/">1</a></td>')
-        self.assertContains(response, '<td>PROC</td>')
-        self.assertContains(response, '<td>DELL</td>')
-        self.assertContains(response, '<td>MODEL001</td>')
-        self.assertContains(response, '<td>PN001</td>')
-        self.assertContains(response, '<td>SAC - Dr. Ovidio, 215</td>')
-        self.assertContains(response, '<td>Ativo</td>')
+        self.assertContains(response, u'<td><a href="/admin/patrimonio/patrimonio/1/">1</a></td>')
+        self.assertContains(response, u'<td>PROC</td>')
+        self.assertContains(response, u'<td>DELL</td>')
+        self.assertContains(response, u'<td>MODEL001</td>')
+        self.assertContains(response, u'<td>PN001</td>')
+        self.assertContains(response, u'<td>SAC - Dr. Ovidio, 215</td>')
+        self.assertContains(response, u'<td>Ativo</td>')
         
         
     def test_view__por_tipo__sem_parametro_de_tipo(self):
@@ -674,12 +674,12 @@ class ViewTest(TestCase):
         self.assertTrue(200, response.status_code)
                 
         # assert breadcrumb
-        self.assertContains(response, '<a href="/patrimonio/relatorio/por_tipo">Patrimônio por tipo</a>')
+        self.assertContains(response, u'<a href="/patrimonio/relatorio/por_tipo">Patrimônio por tipo</a>')
 
-        self.assertContains(response, '<option value="1">TIPO</option>')
+        self.assertContains(response, u'<option value="1">TIPO</option>')
 
-        self.assertNotContains(response, '<h1 repeat="1">Inventário por tipo</h1>')
-        self.assertNotContains(response, '<h4>Patrimonios do tipo TIPO</h4>')
+        self.assertNotContains(response, u'<h1 repeat="1">Inventário por tipo</h1>')
+        self.assertNotContains(response, u'<h4>Patrimonios do tipo TIPO</h4>')
 
 
         
@@ -720,18 +720,18 @@ class ViewTest(TestCase):
         self.assertTrue(200, response.status_code)
         
         # assert breadcrumb
-        self.assertContains(response, '<a href="/patrimonio/relatorio/por_marca">Patrimônio por marca</a>')
+        self.assertContains(response, u'<a href="/patrimonio/relatorio/por_marca">Patrimônio por marca</a>')
         
         # asssert dos botões de PDF
-        self.assertContains(response, 'name="acao" value="1"')
+        self.assertContains(response, u'name="acao" value="1"')
          
         # asssert dos dados do relatório
-        self.assertContains(response, '<h1 repeat="1">Inventário por marca</h1>')
-        self.assertContains(response, '<td>PROC</td>')
-        self.assertContains(response, '<td>MODEL001</td>')
-        self.assertContains(response, '<td>Ativo</td>')
+        self.assertContains(response, u'<h1 repeat="1">Inventário por marca</h1>')
+        self.assertContains(response, u'<td>PROC</td>')
+        self.assertContains(response, u'<td>MODEL001</td>')
+        self.assertContains(response, u'<td>Ativo</td>')
 
-        self.assertContains(response, '<td>PROC</td>')
+        self.assertContains(response, u'<td>PROC</td>')
     
     def test_view__por_marca__sem_filtro(self):
         """
@@ -745,12 +745,12 @@ class ViewTest(TestCase):
         self.assertTrue(200, response.status_code)
         
         # assert breadcrumb
-        self.assertContains(response, '<a href="/patrimonio/relatorio/por_marca">Patrimônio por marca</a>')
+        self.assertContains(response, u'<a href="/patrimonio/relatorio/por_marca">Patrimônio por marca</a>')
         
         # assert filtro
-        self.assertContains(response, '<option value="DELL">DELL</option>')
+        self.assertContains(response, u'<option value="DELL">DELL</option>')
         
-        self.assertNotContains(response, '<h1 repeat="1">Inventário por marca</h1>')
+        self.assertNotContains(response, u'<h1 repeat="1">Inventário por marca</h1>')
 
         
     def test_view__por_marca__pdf(self):
@@ -777,25 +777,25 @@ class ViewTest(TestCase):
         self.assertTrue(200, response.status_code)
         
         # assert breadcrumb
-        self.assertContains(response, '<a href="/patrimonio/relatorio/por_local">Patrimônio por localização</a>')
+        self.assertContains(response, u'<a href="/patrimonio/relatorio/por_local">Patrimônio por localização</a>')
         
         # assert filtro
-        self.assertContains(response, '<form action="/patrimonio/relatorio/por_local/1" method="GET" id="id_form_recurso">')
-        self.assertContains(response, '<input type="hidden" name="entidade" value="1" />')
-        self.assertContains(response, '<input type="hidden" name="endereco" value="1" />')
-        self.assertContains(response, '<input type="hidden" name="detalhe2" value="1" />')
-        self.assertContains(response, '<input type="hidden" name="detalhe1" value="" />')
-        self.assertContains(response, '<input type="hidden" name="detalhe" value="" />')
+        self.assertContains(response, u'<form action="/patrimonio/relatorio/por_local/1" method="GET" id="id_form_recurso">')
+        self.assertContains(response, u'<input type="hidden" name="entidade" value="1" />')
+        self.assertContains(response, u'<input type="hidden" name="endereco" value="1" />')
+        self.assertContains(response, u'<input type="hidden" name="detalhe2" value="1" />')
+        self.assertContains(response, u'<input type="hidden" name="detalhe1" value="" />')
+        self.assertContains(response, u'<input type="hidden" name="detalhe" value="" />')
         
         # asssert dos botões de PDF
-        self.assertContains(response, 'name="acao" value="1"')
+        self.assertContains(response, u'name="acao" value="1"')
          
         # asssert dos dados do relatório
-        self.assertContains(response, '<h4 style="clear:both;">SAC - Dr. Ovidio, 215 - SAC - Dr. Ovidio, 215 - </h4>')
-        self.assertContains(response, '<td>PROC</td>')
-        self.assertContains(response, '<td>DELL</td>')
-        self.assertContains(response, '<td>MODEL001</td>')
-        self.assertContains(response, '<td>Ativo</td>')
+        self.assertContains(response, u'<h4 style="clear:both;">SAC - Dr. Ovidio, 215 - SAC - Dr. Ovidio, 215 - </h4>')
+        self.assertContains(response, u'<td>PROC</td>')
+        self.assertContains(response, u'<td>DELL</td>')
+        self.assertContains(response, u'<td>MODEL001</td>')
+        self.assertContains(response, u'<td>Ativo</td>')
 
     def test_view__por_local__sem_detalhe(self):
         """
@@ -809,25 +809,25 @@ class ViewTest(TestCase):
         self.assertTrue(200, response.status_code)
         
         # assert breadcrumb
-        self.assertContains(response, '<a href="/patrimonio/relatorio/por_local">Patrimônio por localização</a>')
+        self.assertContains(response, u'<a href="/patrimonio/relatorio/por_local">Patrimônio por localização</a>')
         
         # assert filtro
-        self.assertContains(response, '<form action="/patrimonio/relatorio/por_local/1" method="GET" id="id_form_recurso">')
-        self.assertContains(response, '<input type="hidden" name="entidade" value="1" />')
-        self.assertContains(response, '<input type="hidden" name="endereco" value="1" />')
-        self.assertContains(response, '<input type="hidden" name="detalhe2" value="" />')
-        self.assertContains(response, '<input type="hidden" name="detalhe1" value="" />')
-        self.assertContains(response, '<input type="hidden" name="detalhe" value="" />')
+        self.assertContains(response, u'<form action="/patrimonio/relatorio/por_local/1" method="GET" id="id_form_recurso">')
+        self.assertContains(response, u'<input type="hidden" name="entidade" value="1" />')
+        self.assertContains(response, u'<input type="hidden" name="endereco" value="1" />')
+        self.assertContains(response, u'<input type="hidden" name="detalhe2" value="" />')
+        self.assertContains(response, u'<input type="hidden" name="detalhe1" value="" />')
+        self.assertContains(response, u'<input type="hidden" name="detalhe" value="" />')
         
         # asssert dos botões de PDF
-        self.assertContains(response, 'name="acao" value="1"')
+        self.assertContains(response, u'name="acao" value="1"')
          
         # asssert dos dados do relatório
-        self.assertContains(response, '<h4 style="clear:both;">SAC - Dr. Ovidio, 215</h4>')
-        self.assertContains(response, '<td>PROC</td>')
-        self.assertContains(response, '<td>DELL</td>')
-        self.assertContains(response, '<td>MODEL001</td>')
-        self.assertContains(response, '<td>Ativo</td>')
+        self.assertContains(response, u'<h4 style="clear:both;">SAC - Dr. Ovidio, 215</h4>')
+        self.assertContains(response, u'<td>PROC</td>')
+        self.assertContains(response, u'<td>DELL</td>')
+        self.assertContains(response, u'<td>MODEL001</td>')
+        self.assertContains(response, u'<td>Ativo</td>')
         
     def test_view__por_local__pdf(self):
         """
@@ -855,12 +855,12 @@ class ViewTest(TestCase):
         self.assertTrue(200, response.status_code)
         
         # assert breadcrumb
-        self.assertContains(response, '<a href="/patrimonio/relatorio/por_local">Patrimônio por localização</a>')
+        self.assertContains(response, u'<a href="/patrimonio/relatorio/por_local">Patrimônio por localização</a>')
         
         # assert filtro
-        self.assertContains(response, '<option value="3">SAC</option>')
+        self.assertContains(response, u'<option value="3">SAC</option>')
         
-        self.assertNotContains(response, '<h4>') 
+        self.assertNotContains(response, u'<h4>') 
 
 
     def test_view__por_local_rack(self):
@@ -875,39 +875,39 @@ class ViewTest(TestCase):
         self.assertTrue(200, response.status_code)
         
         # assert breadcrumb
-        self.assertContains(response, '<a href="/patrimonio/relatorio/por_local_rack">Patrimônio por local e rack</a>')
+        self.assertContains(response, u'<a href="/patrimonio/relatorio/por_local_rack">Patrimônio por local e rack</a>')
         
         # assert filtro
-        self.assertContains(response, '<form action="/patrimonio/relatorio/por_local_rack/1" method="GET" id="id_form_recurso">')
-        self.assertContains(response, '<input type="hidden" name="entidade" value="1" />')
-        self.assertContains(response, '<input type="hidden" name="endereco" value="1" />')
-        self.assertContains(response, '<input type="hidden" name="detalhe" value="1" />')
-        self.assertContains(response, '<input type="hidden" name="com_fmusp" value="" />')
+        self.assertContains(response, u'<form action="/patrimonio/relatorio/por_local_rack/1" method="GET" id="id_form_recurso">')
+        self.assertContains(response, u'<input type="hidden" name="entidade" value="1" />')
+        self.assertContains(response, u'<input type="hidden" name="endereco" value="1" />')
+        self.assertContains(response, u'<input type="hidden" name="detalhe" value="1" />')
+        self.assertContains(response, u'<input type="hidden" name="com_fmusp" value="" />')
         
         # asssert dos botões de PDF
-        self.assertContains(response, 'name="acao" value="1"')
+        self.assertContains(response, u'name="acao" value="1"')
          
         # asssert dos dados do relatório
-        self.assertContains(response, 'SAC - Dr. Ovidio, 215')
-        self.assertContains(response, '<th>ID</th>')
-        self.assertContains(response, '<th>Tipo</th>')
-        self.assertContains(response, '<th>Modelo</th>')
-        self.assertContains(response, '<th>Part number</th>')
-        self.assertContains(response, '<th>NS</th>')
-        self.assertContains(response, '<th>Apelido</th>')
-        self.assertContains(response, '<th>Descrição</th>')
-        self.assertContains(response, '<th>Posição</th>')
-        self.assertContains(response, '<th>Estado</th>')
+        self.assertContains(response, u'SAC - Dr. Ovidio, 215')
+        self.assertContains(response, u'<th>ID</th>')
+        self.assertContains(response, u'<th>Tipo</th>')
+        self.assertContains(response, u'<th>Modelo</th>')
+        self.assertContains(response, u'<th>Part number</th>')
+        self.assertContains(response, u'<th>NS</th>')
+        self.assertContains(response, u'<th>Apelido</th>')
+        self.assertContains(response, u'<th>Descrição</th>')
+        self.assertContains(response, u'<th>Posição</th>')
+        self.assertContains(response, u'<th>Estado</th>')
         
-        self.assertContains(response, '<td><div class="level_btn"></div><a href="/admin/patrimonio/patrimonio/1/">1</a></td>')
-        self.assertContains(response, '<td class="clickable">Rack</td>')
-        self.assertContains(response, '<td class="clickable">MODEL001</td>')
-        self.assertContains(response, '<td class="clickable">PN001</td>')
-        self.assertContains(response, '<td class="clickable"></td>')
-        self.assertContains(response, '<td class="clickable"></td>')
-        self.assertContains(response, '<td class="clickable"> - </td>')
-        self.assertContains(response, '<td class="clickable">S042           </td>')
-        self.assertContains(response, '<td class="clickable">Ativo</td>')
+        self.assertContains(response, u'<td><div class="level_btn"></div><a href="/admin/patrimonio/patrimonio/1/">1</a></td>')
+        self.assertContains(response, u'<td class="clickable">Rack</td>')
+        self.assertContains(response, u'<td class="clickable">MODEL001</td>')
+        self.assertContains(response, u'<td class="clickable">PN001</td>')
+        self.assertContains(response, u'<td class="clickable"></td>')
+        self.assertContains(response, u'<td class="clickable"></td>')
+        self.assertContains(response, u'<td class="clickable"> - </td>')
+        self.assertContains(response, u'<td class="clickable">S042           </td>')
+        self.assertContains(response, u'<td class="clickable">Ativo</td>')
         
 
     def test_view__por_local_rack__sem_filtro(self):
@@ -922,13 +922,13 @@ class ViewTest(TestCase):
         self.assertTrue(200, response.status_code)
         
         # assert breadcrumb
-        self.assertContains(response, '<a href="/patrimonio/relatorio/por_local_rack">Patrimônio por local e rack</a>')
+        self.assertContains(response, u'<a href="/patrimonio/relatorio/por_local_rack">Patrimônio por local e rack</a>')
         
         # assert filtro
-        self.assertContains(response, 'select name="entidade" id="id_entidade"')
-        self.assertContains(response, '<option value="3">SAC</option>')
-        self.assertContains(response, 'select name="endereco" id="id_endereco"')
-        self.assertContains(response, 'select name="detalhe" id="id_detalhe"')
+        self.assertContains(response, u'select name="entidade" id="id_entidade"')
+        self.assertContains(response, u'<option value="3">SAC</option>')
+        self.assertContains(response, u'select name="endereco" id="id_endereco"')
+        self.assertContains(response, u'select name="detalhe" id="id_detalhe"')
 
 
     def test_view__por_local_rack__pdf(self):
@@ -957,42 +957,42 @@ class ViewTest(TestCase):
         self.assertTrue(200, response.status_code)
 
         # assert breadcrumb
-        self.assertContains(response, '<a href="/patrimonio/relatorio/por_local_termo">Patrimônio por localização (com Termo)</a>')
+        self.assertContains(response, u'<a href="/patrimonio/relatorio/por_local_termo">Patrimônio por localização (com Termo)</a>')
         
         # assert filtro
-        self.assertContains(response, '<input type="hidden" name="entidade" value="1" />')
-        self.assertContains(response, '<input type="hidden" name="endereco" value="1" />')
-        self.assertContains(response, '<input type="hidden" name="detalhe" value="1" />')
-        self.assertContains(response, '<input type="hidden" name="com_fmusp" value="" />')
-        self.assertContains(response, '<input type="hidden" name="nivel1" value="" />')
-        self.assertContains(response, '<input type="hidden" name="nivel2" value="" />')
-        self.assertContains(response, '<input type="hidden" name="nivel3" value="" />')
+        self.assertContains(response, u'<input type="hidden" name="entidade" value="1" />')
+        self.assertContains(response, u'<input type="hidden" name="endereco" value="1" />')
+        self.assertContains(response, u'<input type="hidden" name="detalhe" value="1" />')
+        self.assertContains(response, u'<input type="hidden" name="com_fmusp" value="" />')
+        self.assertContains(response, u'<input type="hidden" name="nivel1" value="" />')
+        self.assertContains(response, u'<input type="hidden" name="nivel2" value="" />')
+        self.assertContains(response, u'<input type="hidden" name="nivel3" value="" />')
 
         # asssert dos botões de PDF
-        self.assertContains(response, 'name="acao" value="1"')
+        self.assertContains(response, u'name="acao" value="1"')
          
         # asssert dos dados do relatório
-        self.assertContains(response, 'SAC - Dr. Ovidio, 215')
+        self.assertContains(response, u'SAC - Dr. Ovidio, 215')
         
-        self.assertContains(response, '<th>ID</th>')
-        self.assertContains(response, '<th>Processo</th>')
-        self.assertContains(response, '<th>Patr. Oficial</th>')
-        self.assertContains(response, '<th>NF</th>')
-        self.assertContains(response, '<th>Modelo</th>')
-        self.assertContains(response, '<th>Part number</th>')
-        self.assertContains(response, '<th>NS</th>')
-        self.assertContains(response, '<th>Apelido</th>')
-        self.assertContains(response, '<th>Descrição</th>')
-        self.assertContains(response, '<th>Posição</th>')
-        self.assertContains(response, '<th>Estado</th>')
+        self.assertContains(response, u'<th>ID</th>')
+        self.assertContains(response, u'<th>Processo</th>')
+        self.assertContains(response, u'<th>Patr. Oficial</th>')
+        self.assertContains(response, u'<th>NF</th>')
+        self.assertContains(response, u'<th>Modelo</th>')
+        self.assertContains(response, u'<th>Part number</th>')
+        self.assertContains(response, u'<th>NS</th>')
+        self.assertContains(response, u'<th>Apelido</th>')
+        self.assertContains(response, u'<th>Descrição</th>')
+        self.assertContains(response, u'<th>Posição</th>')
+        self.assertContains(response, u'<th>Estado</th>')
         
-        self.assertContains(response, '<td><div class="level_btn"></div><a href="/admin/patrimonio/patrimonio/1/">1</a></td>')
-        self.assertContains(response, '<td class="clickable">08/22222-2</td>')
-        self.assertContains(response, '<td class="clickable">MODEL001</td>')
-        self.assertContains(response, '<td class="clickable">PN001</td>')
-        self.assertContains(response, '<td class="clickable"> - </td>')
-        self.assertContains(response, '<td class="clickable">S042           </td>')
-        self.assertContains(response, '<td class="clickable">Ativo</td>')
+        self.assertContains(response, u'<td><div class="level_btn"></div><a href="/admin/patrimonio/patrimonio/1/">1</a></td>')
+        self.assertContains(response, u'<td class="clickable">08/22222-2</td>')
+        self.assertContains(response, u'<td class="clickable">MODEL001</td>')
+        self.assertContains(response, u'<td class="clickable">PN001</td>')
+        self.assertContains(response, u'<td class="clickable"> - </td>')
+        self.assertContains(response, u'<td class="clickable">S042           </td>')
+        self.assertContains(response, u'<td class="clickable">Ativo</td>')
 
 
     def test_view__por_local_termo__sem_filtro(self):
@@ -1007,18 +1007,18 @@ class ViewTest(TestCase):
         self.assertTrue(200, response.status_code)
         
         # assert breadcrumb
-        self.assertContains(response, '<a href="/patrimonio/relatorio/por_local_termo">Patrimônio por localização (com Termo)</a>')
+        self.assertContains(response, u'<a href="/patrimonio/relatorio/por_local_termo">Patrimônio por localização (com Termo)</a>')
 
         # assert filtro
-        self.assertContains(response, '<form method="GET">')
-        self.assertContains(response, '<select name="entidade" id="id_entidade"')
-        self.assertContains(response, '<option value="3">SAC</option>')
-        self.assertContains(response, '<select name="endereco" id="id_endereco"')
-        self.assertContains(response, '<select name="detalhe" id="id_detalhe"')
-        self.assertContains(response, '<input type="checkbox" name="com_fmusp"')
-        self.assertContains(response, '<input type="checkbox" name="nivel1"')
-        self.assertContains(response, '<input type="checkbox" name="nivel2"')
-        self.assertContains(response, '<input type="checkbox" name="nivel3"')
+        self.assertContains(response, u'<form method="GET">')
+        self.assertContains(response, u'<select name="entidade" id="id_entidade"')
+        self.assertContains(response, u'<option value="3">SAC</option>')
+        self.assertContains(response, u'<select name="endereco" id="id_endereco"')
+        self.assertContains(response, u'<select name="detalhe" id="id_detalhe"')
+        self.assertContains(response, u'<input type="checkbox" name="com_fmusp"')
+        self.assertContains(response, u'<input type="checkbox" name="nivel1"')
+        self.assertContains(response, u'<input type="checkbox" name="nivel2"')
+        self.assertContains(response, u'<input type="checkbox" name="nivel3"')
         
         
 
@@ -1052,68 +1052,68 @@ class ViewPermissionDeniedTest(TestCase):
     def test_por_estado(self):
         url = reverse("patrimonio.views.por_estado")
         response = self.client.get(url)
-        self.assertContains(response, '403 Forbidden', status_code=403)
+        self.assertContains(response, u'403 Forbidden', status_code=403)
         
 
     def test_por_tipo(self):
         url = reverse("patrimonio.views.por_tipo")
         response = self.client.get(url)
-        self.assertContains(response, '403 Forbidden', status_code=403)
+        self.assertContains(response, u'403 Forbidden', status_code=403)
         
     def test_por_marca(self):
         url = reverse("patrimonio.views.por_marca")
         response = self.client.get(url)
-        self.assertContains(response, '403 Forbidden', status_code=403)
+        self.assertContains(response, u'403 Forbidden', status_code=403)
         
     def test_por_local(self):
         url = reverse("patrimonio.views.por_local")
         response = self.client.get(url)
-        self.assertContains(response, '403 Forbidden', status_code=403)
+        self.assertContains(response, u'403 Forbidden', status_code=403)
         
     def test_por_local_rack(self):
         url = reverse("patrimonio.views.por_local_rack")
         response = self.client.get(url)
-        self.assertContains(response, '403 Forbidden', status_code=403)
+        self.assertContains(response, u'403 Forbidden', status_code=403)
         
     def test_por_local_termo(self):
         url = reverse("patrimonio.views.por_local_termo")
         response = self.client.get(url)
-        self.assertContains(response, '403 Forbidden', status_code=403)
+        self.assertContains(response, u'403 Forbidden', status_code=403)
         
     def test_por_tipo_equipamento(self):
         url = reverse("patrimonio.views.por_tipo_equipamento")
         response = self.client.get(url)
-        self.assertContains(response, '403 Forbidden', status_code=403)
+        self.assertContains(response, u'403 Forbidden', status_code=403)
         
     def test_por_termo(self):
         url = reverse("patrimonio.views.por_termo")
         response = self.client.get(url)
-        self.assertContains(response, '403 Forbidden', status_code=403)
+        self.assertContains(response, u'403 Forbidden', status_code=403)
         
     def test_racks(self):
         url = reverse("patrimonio.views.racks")
         response = self.client.get(url)
-        self.assertContains(response, '403 Forbidden', status_code=403)
+        self.assertContains(response, u'403 Forbidden', status_code=403)
         
     def test_relatorio_rack(self):
         url = reverse("patrimonio.views.relatorio_rack")
         response = self.client.get(url)
-        self.assertContains(response, '403 Forbidden', status_code=403)
+        self.assertContains(response, u'403 Forbidden', status_code=403)
         
     def test_presta_contas(self):
         url = reverse("patrimonio.views.presta_contas")
         response = self.client.get(url)
-        self.assertContains(response, '403 Forbidden', status_code=403)
+        self.assertContains(response, u'403 Forbidden', status_code=403)
         
     def test_por_tipo_equipamento2(self):
         url = reverse("patrimonio.views.por_tipo_equipamento2")
         response = self.client.get(url)
-        self.assertContains(response, '403 Forbidden', status_code=403)
+        self.assertContains(response, u'403 Forbidden', status_code=403)
         
     def test_planta_baixa_edit(self):
         url = reverse("patrimonio.views.planta_baixa_edit")
         response = self.client.get(url)
-        self.assertContains(response, '403 Forbidden', status_code=403)
+        self.assertContains(response, u'403 Forbidden', status_code=403)
         
     
     
@@ -1130,6 +1130,6 @@ class ViewParcialPermissionTest(TestCase):
     def test_por_estado(self):
         url = reverse("patrimonio.views.por_estado")
         response = self.client.get(url)
-        self.assertContains(response, 'breadcrumbs', status_code=200)
+        self.assertContains(response, u'breadcrumbs', status_code=200)
     
     
