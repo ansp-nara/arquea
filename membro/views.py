@@ -109,7 +109,7 @@ def mensal_func(request):
     if request.GET.get('ano'):
         meses = []
         funcionario = request.GET.get('funcionario')
-        membro = Membro.objects.get(id=funcionario)
+        membro = get_object_or_404(Membro,pk=funcionario)
         if request.user.is_superuser == False and  request.user.email != membro.email: 
             raise Http404
         

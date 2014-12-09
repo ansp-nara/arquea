@@ -49,7 +49,7 @@
   </script>
  <form method="GET">
     <select id="form_funcionario" name="funcionario" onchange="mudar_funcionario();">
-       <option>---</option>
+       <option value="-1">---</option>
        {% for func in funcionarios %}
        <option value="{{ func.funcionario.id }}">{{ func.funcionario.nome }}</option>
        {% endfor %}
