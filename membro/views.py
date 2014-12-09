@@ -116,7 +116,10 @@ def mensal_func(request):
         ano = request.GET.get('ano')
         mes = request.GET.get('mes')
         
-        c = Controle.objects.filter(membro=funcionario)[:1].get()
+        try:
+            c = Controle.objects.filter(membro=funcionario)[:1].get()
+        except Controle.DoesNotExist:
+            raise Http404
 
         # Contagem de total geral do funcionario
         total_meses = c.total_analitico_horas(0, 0)
