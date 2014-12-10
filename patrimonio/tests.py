@@ -1155,7 +1155,6 @@ class ViewTest(TestCase):
         self.setUpPatrimonio()
         url = reverse("patrimonio.views.ajax_abre_arvore_tipo")
         response = self.client.get(url, {"id":"1", "model":"tipoequipamento"})
-        print response.content
         
         self.assertTrue(200, response.status_code)
         
@@ -1174,7 +1173,6 @@ class ViewTest(TestCase):
         self.setUpPatrimonio()
         url = reverse("patrimonio.views.ajax_abre_arvore_tipo")
         response = self.client.get(url, {"id":"1", "model":"equipamento"})
-        print response.content
         
         self.assertTrue(200, response.status_code)
         
@@ -1194,9 +1192,124 @@ class ViewTest(TestCase):
         self.assertContains(response, u'>PN001<')
         self.assertContains(response, u'>Ativo<')
 
+
+    def test_view__ajax_abre_arvore_tipo__sem_id(self):
+        """
+        View de relatório de patrimonio por tipo de equipamento (com abertura de jstree).
+         
+        """
+        self.setUpPatrimonio()
+        url = reverse("patrimonio.views.ajax_abre_arvore_tipo")
+        response = self.client.get(url)
+        
+        self.assertTrue(200, response.status_code)
+        
+        # asssert dos dados do relatório
+        self.assertContains(response, u'"data": "Rack')
+        self.assertContains(response, u'"id": "tipoequipamento-1"')
+        self.assertContains(response, u'"o_model": "tipoequipamento"') 
+        self.assertContains(response, u'"o_id": 1')
+
+
+    def test_view__por_tipo_equipamento__sem_filtro(self):
+        """
+        View de relatório técnico de patrimonio por tipo de equipamento.
+         
+        """
+        self.setUpPatrimonio()
+        url = reverse("patrimonio.views.por_tipo_equipamento")
+        response = self.client.get(url)
+        
+        # assert breadcrumb
+        self.assertContains(response, u'<a href="/patrimonio/relatorio/por_tipo_equipamento">Inventário por tipo de equipamento</a>')
+        
+        # assert filtro
+        self.assertContains(response, u'<select name="tipo" id="id_tipo" onchange="sel_tipo_equip()">')
+        self.assertContains(response, u'<option value="1">Rack</option>')
+        self.assertContains(response, u'<select name="estado" id="id_estado">')
+        self.assertContains(response, u'<option value="1">Ativo</option>')
+        self.assertContains(response, u'<select name="partnumber" id="id_partnumber">')
+        self.assertContains(response, u'<option value="PN001">PN001</option>')
+        
+            
+
+    def test_view__por_tipo_equipamento(self):
+        """
+        View de relatório técnico de patrimonio por tipo de equipamento.
+         
+        """
+        self.setUpPatrimonio()
+        url = reverse("patrimonio.views.por_tipo_equipamento")
+        response = self.client.get(url, {'tipo': '1','estado': '1', 'partnumber': 'PN001'})
+        
+        self.assertTrue(200, response.status_code)
+
+        # assert breadcrumb
+        self.assertContains(response, u'<a href="/patrimonio/relatorio/por_tipo_equipamento">Inventário por tipo de equipamento</a>')
         
 
+        # asssert dos dados do relatório
+        self.assertContains(response, u'<h1 repeat="1">Inventário por tipo de equipamento</h1>')
+        self.assertContains(response, u'<h4>Tipo Rack</h4>')
+
+        self.assertContains(response, u'<th>Entidade</th>')
+        self.assertContains(response, u'<th>Local</th>')
+        self.assertContains(response, u'<th>Posição</th>')
+        self.assertContains(response, u'<th>Marca</th>')
+        self.assertContains(response, u'<th>Modelo</th>')
+        self.assertContains(response, u'<th>Part number</th>')
+        self.assertContains(response, u'<th>Descrição</th>')
+        self.assertContains(response, u'<th>NS</th>')
+        self.assertContains(response, u'<th>Estado</th>')
+    
+        self.assertContains(response, u'<td>SAC</td>')
+        self.assertContains(response, u'<td>S042</td>')
+        self.assertContains(response, u'<td>DELL</td>')
+        self.assertContains(response, u'<td>MODEL001</td>')
+        self.assertContains(response, u'<td>PN001</td>')
+        self.assertContains(response, u'<td><a href="/admin/patrimonio/patrimonio/1/"></a></td>')
+        self.assertContains(response, u'<td>Ativo</td></tr>')
+    
+    
+    def test_view__por_tipo_equipamento__filtro_todos_tipos(self):
+        """
+        View de relatório técnico de patrimonio por tipo de equipamento.
+         
+        """
+        self.setUpPatrimonio()
+        url = reverse("patrimonio.views.por_tipo_equipamento")
+        response = self.client.get(url, {'tipo': '0','estado': '1', 'partnumber': 'PN001'})
         
+        self.assertTrue(200, response.status_code)
+
+        # assert breadcrumb
+        self.assertContains(response, u'<a href="/patrimonio/relatorio/por_tipo_equipamento">Inventário por tipo de equipamento</a>')
+        
+
+        # asssert dos dados do relatório
+        self.assertContains(response, u'<h1 repeat="1">Inventário por tipo de equipamento</h1>')
+        self.assertContains(response, u'<h4>Tipo todos</h4>')
+
+        self.assertContains(response, u'<th>Entidade</th>')
+        self.assertContains(response, u'<th>Local</th>')
+        self.assertContains(response, u'<th>Posição</th>')
+        self.assertContains(response, u'<th>Marca</th>')
+        self.assertContains(response, u'<th>Modelo</th>')
+        self.assertContains(response, u'<th>Part number</th>')
+        self.assertContains(response, u'<th>Descrição</th>')
+        self.assertContains(response, u'<th>NS</th>')
+        self.assertContains(response, u'<th>Estado</th>')
+    
+        self.assertContains(response, u'<td>SAC</td>')
+        self.assertContains(response, u'<td>S042</td>')
+        self.assertContains(response, u'<td>DELL</td>')
+        self.assertContains(response, u'<td>MODEL001</td>')
+        self.assertContains(response, u'<td>PN001</td>')
+        self.assertContains(response, u'<td><a href="/admin/patrimonio/patrimonio/1/"></a></td>')
+        self.assertContains(response, u'<td>Ativo</td></tr>')
+    
+    
+    
 
 class ViewPermissionDeniedTest(TestCase):
     """

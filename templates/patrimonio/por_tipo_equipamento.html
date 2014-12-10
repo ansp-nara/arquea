@@ -18,7 +18,17 @@
     <h4>Tipo {{ tipo }}</h4>
  
     <table border="0" repeat="1" cellpadding="5">
-    <tr><th>Entidade</th><th>Local</th><th>Posição</th><th>Marca</th><th>Modelo</th><th>Part number</th><th>Descrição</th><th>NS</th><th>Estado</th></tr>
+    <tr>
+    	<th>Entidade</th>
+    	<th>Local</th>
+    	<th>Posição</th>
+    	<th>Marca</th>
+    	<th>Modelo</th>
+    	<th>Part number</th>
+    	<th>Descrição</th>
+    	<th>NS</th>
+    	<th>Estado</th>
+    </tr>
     {% for e in entidades %}
         <tr {% if not e.patrimonio %}style="font-weight:bold;"{% endif %}>
             <td>{{ e.entidade }}</td>
