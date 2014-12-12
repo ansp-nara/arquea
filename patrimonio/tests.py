@@ -1310,7 +1310,60 @@ class ViewTest(TestCase):
     
     
     
+    def test_view__por_termo__sem_filtro(self):
+        """
+        View de relatório administrativo de patrimônio por termo de outorga.
+         
+        """
+        self.setUpPatrimonio()
+        url = reverse("patrimonio.views.por_termo")
+        response = self.client.get(url)
+        
+        # assert breadcrumb
+        self.assertContains(response, u'<a href="/patrimonio/relatorio/por_termo">Patrimônio por termo de outorga</a>')
+        
+        # assert filtro
+        self.assertContains(response, u'<select name="termo" id="id_termo">')
+        self.assertContains(response, u'<option value="1">08/22222-2</option>')
+        self.assertContains(response, u'<select name="marca" id="id_marca" multiple size=7>')
+        self.assertContains(response, u'<select name="modalidade" id="id_modalidade">')
+        self.assertContains(response, u'<select name="agilis" id="id_agilis">')
+        self.assertContains(response, u'<select name="doado" id="id_doado">')
+        self.assertContains(response, u'<select name="localizado" id="id_localizado">')
+        self.assertContains(response, u'<select name="numero_fmusp" id="id_numero_fmusp">')
+        self.assertContains(response, u'<label for="id_ver_numero_fmusp">Apresenta patrimônio oficial no relatório</label>')
+            
 
+    def test_view__por_termo(self):
+        """
+        View de relatório técnico de patrimonio por tipo de equipamento.
+         
+        """
+        self.setUpPatrimonio()
+        url = reverse("patrimonio.views.por_termo")
+        response = self.client.get(url, {'tipo': '1','estado': '1', 'partnumber': 'PN001'})
+        
+        self.assertTrue(200, response.status_code)
+
+        print response.content
+        
+        # assert breadcrumb
+        self.assertContains(response, u'<a href="/patrimonio/relatorio/por_termo">Patrimônio por termo de outorga</a>')
+        
+        # asssert dos dados do relatório
+        self.assertContains(response, u'<a href="/patrimonio/relatorio/por_termo">Patrimônio por termo de outorga</a>')
+        self.assertContains(response, u'<select name="termo" id="id_termo"')
+        self.assertContains(response, u'<option value="1">08/22222-2</option>')
+        self.assertContains(response, u'<select name="marca" id="id_marca"')
+        self.assertContains(response, u'<select name="modalidade" id="id_modalidade"')
+        self.assertContains(response, u'<select name="agilis" id="id_agilis"')
+        self.assertContains(response, u'<select name="doado" id="id_doado"')
+        self.assertContains(response, u'<select name="localizado" id="id_localizado"')
+        self.assertContains(response, u'<select name="numero_fmusp" id="id_numero_fmusp"')
+        self.assertContains(response, u'<input type="checkbox" name="ver_numero_fmusp" id="id_ver_numero_fmusp"')
+    
+    
+    
 class ViewPermissionDeniedTest(TestCase):
     """
     Teste das permissões das views. Utilizando um usuário sem permissão de superusuário.
