@@ -3,7 +3,7 @@ from operator import itemgetter, attrgetter
 from django.contrib import admin
 from django.contrib.auth.decorators import permission_required, login_required
 from django.core.urlresolvers import reverse
-from django.db.models import Max, Q, F, Prefetch
+from django.db.models import Max, Q, F, Prefetch, Count
 from django.db import transaction
 from django.http import Http404, HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404
@@ -921,12 +921,13 @@ def por_termo(request, pdf=0):
     template_name = 'por_termo'
 
     # Se não tiver Termo selecionado, volta para a tela de seleção de filtros.
-    filtro_patrimonios = Patrimonio.objects.filter(pagamento__protocolo__termo_id=termo_id, equipamento__entidade_fabricante__isnull=False) \
-                                            .only('equipamento__entidade_fabricante') \
+    ids_fabricantes_de_patrimonios = Patrimonio.objects.filter(pagamento__protocolo__termo_id=termo_id, equipamento__entidade_fabricante__isnull=False) \
+                                            .values_list('equipamento__entidade_fabricante__id') \
                                             .select_related('equipamento__entidade_fabricante') \
-                                            .order_by('equipamento__entidade_fabricante__sigla') \
-                                            .distinct('equipamento__entidade_fabricante__sigla')
-    filtro_marcas = [p.equipamento.entidade_fabricante for p in filtro_patrimonios]
+                                            .order_by('equipamento__entidade_fabricante__sigla')
+    
+    filtro_marcas = Entidade.objects.filter(id__in = ids_fabricantes_de_patrimonios)
+    
     filtro_termos = Termo.objects.all()
     if termo_id is None:
         return TemplateResponse(request, 'patrimonio/escolhe_termo.html', {'filtro_termos':filtro_termos, 'filtro_marcas':filtro_marcas})
