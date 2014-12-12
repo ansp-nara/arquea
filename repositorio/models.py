@@ -13,7 +13,7 @@ class Tipo(models.Model):
 	nome = models.CharField(max_length=50)
 	
 	def __unicode__(self):
-		return '%s' % self.nome
+		return '%s - %s' % (self.entidade, self.nome)
 	
 	class Meta:
 		ordering = ('nome',)
