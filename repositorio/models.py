@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 
+
 # Create your models here.
 
 class Tipo(models.Model):
 	"""
 	Tipo de ocorrência
 	"""
-	
+
+	entidade = models.ForeignKey('identificacao.Entidade')
 	nome = models.CharField(max_length=50)
 	
 	def __unicode__(self):
