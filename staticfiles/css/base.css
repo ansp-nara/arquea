@@ -364,6 +364,10 @@ table.orderable-initalized .order-cell, body>tr>td.order-cell {
 }
 
 /* FORM DEFAULTS */
+/**
+Campos auxiliares
+*/
+.auxiliary { background-color: yellow; }
 
 input, textarea, select, .form-row p {
     margin: 2px 0;
@@ -1404,3 +1408,6 @@ Modulo do patrimonio
  
  
 }
+
+
+
