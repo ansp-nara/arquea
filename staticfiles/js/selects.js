@@ -1014,6 +1014,10 @@ function ajax_filter_equipamento(num_doc, id_patrimonio, id_equipamento)
 function ajax_filter_patrimonio(num_doc)
 {
        p_id = "#id_patrimonio";
+       if($(p_id).length == 0) {
+           p_id = "#id_patrimonios";
+       }
+       
        $(p_id).html('Carregando...');
        $.ajax({
            type: "GET",
@@ -1021,6 +1025,7 @@ function ajax_filter_patrimonio(num_doc)
            dataType: "json",
            data: {'num_doc':num_doc},
            success: function(retorno) {
+        	   
               $(p_id).empty();
               $(p_id).append('<option value="">-----</option>');
               $.each(retorno, function(i, item){
