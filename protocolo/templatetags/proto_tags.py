@@ -58,6 +58,9 @@ def lista_relatorios(context):
     verificacoes = []
     
     user = context['user']
+
+    if user.is_superuser or user.has_perm('financeiro.rel_adm_repositorio'):
+        administrativos.append({'url':'/repositorio/relatorio/repositorio', 'nome':u'Repositório'})
     
     if user.is_superuser or user.has_perm('financeiro.rel_adm_pagamentos_mes'):
         administrativos.append({'url':'/financeiro/relatorios/pagamentos_mes', 'nome':u'Pagamentos por mês'})

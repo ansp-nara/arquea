@@ -1317,3 +1317,27 @@ function retira_termino(inicio)
         }
     });
 }
+
+
+//Ajax para o relatório de repositorios.
+//Retorna os nomes dos Tipos de repositórios, dado a entidade do Tipo como filtro.
+function ajax_repositorio_tipo_nomes(id_entidade)
+{
+    p_id = "#id_entidade";
+    $.ajax({
+        type: "GET",
+        url: "/repositorio/ajax_repositorio_tipo_nomes",
+        dataType: "json",
+        data: {'id_entidade': id_entidade},
+        success: function(retorno) {
+           $("#id_nome").empty();
+           $("#id_nome").append('<option value="" selected>Todos</option>');
+           $.each(retorno, function(i, item){
+               $("#id_nome").append('<option value="'+item+'">'+item+'</option>');
+           });
+        },
+        error: function(erro) {
+           alert('Erro: Sem retorno de requisição.');
+        }
+    });
+}
