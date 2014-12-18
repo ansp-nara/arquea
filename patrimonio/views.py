@@ -1,19 +1,18 @@
 # -*- coding: utf-8 -*-
-from operator import itemgetter, attrgetter
+from operator import itemgetter
 from django.contrib import admin
 from django.contrib.auth.decorators import permission_required, login_required
 from django.core.urlresolvers import reverse
-from django.db.models import Max, Q, F, Prefetch, Count
+from django.db.models import Q, F, Prefetch
 from django.db import transaction
-from django.http import Http404, HttpResponse
+from django.http import HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.template.response import TemplateResponse
-from django.views.decorators.http import require_safe, require_POST
+from django.views.decorators.http import require_safe
 
-from utils.functions import render_to_pdf, render_wk_to_pdf, render_to_pdf_weasy
+from utils.functions import render_wk_to_pdf, render_to_pdf_weasy
 import json
-import csv
 import itertools
 import datetime
 import logging
@@ -1244,7 +1243,7 @@ def relatorio_rack(request):
     if p_dc:
         patrimonio_racks = PatrimonioRack.get_racks_as_list(p_dc)
 
-    dcs = __rack_data(p_dc, p_rack)
+    dcs = _rack_data(p_dc, p_rack)
     
     if request.GET.get('pdf') == "2":
         return render_wk_to_pdf('patrimonio/relatorio-racks-wk.pdf', {'dcs':dcs, 'todos_dcs':todos_dcs, 'patrimonio_racks':patrimonio_racks}, request=request, filename='diagrama_de_racks.pdf',)

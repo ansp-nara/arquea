@@ -1345,8 +1345,6 @@ class ViewTest(TestCase):
         
         self.assertTrue(200, response.status_code)
 
-        print response.content
-        
         # assert breadcrumb
         self.assertContains(response, u'<a href="/patrimonio/relatorio/por_termo">Patrimônio por termo de outorga</a>')
         
@@ -1361,7 +1359,6 @@ class ViewTest(TestCase):
         self.assertContains(response, u'<select name="localizado" id="id_localizado"')
         self.assertContains(response, u'<select name="numero_fmusp" id="id_numero_fmusp"')
         self.assertContains(response, u'<input type="checkbox" name="ver_numero_fmusp" id="id_ver_numero_fmusp"')
-    
     
     
 class ViewPermissionDeniedTest(TestCase):

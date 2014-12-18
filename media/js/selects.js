@@ -715,6 +715,13 @@ function ajax_filter_financeiro(termo_id)
        });
 }
 
+
+/**
+ * Utilizado no form de Patrimonio - Histórico Local
+ * para buscar dados de endereço a partir da escolha de uma entidade.
+ * 
+ * @param id_field
+ */
 function ajax_select_endereco(id_field)
 {
        
