@@ -106,7 +106,7 @@ class Repositorio(models.Model):
 		n = Repositorio.objects.filter(data__year=agora.year).aggregate(Max('numero'))
 		n = n['numero__max'] or 0
 		return n + 1 
-    
+
 	def save(self, *args, **kwargs):
 		if self.id is None:
 			self.numero = self.proximo_numero()
