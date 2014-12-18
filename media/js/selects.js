@@ -116,7 +116,7 @@ function ajax_soma_valores(url, objHtmlReturn, select)
 
     dados = {'despesas':d};
     $.ajax({
-      type: "POST",
+      type: "GET",
       url: url,
       dataType: "json",
       data: dados,
@@ -148,7 +148,7 @@ function ajax_soma_valor_descricao(url, total, descricao, select)
 
     dados = {'despesas':d};
     $.ajax({
-      type: "POST",
+      type: "GET",
       url: url,
       dataType: "json",
       data: dados,
@@ -171,7 +171,7 @@ function ajax_gera_despesas_internas(url, objHtmlReturn, pagina, select, auditor
     $("#"+objHtmlReturn).html('<select multiple>');
     $("#"+objHtmlReturn).html('<option value="">Carregando...</option>');
     $.ajax({
-      type: "POST",
+      type: "GET",
       url: url,
       dataType: "json",
       data: dados,
@@ -184,7 +184,7 @@ function ajax_gera_despesas_internas(url, objHtmlReturn, pagina, select, auditor
           $("#"+pagina).val(retorno['pag']);
       },
       error: function(erro) {
-        alert('Erro. Sem retorno da requisicao.');
+        alert('ajax_gera_despesas_internas Erro. Sem retorno da requisicao.');
       }
     });
     $("#"+objHtmlReturn).html('</select>');
@@ -202,7 +202,7 @@ function ajax_gera_despesas_fapesp(url, objHtmlReturn, parcial, pagina, select, 
     $("#"+objHtmlReturn).html('<select multiple>');
     $("#"+objHtmlReturn).html('<option value="">Carregando...</option>');
     $.ajax({
-      type: "POST",
+      type: "GET",
       url: url,
       dataType: "json",
       data: dados,
@@ -231,7 +231,7 @@ function ajax_proxima_parcial(url, parcial, pagina, select)
 
     dados = {'fontepagadora': id};
     $.ajax({
-      type: "POST",
+      type: "GET",
       url: url,
       dataType: "json",
       data: dados,
@@ -253,7 +253,7 @@ function ajax_filter(url, objHtmlReturn, id)
 //    $("#"+objHtmlReturn).html('<option value="0">Carregando...</option>');
     $("#"+objHtmlReturn).html('<option value="">Carregando...</option>');
     $.ajax({
-      type: "POST",
+      type: "GET",
       url: url,
       dataType: "json",
       data: dados,
@@ -265,7 +265,7 @@ function ajax_filter(url, objHtmlReturn, id)
           });
       },
       error: function(erro) {
-        alert('Erro. Sem retorno da requisicao.');
+        alert('ajax_filter Erro. Sem retorno da requisicao.');
       }
   });
 }
@@ -280,7 +280,7 @@ function ajax_filter2(url, objHtmlReturn, id, objHtmlPrevious)
 //    $("#"+objHtmlReturn).html('<option value="0">Carregando...</option>');
     $("#"+objHtmlReturn).html('<option value="">Carregando...</option>');
     $.ajax({
-      type: "POST",
+      type: "GET",
       url: url,
       dataType: "json",
       data: dados,
@@ -293,7 +293,7 @@ function ajax_filter2(url, objHtmlReturn, id, objHtmlPrevious)
           });
       },
       error: function(erro) {
-        alert('Erro. Sem retorno da requisicao.');
+        alert('ajax_filter2 Erro. Sem retorno da requisicao.');
       }
   });
 }
@@ -307,7 +307,7 @@ function ajax_seleciona_extrato(url, objHtmlReturn, id, previous)
 
     $("#"+objHtmlReturn).html('<option value="">Carregando...</option>');
     $.ajax({
-      type: "POST",
+      type: "GET",
       url: url,
       dataType: "json",
       data: dados,
@@ -319,7 +319,7 @@ function ajax_seleciona_extrato(url, objHtmlReturn, id, previous)
           });
       },
       error: function(erro) {
-        alert('Erro. Sem retorno da requisicao.');
+        alert('ajax_seleciona_extrato Erro. Sem retorno da requisicao.');
       }
   });
 }
@@ -341,7 +341,7 @@ function ajax_filter_inline(url, id, name)
     $("#"+item_outorga).html('<option value="">Carregando...</option>');
 
     $.ajax({
-      type: "POST",
+      type: "GET",
       url: url,
       dataType: "json",
       data: dados,
@@ -354,7 +354,7 @@ function ajax_filter_inline(url, id, name)
           });
       },
       error: function(erro) {
-        alert('Erro. Sem retorno da requisicao.');
+        alert('ajax_filter_inline Erro. Sem retorno da requisicao.');
       }
   });
 }
@@ -379,7 +379,7 @@ function ajax_filter_item_natureza(url, termo, item_anterior, natureza, id, name
     $("#"+natureza).html('<option value="">Carregando...</option>');
 
     $.ajax({
-      type: "POST",
+      type: "GET",
       url: url,
       dataType: "json",
       data: dados,
@@ -399,7 +399,7 @@ function ajax_filter_item_natureza(url, termo, item_anterior, natureza, id, name
           });
       },
       error: function(erro) {
-        alert('Erro. Sem retorno da requisicao.');
+        alert('ajax_filter_item_natureza Erro. Sem retorno da requisicao.');
       }
   });
 }
@@ -427,7 +427,7 @@ function ajax_filter_mod_item_natureza(url, modalidade, item_anterior, natureza,
 
 
     $.ajax({
-      type: "POST",
+      type: "GET",
       url: url,
       dataType: "json",
       data: dados,
@@ -455,7 +455,7 @@ function ajax_filter_mod_item_natureza(url, modalidade, item_anterior, natureza,
       },
       
       error: function(erro) {
-        alert('Erro. Sem retorno da requisicao.');
+        alert('ajax_filter_mod_item_natureza Erro. Sem retorno da requisicao.');
       }
   });
 
@@ -480,7 +480,7 @@ function ajax_filter_modalidade_item_inline(url, id, name)
 
 
     $.ajax({
-      type: "POST",
+      type: "GET",
       url: url,
       dataType: "json",
       data: dados,
@@ -500,7 +500,7 @@ function ajax_filter_modalidade_item_inline(url, id, name)
           });
       },
       error: function(erro) {
-        alert('Erro. Sem retorno da requisicao.');
+        alert('ajax_filter_modalidade_item_inline Erro. Sem retorno da requisicao.');
       }
   });
 }
@@ -517,7 +517,7 @@ function ajax_filter_termo_natureza(url, natureza, id, name)
     $("#"+natureza).html('<option value="">Carregando...</option>');
 
     $.ajax({
-      type: "POST",
+      type: "GET",
       url: url,
       dataType: "json",
       data: dados,
@@ -530,7 +530,7 @@ function ajax_filter_termo_natureza(url, natureza, id, name)
       },
       
       error: function(erro) {
-        alert('Erro. Sem retorno da requisicao.');
+        alert('ajax_filter_termo_natureza Erro. Sem retorno da requisicao.');
       }
   });
 
@@ -547,7 +547,7 @@ function ajax_filtra_item(url, item_pedido, modalidade, termo, select)
     $("#"+modalidade).html('<option value="">Carregando...</option>');
 
     $.ajax({
-      type: "POST",
+      type: "GET",
       url: url,
       dataType: "json",
       data: dados,
@@ -570,7 +570,7 @@ function ajax_filtra_item(url, item_pedido, modalidade, termo, select)
 
       },
       error: function(erro) {
-        alert('Erro: Sem retorno da requisição.');
+        alert('ajax_filtra_item Erro: Sem retorno da requisição.');
       }
   });
 }
@@ -589,7 +589,7 @@ function ajax_filter_origem_protocolo(termo_campo, termo)
       $(nomes+"origem_fapesp").html('<option value="">Carregando...</option>');
 
       $.ajax({
-	  type: "POST",
+	  type: "GET",
 	  url: "/financeiro/pagamento_termo",
 	  dataType: "json",
 	  data: {'termo_id':termo},
@@ -606,12 +606,12 @@ function ajax_filter_origem_protocolo(termo_campo, termo)
 	      });
 	  },
 	  error: function(erro) {
-	    alert('Erro: Sem retorno da requisição.');
+	    alert('ajax_filter_origem_protocolo Erro: Sem retorno da requisição.');
 	  }
       });
 /*      if (!$("#id_auditoria_set-0-pagina").val()){
        $.ajax({
-	  type: "POST",
+	  type: "GET",
 	  url: "/financeiro/parcial_pagina_termo",
 	  dataType: "json",
 	  data: {'termo_id':termo},
@@ -632,7 +632,7 @@ function ajax_filter_protocolo_numero(numero)
       termo = $("#id_termo").val()
 
       $.ajax({
-	  type: "POST",
+	  type: "GET",
 	  url: "/financeiro/pagamento_numero",
 	  dataType: "json",
 	  data: {'termo_id':termo, 'numero':numero},
@@ -644,7 +644,7 @@ function ajax_filter_protocolo_numero(numero)
 	      });
 	  },
 	  error: function(erro) {
-	    alert('Erro: Sem retorno da requisição.');
+	    alert('ajax_filter_protocolo_numero Erro: Sem retorno da requisição.');
 	  }
       });
 }
@@ -654,7 +654,7 @@ function ajax_filter_cc_cod(codigo)
       $("#id_conta_corrente").html('<option value="">Carregando...</option>');
 
       $.ajax({
-      	  type: "POST",
+      	  type: "GET",
 	  url: "/financeiro/pagamento_cc",
 	  dataType: "json",
 	  data: {'codigo':codigo},
@@ -666,7 +666,7 @@ function ajax_filter_cc_cod(codigo)
 	      });
 	  },
 	  error: function(erro) {
-	     alert('Erro: Sem retorno de requisição.');
+	     alert('ajax_filter_cc_cod Erro: Sem retorno de requisição.');
 	  }
        });
 }
@@ -676,7 +676,7 @@ function ajax_filter_pagamentos(url, numero)
       $("#id_pagamento").html('<option value="">Carregando...</option>');
       termo = $("#id_termo").val()
       $.ajax({
-      	  type: "POST",
+      	  type: "GET",
 	  url: url,
 	  dataType: "json",
 	  data: {'numero':numero, 'termo':termo},
@@ -688,7 +688,7 @@ function ajax_filter_pagamentos(url, numero)
 	      });
 	  },
 	  error: function(erro) {
-	     alert('Erro: Sem retorno de requisição.');
+	     alert('ajax_filter_pagamentos Erro: Sem retorno de requisição.');
 	  }
        });
 	
@@ -698,7 +698,7 @@ function ajax_filter_financeiro(termo_id)
 {
        $("#id_extrato_financeiro").html('<option value="">Carregando...</option>');
        $.ajax({
-       	   type: "POST",
+       	   type: "GET",
 	   url: "/financeiro/sel_extrato",
 	   dataType: "json",
 	   data: {'termo':termo_id},
@@ -710,18 +710,11 @@ function ajax_filter_financeiro(termo_id)
 		});
 	   },
            error: function(erro) {
-              alert('Erro: Sem retorno de requisição.');
+              alert('ajax_filter_financeiro Erro: Sem retorno de requisição.');
            }
        });
 }
 
-
-/**
- * Utilizado no form de Patrimonio - Histórico Local
- * para buscar dados de endereço a partir da escolha de uma entidade.
- * 
- * @param id_field
- */
 function ajax_select_endereco(id_field)
 {
        
@@ -742,7 +735,7 @@ function ajax_select_endereco(id_field)
 		});	   
 	   },
 	   error: function(erro) {
-	      alert('Erro: Sem retorno de requisição.');
+	      alert('ajax_select_endereco Erro: Sem retorno de requisição.');
 	   }
        });
 }
@@ -753,7 +746,7 @@ function ajax_select_endereco2()
        e_id = "#id_endereco";
        $(e_id).html('<option value="">Carregando...</option>');
        $.ajax({
-           type: "POST",
+           type: "GET",
            url: "/identificacao/escolhe_entidade",
            dataType: "json",
            data: {'entidade':entidade},
@@ -765,33 +758,33 @@ function ajax_select_endereco2()
                 });
            },
            error: function(erro) {
-              alert('Erro: Sem retorno de requisição.');
+              alert('ajax_select_endereco2 Erro: Sem retorno de requisição.');
            }
        });
 
 }
 
 
-function ajax_patrimonio_existente(pn)
-{
-       $.ajax({
-           type: "GET",
-	   url: "/patrimonio/patrimonio_existente",
-	   dataType: "json",
-	   data: {'part_number':pn},
-	   success: function(retorno) {
-	      if (retorno.marca) {
-	         $("#id_marca").val(retorno.marca);
-	         $("#id_modelo").val(retorno.modelo);
-	         $("#id_descricao").val(retorno.descricao);
-	         $("#id_procedencia").val(retorno.procedencia);
-	      }
-	   },
-	   error: function(erro) {
-	      alert('Erro: Sem retonro de requisição.');
-	   }
-       });
-}
+//function ajax_patrimonio_existente(pn)
+//{
+//       $.ajax({
+//           type: "GET",
+//	   url: "/patrimonio/patrimonio_existente",
+//	   dataType: "json",
+//	   data: {'part_number':pn},
+//	   success: function(retorno) {
+//	      if (retorno.marca) {
+//	         $("#id_marca").val(retorno.marca);
+//	         $("#id_modelo").val(retorno.modelo);
+//	         $("#id_descricao").val(retorno.descricao);
+//	         $("#id_procedencia").val(retorno.procedencia);
+//	      }
+//	   },
+//	   error: function(erro) {
+//	      alert('ajax_patrimonio_existente Erro: Sem retonro de requisição.');
+//	   }
+//       });
+//}
 
 
 function ajax_filter_enderecos(id_ent) {
@@ -799,7 +792,7 @@ function ajax_filter_enderecos(id_ent) {
      $("#id_endereco").html('<option value="0">Carregando...</option>');
 
      $.ajax({
-       type: "POST",
+       type: "GET",
        url: "/identificacao/escolhe_entidade_filhos",
        dataType: "json",
        data: {'entidade': ent_id},
@@ -829,7 +822,7 @@ function ajax_filter_locais() {
      $("#id_detalhe").html('<option value="0">Carregando...</option>');
 
      $.ajax({
-       type: "POST",
+       type: "GET",
        url: "/identificacao/escolhe_endereco",
        dataType: "json",
        data: {'endereco': end_id},
@@ -843,24 +836,24 @@ function ajax_filter_locais() {
      });
 }
 
-function ajax_filter_nivel(nivel, ed_id) {
-     $("#id_detalhe_"+nivel).html('<option value="0">Carregando</option>');
-
-     $.ajax({
-       type: "GET",
-       url: "/patrimonio/escolhe_detalhe",
-       dataType: "json",
-       data: {'detalhe': ed_id},
-       success: function(retorno){
-          $("#id_detalhe_"+nivel).empty();
-          $("#id_detalhe_"+nivel).append('<option value="">------------</option>');
-          $.each(retorno, function(i, item){
-              $("#id_detalhe_"+nivel).append('<option value="'+item.pk+'">'+item.valor+'</option>');
-          });
-
-       },
-     });
-}
+//function ajax_filter_nivel(nivel, ed_id) {
+//     $("#id_detalhe_"+nivel).html('<option value="0">Carregando</option>');
+//
+//     $.ajax({
+//       type: "GET",
+//       url: "/patrimonio/escolhe_detalhe",
+//       dataType: "json",
+//       data: {'detalhe': ed_id},
+//       success: function(retorno){
+//          $("#id_detalhe_"+nivel).empty();
+//          $("#id_detalhe_"+nivel).append('<option value="">------------</option>');
+//          $.each(retorno, function(i, item){
+//              $("#id_detalhe_"+nivel).append('<option value="'+item.pk+'">'+item.valor+'</option>');
+//          });
+//
+//       },
+//     });
+//}
     
 function ajax_filter_pagamentos_memorando(termo)
 {
@@ -869,7 +862,7 @@ function ajax_filter_pagamentos_memorando(termo)
         $("#id_corpo_set-"+j+"-pagamento_from").empty();
      }
      $.ajax({
-       type: "POST",
+       type: "GET",
        url: "/memorando/pagamentos",
        dataType: "json",
        data: {'termo':termo},
@@ -890,7 +883,7 @@ function ajax_filter_pagamentos_memorando(termo)
           }
        },
        error: function(erro) {
-         alert('Erro. Sem retorno da requisicao.');
+         alert('ajax_filter_pagamentos_memorando Erro. Sem retorno da requisicao.');
        }
      });
 }
@@ -900,7 +893,7 @@ function ajax_init_pagamentos()
    termo = $("#id_termo").val();
    if (termo) {
      $.ajax({
-       type: "POST",
+       type: "GET",
        url: "/memorando/pagamentos",
        dataType: "json",
        data: {'termo':termo},
@@ -911,7 +904,9 @@ function ajax_init_pagamentos()
           });
        },
        error: function(erro) {
-         alert('Erro. Sem retorno da requisicao.');
+    	 // Rogério: verificar porque este disparo deve ser feito no window.onload. Com isso está dando erro toda vez que carrega o selects.js.
+    	   
+         //alert('ajax_init_pagamentos Erro. Sem retorno da requisicao.');
        }
      });
   }
@@ -925,7 +920,7 @@ function ajax_filter_perguntas(memorando)
    }
 
    $.ajax({
-       type: "POST",
+       type: "GET",
        url: "/memorando/perguntas",
        dataType: "json",
        data: {'memorando':memorando},
@@ -938,7 +933,7 @@ function ajax_filter_perguntas(memorando)
           });
        },
        error: function(erro) {
-         alert('Erro. Sem retorno da requisicao.');
+         alert('ajax_filter_perguntas Erro. Sem retorno da requisicao.');
        }
    });
 }
@@ -951,7 +946,7 @@ function ajax_select_pergunta(id_field)
        e_id = "#id_corpo_set-"+partes[1]+"-perg";
        $(e_id).html('Carregando...');
        $.ajax({
-           type: "POST",
+           type: "GET",
            url: "/memorando/escolhe_pergunta",
            dataType: "json",
            data: {'pergunta':pergunta},
@@ -960,7 +955,7 @@ function ajax_select_pergunta(id_field)
                 $(e_id).html(retorno);
            },
            error: function(erro) {
-              alert('Erro: Sem retorno de requisição.');
+              alert('ajax_select_pergunta Erro: Sem retorno de requisição.');
            }
        });
 }
@@ -973,7 +968,7 @@ function ajax_filter_pagamentos2(url)
 {
       termo = $("#id_termo").val()
       $.ajax({
-          type: "POST",
+          type: "GET",
           url: url,
           dataType: "json",
           data: {'termo':termo},
@@ -985,7 +980,7 @@ function ajax_filter_pagamentos2(url)
               });
           },
           error: function(erro) {
-             alert('Erro: Sem retorno de requisição.');
+             alert('ajax_filter_pagamentos2 Erro: Sem retorno de requisição.');
           }
        });
 
@@ -1011,7 +1006,7 @@ function ajax_filter_equipamento(num_doc, id_patrimonio, id_equipamento)
               });
            },
            error: function(erro) {
-              alert('Erro: Sem retorno de requisição.');
+              alert('ajax_filter_equipamento Erro: Sem retorno de requisição.');
            }
        });
 }
@@ -1019,6 +1014,10 @@ function ajax_filter_equipamento(num_doc, id_patrimonio, id_equipamento)
 function ajax_filter_patrimonio(num_doc)
 {
        p_id = "#id_patrimonio";
+       if($(p_id).length == 0) {
+           p_id = "#id_patrimonios";
+       }
+       
        $(p_id).html('Carregando...');
        $.ajax({
            type: "GET",
@@ -1026,6 +1025,7 @@ function ajax_filter_patrimonio(num_doc)
            dataType: "json",
            data: {'num_doc':num_doc},
            success: function(retorno) {
+        	   
               $(p_id).empty();
               $(p_id).append('<option value="">-----</option>');
               $.each(retorno, function(i, item){
@@ -1033,34 +1033,44 @@ function ajax_filter_patrimonio(num_doc)
               });
            },
            error: function(erro) {
-              alert('Erro: Sem retorno de requisição.');
+              alert('ajax_filter_patrimonio Erro: Sem retorno de requisição.');
            }
        });
 }
 
+/**
+ * Ajax utilizado no preenchimento no formulário de Pagamento, formulário inline de Auditoria, campos Parcial e Pagina
+ * Não dispara se não houver o valor de origem, e se na Auditoria os campos de Estado e Tipo não estiverem sido preenchidos.
+ * @param origem Valor do campo Origem Fapesp
+ */
 function ajax_prox_audit(origem)
 {
-      if (!$("#id_auditoria_set-0-pagina").val()){
-       $.ajax({
-          type: "POST",
-          url: "/financeiro/parcial_pagina_termo",
-          dataType: "json",
-          data: {'orig_id':origem},
-          success: function(retorno) {
-              $("#id_auditoria_set-0-parcial").val(retorno['parcial']);
-              $("#id_auditoria_set-0-pagina").val(retorno['pagina']);
-          },
-          error: function(erro) {
-            alert('Erro: Sem retorno da requisição.');
-          }
-       });
-      }
+    if (origem != "" && ($("#id_auditoria_set-0-estado").val() || $("#id_auditoria_set-0-tipo").val())){
+    	if (!$("#id_auditoria_set-0-pagina").val()) {
+	       $.ajax({
+	          type: "GET",
+	          url: "/financeiro/parcial_pagina_termo",
+	          dataType: "json",
+	          data: {'orig_id':origem},
+	          success: function(retorno) {
+	              $("#id_auditoria_set-0-parcial").val(retorno['parcial']);
+	              $("#id_auditoria_set-0-pagina").val(retorno['pagina']);
+	          },
+	          error: function(erro) {
+	            alert('ajax_prox_audit Erro: Sem retorno da requisição.');
+	          }
+	       });
+    	}
+    } else {
+        $("#id_auditoria_set-0-parcial").val('');
+        $("#id_auditoria_set-0-pagina").val('');
+    }
 }
 
 function ajax_nova_pagina(parcial)
 {
     $.ajax({
-       type:"POST",
+       type:"GET",
        url:"/financeiro/nova_pagina",
        dataType:"json",
        data: {'orig_id':$("#id_origem_fapesp").val(), 'parcial':parcial.value},
@@ -1079,7 +1089,7 @@ function ajax_select_ano_proj()
        proj_id = partes[1];
        $("#id_os").html('Carregando...');
        $.ajax({
-           type: "POST",
+           type: "GET",
            url: "/rede/planeja_contrato",
            dataType: "json",
            data: {'ano':ano, 'proj_id':proj_id},
@@ -1090,7 +1100,7 @@ function ajax_select_ano_proj()
  	            });
 	   },
 	   error: function(erro) {
-              alert('Erro: Sem retorno de requisição.');
+              alert('ajax_select_ano_proj Erro: Sem retorno de requisição.');
            }
        });
 
@@ -1146,23 +1156,193 @@ function ajax_patrimonio_historico(patr_id)
 	});
 }
 
-
+/**
+ * Utilizado para o formulário do objeto Patrimonio para poder exibir
+ * os dados do Equipamento relacionado
+ * 
+ * @param id_equipamento
+ */
 function ajax_patr_form_get_equipamento(id_equipamento)
 {
-       p_id = "#id_equipamento";
+    if (id_equipamento != '') {
        $.ajax({
            type: "GET",
            url: "/patrimonio/ajax_get_equipamento",
            dataType: "json",
            data: {'id_equipamento':id_equipamento},
            success: function(retorno) {
+        	   $('#id_marca').html(retorno.marca);
         	   $('#id_modelo').html(retorno.modelo);
         	   $('#id_part_number').text(retorno.part_number);
         	   $('#id_ean').text(retorno.ean);
            },
            error: function(erro) {
-              alert('Erro: Sem retorno de requisição.');
+              alert('ajax_patr_form_get_equipamento Erro: Sem retorno de requisição.');
+           }
+       });
+    } else {
+        $('#id_marca').html('');
+    	$('#id_modelo').html('');
+    	$('#id_part_number').text('');
+    	$('#id_ean').text('');
+    }
+}
+
+/**
+ * Ajax para filtro do relatório de Patrimonio por tipo, 
+ * para restringir os dados do segundo campo de filtro Procedencia
+ * @param id_tipo	ID do Tipo do Patrimonio 
+ */
+function ajax_get_procedencia_filter_tipo(id_tipo)
+{
+       p_id = "#id_procedencia";
+       $(p_id).html('Carregando...');
+       $.ajax({
+           type: "GET",
+           url: "/patrimonio/ajax_get_procedencia_filter_tipo",
+           dataType: "json",
+           data: {'id_tipo':id_tipo},
+           success: function(retorno) {
+              $(p_id).empty();
+              $(p_id).append('<option value="">-----</option>');
+              $.each(retorno, function(i, item){
+                  $(p_id).append('<option value="'+item.pk+'">'+ item.valor+'</option>');
+              });
+           },
+           error: function(erro) {
+              alert('ajax_get_procedencia_filter_tipo Erro: Sem retorno de requisição.');
            }
        });
 }
 
+
+/**
+ * Ajax para filtro no formulário de Pagamentos, inline Recursos 
+ * @param id_retorno	ID do DOM para renderizar o resultado
+ * @param estado	Estado para filtrar os Recursos. (EX: Vigente)
+ */
+function ajax_get_recursos(id_retorno, estado)
+{
+	   p_id = id_retorno;
+       $.ajax({
+           type: "GET",
+           url: "/financeiro/ajax_get_recursos_vigentes",
+           dataType: "json",
+           data: {'estado':estado},
+           success: function(retorno) {
+              $(p_id).empty();
+              $(p_id).append('<option value="">-----</option>');
+              $.each(retorno, function(i, item){
+                  $(p_id).append('<option value="'+item.pk+'">'+ item.valor+'</option>');
+              });
+           },
+           error: function(erro) {
+              alert('ajax_get_recursos Erro: Sem retorno de requisição.');
+           }
+       });
+}
+
+
+/**
+ * Ajax para filtro no relatório de Patrimonio por Termo 
+ * @param id_retorno	ID do DOM para renderizar o resultado
+ * @param termo_id		ID do Termo para fazer a busca de marcas dos patrimonios 
+ */
+function ajax_get_marcas_por_termo(id_retorno, termo_id)
+{
+	   p_id = id_retorno;
+       $.ajax({
+           type: "GET",
+           url: "/patrimonio/ajax_get_marcas_por_termo",
+           dataType: "json",
+           data: {'termo':termo_id},
+           success: function(retorno) {
+              $(p_id).empty();
+              $(p_id).append('<option value="0" selected>Todos</option>');
+              $.each(retorno, function(i, item){
+                  $(p_id).append('<option value="'+item.pk+'">'+ item.valor+'</option>');
+              });
+           },
+           error: function(erro) {
+              alert('ajax_get_marcas_por_termo - Erro: Sem retorno de requisição.');
+           }
+       });
+}
+
+/**
+ * Ajax para preencher os campos de data de inicio e fim no relatório gerencial
+**/
+function termo_datas(termo_id)
+{
+    if (termo_id == "") {
+        $("#id_datas").hide();
+        return;
+    }
+    
+    $("#id_datas").show();
+    $.ajax({
+        type: "GET",
+        url: "/outorga/json/termo_datas",
+        dataType: "json",
+        data: {"termo":termo_id},
+        success: function(retorno) {
+            $("#id_inicio").empty();
+            $("#id_termino").empty();
+            lt = retorno.length;
+            selected = '';
+            $.each(retorno, function(i, item) {
+                if (i == lt-1) {
+                    selected = 'selected';
+                }
+                $("#id_inicio").append('<option value="'+item.value+'">'+item.display+'</option>');
+                $("#id_termino").append('<option value="'+item.value+'" '+selected+'>'+item.display+'</option>');
+            });
+        },
+        error: function(erro) {
+            alert('termo_datas - Erro: Sem retorno de requisição.');
+        }
+    });
+}
+
+/**
+ * Ajax para retirar as opções inválidas do campo de fim no relatório gerencial
+**/
+function retira_termino(inicio)
+{
+    data_menor = 1;
+    $("#id_termino option").each(function() {
+        if ($(this).val() == inicio) {
+            data_menor = 0;
+            $(this).prop('selected', true);
+        }
+        if (data_menor == 1) {
+            $(this).hide();
+        } else {
+            $(this).show();
+        }
+    });
+}
+
+
+//Ajax para o relatório de repositorios.
+//Retorna os nomes dos Tipos de repositórios, dado a entidade do Tipo como filtro.
+function ajax_repositorio_tipo_nomes(id_entidade)
+{
+    p_id = "#id_entidade";
+    $.ajax({
+        type: "GET",
+        url: "/repositorio/ajax_repositorio_tipo_nomes",
+        dataType: "json",
+        data: {'id_entidade': id_entidade},
+        success: function(retorno) {
+           $("#id_nome").empty();
+           $("#id_nome").append('<option value="" selected>Todos</option>');
+           $.each(retorno, function(i, item){
+               $("#id_nome").append('<option value="'+item+'">'+item+'</option>');
+           });
+        },
+        error: function(erro) {
+           alert('Erro: Sem retorno de requisição.');
+        }
+    });
+}
