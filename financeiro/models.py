@@ -262,7 +262,6 @@ class Estado(models.Model):
 	
 def ultimaparcial():
     from outorga.models import Termo
-    from financeiro.models import Auditoria
 	
     t = Termo.objects.aggregate(Max('ano'))
     a = Auditoria.objects.filter(pagamento__protocolo__termo__ano=t['ano__max']).aggregate(Max('parcial'))
@@ -270,7 +269,6 @@ def ultimaparcial():
 	
 def ultimapagina():
     from outorga.models import Termo
-    from financeiro.models import Auditoria
 	
     t = Termo.objects.aggregate(Max('ano'))
     p = Auditoria.objects.filter(pagamento__protocolo__termo__ano=t['ano__max'], parcial=ultimaparcial()).aggregate(Max('pagina'))

@@ -43,10 +43,10 @@ def escolhe_termo(request):
 def lista_protocolos(request, t_id):
     retorno = []
     for p in Protocolo.objects.filter(termo__id=t_id).order_by('identificacao__entidade', 'descricao'):
-	mod = ''
-	for fp in p.fontepagadora_set.all():
-	    mod += ' %s' % fp.origem_fapesp.item_outorga.natureza_gasto.modalidade
-	retorno.append({'entidade':p.identificacao.entidade, 'descricao':p.descricao, 'valor':p.valor, 'tipo':p.tipo_documento, 'num':p.num_documento, 'modalidades':mod, 'termo':p.termo})
+        mod = ''
+    for fp in p.fontepagadora_set.all():
+        mod += ' %s' % fp.origem_fapesp.item_outorga.natureza_gasto.modalidade
+    retorno.append({'entidade':p.identificacao.entidade, 'descricao':p.descricao, 'valor':p.valor, 'tipo':p.tipo_documento, 'num':p.num_documento, 'modalidades':mod, 'termo':p.termo})
 
     return render_to_response('protocolo/listagem.html', {'protocolos':retorno})
 

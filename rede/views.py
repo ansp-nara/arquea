@@ -104,7 +104,7 @@ def planilha_informacoes_tecnicas(request, id=None):
         asn = asns.filter(entidade=entidade)
         blocos = blocos_ips.filter(designado=entidade)
         #operadoras = e.enlaceoperadora_set.all()
-	operadoras = e.segmento_set.filter(data_desativacao__isnull=True)
+        operadoras = e.segmento_set.filter(data_desativacao__isnull=True)
         dados.append({"enlace":e, "contatos_tec":contato_tec, "contatos_adm":contato_adm, "asn":asn, "bloco_ip":blocos, "operadoras":operadoras})
     return TemplateResponse(request, 'rede/informacoes_tecnicas.html', {'dados': dados})
 
@@ -204,7 +204,7 @@ def planejamento2(request, pdf=0):
             igeral += imposto
             tgeral += total
         if pdf:
-	    return render_to_pdf('rede/planejamento2.pdf', {'beneficiado':beneficiado, 'entidade':entidade, 'termo':termo, 'pagamentos':pagamentos, 'sem':tgeral, 'com':igeral}, request=request, filename="servicos_contratados_por_processo.pdf")
+            return render_to_pdf('rede/planejamento2.pdf', {'beneficiado':beneficiado, 'entidade':entidade, 'termo':termo, 'pagamentos':pagamentos, 'sem':tgeral, 'com':igeral}, request=request, filename="servicos_contratados_por_processo.pdf")
         else:
             return TemplateResponse(request, 'rede/planejamento2.html', {'beneficiado':beneficiado, 'entidade':entidade, 'termo':termo, 'pagamentos':pagamentos, 'sem':tgeral, 'com':igeral, 'servicos':descricoes_ids})
     else:
@@ -230,7 +230,7 @@ def blocos_ip(request):
 
         anunciante = request.GET.get('anunciante')
         if anunciante != '0':
-	    blocos = blocos.filter(asn__id=anunciante)
+            blocos = blocos.filter(asn__id=anunciante)
 
         proprietario = request.GET.get('proprietario')
         if proprietario != '0':
