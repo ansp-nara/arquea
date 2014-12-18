@@ -98,7 +98,9 @@
     margin-bottom:7px;
  }
 
-
+.div_item_label {
+    vertical-align: top;
+}
 
 
 </style>
