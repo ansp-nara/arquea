@@ -80,8 +80,14 @@
  {
     display: inline-table;
  }
-  .div_item_conteudo {
+ .div_item_conteudo {
     width: 88%;
+    vertical-align: top;
+ }
+ .div_item_conteudo ul {
+    margin: 0 0 0 15px;
+    padding: 0;
+    vertical-align: top;
  }
  .div_item_memorandos, .div_item_tickets, .div_item_patrimonios {
     display: inline-table;
@@ -134,19 +140,25 @@
                     <div class="div_item_memorandos">
                         <div class="div_item_label">Memorandos:</div>
                         <div class="div_item_conteudo">
-                            {% for m in r.memorandos %}{{m}}{% empty %} --- {% endfor %}
+                            <ul>
+                            {% for m in r.memorandos %}<li>{{m}}</li>{% empty %} --- {% endfor %}
+                            </ul>
                         </div>
                     </div>
                     <div class="div_item_tickets">
                         <div class="div_item_label">OTRS:</div>
                         <div class="div_item_conteudo">
-                            {% for m in r.tickets %}{{m}}{% empty %} --- {% endfor %}
+                            <ul>
+                            {% for m in r.tickets %}<li>{{m}}</li>{% empty %} --- {% endfor %}
+                            </ul>
                         </div>
                     </div>
                     <div class="div_item_patrimonios">
                         <div class="div_item_label">Patrimônios:</div>
                         <div class="div_item_conteudo">
-                            {% for p in r.patrimonios %}{{p}}{% empty %} --- {% endfor %}
+                            <ul>
+                            {% for p in r.patrimonios %}<li>{{p}}</li>{% empty %} --- {% endfor %}
+                            </ul>
                         </div>
                     </div>
                 </div>
