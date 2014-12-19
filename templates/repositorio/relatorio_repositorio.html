@@ -103,6 +103,10 @@
     margin-left:15px;
  }
  
+ .div_item_ocorrencia .div_item_conteudo {
+    word-break: break-word;
+ }
+ 
  .div_item_memorandos, .div_item_tickets, .div_item_patrimonios {
     display: inline-table;
     width: 33%;
@@ -177,55 +181,59 @@
         <legend><h3>Filtro</h3></legend>
         <form method="GET" id="form_filtro">
         <div>
-            <div>
-                <label for="id_tipo">Tipo:</label>
-                <select name="entidade" id="id_entidade" onchange="ajax_repositorio_tipo_nomes(this.value);">
-                    <option value="0" {% if entidade == '0' %}selected{% endif %}>Todos</option>
-                    {% for e in filtro_entidades %}
-                        <option value="{{ e.id }}" {% if e.id|safe == entidade %}selected{% endif %}>{{ e }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div>
-                <label for="id_nome">Nome:</label>
-                <select name="nome" id="id_nome">
-                    <option value="" {% if nome == '' %}selected{% endif %}>Todos</option>
-                    {% for e in filtro_nomes %}
-                        <option value="{{ e.nome }}" {% if e.nome|safe == nome %}selected{% endif %}>{{ e.nome }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div>
-                <label for="id_natureza">Natureza:</label>
-                <select name="natureza" id="id_natureza">
-                    <option value="0" {% if natureza == '0'%}selected{% endif %}>Todos</option>
-                    {% for m in filtro_naturezas %}
-                        <option value="{{ m.id }}" {% if m.id|safe == natureza %}selected{% endif %}>{{ m }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            
-            <div>
-                <label for="id_servico">Serviço:</label>
-                <select name="servico" id="id_servico">
-                    <option value="0" {% if servico == '0'%}selected{% endif %}>Todos</option>
-                    {% for m in filtro_servicos %}
-                        <option value="{{ m.id }}" {% if m.id|safe == servico %}selected{% endif %}>{{ m }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div id="div_filtro_datas">
+            <fieldset style="padding-right:10px;">
+                <legend>Tipo do repositório:</legend>
                 <div>
-                    <div id="div_filtro_datas_de">
-                        <label for="id_data_de" style="display:inline; margin-right:28px;">De:</label>
-                        <input name="data_de" id="id_data_de" style="display:inline" value="{{data_de|default:''}}" />
-                    </div>
-                    <div  id="div_filtro_datas_ate">
-                        <label for="id_data_ate" style="display:inline">Ate:</label>
-                        <input name="data_ate" id="id_data_ate"  style="display:inline" value="{{data_ate|default:''}}" />
+                    <label for="id_tipo">Entidade:</label>
+                    <select name="entidade" id="id_entidade" onchange="ajax_repositorio_tipo_nomes(this.value);">
+                        <option value="0" {% if entidade == '0' %}selected{% endif %}>Todos</option>
+                        {% for e in filtro_entidades %}
+                            <option value="{{ e.id }}" {% if e.id|safe == entidade %}selected{% endif %}>{{ e }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label for="id_nome">Grupo:</label>
+                    <select name="nome" id="id_nome">
+                        <option value="" {% if nome == '' %}selected{% endif %}>Todos</option>
+                        {% for e in filtro_nomes %}
+                            <option value="{{ e.nome }}" {% if e.nome|safe == nome %}selected{% endif %}>{{ e.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </fieldset>
+            <fieldset style="padding-right:10px;">
+                <div>
+                    <label for="id_natureza">Natureza:</label>
+                    <select name="natureza" id="id_natureza">
+                        <option value="0" {% if natureza == '0'%}selected{% endif %}>Todos</option>
+                        {% for m in filtro_naturezas %}
+                            <option value="{{ m.id }}" {% if m.id|safe == natureza %}selected{% endif %}>{{ m }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label for="id_servico">Serviço:</label>
+                    <select name="servico" id="id_servico">
+                        <option value="0" {% if servico == '0'%}selected{% endif %}>Todos</option>
+                        {% for m in filtro_servicos %}
+                            <option value="{{ m.id }}" {% if m.id|safe == servico %}selected{% endif %}>{{ m }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div id="div_filtro_datas">
+                    <div>
+                        <div id="div_filtro_datas_de">
+                            <label for="id_data_de" style="display:inline; margin-right:28px;">De:</label>
+                            <input name="data_de" id="id_data_de" style="display:inline" value="{{data_de|default:''}}" />
+                        </div>
+                        <div  id="div_filtro_datas_ate">
+                            <label for="id_data_ate" style="display:inline">Ate:</label>
+                            <input name="data_ate" id="id_data_ate"  style="display:inline" value="{{data_ate|default:''}}" />
+                        </div>
                     </div>
                 </div>
-            </div>
+            </fieldset>
         </div>
         <br />
         <div id="div_submit">
