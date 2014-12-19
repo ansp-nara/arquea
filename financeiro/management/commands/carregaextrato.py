@@ -28,6 +28,7 @@ class Command(BaseCommand):
                 historico = ' '.join(dados)
                 cartao = False
                 codigo = re.sub('\.', '', codigo)
+                (d, m, y) = map(int, data.split('/'))
             else:
                 codigo = dados[0]
                 data = dados[1]
@@ -35,6 +36,7 @@ class Command(BaseCommand):
                 sinal = dados[3]
                 historico = ' '.join(dados[5:-3])
                 cartao = True
+                (d, m, y) = map(int, data.split('/'))
                 codigo_data = '%s%s%s' % (y,m,d)
                 if codigo_data > codigo_anterior:
                     seq = 1
@@ -42,7 +44,6 @@ class Command(BaseCommand):
                 codigo = '%s%s' % (codigo_data, seq)
                 seq += 1
 
-            (d, m, y) = map(int, data.split('/'))
             if y < 2000: y += 2000
             data = date(y,m,d)
 
