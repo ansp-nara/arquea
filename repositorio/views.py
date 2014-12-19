@@ -7,6 +7,7 @@ from django.http import HttpResponse, JsonResponse
 from django.template.response import TemplateResponse
 from django.views.decorators.http import require_safe
 import os
+from collections import OrderedDict
 
 from repositorio.models import Repositorio, Anexo, Ticket, Tipo as TipoRepositorio, Natureza, Servico
 from patrimonio.models import Patrimonio
@@ -54,7 +55,7 @@ def relatorio_repositorio(request, pdf=0):
     param_data_ate = request.GET.get('data_ate') or request.POST.get('data_ate') or ''
     
     
-    grupos = {}
+    grupos = OrderedDict()
     if param_entidade_id or param_natureza_id or param_servico_id:
         param_entidade_id = param_entidade_id or '0'
         param_natureza_id = param_natureza_id or '0'
@@ -69,13 +70,13 @@ def relatorio_repositorio(request, pdf=0):
         if param_natureza_id and param_natureza_id != '0':
             repositorios = repositorios.filter(natureza__id = param_natureza_id)
         if param_servico_id and param_servico_id != '0':
-            repositorios = repositorios.filter(servicos__in = param_servico_id)
+            repositorios = repositorios.filter(servicos__id = param_servico_id)
         if param_data_de:
             repositorios = repositorios.filter(data_ocorrencia__gte = param_data_de)
         if param_data_ate:
             repositorios = repositorios.filter(data_ocorrencia__lte = param_data_ate)
-    # 
-        repositorios = repositorios.select_related('tipo', 'natureza').order_by('tipo__entidade__nome', 'tipo__nome', 'natureza__nome', '-data_ocorrencia', 'estado__nome')
+        
+        repositorios = repositorios.select_related('tipo', 'tipo__entidade', 'natureza').order_by('tipo__entidade__sigla', 'tipo__nome', 'natureza__nome', '-data_ocorrencia', 'estado__nome')
         
         # Repositórios agrupados por Tipo e Natureza
         for r in repositorios:
@@ -98,13 +99,14 @@ def relatorio_repositorio(request, pdf=0):
                 
                 if a.arquivo:
                     filepath = os.path.join(settings.MEDIA_ROOT, a.arquivo.__unicode__())
-                    size = os.path.getsize(filepath)
-                    str_size = ''
-                    if size < 1000:
-                        str_size = "{:10.3f}".format(size/1000.0)
-                    else:
-                        str_size = "{:10.0f}".format(size/1000.0)
-                    
+                    str_size = ' - '
+                    if os.path.isfile(filepath):
+                        size = os.path.getsize(filepath)
+                        if size < 1000:
+                            str_size = "{:10.3f}".format(size/1000.0)
+                        else:
+                            str_size = "{:10.0f}".format(size/1000.0)
+                        
                     anexo = {'nome': a.arquivo.__unicode__(),
                                'tamanho': str_size,
                                'palavras_chave': a.palavras_chave}
