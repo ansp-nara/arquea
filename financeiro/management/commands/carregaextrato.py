@@ -37,14 +37,14 @@ class Command(BaseCommand):
                 historico = ' '.join(dados[5:-3])
                 cartao = True
                 (d, m, y) = map(int, data.split('/'))
-                codigo_data = '%s%s%s' % (y,m,d)
+                y += 2000
+                codigo_data = '%s%02d%02d' % (y,m,d)
                 if codigo_data > codigo_anterior:
                     seq = 1
                     codigo_anterior = codigo_data
                 codigo = '%s%s' % (codigo_data, seq)
                 seq += 1
 
-            if y < 2000: y += 2000
             data = date(y,m,d)
 
             valor = re.sub('\.', '', valor)
