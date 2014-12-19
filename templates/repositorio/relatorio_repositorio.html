@@ -164,18 +164,20 @@
 {% endblock %}
 {% block content %}
 <h1 repeat="1">Relatório do repositório {{data_de}} {{data_de|default:''|date:'d/M/Y'}}</h1>
-<div id="report_toolbar">
-    <form action="{% url 'repositorio.views.relatorio_repositorio' 1 %}" method="GET" id="id_form_recurso">
-        <input type="hidden" name="entidade" value="{{ entidade|default:'' }}" />
-        <input type="hidden" name="natureza" value="{{ natureza|default:'' }}" />
-        <input type="hidden" name="servico" value="{{ servico|default:'' }}" />
-        <input type="hidden" name="data_de" value="{{ data_de|default:'' }}" />
-        <input type="hidden" name="data_ate" value="{{ data_ate|default:'' }}" />
-        <div title="Imprimir" class="btn_print">
-             <input type="submit" title="Versão para impressão A4" class="btn_print" name="acao" value="1"  />
-        </div>
-    </form>
-</div>
+{% if qtd_grupos > 0 %}
+    <div id="report_toolbar">
+        <form action="{% url 'repositorio.views.relatorio_repositorio' 1 %}" method="GET" id="id_form_recurso">
+            <input type="hidden" name="entidade" value="{{ entidade|default:'' }}" />
+            <input type="hidden" name="natureza" value="{{ natureza|default:'' }}" />
+            <input type="hidden" name="servico" value="{{ servico|default:'' }}" />
+            <input type="hidden" name="data_de" value="{{ data_de|default:'' }}" />
+            <input type="hidden" name="data_ate" value="{{ data_ate|default:'' }}" />
+            <div title="Imprimir" class="btn_print">
+                 <input type="submit" title="Versão para impressão A4" class="btn_print" name="acao" value="1"  />
+            </div>
+        </form>
+    </div>
+{% endif %}
 <div id="div_filtro">
     <fieldset>
         <legend><h3>Filtro</h3></legend>
