@@ -2,7 +2,7 @@
 from django.conf import settings
 from django.contrib.auth.decorators import permission_required, login_required
 from django.core import serializers
-from django.db.models import Q 
+from django.db.models import Q, Count 
 from django.http import HttpResponse, JsonResponse
 from django.template.response import TemplateResponse
 from django.views.decorators.http import require_safe
@@ -29,11 +29,12 @@ def ajax_repositorio_tipo_nomes(request):
     Dado um id de Entidade de um Tipo, retorna os nomes dessa entidade.
     """
     param_entidade_id = request.GET.get('id_entidade')
-    nomes = TipoRepositorio.objects.filter(entidade_id=param_entidade_id).values_list('nome', flat=True).order_by('nome')
-    
+    #nomes = TipoRepositorio.objects.filter(entidade_id=param_entidade_id).values_list('nome', flat=True).order_by('nome')
+    nomes = TipoRepositorio.objects.filter(entidade_id=param_entidade_id).values('nome').annotate(dcount=Count('nome')).order_by('nome')
+            
     response = []
     for n in nomes:
-        response.append(n)
+        response.append(n['nome'])
     
     return JsonResponse(response, safe=False)
 
@@ -66,7 +67,7 @@ def relatorio_repositorio(request, pdf=0):
         if param_entidade_id and param_entidade_id != '0':
             repositorios = repositorios.filter(tipo__entidade__id = param_entidade_id)
         if param_nome:
-            repositorios = repositorios.filter(tipo__nome = param_nome)
+            repositorios = repositorios.filter(tipo__nome__iexact = param_nome)
         if param_natureza_id and param_natureza_id != '0':
             repositorios = repositorios.filter(natureza__id = param_natureza_id)
         if param_servico_id and param_servico_id != '0':
@@ -127,7 +128,8 @@ def relatorio_repositorio(request, pdf=0):
     filtro_entidades = Entidade.objects.filter(id__in = TipoRepositorio.objects.all().values_list('entidade_id'))
     filtro_nomes = []
     if param_entidade_id:
-        filtro_nomes = TipoRepositorio.objects.filter(entidade_id=param_entidade_id).values_list('nome', flat=True).order_by('nome')
+        #filtro_nomes = TipoRepositorio.objects.filter(entidade_id=param_entidade_id).values_list('nome', flat=True).order_by('nome')
+        filtro_nomes = TipoRepositorio.objects.filter(entidade_id=param_entidade_id).values('nome').annotate(dcount=Count('nome')).order_by('nome')
     filtro_naturezas = Natureza.objects.filter(id__in = Repositorio.objects.all().values_list('natureza_id'))
     filtro_servicos = Servico.objects.filter(id__in = Repositorio.objects.all().values_list('servicos__id'))
 

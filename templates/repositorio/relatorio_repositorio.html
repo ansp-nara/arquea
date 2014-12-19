@@ -191,7 +191,7 @@
                 <select name="nome" id="id_nome">
                     <option value="" {% if nome == '' %}selected{% endif %}>Todos</option>
                     {% for e in filtro_nomes %}
-                        <option value="{{ e }}" {% if e|safe == nome %}selected{% endif %}>{{ e }}</option>
+                        <option value="{{ e.nome }}" {% if e.nome|safe == nome %}selected{% endif %}>{{ e.nome }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -251,7 +251,7 @@
                 <div class="div_item_conteudo">
                     {% for s in r.servicos %}
                         {{s.nome}}
-                        {% if not forloop.first and not forloop.last %}&nbsp; / &nbsp;{% endif %}
+                        {% if not forloop.last %}&nbsp; / &nbsp;{% endif %}
                         {% empty %} --- 
                     {% endfor %}
                  </div>
