@@ -141,6 +141,7 @@ def relatorio_repositorio(request, pdf=0):
                             {
                             # Dados dos repositórios
                              'grupos': grupos.itervalues(),
+                             'qtd_grupos': len(grupos),
                             # Dados dos filtros
                             'filtro_entidades':filtro_entidades,
                             'filtro_nomes':filtro_nomes,
