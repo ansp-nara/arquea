@@ -16,6 +16,8 @@ class Command(BaseCommand):
             return
         
         arq = open(args[0])
+        seq = 1
+        codigo_anterior = 0
         for l in arq:
             dados = l.split()
             if args[1] == 'cc':
@@ -25,6 +27,7 @@ class Command(BaseCommand):
                 codigo = dados.pop()
                 historico = ' '.join(dados)
                 cartao = False
+                codigo = re.sub('\.', '', codigo)
             else:
                 codigo = dados[0]
                 data = dados[1]
@@ -32,13 +35,19 @@ class Command(BaseCommand):
                 sinal = dados[3]
                 historico = ' '.join(dados[5:-3])
                 cartao = True
+                codigo_data = '%s%s%s' % (y,m,d)
+                if codigo_data > codigo_anterior:
+                    seq = 1
+                    codigo_anterior = codigo_data
+                codigo = '%s%s' % (codigo_data, seq)
+                seq += 1
 
             (d, m, y) = map(int, data.split('/'))
             if y < 2000: y += 2000
             data = date(y,m,d)
+
             valor = re.sub('\.', '', valor)
             valor = re.sub(',', '.', valor)
-            codigo = re.sub('\.', '', codigo)
             sinal = '' if sinal=='C' else '-'
             ex = ExtratoCC.objects.create(data_oper=data, cod_oper=codigo, valor=Decimal('%s%s' % (sinal, valor)), historico=historico, despesa_caixa=False, cartao=cartao)
             
