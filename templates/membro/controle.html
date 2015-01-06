@@ -1,6 +1,9 @@
+{% load proto_tags admin_static %}
+{% load static %}
+{% get_static_prefix as STATIC_PREFIX %}
 {% if acao %}
 <form action="/membro/controle" method="POST">{% csrf_token %}
 <input type="hidden" name="acao" value="{{ acao }}">
-<input type="image" value="Registrar {{ acao }}" src="/media/img/{{ acao }}.png" style="color:rgb(204,204,255);">
+<input type="image" value="Registrar {{ acao }}" src="{{ STATIC_PREFIX }}img/{{ acao|stripaccents }}.png" style="color:rgb(204,204,255);">
 </form>
 {% endif %}

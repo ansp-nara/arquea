@@ -9,6 +9,8 @@ from django.shortcuts import get_object_or_404
 from decimal import Decimal
 import math
 import logging
+import unicodedata
+
 
 from membro.models import Membro
 from protocolo.models import Protocolo, Cotacao
@@ -386,6 +388,18 @@ def has_permission(user, url):
 
     return False 
 
+@register.filter(name='stripaccents')
+def stripaccents(value, arg=""):
+    """
+    Remove os acentos das letras:
+    Ex: troca o caracter acentuado É por E
+    """
+    if type(value) == str:
+        return value
+    return ''.join((c for c in unicodedata.normalize('NFD', value) if unicodedata.category(c) != 'Mn'))
+
+
+
 
 
 def menu_has_permission(context, menuitem):
@@ -417,12 +431,5 @@ def menu_has_permission(context, menuitem):
 
     return retorno
 register.assignment_tag(takes_context=True)(menu_has_permission)
-
-
-
-
-
-
-
 
 
