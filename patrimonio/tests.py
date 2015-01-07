@@ -6,7 +6,7 @@ from django.test import Client
 from datetime import date, datetime
 
 from patrimonio.models import HistoricoLocal, Tipo, Patrimonio, Equipamento, Estado, TipoEquipamento, \
-            Direcao, DistribuicaoUnidade, EnderecoDetalhe 
+            Direcao, DistribuicaoUnidade, EnderecoDetalhe, UnidadeDimensao, Distribuicao, Dimensao 
 from protocolo.models import TipoDocumento, Origem, Protocolo, ItemProtocolo, Estado as EstadoProtocolo
 from identificacao.models import Entidade, Contato, Endereco, Identificacao, TipoDetalhe
 from membro.models import Membro
@@ -95,7 +95,7 @@ class HistoricoLocalTest(TestCase):
         tipoPatr = Tipo.objects.create(nome='roteador')
         rt = Patrimonio.objects.create(ns='AF345678GB3489X', modelo='NetIron400', tipo=tipoPatr, apelido="NetIron400", checado=True)
         est = Estado.objects.create()
-        hl = HistoricoLocal.objects.create(patrimonio=rt, endereco= endDet, descricao='Emprestimo', data= datetime.date(2009,2,5), estado=est)
+        hl = HistoricoLocal.objects.create(patrimonio=rt, endereco= endDet, descricao='Emprestimo', data= date(2009,2,5), estado=est)
 
         self.assertEquals(u'05/02/2009 - NetIron400 - AF345678GB3489X -  | SAC - Dr. Ovidio, 215 - ', hl.__unicode__())
 
@@ -246,8 +246,8 @@ class PatrimonioTest(TestCase):
         tipoDetalhe = TipoDetalhe.objects.create()
         endDet = EnderecoDetalhe.objects.create(endereco=end, tipo=tipoDetalhe, mostra_bayface=True)
         est = Estado.objects.create()
-        hl = HistoricoLocal.objects.create(patrimonio=patrimonio, endereco= endDet, descricao='Emprestimo', data= datetime.date(2009,2,5), estado=est, posicao='S042')
-        hl = HistoricoLocal.objects.create(patrimonio=patrimonio, endereco= endDet, descricao='Emprestimo 2', data= datetime.date(2010,2,5), estado=est, posicao='S043')
+        hl = HistoricoLocal.objects.create(patrimonio=patrimonio, endereco= endDet, descricao='Emprestimo', data= date(2009,2,5), estado=est, posicao='S042')
+        hl = HistoricoLocal.objects.create(patrimonio=patrimonio, endereco= endDet, descricao='Emprestimo 2', data= date(2010,2,5), estado=est, posicao='S043')
         
         
     def test_historico_atual(self):
@@ -459,7 +459,7 @@ class ViewTest(TestCase):
         tipoDetalhe = TipoDetalhe.objects.create()
         endDet = EnderecoDetalhe.objects.create(endereco=end, tipo=tipoDetalhe, mostra_bayface=True)
         est = Estado.objects.create(nome="Ativo")
-        hl = HistoricoLocal.objects.create(patrimonio=patr1, endereco= endDet, descricao='Emprestimo', data= datetime.date(2009,2,5), estado=est, posicao='S042')
+        hl = HistoricoLocal.objects.create(patrimonio=patr1, endereco= endDet, descricao='Emprestimo', data= date(2009,2,5), estado=est, posicao='S042')
 
     
     def test_ajax_escolhe_patrimonio__empty(self):
