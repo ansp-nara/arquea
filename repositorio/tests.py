@@ -103,16 +103,6 @@ class RepositorioRelatorioTest(TestCase):
         self.assertContains(response, u'<a href="/repositorio/relatorio/repositorio">Relatório do Repositório</a>')
         
         # assert filtro
-        self.assertContains(response, u'<form action="/repositorio/relatorio/repositorio/1" method="GET" id="id_form_recurso">')
-        self.assertContains(response, u'<input type="hidden" name="entidade" value="" />')
-        self.assertContains(response, u'<input type="hidden" name="natureza" value="" />')
-        self.assertContains(response, u'<input type="hidden" name="servico" value="" />')
-        self.assertContains(response, u'<input type="hidden" name="data_de" value="" />')
-        self.assertContains(response, u'<input type="hidden" name="data_ate" value="" />')
-        
-        # asssert dos botões de PDF
-        self.assertContains(response, u'name="acao" value="1"')
-        
         self.assertContains(response, u'<h1 repeat="1">Relatório do repositório  </h1>')
         self.assertContains(response, u'<h3>Filtro</h3>')
         self.assertContains(response, u'<select name="entidade" id="id_entidade"')
