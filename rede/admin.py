@@ -45,18 +45,18 @@ class SuperblocoFilter(SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value() == 'super':
-	    return queryset.filter(superbloco__isnull=True)
+            return queryset.filter(superbloco__isnull=True)
         return queryset
 
 class BlocoIPAdmin(admin.ModelAdmin):
 
     fieldsets = (
-		 (None, {
-			 'fields': (('ip', 'mask'), ('asn', 'proprietario'), ('designado', 'usuario'), ('superbloco', 'rir'), 'obs'),
-			 'classes': ('wide',)
-			}
-		),
-		)
+        (None, {
+            'fields': (('ip', 'mask'), ('asn', 'proprietario'), ('designado', 'usuario'), ('superbloco', 'rir'), 'obs'),
+            'classes': ('wide',)
+            }
+        ),
+        )
     list_display = ('cidr', 'asn', 'proprietario', 'usu', 'desig', 'rir', 'obs')
     search_fields = ('asn__entidade__sigla', 'ip')
     list_filter = (SuperblocoFilter, 'asn', 'proprietario', DesignadoFilter, UsuarioFilter)
@@ -65,13 +65,12 @@ admin.site.register(BlocoIP, BlocoIPAdmin)
 
 class SegmentoInline(admin.StackedInline):
     fieldsets = (
-		 (None, {
-			 'fields': (('operadora', 'banda', 'link_redundante'), ('data_ativacao', 'data_desativacao', 'uso', 'sistema', 'canal'), ('designacao', 'interfaces'), 'obs'),
-			 'classes': ('wide',)
-			}
-		 ),
-		)
-
+        (None, {
+            'fields': (('operadora', 'banda', 'link_redundante'), ('data_ativacao', 'data_desativacao', 'uso', 'sistema', 'canal'), ('designacao', 'interfaces'), 'obs'),
+            'classes': ('wide',)
+            }
+        ),
+        )
     model = Segmento
     extra = 1
 
@@ -91,15 +90,15 @@ class RecursoAdmin(admin.ModelAdmin):
     form = RecursoAdminForm
 
     fieldsets = (
-                 (None, {
-                         'fields': ('planejamento', 
-                                    ('termo', 'pagamento'), 
-                                    'obs', 
-                                    ('quantidade', 'mes_referencia', 'ano_referencia'), 
-                                    ('valor_imposto_mensal', 'valor_mensal_sem_imposto'),),
-                         'classes': ('wide',)
-                        }
-                 ),
+                (None, {
+                    'fields': ('planejamento', 
+                              ('termo', 'pagamento'), 
+                              'obs', 
+                              ('quantidade', 'mes_referencia', 'ano_referencia'), 
+                              ('valor_imposto_mensal', 'valor_mensal_sem_imposto'),),
+                    'classes': ('wide',)
+                    }
+                ),
                 )
 
 class BeneficiadoInline(admin.TabularInline):
@@ -110,11 +109,11 @@ class PlanejaAquisicaoRecursoAdmin(admin.ModelAdmin):
 
     form = PlanejaAquisicaoRecursoAdminForm
     fieldsets = (
-                 (None, {
-                         'fields': (('os', 'ano'), ('tipo', 'referente'), ('quantidade', 'valor_unitario'), ('projeto', 'unidade', 'instalacao'), 'banda', 'obs'),
-                         'classes': ('wide',)
+                (None, {
+                        'fields': (('os', 'ano'), ('tipo', 'referente'), ('quantidade', 'valor_unitario'), ('projeto', 'unidade', 'instalacao'), 'banda', 'obs'),
+                        'classes': ('wide',)
                         }
-                 ),
+                ),
                 )
     list_display = ('projeto', 'quantidade', 'tipo', 'os', 'referente', 'valor_unitario', 'instalacao')
 

@@ -15,6 +15,8 @@ def proximo_numero():
 
     return max(n1, n2) + 1
 
+
+
 class Estado(models.Model):
 
     """
@@ -42,11 +44,13 @@ class Estado(models.Model):
         ordering = ("nome", )
 
 
+
 class Assunto(models.Model):
     descricao = models.CharField(max_length=100)
     
     def __unicode__(self):
-		return self.descricao
+        return self.descricao
+
 
 
 class MemorandoFAPESP(models.Model):
@@ -55,11 +59,12 @@ class MemorandoFAPESP(models.Model):
     arquivo = models.FileField(upload_to='memorando', null=True, blank=True)
    
     def __unicode__(self):
-	    return self.numero
+        return self.numero
 
     class Meta:
         verbose_name = _(u'Memorando da FAPESP')
         verbose_name_plural = _(u'Memorandos da FAPESP')
+
 
 
 class Pergunta(models.Model):
@@ -72,6 +77,8 @@ class Pergunta(models.Model):
 
     class Meta:
         ordering = ('numero',)
+
+
 
 class MemorandoResposta(models.Model):
     memorando = models.ForeignKey('memorando.MemorandoFAPESP')
@@ -97,9 +104,9 @@ class MemorandoResposta(models.Model):
     do memorando seja gerado automaticamente para cada ano.
     '''
     def save(self, *args, **kwargs):
-	    if self.id is None:
-	        self.numero = proximo_numero()
-	    super(MemorandoResposta, self).save(*args, **kwargs)
+        if self.id is None:
+            self.numero = proximo_numero()
+        super(MemorandoResposta, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = _(u'Memorando de resposta à FAPESP')
@@ -108,9 +115,13 @@ class MemorandoResposta(models.Model):
 
     def termo(self):
         return self.memorando.termo
-    
+
+
+
 class Corpo(models.Model):
-    """ Cada item de um memorando da FAPESP """
+    """ 
+    Cada item de um memorando da FAPESP
+    """
 
     memorando = models.ForeignKey('memorando.MemorandoResposta')
     pergunta = models.ForeignKey('memorando.Pergunta')
@@ -123,7 +134,9 @@ class Corpo(models.Model):
 
     class Meta:
         ordering = ('pergunta__numero', 'memorando__data')
-	
+
+
+
 class MemorandoSimples(models.Model):
     superior = models.IntegerField(default=3)
     inferior = models.IntegerField(default=2)
@@ -150,11 +163,11 @@ class MemorandoSimples(models.Model):
         return u'%s/%s' % (self.data.year, self.numero)
     num_memo.admin_order_field = 'data'
     num_memo.short_description = u'Número'
-      
+
     class Meta:
         verbose_name_plural = u'Memorandos Simples'
         ordering = ('-data',)
-	
+
     '''
     O método para salvar uma instância é sobrescrito para que o número sequencial
     do memorando seja gerado automaticamente para cada ano.
@@ -163,10 +176,12 @@ class MemorandoSimples(models.Model):
         if self.id is None:
             self.numero = proximo_numero()
         super(MemorandoSimples, self).save(*args, **kwargs)
-	
+
     def destino(self):
-	    dest = self.destinatario.split('\n')
-	    return '<br />'.join(dest)		
+        dest = self.destinatario.split('\n')
+        return '<br />'.join(dest)		
+
+
 
 class Arquivo(models.Model):
     arquivo = models.FileField(upload_to='memorando')
@@ -174,6 +189,7 @@ class Arquivo(models.Model):
 
     def __unicode__(self):
         return self.arquivo.name
+
 
 
 # Classe para definição de permissões de views e relatórios da app Memorando

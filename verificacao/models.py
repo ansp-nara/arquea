@@ -1,13 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from django.db import models
-from django.db.models import Q, Max
-import datetime
-
-import logging
-from django.db.models import F, Sum, Count
+from django.db.models import F, Count
 from patrimonio.models import Equipamento, Patrimonio, Tipo
 
+import logging
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -209,8 +205,8 @@ class VerificacaoPatrimonioEquipamento():
             eq = Equipamento.objects.get(id=patr.equipamento.id)
             
             if att_name == 'descricao':
-                 patr.descricao = eq.descricao
-                 patr.save()
+                patr.descricao = eq.descricao
+                patr.save()
             elif att_name == 'modelo':
                 patr.modelo = eq.modelo
                 patr.save()
@@ -251,10 +247,6 @@ class VerificacaoPatrimonioEquipamento():
             else:
                 raise ValueError('Valor inválido para o parametro. att_name' + str(att_name))
             
-            
         else:
             raise ValueError('Valor inválido para o parametro. to_object=' + str(to_object))        
-        
-        
-        
-        
+

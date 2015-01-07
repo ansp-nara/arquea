@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
-from django.contrib.auth.decorators import permission_required, login_required
+from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.http import HttpResponse, Http404
-from django.template.response import TemplateResponse
 
 import os
-import datetime
 import logging
 import magic
 import urllib
-from membro.models import Membro
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -40,3 +37,5 @@ def serve_files(request, filename):
     response['Content-length'] = os.path.getsize(path)
 
     return response
+
+

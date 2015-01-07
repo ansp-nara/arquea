@@ -66,10 +66,10 @@ class Command(BaseCommand):
                 mods.append(m)
 
         if 'MPN' in mods:
-           mods.remove('MPN')
+            mods.remove('MPN')
 
         if 'STE' in mods:
-           mods.remove('STE')
+            mods.remove('STE')
 
         for m in mods:
             data = urllib.urlencode([('processo', args[0]), ('parcial', parcial), ('tipoPrestacao', 'PRN'), ('tipoDespesa', TIPOS[m]), ('Prosseguir', 'Prosseguir')])
@@ -81,19 +81,19 @@ class Command(BaseCommand):
             dt = []
             for pg in pgs:
                 try:
-                  inte, dec = str(pg.valor_fapesp).split('.')
+                    inte, dec = str(pg.valor_fapesp).split('.')
                 except:
-                  inte = str(pg.valor_fapesp)
-                  dec = 0
+                    inte = str(pg.valor_fapesp)
+                    dec = 0
 
                 nf = pg.protocolo.num_documento
                 if pg.protocolo.tipo_documento.nome.lower().find('anexo') == 0:
                     nf = '%s %s' % (pg.protocolo.tipo_documento.nome, nf)
 
                 try:
-                   data_nota = pg.protocolo.data_vencimento.strftime('%d/%m/%Y')
+                    data_nota = pg.protocolo.data_vencimento.strftime('%d/%m/%Y')
                 except:
-                   data_nota = pg.protocolo.data_chegada.strftime('%d/%m/%Y')
+                    data_nota = pg.protocolo.data_chegada.strftime('%d/%m/%Y')
             
                 dt += [('notaFiscal', nf), ('dataNotaFiscal', data_nota), ('cheque', pg.conta_corrente.cod_oper), ('pagina', pg.auditoria_set.filter(parcial=parcial).values_list('pagina', flat=True)[0]), ('valorItem', '%s,%s' % (inte, dec))]
 

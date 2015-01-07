@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
 import django
-from models import *
-from forms import *
+from financeiro.models import *
+from financeiro.forms import *
 from django.contrib import admin
-from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import smart_unicode
-from memorando.models import Corpo
 from utils.admin import PrintModelAdmin
 from rede.models import Recurso
 

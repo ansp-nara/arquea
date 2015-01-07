@@ -70,7 +70,6 @@ class EnderecoTest(TestCase):
 
 class EntidadeTest(TestCase):
     def setUp(self):
-        from utils.models import CNPJField
         ent = Entidade.objects.create(sigla='SAC', nome='Global Crossing', cnpj='00.000.000/0000-00', fisco=True, recebe_doacao=False, url='')
         ent2 = Entidade.objects.create(sigla='SAC2', nome='Entidade filha', cnpj='00.000.000/0000-00', fisco=True, entidade=ent, url='')
 

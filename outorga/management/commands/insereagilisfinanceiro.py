@@ -5,7 +5,6 @@ import cookielib
 from django.core.management.base import BaseCommand, CommandError
 from financeiro.models import *
 from outorga.models import Termo
-import sys
 import time
 import re
 import getpass
@@ -56,7 +55,7 @@ class Command(BaseCommand):
         for f in financeiros:
             valor = f.valor
             if valor < Decimal('0.0'):
-               valor = -valor
+                valor = -valor
             try:
                 inte, dec = str(valor).split('.')
             except:

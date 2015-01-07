@@ -3,7 +3,6 @@
 from django import forms
 from django.forms.util import ErrorList
 from django.utils.translation import ugettext_lazy as _
-from django.core.exceptions import ObjectDoesNotExist
 from models import Cotacao, TipoDocumento, Protocolo, Estado, Feriado, Arquivo, Descricao
 
 from outorga.models import Termo
@@ -22,10 +21,10 @@ logger = logging.getLogger(__name__)
     #Uma instância dessa classe faz algumas definições/limitações para a tela de cadastramento do modelo 'Contrato'.
 
     #A função '__init__': Define o campo 'data_vencimento' como obrigatório no cadastramento de um Contrato.
-                         #Define um novo 'label' para o campo que indica o contrato anterior e permite selecionar como
-                         #'contrato anterior' os protocolos definidos como 'Contrato' ou 'Ordem de Serviço'
-                         #Define um novo 'label' para o campo 'identificacao'.
-                         #Limita a seleção do tipo do documento apenas para as opções 'Contrato' e 'Ordem de Serviço'.    
+                        #Define um novo 'label' para o campo que indica o contrato anterior e permite selecionar como
+                        #'contrato anterior' os protocolos definidos como 'Contrato' ou 'Ordem de Serviço'
+                        #Define um novo 'label' para o campo 'identificacao'.
+                        #Limita a seleção do tipo do documento apenas para as opções 'Contrato' e 'Ordem de Serviço'.    
     #Cria um campo 'entidade' para filtrar o campo identificação.
     #A 'class Meta' define o modelo que será utilizado.
     #"""
@@ -45,8 +44,8 @@ logger = logging.getLogger(__name__)
 
     ## Redefine os campos 'data_vencimento', 'protocolo', 'tipo_documento' e 'identificacao'.
     #def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
-                 #initial=None, error_class=ErrorList, label_suffix=':',
-                 #empty_permitted=False, instance=None):
+                #initial=None, error_class=ErrorList, label_suffix=':',
+                #empty_permitted=False, instance=None):
 
         #super(ContratoAdminForm, self).__init__(data, files, auto_id, prefix, initial,
                                             #error_class, label_suffix, empty_permitted, instance)
@@ -188,9 +187,9 @@ class ProtocoloAdminForm(forms.ModelForm):
                  initial=None, error_class=ErrorList, label_suffix=':',
                  empty_permitted=False, instance=None):
 
-	termos = Termo.objects.order_by('-ano')
-	if termos and not instance:
-	    initial = {'termo':termos[0].id}
+        termos = Termo.objects.order_by('-ano')
+        if termos and not instance:
+            initial = {'termo':termos[0].id}
 
         super(ProtocoloAdminForm, self).__init__(data, files, auto_id, prefix, initial,
                                             error_class, label_suffix, empty_permitted, instance)
@@ -209,9 +208,9 @@ class ProtocoloAdminForm(forms.ModelForm):
 
 
 class ItemAdminForm(forms.ModelForm):
-      marca = forms.CharField(max_length=100, required=False, label=_('Marca'))
-      modelo = forms.CharField(max_length=100, required=False, label=_('Modelo'))
-      ns = forms.CharField(max_length=30, required=False, label=_(u'Número de série'))
+    marca = forms.CharField(max_length=100, required=False, label=_('Marca'))
+    modelo = forms.CharField(max_length=100, required=False, label=_('Modelo'))
+    ns = forms.CharField(max_length=30, required=False, label=_(u'Número de série'))
 
 
 class FeriadoAdminForm(forms.ModelForm):

@@ -102,7 +102,7 @@ def agenda(request, tipo=8, pdf=None):
                 areas.append(area)
             entidades.append({'entidade':e, 'areas':areas})
             for ef in e.entidade_em.filter(entidadehistorico__ativo=True, agendado__agenda__id=agenda, agendado__ativo=True):
-	        areas = []
+                areas = []
                 for a in Identificacao.objects.filter(endereco__entidade=ef).order_by('area').values_list('area', flat=True).distinct():
                     area = {'area':a, 'contatos':Identificacao.objects.filter(endereco__entidade=ef, area=a).order_by('contato')}
                     areas.append(area)
@@ -135,7 +135,7 @@ def planilha_ecossistema(request, tipo='par'):
 def acessos_terremark(request):
 
     if 'entidade' not in request.GET:
-	entidade_ids = Acesso.objects.values_list('identificacao__endereco__entidade', flat=True).distinct()
+        entidade_ids = Acesso.objects.values_list('identificacao__endereco__entidade', flat=True).distinct()
         entidades = Entidade.objects.filter(id__in=entidade_ids).order_by('sigla')
         return TemplateResponse(request, 'identificacao/acessos.html', {'entidades': entidades})
 
@@ -178,7 +178,7 @@ def acessos_terremark(request):
 
         for na in NivelAcesso.objects.all():
             linha[6] = na.nome.encode('iso-8859-1')
-	    if na in niveis: 
+            if na in niveis: 
                 linha[13] = 'X'
             writer.writerow(linha)
             linha[13] = linha[7] = linha[8] = ''

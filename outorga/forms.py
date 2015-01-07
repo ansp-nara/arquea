@@ -28,7 +28,8 @@ class OrigemFapespInlineForm(forms.ModelForm):
 
     class Meta:
         model = OrigemFapesp
-        
+        fields = ('acordo', 'item_outorga')
+
 
 class ItemAdminForm(forms.ModelForm):
 

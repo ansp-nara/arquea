@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import datetime
-from decimal import Decimal
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
-from django.db import models
-from django.db.models import Sum
-from django.db.models import Q, Max
+from django.db.models import Max, Sum
 from django.utils.translation import ugettext_lazy as _
 
 from utils.functions import formata_moeda
@@ -46,21 +42,20 @@ class ExtratoCC(models.Model):
         verbose_name = _(u'Extrato de Conta corrente')
         verbose_name_plural = _(u'Extratos de Conta corrente')
         ordering = ('-data_oper',)
-	
+
     def __unicode__(self):
-	    return u'%s - %s - %s - %s' % (self.data_oper, self.cod_oper, self.historico, self.valor)
-      
+        return u'%s - %s - %s - %s' % (self.data_oper, self.cod_oper, self.historico, self.valor)
 
     @property
     def saldo(self):
         s = ExtratoCC.objects.filter(data_oper__lte=self.data_oper).aggregate(Sum('valor'))
-	return s['valor__sum']
-	
+        return s['valor__sum']
+
     @property
     def saldo_anterior(self):
         s = ExtratoCC.objects.filter(data_oper__lt=self.data_oper).aggregate(Sum('valor'))
-	return s['valor__sum']
-	
+        return s['valor__sum']
+
     def parciais(self):
         mods = {}
         for p in self.pagamento_set.all().select_related('origem_fapesp', 'origem_fapesp__item_outorga__natureza_gasto__modalidade'):
@@ -83,14 +78,16 @@ class ExtratoCC(models.Model):
             parc += ']  '
 
         return parc
-   
-   
-   
+
+
+
 class TipoComprovanteFinanceiro(models.Model):
     nome = models.CharField(max_length=50)
 
     def __unicode__(self):
         return self.nome
+
+
 
 class ExtratoFinanceiro(models.Model):
     termo = models.ForeignKey('outorga.Termo', verbose_name=_(u'Termo de outorga'))
@@ -103,20 +100,19 @@ class ExtratoFinanceiro(models.Model):
     parcial = models.IntegerField(null=False, blank=False, default=0, validators=[MinValueValidator(0), MaxValueValidator(999999999)])
   
     class Meta:
-	verbose_name = _(u'Extrato do Financeiro')
-	verbose_name_plural = _(u'Extratos do Financeiro')
-	ordering = ('-data_libera',)
+        verbose_name = _(u'Extrato do Financeiro')
+        verbose_name_plural = _(u'Extratos do Financeiro')
+        ordering = ('-data_libera',)
 
     def __unicode__(self):
-	    return u'%s - %s - %s - %s' % (self.data_libera, self.cod, self.historico, self.valor)
+        return u'%s - %s - %s - %s' % (self.data_libera, self.cod, self.historico, self.valor)
     
     def save(self, *args, **kwargs):
-	for (cod, hist) in CODIGO_FINANCEIRO:
-	    if self.cod == cod:
-		self.historico = hist
-		break
-		
-	super(ExtratoFinanceiro, self).save(*args, **kwargs)
+        for (cod, hist) in CODIGO_FINANCEIRO:
+            if self.cod == cod:
+                self.historico = hist
+                break
+        super(ExtratoFinanceiro, self).save(*args, **kwargs)
    
     @property
     def despesa_caixa(self):
@@ -124,6 +120,8 @@ class ExtratoFinanceiro(models.Model):
             return self.tipo_comprovante == TipoComprovanteFinanceiro.objects.get(nome=u'Despesa de caixa')
         except:
             return False
+
+
 
 class Pagamento(models.Model):
     patrocinio = models.ForeignKey('financeiro.ExtratoPatrocinio', verbose_name=_(u'Extrato do patrocínio'), null=True, blank=True)
@@ -163,7 +161,7 @@ class Pagamento(models.Model):
 
     def codigo_operacao(self):
         if self.conta_corrente:
-	    return self.conta_corrente.cod_oper
+            return self.conta_corrente.cod_oper
         else:
             return ''
     codigo_operacao.short_description = 'Operação Bancária'
@@ -176,21 +174,20 @@ class Pagamento(models.Model):
         return retorno
 
     def save(self, *args, **kwargs):
-
         e, created = EstadoProtocolo.objects.get_or_create(nome=u'Pago')
-	if not self.id:
-	   self.protocolo.estado = e
-	   self.protocolo.save()
+        if not self.id:
+            self.protocolo.estado = e
+            self.protocolo.save()
 
-	super(Pagamento, self).save(*args, **kwargs)
+        super(Pagamento, self).save(*args, **kwargs)
 
     def termo(self):
-    	return u'%s' % self.protocolo.termo.__unicode__()
+        return u'%s' % self.protocolo.termo.__unicode__()
 
     def item(self):
         if self.origem_fapesp:
-	   return u'%s' % self.origem_fapesp.item_outorga.__unicode__()
-	else: return u'Não é Fapesp'
+            return u'%s' % self.origem_fapesp.item_outorga.__unicode__()
+        else: return u'Não é Fapesp'
     item.short_description = u'Item do orçamento'	
 
     def data(self):
@@ -205,7 +202,7 @@ class Pagamento(models.Model):
     def formata_valor_fapesp(self):
         moeda = 'R$'
         if self.origem_fapesp and self.origem_fapesp.item_outorga.natureza_gasto.modalidade.moeda_nacional == False:
-	    moeda = 'US$'
+            moeda = 'US$'
         return u'%s %s' % (moeda, formata_moeda(self.valor_fapesp, ','))
     formata_valor_fapesp.short_description = 'Valor Fapesp'
     formata_valor_fapesp.admin_order_field = 'valor_fapesp'
@@ -226,19 +223,22 @@ class Pagamento(models.Model):
     parcial.admin_order_field = 'auditoria__parcial'
 
     class Meta:
-    	ordering = ('conta_corrente',)
+        ordering = ('conta_corrente',)
+
 
 
 class LocalizaPatrocinio(models.Model):
     consignado = models.CharField(max_length=50)
     
     class Meta:
-	    verbose_name = _(u'Localização do patrocínio')
-	    verbose_name_plural = _(u'Localização dos patrocínios')
+        verbose_name = _(u'Localização do patrocínio')
+        verbose_name_plural = _(u'Localização dos patrocínios')
 
     def __unicode__(self):
-	    return self.consignado
-	
+        return self.consignado
+
+
+
 class ExtratoPatrocinio(models.Model):
     localiza = models.ForeignKey('financeiro.LocalizaPatrocinio', verbose_name=_(u'Localização do patrocínio'))
     data_oper = NARADateField(_(u'Data da operação'))
@@ -248,28 +248,30 @@ class ExtratoPatrocinio(models.Model):
     obs = models.TextField()
     
     class Meta:
-	    verbose_name = _(u'Extrato do patrocínio')
-	    verbose_name_plural = _(u'Extratos dos patrocínios')
+        verbose_name = _(u'Extrato do patrocínio')
+        verbose_name_plural = _(u'Extratos dos patrocínios')
 
     def __unicode__(self):
-	    return u'%s - %s - %s' % (self.localiza.consignado, self.data_oper, self.valor)
-	
+        return u'%s - %s - %s' % (self.localiza.consignado, self.data_oper, self.valor)
+
+
+
 class Estado(models.Model):
     nome = models.CharField(max_length=30)
     
     def __unicode__(self):
-	    return self.nome
-	
+        return self.nome
+
 def ultimaparcial():
     from outorga.models import Termo
-	
+
     t = Termo.objects.aggregate(Max('ano'))
     a = Auditoria.objects.filter(pagamento__protocolo__termo__ano=t['ano__max']).aggregate(Max('parcial'))
     return a['parcial__max']
-	
+
 def ultimapagina():
     from outorga.models import Termo
-	
+
     t = Termo.objects.aggregate(Max('ano'))
     p = Auditoria.objects.filter(pagamento__protocolo__termo__ano=t['ano__max'], parcial=ultimaparcial()).aggregate(Max('pagina'))
     return p['pagina__max']+1
@@ -284,19 +286,21 @@ class Auditoria(models.Model):
     obs = models.TextField(null=True, blank=True)
     
     def __unicode__(self):
-	    return u'Parcial: %s, página: %s' % (self.parcial, self.pagina)
-	 
+        return u'Parcial: %s, página: %s' % (self.parcial, self.pagina)
+
+
 
 class TipoComprovante(models.Model):
     nome = models.CharField(max_length=100)
     
     class Meta:
-    	verbose_name = _(u'Tipo de comprovante')
-    	verbose_name_plural = _(u'Tipos de comprovante')
+        verbose_name = _(u'Tipo de comprovante')
+        verbose_name_plural = _(u'Tipos de comprovante')
         ordering = ('nome',)
 
     def __unicode__(self):
-	    return self.nome
+        return self.nome
+
 
 
 # Classe para definição de permissões de views e relatórios da app financeiro
@@ -318,9 +322,6 @@ class Permission(models.Model):
                        ("rel_adm_parciais", "Rel. admin. - Diferenças totais"),     #/financeiro/relatorios/parciais
                        ("rel_adm_prestacao", "Rel. admin. - Prestação de contas"),     #/financeiro/relatorios/prestacao
                       )
-
-
-
 
 
 

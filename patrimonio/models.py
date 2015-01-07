@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from django.db import models
-from django.db.models import Q, Max
+from django.db.models import Max
 from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import cached_property
-import datetime
 import re
 import logging
 
@@ -226,7 +225,9 @@ class Patrimonio(models.Model):
         ht = sorted(self.historicolocal_set.all(), key=lambda x: x.id, reverse=True)
         ht = sorted(self.historicolocal_set.all(), key=lambda x: x.data, reverse=True) 
         
-        if not ht: return None
+        if not ht: 
+            return None
+        
         return ht[0]
     
     def posicao(self):
@@ -478,59 +479,59 @@ class HistoricoLocal(models.Model):
 
     
 class Direcao(models.Model):
-	origem = models.CharField(max_length=15)
-	destino = models.CharField(max_length=15)
-	
-	def __unicode__(self):
-		return u'%s - %s' % (self.origem, self.destino)
-		
-	class Meta:
-		verbose_name = u'Direção'
-		verbose_name_plural = u'Direções'
-	
+    origem = models.CharField(max_length=15)
+    destino = models.CharField(max_length=15)
+
+    def __unicode__(self):
+        return u'%s - %s' % (self.origem, self.destino)
+
+    class Meta:
+        verbose_name = u'Direção'
+        verbose_name_plural = u'Direções'
+
 class DistribuicaoUnidade(models.Model):
-	nome = models.CharField(max_length=45)
-	sigla = models.CharField(max_length=4)
-	
-	def __unicode__(self):
-		return u'%s - %s' % (self.sigla, self.nome)
-		
+    nome = models.CharField(max_length=45)
+    sigla = models.CharField(max_length=4)
+
+    def __unicode__(self):
+        return u'%s - %s' % (self.sigla, self.nome)
+
 class Distribuicao(models.Model):
-	inicio = models.IntegerField()
-	final = models.IntegerField()
-	unidade = models.ForeignKey('patrimonio.DistribuicaoUnidade')
-	direcao = models.ForeignKey('patrimonio.Direcao')
-	
-	def __unicode__(self):
-		return u'%s - %s' % (self.inicio, self.final)
-		
-	class Meta:
-		verbose_name = u'Distribuição'
-		verbose_name_plural = u'Distribuições'
+    inicio = models.IntegerField()
+    final = models.IntegerField()
+    unidade = models.ForeignKey('patrimonio.DistribuicaoUnidade')
+    direcao = models.ForeignKey('patrimonio.Direcao')
+
+    def __unicode__(self):
+        return u'%s - %s' % (self.inicio, self.final)
+
+    class Meta:
+        verbose_name = u'Distribuição'
+        verbose_name_plural = u'Distribuições'
 
 class UnidadeDimensao(models.Model):
-	nome = models.CharField(max_length=15)
-	
-	def __unicode__(self):
-		return u'%s' % self.nome
-		
-	class Meta:
-		verbose_name = u'Unidade da dimensão'
-		verbose_name_plural = u'Unidade das dimensões'
-		
+    nome = models.CharField(max_length=15)
+    
+    def __unicode__(self):
+        return u'%s' % self.nome
+
+    class Meta:
+        verbose_name = u'Unidade da dimensão'
+        verbose_name_plural = u'Unidade das dimensões'
+
 class Dimensao(models.Model):
-	altura = models.DecimalField(max_digits=6, decimal_places=3, null=True, blank=True)
-	largura = models.DecimalField(max_digits=6, decimal_places=3, null=True, blank=True)
-	profundidade = models.DecimalField(max_digits=6, decimal_places=3, null=True, blank=True)
-	peso = models.DecimalField('Peso (kg)', max_digits=6, decimal_places=3, null=True, blank=True)
-	unidade = models.ForeignKey('patrimonio.UnidadeDimensao')
-	
-	def __unicode__(self):
-		return u'%s x %s x %s %s - %s kg' % (self.altura, self.largura, self.profundidade, self.unidade, self.peso)
-	
-	class Meta:
-		verbose_name = u'Dimensão'
-		verbose_name_plural = u'Dimensões'
+    altura = models.DecimalField(max_digits=6, decimal_places=3, null=True, blank=True)
+    largura = models.DecimalField(max_digits=6, decimal_places=3, null=True, blank=True)
+    profundidade = models.DecimalField(max_digits=6, decimal_places=3, null=True, blank=True)
+    peso = models.DecimalField('Peso (kg)', max_digits=6, decimal_places=3, null=True, blank=True)
+    unidade = models.ForeignKey('patrimonio.UnidadeDimensao')
+
+    def __unicode__(self):
+        return u'%s x %s x %s %s - %s kg' % (self.altura, self.largura, self.profundidade, self.unidade, self.peso)
+    
+    class Meta:
+        verbose_name = u'Dimensão'
+        verbose_name_plural = u'Dimensões'
 
 
 class TipoEquipamento(models.Model):

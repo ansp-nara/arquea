@@ -2,7 +2,6 @@
 from import_export import fields
 from import_export import resources
 from rede.models import *
-from utils.functions import formata_moeda
 
 """
 Modelo do model Recurso para a geração do XLS para o relatório Custo Terremark

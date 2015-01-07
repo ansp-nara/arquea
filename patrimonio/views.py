@@ -18,11 +18,10 @@ import datetime
 import logging
 from decimal import Decimal
 
-from models import *
+from patrimonio.models import *
 from modelsResource import RelatorioPorTipoResource
 from identificacao.models import Entidade, EnderecoDetalhe, Endereco
-from outorga.models import Termo, Modalidade, Natureza_gasto, Item
-from protocolo.models import Protocolo, ItemProtocolo
+from outorga.models import Termo, Natureza_gasto, Item
 from financeiro.models import Pagamento
 
 # Get an instance of a logger
@@ -313,7 +312,7 @@ def por_estado(request):
                 try:
                     entidades_ids.append(h.endereco.end.entidade.id)
                 except:
-		    pass
+                    pass
             entidades = []
             for e in Entidade.objects.filter(id__in=entidades_ids):
                 detalhes = []
@@ -419,15 +418,15 @@ def por_local(request, pdf=0):
         detalhe_id = request.GET.get('detalhe2')
         
         if not detalhe_id:
-           detalhe_id = request.GET.get('detalhe1')
+            detalhe_id = request.GET.get('detalhe1')
         if not detalhe_id:
-           detalhe_id = request.GET.get('detalhe')
+            detalhe_id = request.GET.get('detalhe')
    
         
         for p in Patrimonio.objects.filter(patrimonio__isnull=True).prefetch_related(Prefetch('historicolocal_set', queryset=HistoricoLocal.objects.all())):
             ht = p.historico_atual_prefetched
             if ht:
-                 atuais.append(ht.id)
+                atuais.append(ht.id)
         
         # Listamos os patrimonios candidatos, a partir do filtro de endereços
         if detalhe_id:
@@ -458,7 +457,7 @@ def por_local(request, pdf=0):
         for p in Patrimonio.objects.filter(patrimonio__isnull=True, id__in=patrimonio_ids).prefetch_related('historicolocal_set'):
             ht = p.historico_atual_prefetched
             if ht:
-                 atuais.append(ht.id)
+                atuais.append(ht.id)
            
         # Aqui listamos os Patrimonios que possuem Historico Atual no endereço selecionado
         if detalhe_id:
@@ -520,7 +519,7 @@ def por_local_rack(request, pdf=0):
         for p in Patrimonio.objects.filter(patrimonio__isnull=True).prefetch_related('historicolocal_set'):
             ht = p.historico_atual_prefetched
             if ht:
-                 atuais.append(ht.id)
+                atuais.append(ht.id)
 
         if detalhe_id:
             detalhe = get_object_or_404(EnderecoDetalhe, pk=detalhe_id)
@@ -580,13 +579,13 @@ def por_local_termo(request, pdf=0):
         for p in Patrimonio.objects.filter(patrimonio__isnull=True).prefetch_related('historicolocal_set'):
             ht = p.historico_atual_prefetched
             if ht:
-                 atuais.append(ht.id)
+                atuais.append(ht.id)
         
         detalhe_id = request.GET.get('detalhe2')
         if not detalhe_id:
-           detalhe_id = request.GET.get('detalhe1')
+            detalhe_id = request.GET.get('detalhe1')
         if not detalhe_id:
-           detalhe_id = request.GET.get('detalhe')
+            detalhe_id = request.GET.get('detalhe')
 
         nivel1 = request.GET.get('nivel1')
         nivel2 = request.GET.get('nivel2')
@@ -839,7 +838,7 @@ def por_tipo_equipamento_old(request, pdf=0):
 
     part_number = request.GET.get('partnumber')
     if part_number != '0':
-	patrimonios_tipo = patrimonios_tipo.filter(equipamento__part_number=part_number)
+        patrimonios_tipo = patrimonios_tipo.filter(equipamento__part_number=part_number)
 
     for e in Entidade.objects.all():
         patrimonios_entidade = patrimonios_tipo.all()
@@ -858,9 +857,9 @@ def por_tipo_equipamento_old(request, pdf=0):
                     if p.historico_atual is None:
                         patrimonios_local = patrimonios_local.exclude(id=p.id)
                     elif p.historico_atual.endereco.complemento != l:
-			patrimonios_local = patrimonios_local.exclude(id=p.id)
+                        patrimonios_local = patrimonios_local.exclude(id=p.id)
                 local = {'local':l, 'patrimonios':patrimonios_local}
-	        locais.append(local)
+                locais.append(local)
             entidade['locais'] = locais
             entidades.append(entidade)
     
@@ -889,7 +888,7 @@ def ajax_filtra_pn_estado(request):
             if not p.historico_atual:
                 patrimonios_estado = patrimonios_estado.exclude(id=p.id)
             elif p.historico_atual.estado != e:
-		patrimonios_estado = patrimonios_estado.exclude(id=p.id)
+                patrimonios_estado = patrimonios_estado.exclude(id=p.id)
 
         estados.append({'pk':e.id, 'value':'%s (%s)' % (e, patrimonios_estado.order_by('id').distinct().count())})
 
@@ -1008,7 +1007,6 @@ def por_termo(request, pdf=0):
             vars.update({'t':qs[0]})
         return render_to_pdf_weasy('patrimonio/%s.pdf' % template_name, vars, request=request, filename='inventario_por_termo.pdf')
     else:
-        
         return TemplateResponse(request, 'patrimonio/%s.html' % template_name, {'termos':termos,
                                                                                 'i':itertools.count(1),
                                                                                 'termo':qs[0],
@@ -1037,8 +1035,7 @@ def racks(request):
     locais = EnderecoDetalhe.objects.filter(historicolocal__estado__id=Estado.PATRIMONIO_ATIVO, \
                                             historicolocal__patrimonio__equipamento__tipo__nome='Rack', \
                                             mostra_bayface=True,).order_by('id').distinct()
-                                            
-    
+
     todos_dcs = []
     for local in locais:
         dc = {'nome':local.complemento, 'id':local.id}
@@ -1277,8 +1274,8 @@ def ajax_abre_arvore(request):
         id = request.GET.get('id')
         model = request.GET.get('model')
         if model == 'termo':
-	    for n in Termo.objects.get(id=id).natureza_gasto_set.filter(item__origemfapesp__pagamento__patrimonio__isnull=False).distinct():
-	        ret.append({'data':n.modalidade.sigla, 'attr':{'style':'padding-top:4px;', 'o_id':n.id, 'o_model': n._meta.module_name}})
+            for n in Termo.objects.get(id=id).natureza_gasto_set.filter(item__origemfapesp__pagamento__patrimonio__isnull=False).distinct():
+                ret.append({'data':n.modalidade.sigla, 'attr':{'style':'padding-top:4px;', 'o_id':n.id, 'o_model': n._meta.module_name}})
         elif model == 'natureza_gasto':
             for i in Natureza_gasto.objects.get(id=id).item_set.filter(origemfapesp__pagamento__patrimonio__isnull=False).distinct():
                 ret.append({'data':i.__unicode__(), 'attr':{'style':'padding-top:4px;', 'o_id':i.id, 'o_model': i._meta.module_name}})
@@ -1291,7 +1288,7 @@ def ajax_abre_arvore(request):
                 ret.append({'data':'<div><div class="col1"></div><div class="col2"><div class="menor">%s</div><div class="maior">%s</div><div class="maior">%s - %s</div><div class="medio">%s</div><div class="menor">%s</div><div class="menor">%s</div><div class="menor">%s</div></div><div style="clear:both;"></div></div>' % (pt.tipo, pt.ns, pt.descricao, pt.complemento, pt.equipamento.tipo, pt.valor, 'Sim' if pt.agilis else u'Não', 'Sim' if pt.checado else u'Não'), 'attr':{'style':'height:130px;'}})
     else:
         for t in Termo.objects.all():
-	    ret.append({'data':t.__unicode__(), 'attr':{'style':'padding-top:6px;', 'o_id':t.id, 'o_model': t._meta.module_name}})
+            ret.append({'data':t.__unicode__(), 'attr':{'style':'padding-top:6px;', 'o_id':t.id, 'o_model': t._meta.module_name}})
     retorno_json = json.dumps(ret)
     return HttpResponse(retorno_json, content_type="application/json")
 

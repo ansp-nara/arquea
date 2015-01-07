@@ -5,12 +5,12 @@ from models import Pesquisa, L2, L3
 from forms import PesquisaAdminForm
 
 class PesquisaAdmin(admin.ModelAdmin):
-    #"""
-    #Filtra os dados pelo estado.
-    #Realiza busca por: 'sigla' e 'nome' da entidade, 'sigla' e 'nome' da natureza de gasto, 
-                       #'ano' e 'número' do processo do termo, 'referente', 'número', 'tipo' e 'descrição' do protocolo, 
-                       #'valor' da despesa (formato 9.99)
-    #"""
+    """
+    Filtra os dados pelo estado.
+    Realiza busca por: 'sigla' e 'nome' da entidade, 'sigla' e 'nome' da natureza de gasto, 
+                    'ano' e 'número' do processo do termo, 'referente', 'número', 'tipo' e 'descrição' do protocolo, 
+                    'valor' da despesa (formato 9.99)
+    """
 
     form = PesquisaAdminForm
 
@@ -95,10 +95,10 @@ class PesquisaAdmin(admin.ModelAdmin):
     def has_change_permission(self, request, obj=None):
         r1 = super(PesquisaAdmin,self).has_change_permission(request, obj)
         if not obj:
-           return r1
+            return r1
         
         r2 = (obj.usuario == request.user)
-	r3 = request.user.is_superuser
+        r3 = request.user.is_superuser
         
         return (r1 and (r2 or r3))
 

@@ -1,23 +1,12 @@
 # -* coding: utf-8 -*-
 
-from django.contrib.auth.decorators import permission_required, login_required
-from django.db.models import Q, Max, Sum, Count 
-from django.http import Http404, HttpResponse
-from django.shortcuts import render, render_to_response, get_object_or_404
-from django.template import Context, loader, RequestContext
-from django.template.response import TemplateResponse
+from django.contrib.auth.decorators import login_required
+from django.db.models import Q
+from django.shortcuts import render
 
-from models import *
-from verificacao.models import VerificacaoEquipamento
-from patrimonio.models import Tipo
-import datetime
-import json as simplejson
-import os
-
+from verificacao.models import *
 
 import logging
-from patrimonio.models import Equipamento, Patrimonio
-from django.db.models import Q, Max, Sum, Count
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)

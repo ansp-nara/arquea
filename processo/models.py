@@ -2,15 +2,13 @@
 
 from django.db import models
 
-# Create your models here.
-
 
 class Area(models.Model):
     nome = models.CharField(max_length=45)
     escopo = models.TextField()
 
     def __unicode__(self):
-	return self.nome
+        return self.nome
 
     class Meta:
         verbose_name = u'Área'
@@ -25,7 +23,9 @@ class Grupo(models.Model):
         return self.nome
 
     class Meta:
-	ordering = ('area', 'nome')
+        ordering = ('area', 'nome')
+
+
 
 class Macroprocesso(models.Model):
     nome = models.TextField()
@@ -35,11 +35,12 @@ class Macroprocesso(models.Model):
         return u'%s - %s' % (self.grupo, self.nome)
 
     def area(self):
-	return self.grupo.area
+        return self.grupo.area
     area.admin_order_field='grupo__area'
 
     class Meta:
-	ordering = ('grupo', 'nome')
+        ordering = ('grupo', 'nome')
+
 
 
 class Norma(models.Model):
@@ -60,14 +61,18 @@ class Recurso(models.Model):
     class Meta:
         ordering = ('nome',)
 
+
+
 class OTRS(models.Model):
     nome = models.CharField(max_length=120)
   
     def __unicode__(self):
-	return self.nome
+        return self.nome
 
     class Meta:
         ordering = ('nome',)
+
+
 
 class Processo(models.Model):
     nome = models.TextField('Processo')
@@ -82,7 +87,7 @@ class Processo(models.Model):
     saida_otrs = models.ManyToManyField('processo.OTRS', null=True, blank=True, related_name='sai_otrs')
 
     def __unicode__(self):
-	return self.nome
+        return self.nome
 
     def somacro(self):
         return self.macroprocesso.nome
@@ -90,18 +95,20 @@ class Processo(models.Model):
     somacro.short_description='Macroprocesso'
 
     def grupo(self):
-	return self.macroprocesso.grupo
+        return self.macroprocesso.grupo
     grupo.admin_order_field='macroprocesso__grupo'
 
     def area(self):
-	return self.grupo().area
+        return self.grupo().area
     area.admin_order_field='macroprocesso__grupo__area'
 
     def procedimentos(self):
-	return u', '.join(self.procedimento_set.all())
+        return u', '.join(self.procedimento_set.all())
 
     class Meta:
-	ordering = ('macroprocesso', 'nome')
+        ordering = ('macroprocesso', 'nome')
+
+
 
 class Equipe(models.Model):
     nome = models.CharField(max_length=45)
@@ -109,6 +116,8 @@ class Equipe(models.Model):
 
     def __unicode__(self):
         return self.nome
+
+
 
 class Papel(models.Model):
     nome = models.CharField(max_length=45)
@@ -118,6 +127,8 @@ class Papel(models.Model):
 
     class Meta:
         verbose_name_plural = u'Papéis'
+
+
 
 class Atribuicao(models.Model):
     processo = models.ForeignKey('processo.Processo')
@@ -132,15 +143,18 @@ class Atribuicao(models.Model):
         verbose_name_plural = u'Atribuições'
 
 
+
 class Visao(models.Model):
     nome = models.CharField(max_length=45)
 
     def __unicode__(self):
-	return self.nome
+        return self.nome
 
     class Meta:
-	verbose_name = u'Visão'
+        verbose_name = u'Visão'
         verbose_name_plural = u'Visões'
+
+
 
 class Natureza(models.Model):
     nome = models.CharField(max_length=45)
@@ -149,17 +163,19 @@ class Natureza(models.Model):
         return self.nome
 
     class Meta:
-	ordering = ('nome',)
+        ordering = ('nome',)
+
+
 
 class Procedimento(models.Model):
     nome = models.CharField(max_length=200)
     processo = models.ForeignKey('processo.Processo')
 
     def __unicode__(self):
-	return self.nome
+        return self.nome
 
     class Meta:
-	ordering = ('nome',)
+        ordering = ('nome',)
 
 
 

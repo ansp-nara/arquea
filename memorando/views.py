@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from django.contrib.auth.decorators import permission_required, login_required
-from django.http import Http404, HttpResponse
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
-from django.utils.html import strip_tags
-from django.views.decorators.http import require_safe, require_POST
+from django.views.decorators.http import require_safe
 
 import os
 import json as simplejson
@@ -89,7 +88,7 @@ def fapesp(request, mem):
 
     for c in m.corpo_set.all():
         if c.anexo:
-           anexos.append((os.path.join(settings.MEDIA_ROOT, c.anexo.name), u'Pergunta %s' % c.pergunta.numero, 1))
+            anexos.append((os.path.join(settings.MEDIA_ROOT, c.anexo.name), u'Pergunta %s' % c.pergunta.numero, 1))
         if c.pergunta.numero in incluidos.keys():
             corpos[incluidos[c.pergunta.numero]]['respostas'].append(c.resposta)
         else:

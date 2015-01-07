@@ -2,7 +2,6 @@
 
 from django.db import models
 from utils.models import CNPJField
-from utils.models import NARADateField
 from django.utils.translation import ugettext_lazy as _
 from datetime import datetime
 import re
@@ -21,7 +20,6 @@ class Contato(models.Model):
     ativo = models.BooleanField(_(u'Ativo'), default=True)
     tel = models.CharField(_(u'Telefone'), max_length=100, help_text=_(u'ex. Com. (11)2222-2222, Cel. (11)9999-9999, Fax (11)3333-3333, ...'))
     documento = models.CharField(max_length=30, null=True, blank=True)
-
 
     @property
     def nome(self):
@@ -51,6 +49,7 @@ class Contato(models.Model):
         ordering = ('primeiro_nome', 'ultimo_nome')
 
 
+
 class TipoDetalhe(models.Model):
     nome = models.CharField(max_length=40)
 
@@ -59,6 +58,8 @@ class TipoDetalhe(models.Model):
 
     class Meta:
         ordering = ('nome',)
+
+
 
 class EnderecoDetalhe(models.Model):
     endereco = models.ForeignKey('identificacao.Endereco', limit_choices_to={'data_inatividade__isnull':True}, null=True, blank=True)
@@ -76,7 +77,6 @@ class EnderecoDetalhe(models.Model):
         self.ordena = self.__unicode__()
         super(EnderecoDetalhe,self).save(*args,**kwargs)
 
-
     def __unicode__(self):
         if self.endereco:
             return u'%s - %s' % (self.endereco, self.complemento)
@@ -84,20 +84,23 @@ class EnderecoDetalhe(models.Model):
             return u'%s - %s' % (self.detalhe, self.complemento)
 
     def detalhes(self):
-	if self.endereco:
-	    return self.complemento
-	else:
-	    return u'%s - %s' % (self.detalhe.detalhes(), self.complemento)
+        if self.endereco:
+            return self.complemento
+        else:
+            return u'%s - %s' % (self.detalhe.detalhes(), self.complemento)
 
     @property
     def end(self):
-	if self.endereco: return self.endereco
+        if self.endereco: 
+            return self.endereco
         return self.detalhe.end
 
     class Meta:
         ordering = ('ordena', )
     #    verbose_name = u'Detalhe do endereço'
     #    verbose_name_plural = u'Detalhes dos endereços'
+
+
 
 class Endereco(models.Model):
 
@@ -131,13 +134,13 @@ class Endereco(models.Model):
         compl = ', %s' % self.compl if self.compl else ''
         return u'%s%s%s' % (self.rua, num, compl)
 
-
     # Define a descricao do modelo, a ordenação dos dados pela cidade e a unicidade dos dados.
     class Meta:
         verbose_name = _(u'Endereço')
         verbose_name_plural = _(u'Endereços')
         ordering = ('entidade', )
         unique_together = (('rua', 'num', 'compl', 'bairro', 'cidade', 'cep', 'estado', 'pais'),)
+
 
 
 class ASN(models.Model):
@@ -159,6 +162,8 @@ class ASN(models.Model):
         verbose_name_plural = (u'ASNs')
         ordering = ('numero',)
 
+
+
 class Entidade(models.Model):
     """
     Uma instância dessa classe representa uma entidade cadastrada no sistema.
@@ -170,6 +175,7 @@ class Entidade(models.Model):
 
     A unicidade dos dados é feita através do campo 'sigla'.
     """
+    
     TERREMARK_ID = 1
     
     entidade = models.ForeignKey('identificacao.Entidade', verbose_name=_(u'Faz parte de'), null=True, blank=True, related_name='entidade_em')
@@ -180,8 +186,6 @@ class Entidade(models.Model):
     cnpj = CNPJField(_(u'CNPJ'), blank=True, help_text=_(u'ex. 00.000.000/0000-00'))
     fisco = models.BooleanField(_(u'Fisco'), help_text=_(u'ex. Ativo no site da Receita Federal?'), default=False)
     recebe_doacao = models.BooleanField(_(u'Recebe doação de equipamentos?'), default=False)
-    
-
 
     # Retorna a sigla.
     def __unicode__(self):
@@ -189,9 +193,9 @@ class Entidade(models.Model):
     
     def sigla_completa(self):
         if self.entidade:
-           return u'%s - %s' % (self.entidade.sigla_completa(), self.sigla)
+            return u'%s - %s' % (self.entidade.sigla_completa(), self.sigla)
         else:
-           return u'%s' % self.sigla
+            return u'%s' % self.sigla
     sigla_completa.short_description = _(u'Faz parte de')
     
     
@@ -229,6 +233,8 @@ class Entidade(models.Model):
     class Meta:
         ordering = ('sigla', )
 
+
+
 class EntidadeHistorico(models.Model):
     inicio = models.DateField()
     termino = models.DateField(null=True, blank=True)
@@ -241,8 +247,8 @@ class EntidadeHistorico(models.Model):
         return u'%s %s %s' % (self.entidade.sigla, self.tipo.nome, self.inicio)
 
 
-class Identificacao(models.Model):
 
+class Identificacao(models.Model):
     """
     Uma instância dessa classe representa uma identificação de uma empresa, fornecedor ou contato.
 
@@ -282,6 +288,8 @@ class Identificacao(models.Model):
         return self.historico.strftime('%d/%m/%y %H:%M')
     formata_historico.short_description = _(u'Histórico')
 
+
+
 class TipoArquivoEntidade(models.Model):
     nome = models.CharField(max_length=100)
 
@@ -291,6 +299,8 @@ class TipoArquivoEntidade(models.Model):
     class Meta:
         ordering = ('nome',)
 
+
+
 class ArquivoEntidade(models.Model):
     arquivo = models.FileField(upload_to='entidade')
     entidade = models.ForeignKey('identificacao.Entidade')
@@ -298,7 +308,7 @@ class ArquivoEntidade(models.Model):
     tipo = models.ForeignKey('identificacao.TipoArquivoEntidade')
   
     def __unicode__(self):
-	return u'%s - %s' % (self.entidade.sigla, self.arquivo.name)
+        return u'%s - %s' % (self.entidade.sigla, self.arquivo.name)
 
     class Meta:
         ordering = ('tipo', '-data')
@@ -307,19 +317,22 @@ class TipoEntidade(models.Model):
     nome = models.CharField(max_length=100)
     
     def __unicode__(self):
-	return self.nome
+        return self.nome
 
     class Meta:
         ordering = ('nome',)
-	
+
+
+
 class PapelEntidade(models.Model):
     data = models.DateField()
     tipo = models.ForeignKey('identificacao.TipoEntidade')
     entidade = models.ForeignKey('identificacao.Entidade')
-      
+
     def __unicode__(self):
         return u'%s - %s' % (self.entidade, self.tipo)
-	 
+
+
 
 class Agenda(models.Model):
     nome = models.CharField(max_length=40)
@@ -328,6 +341,8 @@ class Agenda(models.Model):
     def __unicode__(self):
         return u'%s' % self.nome
 
+
+
 class Agendado(models.Model):
     agenda = models.ForeignKey('identificacao.Agenda')
     entidade = models.ForeignKey('identificacao.Entidade')
@@ -335,6 +350,8 @@ class Agendado(models.Model):
 
     def __unicode__(self):
         return u'%s - %s' % (self.agenda.nome, self.entidade.sigla)
+
+
 
 class Acesso(models.Model):
     identificacao = models.ForeignKey('identificacao.Identificacao', verbose_name=u'Identificação')
@@ -391,6 +408,7 @@ class Ecossistema(models.Model):
     class Meta:
         ordering = ('identificacao__endereco__entidade__sigla',)
                                                                          
+
 
 
 # Classe para definição de permissões de views e relatórios da app identificação

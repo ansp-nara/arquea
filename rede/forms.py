@@ -5,8 +5,7 @@ from django.forms.util import ErrorList
 from django.utils.html import mark_safe
 
 from models import *
-from outorga.models import Termo, OrigemFapesp
-from protocolo.models import Protocolo
+from outorga.models import Termo
 from financeiro.models import Pagamento
 
 class PlanejaAquisicaoRecursoAdminForm(forms.ModelForm):

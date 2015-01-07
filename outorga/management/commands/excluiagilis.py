@@ -5,7 +5,6 @@ import cookielib
 from django.core.management.base import BaseCommand, CommandError
 from financeiro.models import *
 from outorga.models import Termo
-from patrimonio.models import Patrimonio
 import sys
 import time
 import re

@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from django.contrib import admin
-from models import OrdemDeServico, Contrato, Termo, Outorga, Modalidade, Estado, Natureza_gasto, Item, Categoria, Arquivo, Acordo, OrigemFapesp, ArquivoOS, TipoContrato, EstadoOS
-from forms import *
 from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import smart_unicode
 from django.contrib.admin.util import unquote
 from django.template.response import TemplateResponse
-from identificacao.models import Entidade
 from rede.models import PlanejaAquisicaoRecurso
+from outorga.models import OrdemDeServico, Contrato, Termo, Outorga, Modalidade, Estado, Natureza_gasto, Item, Categoria, Arquivo, Acordo, OrigemFapesp, ArquivoOS, TipoContrato, EstadoOS
+from outorga.forms import *
 
 class Natureza_gastoInline(admin.TabularInline):
     model = Natureza_gasto
@@ -27,6 +25,7 @@ class PlanejamentoInline(admin.StackedInline):
                  ),
                 )
 
+
 class ArquivoInline(admin.TabularInline):
     model = Arquivo
     extra = 2
@@ -39,6 +38,7 @@ class ArquivoOSInline(admin.TabularInline):
     extra = 2
     verbose_name = ''
     verbose_name_plural = 'Arquivos'
+
 
 class ItemInline(admin.StackedInline):
     fieldsets = (
@@ -74,15 +74,18 @@ class OutorgaInline(admin.StackedInline):
     extra = 1
     ordering = ('-data_solicitacao',)
 
+
 class OrigemFapespInline(admin.TabularInline):
     model = OrigemFapesp
     extra = 2
     ordering = ('item_outorga__natureza_gasto__termo', 'item_outorga__descricao')
     form = OrigemFapespInlineForm
 
+
 class OrigemFapespInlineA(OrigemFapespInline):
     fields = ('termo', 'item_outorga')
     readonly_fields = ('termo',)
+
 
 class OrdemDeServicoInline(admin.StackedInline):
 
@@ -116,9 +119,8 @@ class AcordoAdmin(admin.ModelAdmin):
 admin.site.register(Acordo,AcordoAdmin)
 
 
-                
-class EstadoAdmin(admin.ModelAdmin):
 
+class EstadoAdmin(admin.ModelAdmin):
     """
     Permite consulta por:	'nome' do Estado.
     """
@@ -140,7 +142,6 @@ admin.site.register(Estado, EstadoAdmin)
 
 
 class CategoriaAdmin(admin.ModelAdmin):
-
     """
     Permite consulta por:	'nome' da Categoria.
     """
@@ -162,7 +163,6 @@ admin.site.register(Categoria, CategoriaAdmin)
 
 
 class ModalidadeAdmin(admin.ModelAdmin):
-
     """
     Permite consulta por:	'sigla' e 'nome' da Modalidade.
     """
@@ -312,17 +312,17 @@ class ItemAdmin(admin.ModelAdmin):
 
     list_display = ('mostra_termo', 'mostra_modalidade', 'mostra_descricao', 'entidade', 'mostra_quantidade', 'mostra_valor_realizado', 'pagamentos_pagina')
 
-
     search_fields = ('natureza_gasto__modalidade__sigla', 'natureza_gasto__modalidade__nome', 'natureza_gasto__termo__ano', 'natureza_gasto__termo__processo', 'descricao', 'justificativa', 'obs')
 
     list_filter = ('natureza_gasto__termo', 'natureza_gasto__modalidade') 
 
     inlines = [OrigemFapespInline]
-    form = ItemAdminForm
     
     list_display_links = ('mostra_descricao', )
 
     list_per_page = 20
+
+    form = ItemAdminForm
 
 admin.site.register(Item, ItemAdmin)
 
@@ -404,17 +404,19 @@ class OrdemDeServicoAdmin(admin.ModelAdmin):
     list_per_page = 10
     filter_horizontal = ('pergunta',)
 
+
     def change_view(self, request, object_id, form_url='', extra_context=None):
-
-	if request.method =='POST':
-	    obj = self.get_object(request, unquote(object_id))
-	    if obj.estado.id != int(request.POST.get('estado')) and request.POST.get('confirma') is None:
+        if request.method =='POST':
+            obj = self.get_object(request, unquote(object_id))
+            if obj.estado.id != int(request.POST.get('estado')) and request.POST.get('confirma') is None:
                 if request.POST.get('nconfirma'):
-		    return HttpResponseRedirect('/admin/outorga/ordemdeservico/%s' % object_id)
-		return TemplateResponse(request, 'admin/outorga/ordemdeservico/confirma_alteracao.html', {'form_url':form_url})
+                    return HttpResponseRedirect('/admin/outorga/ordemdeservico/%s' % object_id)
+                return TemplateResponse(request, 'admin/outorga/ordemdeservico/confirma_alteracao.html', {'form_url':form_url})
 
-	return super(OrdemDeServicoAdmin, self).change_view(request, object_id, form_url, extra_context)
+        return super(OrdemDeServicoAdmin, self).change_view(request, object_id, form_url, extra_context)
 admin.site.register(OrdemDeServico,OrdemDeServicoAdmin)
+
+
 
 class OrigemFapespAdmin(admin.ModelAdmin):
     list_per_page = 10

@@ -2,10 +2,9 @@
 from django.test import TestCase
 from decimal import Decimal
 
-from datetime import date, timedelta, datetime
-from django.db import models
+from datetime import date, datetime
 from outorga.models import Termo, Item, OrigemFapesp, Estado as EstadoOutorga, Categoria, Outorga, Modalidade, Natureza_gasto, \
-                           Acordo, Contrato, OrdemDeServico, TipoContrato, ArquivoOS
+                           Acordo, Contrato
 from identificacao.models import Entidade, Contato, Identificacao, Endereco
 from protocolo.models import Protocolo, ItemProtocolo, TipoDocumento, Origem, Estado as EstadoProtocolo
 from financeiro.models import Pagamento, ExtratoCC, Estado as EstadoFinanceiro, TipoComprovante, Auditoria, \

@@ -117,7 +117,7 @@ def imprime_informacoes_gerais(request):
     asns = ASN.objects.all() #filter(pais='BR')
     blocos_ips = BlocoIP.objects.all()
     for e in Enlace.objects.filter(participante__entidade__entidadehistorico__ativo=True):
-	entidade = e.participante.entidade
+        entidade = e.participante.entidade
         if contatos: contato_tec = tecnicos.filter(endereco__entidade=entidade)
         else: contato_tec = None
         asn = asns.filter(entidade=entidade)
