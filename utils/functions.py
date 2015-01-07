@@ -8,15 +8,13 @@ import json as simplejson
 import os
 import cgi
 import cStringIO as StringIO
+import csv, codecs, cStringIO
 
 import weasyprint
 
 from django.conf import settings
-from django.core import serializers
 from django.http import HttpResponse
 from django.template import Context, loader, RequestContext
-from django.template.loader import render_to_string
-from django.contrib.sites.models import Site
 
 import logging
 # Get an instance of a logger
@@ -204,9 +202,9 @@ def render_wk_to_pdf(template_src, context_dict, context_instance=None, filename
 
 def formata_moeda(n, s_d):
     if s_d == '.':
-       s_i = ','
+        s_i = ','
     else:
-       s_i = '.'
+        s_i = '.'
     f = str(n)
     num = f.split('.')
     i = num[0]
@@ -238,9 +236,9 @@ def pega_bancos():
         m = l[:n]
         if numero is not None:
             try:
-               bancos.append((int(numero), m.strip().decode('iso-8859-1').encode('utf-8')))
+                bancos.append((int(numero), m.strip().decode('iso-8859-1').encode('utf-8')))
             except:
-               pass
+                pass
             numero = None
         else:
             numero = m.strip()
@@ -279,7 +277,7 @@ def clone_objects(objects):
         return from_object.__class__.objects.create(**args)
 
     if not hasattr(objects,'__iter__'):
-       objects = [ objects ]
+        objects = [ objects ]
 
     # We always have the objects in a list now
     objs = []
@@ -288,25 +286,7 @@ def clone_objects(objects):
         obj.save()
         objs.append(obj)
 
-def clone_objects(objects):
-    def clone(from_object):
-        args = dict([(fld.name, getattr(from_object, fld.name))
-                for fld in from_object._meta.fields
-                        if fld is not from_object._meta.pk]);
 
-        return from_object.__class__.objects.create(**args)
-
-    if not hasattr(objects,'__iter__'):
-       objects = [ objects ]
-
-    # We always have the objects in a list now
-    objs = []
-    for object in objects:
-        obj = clone(object)
-        obj.save()
-        objs.append(obj)
-
-import csv, codecs, cStringIO
 
 class UTF8Recoder:
     """
@@ -337,6 +317,8 @@ class UnicodeReader:
 
     def __iter__(self):
         return self
+
+
 
 class UnicodeWriter:
     """

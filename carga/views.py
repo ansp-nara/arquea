@@ -1,23 +1,17 @@
 # -* coding: utf-8 -*-
 
-from django.shortcuts import render_to_response
-from django.core.exceptions import PermissionDenied
-from django.contrib import admin
-from models import *
-from django.db.models import Q, Max
-from django.contrib.auth.decorators import permission_required, login_required
+from django.contrib.auth.decorators import login_required
+from django.core.context_processors import csrf
 from django.db import connection
 from django.template.response import TemplateResponse
-
-from django.core.context_processors import csrf
 from django.views.decorators.csrf import csrf_protect
 
 import csv
 import datetime
 
 from carga.forms import UploadFileForm
-from carga.models import Carga_inventario
 from patrimonio.models import Equipamento, Patrimonio
+from carga.models import *
 
 import logging
 

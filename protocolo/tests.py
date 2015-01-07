@@ -1,19 +1,12 @@
 # -*- coding: utf-8 -*-
-from datetime import date, timedelta, datetime
-import calendar
+from datetime import date, datetime
 from decimal import Decimal
-from django.db.models import Q
 from django.db import IntegrityError
 from django.test import TestCase
-from django.utils import timezone
 from membro.models import Membro, Cargo, Historico
-from membro.models import Controle, Membro, Ferias, ControleFerias, \
-    DispensaLegal, TipoDispensa
-from protocolo.models import Feriado, TipoDocumento, Origem, Protocolo, ItemProtocolo, Descricao, Cotacao
-from protocolo.models import Estado as ProtocoloEstado
+from protocolo.models import Feriado, TipoDocumento, Origem, Protocolo, ItemProtocolo, Descricao, Cotacao, Estado as ProtocoloEstado
 from identificacao.models import Identificacao, Contato, Entidade, Endereco
-from outorga.models import Termo, Outorga, Categoria, Modalidade, Natureza_gasto
-from outorga.models import Estado as OutorgaEstado
+from outorga.models import Termo, Outorga, Categoria, Modalidade, Natureza_gasto, Estado as OutorgaEstado
 from protocolo.templatetags import proto_tags
 
 import logging

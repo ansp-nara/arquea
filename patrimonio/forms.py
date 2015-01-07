@@ -3,25 +3,18 @@ import django
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.forms.util import ErrorList
-from django.core.urlresolvers import reverse
 from django.utils.html import mark_safe
-from django.contrib.admin.widgets import FilteredSelectMultiple, RelatedFieldWidgetWrapper
+from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
 from django.db.models.fields.related import ManyToOneRel
-from django.forms.formsets import BaseFormSet
 from django.forms.models import BaseInlineFormSet, inlineformset_factory
-from django.forms import models
 from django.forms.fields import ChoiceField
-from django.forms.models import ModelChoiceIterator, ModelChoiceField
-from django.forms import widgets
-from django.forms.util import flatatt
 
-from models import *
+from utils.request_cache import get_request_cache
 from financeiro.models import Pagamento
 from memorando.models import MemorandoSimples
-from identificacao.models import Identificacao, Entidade, Endereco, EnderecoDetalhe, EntidadeHistorico
+from identificacao.models import Identificacao, Entidade, Endereco, EnderecoDetalhe
 from outorga.models import Termo
-from patrimonio.models import Equipamento, Patrimonio
-from utils.request_cache import get_request_cache
+from patrimonio.models import *
 
 
 # Exibição de patrimonios filhos em forma de tabela, dentro do form de Patrimonio
@@ -447,7 +440,7 @@ class BaseHistoricoLocalAdminFormSet(BaseInlineFormSet):
                     historicolocal and \
                     contido_em.historico_atual.posicao_rack != historicolocal.posicao_rack):
                     
-                   raise forms.ValidationError(u'Patrimônio deve estar no mesmo rack do patrimônio em que está contido.')
+                    raise forms.ValidationError(u'Patrimônio deve estar no mesmo rack do patrimônio em que está contido.')
 
                 # Verifica se o patrimonio está no mesmo rack/furo do patrimonio pai
                 # Não verifica se o patrimonio pai for Rack, pois o Rack não tem posição de furo

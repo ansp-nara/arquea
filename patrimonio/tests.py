@@ -3,16 +3,16 @@
 from django.core.urlresolvers import resolve, reverse
 from django.test import TestCase
 from django.test import Client
-from django.http import HttpRequest
-from datetime import date, timedelta, datetime
+from datetime import date, datetime
 
-from patrimonio.models import HistoricoLocal, Tipo, Patrimonio, Equipamento, Estado, TipoEquipamento
-from patrimonio.views import *
+from patrimonio.models import HistoricoLocal, Tipo, Patrimonio, Equipamento, Estado, TipoEquipamento, \
+            Direcao, DistribuicaoUnidade, EnderecoDetalhe 
 from protocolo.models import TipoDocumento, Origem, Protocolo, ItemProtocolo, Estado as EstadoProtocolo
 from identificacao.models import Entidade, Contato, Endereco, Identificacao, TipoDetalhe
 from membro.models import Membro
-from outorga.models import Termo, Estado as EstadoOutorga, Acordo, OrigemFapesp, Categoria, Outorga
-from financeiro.models import ExtratoCC, Estado as EstadoFinanceiro, TipoComprovante, Auditoria
+from outorga.models import Termo, Estado as EstadoOutorga, Acordo, OrigemFapesp, Categoria, Outorga, Modalidade, Natureza_gasto, Item
+
+from financeiro.models import ExtratoCC, Estado as EstadoFinanceiro, TipoComprovante, Auditoria, Pagamento
 
 import re
 import logging

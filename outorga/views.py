@@ -2,11 +2,10 @@
 
 from django.db.models import Sum, Prefetch
 from django.contrib import admin
-from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import permission_required, login_required
 from django.http import Http404, HttpResponse
 from django.shortcuts import render, get_object_or_404
-from django.views.decorators.http import require_safe, require_POST
+from django.views.decorators.http import require_safe
 
 from decimal import Decimal
 import json as simplejson
@@ -262,10 +261,10 @@ def contratos(request):
                 contrato = {'id':c.id, 'inicio':c.data_inicio, 'termino':c.limite_rescisao, 'numero':c.numero, 'arquivo':c.arquivo, 'auto':c.auto_renova}
                 oss = c.ordemdeservico_set.order_by('-data_inicio')
                 if oss.count():
-                   ordens = []
-                   for os in oss:
-                       ordens.append(os)
-                   contrato.update({'os':ordens})
+                    ordens = []
+                    for os in oss:
+                        ordens.append(os)
+                    contrato.update({'os':ordens})
                 contratos.append(contrato)
             entidade.update({'contratos':contratos})
             entidades.append(entidade)
@@ -280,6 +279,8 @@ def contratos(request):
 def por_item(request):
     termo = request.GET.get('termo')
     entidade = request.GET.get('entidade')
+
+    retorno = {'itens':''}
 
     itens = Item.objects.filter(natureza_gasto__termo__id=termo)
     if entidade:
@@ -425,13 +426,6 @@ def acordo_progressivo(request, pdf=False):
     
     """
     acordos = []
-    
-    totalAcordoRealizadoReal = 0 
-    totalAcordoConcedidoReal = 0
-    totalAcordoSaldoReal = 0
-    totalAcordoRealizadoDolar = 0 
-    totalAcordoConcedidoDolar = 0
-    totalAcordoSaldoDolar = 0
     
     for a in Acordo.objects.all():
         acordo = {'nome':a.descricao}

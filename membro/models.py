@@ -243,13 +243,13 @@ class Ferias(models.Model):
 
     def link_edit(self):
         if not self.id: return ''
-	return '<a href="%s?" target="_blank">Detalhes</a>' % reverse('admin:membro_ferias_change', args=[self.id])
+        return '<a href="%s?" target="_blank">Detalhes</a>' % reverse('admin:membro_ferias_change', args=[self.id])
     link_edit.allow_tags = True
     link_edit.short_description = u'Detalhes do período de férias'
 
     @property
     def trab_termino(self):
-	return self.trab_inicio+relativedelta(days=+365)
+        return self.trab_inicio+relativedelta(days=+365)
 
     # Retorna quantos dias de férias foi solicitado.
     def qtde_dias(self):
@@ -277,7 +277,6 @@ class Ferias(models.Model):
         for f in ferias:
             controles = ControleFerias.objects.filter(ferias=f).select_related().order_by('inicio')
             
-            flagPrimeiroControle = False
             for c in controles:
                 if c.dias_uteis_aberto and c.dias_uteis_aberto > 0:
                     total_dias_uteis_aberto = total_dias_uteis_aberto + c.dias_uteis_aberto
@@ -320,7 +319,7 @@ class ControleFerias(models.Model):
         return is_ferias
     
     def __unicode__(self):
-	return u"%s - %s" % (self.inicio, self.termino)
+        return u"%s - %s" % (self.inicio, self.termino)
 
     class Meta:
         verbose_name = _(u'Controle de férias')
@@ -601,7 +600,6 @@ class Controle(models.Model):
             mes_anterior = date(1979, 01, 01)
             dia_anterior = date(1979, 01, 01)
             if controles.count() > 0:
-                controleAcumuladorDia = []
                 
                 for dt in rrule(DAILY, dtstart=primeiroDiaFiltro, until=ultimoDiaFiltro):
         
@@ -713,23 +711,23 @@ class Controle(models.Model):
         d = data_ini
         feriado = Feriado()
         while d < data_fim:
-             # é final de semana?
-             is_final_de_semana = d.weekday() >= 5
-               
-             # é feriado?
-             is_feriado = False
-             diaFeriado = Feriado.get_dia_de_feriado(d)
-             
-             # verifica se o feriado é facultativo, ou seja, com desconto de banco de horas.
-             if diaFeriado != None and  not diaFeriado.tipo.subtrai_banco_hrs:
-                 is_feriado = True
-             
-             # soma os dias de trabalho
-             if not is_final_de_semana and not is_feriado:
-                 soma_dias_de_trabalho = soma_dias_de_trabalho + 1
-                   
-             d += timedelta(days=1)
-                     
+            # é final de semana?
+            is_final_de_semana = d.weekday() >= 5
+
+            # é feriado?
+            is_feriado = False
+            diaFeriado = Feriado.get_dia_de_feriado(d)
+
+            # verifica se o feriado é facultativo, ou seja, com desconto de banco de horas.
+            if diaFeriado != None and  not diaFeriado.tipo.subtrai_banco_hrs:
+                is_feriado = True
+
+            # soma os dias de trabalho
+            if not is_final_de_semana and not is_feriado:
+                soma_dias_de_trabalho = soma_dias_de_trabalho + 1
+
+            d += timedelta(days=1)
+
         # as horas totais do período são as horas do total de dias do mes menos os finais de semana, ferias e dispensas
         total_horas_periodo = (soma_dias_de_trabalho * 8 * 60 * 60)
         
@@ -739,7 +737,7 @@ class Controle(models.Model):
         ordering = ('-entrada',)
 
     def permanencia(self):
-	   return '%2dh%2dmin' % (self.segundos/3600, self.segundos/60%60)
+        return '%2dh%2dmin' % (self.segundos/3600, self.segundos/60%60)
 
 
 class ItemControle:
@@ -752,10 +750,10 @@ class ItemControle:
     is_ferias = False
     
     def almoco(self):
-       return 0
+        return 0
    
     def __unicode__(self):
-       return u'%s' % (self.dia)
+        return u'%s' % (self.dia)
 
 
 # Classe para definição de permissões de views e relatórios da app Membro

@@ -2,13 +2,13 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-# Create your models here.
 
 class Tipo(models.Model):
     nome = models.CharField(max_length=50)
 
     def __unicode__(self):
         return self.nome
+
 
 
 class Evento(models.Model):
@@ -25,6 +25,7 @@ class Evento(models.Model):
         return self.descricao
 
 
+
 class AreaPrograma(models.Model):
     nome = models.CharField(max_length=50)
 
@@ -34,6 +35,8 @@ class AreaPrograma(models.Model):
     class Meta:
         verbose_name = _(u'Área do programa')
         verbose_name_plural = _(u'Áreas dos programas')
+
+
 
 class Sessao(models.Model):
     area = models.ForeignKey('evento.AreaPrograma', verbose_name=_(u'Área'))
@@ -53,18 +56,20 @@ class Sessao(models.Model):
         verbose_name_plural = _(u'Sessões')
 
 
-class Atribuicao(models.Model):   
+
+class Atribuicao(models.Model):
     membro = models.ForeignKey('membro.Membro')
     relatorio = models.FileField(u'Relatório', upload_to='evento', null=True, blank=True)
     area = models.ForeignKey('evento.AreaOperacional', verbose_name=_(u'Área operacional'))
     sessao = models.ForeignKey('evento.Sessao', verbose_name=_(u'Sessão'))
 
     def __unicode__(self):
-	return u'%s tem a função %s no evento %s' % (self.membro.nome, self.area.nome, self.sessao.descricao)
+        return u'%s tem a função %s no evento %s' % (self.membro.nome, self.area.nome, self.sessao.descricao)
 
     class Meta:
         verbose_name = _(u'Atribuição')
         verbose_name_plural = _(u'Atribuições')
+
 
 
 class AreaOperacional(models.Model):
@@ -74,5 +79,5 @@ class AreaOperacional(models.Model):
         return self.nome
 
     class Meta:
-	verbose_name = _(u'Área operacional')
+        verbose_name = _(u'Área operacional')
         verbose_name_plural = _(u'Áreas operacionais')

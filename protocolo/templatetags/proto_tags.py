@@ -2,16 +2,11 @@
 
 from django.template import Library
 from django.core.urlresolvers import resolve
-from django.contrib.auth.models import Group
 from django.utils.translation import ugettext_lazy as _
 from django.utils.safestring import mark_safe
-from django.shortcuts import get_object_or_404
 from decimal import Decimal
-import math
-import logging
+#import logging
 import unicodedata
-
-
 from membro.models import Membro
 from protocolo.models import Protocolo, Cotacao
 
@@ -331,7 +326,7 @@ def controle_horario(user):
 
 @register.filter
 def get_range( value ):
-  """
+    """
     Filter - returns a list containing range made from given value
     Usage (in template):
 
@@ -347,18 +342,18 @@ def get_range( value ):
     </ul>
 
     Instead of 3 one may use the variable set in the views
-  """
-  return range( value )
+    """
+    return range( value )
 
 @register.filter
 def has_group(user, group_name):
     """
-        Filter to check if a user belongs to a certain group.
-        Usage:
-       
-        {% if request.user|has_group:"xxx" %}
-           Do something
-        {% endif %}
+    Filter to check if a user belongs to a certain group.
+    Usage:
+   
+    {% if request.user|has_group:"xxx" %}
+       Do something
+    {% endif %}
     
     """
     

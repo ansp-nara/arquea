@@ -1,19 +1,15 @@
 # -* coding: utf-8 -*-
-from django.core.exceptions import PermissionDenied
-from django.contrib.auth.models import Group
 from django.contrib import admin
 from django.contrib.auth.decorators import permission_required, login_required
 from django.db.models import Q, Max, Sum
-from django.http import Http404, HttpResponse, HttpResponseNotAllowed
+from django.http import HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404
-from django.template import Context, loader, RequestContext
-from django.views.decorators.http import require_safe, require_POST
+from django.template import Context, RequestContext
+from django.views.decorators.http import require_safe
 
 from decimal import Decimal
 import json as simplejson
-from datetime import datetime as dtime
-from datetime import date
-import math
+from datetime import datetime as dtime, date
 import logging
 
 from outorga.models import Modalidade, Outorga, Item, Termo, OrigemFapesp, Natureza_gasto, Acordo
@@ -916,9 +912,9 @@ def presta_contas(request, pdf=False):
             mod.update({'parcial':parcs})
             m.append(mod)
         if pdf:
-           return render_to_pdf_weasy('financeiro/presta_contas.pdf', {'modalidades':m, 'termo':termo}, request=request, filename='presta_contas_%s.pdf' % termo.__unicode__())
+            return render_to_pdf_weasy('financeiro/presta_contas.pdf', {'modalidades':m, 'termo':termo}, request=request, filename='presta_contas_%s.pdf' % termo.__unicode__())
         else:
-           return render_to_response('financeiro/presta_contas.html', {'modalidades':m, 'termo':termo}, context_instance=RequestContext(request))
+            return render_to_response('financeiro/presta_contas.html', {'modalidades':m, 'termo':termo}, context_instance=RequestContext(request))
     else:
         return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all(), 'view':'presta_contas'}, context_instance=RequestContext(request))
 
@@ -928,7 +924,7 @@ def tipos_documentos(context):
  
     protocolos = []
     for p in Protocolo.objects.filter(pagamento__isnull=False):
-	ads = Auditoria.objects.filter(pagamento__protocolo=p)
+        ads = Auditoria.objects.filter(pagamento__protocolo=p)
         audits = []
         for a in ads:
             aa = {'tipo':a.tipo.nome}

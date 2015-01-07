@@ -2,20 +2,17 @@
 import django
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
-from utils.admin import AdminImageWidget
-from utils.functions import clone_objects
-from models import *
-from modelsResource import *
-from forms import *
 from django.conf.urls import *
 from django.contrib.admin.views.decorators import staff_member_required
 from django.template.response import TemplateResponse
+from import_export.admin import ExportMixin
 import csv
 
-from import_export.admin import ExportMixin
-from import_export.admin import ImportExportModelAdmin,ExportMixin
-from import_export import fields,widgets
-from import_export import resources
+from models import *
+from modelsResource import *
+from forms import *
+from utils.admin import AdminImageWidget
+from utils.functions import clone_objects
 
 admin.site.register(Estado)
 admin.site.register(Tipo)
@@ -141,7 +138,7 @@ class PatrimonioAdmin(ExportMixin, admin.ModelAdmin):
     action_clone.short_description = _(u"Duplicar os patrimônios selecionados")
 
     def action_mark_agilis(self, request, queryset):
-	queryset.update(agilis=True)
+        queryset.update(agilis=True)
     action_mark_agilis.short_description = _(u'Marcar para o Agilis')
 
     def action_unmark_agilis(self, request, queryset):

@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from django.core.exceptions import PermissionDenied
-from django.contrib.auth.models import Group
 from django.contrib import admin
 from django.contrib.auth.decorators import permission_required, login_required
 from django.http import Http404, HttpResponse

@@ -31,7 +31,7 @@ class BlocoIP(models.Model):
     AS.short_description = 'ASN'
 
     def prop(self):
-	return self.proprietario
+        return self.proprietario
     prop.admin_order_field = 'proprietario__sigla'
     prop.short_description = u'Proprietário'
 
@@ -44,13 +44,13 @@ class BlocoIP(models.Model):
     usu.short_description = u'Usado por'
 
     def desig(self):
-	return self.designado.sigla
+        return self.designado.sigla
     desig.admin_order_field = 'designado__sigla'
     desig.short_description = 'Designado para'
 
     def save(self, *args, **kwargs):
         if self.superbloco:
-	    self.rir = self.superbloco.rir
+            self.rir = self.superbloco.rir
         super(BlocoIP,self).save(*args, **kwargs)
 
     def leaf(self):
@@ -132,10 +132,10 @@ class Operadora(models.Model):
 
 class IPBorda(models.Model):
     ip = models.GenericIPAddressField('IP de borda')
-	
+
     def __unicode__(self):
         return u'%s' % self.ip
-	
+
 class Enlace(models.Model):
     participante = models.ForeignKey('identificacao.Endereco')
     entrada_ansp = models.ForeignKey('identificacao.Endereco', verbose_name='Ponto de entrada na ANSP', related_name='entrada')
@@ -165,7 +165,7 @@ class EnlaceOperadora(models.Model):
     data_desativacao = models.DateField(null=True, blank=True)
     link_redundante = models.BooleanField(default=False)
     obs = models.TextField(null=True, blank=True)
-	
+
     def __unicode__(self):
         return u'%s - (Operadora %s)' % (self.enlace, self.operadora)
 
@@ -232,7 +232,7 @@ class TipoServico(models.Model):
         return u'%s' % self.nome
 
     class Meta:
-	ordering = ('nome',)
+        ordering = ('nome',)
 
 class Projeto(models.Model):
     nome = models.CharField(max_length=200)
@@ -264,13 +264,13 @@ class PlanejaAquisicaoRecurso(models.Model):
     def __unicode__(self):
         inst = ''
         if self.instalacao:
-	    inst = u'Instalação - '
+            inst = u'Instalação - '
         return u'%s - %s%s - %s - %s - %s (%s)' % (self.os, inst, self.projeto, self.tipo, self.quantidade, self.valor_unitario, self.referente)
 
     @property
     def valor_total(self):
         q = Decimal(str(self.quantidade))
-	return q * self.valor_unitario
+        return q * self.valor_unitario
 
     class Meta:
         verbose_name = u'Planeja Aquisição de Recursos'
@@ -308,16 +308,16 @@ class Recurso(models.Model):
         return u'%s - %s - %s' % (self.planejamento.os, self.planejamento.tipo, self.quantidade)
 
     def save(self, *args, **kwargs):
-	if self.valor_mensal_sem_imposto is None:
-	    self.valor_mensal_sem_imposto = self.planejamento.valor_total
-	super(Recurso, self).save(*args, **kwargs)
+        if self.valor_mensal_sem_imposto is None:
+            self.valor_mensal_sem_imposto = self.planejamento.valor_total
+        super(Recurso, self).save(*args, **kwargs)
 
     def total_geral(self):
         q = Decimal(str(self.quantidade))
-	return q*(self.valor_imposto_mensal)
+        return q*(self.valor_imposto_mensal)
 
     def total_sem_imposto(self):
-	q = Decimal(str(self.quantidade))
+        q = Decimal(str(self.quantidade))
         return q*(self.valor_mensal_sem_imposto)
 
 """
@@ -358,10 +358,10 @@ class Estado(models.Model):
     nome = models.CharField(max_length=45)
 
     def __unicode__(self):
-	return u'%s' % self.nome
+        return u'%s' % self.nome
 
     class Meta:
-	ordering = ('nome',)
+        ordering = ('nome',)
 
 
 # Classe para definição de permissões de views e relatórios da app rede

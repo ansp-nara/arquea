@@ -20,34 +20,35 @@ class Link(models.Model):
         return int(time.time())
 
     def dia(self):
-    	return self.agora()-DIA
+        return self.agora()-DIA
 
     def semana(self):
-    	return self.agora()-SEMANA
+        return self.agora()-SEMANA
 
     def mes(self):
         return self.agora()-MES
 
     def ano(self):
-    	return self.agora()-ANO
+        return self.agora()-ANO
 
     def __unicode__(self):
-    	return self.descricao
+        return self.descricao
 
     def portas(self):
         return self.porta.split('+')
 
     def aggr(self):
         if len(self.portas()) > 1:
-	   return True
-	else: return False
+            return True
+        else: return False
 
     def t1(self):
         if self.inverter:
-	   return 'Out'
-	else: return 'In'
+            return 'Out'
+        else: return 'In'
 
     def t2(self):
         if self.inverter:
-	   return 'In'
-	else: return 'Out'
+            return 'In'
+        else: return 'Out'
+

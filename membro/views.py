@@ -17,7 +17,6 @@ import json as simplejson
 
 from forms import *
 from models import *
-from protocolo.models import Feriado
 from utils.functions import render_to_pdf
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -125,8 +124,8 @@ def mensal_func(request):
         total_meses = c.total_analitico_horas(0, 0)
         total_geral_banco_horas = 0
         for m in total_meses:
-             # soma horas extras somente dos meses que não forem o mês em andamento
-             total_geral_banco_horas += m['total_banco_horas']
+            # soma horas extras somente dos meses que não forem o mês em andamento
+            total_geral_banco_horas += m['total_banco_horas']
               
         if total_geral_banco_horas >= 0:
             total_geral_banco_horas_str = '%2dh %02dmin' % (total_geral_banco_horas/3600, total_geral_banco_horas/60%60)
@@ -179,14 +178,14 @@ def mensal_func(request):
             m.update({'total_banco_horas':total_banco_horas_str})
         
         if total_horas_restante >= 0:
-             total_horas_restante_str = '%2dh %02dmin' % (total_horas_restante/3600, total_horas_restante/60%60)
+            total_horas_restante_str = '%2dh %02dmin' % (total_horas_restante/3600, total_horas_restante/60%60)
         else:
-             total_horas_restante_str = '-%2dh %02dmin' % (-total_horas_restante/3600, -total_horas_restante/60%60)
+            total_horas_restante_str = '-%2dh %02dmin' % (-total_horas_restante/3600, -total_horas_restante/60%60)
              
         if total_banco_horas >= 0:
-             total_banco_horas_str = '%2dh %02dmin' % (total_banco_horas/3600, total_banco_horas/60%60)
+            total_banco_horas_str = '%2dh %02dmin' % (total_banco_horas/3600, total_banco_horas/60%60)
         else:
-             total_banco_horas_str = '-%2dh %02dmin' % (-total_banco_horas/3600, -total_banco_horas/60%60)
+            total_banco_horas_str = '-%2dh %02dmin' % (-total_banco_horas/3600, -total_banco_horas/60%60)
         
         total_horas_str = '%2dh %02dmin' % (total_horas/3600, total_horas/60%60)
         total_horas_periodo_str = '%2dh %02dmin' % (total_horas_periodo/3600, total_horas_periodo/60%60)

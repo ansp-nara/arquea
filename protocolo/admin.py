@@ -1,17 +1,13 @@
 # -*- coding: utf-8 -*-
 import django
-import datetime
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import Group
 from django.core.mail import send_mail
 from django.http import HttpResponseRedirect
-from financeiro.models import Estado as EstadoDespesa
-from utils.admin import AutoCompleteAdmin
 from utils.functions import clone_objects
 
 from models import Origem, TipoDocumento, Estado, Protocolo, Feriado, ItemProtocolo, Cotacao, Arquivo, Descricao, TipoFeriado
-from forms import CotacaoAdminForm, ProtocoloAdminForm, ItemAdminForm
 from forms import *
 
 admin.site.register(TipoDocumento)
@@ -98,20 +94,18 @@ class ProtocoloAdmin(admin.ModelAdmin):
     form = ProtocoloAdminForm
 
     search_fields = ['descricao2__entidade__sigla', 'descricao2__entidade__nome', 'descricao2__descricao', 'num_documento', 'referente']
-    
 
     muda_estado = 0
     
 
     def action_clone(self, request, queryset):
-	objs = clone_objects(queryset)
-	total = queryset.count()
-	if total == 1:
-	    message = _(u'1 protocolo copiado')
-	else:
-	    message = _(u'%s protocolos copiados') % total
-	self.message_user(request, message)
-	  
+        objs = clone_objects(queryset)
+        total = queryset.count()
+        if total == 1:
+            message = _(u'1 protocolo copiado')
+        else:
+            message = _(u'%s protocolos copiados') % total
+        self.message_user(request, message)
     action_clone.short_description = _(u"Copiar os protocolos selecionados")
 
 
@@ -150,8 +144,7 @@ class ProtocoloAdmin(admin.ModelAdmin):
 #						      ns=form.cleaned_data['ns'],
 #						      estado=e1,
 #						      itemprotocolo=obj)
-	
-	
+
     # Encaminha o usuário para a tela de cadastramento da Fonte Pagadora quando uma despesa é alterada.
     def response_change(self, request, obj):
         if self.muda_estado:
@@ -356,7 +349,7 @@ admin.site.register(TipoFeriado, TipoFeriadoAdmin)
     #Filtra os dados pelo campo 'termo'
 
     #Permite consulta por 'nome' e 'sigla' da entidade, 'nome' do contato, 'descrição', 'categoria', 'estado', 'tipo',
-                         #'os' e 'obs'
+                        #'os' e 'obs'
 
     #A função 'save_model' define o estado como 'Pendente'.
     #"""
@@ -366,19 +359,19 @@ admin.site.register(TipoFeriado, TipoFeriadoAdmin)
 
                     #'fields': ('termo', ),
                     #'classes': ('wide',)
-                 #}),
+                #}),
                 #(None, {
                     #'fields': (('entidade', 'identificacao'), ('tipo_documento', 'os', 'auto_renova'), ('descricao', 'categoria', 'moeda_estrangeira')),
                     #'classes': ('wide',)
-                 #}),
+                #}),
                 #(None, {
                     #'fields': (('data_inicio', 'data_vencimento'), ('limite_recisao', 'periodo_renova')),
                     #'classes': ('wide',)
-                 #}),
+                #}),
                 #(None, {
                     #'fields': (('data_chegada', 'origem'), 'obs'),
                     #'classes': ('wide',)
-                 #}),
+                #}),
     #)
     
     #inlines = [ ArquivoInline, ]
@@ -451,8 +444,8 @@ class ArquivoAdmin(admin.ModelAdmin):
 admin.site.register(Arquivo,ArquivoAdmin)
 
 class DescricaoAdmin(admin.ModelAdmin):
-     list_display = ('entidade', 'descricao')
-     search_fields = ('entidade__nome', 'entidade__sigla', 'descricao')
+    list_display = ('entidade', 'descricao')
+    search_fields = ('entidade__nome', 'entidade__sigla', 'descricao')
 
 admin.site.register(Descricao, DescricaoAdmin)
 

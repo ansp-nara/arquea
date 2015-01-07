@@ -3,9 +3,8 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from utils.models import NARADateField
-# Create your models here.
 
-    
+
 class Carga_inventario(models.Model):
     #[0] 
     local = models.CharField(_(u'local'), null=True, blank=True, max_length=100)
@@ -102,17 +101,12 @@ class Carga_inventario(models.Model):
 #     chk_pn = models.BooleanField(_(u'Part Number ok?'), null=True, blank=True)
 #     chk_model = models.BooleanField(_(u'Modelo ok?'), null=True, blank=True)
     
-    
-    
     tipo_carga = models.DecimalField(_(u'tipo_carga'), max_digits=2, decimal_places=0, null=True, blank=True)
  
      
     def __unicode__(self):
-	   return self.serial_number
-    
-    
-    
-    
-    
-    
-    
+        return self.serial_number
+
+
+
+

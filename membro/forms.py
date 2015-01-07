@@ -2,7 +2,7 @@
 
 from django import forms
 from django.forms.models import BaseInlineFormSet, inlineformset_factory
-from django.forms.util import ErrorList
+from django.forms.utils import ErrorList
 from django.utils.translation import ugettext_lazy as _
 from identificacao.models import Entidade
 from models import *
@@ -188,7 +188,7 @@ ControleFeriasAdminFormSet = inlineformset_factory(Ferias, ControleFerias, forms
 class ControleObs(forms.ModelForm):
 
     class Meta:
-	model = Controle
+        model = Controle
         fields = ('obs',)
 
 class ControleAdminForms(forms.ModelForm):
@@ -213,10 +213,10 @@ class ControleAdminForms(forms.ModelForm):
             almoco = cleaned_data.get("almoco")
             tempo_de_trabalho = saida - entrada
             try:
-	            total_seconds = tempo_de_trabalho.total_seconds()
+                total_seconds = tempo_de_trabalho.total_seconds()
             except AttributeError:
-   	            total_seconds = tempo_de_trabalho.seconds + tempo_de_trabalho.days * 24 * 3600
-                   
+                total_seconds = tempo_de_trabalho.seconds + tempo_de_trabalho.days * 24 * 3600
+
             # se for mais que 20h de trabalho
             if total_seconds > 72000:
                 msg = _(u"Período de trabalho maior que 20h.")

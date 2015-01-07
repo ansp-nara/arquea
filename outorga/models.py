@@ -5,7 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import cached_property
 from utils.functions import formata_moeda
 from utils.models import NARADateField
-from django.db.models import Q, Sum
+from django.db.models import Sum
 from decimal import Decimal
 from datetime import date
 import datetime
@@ -262,7 +262,6 @@ class Termo(models.Model):
     formata_realizado_real.allow_tags = True
     formata_realizado_real.short_description=_(u'Realizado')
 
-
     # Calcula total de despesas ($) realizadas durante o termo.
     @property
     def total_realizado_dolar(self):
@@ -271,7 +270,6 @@ class Termo(models.Model):
             if not n.modalidade.moeda_nacional:
                 total += n.total_realizado
         return total
-
 
     # Retorna o total de despesas ($) em formato moeda.
     def formata_realizado_dolar(self):
@@ -285,16 +283,16 @@ class Termo(models.Model):
     formata_realizado_dolar.allow_tags = True
     formata_realizado_dolar.short_description=_(u'Realizado')
 
-    
+
     def saldo_real(self):
-	return self.real - self.total_realizado_real
+        return self.real - self.total_realizado_real
 
     def saldo_dolar(self):
-	return self.dolar - self.total_realizado_dolar
+        return self.dolar - self.total_realizado_dolar
 
 
     def formata_saldo_real(self):
-	return '<b>R$ %s</b>' % formata_moeda(self.saldo_real(), ',')
+        return '<b>R$ %s</b>' % formata_moeda(self.saldo_real(), ',')
     formata_saldo_real.allow_tags=True
     formata_saldo_real.short_description=_(u'Saldo')
 
@@ -337,8 +335,8 @@ class Termo(models.Model):
     def termo_ativo(cls):
         hoje = datetime.datetime.now().date()
         for t in Termo.objects.order_by('-inicio'):
-	    if t.inicio <= hoje and t.termino >= hoje:
-		return t
+            if t.inicio <= hoje and t.termino >= hoje:
+                return t
 
         return None
 
@@ -348,7 +346,6 @@ class Categoria(models.Model):
 
     O método '__unicode__'	Retorna o campo 'nome'.
     A class 'Meta'		Define a ordenação dos dados pelo nome.
-
     """
 
     nome = models.CharField(_(u'Nome'), max_length=60, help_text=_(u'ex. Aditivo'), unique=True)
@@ -546,12 +543,12 @@ class Natureza_gasto(models.Model):
 
     # Retorna o total de despesas realizadas em formato moeda.
     def formata_total_realizado(self):
-       if not self.total_realizado:
-           return '-'
+        if not self.total_realizado:
+            return '-'
 
-       if self.valor_concedido < self.total_realizado  :
+        if self.valor_concedido < self.total_realizado  :
             return '<span style="color: red">%s</span>' % self.formata_valor(self.total_realizado)
-       return self.formata_valor(self.total_realizado)
+        return self.formata_valor(self.total_realizado)
     formata_total_realizado.allow_tags = True
     formata_total_realizado.short_description=_(u'Total Realizado')
 
@@ -567,7 +564,7 @@ class Natureza_gasto(models.Model):
 
         if total != 0:
             return self.formata_valor(total)
-	return '-'
+        return '-'
     soma_itens.allow_tags = True
     soma_itens.short_description=_(u'Total dos Itens')
 
@@ -602,7 +599,7 @@ class Natureza_gasto(models.Model):
     
     def valor_saldo(self):
         return self.valor_concedido - self.total_realizado
-	
+
     # Define a descrição e a ordenação dos dados pelo Termo de Outorga.
     class Meta:
         verbose_name = _(u'Pasta')
@@ -714,9 +711,9 @@ class Item(models.Model):
             return '-'
 
         total = self.natureza_gasto.formata_valor(self.valor_realizado_acumulado)
-	#if self.valor_realizado_acumulado > self.valor:
+        #if self.valor_realizado_acumulado > self.valor:
         #    return '<span style="color: red">%s</span>' % (total)
-	return total
+        return total
     mostra_valor_realizado.allow_tags = True
     mostra_valor_realizado.short_description=_(u'Total Realizado')
 
@@ -736,7 +733,7 @@ class Item(models.Model):
     protocolos_pagina.allow_tags = True
 
     def pagamentos_pagina(self):
-    	return '<a href="/financeiro/pagamento/?origem_fapesp__item_outorga=%s">Despesas</a>' % self.id
+        return '<a href="/financeiro/pagamento/?origem_fapesp__item_outorga=%s">Despesas</a>' % self.id
     pagamentos_pagina.short_description = _(u'Lista de pagamentos')
     pagamentos_pagina.allow_tags = True
 
@@ -760,14 +757,12 @@ class Arquivo(models.Model):
     arquivo = models.FileField(upload_to=upload_dir)
     outorga = models.ForeignKey('outorga.Outorga', related_name='arquivos')
 
-
     # Retorna o nome do arquivo.
     def __unicode__(self):
         if self.arquivo.name.find('/') == -1:
             return u'%s' % self.arquivo.name
         else:
             return u'%s' % self.arquivo.name.split('/')[-1]
-
 
     # Retorna o pedido de concessão.
     def concessao(self):
@@ -789,89 +784,90 @@ class Arquivo(models.Model):
 
 
 class Acordo(models.Model):
-      """
-      Acordos como, por exemplo, entre a ANSP e a Telefônica.
+    """
+    Acordos como, por exemplo, entre a ANSP e a Telefônica.
 
-      O método '__unicode__'	Retorna a descrição do acordo.
-      """
-      
-      estado = models.ForeignKey('outorga.Estado')
-      descricao = models.TextField(verbose_name=_(u'Descrição'))
-      itens_outorga = models.ManyToManyField('outorga.Item', through='outorga.OrigemFapesp')
+    O método '__unicode__'	Retorna a descrição do acordo.
+    """
 
-      # Retorna a descrição.
-      def __unicode__(self):
-          return u"%s" % self.descricao
+    estado = models.ForeignKey('outorga.Estado')
+    descricao = models.TextField(verbose_name=_(u'Descrição'))
+    itens_outorga = models.ManyToManyField('outorga.Item', through='outorga.OrigemFapesp')
 
-      class Meta:
-          ordering = ('descricao',)
+    # Retorna a descrição.
+    def __unicode__(self):
+        return u"%s" % self.descricao
+
+    class Meta:
+        ordering = ('descricao',)
+
 
 class OrigemFapesp(models.Model):
-      """
-      Uma instância dessa classe representa a associação de uma acordo a um item da Outorga
-      """
+    """
+    Uma instância dessa classe representa a associação de uma acordo a um item da Outorga
+    """
 
-      acordo = models.ForeignKey('outorga.Acordo')
-      item_outorga = models.ForeignKey('outorga.Item', verbose_name=_(u'Item de Outorga'))
+    acordo = models.ForeignKey('outorga.Acordo')
+    item_outorga = models.ForeignKey('outorga.Item', verbose_name=_(u'Item de Outorga'))
+
+    # Retorna o acordo e o item de Outorga da Origem FAPESP.
+    def __unicode__(self):
+        return u"%s - %s" % (self.acordo, self.item_outorga)
 
 
-      # Retorna o acordo e o item de Outorga da Origem FAPESP.
-      def __unicode__(self):
-	  return u"%s - %s" % (self.acordo, self.item_outorga)
+    # Define a descrição do modelo.
+    class Meta:
+        verbose_name = _(u'Origem FAPESP')
+        verbose_name_plural = _(u'Origem FAPESP')
+        ordering = ('item_outorga',)
 
+    def gasto(self):
+        g = self.pagamento_set.all().aggregate(Sum('valor_fapesp'))
+        return g['valor_fapesp__sum'] or Decimal('0.0')
 
-      # Define a descrição do modelo.
-      class Meta:
-          verbose_name = _(u'Origem FAPESP')
-          verbose_name_plural = _(u'Origem FAPESP')
-	  ordering = ('item_outorga',)
+    def termo(self):
+        return self.item_outorga.natureza_gasto.termo
 
-      def gasto(self):
-          g = self.pagamento_set.all().aggregate(Sum('valor_fapesp'))
-          return g['valor_fapesp__sum'] or Decimal('0.0')
-
-      def termo(self):
-          return self.item_outorga.natureza_gasto.termo
 
 class Contrato(models.Model):
-      """
-      Uma instância dessa classe representa um contrato. (Ex. Instituto Uniemp e Telefônica)
-      """
+    """
+    Uma instância dessa classe representa um contrato. (Ex. Instituto Uniemp e Telefônica)
+    """
 
-      numero = models.CharField(_(u'Número'), max_length=20)
-      descricao = models.TextField(_(u'Descrição'), blank=True)
-      data_inicio = NARADateField(_(u'Início'))
-      auto_renova = models.BooleanField(_(u'Auto renovação?'), default=False)
-      limite_rescisao = NARADateField(_(u'término'), null=True, blank=True)
-      entidade = models.ForeignKey('identificacao.Entidade')
-      anterior = models.ForeignKey('outorga.Contrato', verbose_name=_('Contrato anterior'), null=True, blank=True)
-      arquivo = models.FileField(upload_to='contrato')
+    numero = models.CharField(_(u'Número'), max_length=20)
+    descricao = models.TextField(_(u'Descrição'), blank=True)
+    data_inicio = NARADateField(_(u'Início'))
+    auto_renova = models.BooleanField(_(u'Auto renovação?'), default=False)
+    limite_rescisao = NARADateField(_(u'término'), null=True, blank=True)
+    entidade = models.ForeignKey('identificacao.Entidade')
+    anterior = models.ForeignKey('outorga.Contrato', verbose_name=_('Contrato anterior'), null=True, blank=True)
+    arquivo = models.FileField(upload_to='contrato')
 
-      # Retorna a entidade e a data de ínicio do Contrato.
-      def __unicode__(self):
-          inicio = self.data_inicio.strftime("%d/%m/%Y")
-          return u"%s - %s" % (self.entidade, inicio)
+    # Retorna a entidade e a data de ínicio do Contrato.
+    def __unicode__(self):
+        inicio = self.data_inicio.strftime("%d/%m/%Y")
+        return u"%s - %s" % (self.entidade, inicio)
 
-      # Retorna um ícone se o contrato tiver anexo.
-      def existe_arquivo(self):
-          if self.arquivo and self.arquivo.name.find('/') >= 0:
-              a = '<center><a href="%s"><img src="/media/img/arquivo.png" /></a></center>' % self.arquivo.url
-              return a
-          return ' '
-      existe_arquivo.allow_tags = True
-      existe_arquivo.short_description = _(u'Arquivo')
+    # Retorna um ícone se o contrato tiver anexo.
+    def existe_arquivo(self):
+        if self.arquivo and self.arquivo.name.find('/') >= 0:
+            a = '<center><a href="%s"><img src="/media/img/arquivo.png" /></a></center>' % self.arquivo.url
+            return a
+        return ' '
+    existe_arquivo.allow_tags = True
+    existe_arquivo.short_description = _(u'Arquivo')
 
 
 class TipoContrato(models.Model):
-      nome = models.CharField(max_length=30)
+    nome = models.CharField(max_length=30)
 
-      def __unicode__(self):
-      	  return self.nome
+    def __unicode__(self):
+        return self.nome
 
-      class Meta:
-      	  verbose_name = u'Tipo de documento'
-	  verbose_name_plural = u'Tipos de documento'
-          ordering = ('nome',)
+    class Meta:
+        verbose_name = u'Tipo de documento'
+        verbose_name_plural = u'Tipos de documento'
+        ordering = ('nome',)
 
 class EstadoOS(models.Model):
     nome = models.CharField(max_length=20)
@@ -883,82 +879,83 @@ class EstadoOS(models.Model):
         ordering = ('nome',)
         verbose_name = 'Estado da OS'
         verbose_name_plural = 'Estados das OSs'
-        
+
+
 class OrdemDeServico(models.Model):
-      """
-      Uma instância dessa classe representa uma ordem de serviço de um Contrato.
-      
-      arquivos: related_name para ArquivoOS
-      """
+    """
+    Uma instância dessa classe representa uma ordem de serviço de um Contrato.
+    
+    arquivos: related_name para ArquivoOS
+    """
 
-      numero = models.CharField(_(u'Número'), max_length=20)
-      tipo = models.ForeignKey('outorga.TipoContrato')
-      acordo = models.ForeignKey('outorga.Acordo')
-      contrato = models.ForeignKey('outorga.Contrato')
-      data_inicio = NARADateField(_(u'Início'))
-      data_rescisao = NARADateField(_(u'Término'), null=True, blank=True)
-      antes_rescisao = models.IntegerField(_(u'Prazo p/ solicitar rescisão (dias)'), null=True, blank=True)
-      descricao = models.TextField(_(u'Descrição'))
-      #arquivo = models.FileField(upload_to='OS', null=True, blank=True)
-      estado = models.ForeignKey('outorga.EstadoOS')
-      pergunta = models.ManyToManyField('memorando.Pergunta', null=True, blank=True)
-      substituicoes = models.TextField(null=True, blank=True)
-
-
-      # Retorna a descrição.
-      def __unicode__(self):
-	  return u"%s %s" % (self.tipo, self.numero)
+    numero = models.CharField(_(u'Número'), max_length=20)
+    tipo = models.ForeignKey('outorga.TipoContrato')
+    acordo = models.ForeignKey('outorga.Acordo')
+    contrato = models.ForeignKey('outorga.Contrato')
+    data_inicio = NARADateField(_(u'Início'))
+    data_rescisao = NARADateField(_(u'Término'), null=True, blank=True)
+    antes_rescisao = models.IntegerField(_(u'Prazo p/ solicitar rescisão (dias)'), null=True, blank=True)
+    descricao = models.TextField(_(u'Descrição'))
+    #arquivo = models.FileField(upload_to='OS', null=True, blank=True)
+    estado = models.ForeignKey('outorga.EstadoOS')
+    pergunta = models.ManyToManyField('memorando.Pergunta', null=True, blank=True)
+    substituicoes = models.TextField(null=True, blank=True)
 
 
-      # Retorna o prazo para solicitar recisão (campo 'antes_rescisao').
-      def mostra_prazo(self):
-          if self.antes_rescisao < 1:
-              return '-'
-          if self.antes_rescisao > 1:
-              return u'%s dias' % self.antes_rescisao
-          return u'%s dias' % self.antes_rescisao
-      mostra_prazo.short_description = _(u'Prazo p/ rescisão')
+    # Retorna a descrição.
+    def __unicode__(self):
+        return u"%s %s" % (self.tipo, self.numero)
 
-      # Retorna um ícone se a ordem de serviço tiver anexo.
-      def existe_arquivo(self):
-          a = '<center><a href="/admin/outorga/arquivoos/?os__id__exact=%s"><img src="/media/img/arquivo.png" /></a></center>' % self.id
-          if self.arquivos.count() > 0:
-              return a
-          else:
-              return ' '
-      existe_arquivo.allow_tags = True
-      existe_arquivo.short_description = _(u'Arquivo')
 
-      def entidade(self):
-          return self.contrato.entidade
+    # Retorna o prazo para solicitar recisão (campo 'antes_rescisao').
+    def mostra_prazo(self):
+        if self.antes_rescisao < 1:
+            return '-'
+        if self.antes_rescisao > 1:
+            return u'%s dias' % self.antes_rescisao
+        return u'%s dias' % self.antes_rescisao
+    mostra_prazo.short_description = _(u'Prazo p/ rescisão')
 
-      def primeiro_arquivo(self):
-          osf = self.arquivos.all()
-          if osf.count() > 0: return osf[0].arquivo
-          return None
+    # Retorna um ícone se a ordem de serviço tiver anexo.
+    def existe_arquivo(self):
+        a = '<center><a href="/admin/outorga/arquivoos/?os__id__exact=%s"><img src="/media/img/arquivo.png" /></a></center>' % self.id
+        if self.arquivos.count() > 0:
+            return a
+        else:
+            return ' '
+    existe_arquivo.allow_tags = True
+    existe_arquivo.short_description = _(u'Arquivo')
 
-      class Meta:
-	  verbose_name = _(u'Alteração de contrato (OS)')
-	  verbose_name_plural = _(u'Alteração de contratos (OS)')
-          ordering = ('tipo', 'numero')
+    def entidade(self):
+        return self.contrato.entidade
+
+    def primeiro_arquivo(self):
+        osf = self.arquivos.all()
+        if osf.count() > 0:
+            return osf[0].arquivo
+        return None
+
+    class Meta:
+        verbose_name = _(u'Alteração de contrato (OS)')
+        verbose_name_plural = _(u'Alteração de contratos (OS)')
+        ordering = ('tipo', 'numero')
 
 
 class ArquivoOS(models.Model):
-      """
-      Arquivos de ordem de serviço	
-      """    
-      arquivo = models.FileField(upload_to=upload_dir_os)
-      data = models.DateField()
-      historico = models.TextField()
-      os = models.ForeignKey('outorga.OrdemDeServico', related_name='arquivos')
+    """
+    Arquivos de ordem de serviço	
+    """
+    arquivo = models.FileField(upload_to=upload_dir_os)
+    data = models.DateField()
+    historico = models.TextField()
+    os = models.ForeignKey('outorga.OrdemDeServico', related_name='arquivos')
 
-      def __unicode__(self):
-	  if self.arquivo.name.find('/') == -1:
-	      return u'%s' % self.arquivo.name
-	  else:
-	      return u'%s' % self.arquivo.name.split('/')[-1]
-	  
-	  
+    def __unicode__(self):
+        if self.arquivo.name.find('/') == -1:
+            return u'%s' % self.arquivo.name
+        else:
+            return u'%s' % self.arquivo.name.split('/')[-1]
+
 
 # Classe para definição de permissões de views e relatórios da app patrimonio
 class Permission(models.Model):

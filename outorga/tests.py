@@ -1,17 +1,10 @@
 # -*- coding: utf-8 -*-
 from datetime import date, timedelta, datetime
 from decimal import Decimal
-from django.db import models
 from django.http import QueryDict
-from django.utils.datastructures import MultiValueDict
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase
 from utils.UnitTestCase import UnitTestCase
-from StringIO import StringIO
-import os
 import mock
 
-from outorga.views import *
 from outorga.models import Termo, Item, OrigemFapesp, Estado as EstadoOutorga, Categoria, Outorga, Modalidade, Natureza_gasto, \
                            Acordo, Contrato, OrdemDeServico, TipoContrato, ArquivoOS, Arquivo, EstadoOS
 from financeiro.models import Pagamento, ExtratoCC, Estado as EstadoFinanceiro
@@ -838,7 +831,6 @@ class ItemTest(UnitTestCase):
         o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007,12,1), termino=date(2008,12,31), data_presta_contas=date(2008,2,28))
         o2 = Outorga.objects.create(termo=t, categoria=c2, data_solicitacao=date(2008,4,1), termino=date(2008,12,31), data_presta_contas=date(2008,2,28))
 
-
         #Cria Natureza de gasto
         m1 = Modalidade.objects.create(sigla='STE', nome='Servicos de Terceiro no Exterior', moeda_nacional=False)
         m2 = Modalidade.objects.create(sigla='STF', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
@@ -846,22 +838,19 @@ class ItemTest(UnitTestCase):
         n1 = Natureza_gasto.objects.create(modalidade=m1, termo=t, valor_concedido='1500000.00')
         n2 = Natureza_gasto.objects.create(modalidade=m2, termo=t, valor_concedido='300000.00')
 
-
-         #Cria Item de Outorga
+        #Cria Item de Outorga
         ent1 = Entidade.objects.create(sigla='SAC', nome='SAC do Brasil', cnpj='00.000.000/0000-00', fisco=True, url='')
         endereco = Endereco.objects.create(entidade=ent1)
-
 
         i1 = Item.objects.create(entidade=ent1, natureza_gasto=n1, descricao='Serviço de Conexão Internacional', justificativa='Link Internacional', quantidade=12, valor=250000)
         i2 = Item.objects.create(entidade=ent1, natureza_gasto=n2, descricao='Serviço de Conexão Internacional', justificativa='Ajuste na cobrança do Link Internacional', quantidade=6, valor=50000)
 
-         #Cria Protocolo
+        #Cria Protocolo
         ep = EstadoProtocolo.objects.create(nome='Aprovado')
         td = TipoDocumento.objects.create(nome='Nota Fiscal')
         og = Origem.objects.create(nome='Motoboy')
         
         cot1 = Contato.objects.create(primeiro_nome='Alex', email='alex@alex.com.br', tel='')
-        
 
         iden1 = Identificacao.objects.create(contato=cot1, funcao='Gerente', area='Redes', ativo=True, endereco=endereco)
 
@@ -874,7 +863,6 @@ class ItemTest(UnitTestCase):
         ip2 = ItemProtocolo.objects.create(protocolo=p1, descricao='Reajuste do serviço de Conexão Internacional - 09/2009', quantidade=1, valor_unitario=50000)
         ip3 = ItemProtocolo.objects.create(protocolo=p2, descricao='Conexão Internacional - 10/2009', quantidade=1, valor_unitario=250000)
         ip4 = ItemProtocolo.objects.create(protocolo=p2, descricao='Reajuste do serviço de Conexão Internacional - 10/2009', quantidade=1, valor_unitario=50000)
-
 
         #Criar Fonte Pagadora
         ef1 = EstadoFinanceiro.objects.create(nome='Aprovado')
@@ -1045,7 +1033,7 @@ class ModalidadeTest(UnitTestCase):
         n1 = Natureza_gasto.objects.create(modalidade=m1, termo=t, valor_concedido='1500000.00')
         n2 = Natureza_gasto.objects.create(modalidade=m2, termo=t, valor_concedido='300000.00')
 
-         #Cria Item de Outorga
+        #Cria Item de Outorga
         ent1 = Entidade.objects.create(sigla='SAC', nome='SAC do Brasil', cnpj='00.000.000/0000-00', fisco=True, url='')
         endereco = Endereco.objects.create(entidade=ent1)
 
@@ -1099,22 +1087,19 @@ class OrigemFapespTest(UnitTestCase):
         n1 = Natureza_gasto.objects.create(modalidade=m1, termo=t, valor_concedido='1500000.00')
         n2 = Natureza_gasto.objects.create(modalidade=m2, termo=t, valor_concedido='300000.00')
 
-
-         #Cria Item de Outorga
+        #Cria Item de Outorga
         ent1 = Entidade.objects.create(sigla='SAC', nome='SAC do Brasil', cnpj='00.000.000/0000-00', fisco=True, url='')
         endereco = Endereco.objects.create(entidade=ent1)
-
 
         i1 = Item.objects.create(entidade=ent1, natureza_gasto=n1, descricao='Serviço de Conexão Internacional', justificativa='Link Internacional', quantidade=12, valor=250000)
         i2 = Item.objects.create(entidade=ent1, natureza_gasto=n2, descricao='Serviço de Conexão Internacional', justificativa='Ajuste na cobrança do Link Internacional', quantidade=6, valor=50000)
 
-         #Cria Protocolo
+        #Cria Protocolo
         ep = EstadoProtocolo.objects.create(nome='Aprovado')
         td = TipoDocumento.objects.create(nome='Nota Fiscal')
         og = Origem.objects.create(nome='Motoboy')
         
         cot1 = Contato.objects.create(primeiro_nome='Alex', email='alex@alex.com.br', tel='', ativo=True)
-        
 
         iden1 = Identificacao.objects.create(contato=cot1, funcao='Gerente', area='Redes', ativo=True, endereco=endereco)
 

@@ -107,7 +107,7 @@ class AssinaturaTest(TestCase):
     def setUp(self):
         mb = Membro.objects.create(nome='Soraya Gomes', email= 'soraya@gomes.com', cpf= '312.617.028-00', site=True)
         ta = TipoAssinatura.objects.create(nome='Cheque')
-        a = Assinatura.objects.create(membro=mb, tipo_assinatura=ta)
+        Assinatura.objects.create(membro=mb, tipo_assinatura=ta)
 
     def test_unicode(self):
         assinatura = Assinatura.objects.get(pk=1)
@@ -143,25 +143,12 @@ class MembroControleTest(TestCase):
         self.assertEquals(controle.segundos, 9 * 60 * 60, 'Deveria ser 32400 mas e ' + str(controle.segundos))
         
 
-    def test_controle_permanencia_sem_almoco(self):
-        """
-        Teste de permanencia em um dia sem almoco
-        """
-        membro = Membro.objects.create(id=1, nome='teste', site=True)
-        
-        controle = Controle.objects.create(id=1, membro=membro, entrada=timezone.now(), saida=timezone.now()+timedelta(hours=48), 
-                            almoco_devido=False, almoco=60)
-
-        controle = Controle.objects.get(id=1)
-        
-        #self.assertEquals(controle.segundos, 48 * 60 * 60)
-
     def test_controle_mover_bloco(self):
         membro = Membro.objects.create(id=1, nome='teste', site=True)
         
-        controle = Controle.objects.create(id=1, membro=membro, entrada=datetime(year=2000, month=01, day=01, hour=12), saida=datetime(year=2000, month=01, day=01, hour=18, minute=30), 
+        Controle.objects.create(id=1, membro=membro, entrada=datetime(year=2000, month=01, day=01, hour=12), saida=datetime(year=2000, month=01, day=01, hour=18, minute=30), 
                             almoco_devido=False, almoco=60)
-        controle = Controle.objects.get(id=1)
+        Controle.objects.get(id=1)
         
         tempo = 20
 
@@ -191,7 +178,7 @@ class MembroControleHorarioTest(TestCase):
         
         membro = Membro(id=1)
         ferias = Ferias(membro = membro, id=1)
-        c = ControleFerias.objects.create(ferias = ferias, inicio = ferias_data_inicio, termino = ferias_data_fim, dias_uteis_fato=30, dias_uteis_aberto=0, oficial=True, vendeu10=False, antecipa13=False)
+        ControleFerias.objects.create(ferias = ferias, inicio = ferias_data_inicio, termino = ferias_data_fim, dias_uteis_fato=30, dias_uteis_aberto=0, oficial=True, vendeu10=False, antecipa13=False)
         
         # ferias_ini < mes_ini < ferias_fim  OR  mes_ini < ferias_ini < mes_fim
         controleFerias = ControleFerias.objects.filter(Q(inicio__lte=mes_corrente_ini, termino__gte=mes_corrente_ini) |
@@ -265,7 +252,7 @@ class DispensaLegalTest(TestCase):
         
         tipo = TipoDispensa.objects.create()
         # a data é uma sexta-feira
-        dispensaLegal = DispensaLegal.objects.create(membro=membro, tipo=tipo, dias_corridos=1, horas=0, minutos=0, inicio_realizada=date(2013,07,19), realizada=True, inicio_direito=date(2013,07,19), atestado=False)
+        DispensaLegal.objects.create(membro=membro, tipo=tipo, dias_corridos=1, horas=0, minutos=0, inicio_realizada=date(2013,07,19), realizada=True, inicio_direito=date(2013,07,19), atestado=False)
         
         dispensa = DispensaLegal.objects.get(pk=1).dia_dispensa(date(2013,07,19))
         
@@ -277,7 +264,7 @@ class DispensaLegalTest(TestCase):
         
         tipo = TipoDispensa.objects.create()
         # a data é uma sexta-feira
-        dispensaLegal = DispensaLegal.objects.create(membro=membro, tipo=tipo, dias_corridos=0, horas=4, minutos=0, inicio_realizada=date(2013,07,19), realizada=True, inicio_direito=date(2013,07,19), atestado=False)
+        DispensaLegal.objects.create(membro=membro, tipo=tipo, dias_corridos=0, horas=4, minutos=0, inicio_realizada=date(2013,07,19), realizada=True, inicio_direito=date(2013,07,19), atestado=False)
         
         dispensa = DispensaLegal.objects.get(pk=1).dia_dispensa(date(2013,07,19))
         
@@ -289,7 +276,7 @@ class DispensaLegalTest(TestCase):
         
         tipo = TipoDispensa.objects.create()
         # a data é uma sexta-feira
-        dispensaLegal = DispensaLegal.objects.create(membro=membro, tipo=tipo, dias_corridos=0, horas=4, minutos=30, inicio_realizada=date(2013,07,19), realizada=True, inicio_direito=date(2013,07,19), atestado=False)
+        DispensaLegal.objects.create(membro=membro, tipo=tipo, dias_corridos=0, horas=4, minutos=30, inicio_realizada=date(2013,07,19), realizada=True, inicio_direito=date(2013,07,19), atestado=False)
         
         dispensa = DispensaLegal.objects.get(pk=1).dia_dispensa(date(2013,07,19))
         
@@ -301,7 +288,7 @@ class DispensaLegalTest(TestCase):
         
         tipo = TipoDispensa.objects.create(nome='Medica')
         # a data é uma sexta-feira
-        dispensaLegal = DispensaLegal.objects.create(membro=membro, tipo=tipo, dias_corridos=2, horas=4, minutos=30, inicio_realizada=date(2013,07,19), realizada=True, inicio_direito=date(2013,07,19), atestado=False)
+        DispensaLegal.objects.create(membro=membro, tipo=tipo, dias_corridos=2, horas=4, minutos=30, inicio_realizada=date(2013,07,19), realizada=True, inicio_direito=date(2013,07,19), atestado=False)
         
         dispensa = DispensaLegal.objects.get(pk=1).dia_dispensa(date(2013,07,19))
         self.assertEqual(dispensa['is_dispensa'], True)
@@ -320,7 +307,7 @@ class DispensaLegalTest(TestCase):
         
         tipo = TipoDispensa.objects.create(nome='Medica')
         # a data é uma sexta-feira
-        dispensaLegal = DispensaLegal.objects.create(membro=membro, tipo=tipo, dias_corridos=2, inicio_realizada=date(2013,07,19), realizada=True, inicio_direito=date(2013,07,19), atestado=False)
+        DispensaLegal.objects.create(membro=membro, tipo=tipo, dias_corridos=2, inicio_realizada=date(2013,07,19), realizada=True, inicio_direito=date(2013,07,19), atestado=False)
         
         dispensa = DispensaLegal.objects.get(pk=1).dia_dispensa(date(2013,07,18))
         self.assertEqual(dispensa['is_dispensa'], False)
@@ -419,10 +406,10 @@ class FeriasTest(TestCase):
         
         ferias = Ferias.objects.create(id=10, membro=membro, inicio=datetime.now(), realizado=True)
         
-        controleFerias = ControleFerias.objects.create(ferias=ferias, termino=datetime.now(), inicio=datetime.now(), dias_uteis_fato=20, dias_uteis_aberto=10, oficial=True, vendeu10=False, antecipa13=False)
-        controleFerias = ControleFerias.objects.create(ferias=ferias, termino=datetime.now(), inicio=datetime.now(), dias_uteis_fato=0, dias_uteis_aberto=30, oficial=True, vendeu10=False, antecipa13=False)
-        controleFerias = ControleFerias.objects.create(ferias=ferias, termino=datetime.now(), inicio=datetime.now(), dias_uteis_fato=0, dias_uteis_aberto=30, oficial=True, vendeu10=False, antecipa13=False)
-        controleFerias = ControleFerias.objects.create(ferias=ferias, termino=datetime.now(), inicio=datetime.now(), dias_uteis_fato=30, dias_uteis_aberto=0, oficial=True, vendeu10=False, antecipa13=False)
+        ControleFerias.objects.create(ferias=ferias, termino=datetime.now(), inicio=datetime.now(), dias_uteis_fato=20, dias_uteis_aberto=10, oficial=True, vendeu10=False, antecipa13=False)
+        ControleFerias.objects.create(ferias=ferias, termino=datetime.now(), inicio=datetime.now(), dias_uteis_fato=0, dias_uteis_aberto=30, oficial=True, vendeu10=False, antecipa13=False)
+        ControleFerias.objects.create(ferias=ferias, termino=datetime.now(), inicio=datetime.now(), dias_uteis_fato=0, dias_uteis_aberto=30, oficial=True, vendeu10=False, antecipa13=False)
+        ControleFerias.objects.create(ferias=ferias, termino=datetime.now(), inicio=datetime.now(), dias_uteis_fato=30, dias_uteis_aberto=0, oficial=True, vendeu10=False, antecipa13=False)
         
         self.assertEquals(Ferias().total_dias_uteis_aberto(1), 20 * 8 * 60 * 60)
 

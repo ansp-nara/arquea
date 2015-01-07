@@ -2,16 +2,12 @@
 
 from django import forms
 from django.forms.models import inlineformset_factory, BaseInlineFormSet
-from django.forms.util import ErrorList
+from django.forms.utils import ErrorList
 from django.utils.translation import ugettext_lazy as _
-from django.utils.html import strip_tags
 from ckeditor.widgets import CKEditorWidget
 from tinymce.widgets import TinyMCE
 
-from financeiro.models import Pagamento
-from outorga.models import Termo
 from utils import widgets
-from utils.request_cache import get_request_cache
 from models import *
 
 
@@ -63,7 +59,7 @@ class CorpoAdminForm(forms.ModelForm):
 
         super(CorpoAdminForm, self).__init__(data, files, auto_id, prefix, initial,
                                             error_class, label_suffix, empty_permitted, instance)
-	if data:
+        if data:
             pergunta_id = data.get('pergunta')
             if pergunta_id:
                 pgta = Pergunta.objects.get(id=pergunta_id)
@@ -78,7 +74,7 @@ class CorpoAdminForm(forms.ModelForm):
     class Media:
         js = ('/media/js/selects.js', )
 
-	
+
 class BaseCorpoInlineFormSet(BaseInlineFormSet):
     
     def __init__(self, data=None, files=None, instance=None,
@@ -106,6 +102,4 @@ class BaseCorpoInlineFormSet(BaseInlineFormSet):
                 f.fields['pergunta'].queryset = Pergunta.objects.none()
             self.empty_form.fields['pergunta'].queryset = Pergunta.objects.none()
                 
-
-
 CorpoFormSet = inlineformset_factory(MemorandoResposta, Corpo, formset=BaseCorpoInlineFormSet, fields=['pergunta', 'resposta', 'anexo', 'concluido',])

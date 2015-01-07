@@ -1,5 +1,4 @@
-from django.core.management.base import BaseCommand, CommandError
-import sys
+from django.core.management.base import BaseCommand
 from datetime import date
 import re
 from decimal import Decimal

@@ -231,9 +231,9 @@ class Protocolo(models.Model):
 
     # Caso seja um pedido, exibe um link para as cotações
     def cotacoes(self):
-	if self.tipo_documento.nome == 'Pedido':
-	    return u'<a href="/protocolo/%s/cotacoes">Cotações</a>' % self.pk
-	return ''
+        if self.tipo_documento.nome == 'Pedido':
+            return u'<a href="/protocolo/%s/cotacoes">Cotações</a>' % self.pk
+        return ''
     cotacoes.allow_tags = True
     cotacoes.short_description = _(u'Cotações')
 
@@ -241,8 +241,8 @@ class Protocolo(models.Model):
     # Retorna a entidade.
     def entidade(self):
         if self.descricao2:
-           return self.descricao2.entidade.sigla
-	else: return ''
+            return self.descricao2.entidade.sigla
+        else: return ''
     entidade.short_description = _(u'Entidade')
     entidade.admin_order_field = 'descricao2'
 
@@ -267,10 +267,10 @@ class Protocolo(models.Model):
 
     # Retorna o tipo e o número do documento.
     def doc_num(self):
-	try:
-	    self.cotacao
-	except Cotacao.DoesNotExist:
-	    return u'%s %s' % (self.tipo_documento.nome, self.num_documento)
+        try:
+            self.cotacao
+        except Cotacao.DoesNotExist:
+            return u'%s %s' % (self.tipo_documento.nome, self.num_documento)
         return ''
     doc_num.short_description = _(u'Documento')
 
@@ -308,7 +308,7 @@ class Protocolo(models.Model):
         if self.estado.nome.lower().startswith(u'concluído'):
             return '<span style="color: green">%s</span>' % (self.estado.nome)
         else:
-	    return self.estado.nome
+            return self.estado.nome
     colorir.allow_tags = True
     colorir.short_description = _(u'Estado')
     colorir.admin_order_field = 'estado'
@@ -316,18 +316,18 @@ class Protocolo(models.Model):
 
     # Verifica se a data de vencimento do protocolo diferente de 'Contrato' e 'Cotação' e com estado diferente de 'concluído' será no próximo dia útil.
     def pagamentos_amanha(self):
-	try:
-	    self.cotacao
-	except Cotacao.DoesNotExist:
-	    if self.estado.nome.lower() != u'concluído':
-		today = datetime.date.today()
-		next = today + relativedelta(days=+1)
-		while Feriado.dia_de_feriado(next) or next.weekday() > 4:
-		    next = next + relativedelta(days=+1)
-		if self.data_vencimento and self.data_vencimento <= next:
-		    return True
-		return False
-	    return False
+        try:
+            self.cotacao
+        except Cotacao.DoesNotExist:
+            if self.estado.nome.lower() != u'concluído':
+                today = datetime.date.today()
+                nextday = today + relativedelta(days=+1)
+                while Feriado.dia_de_feriado(nextday) or nextday.weekday() > 4:
+                    nextday = nextday + relativedelta(days=+1)
+                if self.data_vencimento and self.data_vencimento <= nextday:
+                    return True
+                return False
+            return False
 
 
     # Define um atributo que calcula a soma de todos os itens do protocolo.
@@ -376,9 +376,9 @@ class Protocolo(models.Model):
     def protocolos_em_aberto(cls, fp=None):
         if fp:
             prot = cls.objects.filter(~Q(estado__nome='Pago')&~Q(estado__nome="Concluído") | Q(pk=fp.protocolo.id))
-	    protocolos = [p for p in prot if p != fp.protocolo]
+            protocolos = [p for p in prot if p != fp.protocolo]
         else:
-	    prot = cls.objects.exclude(estado__nome__in=['Pago', 'Concluído'])
+            prot = cls.objects.exclude(estado__nome__in=['Pago', 'Concluído'])
             protocolos = [p for p in prot]
 
         for p in protocolos:
@@ -387,7 +387,7 @@ class Protocolo(models.Model):
             for f in fp:
                 total += f.valor
             if p.valor <= total:
-               prot = prot.exclude(pk=p.id)
+                prot = prot.exclude(pk=p.id)
 
         return prot
 
@@ -648,7 +648,7 @@ class Arquivo(models.Model):
 
     # Retorna o nome do arquivo.
     def __unicode__(self):
-    	if not self.arquivo.name: return ''
+        if not self.arquivo.name: return ''
         if self.arquivo.name.find('/') == -1:
             return self.arquivo.name
         else:
@@ -664,9 +664,9 @@ class Arquivo(models.Model):
     # Retorna a sigla da entidade.
     def mostra_entidade(self):
         if self.protocolo.identificacao_id:
-	    return self.protocolo.identificacao.entidade.sigla
+            return self.protocolo.identificacao.entidade.sigla
         else:
-	    return ''
+            return ''
     mostra_entidade.short_description = _(u'Entidade')
 
 
@@ -687,12 +687,12 @@ class Descricao(models.Model):
     entidade = models.ForeignKey(Entidade)
 
     class Meta:
-	verbose_name = u'Descrição'
-	verbose_name_plural = u'Descrições'
-	ordering = ('entidade', 'descricao')
+        verbose_name = u'Descrição'
+        verbose_name_plural = u'Descrições'
+        ordering = ('entidade', 'descricao')
 
     def __unicode__(self):
-	return "%s - %s" % (self.entidade.__unicode__(), self.descricao)
+        return "%s - %s" % (self.entidade.__unicode__(), self.descricao)
 
 
 
