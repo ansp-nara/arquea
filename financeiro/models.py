@@ -309,7 +309,7 @@ class Permission(models.Model):
         # remover as permissões padrões, pois essa é uma classe para configurar permissões customizadas
         default_permissions = ()
         permissions = (
-                       ("rel_adm_extrato", "Rel. admin. - Extrato da conta corrente"),     #/financeiro/extrato
+                       ("rel_adm_extrato", "Rel. admin. - Panorama da conta corrente"),     #/financeiro/extrato
                        ("rel_adm_extrato_financeiro", "Rel. admin. - Extrato do financeiro por mês"),     #/financeiro/extrato_financeiro
                        ("rel_adm_extrato_financeiro_parciais", "Rel. admin. - Extrato do financeiro por parcial"),     #/financeiro/extrato_financeiro_parciais
                        ("rel_adm_extrato_mes", "Rel. admin. - Extrato da conta corrente por mês"),     #/financeiro/extrato_mes

@@ -57,7 +57,7 @@ th {
 </style> 
 </head>
 <body>
-<h1 repeat="1">Extrato da conta corrente do projeto em {{ ano }}</h1>
+<h1 repeat="1">Panorama da conta corrente do projeto em {{ ano }}</h1>
     <table border="0" repeat="1" cellpadding="5">
     <thead>
     <tr>

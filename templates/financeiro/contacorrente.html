@@ -19,11 +19,11 @@
 {% block breadcrumbs %}
     <div class="breadcrumbs">Você está em: 
       <a href="../../">{% trans "Home" %}</a> &rsaquo; 
-      <a href="{% url 'financeiro.views.extrato' %}">Extrato da conta corrente</a>
+      <a href="{% url 'financeiro.views.extrato' %}">Panorama da conta corrente</a>
     </div>
 {% endblock %}
 {% block content %}
-<h1 repeat="1">Extrato da conta corrente do projeto em {{ ano }}</h1>
+<h1 repeat="1">Panorama da conta corrente do projeto em {{ ano }}</h1>
 <div id="report_toolbar">
     <form action="{% url 'financeiro.views.extrato' 1 %}" method="GET" id="id_form_recurso">
         <input type="hidden" name="ano" value="{{ ano }}" />

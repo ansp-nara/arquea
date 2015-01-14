@@ -72,7 +72,7 @@ def lista_relatorios(context):
         administrativos.append({'url':'/financeiro/relatorios/caixa', 'nome':u'Diferenças de caixa'})
     
     if user.is_superuser or user.has_perm('financeiro.rel_adm_extrato'):
-        administrativos.append({'url':'/financeiro/extrato', 'nome':u'Extrato da conta corrente'})
+        administrativos.append({'url':'/financeiro/extrato', 'nome':u'Panorama da conta corrente'})
     
     if user.is_superuser or user.has_perm('financeiro.rel_adm_extrato_mes'):
         administrativos.append({'url':'/financeiro/extrato_mes', 'nome':u'Extrato da conta corrente por mês'})
