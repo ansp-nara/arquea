@@ -426,7 +426,7 @@ def relatorio_acordos(request, pdf=False):
 @require_safe
 def extrato(request, pdf=False):
     """
-     Relatório Administrativo - Relatório de Extrato da conta corrente.
+     Relatório Administrativo - Relatório de Panorama da conta corrente.
     
     """
     if request.GET.get('ano'):

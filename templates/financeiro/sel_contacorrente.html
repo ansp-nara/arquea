@@ -4,11 +4,11 @@
 {% block breadcrumbs %}
     <div class="breadcrumbs">Você está em: 
       <a href="../../">{% trans "Home" %}</a> &rsaquo; 
-      <a href="{% url 'financeiro.views.extrato' %}">Extrato da conta corrente</a>
+      <a href="{% url 'financeiro.views.extrato' %}">Panorama da conta corrente</a>
     </div>
 {% endblock %}
 {% block content %}
-<h1>Extrato da conta corrente</h1>
+<h1>Panorama da conta corrente</h1>
 <p>Selecione o ano:</p>
 <form method="GET">
 <select name="ano" id="id_ano">
