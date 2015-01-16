@@ -56,9 +56,6 @@ def lista_relatorios(context):
     
     user = context['user']
 
-    if user.is_superuser or user.has_perm('financeiro.rel_adm_repositorio'):
-        administrativos.append({'url':'/repositorio/relatorio/repositorio', 'nome':u'Repositório'})
-    
     if user.is_superuser or user.has_perm('financeiro.rel_adm_pagamentos_mes'):
         administrativos.append({'url':'/financeiro/relatorios/pagamentos_mes', 'nome':u'Pagamentos por mês'})
     
@@ -116,6 +113,14 @@ def lista_relatorios(context):
     if user.is_superuser or user.has_perm('patrimonio.rel_adm_presta_contas'):
         administrativos.append({'url':'/patrimonio/relatorio/presta_contas', 'nome':u'Prestação de contas patrimonial (em construção)'})
 
+    if user.is_superuser or user.has_perm('identificacao.rel_tec_arquivos'):
+        ## Movido da área técnica para a administrativa
+        administrativos.append({'url':'/identificacao/relatorios/arquivos', 'nome':u'Documentos por entidade'})
+
+    if user.is_superuser or user.has_perm('financeiro.rel_adm_repositorio'):
+        ## Movido da área aministrativa para gerencial
+        gerenciais.append({'url':'/repositorio/relatorio/repositorio', 'nome':u'Repositório'})
+
     if user.is_superuser or user.has_perm('financeiro.rel_ger_gerencial'):
         gerenciais.append({'url':'/financeiro/relatorios/gerencial', 'nome':u'Gerencial'})
     
@@ -136,9 +141,6 @@ def lista_relatorios(context):
     
     if user.is_superuser or user.has_perm('rede.rel_ger_custo_terremark'):
         gerenciais.append({'url':'/rede/custo_terremark', 'nome':u'Custos dos recursos contratados'})
-
-    if user.is_superuser or user.has_perm('identificacao.rel_tec_arquivos'):
-        tecnicos.append({'url':'/identificacao/relatorios/arquivos', 'nome':u'Documentos por entidade'})
     
     if user.is_superuser or user.has_perm('patrimonio.rel_tec_por_estado'):
         tecnicos.append({'url':'/patrimonio/relatorio/por_estado', 'nome':u'Patrimônio por estado do item'})
