@@ -128,3 +128,19 @@ class Anexo(models.Model):
 	
 	def lista_palavras_chave(self):
 		return self.palavras_chave.split()
+
+
+
+# Classe para definição de permissões de views e relatórios da app repositorio
+class Permission(models.Model):
+    class Meta:
+        # remover as permissões padrões, pois essa é uma classe para configurar permissões customizadas
+        default_permissions = ()
+        permissions = (
+                       ("rel_adm_repositorio", "Rel. admin. - Repositório"),     #/financeiro/relatorios/prestacao
+                      )
+
+
+
+
+

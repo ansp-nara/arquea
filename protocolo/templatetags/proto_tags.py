@@ -117,7 +117,7 @@ def lista_relatorios(context):
         ## Movido da área técnica para a administrativa
         administrativos.append({'url':'/identificacao/relatorios/arquivos', 'nome':u'Documentos por entidade'})
 
-    if user.is_superuser or user.has_perm('financeiro.rel_adm_repositorio'):
+    if user.is_superuser or user.has_perm('repositorio.rel_adm_repositorio'):
         ## Movido da área aministrativa para gerencial
         gerenciais.append({'url':'/repositorio/relatorio/repositorio', 'nome':u'Repositório'})
 
