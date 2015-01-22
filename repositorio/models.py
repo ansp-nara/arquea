@@ -137,7 +137,7 @@ class Permission(models.Model):
         # remover as permissões padrões, pois essa é uma classe para configurar permissões customizadas
         default_permissions = ()
         permissions = (
-                       ("rel_adm_repositorio", "Rel. admin. - Repositório"),     #/financeiro/relatorios/prestacao
+                       ("rel_ger_repositorio", "Rel. admin. - Repositório"),     #/financeiro/relatorios/prestacao
                       )
 
 
