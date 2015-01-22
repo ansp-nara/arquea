@@ -40,7 +40,7 @@ def ajax_repositorio_tipo_nomes(request):
 
 
 @login_required
-@permission_required('repositorio.rel_adm_repositorio', raise_exception=True)
+@permission_required('repositorio.rel_ger_repositorio', raise_exception=True)
 @require_safe
 def relatorio_repositorio(request, pdf=0):
     """
