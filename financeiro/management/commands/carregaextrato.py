@@ -30,7 +30,9 @@ class Command(BaseCommand):
                 (d, m, y) = map(int, data.split('/'))
             else:
                 codigo = dados[0]
-                data = dados[1]
+                data = dados[-2]
+                if data[0] == '0' and data[1] == '0':
+                    data = dados[1]
                 valor = dados[2]
                 sinal = dados[3]
                 historico = ' '.join(dados[5:-3])
