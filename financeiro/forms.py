@@ -1,23 +1,25 @@
 # -*- coding: utf-8 -*-
-import StringIO
-from decimal import Decimal
-
 import django
 from django import forms
-from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
+from django.core.exceptions import ValidationError
+from django.contrib.admin.widgets import FilteredSelectMultiple, RelatedFieldWidgetWrapper
 from django.db.models.fields.related import ManyToOneRel
-from django.forms.utils import ErrorList
+from django.forms.util import ErrorList
 from django.utils.html import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from PIL import Image as Img
+import StringIO
 
+from models import *
 from outorga.models import Termo, OrigemFapesp
 from protocolo.models import Protocolo
 from memorando.models import Pergunta
 from rede.models import PlanejaAquisicaoRecurso, Recurso
+from financeiro.models import ExtratoPatrocinio, Estado, TipoComprovante
 from utils.request_cache import get_request_cache
-from models import *
+
 
 class RecursoInlineAdminForm(forms.ModelForm):
     # Foi codificado no label um Checkbox para exibir somente os recursos vigentes
@@ -58,10 +60,10 @@ class PagamentoAdminForm(forms.ModelForm):
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=':',
                  empty_permitted=False, instance=None):
-
+	
         if instance and not data:
             initial = {'termo': instance.protocolo.termo.id}
-
+	   
         super(PagamentoAdminForm, self).__init__(data, files, auto_id, prefix, initial,
                                             error_class, label_suffix, empty_permitted, instance)
 
@@ -114,16 +116,16 @@ class PagamentoAdminForm(forms.ModelForm):
         js = ('/media/js/selects.js',)
 
     cod_oper = forms.CharField(label=_(u'Código da operação'), required=False,
-        widget=forms.TextInput(attrs={'onchange':'ajax_filter_cc_cod(this.value);'}))
+    	      widget=forms.TextInput(attrs={'onchange':'ajax_filter_cc_cod(this.value);', 'class':'auxiliary'}))
 
     termo = forms.ModelChoiceField(Termo.objects.all(), label=_(u'Termo'), required=False,
-        widget=forms.Select(attrs={'onchange': 'ajax_filter_origem_protocolo(this.id, this.value);'}))
-
+	      widget=forms.Select(attrs={'onchange': 'ajax_filter_origem_protocolo(this.id, this.value);', 'class':'auxiliary'}))
+	      
     numero = forms.CharField(label=_(u'Número do protocolo'), required=False,
-        widget=forms.TextInput(attrs={'onchange': 'ajax_filter_protocolo_numero(this.value);'}))
-
+	      widget=forms.TextInput(attrs={'onchange': 'ajax_filter_protocolo_numero(this.value);', 'class':'auxiliary'}))
+	     
     origem_fapesp = forms.ModelChoiceField(OrigemFapesp.objects.all(), label=_(u'Origem Fapesp'),
-        required=False, widget=forms.Select(attrs={'onchange':'ajax_prox_audit(this.value);'}))
+              required=False, widget=forms.Select(attrs={'onchange':'ajax_prox_audit(this.value);'}))
 
     # tornando clicável o label do campo conta_corrente
     conta_corrente = forms.ModelChoiceField(queryset=ExtratoCC.objects.all(), 
@@ -143,6 +145,7 @@ class PagamentoAdminForm(forms.ModelForm):
         origem = self.cleaned_data.get('origem_fapesp')
 
         if valor and not origem:
+            #raise forms.ValidationError()
             self._errors["origem_fapesp"] = self.error_class([ u'Valor da FAPESP obriga a ter uma origem da FAPESP'])
             del cleaned_data["origem_fapesp"]
 
@@ -195,7 +198,7 @@ class ExtratoPatrocinioAdminForm(forms.ModelForm):
 class ExtratoCCAdminForm(forms.ModelForm):
 
     termo = forms.ModelChoiceField(Termo.objects.all(), label=_(u'Termo'), required=False,
-                  widget=forms.Select(attrs={'onchange': 'ajax_filter_financeiro(this.value);'}))
+                  widget=forms.Select(attrs={'onchange': 'ajax_filter_financeiro(this.value);', 'class':'auxiliary'}))
 
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=':',
