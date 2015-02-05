@@ -61,7 +61,8 @@ class EnderecoAdminForm(forms.ModelForm):
 class EnderecoDetalheAdminForm(forms.ModelForm):
 
     entidade = forms.ModelChoiceField(Entidade.objects.all(), required=False,
-            widget=forms.Select(attrs={'onchange': 'ajax_select_endereco2();'}))
+            widget=forms.Select(attrs={'onchange': 'ajax_select_endereco2();',
+                                       'class':'auxiliary'}))
 
     def clean(self):
         cleaned_data = self.cleaned_data

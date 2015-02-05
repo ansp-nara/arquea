@@ -40,7 +40,7 @@ class ExtratoCCAdmin(admin.ModelAdmin):
     
     fieldsets = (
 		  (None, {
-			  'fields': (('termo', 'extrato_financeiro', 'despesa_caixa'), ('data_oper', 'cod_oper'), ('historico', 'valor')),
+			  'fields': (('termo', 'extrato_financeiro', 'despesa_caixa', 'cartao'), ('data_oper', 'cod_oper'), ('historico', 'valor')),
 			  'classes': ('wide',)
 		  }),
 		  ('Extras', {
@@ -58,7 +58,7 @@ class ExtratoFinanceiroAdmin(admin.ModelAdmin):
     
     fieldsets = (
 		  (None, {
-			  'fields': (('termo', 'data_libera'), ('cod', 'valor'), ('comprovante', 'tipo_comprovante'), 'parcial'),
+			  'fields': (('termo', 'data_libera'), ('cod', 'valor'), ('comprovante', 'tipo_comprovante'), 'parcial', 'taxas'),
 			  'classes': ('wide',)
 		  }),
     )

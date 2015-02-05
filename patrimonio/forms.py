@@ -116,16 +116,17 @@ class PatrimonioAdminForm(forms.ModelForm):
     A class 'Media'        Define os arquivos .js que serão utilizados.
     """
         
-    termo = forms.ModelChoiceField(Termo.objects.all(), label=_(u'Termo de outorga'), required=False)
+    termo = forms.ModelChoiceField(Termo.objects.all(), label=_(u'Termo de outorga'), required=False,
+                                   widget=forms.Select(attrs={'class':'auxiliary'}))
 
     npgto = forms.CharField(label=_(u'Nº do cheque ou do documento'), required=False,
-            widget=forms.TextInput(attrs={'onchange': 'ajax_filter_pagamentos("/patrimonio/escolhe_pagamento", this.value);'}))
+            widget=forms.TextInput(attrs={'onchange': 'ajax_filter_pagamentos("/patrimonio/escolhe_pagamento", this.value);', 'class':'auxiliary'}))
 
 #    part_number = forms.CharField(required=False, widget=forms.TextInput(attrs={'onchange':'ajax_patrimonio_existente(this.value);'}))
 
     nf = forms.CharField(label=_(u'Nº da NF ou NS'), required=False,
             widget=forms.TextInput(attrs={'onkeydown':'if (event.keyCode == 13) {$(\'#id_patrimonio\').focus(); return false;}', 
-                                          'onchange': 'ajax_filter_patrimonio(this.value);'}))
+                                          'onchange': 'ajax_filter_patrimonio(this.value);', 'class':'auxiliary'}))
 
     tem_numero_fmusp = forms.BooleanField(label=u'Tem nº de patrimônio oficial?', required=False, 
             widget=forms.CheckboxInput(attrs={'onchange':'ajax_numero_fmusp();'}))
@@ -134,7 +135,8 @@ class PatrimonioAdminForm(forms.ModelForm):
     
     filtro_equipamento = forms.CharField(label=_(u'Filtro para busca de Equipamento'), required=False,\
         widget = forms.TextInput(attrs={'onchange': 'ajax_filter_equipamento(this.value);',
-                                        'onkeydown':'return false;'}))
+                                        'onkeydown':'return false;',
+                                        'class': 'auxiliary'}))
     
     # Uso de Model específico para a adição de reticências na descrição
     # e javascript para adição de link no label para a página do Equipamento selecionado 
@@ -329,7 +331,8 @@ class PatrimonioHistoricoLocalAdminForm(forms.ModelForm):
 
 
     entidade = EntidadeModelChoiceField(Entidade.objects.all(), required=False,
-                widget=forms.Select(attrs={'onchange': 'ajax_select_endereco(this.id);'}))
+                widget=forms.Select(attrs={'onchange': 'ajax_select_endereco(this.id);',
+                                           'class':'auxiliary'}))
 
     descricao = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows':'2'}))    
 

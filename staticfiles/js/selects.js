@@ -1346,3 +1346,35 @@ function ajax_repositorio_tipo_nomes(id_entidade)
         }
     });
 }
+
+
+function insere_entrada_extrato() {
+    var url = window.location.href;
+    var pieces = url.split('/');
+    var last_piece = pieces[pieces.length-1];
+    last_piece = last_piece.split('?')[0];
+    var id = -1;
+    if (last_piece) {
+        id = last_piece;
+    } else {
+        id = pieces[pieces.length-2];
+    }
+    $.ajax({
+        type:"POST",
+        url: "/financeiro/ajax_insere_extrato_cc",
+        dataType: "json",
+        data: {'id':id },
+        success: function(retorno) {
+            if (retorno == 1) {
+                $("#mensagem_insere").html("Extrato de conta corrente inserido com sucesso.");
+            } else if (retorno == 2) {
+                $("#mensagem_insere").html("Extrato de conta corrente já existente.");
+            } else {
+                $("#mensagem_insere").html("Extrato de conta corrente não inserido.");
+            }
+        },
+        error: function(erro){
+            alert('Erro: Sem retorno de requisição.');
+        }
+    });
+}

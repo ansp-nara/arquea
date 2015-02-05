@@ -58,7 +58,8 @@ class ItemAdminForm(forms.ModelForm):
 
 
     termo = forms.ModelChoiceField(Termo.objects.all(), label=_(u'Termo'), required=False,
-            widget=forms.Select(attrs={'onchange': 'ajax_filter_termo_natureza("/outorga/seleciona_termo_natureza", "natureza_gasto", this.value, this.id);'}))
+            widget=forms.Select(attrs={'onchange': 'ajax_filter_termo_natureza("/outorga/seleciona_termo_natureza", "natureza_gasto", this.value, this.id);',
+                                       'class':'auxiliary'}))
 
 
     # Define o modelo
