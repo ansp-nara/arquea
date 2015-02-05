@@ -367,7 +367,7 @@ table.orderable-initalized .order-cell, body>tr>td.order-cell {
 /**
 Campos auxiliares
 */
-.auxiliary { background-color: yellow; }
+.auxiliary { background-color: #faffbd; }
 
 input, textarea, select, .form-row p {
     margin: 2px 0;
