@@ -7,7 +7,8 @@ from django.db.models import Q
 
 class RepositorioAdminForm(forms.ModelForm):
     filtra_patrimonio = forms.CharField(label=u'Filtro do patrimônio', required=False,
-                        widget=forms.TextInput(attrs={'onchange':'ajax_filter_patrimonio(this.value);'}))
+                        widget=forms.TextInput(attrs={'onchange':'ajax_filter_patrimonio(this.value);',
+                                                      'class':'auxiliary'}))
 
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=':',

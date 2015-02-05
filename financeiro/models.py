@@ -32,7 +32,7 @@ class ExtratoCC(models.Model):
     despesa_caixa = models.BooleanField(_(u'Despesa de caixa?'), default=False)
     valor = models.DecimalField(_(u'Valor'), max_digits=12, decimal_places=2)
     historico = models.CharField(_(u'Histórico'), max_length=30)
-    cartao = models.BooleanField(_(u'Cartão'), default=False)
+    cartao = models.BooleanField(_(u'Cartão?'), default=False)
     data_extrato = NARADateField(_(u'Data do extrato'), null=True, blank=True)
     imagem = models.ImageField(_(u'Imagem do cheque'), upload_to='extratocc', null=True, blank=True, help_text=u'Somente imagem .jpeg', validators=[RegexValidator(regex=".+((\.jpg)|.+(\.jpeg))$", message="Enviar somente imagem jpeg. A proporção da largura / altura deve ser maior que 2."),])
     capa = models.TextField(null=True, blank=True)
@@ -98,6 +98,7 @@ class ExtratoFinanceiro(models.Model):
     comprovante = models.FileField(_(u'Comprovante da operação'), upload_to='extratofinanceiro', null=True, blank=True)
     tipo_comprovante = models.ForeignKey('financeiro.TipoComprovanteFinanceiro', null=True, blank=True)
     parcial = models.IntegerField(null=False, blank=False, default=0, validators=[MinValueValidator(0), MaxValueValidator(999999999)])
+    taxas = models.IntegerField(default=0)
   
     class Meta:
         verbose_name = _(u'Extrato do Financeiro')

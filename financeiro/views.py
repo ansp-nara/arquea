@@ -5,7 +5,7 @@ from django.db.models import Q, Max, Sum
 from django.http import HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import Context, RequestContext
-from django.views.decorators.http import require_safe
+from django.views.decorators.http import require_safe, require_POST
 
 from decimal import Decimal
 import json as simplejson
@@ -957,3 +957,29 @@ def ajax_get_recursos_vigentes(request):
     return HttpResponse(json, content_type="application/json")
 
 
+@login_required
+@require_POST
+def ajax_insere_extrato_cc(request):
+    """
+    AJAX para inserir no extrato de conta corrente a liberação do financeiro para o Cartão Pesquisa BB
+    Recebe o id do extrato do financeiro
+    """
+    id = request.POST.get('id')
+    retorno = 1
+
+    ef = get_object_or_404(ExtratoFinanceiro, pk=id)
+    if ef.extratocc_set.count() > 0:
+        retorno = 2
+    else:
+        ecc1 = ExtratoCC.objects.create(data_oper=ef.data_libera, historico=u'Liberação de verba MP', valor=-ef.valor, cod_oper=ef.data_libera.strftime('%Y%m%d9'), extrato_financeiro=ef)
+
+        if ef.taxas > 0:
+            ecc2 = ExtratoCC.objects.create(data_oper=ef.data_libera, historico=u'Liberação de verba TX', valor=ef.taxas*Decimal('1.00'), cod_oper=ef.data_libera.strftime('%Y%m%d9'))
+            ecc3 = ExtratoCC.objects.create(data_oper=ef.data_libera, historico=u'Pagamento TX', valor=ef.taxas*Decimal('-1.00'), cod_oper=ef.data_libera.strftime('%Y%m%d9'))
+            if not ecc2 or not ecc3:
+                retorno = 0
+
+        if not ecc1:
+            retorno = 0
+
+    return HttpResponse(simplejson.dumps(retorno), content_type='application/json')

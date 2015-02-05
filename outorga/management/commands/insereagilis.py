@@ -5,6 +5,7 @@ import cookielib
 from django.core.management.base import BaseCommand, CommandError
 from financeiro.models import *
 from outorga.models import Termo
+from protocolo.models import Protocolo, Estado as EstadoP
 import sys
 import time
 import re
@@ -71,6 +72,8 @@ class Command(BaseCommand):
         if 'STE' in mods:
             mods.remove('STE')
 
+	ha = EstadoP.objects.get(name__contains='Agilis')
+	protocolos_agilis = []
         for m in mods:
             data = urllib.urlencode([('processo', args[0]), ('parcial', parcial), ('tipoPrestacao', 'PRN'), ('tipoDespesa', TIPOS[m]), ('Prosseguir', 'Prosseguir')])
             req = urllib2.Request(url='http://internet.aquila.fapesp.br/agilis/PconlineSelecao.do?method=pesquisar', data=data)
@@ -79,6 +82,7 @@ class Command(BaseCommand):
             pgs = pagamentos.filter(origem_fapesp__item_outorga__natureza_gasto__modalidade__sigla=m)
 
             dt = []
+	    pa = []
             for pg in pgs:
                 try:
                     inte, dec = str(pg.valor_fapesp).split('.')
@@ -86,6 +90,7 @@ class Command(BaseCommand):
                     inte = str(pg.valor_fapesp)
                     dec = 0
 
+		pa.append(pg.protocolo.pk)
                 nf = pg.protocolo.num_documento
                 if pg.protocolo.tipo_documento.nome.lower().find('anexo') == 0:
                     nf = '%s %s' % (pg.protocolo.tipo_documento.nome, nf)
@@ -101,6 +106,7 @@ class Command(BaseCommand):
                 dt += [('notaFiscal', ''), ('dataNotaFiscal', ''), ('cheque', ''), ('pagina', ''), ('valorItem', '')]
                 
             i = 0
+	    erros = []
             while i < pgs.count():
                 data = urllib.urlencode(dt[5*i:5*i+25]+[('method', 'Incluir')])
                 req = urllib2.Request(url='http://internet.aquila.fapesp.br/agilis/PconlineIncluiOud.do?method=Incluir', data=data)
@@ -111,5 +117,13 @@ class Command(BaseCommand):
                 if txt.find('Erros') >= 0:
                     self.stderr.write(u'Erro encontrado na inserção dos itens abaixo')
                     self.stderr.write('%s' % dt[5*i:5*i+25])
+		    erros.append(i)
 
                 i += 5
+
+	    for l in range(len(erros)-1,-1,-1):
+		pa = pa[:erros[l]] + pa[erros[l]+5:]
+	
+            protocolos_agilis += pa
+
+	Protocolo.objects.filter(id__in=protocolos_agilis).update(estado=ha)	
