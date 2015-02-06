@@ -6,6 +6,7 @@ from django.contrib.admin.widgets import FilteredSelectMultiple, RelatedFieldWid
 from django.db.models.fields.related import ManyToOneRel
 from django.forms.util import ErrorList
 from django.utils.html import mark_safe
+from decimal import Decimal
 from django.utils.translation import ugettext_lazy as _
 
 from django.core.files.uploadedfile import InMemoryUploadedFile
@@ -234,7 +235,7 @@ class ExtratoCCAdminForm(forms.ModelForm):
             image_read = Img.open(StringIO.StringIO(imagem.read()))
             (imw, imh) = image_read.size
             ratio = Decimal(imw) / Decimal(imh)
-            if (ratio < 2):
+            if ratio < 2:
                 raise forms.ValidationError(_(u'Dimensões da imagem do cheque incorreta. (Proporção = %.3f)' % ratio))
             
         return imagem
