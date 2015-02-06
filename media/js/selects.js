@@ -960,10 +960,6 @@ function ajax_select_pergunta(id_field)
        });
 }
 
-$(window).load(function () {
-    ajax_init_pagamentos();
-});	
-
 function ajax_filter_pagamentos2(url)
 {
       termo = $("#id_termo").val()
@@ -1346,3 +1342,18 @@ function ajax_repositorio_tipo_nomes(id_entidade)
         }
     });
 }
+
+
+/**
+ * Utilizado no form RecursoInlineAdminForm, no campo de Planejamento.
+ */
+function get_recursos(obj) {
+	var check = obj.is(":checked") ? "Vigente":"";
+	ajax_get_recursos("#"+obj.parent().attr("for"), check);
+	
+}
+
+
+$(document).ready(function () {
+    ajax_init_pagamentos();
+});	

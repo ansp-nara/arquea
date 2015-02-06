@@ -239,7 +239,7 @@ $(document).ajaxSend(function(event, xhr, settings) {
 	{% block breadcrumbs %}<div class="breadcrumbs">Você está em: <a href="/">{% trans 'Home' %}</a>{% if title %} &rsaquo; {{ title }}{% endif %}</div>{% endblock %}
 
     <!-- Content -->
-    <div id="content" class="{% block coltype %}colM{% endblock %}">
+    <div id="content" class="{% block coltype %}colM{% endblock %}" style="display:none;">
         {% block pretitle %}{% endblock %}
         
         {% block content %}
@@ -258,6 +258,11 @@ $(document).ajaxSend(function(event, xhr, settings) {
         {% block sidebar %}{% endblock %}
         <!--<br class="clear" />-->
     </div>
+    <script type="text/javascript">
+         $(document).ready(function () {
+             $("#content").show();
+         }); 
+    </script>
     <!-- END Content -->
 
 	</div><!-- END Container -->

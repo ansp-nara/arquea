@@ -45,11 +45,6 @@ class RecursoInlineAdminForm(forms.ModelForm):
         self.fields['planejamento'].choices =  cache.get('rede.PlanejaAquisicaoRecurso.all')
             
         self.fields['planejamento'].label=mark_safe('<a href="#"  onclick="window.open(\'/admin/rede/planejaaquisicaorecurso/\'+$(\'#\'+$(this).parent().attr(\'for\')).val() + \'/\', \'_blank\');return true;">Planejamento:</a>'\
-                                                                  + '<script type="text/javascript">' \
-                                                                  + '    function get_recursos(obj) {' \
-                                                                  + '    var check = obj.is(":checked")?"Vigente":"";' \
-                                                                  + '    ajax_get_recursos("#"+obj.parent().attr("for"), check); }' \
-                                                                  + '</script>'\
                                                                   + ' <input type="checkbox" onclick="get_recursos($(this));"> Exibir somente os vigentes.')
 
     class Meta:
