@@ -419,7 +419,8 @@ class Permission(models.Model):
         permissions = (
                     ("rel_adm_agenda", "Rel. Adm. - Agenda"),     #/identificacao/agenda
                     ("rel_adm_ecossistema", "Rel. Adm. - Ecossistema"),     #/identificacao/ecossistema/par
-                    ("rel_tec_arquivos", "Rel. Téc. - Documentos por entidade"),     #/identificacao/relatorios/arquivos
+                    # movido de relatorio tecnico para administrativo
+                    ("rel_tec_arquivos", "Rel. Adm. - Documentos por entidade"),     #/identificacao/relatorios/arquivos
                 )
 
 
