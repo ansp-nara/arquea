@@ -162,7 +162,7 @@ def patrimonio_procedencia_vazia(request):
         filtros_saida = {"tipos":VerificacaoPatrimonioEquipamento().listaFiltroTipoPatrimonio(verficacao.equipamentoVazio()[0])}
     
     return render(request, 'verificacao/patrimonio_procedencia.html', 
-                              {'desc':'Patrimonios sem Equipamento', 'patrimonios':retorno, 'filtros':filtros_saida})
+                              {'desc':'Patrimonios com procedência vazia', 'patrimonios':retorno, 'filtros':filtros_saida})
 
 
 @login_required
