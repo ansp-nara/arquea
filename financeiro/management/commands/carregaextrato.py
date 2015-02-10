@@ -29,16 +29,12 @@ class Command(BaseCommand):
                 codigo = re.sub('\.', '', codigo)
                 (d, m, y) = map(int, data.split('/'))
             else:
-                codigo = dados[0]
-                data = dados[-2]
-                if data[0] == '0' and data[1] == '0':
-                    data = dados[1]
-                valor = dados[2]
-                sinal = dados[3]
-                historico = ' '.join(dados[5:-3])
+                data = dados[0]
+                valor = dados[-6]
+                sinal = dados[-5]
+                historico = ' '.join(dados[1:-7])
                 cartao = True
                 (d, m, y) = map(int, data.split('/'))
-                y += 2000
                 codigo_data = '%s%02d%02d' % (y,m,d)
                 if codigo_data > codigo_anterior:
                     seq = 1
