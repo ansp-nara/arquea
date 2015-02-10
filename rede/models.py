@@ -2,6 +2,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from decimal import Decimal
+from ipaddress import IPv4Network
 
 # Create your models here.
 
@@ -24,6 +25,10 @@ class BlocoIP(models.Model):
     cidr.admin_order_field = 'ip'
     cidr.allow_tags = True
     cidr.short_description = 'Bloco IP'
+
+    def netmask(self):
+        ip = IPv4Network('%s/%s' % (self.ip, self.mask), strict=False)
+        return '%s' % ip.netmask
 
     def AS(self):
         return self.asn.numero
