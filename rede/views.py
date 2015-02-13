@@ -132,6 +132,7 @@ def imprime_informacoes_gerais(request):
 def blocos_texto(request):
     return TemplateResponse(request, 'rede/blocos.txt', {'blocos':BlocoIP.objects.all()}, content_type='text/plain')
 
+
 @login_required
 @require_safe
 def planeja_contrato(request):
@@ -158,7 +159,6 @@ def planejamento2(request, pdf=0):
     """
      Relatório Técnico - Relatório de Serviços contratados por processo.
      
-      
     """
     entidade_id = request.GET.get('entidade')
     termo_id = request.GET.get('termo')
@@ -217,13 +217,13 @@ def planejamento2(request, pdf=0):
 @require_safe
 def blocosip(request, tipo=None):
     return _blocos_ip_superbloco(request, tipo)
-    
+
 @login_required
 @permission_required('rede.rel_tec_blocosip_ansp', raise_exception=True)
 @require_safe
 def blocosip_ansp(request, tipo=None):
     return _blocos_ip_superbloco(request, 'ansp')
-    
+
 def _blocos_ip_superbloco(request, tipo=None):
     """
      Relatório Técnico - Relatório de Lista de blocos IP.
@@ -332,12 +332,15 @@ def _blocos_ip_superbloco(request, tipo=None):
                 queryset = queryset.filter(proprietario__entidade__sigla="ANSP")
              
             queryset = queryset.order_by('ip', 'mask')
-
             dataset = BlocosIPResource().export(queryset = queryset)
             
             response = HttpResponse(dataset.xls, content_type='application/vnd.ms-excel;charset=utf-8')
-            response['Content-Disposition'] = "attachment; filename=blocosip_%s.xls" % tipo
-
+            
+            if tipo:
+                response['Content-Disposition'] = "attachment; filename=blocosip_%s.xls" % tipo
+            else:
+                response['Content-Disposition'] = "attachment; filename=blocosip.xls"
+        
             return response
         
         elif request.GET.get('porusuario'):
@@ -377,7 +380,6 @@ def _blocos_ip_continuo(request, template, tipo=None):
      É feito uma seleção dos blocos continuamente, sem fazer a relação hierárquica de
      superblocos.
     """
-    
     # Template
     # 
     # tipo: transito
@@ -432,7 +434,7 @@ def _blocos_ip_continuo(request, template, tipo=None):
             blocos = blocos.filter(usuario__id=usuario)
         if designado and designado != '0':
             blocos = blocos.filter(designado__id=designado)
-        
+
         # ordenando os blocos
         if tipo == 'inst_ansp' or tipo == 'ansp':
             blocos = blocos.order_by('usuario__sigla')
@@ -462,8 +464,8 @@ def _blocos_ip_continuo(request, template, tipo=None):
                                                     'filtro_proprietario':filtro_proprietario,
                                                     'filtro_usuarios':filtro_usuarios, 
                                                     'filtro_designados':filtro_designados})
-        
-        
+
+
 @login_required
 @permission_required('rede.rel_ger_custo_terremark', raise_exception=True)
 @require_safe
@@ -498,7 +500,6 @@ def custo_terremark(request, pdf=0, xls=0):
     if estado and estado > '0':
         estado_selected = int(request.GET.get('estado'))
         recursos = recursos.filter(planejamento__os__estado__id=estado_selected)
-
 
     if request.GET.get('acao') and request.GET.get('acao')=='2':
         # Export para Excel/XLS
@@ -592,7 +593,6 @@ def relatorio_recursos_operacional(request, pdf=0, xls=0):
                             'entidade':'', 'quantidade':p.quantidade, }
             context_dict.append(ctx_planejamento)
 
-
     if request.GET.get('acao') and request.GET.get('acao')=='2':
         # Export para Excel/XLS
         beneficiados = Beneficiado.objects.all()
@@ -608,12 +608,12 @@ def relatorio_recursos_operacional(request, pdf=0, xls=0):
                                             'planejamento__os__numero')
     
         dataset = RecursoOperacionalResource().export(queryset=beneficiados)
- 
+
         response = HttpResponse(dataset.xls, content_type='application/vnd.ms-excel;charset=utf-8')
         response['Content-Disposition'] = "attachment; filename=recursos_tecnicos.xls"
- 
+
         return response
- 
+
     elif request.GET.get('acao') and request.GET.get('acao')=='1':
         # Export para PDF
         return render_to_pdf_weasy(template_src='rede/recurso_operacional.pdf', context_dict={'planejamentos':context_dict,}, request=request, filename='recursos_tecnicos.pdf')
@@ -622,5 +622,7 @@ def relatorio_recursos_operacional(request, pdf=0, xls=0):
                             {'planejamentos':context_dict, 
                              'filtro_estados':filtro_estados, 'estado_selected':estado_selected, 'estado':estado,
                              'filtro_beneficiados':filtro_beneficiados, 'beneficiado_selected':beneficiado_selected, 'beneficiado':beneficiado})
+
+
 
 
