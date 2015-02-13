@@ -6,9 +6,9 @@
     <div class="breadcrumbs">Você está em: 
       <a href="../../">{% trans "Home" %}</a> &rsaquo;
       {% if tipo == 'transito' %}
-           <a href="{% url 'rede.views.blocos_ip' tipo='transito' %}">Lista de Blocos IP - Trânsito</a>
+           <a href="{% url 'rede.views.blocosip' tipo='transito' %}">Lista de Blocos IP - Trânsito</a>
       {% else %}
-           <a href="{% url 'rede.views.blocos_ip' %}">Lista de Blocos IP</a>
+           <a href="{% url 'rede.views.blocosip' %}">Lista de Blocos IP</a>
       {% endif %}
     </div>
 {% endblock %}
