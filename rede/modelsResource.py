@@ -111,29 +111,38 @@ class BlocosIPResource(resources.ModelResource):
     rir = fields.Field(column_name='RIR')
     obs = fields.Field(column_name='Observacao')
     superbloco = fields.Field(column_name='Superbloco')
+    superbloco_mask = fields.Field(column_name='Superbloco Másc.')
+    mask = fields.Field(column_name='Máscara IP')
+    ipv = fields.Field(column_name='IPv4_6')
     
     class Meta:
         model = BlocoIP
         fields = ('id',
                   'usuario',
                   'superbloco',
+                  'superbloco_mask',
                   'cidr',
+                  'mask',
                   'asn',
                   'proprietario',
                   'designado',
                   'rir',
                   'obs',
+                  'ipv'
                  )
         export_order = (
                   'id',
                   'usuario',
                   'superbloco',
+                  'superbloco_mask',
                   'cidr',
+                  'mask',
                   'asn',
                   'proprietario',
                   'designado',
                   'rir',
                   'obs',
+                  'ipv'
                  )
 
     def dehydrate_usuario(self, bloco):
@@ -159,6 +168,23 @@ class BlocosIPResource(resources.ModelResource):
     
     def dehydrate_obs(self, bloco):
         return '%s' % bloco.obs
+
+    def dehydrate_mask(self, bloco):
+        return '%s' % bloco.netmask()
+
+    def dehydrate_superbloco_mask(self, bloco):
+        if bloco.superbloco:
+            return '%s' % bloco.superbloco.netmask()
+        else:
+            return ''
+
+    def dehydrate_ipv(self, bloco):
+        if bloco.is_IPV4():
+            return 'IPv4';
+        elif bloco.is_IPV6():
+            return 'IPv6'
+        else:
+            return ''
 
 
 

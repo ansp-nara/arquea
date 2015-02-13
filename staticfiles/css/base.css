@@ -1153,6 +1153,7 @@ table#change-history tbody th {
     min-width:1200px;
 	height:180px;
 	background:#134089;
+	margin-top:15px;
 }
 
 .footer-content{min-width:1000px; width:1200px; margin:0 auto;}
@@ -1411,3 +1412,49 @@ Modulo do patrimonio
 
 
 
+
+
+#div_filtro {
+    width: 750px;
+    clear:both;
+    margin-bottom:20px;
+}
+#div_filtro>fieldset>legend {
+    font-size: 14px;
+    margin: .8em 0 .3em 0;
+    color: #666;
+    font-weight: bold;
+}
+#div_filtro fieldset {
+    padding:10px 0 10px 10px;
+}
+#form_filtro {
+    display:table-row;
+}
+#form_filtro select {
+    width: 250px;
+} 
+#form_filtro input {
+    width: 65px;
+}
+
+#form_filtro div {
+    display:table-cell;
+    padding-right:15px;
+    padding-left:15px;
+}
+#form_filtro div div{
+    display:table-row;
+    
+}
+#form_filtro label {
+    display:table-cell;
+}
+#form_filtro input, 
+#form_filtro select {
+    display:table-cell;
+    margin-left:10px;
+}
+#form_filtro #div_submit {
+    vertical-align:bottom;
+}

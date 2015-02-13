@@ -23,66 +23,112 @@
 <script type="text/javascript" src="/media/js/jstree/jquery.jstree.js"></script>
 {% endblock %}
 {% block content %}
-<div id="report_title">
-	<h1>Blocos IP</h1>
-    <div id="report_toolbar">
-        <form action="{% url 'rede.views.blocos_ip' %}" method="GET" id="id_form_recurso_xls">
-            <input type="hidden" name="anunciante" value="{{request.GET.anunciante}}" />
-            <input type="hidden" name="proprietario" value="{{request.GET.proprietario}}" />
-            <input type="hidden" name="usuario" value="{{request.GET.usuario}}" />
-            <input type="hidden" name="designado" value="{{request.GET.designado}}" />
-            <input type="hidden" name="xls" value="1" />
-            <div title="Exportar para Excel" class="btn_excel">
-               <input type="submit" value="" />
-            </div>
-        </form>
+    <div id="report_title">
+        <h1>Blocos IP</h1>
+        <div id="report_toolbar">
+        {% if blocos %}
+            <form action="{% url 'rede.views.blocosip' %}" method="GET" id="id_form_recurso_xls">
+                <input type="hidden" name="anunciante" value="{{request.GET.anunciante}}" />
+                <input type="hidden" name="proprietario" value="{{request.GET.proprietario}}" />
+                <input type="hidden" name="usuario" value="{{request.GET.usuario}}" />
+                <input type="hidden" name="designado" value="{{request.GET.designado}}" />
+                <input type="hidden" name="xls" value="1" />
+                <div title="Exportar para Excel" class="btn_excel">
+                   <input type="submit" value="" />
+                </div>
+            </form>
+        {% endif %}
+        </div>
+        <p></p>
     </div>
-    <p></p>
+<div id="div_filtro">
+    <fieldset>
+        <legend>Filtro</legend>
+        <form method="GET">
+        <label for="id_anunciante">Anunciante:</label>
+        <select name="anunciante" id="id_anunciante">
+          <option value="0" selected>Todos</option>
+          {% for asn in filtro_asns %}
+             <option value="{{ asn.id }}" {% if asn.id|striptags == request.GET.anunciante|striptags %}selected{% endif %}>{{ asn }}</option>
+          {% endfor %}
+        </select>
+        <br />
+        <label for="id_proprietario">Proprietário:</label>
+        <select name="proprietario" id="id_proprietario">
+          <option value="0" selected>Todos</option>
+          {% for asn in filtro_proprietario %}
+             <option value="{{ asn.id }}" {% if asn.id|striptags == request.GET.proprietario|striptags %}selected{% endif %}>{{ asn }}</option>
+          {% endfor %}
+        </select>
+        <br />
+        <label for="id_usuario">Usuário:</label>
+        <select name="usuario" id="id_usuario">
+          <option value="0" selected>Todos</option>
+          {% for u in filtro_usuarios %}
+             <option value="{{ u.id }}" {% if u.id|striptags == request.GET.usuario|striptags %}selected{% endif %}>{{ u }}</option>
+          {% endfor %}
+        </select>
+        <br />
+        <label for="id_designado">Designado:</label>
+        <select name="designado" id="id_designado">
+          <option value="0" selected>Todos</option>
+          {% for d in filtro_designados %}
+             <option value="{{ d.id }}" {% if d.id|striptags == request.GET.designado|striptags %}selected{% endif %}>{{ d }}</option>
+          {% endfor %}
+        </select>
+        <br />
+        <label for="id_porusuario">Ordenar por usuário?</label>
+        <input type="checkbox" id="id_porusuario" name="porusuario">
+        <br />
+        <input type="submit" value="Enviar">
+        </form>
+    </fieldset>
 </div>
-
-<div id="theader">
-<div class="col1">
-Bloco IP
-</div>
-<div class="col2">
- <div class="colunas">AS anunciante</div>
- <div class="colunas">AS proprietário</div>
- <div class="colunas">Usado por</div>
- <div class="colunas">Designado para</div>
- <div class="colunas">RIR</div>
- <div class="obs">Obs</div>
-</div>
-<div style="clear:both;"> </div>
-</div>
+{% if blocos %}
+   <div id="theader">
+   <div class="col1">
+   Bloco IP
+   </div>
+   <div class="col2">
+    <div class="colunas">AS anunciante</div>
+    <div class="colunas">AS proprietário</div>
+    <div class="colunas">Usado por</div>
+    <div class="colunas">Designado para</div>
+    <div class="colunas">RIR</div>
+    <div class="obs">Obs</div>
+   </div>
+   <div style="clear:both;"> </div>
+   </div>
+{% endif %}
 <div id="blocos">
 <ul>
 {% for b in blocos %}
-   <li style="padding-top:6px;">
+   <li style="padding-top:6px;" class="jstree-open" >
       <div>
-        <div class="col1"><a href="{% url "admin:rede_blocoip_change" b.id %}">{{ b }}</a></div>
-        <div class="col2">
-           <div class="colunas">{{ b.asn }}</div>
-           <div class="colunas">{{ b.proprietario|default_if_none:"-" }}</div>
-           <div class="colunas">{{ b.usuario|default_if_none:"-" }}</div>
-           <div class="colunas">{{ b.designado|default_if_none:"-" }}</div>
-           <div class="colunas">{{ b.rir }}</div>
-           <div class="obs">{{ b.obs }}</div>
+        <div class="col1"><a href="{% url "admin:rede_blocoip_change" b.id %}"  {% if b.enabled %}style="color:black;"{% else %}style="color:darkgray;"{% endif %}>{{ b.obj }}</a></div>
+        <div class="col2"  {% if b.enabled %}style="color:black;"{% else %}style="color:darkgray;"{% endif %}>
+           <div class="colunas">{{ b.obj.asn }}</div>
+           <div class="colunas">{{ b.obj.proprietario|default_if_none:"-" }}</div>
+           <div class="colunas">{{ b.obj.usuario|default_if_none:"-" }}</div>
+           <div class="colunas">{{ b.obj.designado|default_if_none:"-" }}</div>
+           <div class="colunas">{{ b.obj.rir }}</div>
+           <div class="obs">{{ b.obj.obs }}</div>
         </div>
         <div style="clear:both;"> </div>
       </div>
-   {% if not b.leaf %}
+   {% if b.subnivel %}
    <ul>
-   {% for sb in b.blocoip_set.all %}
+   {% for sb in b.subnivel %}
    <li style="padding-top:4px;">
       <div>
-        <div class="col1"><a href="{% url "admin:rede_blocoip_change" sb.id %}">{{ sb }}</a></div>
+        <div class="col1"><a href="{% url "admin:rede_blocoip_change" sb.id %}">{{ sb.obj }}</a></div>
         <div class="col2">
-           <div class="colunas">{{ sb.asn }}</div>
-           <div class="colunas">{{ sb.proprietario|default_if_none:"-" }}</div>
-           <div class="colunas">{{ sb.usuario|default_if_none:"-" }}</div>
-           <div class="colunas">{{ sb.designado|default_if_none:"-" }}</div>
-           <div class="colunas">{{ sb.rir }}</div>
-           <div class="obs">{{ sb.obs }}</div>
+           <div class="colunas">{{ sb.obj.asn }}</div>
+           <div class="colunas">{{ sb.obj.proprietario|default_if_none:"-" }}</div>
+           <div class="colunas">{{ sb.obj.usuario|default_if_none:"-" }}</div>
+           <div class="colunas">{{ sb.obj.designado|default_if_none:"-" }}</div>
+           <div class="colunas">{{ sb.obj.rir }}</div>
+           <div class="obs">{{ sb.obj.obs }}</div>
         </div>
         <div style="clear:both;"> </div>
       </div>
