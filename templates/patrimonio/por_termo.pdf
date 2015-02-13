@@ -7,7 +7,7 @@
 
 @page {
     size:a4 landscape;
-    background-image: url('media:{{papelaria.papel_timbrado_paisagem_a4}}');
+    background-image: url('media:{{papelaria.papel_timbrado_paisagem_a4|default:''}}');
     background-size: contain;
     background-repeat:no-repeat;
     margin-top:0;
