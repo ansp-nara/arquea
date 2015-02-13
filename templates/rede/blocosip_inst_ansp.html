@@ -57,11 +57,11 @@
           {% endfor %}
         </select>
         <br />
-        <label for="id_proprietario">Proprietário:</label>
-        <select name="proprietario" id="id_proprietario">
+        <label for="id_usuario">Usuário:</label>
+        <select name="usuario" id="id_usuario">
           <option value="0" selected>Todos</option>
-          {% for asn in filtro_proprietario %}
-             <option value="{{ asn.id }}" {% if asn.id|striptags == request.GET.proprietario|striptags %}selected{% endif %}>{{ asn }}</option>
+          {% for u in filtro_usuarios %}
+             <option value="{{ u.id }}" {% if u.id|striptags == request.GET.usuario|striptags %}selected{% endif %}>{{ u }}</option>
           {% endfor %}
         </select>
         <br />
