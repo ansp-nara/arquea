@@ -1,53 +1,67 @@
+{# Página de filtro para o relatório de Blocos IPs (visão de árvore) #}
 {% extends "admin/base_site.html" %}
 {% load proto_tags %}
 {% load i18n %}
 {% block breadcrumbs %}
     <div class="breadcrumbs">Você está em: 
-      <a href="../../">{% trans "Home" %}</a> &rsaquo; 
-      <a href="{% url 'rede.views.blocos_ip' %}">Lista de Blocos IP</a>
+      <a href="../../">{% trans "Home" %}</a> &rsaquo;
+      {% if tipo == 'transito' %}
+           <a href="{% url 'rede.views.blocos_ip' tipo='transito' %}">Lista de Blocos IP - Trânsito</a>
+      {% else %}
+           <a href="{% url 'rede.views.blocos_ip' %}">Lista de Blocos IP</a>
+      {% endif %}
     </div>
 {% endblock %}
 {% block extrahead %}
 <script type="text/javascript" src="/media/js/selects.js"></script>
 {% endblock %}
 {% block content %}
-<h1>Blocos IP</h1>
-<form method="GET">
-<label for="id_anunciante">Anunciante:</label>
-<select name="anunciante" id="id_anunciante">
-  <option value="0" selected>Todos</option>
-  {% for asn in asns %}
-     <option value="{{ asn.id }}">{{ asn }}</option>
-  {% endfor %}
-</select>
-<br />
-<label for="id_proprietario">Proprietário:</label>
-<select name="proprietario" id="id_proprietario">
-  <option value="0" selected>Todos</option>
-  {% for asn in asns %}
-     <option value="{{ asn.id }}">{{ asn }}</option>
-  {% endfor %}
-</select>
-<br />
-<label for="id_usuario">Usuário:</label>
-<select name="usuario" id="id_usuario">
-  <option value="0" selected>Todos</option>
-  {% for u in usuarios %}
-     <option value="{{ u.id }}">{{ u }}</option>
-  {% endfor %}
-</select>
-<br />
-<label for="id_designado">Designado:</label>
-<select name="designado" id="id_designado">
-  <option value="0" selected>Todos</option>
-  {% for d in designados %}
-     <option value="{{ d.id }}">{{ d }}</option>
-  {% endfor %}
-</select>
-<br />
-<label for="id_porusuario">Ordenar por usuário?</label>
-<input type="checkbox" id="id_porusuario" name="porusuario">
-<br />
-<input type="submit" value="Enviar">
-</form>
+<h1>Blocos IP 
+    {% if tipo == 'transito' %}
+    - Trânsito
+    {% endif %} 
+</h1>
+<div id="div_filtro">
+    <fieldset>
+        <legend>Filtro</legend>
+        <form method="GET">
+        <label for="id_anunciante">Anunciante:</label>
+        <select name="anunciante" id="id_anunciante">
+          <option value="0" selected>Todos</option>
+          {% for asn in asns %}
+             <option value="{{ asn.id }}">{{ asn }}</option>
+          {% endfor %}
+        </select>
+        <br />
+        <label for="id_proprietario">Proprietário:</label>
+        <select name="proprietario" id="id_proprietario">
+          <option value="0" selected>Todos</option>
+          {% for asn in asns %}
+             <option value="{{ asn.id }}">{{ asn }}</option>
+          {% endfor %}
+        </select>
+        <br />
+        <label for="id_usuario">Usuário:</label>
+        <select name="usuario" id="id_usuario">
+          <option value="0" selected>Todos</option>
+          {% for u in usuarios %}
+             <option value="{{ u.id }}">{{ u }}</option>
+          {% endfor %}
+        </select>
+        <br />
+        <label for="id_designado">Designado:</label>
+        <select name="designado" id="id_designado">
+          <option value="0" selected>Todos</option>
+          {% for d in designados %}
+             <option value="{{ d.id }}">{{ d }}</option>
+          {% endfor %}
+        </select>
+        <br />
+        <label for="id_porusuario">Ordenar por usuário?</label>
+        <input type="checkbox" id="id_porusuario" name="porusuario">
+        <br />
+        <input type="submit" value="Enviar">
+        </form>
+    </fieldset>
+</div>
 {% endblock %}

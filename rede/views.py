@@ -215,53 +215,255 @@ def planejamento2(request, pdf=0):
 @login_required
 @permission_required('rede.rel_tec_blocosip', raise_exception=True)
 @require_safe
-def blocos_ip(request):
+def blocosip(request, tipo=None):
+    return _blocos_ip_superbloco(request, tipo)
+    
+@login_required
+@permission_required('rede.rel_tec_blocosip_ansp', raise_exception=True)
+@require_safe
+def blocosip_ansp(request, tipo=None):
+    return _blocos_ip_superbloco(request, 'ansp')
+    
+def _blocos_ip_superbloco(request, tipo=None):
     """
      Relatório Técnico - Relatório de Lista de blocos IP.
-    
     """
-    if len(request.GET) < 4:
+    # Template
+    # 
+    # tipo: transito
+    #     Adiciona o filtro de flag transito=True para as QuerySets
+    # tipo: ansp
+    #     Adiciona o filtro de superbloco com propriedade da ANSP para as QuerySets
+    #
+    if tipo == 'ansp':          template = 'rede/blocosip_ansp.html'
+    else:                         template = 'rede/blocosip.html'
+    
+    # Filtros selecionados
+    anunciante = request.GET.get('anunciante')
+    proprietario = request.GET.get('proprietario')
+    usuario = request.GET.get('usuario')
+    designado = request.GET.get('designado')
+
+    # Filtro - lista de dados
+    if tipo == 'ansp' or tipo =='inst_ansp':
+        ent_asn_ids = BlocoIP.objects.filter(proprietario__entidade__sigla="ANSP").values_list('asn', flat=True).distinct()
+        ent_proprietario_ids = BlocoIP.objects.filter(proprietario__entidade__sigla="ANSP").values_list('proprietario', flat=True).distinct()
+        ent_usuario_ids = BlocoIP.objects.filter(proprietario__entidade__sigla="ANSP").values_list('usuario', flat=True).distinct()
+        ent_designado_ids = BlocoIP.objects.filter(proprietario__entidade__sigla="ANSP").values_list('designado', flat=True).distinct()
+    else:
+        ent_asn_ids = BlocoIP.objects.values_list('asn', flat=True).distinct()
+        ent_proprietario_ids = BlocoIP.objects.values_list('proprietario', flat=True).distinct()
         ent_usuario_ids = BlocoIP.objects.values_list('usuario', flat=True).distinct()
         ent_designado_ids = BlocoIP.objects.values_list('designado', flat=True).distinct()
-        return TemplateResponse(request, 'rede/filtra_blocos.html', {'asns':ASN.objects.all(), 'usuarios':Entidade.objects.filter(id__in=ent_usuario_ids), 'designados':Entidade.objects.filter(id__in=ent_designado_ids)})
+
+    filtro_asns = ASN.objects.filter(id__in=ent_asn_ids)
+    filtro_proprietario = ASN.objects.filter(id__in=ent_proprietario_ids)
+    filtro_usuarios = Entidade.objects.filter(id__in=ent_usuario_ids)
+    filtro_designados = Entidade.objects.filter(id__in=ent_designado_ids)
+
+    if len(request.GET) < 1:
+        print 2
+        return TemplateResponse(request, template, {
+                                                'tipo':tipo,
+                                                'filtro_asns':filtro_asns, 
+                                                'filtro_proprietario':filtro_proprietario,
+                                                'filtro_usuarios':filtro_usuarios, 
+                                                'filtro_designados':filtro_designados})
 
     else:
-        blocos = BlocoIP.objects.all()
+        # Buscando blocos filhos que são restritos pelos filtros
+        blocos_filhos = BlocoIP.objects.all().filter(superbloco__isnull=False)
+        if anunciante and anunciante != '0':
+            blocos_filhos = blocos_filhos.filter(asn__id=anunciante)
+        if proprietario and proprietario != '0':
+            blocos_filhos = blocos_filhos.filter(proprietario__id=proprietario)
+        if usuario and usuario != '0':
+            blocos_filhos = blocos_filhos.filter(usuario__id=usuario)
+        if designado and designado != '0':
+            blocos_filhos = blocos_filhos.filter(designado__id=designado)
+            
+        print blocos_filhos.values_list('superbloco__id', flat=True)
+        
+        # Buscando os superblocos dos filhos encontrados acima
+        blocos_com_filhos_filtrados = BlocoIP.objects.all().filter(id__in=blocos_filhos.values_list('superbloco__id', flat=True))
+#         if tipo == 'transito':
+#             blocos_com_filhos_filtrados = blocos_com_filhos_filtrados.filter(transito=True)
+        
+        # Buscando superblocos restritos pelos filtros
+        blocos_filtrados = BlocoIP.objects.filter(superbloco__isnull=True).exclude(id__in = blocos_com_filhos_filtrados)
+        if tipo == 'ansp':
+            blocos_filtrados = blocos_filtrados.filter(proprietario__entidade__sigla="ANSP")
+        if anunciante and anunciante != '0':
+            blocos_filtrados = blocos_filtrados.filter(asn__id=anunciante)
+        if proprietario and proprietario != '0':
+            blocos_filtrados = blocos_filtrados.filter(proprietario__id=proprietario)
+        if usuario and usuario != '0':
+            blocos_filtrados = blocos_filtrados.filter(usuario__id=usuario)
+        if designado and designado != '0':
+            blocos_filtrados = blocos_filtrados.filter(designado__id=designado)
 
-        anunciante = request.GET.get('anunciante')
-        if anunciante != '0':
-            blocos = blocos.filter(asn__id=anunciante)
+        # combinando as duas listas
+        blocos = blocos_com_filhos_filtrados | blocos_filtrados
+        blocos = blocos.order_by('ip', 'mask')
+        
+        # Gerando o contexto para o template
+        blocos_contexto = []
+        for b in blocos:
+            subnivel = []
+            for sb in blocos_filhos.filter(superbloco = b):
+                subnivel.append({'id':sb.id, 'obj':sb, 'netmask':sb.netmask, 'enabled':True})
 
-        proprietario = request.GET.get('proprietario')
-        if proprietario != '0':
-            blocos = blocos.filter(proprietario__id=proprietario)
-
-        usuario = request.GET.get('usuario')
-        if usuario != '0':
-            blocos = blocos.filter(usuario__id=usuario)
-
-        designado = request.GET.get('designado')
-        if designado != '0':
-            blocos = blocos.filter(designado__id=designado)
-
+            # O atributo 'enabled' serve para esconder os superblocos que não 
+            # atendem ao filtro. Isso ocorre quando são encontrados itens somente nos filhos.
+            enabled = False
+            if (anunciante == '0' or (b.asn and str(b.asn.id) == anunciante)) and \
+                    (proprietario == '0' or (b.proprietario and str(b.proprietario.id) == proprietario)) and \
+                    (usuario == '0' or (b.usuario and str(b.usuario.id) == usuario)) and \
+                    (designado == '0' or (b.designado and str(b.designado.id) == designado)):
+                enabled = True
+                
+            blocos_contexto.append({'id':b.id, 'obj':b, 'subnivel':subnivel, 'netmask':b.netmask, 'enabled':enabled})
 
         if request.GET.get('xls') and request.GET.get('xls')=='1':
             # Export para Excel/XLS
-            querysetPais=blocos.filter(superbloco__isnull=True)
-            querysetFilhos=BlocoIP.objects.all().filter(superbloco__in=querysetPais)
-            queryset=(querysetPais|querysetFilhos).order_by('ip', 'mask')
-            dataset = BlocosIPResource().export(queryset=queryset)
+            queryset = (blocos_com_filhos_filtrados|blocos_filhos|blocos_filtrados)
+            
+            if tipo == 'ansp':
+                queryset = queryset.filter(proprietario__entidade__sigla="ANSP")
+             
+            queryset = queryset.order_by('ip', 'mask')
+
+            dataset = BlocosIPResource().export(queryset = queryset)
             
             response = HttpResponse(dataset.xls, content_type='application/vnd.ms-excel;charset=utf-8')
-            response['Content-Disposition'] = "attachment; filename=blocosip.xls"
-    
+            response['Content-Disposition'] = "attachment; filename=blocosip_%s.xls" % tipo
+
             return response
-
+        
         elif request.GET.get('porusuario'):
-            return TemplateResponse(request, 'rede/blocosip.html.notree', {'blocos':blocos.order_by('usuario__sigla')})
-        return TemplateResponse(request, 'rede/blocosip.html', {'blocos':blocos})
+            return TemplateResponse(request, 'rede/blocosip.html.notree', {'blocos':blocos_contexto.order_by('usuario__sigla')})
+        
+        return TemplateResponse(request, template, {
+                                                    'tipo':tipo,
+                                                    'blocos':blocos_contexto, 
+                                                    'filtro_asns':filtro_asns, 
+                                                    'filtro_proprietario':filtro_proprietario,
+                                                    'filtro_usuarios':filtro_usuarios, 
+                                                    'filtro_designados':filtro_designados})
 
 
+@login_required
+@permission_required('rede.rel_tec_blocosip_transito', raise_exception=True)
+@require_safe
+def blocosip_transito(request):
+    return _blocos_ip_continuo(request, 'rede/blocosip_transito.html', 'transito')
+
+@login_required
+@permission_required('rede.rel_tec_blocosip_inst_transito', raise_exception=True)
+@require_safe
+def blocosip_inst_transito(request):
+    return _blocos_ip_continuo(request, 'rede/blocosip_inst_transito.html', 'inst_transito')
+
+@login_required
+@permission_required('rede.rel_tec_blocosip_inst_ansp', raise_exception=True)
+@require_safe
+def blocosip_inst_ansp(request):
+    return _blocos_ip_continuo(request, 'rede/blocosip_inst_ansp.html', 'inst_ansp')
+
+
+def _blocos_ip_continuo(request, template, tipo=None):
+    """
+     Relatório Técnico - Relatório de Lista de blocos IP
+     É feito uma seleção dos blocos continuamente, sem fazer a relação hierárquica de
+     superblocos.
+    """
+    
+    # Template
+    # 
+    # tipo: transito
+    #     Adiciona o filtro de flag transito=True para as QuerySets
+    # tipo: ansp
+    #     Adiciona o filtro de superbloco com propriedade da ANSP para as QuerySets
+    #
+
+    # Filtros selecionados
+    anunciante = request.GET.get('anunciante')
+    proprietario = request.GET.get('proprietario')
+    usuario = request.GET.get('usuario')
+    designado = request.GET.get('designado')
+
+    # Filtro - lista de dados
+    if tipo =='transito' or tipo =='inst_transito':
+        ent_asn_ids = BlocoIP.objects.filter(transito=True).values_list('asn', flat=True).distinct()
+        ent_proprietario_ids = BlocoIP.objects.filter(transito=True).values_list('proprietario', flat=True).distinct()
+        ent_usuario_ids = BlocoIP.objects.filter(transito=True).values_list('usuario', flat=True).distinct()
+        ent_designado_ids = BlocoIP.objects.filter(transito=True).values_list('designado', flat=True).distinct()
+    elif tipo =='ansp' or tipo =='inst_ansp':
+        ent_asn_ids = BlocoIP.objects.filter(proprietario__entidade__sigla="ANSP").values_list('asn', flat=True).distinct()
+        ent_proprietario_ids = BlocoIP.objects.filter(proprietario__entidade__sigla="ANSP").values_list('proprietario', flat=True).distinct()
+        ent_usuario_ids = BlocoIP.objects.filter(proprietario__entidade__sigla="ANSP").values_list('usuario', flat=True).distinct()
+        ent_designado_ids = BlocoIP.objects.filter(proprietario__entidade__sigla="ANSP").values_list('designado', flat=True).distinct()
+
+    filtro_asns = ASN.objects.filter(id__in=ent_asn_ids)
+    filtro_proprietario = ASN.objects.filter(id__in=ent_proprietario_ids)
+    filtro_usuarios = Entidade.objects.filter(id__in=ent_usuario_ids)
+    filtro_designados = Entidade.objects.filter(id__in=ent_designado_ids)
+
+    if len(request.GET) < 1:
+        return TemplateResponse(request, template, {
+                                                'tipo':tipo,
+                                                'filtro_asns':filtro_asns, 
+                                                'filtro_proprietario':filtro_proprietario,
+                                                'filtro_usuarios':filtro_usuarios, 
+                                                'filtro_designados':filtro_designados})
+
+    else:
+        # Buscando blocos filhos que são restritos pelos filtros
+        blocos = BlocoIP.objects.all()
+        if tipo =='inst_transito' or tipo =='transito':
+            blocos = blocos.filter(transito=True)
+        if tipo == 'inst_ansp' or tipo == 'ansp':
+            blocos = blocos.filter(proprietario__entidade__sigla="ANSP")
+        if anunciante and anunciante != '0':
+            blocos = blocos.filter(asn__id=anunciante)
+        if proprietario and proprietario != '0':
+            blocos = blocos.filter(proprietario__id=proprietario)
+        if usuario and usuario != '0':
+            blocos = blocos.filter(usuario__id=usuario)
+        if designado and designado != '0':
+            blocos = blocos.filter(designado__id=designado)
+        
+        # ordenando os blocos
+        if tipo == 'inst_ansp' or tipo == 'ansp':
+            blocos = blocos.order_by('usuario__sigla')
+        elif tipo =='inst_transito':
+            blocos = blocos.order_by('proprietario__entidade__sigla')
+        else:  # tipo =='transito'
+            blocos = blocos.order_by('ip', 'mask')
+        
+        # Gerando o contexto para o template
+        blocos_contexto = []
+        for b in blocos:
+            blocos_contexto.append({'id':b.id, 'obj':b, 'netmask':b.netmask})
+
+        if request.GET.get('xls') and request.GET.get('xls')=='1':
+            # Export para Excel/XLS
+            dataset = BlocosIPResource().export(queryset=blocos)
+            
+            response = HttpResponse(dataset.xls, content_type='application/vnd.ms-excel;charset=utf-8')
+            response['Content-Disposition'] = "attachment; filename=blocosip_%s.xls" % tipo
+
+            return response
+        
+        return TemplateResponse(request, template, {
+                                                    'tipo':tipo,
+                                                    'blocos':blocos_contexto, 
+                                                    'filtro_asns':filtro_asns, 
+                                                    'filtro_proprietario':filtro_proprietario,
+                                                    'filtro_usuarios':filtro_usuarios, 
+                                                    'filtro_designados':filtro_designados})
+        
+        
 @login_required
 @permission_required('rede.rel_ger_custo_terremark', raise_exception=True)
 @require_safe
@@ -316,6 +518,7 @@ def custo_terremark(request, pdf=0, xls=0):
                              'filtro_estados':EstadoOS.objects.all(), 'estado_selected':estado_selected, 'estado':estado})
 
 
+
 @login_required
 @permission_required('rede.rel_tec_recursos_operacional', raise_exception=True)
 @require_safe
@@ -334,6 +537,7 @@ def relatorio_recursos_operacional(request, pdf=0, xls=0):
                                         'os__numero')
 
     estado_selected = 0
+    
     # Filtro selecionado do estado da OS
     estado = request.GET.get('estado')
     if estado and estado > '0':

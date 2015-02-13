@@ -183,6 +183,17 @@ def lista_relatorios(context):
         tecnicos.append({'url':'/patrimonio/relatorio/por_tipo_equipamento', 'nome':u'Busca por tipo de equipamento'})
     if user.is_superuser or user.has_perm('rede.rel_tec_recursos_operacional'):
         tecnicos.append({'url':'/rede/relatorio_recursos_operacional', 'nome':u'Relatório de recursos'})
+
+    if user.is_superuser or user.has_perm('rede.rel_tec_blocosip_transito'):
+        tecnicos.append({'url':'/rede/blocosip_transito', 'nome':u'Lista de blocos IP - Trânsito'})
+    if user.is_superuser or user.has_perm('rede.rel_tec_blocosip_inst_transito'):
+        tecnicos.append({'url':'/rede/blocosip_inst_transito', 'nome':u'Lista de blocos IP - Instituição Trânsito'})
+    
+    if user.is_superuser or user.has_perm('rede.rel_tec_blocosip_ansp'):
+        tecnicos.append({'url':'/rede/blocosip_ansp', 'nome':u'Lista de blocos IP - ANSP'})
+    if user.is_superuser or user.has_perm('rede.rel_tec_blocosip_inst_ansp'):
+        tecnicos.append({'url':'/rede/blocosip_inst_ansp', 'nome':u'Lista de blocos IP - Instituição ANSP'})
+
     
     if user.is_superuser:
         verificacoes.append({'url':'/verificacao/relatorio/equipamento_consolidado', 'nome':u'Verificação de equipamentos'})

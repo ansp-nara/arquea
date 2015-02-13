@@ -1,12 +1,16 @@
 # -*- coding: utf-8 -*-
 
 from django.contrib import admin
-from models import *
-from forms import *
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.admin import SimpleListFilter
 from identificacao.models import Entidade
 from utils.functions import clone_objects
+from import_export.admin import ExportMixin
+
+from models import *
+from modelsResource import *
+from forms import *
+
 
 class DesignadoFilter(SimpleListFilter):
     title = u'designado'
@@ -48,18 +52,28 @@ class SuperblocoFilter(SimpleListFilter):
             return queryset.filter(superbloco__isnull=True)
         return queryset
 
-class BlocoIPAdmin(admin.ModelAdmin):
-
+class BlocoIPAdmin(ExportMixin, admin.ModelAdmin):
+    resource_class = BlocosIPResource
+    
     fieldsets = (
         (None, {
-            'fields': (('ip', 'mask'), ('asn', 'proprietario'), ('designado', 'usuario'), ('superbloco', 'rir'), 'obs'),
+            'fields': (('ip', 'mask', 'transito'), ('asn', 'proprietario'), ('designado', 'usuario'), ('superbloco', 'rir'), 'obs'),
             'classes': ('wide',)
             }
         ),
         )
-    list_display = ('cidr', 'asn', 'proprietario', 'usu', 'desig', 'rir', 'obs')
+    list_display = ('cidr', 'asn', 'proprietario', 'usu', 'desig', 'rir', 'transito', 'obs')
     search_fields = ('asn__entidade__sigla', 'ip')
     list_filter = (SuperblocoFilter, 'asn', 'proprietario', DesignadoFilter, UsuarioFilter)
+    
+    def get_export_queryset(self, request):
+        """
+        Gera o queryset utilizado na geração da exportação para Excell
+        """
+        queryset = super(BlocoIPAdmin, self).get_export_queryset(request)
+        return queryset.select_related('cidr', 'asn', 'proprietario', 'usu', 'desig', 'rir', 'transito', 'obs')
+
+
 
 admin.site.register(BlocoIP, BlocoIPAdmin)
 

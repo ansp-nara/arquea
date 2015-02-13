@@ -2,9 +2,9 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from decimal import Decimal
-from ipaddress import IPv4Network
+from ipaddress import IPv4Network, IPv4Address, IPv6Address
+import ipaddress
 
-# Create your models here.
 
 class BlocoIP(models.Model):
     ip = models.GenericIPAddressField(verbose_name='Bloco IP')
@@ -16,6 +16,7 @@ class BlocoIP(models.Model):
     usuario = models.ForeignKey('identificacao.Entidade', help_text=u'Preencher caso seja diferente do designado.', null=True, blank=True, related_name='usa', verbose_name=u'Usado por')
     rir = models.ForeignKey('rede.RIR', null=True, blank=True, verbose_name='RIR')
     obs = models.TextField(null=True, blank=True)
+    transito = models.BooleanField(u'Bloco de trânsito?', default=False)
 
     def __unicode__(self):
         return u'%s/%s' % (self.ip, self.mask)
@@ -27,8 +28,15 @@ class BlocoIP(models.Model):
     cidr.short_description = 'Bloco IP'
 
     def netmask(self):
-        ip = IPv4Network('%s/%s' % (self.ip, self.mask), strict=False)
+        #ip = IPv4Network(u'%s/%s' % (self.ip, self.mask), strict=False)
+        ip = ipaddress.ip_network(u'%s/%s' % (self.ip, self.mask), strict=False)
         return '%s' % ip.netmask
+    
+    def is_IPV4(self):
+        return isinstance(ipaddress.ip_address(u'%s' % self.ip), IPv4Address)
+    
+    def is_IPV6(self):
+        return isinstance(ipaddress.ip_address(u'%s' % self.ip), IPv6Address)
 
     def AS(self):
         return self.asn.numero
@@ -381,6 +389,10 @@ class Permission(models.Model):
                 ("rel_tec_planejamento", u"Rel. Téc. - Planejamento por ano"),     #/rede/planejamento
                 ("rel_tec_servico_processo", u"Rel. Téc. - Serviços contratados por processo"),     #/rede/planejamento2
                 ("rel_tec_recursos_operacional", u"Rel. Téc. - Relatório de recursos"),     #/rede/relatorio_recursos_operacional
+                
+                ("rel_tec_blocosip_ansp", u"Rel. Téc. - Blocos IP - ANSP"),     #/rede/blocosip_ansp
+                ("rel_tec_blocosip_transito", u"Rel. Téc. - Blocos IP - Trânsito"),     #/rede/blocosip_transito
+                ("rel_tec_blocosip_inst_transito", u"Rel. Téc. - Blocos IP - Inst. Trânsito"),     #/rede/blocosip_inst_transito
+                ("rel_tec_blocosip_inst_ansp", u"Rel. Téc. - Blocos IP - Inst. ANSP"),     #/rede/blocosip_inst_ansp
             )
-
 
