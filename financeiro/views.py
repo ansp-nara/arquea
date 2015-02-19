@@ -971,7 +971,7 @@ def ajax_insere_extrato_cc(request):
     if ef.extratocc_set.count() > 0:
         retorno = 2
     else:
-        ecc1 = ExtratoCC.objects.create(data_oper=ef.data_libera, historico=u'Liberação de verba MP', valor=-ef.valor, cod_oper=ef.data_libera.strftime('%Y%m%d9'), extrato_financeiro=ef)
+        ecc1 = ExtratoCC.objects.create(data_oper=ef.data_libera, historico=u'Liberação de verba MP', valor=-ef.valor, cod_oper=ef.data_libera.strftime('%Y%m%d9'))
 
         if ef.taxas > 0:
             ecc2 = ExtratoCC.objects.create(data_oper=ef.data_libera, historico=u'Liberação de verba TX', valor=ef.taxas*Decimal('1.00'), cod_oper=ef.data_libera.strftime('%Y%m%d9'))
