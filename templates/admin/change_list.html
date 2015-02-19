@@ -38,14 +38,8 @@
 {% if not is_popup %}
   {% block breadcrumbs %}
     <div class="breadcrumbs">Você está em: 
-      <a href="../../">
-        {% trans "Home" %}
-      </a>
-       &rsaquo; 
-       <a href="../">
-         {{ app_label|capfirst }}
-      </a>
-      &rsaquo; 
+      <a href="../../"> {% trans "Home" %} </a> &rsaquo;
+      {% if app_label %}<a href="../../">{{ app_label|capfirst|escape }}</a> &rsaquo;{% endif %} 
       {{ cl.opts.verbose_name_plural|capfirst }}
     </div>
   {% endblock %}
