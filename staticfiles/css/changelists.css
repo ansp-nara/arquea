@@ -133,7 +133,7 @@
 
 #changelist-filter {
 	position: absolute;
-    top: 36px;
+    top: 165px;
     right: 0;
     /*z-index: 1000;*/
 	float:right;
@@ -383,3 +383,17 @@
 	}
 
 /* CAIXA DE BUSCA - LADO DIREITO DA TELA - FIM */
+
+#changelist-filter .dropdown-header {
+    font-size: 12px;
+    font-weight:bold;
+    margin-top: 10px;
+    margin-bottom: 0;
+    color:#134089;
+}
+
+#changelist-filter li.active {
+    text-decoration: underline;
+}
+
+
