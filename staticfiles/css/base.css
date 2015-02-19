@@ -341,10 +341,12 @@ table thead th.sorted a {
 
 table thead th.ascending a {
     background: url(../img/admin/arrow-down.png) right .4em no-repeat;
+    background-size:1em;
 }
 
 table thead th.descending a {
     background: url(../img/admin/arrow-up.png) right .4em no-repeat;
+    background-size:1em;
 }
 
 /* ORDERABLE TABLES */
