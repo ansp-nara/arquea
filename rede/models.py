@@ -296,7 +296,6 @@ class Beneficiado(models.Model):
     estado = models.ForeignKey('rede.Estado', null=True)
     quantidade = models.FloatField()
 
-
     def __unicode__(self):
         return u'%s' % self.entidade
 

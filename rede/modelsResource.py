@@ -102,6 +102,99 @@ class CustoTerremarkRecursoResource(resources.ModelResource):
 
 
 class BlocosIPResource(resources.ModelResource):
+    """
+    Utilizado na exportação para a lista de Bloco IP.
+    """
+    
+    
+    usuario = fields.Field(column_name='Usado por')
+    cidr = fields.Field(column_name='Bloco IP')
+    asn = fields.Field(column_name='AS Anunciante')
+    proprietario = fields.Field(column_name='AS Proprietário')
+    designado = fields.Field(column_name='Designado para')
+    rir = fields.Field(column_name='RIR')
+    obs = fields.Field(column_name='Observacao')
+    superbloco = fields.Field(column_name='Superbloco')
+    superbloco_mask = fields.Field(column_name='Superbloco Másc.')
+    mask = fields.Field(column_name='Máscara IP')
+    ipv = fields.Field(column_name='IPv4_6')
+    
+    class Meta:
+        model = BlocoIP
+        fields = ('id',
+                  'usuario',
+                  'superbloco',
+                  'superbloco_mask',
+                  'cidr',
+                  'mask',
+                  'asn',
+                  'proprietario',
+                  'designado',
+                  'rir',
+                  'obs',
+                  'ipv'
+                 )
+        export_order = (
+                  'id',
+                  'usuario',
+                  'superbloco',
+                  'superbloco_mask',
+                  'cidr',
+                  'mask',
+                  'asn',
+                  'proprietario',
+                  'designado',
+                  'rir',
+                  'obs',
+                  'ipv'
+                 )
+
+    def dehydrate_usuario(self, bloco):
+        return '%s' % (bloco.usuario or '')
+
+    def dehydrate_superbloco(self, bloco):
+        return '%s' % (bloco.superbloco or '')
+
+    def dehydrate_cidr(self, bloco):
+        return '%s' % bloco.cidr()
+    
+    def dehydrate_asn(self, bloco):
+        return '%s' % (bloco.asn or '')
+    
+    def dehydrate_proprietario(self, bloco):
+        return '%s' % (bloco.proprietario or '')
+    
+    def dehydrate_designado(self, bloco):
+        return '%s' % bloco.designado
+    
+    def dehydrate_rir(self, bloco):
+        return '%s' % bloco.rir
+    
+    def dehydrate_obs(self, bloco):
+        return '%s' % bloco.obs
+
+    def dehydrate_mask(self, bloco):
+        return '%s' % bloco.netmask()
+
+    def dehydrate_superbloco_mask(self, bloco):
+        if bloco.superbloco:
+            return '%s' % bloco.superbloco.netmask()
+        else:
+            return ''
+
+    def dehydrate_ipv(self, bloco):
+        if bloco.is_IPV4():
+            return 'IPv4';
+        elif bloco.is_IPV6():
+            return 'IPv6'
+        else:
+            return ''
+        
+
+class BlocosIP_Rel_Lista_Inst_BlocoIP_Resource(resources.ModelResource):
+    """
+    Utilizado na exportação para o relatório de Lista de Blocos IP por instituição
+    """
     
     usuario = fields.Field(column_name='Usado por')
     cidr = fields.Field(column_name='Bloco IP')
@@ -186,6 +279,85 @@ class BlocosIPResource(resources.ModelResource):
         else:
             return ''
 
+
+class BlocosIP_Rel_Lista_BlocoIP_Resource(resources.ModelResource):
+    """
+    Utilizado na exportação para o relatório de Lista de Blocos IP
+    """
+    
+    usuario = fields.Field(column_name='Usado por')
+    cidr = fields.Field(column_name='Bloco IP')
+    asn = fields.Field(column_name='AS Anunciante')
+    proprietario = fields.Field(column_name='AS Proprietário')
+    designado = fields.Field(column_name='Designado para')
+    rir = fields.Field(column_name='RIR')
+    obs = fields.Field(column_name='Observacao')
+    superbloco = fields.Field(column_name='Superbloco')
+    superbloco_mask = fields.Field(column_name='Superbloco Másc.')
+    mask = fields.Field(column_name='Máscara IP')
+    ipv = fields.Field(column_name='IPv4_6')
+    
+    class Meta:
+        model = BlocoIP
+        fields = (
+                  'superbloco',
+                  'cidr',
+                  'mask',
+                  'asn',
+                  'proprietario',
+                  'usuario',
+                  'designado',
+                  'rir',
+                  'obs',
+                  'ipv'
+                 )
+        export_order = (
+                  'superbloco',
+                  'cidr',
+                  'mask',
+                  'asn',
+                  'proprietario',
+                  'usuario',
+                  'designado',
+                  'rir',
+                  'obs',
+                  'ipv'
+                 )
+
+    def dehydrate_superbloco(self, bloco):
+        return '%s' % (bloco.superbloco or '')
+
+    def dehydrate_cidr(self, bloco):
+        return '%s' % bloco.cidr()
+
+    def dehydrate_mask(self, bloco):
+        return '%s' % bloco.netmask()
+
+    def dehydrate_asn(self, bloco):
+        return '%s' % (bloco.asn or '')
+    
+    def dehydrate_proprietario(self, bloco):
+        return '%s' % (bloco.proprietario or '')
+    
+    def dehydrate_usuario(self, bloco):
+        return '%s' % (bloco.usuario or '')
+    
+    def dehydrate_designado(self, bloco):
+        return '%s' % bloco.designado
+    
+    def dehydrate_rir(self, bloco):
+        return '%s' % bloco.rir
+    
+    def dehydrate_obs(self, bloco):
+        return '%s' % bloco.obs
+
+    def dehydrate_ipv(self, bloco):
+        if bloco.is_IPV4():
+            return 'IPv4';
+        elif bloco.is_IPV6():
+            return 'IPv6'
+        else:
+            return ''
 
 
 """
