@@ -262,7 +262,6 @@ def _blocos_ip_superbloco(request, tipo=None):
     filtro_designados = Entidade.objects.filter(id__in=ent_designado_ids)
 
     if len(request.GET) < 1:
-        print 2
         return TemplateResponse(request, template, {
                                                 'tipo':tipo,
                                                 'filtro_asns':filtro_asns, 
@@ -282,8 +281,6 @@ def _blocos_ip_superbloco(request, tipo=None):
         if designado and designado != '0':
             blocos_filhos = blocos_filhos.filter(designado__id=designado)
             
-        print blocos_filhos.values_list('superbloco__id', flat=True)
-        
         # Buscando os superblocos dos filhos encontrados acima
         blocos_com_filhos_filtrados = BlocoIP.objects.all().filter(id__in=blocos_filhos.values_list('superbloco__id', flat=True))
 #         if tipo == 'transito':

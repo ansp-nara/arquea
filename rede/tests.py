@@ -183,7 +183,6 @@ class ViewTest(TestCase):
                                       asn=asn, proprietario=proprietario, superbloco=None,
                                       designado=designado, usuario=usuario, rir=rir,
                                       obs="OBS ipv4 - n1", transito=True)
-        
         # Registro 2
         asn_entidade = Entidade.objects.create(sigla='ANSP_ASN_2', nome='nome ANSP_ASN_2', cnpj='', fisco= True, url='')
         asn = ASN.objects.create(numero=1234, entidade=asn_entidade, pais="BR")
@@ -202,6 +201,47 @@ class ViewTest(TestCase):
                                       designado=designado, usuario=usuario, rir=rir,
                                       obs="OBS ipv6 - n1", transito=True)
 
+
+    def setUpBlocoIP_ANSP(self):
+        # Registro 1
+        entidade_ansp = Entidade.objects.create(sigla='ANSP', nome='nome ANSP_ASN_1', cnpj='', fisco= True, url='')
+        
+        asn = ASN.objects.create(numero=1234, entidade=entidade_ansp, pais="BR")
+        proprietario = ASN.objects.create(numero=4321, entidade=entidade_ansp, pais="BR")
+        designado = entidade_ansp
+        usuario = entidade_ansp
+        rir = RIR.objects.create(nome="RIR_1")
+        
+        ipv4_1 = BlocoIP.objects.create(ip='192.168.1.0', mask='20',
+                                      asn=asn, proprietario=proprietario, superbloco=None,
+                                      designado=designado, usuario=usuario, rir=rir,
+                                      obs="OBS ipv4 - n1", transito=True)
+        
+        proprietario_2 = ASN.objects.create(numero=4322, entidade=entidade_ansp, pais="BR")
+        
+        ipv4_2 = BlocoIP.objects.create(ip='192.168.1.1', mask='20',
+                                      asn=asn, proprietario=proprietario_2, superbloco=ipv4_1,
+                                      designado=designado, usuario=usuario, rir=rir,
+                                      obs="OBS ipv4 - n1_1", transito=True)
+
+
+        # Registro 2
+        asn_entidade = Entidade.objects.create(sigla='ANSP_ASN_2', nome='nome ANSP_ASN_2', cnpj='', fisco= True, url='')
+        asn = ASN.objects.create(numero=12345, entidade=asn_entidade, pais="BR")
+        
+        proprietario_entidade = Entidade.objects.create(sigla='ANSP_PROP_2', nome='nome ANSP_PROP_2', cnpj='', fisco= True, url='')
+        proprietario = ASN.objects.create(numero=54321, entidade=proprietario_entidade, pais="BR")
+        
+        designado = Entidade.objects.create(sigla='ANSP_DESIGNADO_2', nome='nome ANSPP_DESIGNADO_2', cnpj='', fisco= True, url='')
+        usuario = Entidade.objects.create(sigla='ANSP_USUARIO_2', nome='nome ANSP_USUARIO_2', cnpj='', fisco= True, url='')
+        
+        rir = RIR.objects.create(nome="RIR_2")
+        
+
+        ipv6 = BlocoIP.objects.create(ip='2001:0db8::7344', mask='20',
+                                      asn=asn, proprietario=proprietario, superbloco=None,
+                                      designado=designado, usuario=usuario, rir=rir,
+                                      obs="OBS ipv6 - n1", transito=True)
 
     def _test_view__blocosip__breadcrumb(self, response):
         # assert breadcrumb
@@ -376,5 +416,119 @@ class ViewTest(TestCase):
         self.assertNotContains(response, u'2001:db8::7344/20')
 
 
+
+
+
+
+
+
+
+    def _test_view__blocosip_ansp__breadcrumb(self, response):
+        # assert breadcrumb
+        self.assertContains(response, u'<a href="/rede/blocosip_ansp">Lista de Blocos IP - Blocos ANSP</a>')
+
+    def _test_view__blocosip_ansp__filtros__cabecalhos(self, response):
+        # assert breadcrumb
+        self.assertContains(response, u'<select name="anunciante" id="id_anunciante">')
+        self.assertContains(response, u'<select name="proprietario" id="id_proprietario">')
+
+    
+    def test_view__blocosip_ansp(self):
+        """
+        View do relatório de Blocos IP, com visão de árvore hierárquica.
+        """
+        self.setUpBlocoIP_ANSP()
+        
+        url = reverse("rede.views.blocosip_ansp")
+        response = self.client.get(url, {})
+        
+        self.assertTrue(200, response.status_code)
+        
+        # assert breadcrumb
+        self._test_view__blocosip_ansp__breadcrumb(response)
+
+        # asssert dos filtros
+        self._test_view__blocosip_ansp__filtros__cabecalhos(response)
+
+
+    def test_view__blocosip_ansp__resultado_sem_filtro(self):
+        """
+        View do relatório de Blocos IP, com visão de árvore hierárquica.
+        """
+        self.setUpBlocoIP_ANSP()
+        
+        url = reverse("rede.views.blocosip_ansp")
+        response = self.client.get(url, {'anunciante':'0', 'proprietario':'0'})
+        
+        self.assertTrue(200, response.status_code)
+        
+        # assert breadcrumb
+        self._test_view__blocosip_ansp__breadcrumb(response)
+
+        # asssert dos filtros
+        self._test_view__blocosip_ansp__filtros__cabecalhos(response)
+        
+        # asssert dos dados do relatório. Verificação dos dados
+        self.assertContains(response, u'<h4>Bloco <a href="/admin/rede/blocoip/1/" >192.168.1.0/20 - 255.255.240.0</a></h4>')
+        self.assertContains(response, u'<td class="col1 td_titulo">Prefixo</td>')
+        self.assertContains(response, u'<td class="colunas td_titulo">Máscara IP</td>')
+        self.assertContains(response, u'<td class="colunas td_titulo">ASN Anunciante</td>')
+        self.assertContains(response, u'<td class="colunas td_titulo">Usuário</td>')
+        self.assertContains(response, u'<td class="obs td_titulo">Obs</td>')
+        
+        self.assertContains(response, u'<td class="col1"><a href="/admin/rede/blocoip/2/">192.168.1.1/20</a></td>')
+        self.assertContains(response, u'<td class="colunas">255.255.240.0</td>')
+        self.assertContains(response, u'<td class="colunas">1234</td>')
+        self.assertContains(response, u'<td class="colunas">ANSP</td>')
+        self.assertContains(response, u'<td class="obs">OBS ipv4 - n1_1</td>')
+
+
+
+    def test_view__blocosip_ansp__filtro_anunciante(self):
+        """
+        View do relatório de Blocos IP, com visão de árvore hierárquica. Filtro por anunciante.
+        """
+        self.setUpBlocoIP_ANSP()
+        
+        url = reverse("rede.views.blocosip_ansp")
+        response = self.client.get(url, {'anunciante':'1', 'proprietario':'0'})
+        
+        self.assertTrue(200, response.status_code)
+        
+        # assert breadcrumb
+        self._test_view__blocosip_ansp__breadcrumb(response)
+
+        # asssert dos filtros
+        self._test_view__blocosip_ansp__filtros__cabecalhos(response)
+        self.assertContains(response, u'<option value="1" selected>1234 - ANSP</option>')
+
+        # asssert dos dados do relatório. Verificação dos dados
+        self.assertContains(response, u'192.168.1.0/20')
+        self.assertContains(response, u'192.168.1.1/20')
+        self.assertNotContains(response, u'2001:db8::7344/20')
+        
+
+    def test_view__blocosip_ansp__filtro_proprietario(self):
+        """
+        View do relatório de Blocos IP, com visão de árvore hierárquica. Filtro por proprietario.
+        """
+        self.setUpBlocoIP_ANSP()
+        
+        url = reverse("rede.views.blocosip_ansp")
+        response = self.client.get(url, {'anunciante':'0', 'proprietario':'3', 'usuario':'0', 'designado':'0'})
+        
+        self.assertTrue(200, response.status_code)
+        
+        # assert breadcrumb
+        self._test_view__blocosip_ansp__breadcrumb(response)
+
+        # asssert dos filtros
+        self._test_view__blocosip_ansp__filtros__cabecalhos(response)
+        self.assertContains(response, u'<option value="3" selected>4322 - ANSP</option>')
+
+        # asssert dos dados do relatório. Verificação dos dados
+        self.assertContains(response, u'192.168.1.0/20')
+        self.assertContains(response, u'192.168.1.1/20')
+        self.assertNotContains(response, u'2001:db8::7344/20')
 
 
