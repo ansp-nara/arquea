@@ -236,8 +236,12 @@ $(document).ajaxSend(function(event, xhr, settings) {
 	</div>
 	
 	{% endblock %}
-	{% block breadcrumbs %}<div class="breadcrumbs">Você está em: <a href="/">{% trans 'Home' %}</a>{% if title %} &rsaquo; {{ title }}{% endif %}</div>{% endblock %}
-
+	{% block breadcrumbs %}
+        <div class="breadcrumbs">
+            Você está em: <a href="/">{% trans 'Home' %}</a>
+            {% if title %} &rsaquo; {{ title }}{% endif %}
+        </div>
+    {% endblock %}
     <!-- Content -->
     <div id="content" class="{% block coltype %}colM{% endblock %}" style="display:none;">
         {% block pretitle %}{% endblock %}
