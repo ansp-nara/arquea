@@ -62,9 +62,14 @@ class BlocoIPAdmin(ExportMixin, admin.ModelAdmin):
             }
         ),
         )
-    list_display = ('cidr', 'asn', 'proprietario', 'usu', 'desig', 'rir', 'transito', 'obs')
-    search_fields = ('asn__entidade__sigla', 'ip')
+    
+    list_display = ('cidr', 'asn_anunciante_numero', 'asn_anunciante_sigla', \
+                    'asn_proprietario_numero', 'asn_proprietario_sigla', 'usu', 'desig', 'rir', 'transito', 'obs')
+    search_fields = ('ip', 'asn__numero', 'asn__entidade__sigla', 'proprietario__numero', \
+                     'proprietario__entidade__sigla', 'usuario__sigla', 'designado__sigla')
     list_filter = (SuperblocoFilter, 'asn', 'proprietario', DesignadoFilter, UsuarioFilter)
+    ordering = ['ip', 'asn__entidade__sigla', 'proprietario']
+    admin_order_field = ['ip', 'asn__entidade__sigla', 'proprietario__entidade__sigla', 'usuario', 'designado', 'rir', 'transito']
     
     def get_export_queryset(self, request):
         """
@@ -73,6 +78,33 @@ class BlocoIPAdmin(ExportMixin, admin.ModelAdmin):
         queryset = super(BlocoIPAdmin, self).get_export_queryset(request)
         return queryset.select_related('cidr', 'asn', 'proprietario', 'usu', 'desig', 'rir', 'transito', 'obs')
 
+    def asn_anunciante_numero(self, obj):
+        if obj.asn:
+            return ("%d" % (obj.asn.numero))
+        return '-'
+    asn_anunciante_numero.short_description = 'ASN Anunciante'
+    asn_anunciante_numero.admin_order_field = 'asn__numero'
+
+    def asn_anunciante_sigla(self, obj):
+        if obj.asn and obj.asn.entidade:
+            return ("%s" % (obj.asn.entidade.sigla))
+        return '-'
+    asn_anunciante_sigla.short_description = 'Anunciante'
+    asn_anunciante_sigla.admin_order_field = 'asn__entidade__sigla'
+
+    def asn_proprietario_numero(self, obj):
+        if obj.proprietario:
+            return ("%d" % (obj.proprietario.numero))
+        return '-'
+    asn_proprietario_numero.short_description = 'ASN Proprietário'
+    asn_proprietario_numero.admin_order_field = 'proprietario__numero'
+
+    def asn_proprietario_sigla(self, obj):
+        if obj.proprietario and obj.proprietario.entidade:
+            return ("%s" % (obj.proprietario.entidade.sigla))
+        return '-'
+    asn_proprietario_sigla.short_description = 'Proprietário'
+    asn_proprietario_sigla.admin_order_field = 'proprietario__entidade__sigla'
 
 
 admin.site.register(BlocoIP, BlocoIPAdmin)
