@@ -290,7 +290,7 @@ def _blocos_ip_superbloco(request, tipo=None):
 #             blocos_com_filhos_filtrados = blocos_com_filhos_filtrados.filter(transito=True)
         
         # Buscando superblocos restritos pelos filtros
-        blocos_filtrados = BlocoIP.objects.filter(superbloco__isnull=True).exclude(id__in = blocos_com_filhos_filtrados)
+        blocos_filtrados = BlocoIP.objects.filter(superbloco__isnull=True)
         if tipo == 'ansp':
             blocos_filtrados = blocos_filtrados.filter(proprietario__entidade__sigla="ANSP")
         if anunciante and anunciante != '0':
@@ -303,7 +303,9 @@ def _blocos_ip_superbloco(request, tipo=None):
             blocos_filtrados = blocos_filtrados.filter(designado__id=designado)
 
         # combinando as duas listas
-        blocos = blocos_com_filhos_filtrados | blocos_filtrados
+        # Obs: Fazendo o exclude no Union, para poder reaproveitar a queryset na geração do XLS,
+        # que não deve incluir o 'bloco_com_filhos_filtrados' 
+        blocos = blocos_com_filhos_filtrados | blocos_filtrados.exclude(id__in = blocos_com_filhos_filtrados)
         blocos = blocos.order_by('ip', 'mask')
         
         # Gerando o contexto para o template
@@ -326,13 +328,15 @@ def _blocos_ip_superbloco(request, tipo=None):
 
         if request.GET.get('xls') and request.GET.get('xls')=='1':
             # Export para Excel/XLS
-            queryset = (blocos_com_filhos_filtrados|blocos_filhos|blocos_filtrados)
+            # Obs: Não deve incluir o 'bloco_com_filhos_filtrados' pois
+            # ele incluir os blocos pais mas que não satisfazem os filtros 
+            queryset = (blocos_filhos|blocos_filtrados)
             
             if tipo == 'ansp':
                 queryset = queryset.filter(proprietario__entidade__sigla="ANSP")
              
             queryset = queryset.order_by('ip', 'mask')
-            dataset = BlocosIPResource().export(queryset = queryset)
+            dataset = BlocosIP_Rel_Lista_BlocoIP_Resource().export(queryset = queryset)
             
             response = HttpResponse(dataset.xls, content_type='application/vnd.ms-excel;charset=utf-8')
             
@@ -450,7 +454,7 @@ def _blocos_ip_continuo(request, template, tipo=None):
 
         if request.GET.get('xls') and request.GET.get('xls')=='1':
             # Export para Excel/XLS
-            dataset = BlocosIPResource().export(queryset=blocos)
+            dataset = BlocosIP_Rel_Lista_Inst_BlocoIP_Resource().export(queryset=blocos)
             
             response = HttpResponse(dataset.xls, content_type='application/vnd.ms-excel;charset=utf-8')
             response['Content-Disposition'] = "attachment; filename=blocosip_%s.xls" % tipo
