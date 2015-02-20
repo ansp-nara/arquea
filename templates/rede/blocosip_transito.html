@@ -88,28 +88,15 @@
        </tr>
     </thead>
     {% for b in blocos %}
-       <tr>
-           <td class="col1"><a href="{% url "admin:rede_blocoip_change" b.id %}" >{{ b.obj }}</a></td>
-           <td class="colunas">{{ b.netmask }}</td>
-           <td class="colunas">{{ b.obj.asn.numero|default_if_none:"-" }}</td>
-           <td class="colunas">{{ b.obj.asn.entidade|default_if_none:"-" }}</td>
-           <td class="colunas">{{ b.obj.proprietario.numero|default_if_none:"-" }}</td>
-           <td class="colunas">{{ b.obj.proprietario.entidade|default_if_none:"-" }}</td>
-           <td class="obs">{{ b.obj.obs }}</td>
+       <tr id="tr_blocos_{{forloop.counter}}">
+           <td id="td_blocos_{{forloop.counter}}_col1" class="col1"><a href="{% url "admin:rede_blocoip_change" b.id %}" >{{ b.obj }}</a></td>
+           <td id="td_blocos_{{forloop.counter}}_col2" class="colunas">{{ b.netmask }}</td>
+           <td id="td_blocos_{{forloop.counter}}_col3" class="colunas">{{ b.obj.asn.numero|default_if_none:"-" }}</td>
+           <td id="td_blocos_{{forloop.counter}}_col4" class="colunas">{{ b.obj.asn.entidade|default_if_none:"-" }}</td>
+           <td id="td_blocos_{{forloop.counter}}_col5" class="colunas">{{ b.obj.proprietario.numero|default_if_none:"-" }}</td>
+           <td id="td_blocos_{{forloop.counter}}_col6" class="colunas">{{ b.obj.proprietario.entidade|default_if_none:"-" }}</td>
+           <td id="td_blocos_{{forloop.counter}}_col7" class="obs">{{ b.obj.obs }}</td>
        </tr>
-       {% if b.subnivel %}
-           {% for sb in b.subnivel %}
-           <tr>
-              <td class="col1">&nbsp;&nbsp;&nbsp;<a href="{% url "admin:rede_blocoip_change" sb.id %}">{{ sb.obj }}</a></td>
-              <td class="colunas">{{ sb.netmask }}</td>
-              <td class="colunas">{{ sb.obj.asn.numero|default_if_none:"-" }}</td>
-              <td class="colunas">{{ sb.obj.asn.entidade|default_if_none:"-" }}</td>
-              <td class="colunas">{{ sb.obj.proprietario.numero|default_if_none:"-" }}</td>
-              <td class="colunas">{{ sb.obj.proprietario.entidade|default_if_none:"-" }}</td>
-              <td class="obs">{{ sb.obj.obs }}</td>
-           </tr>
-           {% endfor %}
-       {% endif %}
     {% endfor %}
     </table>
     </div>
