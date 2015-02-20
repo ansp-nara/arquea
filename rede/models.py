@@ -311,8 +311,8 @@ class Recurso(models.Model):
     valor_imposto_mensal = models.DecimalField(u'Valor mensal com imposto', max_digits=12, decimal_places=2)
     pagamento = models.ForeignKey('financeiro.Pagamento', null=True, blank=True)
     
-    mes_referencia = models.DecimalField(u'Mes inicial de referencia', max_digits=2, decimal_places=0, validators=[MaxValueValidator(12), MinValueValidator(1)], null=True, blank=True)
-    ano_referencia  = models.DecimalField(u'Ano inicial de referencia', max_digits=4, decimal_places=0, validators=[MinValueValidator(1950)], null=True, blank=True)
+    mes_referencia = models.DecimalField(u'Mês inicial de referência', max_digits=2, decimal_places=0, validators=[MaxValueValidator(12), MinValueValidator(1)], null=True, blank=True)
+    ano_referencia  = models.DecimalField(u'Ano inicial de referência', max_digits=4, decimal_places=0, validators=[MinValueValidator(1950)], null=True, blank=True)
     
     obs = models.TextField(null=True, blank=True)
 
