@@ -10,7 +10,7 @@ class RecursoInline(admin.StackedInline):
     model = Recurso
     extra = 2
     form = RecursoInlineAdminForm
-    fieldsets = ((None, {'fields':('planejamento',('quantidade','valor_mensal_sem_imposto','valor_imposto_mensal'),'obs')}),)
+    fieldsets = ((None, {'fields':('planejamento',('quantidade','mes_referencia','ano_referencia'), ('valor_mensal_sem_imposto','valor_imposto_mensal'),'obs')}),)
 
     def __init__(self, model, admin_site):
         """
