@@ -637,7 +637,7 @@ class ViewBlocoIPTransitoTest(TestCase):
         self.assertContains(response, u'<th class="colunas">Proprietário</th>')
         self.assertContains(response, u'<th class="obs">Obs</th>')
 
-        self.assertContains(response, u'<td id="td_blocos_1_col1" class="col1"><a href="/admin/rede/blocoip/2/" >143.106.0.0/16</a></td>', msg_prefix=response.content)
+        self.assertContains(response, u'<td id="td_blocos_1_col1" class="col1"><a href="/admin/rede/blocoip/2/" >143.106.0.0/16</a></td>')
         self.assertContains(response, u'<td id="td_blocos_1_col2" class="colunas">255.255.0.0</td>')
         self.assertContains(response, u'<td id="td_blocos_1_col3" class="colunas">53187</td>')
         self.assertContains(response, u'<td id="td_blocos_1_col4" class="colunas">UNICAMP</td>')
