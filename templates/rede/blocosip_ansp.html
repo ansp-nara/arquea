@@ -76,6 +76,11 @@
         </form>
     </fieldset>
 </div>
+{% if blocos|length_is:"0" %}
+    <div style="border:1px solid lightgray; padding: 15px;">
+        <strong>Não foram encontrados Blocos IP que satisfaçam os filtros selecionados.</strong>
+    </div>
+{% endif %}
 {% if blocos %}
     <div id="blocos">
     <table>
