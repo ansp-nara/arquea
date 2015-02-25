@@ -54,19 +54,20 @@ class SuperblocoFilter(SimpleListFilter):
 
 class BlocoIPAdmin(ExportMixin, admin.ModelAdmin):
     resource_class = BlocosIPResource
+    form = BlocoIPAdminForm
     
     fieldsets = (
         (None, {
-            'fields': (('ip', 'mask', 'transito'), ('asn', 'proprietario'), ('designado', 'usuario'), ('superbloco', 'rir'), 'obs'),
+            'fields': (('ip', 'mask', 'net_mask', 'transito'), ('asn', 'proprietario'), ('designado', 'usuario'), ('superbloco', 'rir'), 'obs'),
             'classes': ('wide',)
             }
         ),
         )
     
     list_display = ('cidr', 'asn_anunciante_numero', 'asn_anunciante_sigla', \
-                    'asn_proprietario_numero', 'asn_proprietario_sigla', 'usu', 'desig', 'rir', 'transito', 'obs')
+                    'asn_proprietario_numero', 'asn_proprietario_sigla', 'usu', 'desig', 'rir', 'transito')
     search_fields = ('ip', 'asn__numero', 'asn__entidade__sigla', 'proprietario__numero', \
-                     'proprietario__entidade__sigla', 'usuario__sigla', 'designado__sigla')
+                     'proprietario__entidade__sigla', 'usuario__sigla', 'designado__sigla', 'obs')
     list_filter = (SuperblocoFilter, 'asn', 'proprietario', DesignadoFilter, UsuarioFilter)
     ordering = ['ip', 'asn__entidade__sigla', 'proprietario']
     admin_order_field = ['ip', 'asn__entidade__sigla', 'proprietario__entidade__sigla', 'usuario', 'designado', 'rir', 'transito']
@@ -107,7 +108,6 @@ class BlocoIPAdmin(ExportMixin, admin.ModelAdmin):
     asn_proprietario_sigla.admin_order_field = 'proprietario__entidade__sigla'
 
 
-admin.site.register(BlocoIP, BlocoIPAdmin)
 
 class SegmentoInline(admin.StackedInline):
     fieldsets = (
@@ -125,12 +125,6 @@ class EnlaceAdmin(admin.ModelAdmin):
 
     inlines = [SegmentoInline]
     #list_display = ('participante_display', 'entrada_display', 'banda', 'operadora')
-
-admin.site.register(Operadora)
-admin.site.register(EnlaceOperadora)
-admin.site.register(Banda)
-admin.site.register(IPBorda)
-admin.site.register(Enlace, EnlaceAdmin)
 
 class RecursoAdmin(admin.ModelAdmin):
     form = RecursoAdminForm
@@ -196,6 +190,129 @@ class TipoServicoAdmin(admin.ModelAdmin):
 
     action_clone.short_description = _(u"Copiar os tipos de serviço selecionados")
 
+
+class TipoConectorAdmin(admin.ModelAdmin):
+    list_display = ('sigla', )
+    search_fields = ('sigla',)
+    ordering = ['sigla',]
+    
+
+class TipoConectorFilter(SimpleListFilter):
+    title = u'Tipo de conector'
+    parameter_name = 'tipoConector'
+
+    def lookups(self, request, model_admin):
+        tipoConector_ids = IFCConector.objects.values_list('tipoConector', flat=True).distinct()
+        return [(e.id, e.sigla) for e in TipoConector.objects.filter(id__in=tipoConector_ids)]
+
+    def queryset(self, request, queryset):
+        id=self.value()
+        if id:
+            return queryset.filter(tipoConector__id__exact=id)
+        else: return queryset
+        
+        
+class IFCConectorAdmin(ExportMixin, admin.ModelAdmin):
+    fieldsets = ((None, {
+                    'fields': (('rack', 'shelf', 'porta'),
+                              'tipoConector',
+                              'ativo', 
+                              'obs', ),
+                    'classes': ('wide',)
+                    }
+                ),)
+
+    list_display = ('rack', 'shelf', 'porta', 'tipoConector', 'ativo')
+    search_fields = ('rack', 'porta', 'tipoConector__sigla')
+    list_filter = ('rack', TipoConectorFilter)
+    
+
+class CrossConnectionAdmin(ExportMixin, admin.ModelAdmin):
+    resource_class = CrossConnectionResource
+    form = CrossConnectionAdminForm
+    
+    list_display = ('origem__rack', 'origem__shelf', 'origem__porta', 'origem__tipoConector', \
+                    'destino__rack', 'destino__shelf', 'destino__porta', 'destino__tipoConector', \
+                    'ordemDeServico', 'circuito', )
+    
+    search_fields = ('origem__rack', 'destino__rack', 'circuito', 'ordemDeServico',)
+    
+    ordering = ['origem__rack', 'origem__shelf', 'origem__porta', 'destino__rack','destino__shelf','destino__porta',]
+    
+    admin_order_field = ['origem__rack', 'destino__rack',]
+    
+    def get_export_queryset(self, request):
+        """
+        Gera o queryset utilizado na geração da exportação para Excell
+        """
+        queryset = super(CrossConnectionAdmin, self).get_export_queryset(request)
+        return queryset
+    
+    def origem__rack(self, obj):
+        if obj.origem:
+            return ("%s" % (obj.origem.rack))
+        return '-'
+    origem__rack.short_description = 'Rack 1'
+    origem__rack.admin_order_field = 'origem__rack'
+
+    def origem__shelf(self, obj):
+        if obj.origem:
+            return ("%s" % (obj.origem.shelf))
+        return '-'
+    origem__shelf.short_description = 'Shelf'
+    origem__shelf.admin_order_field = 'origem__shelf'
+
+    def origem__porta(self, obj):
+        if obj.origem:
+            return ("%s" % (obj.origem.porta))
+        return '-'
+    origem__porta.short_description = 'Porta'
+    origem__porta.admin_order_field = 'origem__porta'
+    
+    def origem__tipoConector(self, obj):
+        if obj.origem:
+            return ("%s" % (obj.origem.tipoConector))
+        return '-'
+    origem__tipoConector.short_description = 'Conector'
+    origem__tipoConector.admin_order_field = 'origem__tipoConector'
+    
+
+    def destino__rack(self, obj):
+        if obj.destino:
+            return ("%s" % (obj.destino.rack))
+        return '-'
+    destino__rack.short_description = 'Rack 2'
+    destino__rack.admin_order_field = 'destino__rack'
+
+    def destino__shelf(self, obj):
+        if obj.destino:
+            return ("%s" % (obj.destino.shelf))
+        return '-'
+    destino__shelf.short_description = 'Shelf'
+    destino__shelf.admin_order_field = 'destino__shelf'
+
+    def destino__porta(self, obj):
+        if obj.destino:
+            return ("%s" % (obj.destino.porta))
+        return '-'
+    destino__porta.short_description = 'Porta'
+    destino__porta.admin_order_field = 'destino__porta'
+    
+    def destino__tipoConector(self, obj):
+        if obj.destino:
+            return ("%s" % (obj.destino.tipoConector))
+        return '-'
+    destino__tipoConector.short_description = 'Conector'
+    destino__tipoConector.admin_order_field = 'destino__tipoConector'
+    
+
+admin.site.register(BlocoIP, BlocoIPAdmin)
+admin.site.register(Operadora)
+admin.site.register(EnlaceOperadora)
+admin.site.register(Banda)
+admin.site.register(IPBorda)
+admin.site.register(Enlace, EnlaceAdmin)
+
 admin.site.register(TipoServico, TipoServicoAdmin)
 admin.site.register(Projeto)
 admin.site.register(Unidade)
@@ -209,3 +326,9 @@ admin.site.register(Interface)
 admin.site.register(Uso)
 admin.site.register(Sistema)
 admin.site.register(Estado)
+
+admin.site.register(TipoConector, TipoConectorAdmin)
+admin.site.register(IFCConector, IFCConectorAdmin)
+admin.site.register(CrossConnection, CrossConnectionAdmin)
+admin.site.register(CrossConnectionHistorico)
+

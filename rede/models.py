@@ -1,8 +1,12 @@
 #-*- encoding:utf-8 -*-
 from django.db import models
+from django.core.exceptions import ValidationError
+from django.utils.translation import ugettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator
 from decimal import Decimal
 from ipaddress import IPv4Network, IPv4Address, IPv6Address
+from django.utils.translation import ugettext_lazy as _
+
 import ipaddress
 
 
@@ -376,6 +380,77 @@ class Estado(models.Model):
         ordering = ('nome',)
 
 
+
+class TipoConector(models.Model):
+    """
+    Representa um tipo de conector utilizado nas IFCs.
+    """
+    sigla = models.CharField(_(u'Sigla'), max_length=20, unique=True)
+    obs = models.TextField(_(u'Observação'), null=True, blank=True)
+    imagem = models.ImageField(upload_to='conector', null=True, blank=True)
+
+    def __unicode__(self):
+        return u'%s' % self.sigla
+
+    class Meta:
+        verbose_name = u'Tipo de Conector'
+        verbose_name_plural = u'Tipos de Conectores'
+        ordering = ('sigla',)
+
+
+class IFCConector(models.Model):
+    """
+    Representa um conector de IFCs para a cross conexão.
+    """
+    rack = models.CharField(_(u'Rack'), max_length=30, )
+    shelf = models.CharField(_(u'Shelf'), max_length=5, )
+    porta = models.CharField(_(u'Porta'), max_length=10, )
+    tipoConector = models.ForeignKey('rede.TipoConector')
+    ativo = models.BooleanField(u'Conector ativo?', default=True)
+    obs = models.TextField(null=True, blank=True)
+
+    def __unicode__(self):
+        if self.tipoConector:
+            return u'%s %s %s %s' % (self.rack, self.shelf, self.porta, self.tipoConector.sigla)
+        return u'%s %s %s -' % (self.rack, self.shelf, self.porta)
+
+    class Meta:
+        verbose_name = u'IFC Conector'
+        verbose_name_plural = u'IFC Conectores'
+        ordering = ('rack', 'shelf', 'porta')
+        unique_together = ('rack', 'shelf', 'porta')
+
+class CrossConnection(models.Model):
+    """
+    Representa uma cross conexão.
+    """
+    origem = models.ForeignKey('rede.IFCConector', related_name='%(class)s_origem')
+    destino = models.ForeignKey('rede.IFCConector', related_name='%(class)s_destino')
+    circuito = models.CharField(_(u'Circuito'), max_length=40, null=True, blank=True)
+    ordemDeServico = models.CharField(_(u'OS/Projeto'), max_length=30, null=True, blank=True)
+    obs = models.TextField(_(u'Observação'), null=True, blank=True)
+    ativo = models.BooleanField(u'Conector ativo?', default=True)
+
+    class Meta:
+        verbose_name = u'Cross Connection'
+        verbose_name_plural = u'Cross Connections'
+
+class CrossConnectionHistorico(models.Model):
+    """
+    Uma instância dessa classe representa o histórico de uma cross conexão.
+    """
+    crossConnection = models.ForeignKey(CrossConnection, verbose_name=_(u'Cross Connection'))
+    obs = models.TextField(_(u'Observação'), )
+    data = models.DateField(_(u'Data'))
+
+    # Define a descrição do modelo e a ordenação dos dados pelo campo 'nome'.
+    class Meta:
+        verbose_name = _(u'Histórico Local')
+        verbose_name_plural = _(u'Histórico Local')
+        ordering = ('-data', 'id')
+
+
+
 # Classe para definição de permissões de views e relatórios da app rede
 class Permission(models.Model):
     class Meta:
@@ -393,5 +468,8 @@ class Permission(models.Model):
                 ("rel_tec_blocosip_transito", u"Rel. Téc. - Blocos IP - Trânsito"),     #/rede/blocosip_transito
                 ("rel_tec_blocosip_inst_transito", u"Rel. Téc. - Blocos IP - Inst. Trânsito"),     #/rede/blocosip_inst_transito
                 ("rel_tec_blocosip_inst_ansp", u"Rel. Téc. - Blocos IP - Inst. ANSP"),     #/rede/blocosip_inst_ansp
+                
+                ("rel_tec_crossconnection", u"Lista de Cross Connections"),     #/rede/crossconnection
+                
             )
 

@@ -627,3 +627,62 @@ def relatorio_recursos_operacional(request, pdf=0, xls=0):
 
 
 
+
+
+@login_required
+@permission_required('rede.rel_tec_crossconnection', raise_exception=True)
+@require_safe
+def crossconnection(request):
+    """
+     Relatório Técnico - Relatório de Cross Connection.
+    """
+    template = 'rede/crossconnection.html'
+    # Filtros selecionados
+    rack = request.GET.get('rack')
+    shelf = request.GET.get('shelf')
+    conector = request.GET.get('conector')
+    projeto = request.GET.get('projeto')
+
+    filtro_rack = IFCConector.objects.order_by().values_list('rack', flat=True).distinct()
+    filtro_shelf = IFCConector.objects.order_by().values_list('shelf', flat=True).distinct()
+    filtro_conector = IFCConector.objects.order_by().values_list('tipoConector__sigla', flat=True).distinct()
+    filtro_projeto = CrossConnection.objects.order_by().values_list('ordemDeServico', flat=True).distinct()
+
+    if len(request.GET) < 1:
+        return TemplateResponse(request, template, {
+                                                'filtro_rack':filtro_rack, 
+                                                'filtro_shelf':filtro_shelf,
+                                                'filtro_conector':filtro_conector, 
+                                                'filtro_projeto':filtro_projeto})
+
+    else:
+        cross = CrossConnection.objects.all().order_by('origem__rack', 'origem__shelf', 'origem__porta', 'destino__rack','destino__shelf','destino__porta',)
+        
+        # Filtrando o resultado
+        if rack and rack != '0':
+            cross = cross.filter(Q(origem__rack=rack)|Q(destino__rack=rack))
+        if shelf and shelf != '0':
+            cross = cross.filter(Q(origem__shelf=shelf)|Q(destino__shelf=shelf))
+        if conector and conector != '0':
+            cross = cross.filter(Q(origem__tipoConector__sigla=conector)|Q(destino__tipoConector__sigla=conector))
+        if projeto and projeto != '0':
+            cross = cross.filter(ordemDeServico=projeto)
+        
+        if request.GET.get('xls') and request.GET.get('xls')=='1':
+            # Export para Excel/XLS
+            queryset = (cross)
+            dataset = CrossConnectionResource().export(queryset = queryset)
+             
+            response = HttpResponse(dataset.xls, content_type='application/vnd.ms-excel;charset=utf-8')
+             
+            response['Content-Disposition'] = "attachment; filename=cross_connection.xls"
+         
+            return response
+         
+        return TemplateResponse(request, template, {
+                                                'cross':cross,
+                                                'filtro_rack':filtro_rack, 
+                                                'filtro_shelf':filtro_shelf,
+                                                'filtro_conector':filtro_conector, 
+                                                'filtro_projeto':filtro_projeto})
+

@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from django import forms
-from django.utils.translation import ugettext_lazy as _
+from django.db.models import Q
 from django.forms.util import ErrorList
 from django.utils.html import mark_safe
+from django.utils.translation import ugettext_lazy as _
 
 from models import *
 from outorga.models import Termo
@@ -15,6 +16,46 @@ class PlanejaAquisicaoRecursoAdminForm(forms.ModelForm):
     class Meta:
         model = PlanejaAquisicaoRecurso
         fields = ['os', 'ano', 'tipo', 'referente', 'quantidade', 'valor_unitario', 'projeto', 'unidade', 'instalacao', 'banda', 'obs',]
+
+
+
+class BlocoIPAdminForm(forms.ModelForm):
+    
+    # Campo de exibição de net mask. Utilizado somente para visualizar o netmask.
+    net_mask = forms.CharField(label=_(u'Net Mask'), required=False,
+            widget=forms.TextInput(attrs={'disabled':'disabled'}))
+
+    def __init__(self, *args, **kwargs):
+        super(BlocoIPAdminForm, self).__init__(*args, **kwargs)
+
+        if 'instance' in kwargs and kwargs['instance']:
+            ip = kwargs['instance'].ip
+            mask = kwargs['instance'].mask
+            
+            # Preenchendo o campo de exibição de net mask
+            if ip and mask:
+                self.fields['net_mask'].initial = ipaddress.ip_network(u'%s/%s' % (ip, mask), strict=False).netmask
+            
+    def clean(self):
+        cleaned_data = super(BlocoIPAdminForm, self).clean()
+        
+        ip = self.cleaned_data.get('ip')
+        mask = self.cleaned_data.get('mask')
+        
+        # Verifica se o IP / Mask foram preenchidos com valores de válidos
+        if ip and mask:
+            try:
+                ipaddress.ip_network(u'%s/%s' % (ip, mask), strict=False)
+            except ValueError:
+                self._errors["ip"] = self.error_class([u'IP / Mask não representam um endereço de rede válido.'])
+                del cleaned_data["ip"]
+
+        return cleaned_data
+
+    class Meta:
+        model = BlocoIP
+
+
 
 
 class RecursoAdminForm(forms.ModelForm):
@@ -71,3 +112,41 @@ class RecursoAdminForm(forms.ModelForm):
     class Media:
         js = ('/media/js/selects.js',)
 
+
+
+class CrossConnectionAdminForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(CrossConnectionAdminForm, self).__init__(*args, **kwargs)
+
+        if 'instance' in kwargs:
+            self.id = kwargs['instance'].id
+
+        
+    def clean(self):
+        cleaned_data = super(CrossConnectionAdminForm, self).clean()
+        
+        origem_id = self.cleaned_data.get('origem')
+        destino_id = self.cleaned_data.get('destino')
+        
+        # Verifica se a origem e destino da cross conexão não são iguais
+        if origem_id and destino_id and origem_id == destino_id:
+            self._errors["origem"] = self.error_class([u'IFC de origem e destino não podem ser a mesma.'])
+        
+        # Verifica se as IFC especificadas já estão cadastradas em outra Cross conexão ativa.
+        if origem_id:
+            qs = CrossConnection.objects.filter(Q(origem_id=origem_id)|Q(destino_id=origem_id))
+            qs = qs.filter(ativo = True)
+            if self.id:
+                qs = qs.exclude(pk=self.id)
+            if qs.count() > 0:
+                self._errors["origem"] = self.error_class([u'IFC já cadastrado em uma Cross Conexão.'])
+        if destino_id:
+            qs = CrossConnection.objects.filter(Q(origem_id=destino_id)|Q(destino_id=destino_id))
+            qs = qs.filter(ativo = True)
+            if self.id:
+                qs = qs.exclude(pk=self.id)
+            if qs.count() > 0:
+                self._errors["destino"] = self.error_class([u'IFC já cadastrado em uma Cross Conexão.'])
+
+
+        return cleaned_data
