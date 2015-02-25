@@ -194,6 +194,8 @@ def lista_relatorios(context):
     if user.is_superuser or user.has_perm('rede.rel_tec_blocosip_inst_ansp'):
         tecnicos.append({'url':'/rede/blocosip_inst_ansp', 'nome':u'Lista de blocos IP - Instituição ANSP'})
 
+    if user.is_superuser or user.has_perm('rede.rel_tec_crossconnection'):
+        tecnicos.append({'url':'/rede/rel_tec_crossconnection', 'nome':u'Lista de Cross Connections'})
     
     if user.is_superuser:
         verificacoes.append({'url':'/verificacao/relatorio/equipamento_consolidado', 'nome':u'Verificação de equipamentos'})
