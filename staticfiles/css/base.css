@@ -1343,25 +1343,21 @@ div.btn_excel input[type=submit]:active {
 }
 
 div.btn_print {
-    float:left;
+    display:inline-block;
 }
 
 div.btn_excel {
-    float:left;
+    display:inline-block;
 }
 
 #report_title {
-    height: 10px;
 }
 #report_toolbar {
-    float: left;
     width: 800px;
-    height: 40px;
     margin: 0 0 0 25px;
     padding: 0;
 }
 #report_toolbar form {
-    float: left;
     margin-right: 10px;
 }
 #report_toolbar span {

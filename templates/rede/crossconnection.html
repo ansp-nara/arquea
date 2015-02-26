@@ -36,22 +36,7 @@
 {% endblock %}
 {% block content %}
 <div id="report_title">
-	<h1>Cross Conexões</h1>
-    <div id="report_toolbar">
-        {% if cross %}
-        <form action="{% url 'rede.views.crossconnection' %}" method="GET" id="id_form_recurso_xls">
-            <input type="hidden" name="rack" value="{{request.GET.rack}}" />
-            <input type="hidden" name="shelf" value="{{request.GET.shelf}}" />
-            <input type="hidden" name="conector" value="{{request.GET.conector}}" />
-            <input type="hidden" name="projeto" value="{{request.GET.projeto}}" />
-            <input type="hidden" name="xls" value="1" />
-            <div title="Exportar para Excel" class="btn_excel">
-               <input type="submit" value="" />
-            </div>
-        </form>
-        {% endif %}
-    </div>
-    <p></p>
+    <h1>Cross Conexões</h1>
 </div>
 <div id="div_filtro">
     <fieldset>
@@ -93,6 +78,21 @@
         </form>
     </fieldset>
 </div>
+<div id="report_toolbar">
+    {% if cross %}
+    <form action="{% url 'rede.views.crossconnection' %}" method="GET" id="id_form_recurso_xls">
+        <input type="hidden" name="rack" value="{{request.GET.rack}}" />
+        <input type="hidden" name="shelf" value="{{request.GET.shelf}}" />
+        <input type="hidden" name="conector" value="{{request.GET.conector}}" />
+        <input type="hidden" name="projeto" value="{{request.GET.projeto}}" />
+        <input type="hidden" name="xls" value="1" />
+        <div title="Exportar para Excel" class="btn_excel">
+           <input type="submit" value="" />
+        </div>
+    </form>
+    {% endif %}
+</div>
+
 {% if cross|length_is:"0" %}
     <div style="border:1px solid lightgray; padding: 15px;">
         <strong>Não foram encontrados Cross Conexões que satisfaçam os filtros selecionados.</strong>

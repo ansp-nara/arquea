@@ -25,21 +25,6 @@
 {% block content %}
     <div id="report_title">
         <h1>Blocos IP</h1>
-        <div id="report_toolbar">
-        {% if blocos %}
-            <form action="{% url 'rede.views.blocosip' %}" method="GET" id="id_form_recurso_xls">
-                <input type="hidden" name="anunciante" value="{{request.GET.anunciante}}" />
-                <input type="hidden" name="proprietario" value="{{request.GET.proprietario}}" />
-                <input type="hidden" name="usuario" value="{{request.GET.usuario}}" />
-                <input type="hidden" name="designado" value="{{request.GET.designado}}" />
-                <input type="hidden" name="xls" value="1" />
-                <div title="Exportar para Excel" class="btn_excel">
-                   <input type="submit" value="" />
-                </div>
-            </form>
-        {% endif %}
-        </div>
-        <p></p>
     </div>
 <div id="div_filtro">
     <fieldset>
@@ -84,6 +69,21 @@
         </form>
     </fieldset>
 </div>
+<div id="report_toolbar">
+    {% if blocos %}
+        <form action="{% url 'rede.views.blocosip' %}" method="GET" id="id_form_recurso_xls">
+            <input type="hidden" name="anunciante" value="{{request.GET.anunciante}}" />
+            <input type="hidden" name="proprietario" value="{{request.GET.proprietario}}" />
+            <input type="hidden" name="usuario" value="{{request.GET.usuario}}" />
+            <input type="hidden" name="designado" value="{{request.GET.designado}}" />
+            <input type="hidden" name="xls" value="1" />
+            <div title="Exportar para Excel" class="btn_excel">
+               <input type="submit" value="" />
+            </div>
+        </form>
+    {% endif %}
+</div>
+
 {% if blocos %}
    <div id="theader">
    <div class="col1">

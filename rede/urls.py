@@ -22,6 +22,7 @@ urlpatterns = patterns('rede.views',
     (r'blocosip/$', 'blocosip'),
     
     (r'crossconnection$', 'crossconnection'),
+    (r'crossconnection/$', 'crossconnection'),
     
     (r'blocos.txt', 'blocos_texto'),
     (r'planeja_contrato$', 'planeja_contrato'),
