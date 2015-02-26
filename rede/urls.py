@@ -10,19 +10,23 @@ urlpatterns = patterns('rede.views',
     (r'info.pdf$', 'imprime_informacoes_gerais'),
     (r'info_tec/(?P<id>\d+)$', 'planilha_informacoes_tecnicas'),
     
-    (r'blocosip_transito$', 'blocosip_transito'),
-    (r'blocosip_inst_transito$', 'blocosip_inst_transito'),
-    (r'blocosip_inst_ansp$', 'blocosip_inst_ansp'),
-    (r'blocosip_ansp$', 'blocosip_ansp'),
-    (r'blocosip$', 'blocosip'),
-    (r'blocosip_transito/$', 'blocosip_transito'),
-    (r'blocosip_inst_transito/$', 'blocosip_inst_transito'),
-    (r'blocosip_inst_ansp/$', 'blocosip_inst_ansp'),
-    (r'blocosip_ansp/$', 'blocosip_ansp'),
-    (r'blocosip/$', 'blocosip'),
+    (r'relatorios/blocosip_transito$', 'blocosip_transito'),
+    (r'relatorios/blocosip_transito/$', 'blocosip_transito'),
     
-    (r'crossconnection$', 'crossconnection'),
-    (r'crossconnection/$', 'crossconnection'),
+    (r'relatorios/blocosip_inst_transito$', 'blocosip_inst_transito'),
+    (r'relatorios/blocosip_inst_transito/$', 'blocosip_inst_transito'),
+    
+    (r'relatorios/blocosip_inst_ansp$', 'blocosip_inst_ansp'),
+    (r'relatorios/blocosip_inst_ansp/$', 'blocosip_inst_ansp'),
+    
+    (r'relatorios/blocosip_ansp$', 'blocosip_ansp'),
+    (r'relatorios/blocosip_ansp/$', 'blocosip_ansp'),
+
+    (r'relatorios/blocosip$', 'blocosip'),
+    (r'relatorios/blocosip/$', 'blocosip'),
+    
+    (r'relatorios/crossconnection$', 'crossconnection'),
+    (r'relatorios/crossconnection/$', 'crossconnection'),
     
     (r'blocos.txt', 'blocos_texto'),
     (r'planeja_contrato$', 'planeja_contrato'),
