@@ -15,6 +15,11 @@ urlpatterns = patterns('rede.views',
     (r'blocosip_inst_ansp$', 'blocosip_inst_ansp'),
     (r'blocosip_ansp$', 'blocosip_ansp'),
     (r'blocosip$', 'blocosip'),
+    (r'blocosip_transito/$', 'blocosip_transito'),
+    (r'blocosip_inst_transito/$', 'blocosip_inst_transito'),
+    (r'blocosip_inst_ansp/$', 'blocosip_inst_ansp'),
+    (r'blocosip_ansp/$', 'blocosip_ansp'),
+    (r'blocosip/$', 'blocosip'),
     
     (r'crossconnection$', 'crossconnection'),
     
