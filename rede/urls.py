@@ -14,9 +14,9 @@ urlpatterns = patterns('rede.views',
     (r'blocosip_inst_transito$', 'blocosip_inst_transito'),
     (r'blocosip_inst_ansp$', 'blocosip_inst_ansp'),
     (r'blocosip_ansp$', 'blocosip_ansp'),
-    (r'blocosip', 'blocosip'),
+    (r'blocosip$', 'blocosip'),
     
-    (r'crossconnection', 'crossconnection'),
+    (r'crossconnection$', 'crossconnection'),
     
     (r'blocos.txt', 'blocos_texto'),
     (r'planeja_contrato$', 'planeja_contrato'),
