@@ -118,7 +118,7 @@ class CrossConnectionAdminForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(CrossConnectionAdminForm, self).__init__(*args, **kwargs)
 
-        if 'instance' in kwargs:
+        if 'instance' in kwargs and kwargs['instance']:
             self.id = kwargs['instance'].id
 
         
