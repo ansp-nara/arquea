@@ -527,7 +527,8 @@ class Dimensao(models.Model):
     unidade = models.ForeignKey('patrimonio.UnidadeDimensao')
 
     def __unicode__(self):
-        return u'%s x %s x %s %s - %s kg' % (self.altura, self.largura, self.profundidade, self.unidade, self.peso)
+        return u'%s x %s x %s %s - %s kg' % (self.altura, self.largura, self.profundidade, self.unidade, (self.peso or '-'))
+    
     
     class Meta:
         verbose_name = u'Dimensão'
