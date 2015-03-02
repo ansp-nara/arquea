@@ -213,6 +213,8 @@ class TipoConectorFilter(SimpleListFilter):
         
         
 class IFCConectorAdmin(ExportMixin, admin.ModelAdmin):
+    form = IFCConectorAdminForm
+    
     fieldsets = ((None, {
                     'fields': (('rack', 'shelf', 'porta'),
                               'tipoConector',
@@ -231,6 +233,16 @@ class CrossConnectionAdmin(ExportMixin, admin.ModelAdmin):
     resource_class = CrossConnectionResource
     form = CrossConnectionAdminForm
     
+    fieldsets = (
+                 ('IFC', {
+                      'fields': ('origem', 'destino'),
+                      'classes': ('wide',)
+                 }),
+                 ('Descrição', {
+                      'fields': ('circuito', 'ordemDeServico', 'obs', 'ativo')
+                 }),
+    )
+    
     list_display = ('origem__rack', 'origem__shelf', 'origem__porta', 'origem__tipoConector', \
                     'destino__rack', 'destino__shelf', 'destino__porta', 'destino__tipoConector', \
                     'ordemDeServico', 'circuito', )
@@ -241,6 +253,7 @@ class CrossConnectionAdmin(ExportMixin, admin.ModelAdmin):
     
     admin_order_field = ['origem__rack', 'destino__rack',]
     
+
     def get_export_queryset(self, request):
         """
         Gera o queryset utilizado na geração da exportação para Excell
