@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 from django import forms
+from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
 from django.db.models import Q
+from django.db.models.fields.related import ManyToOneRel
 from django.forms.util import ErrorList
 from django.utils.html import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
 from models import *
-from outorga.models import Termo
+from outorga.models import Termo, OrdemDeServico
 from financeiro.models import Pagamento
 
 class PlanejaAquisicaoRecursoAdminForm(forms.ModelForm):
@@ -113,15 +115,41 @@ class RecursoAdminForm(forms.ModelForm):
         js = ('/media/js/selects.js',)
 
 
+class IFCConectorAdminForm(forms.ModelForm):
 
-class CrossConnectionAdminForm(forms.ModelForm):
+    class Meta:
+        model = IFCConector
+        fields = ['rack', 'shelf', 'porta', 'tipoConector', 'ativo', 'obs']
+        
     def __init__(self, *args, **kwargs):
-        super(CrossConnectionAdminForm, self).__init__(*args, **kwargs)
-
+        super(IFCConectorAdminForm, self).__init__(*args, **kwargs)
+        
         self.id = None
         if 'instance' in kwargs and kwargs['instance']:
             self.id = kwargs['instance'].id
 
+        # Adicionando link para o label do campo de Tipo de Conector
+        self.fields['tipoConector'].label = mark_safe('<a href="#" onclick="window.open(\'/admin/rede/tipoconector/\'+$(\'#id_tipoConector\').val() + \'/\', \'_blank\');return true;">Tipo de Conector</a>')
+
+
+class CrossConnectionAdminForm(forms.ModelForm):
+    
+    class Meta:
+        model = CrossConnection
+        fields = ['origem', 'destino', 'circuito', 'ordemDeServico', 'obs', 'ativo']
+
+    def __init__(self, *args, **kwargs):
+        super(CrossConnectionAdminForm, self).__init__(*args, **kwargs)
+        
+        self.id = None
+        if 'instance' in kwargs and kwargs['instance']:
+            self.id = kwargs['instance'].id
+
+        # Adicionando link para o label do campo de Origem
+        self.fields['origem'].label = mark_safe('<a href="#" onclick="window.open(\'/admin/rede/ifcconector/\'+$(\'#id_origem\').val() + \'/\', \'_blank\');return true;">Origem</a>')
+        # Adicionando link para o label do campo de Destino
+        self.fields['destino'].label = mark_safe('<a href="#" onclick="window.open(\'/admin/rede/ifcconector/\'+$(\'#id_destino\').val() + \'/\', \'_blank\');return true;">Destino</a>')
+        
         
     def clean(self):
         cleaned_data = super(CrossConnectionAdminForm, self).clean()

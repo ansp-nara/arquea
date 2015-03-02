@@ -411,8 +411,8 @@ class IFCConector(models.Model):
 
     def __unicode__(self):
         if self.tipoConector:
-            return u'%s %s %s %s' % (self.rack, self.shelf, self.porta, self.tipoConector.sigla)
-        return u'%s %s %s -' % (self.rack, self.shelf, self.porta)
+            return u'%s | Shelf: %s | Porta: %s | %s' % (self.rack, self.shelf, self.porta, self.tipoConector.sigla)
+        return u'%s | Shelf: %s | Porta: %s | -' % (self.rack, self.shelf, self.porta)
 
     class Meta:
         verbose_name = u'IFC Conector'
@@ -430,6 +430,14 @@ class CrossConnection(models.Model):
     ordemDeServico = models.CharField(_(u'OS/Projeto'), max_length=30, null=True, blank=True)
     obs = models.TextField(_(u'Observação'), null=True, blank=True)
     ativo = models.BooleanField(u'Conector ativo?', default=True)
+
+    def __unicode__(self):
+        retorno = ''
+        if self.origem:
+            retorno = retorno + u'%s | %s | %s _X_ ' % (self.origem.rack, self.origem.shelf, self.origem.porta)
+        if self.destino:
+            retorno = retorno +  u'%s | %s | %s' % (self.destino.rack, self.destino.shelf, self.destino.porta)
+        return retorno
 
     class Meta:
         verbose_name = u'Cross Connection'
