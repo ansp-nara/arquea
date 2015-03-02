@@ -207,7 +207,7 @@ class ViewBlocoIPTest(TestCase):
 
     def _test_view__blocosip__breadcrumb(self, response):
         # assert breadcrumb
-        self.assertContains(response, u'<a href="/rede/blocosip">Lista de Blocos IP</a>')
+        self.assertContains(response, u'<a href="/rede/relatorios/blocosip/">Lista de Blocos IP</a>')
 
     def _test_view__blocosip__filtros__cabecalhos(self, response):
         # assert breadcrumb
@@ -432,7 +432,7 @@ class ViewBlocoIPANSPTest(TestCase):
         
     def _test_view__blocosip_ansp__breadcrumb(self, response):
         # assert breadcrumb
-        self.assertContains(response, u'<a href="/rede/blocosip_ansp">Lista de Blocos IP - Blocos ANSP</a>')
+        self.assertContains(response, u'<a href="/rede/relatorios/blocosip_ansp/">Lista de Blocos IP - Blocos ANSP</a>')
 
     def _test_view__blocosip_ansp__filtros__cabecalhos(self, response):
         # assert breadcrumb
@@ -587,7 +587,7 @@ class ViewBlocoIPTransitoTest(TestCase):
         
     def _test_view__blocosip_transito__breadcrumb(self, response):
         # assert breadcrumb
-        self.assertContains(response, u'<a href="/rede/blocosip_transito">Lista de Blocos IP - Trânsito</a>')
+        self.assertContains(response, u'<a href="/rede/relatorios/blocosip_transito/">Lista de Blocos IP - Trânsito</a>')
 
     def _test_view__blocosip_transito__filtros__cabecalhos(self, response):
         # assert breadcrumb
@@ -779,7 +779,7 @@ class ViewBlocoIPInstTransitoTest(TestCase):
         
     def _test_view__blocosip_inst_transito__breadcrumb(self, response):
         # assert breadcrumb
-        self.assertContains(response, u'<a href="/rede/blocosip_inst_transito">Lista de Blocos IP - Instituição Trânsito</a>')
+        self.assertContains(response, u'<a href="/rede/relatorios/blocosip_inst_transito/">Lista de Blocos IP - Instituição Trânsito</a>')
 
     def _test_view__blocosip_inst_transito__filtros__cabecalhos(self, response):
         # assert breadcrumb
@@ -924,33 +924,6 @@ class ViewBlocoIPInstTransitoTest(TestCase):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 class ViewCrossConnectionTest(TestCase):
  
     # Fixture para carregar dados de autenticação de usuário
@@ -984,7 +957,7 @@ class ViewCrossConnectionTest(TestCase):
 
     def _test_view__cross_connection__breadcrumb(self, response):
         # assert breadcrumb
-        self.assertContains(response, u'<a href="/rede/crossconnection">Lista de Cross Conexões</a>')
+        self.assertContains(response, u'<a href="/rede/relatorios/crossconnection/">Lista de Cross Conexões</a>')
 
 
     def _test_view__cross_connection__filtros__cabecalhos(self, response):
