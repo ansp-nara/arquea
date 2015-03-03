@@ -4,6 +4,7 @@ from django.db.models import Q
 from django.http import Http404, HttpResponse
 from django.template.response import TemplateResponse
 from django.views.decorators.http import require_safe
+from datetime import date
 
 import json as simplejson
 
@@ -337,10 +338,11 @@ def _blocos_ip_superbloco(request, tipo=None):
             
             response = HttpResponse(dataset.xls, content_type='application/vnd.ms-excel;charset=utf-8')
             
+            today = date.today()
             if tipo:
-                response['Content-Disposition'] = "attachment; filename=blocosip_%s.xls" % tipo
+                response['Content-Disposition'] = "attachment; filename=blocosip_%s_%d_%02d_%02d.xls" % (tipo, today.year, today.month, today.day)
             else:
-                response['Content-Disposition'] = "attachment; filename=blocosip.xls"
+                response['Content-Disposition'] = "attachment; filename=blocosip_%d_%02d_%02d.xls" % (today.year, today.month, today.day)
         
             return response
         
@@ -354,6 +356,7 @@ def _blocos_ip_superbloco(request, tipo=None):
                                                     'filtro_proprietario':filtro_proprietario,
                                                     'filtro_usuarios':filtro_usuarios, 
                                                     'filtro_designados':filtro_designados})
+
 
 
 @login_required
@@ -454,7 +457,9 @@ def _blocos_ip_continuo(request, template, tipo=None):
             dataset = BlocosIP_Rel_Lista_Inst_BlocoIP_Resource().export(queryset=blocos)
             
             response = HttpResponse(dataset.xls, content_type='application/vnd.ms-excel;charset=utf-8')
-            response['Content-Disposition'] = "attachment; filename=blocosip_%s.xls" % tipo
+            
+            today = date.today()
+            response['Content-Disposition'] = "attachment; filename=blocosip_%s_%d_%02d_%02d.xls" % (tipo, today.year, today.month, today.day)
 
             return response
         
@@ -675,7 +680,8 @@ def crossconnection(request):
              
             response = HttpResponse(dataset.xls, content_type='application/vnd.ms-excel;charset=utf-8')
              
-            response['Content-Disposition'] = "attachment; filename=cross_connection.xls"
+            today = date.today()
+            response['Content-Disposition'] = "attachment; filename=cross_connection_%d_%02d_%02d.xls" % (today.year, today.month, today.day)
          
             return response
          
