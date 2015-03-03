@@ -30,6 +30,9 @@ class BlocoIPAdminForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(BlocoIPAdminForm, self).__init__(*args, **kwargs)
 
+        # Adicionando link para o label do campo de Superbloco
+        self.fields['superbloco'].label = mark_safe('<a href="#" onclick="window.open(\'/admin/rede/blocoip/\'+$(\'#id_superbloco\').val() + \'/\', \'_blank\');return true;">Super bloco</a>')
+
         if 'instance' in kwargs and kwargs['instance']:
             ip = kwargs['instance'].ip
             mask = kwargs['instance'].mask
@@ -37,6 +40,8 @@ class BlocoIPAdminForm(forms.ModelForm):
             # Preenchendo o campo de exibição de net mask
             if ip and mask:
                 self.fields['net_mask'].initial = ipaddress.ip_network(u'%s/%s' % (ip, mask), strict=False).netmask
+                
+
             
     def clean(self):
         cleaned_data = super(BlocoIPAdminForm, self).clean()
