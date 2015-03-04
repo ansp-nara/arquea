@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from models import *
 from django import forms
+from django.utils.html import mark_safe
+from models import *
 import re
 
 
@@ -60,9 +61,19 @@ class EnderecoAdminForm(forms.ModelForm):
 
 class EnderecoDetalheAdminForm(forms.ModelForm):
 
+    # Campo de filtro por Entidade para reduzir a seleção do campo Endereço
     entidade = forms.ModelChoiceField(Entidade.objects.all(), required=False,
             widget=forms.Select(attrs={'onchange': 'ajax_select_endereco2();',
                                        'class':'auxiliary'}))
+
+    def __init__(self, *args, **kwargs):
+        super(EnderecoDetalheAdminForm, self).__init__(*args, **kwargs)
+        
+        # Adicionando link para o label do campo de Tipo de Conector
+        self.fields['endereco'].label = mark_safe('<a href="#" onclick="window.open(\'/admin/identificacao/endereco/\'+$(\'#id_endereco\').val() + \'/\', \'_blank\');return true;">%s</a>' % self.fields['endereco'].label)
+        self.fields['detalhe'].label = mark_safe('<a href="#" onclick="window.open(\'/admin/identificacao/enderecodetalhe/\'+$(\'#id_detalhe\').val() + \'/\', \'_blank\');return true;">%s</a>' % self.fields['detalhe'].label)
+
+
 
     def clean(self):
         cleaned_data = self.cleaned_data
