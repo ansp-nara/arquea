@@ -3,6 +3,7 @@
 from django.contrib import admin
 from models import *
 from django.utils.translation import ugettext_lazy as _
+from django.contrib.admin import SimpleListFilter
 from forms import *
 
 
@@ -148,6 +149,24 @@ class IdentificacaoAdmin(admin.ModelAdmin):
 
 admin.site.register(Identificacao, IdentificacaoAdmin)
 
+
+
+class EnderecoDetalheEntidadeFilter(SimpleListFilter):
+    title = 'Entidade'
+    parameter_name = 'endereco__entidade__sigla'
+
+    def lookups(self, request, model_admin):
+        entidade_ids = EnderecoDetalhe.objects.values_list('endereco__entidade_id', flat=True).distinct().order_by()
+        return [(e.id, e.sigla) for e in Entidade.objects.filter(id__in=entidade_ids)]
+
+    def queryset(self, request, queryset):
+        id=self.value()
+        if id:
+            return queryset.filter(endereco__entidade__id__exact=id) | \
+                   queryset.filter(detalhe__endereco__entidade__id__exact=id)
+        else: return queryset
+
+    
 class EnderecoDetalheAdmin(admin.ModelAdmin):
     form = EnderecoDetalheAdminForm
 
@@ -158,7 +177,9 @@ class EnderecoDetalheAdmin(admin.ModelAdmin):
 		 }),
     )
 
-    search_fields = ['endereco__entidade__sigla', 'endereco__rua', 'detalhe__endereco__entidade__sigla']
+    search_fields = ['', 'endereco__rua', 'detalhe__endereco__entidade__sigla']
+    
+    list_filter = (EnderecoDetalheEntidadeFilter, 'tipo')
 
 class ASNAdmin(admin.ModelAdmin):
 
