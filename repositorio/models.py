@@ -111,7 +111,10 @@ class Repositorio(models.Model):
 		if self.id is None:
 			self.numero = self.proximo_numero()
 		super(Repositorio, self).save(*args, **kwargs)
-			
+
+	def servicos_display(self):
+        return ', '.join([unicode(s) for s in self.servicos.all()])
+
 	class Meta:
 		verbose_name = u'Repositório'
 		verbose_name_plural = u'Repositórios'
