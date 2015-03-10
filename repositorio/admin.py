@@ -26,7 +26,7 @@ class RepositorioAdmin(admin.ModelAdmin):
 	)
 	
 	readonly_fields = ('num_rep',)
-	list_display = ('num_rep', 'data', 'data_ocorrencia', 'tipo', 'servicos_display' 'natureza', 'estado')
+	list_display = ('num_rep', 'data', 'data_ocorrencia', 'tipo', 'servicos_display', 'natureza', 'estado')
 	search_fields = ('ocorrencia', 'tipo__nome', 'natureza__nome', 'servicos__nome')
 	
 # Register your models here.
