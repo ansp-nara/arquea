@@ -125,7 +125,7 @@ class Repositorio(models.Model):
 
     def servicos_display(self):
         return ', '.join([unicode(s) for s in self.servicos.all()])
-    servicos_displa.short_description = u'Serviços'
+    servicos_display.short_description = u'Serviços'
 
     class Meta:
         verbose_name = u'Repositório'
