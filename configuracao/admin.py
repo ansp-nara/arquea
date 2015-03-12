@@ -25,9 +25,18 @@ class PapelariaAdmin(admin.ModelAdmin):
     
 admin.site.register(Papelaria, PapelariaAdmin)
 
+
 class ChequeAdmin(admin.ModelAdmin):
     
     list_per_page = 10
     list_display = ('nome_assinatura',)
     
 admin.site.register(Cheque, ChequeAdmin)
+
+
+class VariavelAdmin(admin.ModelAdmin):
+    list_per_page = 20
+    list_display = ('nome', 'valor')
+    
+admin.site.register(Variavel, VariavelAdmin)
+

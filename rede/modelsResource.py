@@ -428,12 +428,12 @@ class CrossConnectionResource(resources.ModelResource):
     """
     Modelo do model CrossConnection para a geração do XLS para a lista de registros de Cross Connection
     """
-    origem__rack = fields.Field(column_name='Rack 1')
+    origem__rack__complemento = fields.Field(column_name='Rack 1')
     origem__shelf = fields.Field(column_name='Shelf')
     origem__porta = fields.Field(column_name='Porta')
     origem__tipoConector__sigla = fields.Field(column_name='Conector')
     
-    destino__rack = fields.Field(column_name='Rack 2')
+    destino__rack__complemento = fields.Field(column_name='Rack 2')
     destino__shelf = fields.Field(column_name='Shelf')
     destino__porta = fields.Field(column_name='Porta')
     destino__tipoConector__sigla = fields.Field(column_name='Conector')
@@ -445,11 +445,11 @@ class CrossConnectionResource(resources.ModelResource):
 
     class Meta:
         model = CrossConnection
-        fields = ('origem__rack',
+        fields = ('origem__rack__complemento',
                   'origem__shelf',
                   'origem__porta',
                   'origem__tipoConector__sigla',
-                  'destino__rack',
+                  'destino__rack__complemento',
                   'destino__shelf',
                   'destino__porta',
                   'destino__tipoConector__sigla',
@@ -457,11 +457,11 @@ class CrossConnectionResource(resources.ModelResource):
                   'circuito',
                   'obs',
                   )
-        export_order = ('origem__rack',
+        export_order = ('origem__rack__complemento',
                   'origem__shelf',
                   'origem__porta',
                   'origem__tipoConector__sigla',
-                  'destino__rack',
+                  'destino__rack__complemento',
                   'destino__shelf',
                   'destino__porta',
                   'destino__tipoConector__sigla',
@@ -470,8 +470,8 @@ class CrossConnectionResource(resources.ModelResource):
                   'obs',
                   )
 
-    def dehydrate_origem__rack(self, obj):
-        return obj.origem.rack
+    def dehydrate_origem__rack__complemento(self, obj):
+        return obj.origem.rack.complemento
     
     def dehydrate_origem__shelf(self, obj):
         return obj.origem.shelf
@@ -482,8 +482,8 @@ class CrossConnectionResource(resources.ModelResource):
     def dehydrate_origem__tipoConector__sigla(self, obj):
         return obj.origem.tipoConector.sigla
 
-    def dehydrate_destino__rack(self, obj):
-        return obj.destino.rack
+    def dehydrate_destino__rack__complemento(self, obj):
+        return obj.destino.rack.complemento
     
     def dehydrate_destino__shelf(self, obj):
         return obj.destino.shelf
