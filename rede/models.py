@@ -402,22 +402,22 @@ class IFCConector(models.Model):
     """
     Representa um conector de IFCs para a cross conexão.
     """
-    rack = models.CharField(_(u'Rack'), max_length=30, )
-    shelf = models.CharField(_(u'Shelf'), max_length=5, )
-    porta = models.CharField(_(u'Porta'), max_length=10, )
+    rack = models.ForeignKey('identificacao.EnderecoDetalhe')
+    shelf = models.CharField(_(u'Shelf'), max_length=5, )  # patrimonio
+    porta = models.CharField(_(u'Porta'), max_length=10, )  # novo  porta
     tipoConector = models.ForeignKey('rede.TipoConector')
     ativo = models.BooleanField(u'Conector ativo?', default=True)
     obs = models.TextField(null=True, blank=True)
 
     def __unicode__(self):
         if self.tipoConector:
-            return u'%s | Shelf: %s | Porta: %s | %s' % (self.rack, self.shelf, self.porta, self.tipoConector.sigla)
-        return u'%s | Shelf: %s | Porta: %s | -' % (self.rack, self.shelf, self.porta)
+            return u'%s | Shelf: %s | Porta: %s | %s' % (self.rack.complemento, self.shelf, self.porta, self.tipoConector.sigla)
+        return u'%s | Shelf: %s | Porta: %s | -' % (self.rack.complemento, self.shelf, self.porta)
 
     class Meta:
         verbose_name = u'IFC Conector'
         verbose_name_plural = u'IFC Conectores'
-        ordering = ('rack', 'shelf', 'porta')
+        ordering = ('rack__complemento', 'shelf', 'porta')
         unique_together = ('rack', 'shelf', 'porta')
 
 class CrossConnection(models.Model):
@@ -434,9 +434,9 @@ class CrossConnection(models.Model):
     def __unicode__(self):
         retorno = ''
         if self.origem:
-            retorno = retorno + u'%s | %s | %s _X_ ' % (self.origem.rack, self.origem.shelf, self.origem.porta)
+            retorno = retorno + u'%s | %s | %s _X_ ' % (self.origem.rack.complemento, self.origem.shelf, self.origem.porta)
         if self.destino:
-            retorno = retorno +  u'%s | %s | %s' % (self.destino.rack, self.destino.shelf, self.destino.porta)
+            retorno = retorno +  u'%s | %s | %s' % (self.destino.rack.complemento, self.destino.shelf, self.destino.porta)
         return retorno
 
     class Meta:

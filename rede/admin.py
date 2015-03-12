@@ -17,7 +17,7 @@ class DesignadoFilter(SimpleListFilter):
     parameter_name = 'designado'
 
     def lookups(self, request, model_admin):
-        entidade_ids = BlocoIP.objects.values_list('designado', flat=True).distinct()
+        entidade_ids = BlocoIP.objects.values_list('designado', flat=True).distinct().order_by()
         return [(e.id, e.sigla) for e in Entidade.objects.filter(id__in=entidade_ids)]
 
     def queryset(self, request, queryset):
@@ -31,7 +31,7 @@ class UsuarioFilter(SimpleListFilter):
     parameter_name = 'usado'
 
     def lookups(self, request, model_admin):
-        entidade_ids = BlocoIP.objects.values_list('usuario', flat=True).distinct()
+        entidade_ids = BlocoIP.objects.values_list('usuario', flat=True).distinct().order_by()
         return [(e.id, e.sigla) for e in Entidade.objects.filter(id__in=entidade_ids)]
 
     def queryset(self, request, queryset):
@@ -202,7 +202,7 @@ class TipoConectorFilter(SimpleListFilter):
     parameter_name = 'tipoConector'
 
     def lookups(self, request, model_admin):
-        tipoConector_ids = IFCConector.objects.values_list('tipoConector', flat=True).distinct()
+        tipoConector_ids = IFCConector.objects.values_list('tipoConector', flat=True).distinct().order_by()
         return [(e.id, e.sigla) for e in TipoConector.objects.filter(id__in=tipoConector_ids)]
 
     def queryset(self, request, queryset):
@@ -227,7 +227,38 @@ class IFCConectorAdmin(ExportMixin, admin.ModelAdmin):
     list_display = ('rack', 'shelf', 'porta', 'tipoConector', 'ativo')
     search_fields = ('rack', 'porta', 'tipoConector__sigla')
     list_filter = ('rack', TipoConectorFilter)
+
+
+class OrigemRackFilter(SimpleListFilter):
+    title = u'Rack Origem'
+    parameter_name = 'origem'
     
+    def lookups(self, request, model_admin):
+        racks = CrossConnection.objects.values_list('origem__rack', flat=True).distinct().order_by()
+        return [(e, e) for e in IFCConector.objects.filter(rack__in=racks).values_list('rack', flat=True).distinct().order_by()]
+
+    def queryset(self, request, queryset):
+        rack = self.value()
+        if rack:
+            return queryset.filter(origem__rack__exact=rack)
+        else: return queryset
+
+
+
+class DestinoRackFilter(SimpleListFilter):
+    title = u'Rack Destino'
+    parameter_name = 'destino'
+    
+    def lookups(self, request, model_admin):
+        racks = CrossConnection.objects.values_list('destino__rack', flat=True).distinct().order_by()
+        return [(e, e) for e in IFCConector.objects.filter(rack__in=racks).values_list('rack', flat=True).distinct().order_by()]
+
+    def queryset(self, request, queryset):
+        rack = self.value()
+        if rack:
+            return queryset.filter(destino__rack__exact=rack)
+        else: return queryset
+        
 
 class CrossConnectionAdmin(ExportMixin, admin.ModelAdmin):
     resource_class = CrossConnectionResource
@@ -252,6 +283,8 @@ class CrossConnectionAdmin(ExportMixin, admin.ModelAdmin):
     ordering = ['origem__rack', 'origem__shelf', 'origem__porta', 'destino__rack','destino__shelf','destino__porta',]
     
     admin_order_field = ['origem__rack', 'destino__rack',]
+    
+    list_filter = (OrigemRackFilter, DestinoRackFilter, 'ordemDeServico')
     
 
     def get_export_queryset(self, request):

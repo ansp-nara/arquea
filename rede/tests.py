@@ -3,7 +3,7 @@ from django.core.urlresolvers import resolve, reverse
 from django.test import TestCase
 from django.db.models import Prefetch
 
-from identificacao.models import ASN, Entidade
+from identificacao.models import ASN, Entidade, Endereco, EnderecoDetalhe, Identificacao, TipoDetalhe
 
 from rede.models import *
 
@@ -935,23 +935,35 @@ class ViewCrossConnectionTest(TestCase):
         self.response = self.client.login(username='john', password='123456')
 
     def setUpCrossConnection(self):
+        ent= Entidade.objects.create(sigla='TERREMARK', nome='', cnpj='', fisco=True, url='')
+        end = Endereco.objects.create(entidade=ent, rua='', num=215, bairro='', cep='', estado='', pais='')
+        tipoDetalhe = TipoDetalhe.objects.create(nome='Rack')
+        rack1 = EnderecoDetalhe.objects.create(endereco=end, tipo=tipoDetalhe, complemento="NAPSAO.01.CP073", mostra_bayface=True)
+        rack2 = EnderecoDetalhe.objects.create(endereco=end, tipo=tipoDetalhe, complemento="NAPSAO.01.S039", mostra_bayface=True)
+        rack3 = EnderecoDetalhe.objects.create(endereco=end, tipo=tipoDetalhe, complemento="NAPSAO.01.S040", mostra_bayface=True)
+        rack4 = EnderecoDetalhe.objects.create(endereco=end, tipo=tipoDetalhe, complemento="NAPSAO.01.S041", mostra_bayface=True)
+        rack5 = EnderecoDetalhe.objects.create(endereco=end, tipo=tipoDetalhe, complemento="NAPSAO.01.S042", mostra_bayface=True)
+        rack6 = EnderecoDetalhe.objects.create(endereco=end, tipo=tipoDetalhe, complemento="NAPSAO.01.S043", mostra_bayface=True)
+        rack7 = EnderecoDetalhe.objects.create(endereco=end, tipo=tipoDetalhe, complemento="NAPSAO.01.S044", mostra_bayface=True)
+        rack8 = EnderecoDetalhe.objects.create(endereco=end, tipo=tipoDetalhe, complemento="NAPSAO.01.S045", mostra_bayface=True)
+
         t1 = TipoConector.objects.create(sigla='RJ45', obs='',)
-        origem = IFCConector.objects.create(rack='rack1', shelf='shelf1', porta='1-2', tipoConector=t1, ativo=True, obs='')
-        destino = IFCConector.objects.create(rack='rack2', shelf='shelf2', porta='3-4', tipoConector=t1, ativo=True, obs='')
+        origem = IFCConector.objects.create(rack=rack1, shelf='shelf1', porta='1-2', tipoConector=t1, ativo=True, obs='')
+        destino = IFCConector.objects.create(rack=rack2, shelf='shelf2', porta='3-4', tipoConector=t1, ativo=True, obs='')
         cross = CrossConnection.objects.create(origem=origem, destino=destino, circuito='CIRCUITO1', ordemDeServico='OS1', obs='', ativo=True)
 
         t2 = TipoConector.objects.create(sigla='PC SM', obs='',)
-        origem = IFCConector.objects.create(rack='rack3', shelf='shelf3', porta='1-2', tipoConector=t2, ativo=True, obs='')
-        destino = IFCConector.objects.create(rack='rack4', shelf='shelf4', porta='3-4', tipoConector=t2, ativo=True, obs='')
+        origem = IFCConector.objects.create(rack=rack3, shelf='shelf3', porta='1-2', tipoConector=t2, ativo=True, obs='')
+        destino = IFCConector.objects.create(rack=rack4, shelf='shelf4', porta='3-4', tipoConector=t2, ativo=True, obs='')
         cross = CrossConnection.objects.create(origem=origem, destino=destino, circuito='CIRCUITO2', ordemDeServico='OS2', obs='', ativo=True)
 
-        origem = IFCConector.objects.create(rack='rack5', shelf='shelf5', porta='1-2', tipoConector=t2, ativo=True, obs='')
-        destino = IFCConector.objects.create(rack='rack6', shelf='shelf6', porta='3-4', tipoConector=t2, ativo=True, obs='')
+        origem = IFCConector.objects.create(rack=rack5, shelf='shelf5', porta='1-2', tipoConector=t2, ativo=True, obs='')
+        destino = IFCConector.objects.create(rack=rack6, shelf='shelf6', porta='3-4', tipoConector=t2, ativo=True, obs='')
         cross = CrossConnection.objects.create(origem=origem, destino=destino, circuito='CIRCUITO3', ordemDeServico='OS3', obs='', ativo=True)
 
         t3 = TipoConector.objects.create(sigla='PC MM', obs='',)
-        origem = IFCConector.objects.create(rack='rack7', shelf='shelf7', porta='1-2', tipoConector=t3, ativo=True, obs='')
-        destino = IFCConector.objects.create(rack='rack8', shelf='shelf8', porta='3-4', tipoConector=t3, ativo=True, obs='')
+        origem = IFCConector.objects.create(rack=rack7, shelf='shelf7', porta='1-2', tipoConector=t3, ativo=True, obs='')
+        destino = IFCConector.objects.create(rack=rack8, shelf='shelf8', porta='3-4', tipoConector=t3, ativo=True, obs='')
         cross = CrossConnection.objects.create(origem=origem, destino=destino, circuito='CIRCUITO4', ordemDeServico='OS3', obs='', ativo=True)
 
 

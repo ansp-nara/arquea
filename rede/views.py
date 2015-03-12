@@ -9,6 +9,7 @@ from datetime import date
 import json as simplejson
 
 from utils.functions import render_to_pdf, render_to_pdf_weasy
+from configuracao.models import Variavel
 from outorga.models import *
 from financeiro.models import Pagamento
 from identificacao.models import Entidade, Identificacao, ASN
@@ -483,9 +484,12 @@ def custo_terremark(request, pdf=0, xls=0):
      O relatório filtra implicitamente pela entidade Terremark.
  
     """
+    
+    # Variável indicando o datacenter. Ex: 1 == terremark
+    datacenter_id = Variavel.objects.get(nome = 'DATACENTER_IDS')
    
     # Filtrando por Entidade
-    recursos = Recurso.objects.filter(planejamento__os__contrato__entidade_id=Entidade.TERREMARK_ID) \
+    recursos = Recurso.objects.filter(planejamento__os__contrato__entidade_id=datacenter_id) \
                               .order_by('planejamento__projeto__nome', \
                                         'planejamento__tipo__nome', \
                                         'planejamento__referente', \
@@ -535,8 +539,12 @@ def relatorio_recursos_operacional(request, pdf=0, xls=0):
     
     Relatório operacional para visualização dos recursos.
     """
+    
+        # Variável indicando o datacenter. Ex: 1 == terremark
+    datacenter_id = Variavel.objects.get(nome = 'DATACENTER_IDS')
+    
     # Filtrando por Entidade
-    planejamentos = PlanejaAquisicaoRecurso.objects.filter(os__contrato__entidade_id=Entidade.TERREMARK_ID) \
+    planejamentos = PlanejaAquisicaoRecurso.objects.filter(os__contrato__entidade_id=datacenter_id) \
                               .prefetch_related('beneficiado_set') \
                               .select_related('os', 'os__estado', 'os__contrato', 'projeto', 'tipo') \
                               .order_by('projeto__nome', \
