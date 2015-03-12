@@ -486,8 +486,8 @@ def custo_terremark(request, pdf=0, xls=0):
     """
     
     # Variável indicando o datacenter. Ex: 1 == terremark
-    datacenter_id = Variavel.objects.get(nome = 'DATACENTER_IDS')
-   
+    datacenter_id = Variavel.objects.get(nome = Variavel.DATACENTER_IDS)
+    
     # Filtrando por Entidade
     recursos = Recurso.objects.filter(planejamento__os__contrato__entidade_id=datacenter_id) \
                               .order_by('planejamento__projeto__nome', \
@@ -541,7 +541,7 @@ def relatorio_recursos_operacional(request, pdf=0, xls=0):
     """
     
         # Variável indicando o datacenter. Ex: 1 == terremark
-    datacenter_id = Variavel.objects.get(nome = 'DATACENTER_IDS')
+    datacenter_id = Variavel.objects.get(nome = Variavel.DATACENTER_IDS)
     
     # Filtrando por Entidade
     planejamentos = PlanejaAquisicaoRecurso.objects.filter(os__contrato__entidade_id=datacenter_id) \

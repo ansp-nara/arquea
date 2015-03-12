@@ -37,10 +37,12 @@ class Cheque(models.Model):
 
 
 class Variavel(models.Model):
-    NOMES = (
-                ('DATACENTER_IDS', 'ID da Entidade do Datacenter principal.'),
+    DATACENTER_IDS = 'DATACENTER_IDS'
+    
+    _NOMES = (
+                (DATACENTER_IDS, 'ID da Entidade do Datacenter principal.'),
             )
-    nome = models.CharField(_(u'Nome da variável'), max_length=60, unique=True, choices=NOMES)
+    nome = models.CharField(_(u'Nome da variável'), max_length=60, unique=True, choices=_NOMES)
     valor = models.CharField(_(u'Valor'), max_length=60, help_text=u'', )
     obs = models.TextField(null=True, blank=True) 
   
