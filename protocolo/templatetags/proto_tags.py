@@ -388,11 +388,18 @@ def has_permission(user, url):
     try:
         if url:
             myurl = resolve(url)
+            
             url_splitted = myurl.url_name.split("_")
+            
+            model_name = 'xxx'
             if len(url_splitted) == 3:
-                permission_name = url_splitted[0] + ".change_" + url_splitted[1]
-                retorno = user.has_perm(permission_name)
-                return retorno
+                model_name = url_splitted[1]
+            elif len(url_splitted) == 4:
+                model_name = url_splitted[1] + "_" + url_splitted[2] 
+            
+            permission_name = url_splitted[0] + ".change_" + model_name
+            retorno = user.has_perm(permission_name)
+            return retorno
     except:
         return False
 
@@ -422,22 +429,28 @@ def menu_has_permission(context, menuitem):
             patrimonio.change_historicolocal
             
     """
+    
     retorno = False
-    try:
-        if menuitem.url:
-            myurl = resolve(menuitem.url)
-            url_splitted = myurl.url_name.split("_")
-            if len(url_splitted) == 3:
-                permission_name = url_splitted[0] + ".change_" + url_splitted[1]
-                retorno = context['user'].has_perm(permission_name)
+    
+    if menuitem.url:
+        
+        myurl = resolve(menuitem.url)
+        
+        url_splitted = myurl.url_name.split("_")
+       
+        model_name = 'xxx'
+        if len(url_splitted) == 3:
+            model_name = url_splitted[1]
+        elif len(url_splitted) == 4:
+            model_name = url_splitted[1] + "_" + url_splitted[2] 
             
-        if not retorno and menuitem.has_children():
-            for child in menuitem.children():
-                retorno = retorno or menu_has_permission(context, child)
+        permission_name = url_splitted[0] + ".change_" + model_name
+        retorno = context['user'].has_perm(permission_name)
+        
+    if not retorno and menuitem.has_children():
+        for child in menuitem.children():
+            retorno = retorno or menu_has_permission(context, child)
 
-    except Exception as e:
-        print '%s (%s)' % (e.message, type(e))
-        retorno = False
 
     return retorno
 register.assignment_tag(takes_context=True)(menu_has_permission)
