@@ -202,7 +202,8 @@
 	  <th class="sp_real"><span>Total realizado</span></th>
 	  <th class="sp_sald"><span>Saldo</span></th>
   </tr>
-  {% for it, valores in m.itens.items %}
+
+  {% for it, valores in m.itens.items|dictsort:"0.descricao" %}
      <tr>
         <td>{{ it.quantidade }}</td>
         <td class="span_desc"><span>{{ it.descricao }}</span></td>
