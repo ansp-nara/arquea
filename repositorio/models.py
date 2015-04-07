@@ -16,7 +16,7 @@ class Tipo(models.Model):
         return '%s - %s' % (self.entidade, self.nome)
 
     class Meta:
-        ordering = ('nome',)
+        ordering = ('entidade__sigla', 'nome',)
 
 
 class Estado(models.Model):
