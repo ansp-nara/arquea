@@ -4,6 +4,15 @@
 {% block extrahead %}{{ block.super }}
 {% url 'admin:jsi18n' as jsi18nurl %}
 <script type="text/javascript" src="{{ jsi18nurl|default:"../../../jsi18n/" }}"></script>
+<script type="text/javascript" src="{% static "js/jquery.balloon.min.js" %}"></script>
+    <script>
+        $(function() {
+            //$.balloon.defaults.css = null;
+            $("#balloon").balloon({position:"bottom left", url:"{% url 'configuracao.views.help_text' opts.app_label opts.model_name %}", classname:"balloon",
+                css:{opacity: 1}
+            });
+        });
+    </script>
 {{ media }}
 {% endblock %}
 
@@ -24,11 +33,15 @@
 
 {% block content %}<div id="content-main">
 {% block object-tools %}
-{% if change %}{% if not is_popup %}
-  <ul class="object-tools"><li><a href="history/" class="historylink">{% trans "History" %}</a></li>
-  {% if has_absolute_url %}<li><a href="../../../r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
-  </ul>
-{% endif %}{% endif %}
+{% if not is_popup %}
+    <ul class="object-tools">
+        <li><a id="balloon" href="#" class="helplink">{% trans "Help" %}</a></li>
+{% if change %}
+    <li><a href="history/" class="historylink">{% trans "History" %}</a></li>
+  {% if has_absolute_url %}<li><a href="../../../r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif %}
+{% endif %}
+    </ul>
+{% endif %}
 {% endblock %}
 <form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="{{ form_url }}" method="post" id="{{ opts.module_name }}_form">{% csrf_token %}{% block form_top %}{% endblock %}
 <div>

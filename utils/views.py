@@ -37,5 +37,3 @@ def serve_files(request, filename):
     response['Content-length'] = os.path.getsize(path)
 
     return response
-
-

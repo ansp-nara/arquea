@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.contrib.contenttypes.models import ContentType
 
 class Papelaria(models.Model):
     papel_timbrado_retrato_a4 = models.FileField(upload_to='papel_timbrado_retrato_a4', null=True, blank=True)
@@ -53,3 +54,14 @@ class Variavel(models.Model):
 
 
 
+class ClassesExtra(models.Model):
+    content_type = models.ForeignKey(ContentType)
+    help = models.TextField()
+
+    def __unicode__(self):
+        return '%s/%s - extra' % (self.content_type.app_label, self.content_type.model)
+
+    class Meta:
+        ordering = ('content_type__app_label', 'content_type__model')
+        verbose_name = u'Ajuda dos modelos'
+        verbose_name_plural = u'Ajudas dos modelos'
