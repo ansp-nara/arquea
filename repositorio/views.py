@@ -110,11 +110,13 @@ def relatorio_repositorio(request, pdf=0):
                         
                     anexo = {'nome': a.arquivo.__unicode__(),
                                'tamanho': str_size,
-                               'palavras_chave': a.palavras_chave}
+                               'palavras_chave': a.palavras_chave,
+                               'path':os.path.join(settings.ADMIN_MEDIA_PREFIX, a.arquivo.__unicode__())}
                     anexos.append(anexo)
-    
+                    
             # Guardando os dados do repositório no grupo
-            grupo['repositorios'].append({'data_ocorrencia': r.data_ocorrencia.isoformat(),
+            grupo['repositorios'].append({'id': r.id,
+                                            'data_ocorrencia': r.data_ocorrencia.isoformat(),
                                             'estado': r.estado,
                                             'ocorrencia': r.ocorrencia,
                                             'servicos': r.servicos.all().order_by('nome'),
