@@ -24,7 +24,6 @@ urlpatterns = patterns('',
 
     # Uncomment the next line to enable the admin:
     (r'^admin/', include(admin.site.urls)),
-    (r'^files/(?P<filename>.*)', 'utils.views.serve_files'),
     (r'^protocolo/', include('protocolo.urls')),
     (r'^patrimonio/', include('patrimonio.urls')),
     (r'^financeiro/', include('financeiro.urls')),
@@ -38,6 +37,7 @@ urlpatterns = patterns('',
     (r'^verificacao/', include('verificacao.urls')),
     (r'^repositorio/', include('repositorio.urls')),
     (r'^carga/', include('carga.urls')),
+    (r'^utils/', include('utils.urls')),
     (r'^configuracao/', include('configuracao.urls')),
     
     (r'^accounts/login/$', 'django_cas.views.login'),

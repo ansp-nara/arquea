@@ -26,7 +26,7 @@ TEMPLATE_DIRS = (
     '/home/antonio/develop/sistema/templates',
 )
 
-CKEDITOR_UPLOAD_PATH='/tmp/ckeditor'
+CKEDITOR_UPLOAD_PATH='ckeditor/'
 
 
 DATABASES = {

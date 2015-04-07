@@ -873,6 +873,17 @@ a.deletelink:hover {
 	background: #ff9900 url(../img/admin/bg-btn-view2.png) center right no-repeat;
 }
 
+.object-tools a.helplink {
+    background: #134089 url(../img/admin/icon_help.png) center right no-repeat;
+    height:25px;
+    line-height: 25px;
+    padding: 3px 10px;
+}
+
+.object-tools a.helplink:hover{
+	background: #ff9900 url(../img/admin/icon_help.png) center right no-repeat;
+}
+
 /* OBJECT HISTORY */
 
 

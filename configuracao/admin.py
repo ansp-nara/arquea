@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
 from models import *
+from .forms import ClassesExtraForm
 
 class PapelariaAdmin(admin.ModelAdmin):
     
@@ -40,3 +41,8 @@ class VariavelAdmin(admin.ModelAdmin):
     
 admin.site.register(Variavel, VariavelAdmin)
 
+
+class ClassesExtraAdmin(admin.ModelAdmin):
+    form = ClassesExtraForm
+
+admin.site.register(ClassesExtra, ClassesExtraAdmin)

@@ -61,6 +61,7 @@ class BlocoIPAdminForm(forms.ModelForm):
 
     class Meta:
         model = BlocoIP
+        fields = '__all__'
 
 
 

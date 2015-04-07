@@ -12,6 +12,7 @@ from django.utils.translation import ugettext as _
 from django.utils.safestring import mark_safe
 from functions import render_to_pdf
 
+
 class AutoCompleteAdmin(admin.ModelAdmin):
     """
 	Define metodos para o uso da funcao do 'autocomplete' em campos de chave estrangeira
