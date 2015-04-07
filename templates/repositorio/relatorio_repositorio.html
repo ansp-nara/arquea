@@ -86,6 +86,9 @@
  }
 .td_item_arquivo_nome {
  }
+.td_item_arquivo_nome a {
+    line-height: initial;
+ }
 .td_item_arquivo_tamanho {
     width: 10%;
 }
@@ -209,10 +212,16 @@
 <div style="clear:both;"></div>
 <div id="conteudo">
 {% for g in grupos %}
-    <h4>{{g.entidade}} {% if g.nome %} - {{g.nome}}{% endif %}{% if g.natureza %} - {{g.natureza}}{% endif %}</h4>
+    <h4>
+        {{g.entidade}} {% if g.nome %} - {{g.nome}}{% endif %}{% if g.natureza %} - {{g.natureza}}{% endif %}
+    </h4>
     {% for r in g.repositorios %}
     <fieldset>
-        <legend class="legend_item_titulo">{{r.data_ocorrencia}} - {{r.estado}}</legend>
+        <legend class="legend_item_titulo">
+            <a href="{% url 'admin:repositorio_repositorio_change' r.id %}">
+                {{r.data_ocorrencia}} - {{r.estado}}
+            </a>
+        </legend>
         <div class="div_item">
             <div class="div_item_ocorrencia">
                 <div class="div_item_label">Ocorrência:</div>
@@ -262,7 +271,11 @@
                     <table class="div_item_conteudo table_item_conteudo">
                         {% for a in r.anexos %}
                             <tr>
-                                <td class="td_item_arquivo_nome">{{a.nome}}</td>
+                                <td class="td_item_arquivo_nome">
+                                    <a href="{{a.path}}">
+                                        {{a.nome}}
+                                    </a>
+                                </td>
                                 <td class="td_item_arquivo_tamanho">({{a.tamanho}} KBytes)</td>
                                 <td class="td_item_arquivo_palavra">{{a.palavras_chave}}</td>
                             </tr>
