@@ -426,6 +426,7 @@ def acordo_progressivo(request, pdf=False):
     
     """
     acordos = []
+    termos = []
     
     for a in Acordo.objects.all():
         acordo = {'nome':a.descricao}
