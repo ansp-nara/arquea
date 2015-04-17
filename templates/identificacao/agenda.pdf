@@ -3,17 +3,27 @@
 {% block content %}
   <table>
   {% for e in entidades %}
-    <tr><td width="20%">{% if not e.filho %}{% if e.entidade.url %}<a href="{{ e.entidade.url }}">{{ e.entidade.sigla }}</a>{% else %}{{ e.entidade.sigla }}{% endif %}{% endif %}</td><td colspan="3">{% if e.filho %}<span style="font-weight:bold;">{{ e.entidade.sigla }}</span> - {% endif %}{{ e.entidade.nome }}</td></tr>
+    <thead>
+        <tr>
+            <th width="10%"></th>
+            <th width="15%"></th>
+            <th width="55%"></th>
+            <th width="20%"></th>
+        </tr>
+    </thead>
+    <tbody>
+    <tr><td>{% if not e.filho %}{% if e.entidade.url %}<a href="{{ e.entidade.url }}">{{ e.entidade.sigla }}</a>{% else %}{{ e.entidade.sigla }}{% endif %}{% endif %}</td><td colspan="3">{% if e.filho %}<span style="font-weight:bold;">{{ e.entidade.sigla }}</span> - {% endif %}{{ e.entidade.nome }}</td></tr>
     {% for a in e.areas %}
       <tr><td></td><td colspan="3">{{ a.area }}</td></tr>
       {% for c in a.contatos %}
-         <tr><td></td><td width="15%"></td><td>{{ c.contato.nome }} ({{ c.contato.email }})</td><td>{{ c.funcao }}</td></tr>
+         <tr><td></td><td></td><td>{{ c.contato.nome }} ({{ c.contato.email }})</td><td>{{ c.funcao }}</td></tr>
          <tr><td></td><td></td><td>{{ c.endereco.logradouro }} - CEP: {{ c.endereco.cep }}</td></tr>
          <tr><td></td><td></td><td>{{ c.endereco.bairro}} - {{ c.endereco.cidade }} - {{ c.endereco.estado }}</td></tr>
          <tr><td></td><td></td><td>{{ c.contato.tel }}</td></tr>
       {% endfor %}
     {% endfor %}
   {% endfor %}
+  </tbody>
   </table>
 
 {% endblock %}

@@ -63,7 +63,17 @@
     </div>
 {% endblock %}
 {% block content %}
-  <a href="{% url 'identificacao.views.agenda' 'pdf' tipo %}?agenda={{ agenda }}">Versão para impressão</a>
+  <h1>Agenda</h1>
+  <br>
+  <div id="report_toolbar">
+      <form action="{% url 'identificacao.views.agenda' 'pdf' tipo %}" method="GET" id="id_form_recurso_pdf">
+          <input type="hidden" name="agenda" value="{{ agenda }}" />
+          <div title="Imprimir" class="btn_print">
+             <input type="submit" title="Versão para impressão" class="btn_print" value="" />
+          </div>
+      </form>
+  </div>
+
   <div class="tabnav">
     <ul>
         {% for t in tipos %}
