@@ -1,5 +1,7 @@
 {% extends "admin/base_site.html" %}
-{% block content %}
+{% load proto_tags %}
+{% load i18n %}
+{% block extrahead %}
 <style>
  .table-consolidado {
     width: 700px;
@@ -58,6 +60,15 @@
         }
   }
 </style>
+{% endblock %}
+{% block breadcrumbs %}
+    <div class="breadcrumbs">Você está em: 
+      <a href="../../">{% trans "Home" %}</a> &rsaquo; 
+      <a href="{% url 'membro.views.mensal_func' %}">Controle de horário mensal</a>
+    </div>
+{% endblock %}
+{% block content %}
+  <h1>Controle de horário mensal</h1>
   <h2>{{ membro.nome }}</h2>
   <table class="table-consolidado">
     <tr><th width="150px">Total de banco de horas</th><td>{{total_geral_banco_horas}}</td></tr>

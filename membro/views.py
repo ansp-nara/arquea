@@ -105,9 +105,10 @@ def mensal_func(request):
      Relatório Administrativo - Relatório com o lançamento de horas dos funcionários. 
     
     """
-    if request.GET.get('ano'):
+    funcionario = request.GET.get('funcionario')
+
+    if request.GET.get('ano') and funcionario != "-1":
         meses = []
-        funcionario = request.GET.get('funcionario')
         membro = get_object_or_404(Membro,pk=funcionario)
         if request.user.is_superuser == False and  request.user.email != membro.email: 
             raise Http404
