@@ -9,13 +9,20 @@
 {% endblock %}
 {% block content %}
 
-<h1>Escolher memorando</h1>
+<h1>Memorando</h1>
+<div id="div_filtro">
+    <fieldset>
+        <legend>Filtro</legend>
+        <form method="GET">
+            <label for="mem">Escolher memorando:</label>
+            <select name="mem">
+                {% for m in memorandos %}
+                    <option value="{{ m.id }}">{{ m.termo }} - {{ m.numero }}</option>
+                {% endfor %}
+            </select>
+            <input type="submit" value="Enviar">
+        </form>
+    </fieldset>
+</div>
 
-<form method="GET">
-<select name="mem">
-{% for m in memorandos %}
-<option value="{{ m.id }}">{{ m.termo }} - {{ m.numero }}</option>
-{% endfor %}
-</select>
-<input type="submit" value="Enviar">
 {% endblock %}
