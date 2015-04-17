@@ -370,7 +370,7 @@ class HistoricoLocal(models.Model):
     estado =  models.ForeignKey(Estado, verbose_name=_(u'Estado do Patrimônio'))
     descricao = models.TextField(_(u'Ocorrência'), help_text=_(u'ex. Empréstimo'))
     data = models.DateField(_(u'Data'))
-    posicao = models.CharField(u'Posição', max_length=50, null=True, blank=True, help_text=_(u"<b>[rack:</b>XXX<b>].F[furo:</b>000<b>].[posicao:</b>TD,TE,LD,LE<b>]</b>"))
+    posicao = models.CharField(u'Posição', max_length=50, null=True, blank=True, help_text=_(u"<b>[rack:</b>XXX<b>].F[furo:</b>000<b>].[posicao:</b>T,TD,TE,T01,T02,LD,LE,01,02<b>]</b>"))
     pai = models.ForeignKey(Patrimonio, null=True, blank=True, related_name='filhos')
 
     # Retorna a data o patrimônio e o endereco.
