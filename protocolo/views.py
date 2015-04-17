@@ -77,5 +77,5 @@ def protocolos_descricao(request, pdf=False):
         else:
             return render_to_response('protocolo/descricoes.html', {'protocolos':retorno}, context_instance=RequestContext(request))
     else:
-        return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all()}, context_instance=RequestContext(request))
+        return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all(), 'view':'protocolos_descricao'}, context_instance=RequestContext(request))
 
