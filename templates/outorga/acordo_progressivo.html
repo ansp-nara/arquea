@@ -69,14 +69,17 @@
 <h1 repeat="1"></h1>
 <div id="report_title">
     <h1>Relatório gerencial progressivo</h1>
-    <div id="report_toolbar">
-        <form action="{% url 'outorga.views.acordo_progressivo' 1 %}" method="GET" id="id_form_recurso_pdf">
-            <div title="Imprimir" class="btn_print">
-               <input type="submit" title="Versão para impressão" class="btn_print" value="" />
-            </div>
-        </form>
-    </div>
+    {% if acordos %}
+        <div id="report_toolbar">
+            <form action="{% url 'outorga.views.acordo_progressivo' 1 %}" method="GET" id="id_form_recurso_pdf">
+                <div title="Imprimir" class="btn_print">
+                   <input type="submit" title="Versão para impressão" class="btn_print" value="" />
+                </div>
+            </form>
+        </div>
+    {% endif %}
 </div>
+{% if acordos %}
     <table id="tbl_consolidado" border="0" repeat="1" cellpadding="5">
 	    <tr>
 	    {% comment %}<th colspan="2" class="td_nome"><span>&nbsp;</span></th>{% endcomment %}
@@ -181,5 +184,11 @@
        {% endfor %}
     </table>
     {% endfor %}
+{% else %}
+    <table border="0" repeat="1">
+        <tr><td><br><br>Não foram encontrados dados para a exibição.</td></tr>
+    </table>
+{% endif %}
+
 {% endblock %}
 
