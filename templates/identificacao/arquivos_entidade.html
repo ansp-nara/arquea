@@ -8,15 +8,21 @@
     </div>
 {% endblock %}
 {% block content %}
-<h1 repeat="1">Arquivos por entidade</h1>
+<h1 repeat="1">Documentos por entidade</h1>
 
+{% if entidades %}
     <table border="0" cellpadding="5">
-    {% for e in entidades %}
-	<tr><td>{{ e.sigla }}</td></tr>
-	{% for a in e.arquivoentidade_set.all %}
-	   <tr><td></td><td>{{ a.data }}</td><td>{{ a.tipo }}</td><td><a href="{{ a.arquivo.url }}">{{ a.arquivo.name }}</a></td></tr>
-	{% endfor %}
-    {% endfor %}
+        {% for e in entidades %}
+            <tr><td>{{ e.sigla }}</td></tr>
+            {% for a in e.arquivoentidade_set.all %}
+                <tr><td></td><td>{{ a.data }}</td><td>{{ a.tipo }}</td><td><a href="{{ a.arquivo.url }}">{{ a.arquivo.name }}</a></td></tr>
+            {% endfor %}
+        {% endfor %}
     </table>
+{% else %}
+    <table border="0" repeat="1">
+        <tr><td><br><br>Não foram encontrados dados para a exibição.</td></tr>
+    </table>
+{% endif %}
 
 {% endblock %}
