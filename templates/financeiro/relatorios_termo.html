@@ -3,11 +3,15 @@
 {% load admin_static admin_list i18n %}
 {% block extrahead %}
 <script type="text/javascript" src="{{STATIC_URL}}js/selects.js"></script>
+<style type="text/css">
+  div#theader {font-weight:bold; clear:both;}
+  div#div_filtro {margin-bottom:15px;}
+  div#div_filtro label {width:220px; display:inline-block;}
+</style>
 {% endblock %}
 {% block breadcrumbs %}
     <div class="breadcrumbs">Você está em: 
       <a href="../../">{% trans "Home" %}</a> &rsaquo;
-       
       {% if view == 'financeiro_parciais' %}
         <a href="{% url 'financeiro.views.financeiro_parciais' %}">Extrato do financeiro por parcial</a>
       {% elif view == 'extrato_financeiro' %}
@@ -22,41 +26,71 @@
         <a href="{% url 'financeiro.views.caixa' %}">Diferenças de caixa</a>
       {% elif view == 'presta_contas' %}
         <a href="{% url 'financeiro.views.presta_contas' %}">Prestação de contas</a>
+      {% elif view == 'protocolos_descricao' %}
+        <a href="{% url 'protocolo.views.protocolos_descricao' %}">Relatório de Protocolos por descrição</a>
       {% else %}
         <a href="{{ request.get_full_path }}">Relatório</a>
       {% endif %}
     </div>
 {% endblock %}
 {% block content %}
-</style>
-<form method="GET">
-<p>
-{% if meses %}<label for="id_mes">Mês (escolha '0' para todos os meses):</label>
-<select name="mes" id="id_mes">
-  {% for mes in meses %}
-     <option value="{{ mes }}">{{ mes }}</option>
-  {% endfor %}
-</select>
-{% endif %}
-</p>
-<p>
-<label for="id_termo">Termo de outorga:</label>
-<select name="termo" id="id_termo"{% if view == 'relatorio_gerencial' %} onchange="termo_datas(this.value);"><option value="">Selecione o termo de outorga</option{% endif %}>
-  {% for t in termos %}
-     <option value="{{ t.id }}">{{ t }}</option>
-  {% endfor %}
-</select>
-</p>
-{% if view == 'relatorio_gerencial' %}
-<p id="id_datas" style="display:none;">
-<label for="id_inicio">Mês de início</label>
-<select name="inicio" id="id_inicio" onchange="retira_termino(this.value);">
-</select>
-<label for="id_termino">Mês de término</label>
-<select name="termino" id="id_termino">
-</select>
-</p>
-{% endif %}
-<input type="submit" value="Enviar">
-</form>
+<div id="report_title">
+    <h1>
+    {% if view == 'financeiro_parciais' %}
+        Extrato do financeiro por parcial
+      {% elif view == 'extrato_financeiro' %}
+        Extrato do financeiro por mês
+      {% elif view == 'relatorio_acordos' %}
+        Relatório de acordos
+      {% elif view == 'relatorio_gerencial' %}
+        Relatório gerencial
+      {% elif view == 'parciais' %}
+        Diferenças totais
+      {% elif view == 'caixa' %}
+        Diferenças de caixa
+      {% elif view == 'presta_contas' %}
+        Prestação de contas
+      {% elif view == 'protocolos_descricao' %}
+        Relatório de Protocolos por descrição
+      {% else %}
+        Relatório
+      {% endif %}
+    </h1>
+</div>
+<div id="div_filtro">
+    <fieldset>
+        <legend>Filtro</legend>
+        <form method="GET">
+            <p>
+            {% if meses %}<label for="id_mes">Mês (escolha '0' para todos os meses):</label>
+                <select name="mes" id="id_mes">
+                  {% for mes in meses %}
+                     <option value="{{ mes }}">{{ mes }}</option>
+                  {% endfor %}
+                </select>
+            {% endif %}
+            </p>
+            <p>
+                <label for="id_termo">Termo de outorga:</label>
+                <select name="termo" id="id_termo"{% if view == 'relatorio_gerencial' %} onchange="termo_datas(this.value);"><option value="">Selecione o termo de outorga</option{% endif %}>
+                  {% for t in termos %}
+                     <option value="{{ t.id }}">{{ t }}</option>
+                  {% endfor %}
+                </select>
+            </p>
+            {% if view == 'relatorio_gerencial' %}
+            <p id="id_datas" style="display:none;">
+                <label for="id_inicio">Mês de início</label>
+                <select name="inicio" id="id_inicio" onchange="retira_termino(this.value);">
+                </select>
+                <br>
+                <label for="id_termino">Mês de término</label>
+                <select name="termino" id="id_termino">
+                </select>
+            </p>
+            {% endif %}
+            <input type="submit" value="Enviar">
+        </form>
+    </fieldset>
+</div>
 {% endblock %}
