@@ -19,10 +19,12 @@ import logging
 from decimal import Decimal
 
 from patrimonio.models import *
+from configuracao.models import Variavel
 from modelsResource import RelatorioPorTipoResource
 from identificacao.models import Entidade, EnderecoDetalhe, Endereco
 from outorga.models import Termo, Natureza_gasto, Item
 from financeiro.models import Pagamento
+from distutils.tests.setuptools_build_ext import if_dl
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -297,33 +299,39 @@ def por_estado(request):
     """
     if request.method == 'GET' and request.GET.get('estado'):
             estado_id = request.GET.get('estado')
-            estado = get_object_or_404(Estado, pk=estado_id)
-
-            no_estado = []
-            for p in Patrimonio.objects.filter(patrimonio__isnull=True):
-                ht = p.historico_atual
-                if ht and ht.estado == estado:
-                    no_estado.append(ht.id)
-
-            no_estado = HistoricoLocal.objects.filter(id__in=no_estado)
-            # entidades_ids = no_estado.values_list('endereco__endereco__entidade', flat=True).distinct()
-            entidades_ids = []
-            for h in no_estado:
-                try:
-                    entidades_ids.append(h.endereco.end.entidade.id)
-                except:
-                    pass
+            
             entidades = []
-            for e in Entidade.objects.filter(id__in=entidades_ids):
-                detalhes = []
-                # detalhes_ids = no_estado.values_list('endereco', flat=True).filter(endereco__endereco__entidade=e)
-                detalhes_ids = [h.endereco.id for h in no_estado if h.endereco.end.entidade == e]
-                for d in EnderecoDetalhe.objects.filter(id__in=detalhes_ids):
-                    detalhes.append({'detalhe':d, 'patrimonio':Patrimonio.objects.filter(historicolocal__in=no_estado.filter(endereco=d))})
-                entidades.append({'entidade':e, 'detalhes':detalhes})
-            return TemplateResponse(request, 'patrimonio/por_estado.html', {'estado':estado, 'entidades':entidades})
+            estado = ''
+            
+            if Estado.objects.filter(pk=estado_id).exists():
+                estado = get_object_or_404(Estado, pk=estado_id)
+    
+                no_estado = []
+                for p in Patrimonio.objects.filter(patrimonio__isnull=True):
+                    ht = p.historico_atual
+                    if ht and ht.estado == estado:
+                        no_estado.append(ht.id)
+    
+                no_estado = HistoricoLocal.objects.filter(id__in=no_estado)
+                # entidades_ids = no_estado.values_list('endereco__endereco__entidade', flat=True).distinct()
+                entidades_ids = []
+                for h in no_estado:
+                    try:
+                        entidades_ids.append(h.endereco.end.entidade.id)
+                    except:
+                        pass
+                entidades = []
+                for e in Entidade.objects.filter(id__in=entidades_ids):
+                    detalhes = []
+                    # detalhes_ids = no_estado.values_list('endereco', flat=True).filter(endereco__endereco__entidade=e)
+                    detalhes_ids = [h.endereco.id for h in no_estado if h.endereco.end.entidade == e]
+                    for d in EnderecoDetalhe.objects.filter(id__in=detalhes_ids):
+                        detalhes.append({'detalhe':d, 'patrimonio':Patrimonio.objects.filter(historicolocal__in=no_estado.filter(endereco=d))})
+                    entidades.append({'entidade':e, 'detalhes':detalhes})
+
+            return TemplateResponse(request, 'patrimonio/por_estado.html', {'estado_id': estado_id, 'estado':estado, 'entidades':entidades, 'estados':Estado.objects.all()})
     else:
-        return TemplateResponse(request, 'patrimonio/sel_estado.html', {'estados':Estado.objects.all()})
+        return TemplateResponse(request, 'patrimonio/por_estado.html', {'estados':Estado.objects.all()})
 
 
 @login_required
@@ -933,7 +941,22 @@ def por_termo(request, pdf=0):
     if termo_id != '0':
         qs = Termo.objects.filter(id=termo_id)
     else:
-        qs = Termo.objects.exclude(id=9)
+        if Variavel.objects.filter(nome = Variavel.TERMO_EXCLUIDO_IDS).exists():
+            termos_excluidos = Variavel.objects.get(nome = Variavel.TERMO_EXCLUIDO_IDS).valor
+            if termos_excluidos:
+                termo_excluido_ids = map(int, termos_excluidos.split(','))
+                qs = Termo.objects.exclude(id__in = termo_excluido_ids)
+                
+            else:
+                qs = Termo.objects.all()
+        else:
+            qs = Termo.objects.all()
+        
+        
+    
+    termo_filtro = None
+    if qs.exists():
+        termo_filtro = qs[0]
 
     termos = []
 
@@ -998,18 +1021,18 @@ def por_termo(request, pdf=0):
         termos.append(termo)
         
     if pdf:
-        vars = {'termo':qs[0],
+        vars = {'termo':termo_filtro,
                 'termos':termos,
                 'i':itertools.count(1),
                 'numero_fmusp':numero_fmusp,
                 'ver_numero_fmusp':ver_numero_fmusp, }
         if termo_id != 0 and len(qs) > 0:
-            vars.update({'t':qs[0]})
+            vars.update({'t':termo_filtro})
         return render_to_pdf_weasy('patrimonio/%s.pdf' % template_name, vars, request=request, filename='inventario_por_termo.pdf')
     else:
         return TemplateResponse(request, 'patrimonio/%s.html' % template_name, {'termos':termos,
                                                                                 'i':itertools.count(1),
-                                                                                'termo':qs[0],
+                                                                                'termo':termo_filtro,
                                                                                 'modalidade':modalidade,
                                                                                 'agilis':agilis,
                                                                                 'doado':doado,
