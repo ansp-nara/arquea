@@ -8,17 +8,25 @@
     </div>
 {% endblock %}
 {% block content %}
-<form method="GET">
-<select name="termo" id="id_termo">
-  {% for t in termos %}
-     <option value="{{ t.id }}">{{ t }}</option>
-  {% endfor %}
-</select>
-<select name="parcial" id="id_parcial">
-  {% for p in parciais %}
-     <option value="{{ p }}">{{ p }}</option>
-  {% endfor %}
-</select>
-<input type="submit" value="Enviar">
-</form>
+    <h1>Pagamentos por parcial</h1>
+    
+    <div id="div_filtro">
+        <fieldset>
+            <legend>Filtro</legend>
+            <form method="GET">
+                <select name="termo" id="id_termo">
+                    {% for t in termos %}
+                       <option value="{{ t.id }}">{{ t }}</option>
+                    {% endfor %}
+                </select>
+                <select name="parcial" id="id_parcial">
+                    {% for p in parciais %}
+                       <option value="{{ p }}">{{ p }}</option>
+                    {% endfor %}
+                </select>
+                <input type="submit" value="Enviar">
+            </form>
+        </fieldset>
+    </div>
+
 {% endblock %}

@@ -220,7 +220,7 @@ def pagamentos_parciais(request, pdf=False):
      Relatório Administrativo - Relatório de Pagamentos por parcial.
      
     """
-    if request.GET.get('parcial'):
+    if request.GET.get('parcial') and request.GET.get('termo'):
         parcial = int(request.GET.get('parcial'))
         termo_id = int(request.GET.get('termo'))
         termo = Termo.objects.get(pk=termo_id)
