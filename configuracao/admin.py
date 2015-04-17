@@ -46,3 +46,4 @@ class ClassesExtraAdmin(admin.ModelAdmin):
     form = ClassesExtraForm
 
 admin.site.register(ClassesExtra, ClassesExtraAdmin)
+admin.site.register(FieldsHelp)
