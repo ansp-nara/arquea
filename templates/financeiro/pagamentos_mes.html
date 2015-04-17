@@ -11,19 +11,33 @@
     </div>
 {% endblock %}
 {% block content %}
-<form method="GET">
-{% if meses %}
-<select name="mes" id="id_mes">
-  {% for mes in meses %}
-     <option value="{{ mes }}">{{ mes }}</option>
-  {% endfor %}
-</select>
-{% endif %}
-<select name="ano" id="id_ano">
-  {% for ano in anos %}
-     <option value="{{ ano }}">{{ ano }}</option>
-  {% endfor %}
-</select>
-<input type="submit" value="Enviar">
-</form>
+    <div id="report_title">
+        <h1>
+            {% if view == 'pagamentos_mensais' %}
+                Pagamentos por mês
+            {% elif view == 'extrato_tarifas' %}
+                Extrato de tarifas por mês
+            {% endif %}
+        </h1>
+    </div>
+    <div id="div_filtro">
+        <fieldset>
+            <legend>Filtro</legend>
+            <form method="GET">
+                {% if meses %}
+                    <select name="mes" id="id_mes">
+                        {% for mes in meses %}
+                            <option value="{{ mes }}">{{ mes }}</option>
+                        {% endfor %}
+                    </select>
+                {% endif %}
+                <select name="ano" id="id_ano">
+                    {% for ano in anos %}
+                        <option value="{{ ano }}">{{ ano }}</option>
+                    {% endfor %}
+                </select>
+                <input type="submit" value="Enviar">
+            </form>
+        </fieldset>
+    </div>
 {% endblock %}

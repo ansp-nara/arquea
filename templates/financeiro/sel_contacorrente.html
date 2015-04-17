@@ -8,14 +8,19 @@
     </div>
 {% endblock %}
 {% block content %}
-<h1>Panorama da conta corrente</h1>
-<p>Selecione o ano:</p>
-<form method="GET">
-<select name="ano" id="id_ano">
-  {% for ano in anos %}
-     <option value="{{ ano }}">{{ ano }}</option>
-  {% endfor %}
-</select>
-<input type="submit" value="Enviar">
-</form>
+    <h1>Panorama da conta corrente</h1>
+    <div id="div_filtro">
+        <fieldset>
+            <legend>Filtro</legend>
+            <p>Selecione o ano:</p>
+            <form method="GET">
+                <select name="ano" id="id_ano">
+                  {% for ano in anos %}
+                     <option value="{{ ano }}">{{ ano }}</option>
+                  {% endfor %}
+                </select>
+                <input type="submit" value="Enviar">
+            </form>
+        </fieldset>
+    </div>
 {% endblock %}
