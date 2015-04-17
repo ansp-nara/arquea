@@ -78,39 +78,42 @@
     </div>
 {% endblock %}
 {% block content %}
-<h1>Patrimônio por tipo de equipamento</h1>
-<div id="theader">
-	<div style="clear:both;"> </div>
-</div>
-<div id="blocos"> </div>
-<script type="text/javascript">
-$(function() {
-    $("#blocos").jstree({
-        json_data : {
-            ajax: {
-				url: function(node) {
-	                 if (node == -1){
-	                 	return '{% url "patrimonio.views.ajax_abre_arvore_tipo" %}';
-	                 } else if (node.attr("o_id")) {
-			         	return '{% url "patrimonio.views.ajax_abre_arvore_tipo" %}?id='+node.attr("o_id")+'&model='+node.attr("o_model");
-	                 }
-	                 return 'http://#'; // invalidando o disparo da URL se não houver atributo válido para a chamada AJAX.
-		        },
-	            type:"get",
-				success: function(ops) {
-		 		    data = [];
-				    for (opnum in ops) {
-						var op = ops[opnum];
-						node = {"data":op["data"], "attr":op["attr"], "state":"closed"};
-						data.push(node);
-				    }
-				    return data;
-				}
-		    }
-		},
-	    core : {"html_titles" : true,  "load_open" : true },
-		plugins : [ "themes", "json_data"]
-    });
-});
-</script>
+    <h1>Patrimônio por tipo de equipamento</h1>
+    <div id="theader">
+        <div style="clear:both;"> </div>
+    </div>
+    <div id="blocos"> </div>
+    <script type="text/javascript">
+        $(function() {
+            $("#blocos").jstree({
+                json_data : {
+                    ajax: {
+                        url: function(node) {
+                             if (node == -1){
+                                 return '{% url "patrimonio.views.ajax_abre_arvore_tipo" %}';
+                             } else if (node.attr("o_id")) {
+                                 return '{% url "patrimonio.views.ajax_abre_arvore_tipo" %}?id='+node.attr("o_id")+'&model='+node.attr("o_model");
+                             }
+                             return 'http://#'; // invalidando o disparo da URL se não houver atributo válido para a chamada AJAX.
+                        },
+                        type:"get",
+                        success: function(ops) {
+                        data = [];
+                            for (opnum in ops) {
+                                var op = ops[opnum];
+                                node = {"data":op["data"], "attr":op["attr"], "state":"closed"};
+                                data.push(node);
+                            }
+                            if (ops && ops.length == 0) {
+                                data.push('Não foram encontrados dados para a exibição.');
+                            }
+                            return data;
+                        }
+                    }
+                },
+                core : {"html_titles" : true,  "load_open" : true },
+                plugins : [ "themes", "json_data"]
+            });
+        });
+    </script>
 {% endblock %}

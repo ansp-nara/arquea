@@ -3,7 +3,9 @@
 {% load i18n admin_modify admin_static %}
 {% block extrahead %}
 <style>
-    form#filtro label { display:inline-block; width: 75px; }
+    div#theader {font-weight:bold; clear:both;}
+    div#div_filtro {margin-bottom:15px;}
+    div#div_filtro label {width:100px; display:inline-block;}
 </style>
 <script type="text/javascript" src="/media/js/selects.js"></script>
 {% endblock %}
@@ -14,24 +16,29 @@
     </div>
 {% endblock %}
 {% block content %}
-<form id="filtro" method="GET">
-	<p>
-		<label for="id_tipo">Tipo*</label>:
-		<select name="tipo" id="id_tipo" onchange="ajax_get_procedencia_filter_tipo(this.value)">
-			{% for t in tipos %}
-		    	<option value="{{ t.id }}">{{ t }}</option>
-			{% endfor %}
-		</select>
-	</p>
-	<p>
-		<label for="id_procedencia">Procedencia</label>:
-		<select name="procedencia" id="id_procedencia">
-		    <option value="">Todos</option>
-			{% for procedencia in procedencias %}
-				<option value="{{ procedencia.id }}">{{ procedencia }}</option>
-			{% endfor %}
-		</select>
-	</p>
-	<input type="submit" value="Enviar">
-</form>
+    <h1 repeat="1">Patrimônio por tipo</h1>
+    <br>
+    <div id="div_filtro">
+        <fieldset>
+            <legend>Filtro</legend>
+            <form id="filtro" method="GET">
+               <label for="id_tipo">Tipo*</label>
+                <select name="tipo" id="id_tipo" onchange="ajax_get_procedencia_filter_tipo(this.value)">
+                    {% for t in tipos %}
+                        <option value="{{ t.id }}">{{ t }}</option>
+                    {% endfor %}
+                </select>
+                <br />
+                <label for="id_procedencia">Procedencia</label>
+                <select name="procedencia" id="id_procedencia">
+                    <option value="">Todos</option>
+                    {% for procedencia in procedencias %}
+                        <option value="{{ procedencia.id }}">{{ procedencia }}</option>
+                    {% endfor %}
+                </select>
+                <br />
+                <input type="submit" value="Enviar">
+            </form>
+        </fieldset>
+    </div>
 {% endblock %}

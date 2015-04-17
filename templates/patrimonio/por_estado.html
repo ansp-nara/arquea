@@ -8,29 +8,51 @@
     </div>
 {% endblock %}
 {% block content %}
-<h1 repeat="1">Inventário por estado</h1>
-{% comment %}
-    <form action="{% url 'patrimonio.views.por_estado' 1 %}" method="GET">
-       <input type="hidden" value="{{ termo.id }}" name="termo" />
-       <input type="submit" value="Versão para impressão" />
-    </form> {% endcomment %}
-
-    <h4>Estado {{ estado }}</h4>
- 
-    <table border="0" repeat="1" cellpadding="5">
-    <tr><th>Entidade</th><th>Local</th><th>Procedência</th><th>Marca</th><th>Modelo</th><th>Part number</th><th>Descrição</th><th>NS</th></tr>
-    {% for e in entidades %}
-        <tr><td>{{ e.entidade }}</td><td colspan="7"></td></tr>
-        {% for d in e.detalhes %}
-           <tr><td></td><td>{{ d.detalhe.detalhes }}</td><td colspan="6"></td></tr>
-           {% for p in d.patrimonio %}
-              <tr {% if not p.patrimonio %}style="font-weight:bold;"{% endif %}><td></td><td></td><td>{{ p.procedencia }}</td><td>{{ p.equipamento.entidade_fabricante.sigla }}</td><td>{{ p.modelo }}</td><td>{{ p.part_number }}</td><td><a href="{% url 'admin:patrimonio_patrimonio_change' p.id %}">{{ p.descricao }}</a></td><td>{{ p.ns }}</td></tr>
-              {% for f in p.patrimonio_set.all %}
-                 <tr><td></td><td></td><td></td><td>{{ f.procedencia }}</td><td>{{ f.equipamento.entidade_fabricante.sigla }}</td><td>{{ f.modelo }}</td><td>{{ f.part_number }}</td><td>{{ p.descricao }}</td><td>{{ f.ns }}</td></tr>
-              {% endfor %}
-           {% endfor %}
+    <h1 repeat="1">Patrimônio por estado</h1>
+    
+    <div id="div_filtro">
+        <fieldset>
+            <legend>Filtro</legend>
+            <form method="GET">
+                <label for="id_estado">Estado</label>:
+                <select name="estado" id="id_estado">
+                    {% for e in estados %}
+                        <option value="{{ e.id }}" {% if estado.id == e.id %}selected="true"{% endif %}>{{ e }} ({{ e.historicolocal_set.count }})</option>
+                    {% endfor %}
+                </select>
+                <input type="submit" value="Enviar">
+            </form>
+        </fieldset>
+    </div>
+    
+    {% if entidades %}
+        {% comment %}
+            <form action="{% url 'patrimonio.views.por_estado' 1 %}" method="GET">
+               <input type="hidden" value="{{ termo.id }}" name="termo" />
+               <input type="submit" value="Versão para impressão" />
+            </form> 
+        {% endcomment %}
+    
+        <h4>Estado {{ estado }}</h4>
+     
+        <table border="0" repeat="1" cellpadding="5">
+        <tr><th>Entidade</th><th>Local</th><th>Procedência</th><th>Marca</th><th>Modelo</th><th>Part number</th><th>Descrição</th><th>NS</th></tr>
+        {% for e in entidades %}
+            <tr><td>{{ e.entidade }}</td><td colspan="7"></td></tr>
+            {% for d in e.detalhes %}
+               <tr><td></td><td>{{ d.detalhe.detalhes }}</td><td colspan="6"></td></tr>
+               {% for p in d.patrimonio %}
+                  <tr {% if not p.patrimonio %}style="font-weight:bold;"{% endif %}><td></td><td></td><td>{{ p.procedencia }}</td><td>{{ p.equipamento.entidade_fabricante.sigla }}</td><td>{{ p.modelo }}</td><td>{{ p.part_number }}</td><td><a href="{% url 'admin:patrimonio_patrimonio_change' p.id %}">{{ p.descricao }}</a></td><td>{{ p.ns }}</td></tr>
+                  {% for f in p.patrimonio_set.all %}
+                     <tr><td></td><td></td><td></td><td>{{ f.procedencia }}</td><td>{{ f.equipamento.entidade_fabricante.sigla }}</td><td>{{ f.modelo }}</td><td>{{ f.part_number }}</td><td>{{ p.descricao }}</td><td>{{ f.ns }}</td></tr>
+                  {% endfor %}
+               {% endfor %}
+            {% endfor %}
         {% endfor %}
-    {% endfor %}
-    </table>
-
+        </table>
+    {% elif estado_id %}
+        <table border="0" repeat="1" cellpadding="5">
+            <tr><td>Não foram encontrados dados para a exibição.</td></tr>
+        </table>
+    {% endif %}
 {% endblock %}

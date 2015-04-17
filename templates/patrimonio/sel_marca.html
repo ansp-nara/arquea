@@ -7,13 +7,20 @@
     </div>
 {% endblock %}
 {% block content %}
-<form method="GET">
-<label for="id_marca">Marca</label>:
-<select name="marca" id="id_marca">
-  {% for m in marcas %}
-     <option value="{{ m }}">{{ m }}</option>
-  {% endfor %}
-</select>
-<input type="submit" value="Enviar">
-</form>
+    <h1 repeat="1">Patrimônio por marca</h1>
+    <br>
+    <div id="div_filtro">
+        <fieldset>
+            <legend>Filtro</legend>
+            <form method="GET">
+                <label for="id_marca">Marca</label>:
+                <select name="marca" id="id_marca">
+                    {% for m in marcas %}
+                        <option value="{{ m }}">{{ m }}</option>
+                    {% endfor %}
+                </select>
+                <input type="submit" value="Enviar">
+            </form>
+        </fieldset>
+    </div>
 {% endblock %}
