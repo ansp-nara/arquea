@@ -120,7 +120,7 @@ INSTALLED_APPS += PROJECT_APPS
 
 #############################################################
 INSTALLED_APPS += (
-    'django_cas',
+    'django_cas_ng',
 )
 
 
@@ -130,14 +130,14 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django_cas.middleware.CASMiddleware',
+    'django_cas_ng.middleware.CASMiddleware',
     'middleware.SSLRedirect',
     'utils.request_cache.RequestCacheMiddleware',
 )
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
-    'django_cas.backends.CASBackend',
+    'django_cas_ng.backends.CASBackend',
 )
 
 CAS_SERVER_URL = 'https://cas.ansp.br/cas/'

@@ -6,7 +6,8 @@
         <link rel="shortcut icon" href="{% static "img/favicon.png" %}" />
 	<link rel="stylesheet" type="text/css" href="{% block stylesheet %}{% static "css/base.css" %}{% endblock %}" />
 	<link rel="stylesheet" type="text/css" href="{% static "css/import-export-admin.css" %}" />
-	<meta http-equipv="Content-type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    <meta http-equipv="Content-type" content="text/html; charset=utf-8" />
 	{% block extrastyle %}{% endblock %}
 	<!--[if lte IE 7]><link rel="stylesheet" type="text/css" href="{% block stylesheet_ie %}{% static "css/ie.css" %}{% endblock %}" /><![endif]-->
 	{% if LANGUAGE_BIDI %}<link rel="stylesheet" type="text/css" href="{% block stylesheet_rtl %}{% static "css/rtl.css" %}{% endblock %}" />{% endif %}
@@ -16,6 +17,8 @@
 	<script type="text/javascript" src="{% static "js/jquery.min.js" %}"></script>
         {% block extrahead %}{% endblock %}
 	<script type="text/javascript" src="{% static "js/jquery-blockUI.js" %}"></script>
+
+    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 	<!--<script type="text/javascript" src="/media/js/jquery.accordion.js"></script>
 	
 	<script type="text/javascript"> 
@@ -109,9 +112,8 @@ $(document).ajaxSend(function(event, xhr, settings) {
         xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
     }
 });
+    </script>
 
-	</script> 
-	
 	
 </head>
 {% load i18n %}
@@ -154,7 +156,7 @@ $(document).ajaxSend(function(event, xhr, settings) {
 					<li><a class="change-pass" href="{{ root_path }}password_change/">
 					{% endif %}
 					{% trans 'Change password' %}</a></li>
-					{% url 'django_cas.views.logout' as logout_url %}
+					{% url 'django_cas_ng.views.logout' as logout_url %}
 					{% if logout_url %}
 					<li><a class="sair" href="{{ logout_url }}">
 					{% else %}

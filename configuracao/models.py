@@ -65,3 +65,11 @@ class ClassesExtra(models.Model):
         ordering = ('content_type__app_label', 'content_type__model')
         verbose_name = u'Ajuda dos modelos'
         verbose_name_plural = u'Ajudas dos modelos'
+
+class FieldsHelp(models.Model):
+    model = models.ForeignKey(ClassesExtra)
+    field = models.CharField(max_length=30)
+    help = models.CharField(max_length=100)
+
+    def __unicode__(self):
+        return '%s/%s - %s' % (self.model.content_type.app_label, self.model.content_type.model, self.field)

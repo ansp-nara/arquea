@@ -7,13 +7,34 @@
 <script type="text/javascript" src="{% static "js/jquery.balloon.min.js" %}"></script>
     <script>
         $(function() {
-            //$.balloon.defaults.css = null;
-            $("#balloon").balloon({position:"bottom left", url:"{% url 'configuracao.views.help_text' opts.app_label opts.model_name %}", classname:"balloon",
-                css:{opacity: 1}
+            var bal = 0;
+            $.ajaxSetup({ async:false });
+            $.get('{% url 'configuracao.views.has_help_text' opts.app_label opts.model_name %}', function(has) {
+                bal = parseInt(has);
             });
-        });
-    </script>
-{{ media }}
+            $.ajaxSetup({ async:true });
+            if (bal) {
+                $("#balloon").balloon({position:"bottom left", url:"{% url 'configuracao.views.help_text' opts.app_label opts.model_name %}", classname:"balloon",
+                    css:{opacity: 1}
+                });
+            } else {
+                $("#balloon").hide();
+            }
+
+         $(document).tooltip({
+             items: "input, select, textarea",
+             show: {delay:300},
+             content: function(callback) {
+                 var element = $(this);
+                 $.get('{% url 'configuracao.views.tooltip' opts.app_label opts.model_name %}', {'field_name': element.attr('name') }, function(data) {
+                     callback(data);
+                 });
+             },
+
+         });
+     });
+
+	</script> {{ media }}
 {% endblock %}
 
 {% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "css/forms.css" %}"/>{% endblock %}
