@@ -305,7 +305,11 @@ def _blocos_ip_superbloco(request, tipo=None):
         # Obs: Fazendo o exclude no Union, para poder reaproveitar a queryset na geração do XLS,
         # que não deve incluir o 'bloco_com_filhos_filtrados' 
         blocos = blocos_com_filhos_filtrados | blocos_filtrados.exclude(id__in = blocos_com_filhos_filtrados)
-        blocos = blocos.order_by('ip', 'mask')
+        if request.GET.get('porusuario'):
+            blocos = blocos.order_by('usuario__sigla')
+        else:
+            blocos = blocos.order_by('ip', 'mask')
+
         
         # Gerando o contexto para o template
         blocos_contexto = []
@@ -348,7 +352,7 @@ def _blocos_ip_superbloco(request, tipo=None):
             return response
         
         elif request.GET.get('porusuario'):
-            return TemplateResponse(request, 'rede/blocosip.html.notree', {'blocos':blocos_contexto.order_by('usuario__sigla')})
+            return TemplateResponse(request, 'rede/blocosip.html.notree', {'blocos':blocos_contexto})
         
         return TemplateResponse(request, template, {
                                                     'tipo':tipo,
