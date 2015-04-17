@@ -201,11 +201,26 @@ def render_wk_to_pdf(template_src, context_dict, context_instance=None, filename
 
 
 def formata_moeda(n, s_d):
+    """
+    Formata um número n no formato de moeda, sendo s_d o ponto de sinal do decimal.
+    Ex:
+        n = 10000
+        s_d = ,
+        
+        retorno: 1.000,00
+    
+    Caso n seja vazio ou nulo, retorna 0.00 ou 0,00
+    """
     if s_d == '.':
         s_i = ','
     else:
         s_i = '.'
-    f = str(n)
+    
+    if n:
+        f = str(n)
+    else:
+        f = "0"
+    
     num = f.split('.')
     i = num[0]
     if len(num) > 1:
