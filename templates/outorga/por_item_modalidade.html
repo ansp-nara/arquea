@@ -9,6 +9,7 @@
 {% endblock %}
 {% block content %}
 <h1 repeat="1">Pagamentos por item de outorga do processo {{ termo }} e modalidade {{ modalidade }}</h1>
+
 <div id="report_title">
     <div id="report_toolbar">
         <form action="{% url 'outorga.views.item_modalidade' 1 %}" method="GET" id="id_form_recurso_pdf">
