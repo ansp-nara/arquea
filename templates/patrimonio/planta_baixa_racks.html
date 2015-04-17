@@ -129,16 +129,22 @@
 	   <p>É necessário adicionar os Data Centers para habilitar a edição da planta baixa.</p>
 	   <p><a href="{% url "admin:patrimonio_plantabaixadatacenter_add" %}" target="_blank">Clique aqui para adicionar.</a></p>
 	{% else %}
-        <form id="form_racks" method="GET">
-            <span class="span_obj_title">Data Centers</span>
-            <select name="dc" onchange="this.form.submit();">
-            <option value="-">--------</option>
-            {% for dc in todos_dcs %}
-               <option value="{{ dc.id }}" {% if request.GET.dc == dc.id|lower %}selected{% endif %}>{{ dc.nome|default:'' }}</option>
-            {% endfor %}
-            </select>
-        </form>
-	{% endif %}
+        <div id="div_filtro" style="margin:20px 0 20px 0;">
+            <fieldset>
+                <legend>Filtro</legend>
+                <form id="form_racks" method="GET" style="margin-right:20px;">
+                    <span class="span_obj_title">Data Centers</span>
+                    <select name="dc" onchange="this.form.submit();">
+                    <option value="-">--------</option>
+                    {% for dc in todos_dcs %}
+                       <option value="{{ dc.id }}" {% if request.GET.dc == dc.id|lower %}selected{% endif %}>{{ dc.nome|default:'' }}</option>
+                    {% endfor %}
+                    </select>
+                </form>
+                </form>
+            </fieldset>
+        </div>
+    {% endif %}
 </div>
 {% if request.GET.dc %}
 <div id="icons">

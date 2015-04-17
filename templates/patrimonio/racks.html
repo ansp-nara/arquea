@@ -34,6 +34,9 @@
   
 }
 
+#icons {
+  height: 40px;
+}
  
  /* utilizado para mostrar que um equipamento está 'desabilitado'
     na visão do rack. Isso normalmente acontece quando ele oculpa
@@ -58,46 +61,49 @@
 <script type="text/javascript" src="{{ STATIC_PREFIX }}js/admin/RelatedObjectLookups.js"></script>
 {% endblock %}
 {% block breadcrumbs %}
-	{% if not is_popup %}
-    <div class="breadcrumbs">Você está em: 
-      <a href="../../">
-        {% trans "Home" %}
-      </a>
-       &rsaquo;
-       <a href="/patrimonio/racks"> 
-        Diagrama de Racks Frontal
-      </a>
-    </div>
-	{% endif %}
+    {% if not is_popup %}
+        <div class="breadcrumbs">Você está em: 
+          <a href="../../">{% trans "Home" %}</a>&rsaquo;
+          <a href="/patrimonio/racks">Diagrama de Racks Frontal</a>
+        </div>
+    {% endif %}
 {% endblock %}
 {% block content %}
-
 <h1>Diagrama de Racks Frontal</h1>
-<div id="wrap-form">
-	<form id="form_racks" method="GET">
-	Data Centers
-	<select name="dc_id" onchange="this.form.submit();">
-	    <option value="0">Todos</option>
-	{% for dc in todos_dcs %}
-	   <option value="{{ dc.id }}" {% if request.GET.dc_id == dc.id|lower %}selected{% endif %}>{{ dc.nome|default:'' }}</option>
-	{% endfor %}
-	</select>
-	</form>
+<div id="div_filtro">
+    <fieldset>
+        <legend>Filtro</legend>
+        <div id="wrap-form">
+            <form id="form_racks" method="GET">
+                Data Centers
+                <select name="dc_id" onchange="this.form.submit();">
+                    <option value="0">Todos</option>
+                    {% for dc in todos_dcs %}
+                       <option value="{{ dc.id }}" {% if request.GET.dc_id == dc.id|lower %}selected{% endif %}>{{ dc.nome|default:'' }}</option>
+                    {% endfor %}
+                </select>
+                {% if not dc %}
+                    <button name="Buscar" onclick="document.getElementById('form_racks').submit();">Buscar</button>
+                {% endif %}
+            </form>
+        </div>
+    </fieldset>
 </div>
 {% if dcs %}
+<br>
 <div id="icons">
     <a href="{{ request.get_full_path  }}&pdf=2" class="printlink"><img src="{{ STATIC_URL }}img/icon-pdf.png" title="Exportar para PDF." /></a>
 </div>
 <form>
-<input type="checkbox" id="chk_stencil" name="chk_stencil" value="1" {% if chk_stencil = 1 %}checked{% endif %}><span>&nbsp;Mostrar stencils</span><br>
-<input type="checkbox" id="chk_legenda" name="chk_legenda" value="1" {% if chk_legenda = 1 %}checked{% endif %}><span>&nbsp;Mostrar legendas</span><br>
-<input type="checkbox" id="chk_legenda_desc" name="chk_legenda_desc" value="1" {% if chk_legenda_desc = 1 %}checked{% endif %}><span>&nbsp;Mostrar descrição.</span><br><br>
-
-<input type="checkbox" id="chk_traseira" name="chk_traseira" value="1" {% if chk_traseira = 1 %}checked{% endif %}><span>&nbsp;Mostrar visão traseira do Rack.</span><br>
-<input type="checkbox" id="chk_outros" name="chk_outros" value="1" {% if chk_outros = 1 %}checked{% endif %}><span>&nbsp;Mostrar outros equipamentos.</span><br>
-<input type="checkbox" id="chk_avisos" name="chk_avisos" value="1" {% if chk_avisos = 1 %}checked{% endif %}><span>&nbsp;Mostrar avisos.</span><br>
-</form>
+    <input type="checkbox" id="chk_stencil" name="chk_stencil" value="1" {% if chk_stencil = 1 %}checked{% endif %}><span>&nbsp;Mostrar stencils</span><br>
+    <input type="checkbox" id="chk_legenda" name="chk_legenda" value="1" {% if chk_legenda = 1 %}checked{% endif %}><span>&nbsp;Mostrar legendas</span><br>
+    <input type="checkbox" id="chk_legenda_desc" name="chk_legenda_desc" value="1" {% if chk_legenda_desc = 1 %}checked{% endif %}><span>&nbsp;Mostrar descrição.</span><br><br>
     
+    <input type="checkbox" id="chk_traseira" name="chk_traseira" value="1" {% if chk_traseira = 1 %}checked{% endif %}><span>&nbsp;Mostrar visão traseira do Rack.</span><br>
+    <input type="checkbox" id="chk_outros" name="chk_outros" value="1" {% if chk_outros = 1 %}checked{% endif %}><span>&nbsp;Mostrar outros equipamentos.</span><br>
+    <input type="checkbox" id="chk_avisos" name="chk_avisos" value="1" {% if chk_avisos = 1 %}checked{% endif %}><span>&nbsp;Mostrar avisos.</span><br>
+</form>
+<br><br><br>
 {% for dc in dcs %}
     {% if not forloop.first %}
        <div class="page-break"></div>
@@ -394,8 +400,6 @@
     {% endfor %}{# ENDFOR FILEIRA #}
 	</div>
 {% endfor %}{# ENDFOR DC #}
-{% else %}
-    <button name="Buscar" onclick="document.getElementById('form_racks').submit();">Buscar</button>
 {% endif %}
 </div>
 

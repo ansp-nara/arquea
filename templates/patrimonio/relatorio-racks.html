@@ -47,46 +47,50 @@
     font-size: 14px;
     font-weight: bold;
 }
-
 </style>
+<style type="text/css">
+  div#theader {font-weight:bold; clear:both;}
+  div#div_filtro {margin-bottom:15px;}
+  div#div_filtro div#wrap-form label {width:100px; display:inline-block;}
+</style>
+
 <script type="text/javascript" src="{{ STATIC_PREFIX }}js/racks.js"></script>
 <script type="text/javascript" src="{{ STATIC_PREFIX }}js/admin/RelatedObjectLookups.js"></script>
 {% endblock %}
 {% block breadcrumbs %}
-	{% if not is_popup %}
-    <div class="breadcrumbs">Você está em: 
-      <a href="../../">
-        {% trans "Home" %}
-      </a>
-       &rsaquo;
-       <a href="/patrimonio/relatorio_rack"> 
-        Relatório de Rack
-      </a>
-    </div>
-	{% endif %}
+    {% if not is_popup %}
+        <div class="breadcrumbs">Você está em: 
+            <a href="../../">{% trans "Home" %}</a>&rsaquo;
+            <a href="/patrimonio/relatorio_rack">Relatório de Rack</a>
+        </div>
+    {% endif %}
 {% endblock %}
 {% block content %}
-
 <h1>Relatório de Rack</h1>
-<div id="wrap-form">
-	<form id="form_racks" method="GET">
-	Data Centers
-	<select name="dc" onchange="this.form.submit();">
-	    <option value="0">-------</option>
-	{% for dc in todos_dcs %}
-	   <option value="{{ dc.id }}" {% if request.GET.dc == dc.id|lower %}selected{% endif %}>{{ dc.nome|default:'' }}</option>
-	{% endfor %}
-	</select>
-	<br>
-	Racks
-    <select name="rack" onchange="this.form.submit();">
-        <option value="0">-------</option>
-    {% for p in patrimonio_racks %}
-       <option value="{{ p.id }}" {% if request.GET.rack == p.id|lower %}selected{% endif %}>{{ p.apelido|default:'' }}</option>
-    {% endfor %}
-    </select>
-	
-	</form>
+<br>
+<div id="div_filtro">
+    <fieldset>
+        <legend>Filtro</legend>
+        <div id="wrap-form">
+            <form id="form_racks" method="GET">
+                <label for="dc">Data Centers*</label>
+                <select name="dc" onchange="this.form.submit();">
+                    <option value="0">-------</option>
+                    {% for dc in todos_dcs %}
+                       <option value="{{ dc.id }}" {% if request.GET.dc == dc.id|lower %}selected{% endif %}>{{ dc.nome|default:'' }}</option>
+                    {% endfor %}
+                </select>
+                <br>
+                <label for="racks">Racks*</label>
+                <select name="rack" onchange="this.form.submit();">
+                    <option value="0">-------</option>
+                    {% for p in patrimonio_racks %}
+                        <option value="{{ p.id }}" {% if request.GET.rack == p.id|lower %}selected{% endif %}>{{ p.apelido|default:'' }}</option>
+                    {% endfor %}
+                </select>
+            </form>
+        </div>
+    </fieldset>
 </div>
 {% if request.GET.dc and request.GET.dc != '0' and request.GET.rack and request.GET.rack != '0' %}
 {% for dc in dcs %}
@@ -97,9 +101,9 @@
         <div id="icons">
             <a href="{{ request.get_full_path  }}&pdf=2" class="printlink"><img src="{{ STATIC_URL }}img/icon-pdf.png" title="Exportar para PDF." /></a>
         </div>
-    	<div class="dc" style="display:table;">
-    	<h1>{{ dc.entidade }} - {{ dc.nome|default:'' }}</h1>
-    	{% for fileira in dc.fileiras %}
+        <div class="dc" style="display:table;">
+        <h1>{{ dc.entidade }} - {{ dc.nome|default:'' }}</h1>
+        {% for fileira in dc.fileiras %}
             <p style="height:10px;"></p>
             {% for rack in fileira.racks %}
                 {% with ''|center:2 as range %}
@@ -303,63 +307,63 @@
             
             {% for rack in fileira.racks %}
                 <div style="display:inline-table; width:860px;margin-bottom: 50px;margin-top:30px;">
-                        <div class="outros">
-                            <div class="outros-content">
-                            <table>
-                                <caption class="outros-title" style="width:0;">Equipamentos.</caption>
+                    <div class="outros">
+                        <div class="outros-content">
+                        <table>
+                            <caption class="outros-title" style="width:0;">Equipamentos.</caption>
+                            <tr>
+                                <th>ID</th>
+                                <th style="width:75px;">Nome</th>
+                                <th>Desc</th>
+                                <th>SN</th>
+                                <th style="width:80px;">PN</th>
+                                <th style="width:110px;">Modelo</th>
+                                <th>Tam(U)</th>
+                                <th>Pos(F)</th>
+                                <th>Col</th>
+                            </tr>
+                            {% for eq in rack.equipamentos %}
                                 <tr>
-                                    <th>ID</th>
-                                    <th style="width:75px;">Nome</th>
-                                    <th>Desc</th>
-                                    <th>SN</th>
-                                    <th style="width:80px;">PN</th>
-                                    <th style="width:110px;">Modelo</th>
-                                    <th>Tam(U)</th>
-                                    <th>Pos(F)</th>
-                                    <th>Col</th>
+                                    <td>{{ eq.id }}</td>
+                                    <td>{{ eq.nome|default:'' }}</td>
+                                    <td>
+                                        <a href="{% url "admin:patrimonio_patrimonio_change" eq.id %}" onclick="return showAddAnotherPopup(this);">{{ eq.nome|default:'' }}{{ eq.descricao|truncatechars:105 }}</a>
+                                    </td>
+                                    <td>{{ eq.sn|default:'' }}</td>
+                                    <td>{{ eq.pn|default:'' }}</td>
+                                    <td>{{ eq.modelo|default:'' }}</td>
+                                    <td>{{ eq.tam_u }}</td>
+                                    <td>{{ eq.pos_original }}</td>
+                                    <td>{{ eq.pos_col|default:'-' }}</td>
                                 </tr>
-                                {% for eq in rack.equipamentos %}
-                                    <tr>
-                                        <td>{{ eq.id }}</td>
-                                        <td>{{ eq.nome|default:'' }}</td>
-                                        <td>
-                                            <a href="{% url "admin:patrimonio_patrimonio_change" eq.id %}" onclick="return showAddAnotherPopup(this);">{{ eq.nome|default:'' }}{{ eq.descricao|truncatechars:105 }}</a>
-                                        </td>
-                                        <td>{{ eq.sn|default:'' }}</td>
-                                        <td>{{ eq.pn|default:'' }}</td>
-                                        <td>{{ eq.modelo|default:'' }}</td>
-                                        <td>{{ eq.tam_u }}</td>
-                                        <td>{{ eq.pos_original }}</td>
-                                        <td>{{ eq.pos_col|default:'-' }}</td>
-                                    </tr>
-                                {% endfor %}
-                            </table>
-                            </div>
-                        </div>{# pdus #}
-                        <div class="outros">
-                            <div class="outros-content">
-                            <table>
-                                <caption class="outros-title">PDUs.</caption>
+                            {% endfor %}
+                        </table>
+                        </div>
+                    </div>{# pdus #}
+                    <div class="outros">
+                        <div class="outros-content">
+                        <table>
+                            <caption class="outros-title">PDUs.</caption>
+                            <tr>
+                                <th>Desc</th>
+                                <th>Tam</th>
+                                <th>Pos</th>
+                                <th>Col</th>
+                            </tr>
+                            {% for eq in rack.equipamentos_pdu %}
                                 <tr>
-                                    <th>Desc</th>
-                                    <th>Tam</th>
-                                    <th>Pos</th>
-                                    <th>Col</th>
+                                    <td>
+                                        <a href="{% url "admin:patrimonio_patrimonio_change" eq.id %}" onclick="return showAddAnotherPopup(this);">{{ eq.nome|default:'' }}{{ eq.descricao }}</a>
+                                    </td>
+                                    <td>{{ eq.tam_u }}</td>
+                                    <td>{{ eq.pos_original }}</td>
+                                    <td>{{ eq.pos_col|default:'-' }}</td>
                                 </tr>
-                                {% for eq in rack.equipamentos_pdu %}
-                                    <tr>
-                                        <td>
-                                            <a href="{% url "admin:patrimonio_patrimonio_change" eq.id %}" onclick="return showAddAnotherPopup(this);">{{ eq.nome|default:'' }}{{ eq.descricao }}</a>
-                                        </td>
-                                        <td>{{ eq.tam_u }}</td>
-                                        <td>{{ eq.pos_original }}</td>
-                                        <td>{{ eq.pos_col|default:'-' }}</td>
-                                    </tr>
-                                {% endfor %}
-                            </table>
-                            </div>
-                        </div>{# pdus #}
-                        {% if rack.equipamentos_fora_visao %}
+                            {% endfor %}
+                        </table>
+                        </div>
+                    </div>{# pdus #}
+                    {% if rack.equipamentos_fora_visao %}
                         <div class="outros">
                             <div class="outros-content">
                             <table>

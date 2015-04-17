@@ -41,73 +41,78 @@
     </div>
 {% endblock %}
 {% block content %}
-<h3>Filtro</h3>
-<form method="GET" id="form_filtro">
-<div>
-	<label for="id_termo">Termo de outorga*:</label>
-	<select name="termo" id="id_termo">
-	  <option value="0">Todos</option>
-	  {% for t in filtro_termos %}
-	     <option value="{{ t.id }}">{{ t }}</option>
-	  {% endfor %}
-	</select>
-</div>
-<div>
-    <label for="id_marca">Marca</label>
-    <select name="marca" id="id_marca" multiple size=7>
-        <option value="0" selected>Todos</option>
-        {% for m in filtro_marcas %}
-           <option value="{{ m.id }}">{{ m }}</option>
-        {% endfor %}
-    </select>
-</div>
-<div>
-	<label for="id_modalidade">Modalidade</label>
-	<select name="modalidade" id="id_modalidade">
-	    <option value="0">Todos</option>
-	    <option value="1">Material permanente</option>
-	    <option value="2">Material de consumo</option>
-	</select>
-</div>
-<div>
-	<label for="id_agilis">Têm Agilis</label>
-	<select name="agilis" id="id_agilis">
-	     <option value="-">Todos</option>
-	     <option value="0">Não</option>
-	     <option value="1">Sim</option>
-	</select>
-</div>
-<div>
-	<label for="id_doado">Doado por processo oficial</label>
-	<select name="doado" id="id_doado">
-	     <option value="2">Todos</option>
-	     <option value="0">Não doados</option>
-	     <option value="1">Doados</option>
-	</select>
-</div>
-<div>
-	<label for="id_localizado">Patrimônio localizado</label>
-	<select name="localizado" id="id_localizado">
-	     <option value="2">Todos</option>
-	     <option value="0">Não localizados</option>
-	     <option value="1">Localizados</option>
-	</select>
-</div>
-<div>
-	<label for="id_numero_fmusp">Com identificação do patrimônio oficial</label>
-	<select name="numero_fmusp" id="id_numero_fmusp">
-	     <option value="2">Todos</option>
-	     <option value="0">Não</option>
-	     <option value="1">Sim</option>
-	</select>
-</div>
-<div>
-    <label for="id_ver_numero_fmusp">Apresenta patrimônio oficial no relatório</label>
-    <input type="checkbox" name="ver_numero_fmusp" id="id_ver_numero_fmusp" checked />
-</div>
-<br />
-<div>
-    <input type="submit" value="Enviar">
-</div>
-</form>
+    <h1>Patrimônio por termo de outorga</h1>
+    <div id="div_filtro">
+        <fieldset>
+            <legend>Filtro</legend>
+            <form method="GET" id="form_filtro">
+                <div>
+                	<label for="id_termo">Termo de outorga*:</label>
+                	<select name="termo" id="id_termo">
+                	  <option value="0">Todos</option>
+                	  {% for t in filtro_termos %}
+                	     <option value="{{ t.id }}">{{ t }}</option>
+                	  {% endfor %}
+                	</select>
+                </div>
+                <div>
+                    <label for="id_marca">Marca</label>
+                    <select name="marca" id="id_marca" multiple size=7>
+                        <option value="0" selected>Todos</option>
+                        {% for m in filtro_marcas %}
+                           <option value="{{ m.id }}">{{ m }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                	<label for="id_modalidade">Modalidade</label>
+                	<select name="modalidade" id="id_modalidade">
+                	    <option value="0">Todos</option>
+                	    <option value="1">Material permanente</option>
+                	    <option value="2">Material de consumo</option>
+                	</select>
+                </div>
+                <div>
+                	<label for="id_agilis">Têm Agilis</label>
+                	<select name="agilis" id="id_agilis">
+                	     <option value="-">Todos</option>
+                	     <option value="0">Não</option>
+                	     <option value="1">Sim</option>
+                	</select>
+                </div>
+                <div>
+                	<label for="id_doado">Doado por processo oficial</label>
+                	<select name="doado" id="id_doado">
+                	     <option value="2">Todos</option>
+                	     <option value="0">Não doados</option>
+                	     <option value="1">Doados</option>
+                	</select>
+                </div>
+                <div>
+                	<label for="id_localizado">Patrimônio localizado</label>
+                	<select name="localizado" id="id_localizado">
+                	     <option value="2">Todos</option>
+                	     <option value="0">Não localizados</option>
+                	     <option value="1">Localizados</option>
+                	</select>
+                </div>
+                <div>
+                	<label for="id_numero_fmusp">Com identificação do patrimônio oficial</label>
+                	<select name="numero_fmusp" id="id_numero_fmusp">
+                	     <option value="2">Todos</option>
+                	     <option value="0">Não</option>
+                	     <option value="1">Sim</option>
+                	</select>
+                </div>
+                <div>
+                    <label for="id_ver_numero_fmusp">Apresenta patrimônio oficial no relatório</label>
+                    <input type="checkbox" name="ver_numero_fmusp" id="id_ver_numero_fmusp" checked />
+                </div>
+                <br />
+                <div>
+                    <input type="submit" value="Enviar">
+                </div>
+            </form>
+        </fieldset>
+    </div>
 {% endblock %}
