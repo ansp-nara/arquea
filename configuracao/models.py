@@ -38,11 +38,16 @@ class Cheque(models.Model):
 
 
 class Variavel(models.Model):
+    # Nome da variável. É utilizada nos outros models para identificar a variável.
     DATACENTER_IDS = 'DATACENTER_IDS'
+    TERMO_EXCLUIDO_IDS = 'TERMO_EXCLUIDO_IDS'
     
+    # Nome das variáveis e suas descrições que devem ser exibidas na tela do Administrador
     _NOMES = (
                 (DATACENTER_IDS, 'ID da Entidade do Datacenter principal.'),
+                (TERMO_EXCLUIDO_IDS, 'IDs de Termos a serem excluídos da visão de relatórios, como o de Patrimônio por Termo. Ex: 1,2,3'),
             )
+    
     nome = models.CharField(_(u'Nome da variável'), max_length=60, unique=True, choices=_NOMES)
     valor = models.CharField(_(u'Valor'), max_length=60, help_text=u'', )
     obs = models.TextField(null=True, blank=True) 
