@@ -551,7 +551,8 @@ class ViewTest(TestCase):
         # assert breadcrumb
         self.assertContains(response, u'<a href="/patrimonio/relatorio/por_estado">Patrimônio por estado do item</a>')
 
-        self.assertContains(response, u'<option value="1">Ativo (1)</option>')
+        self.assertContains(response, u'<option value="1" >Ativo (1)</option>')
+        
     
     def test_ajax_patrimonio_historico(self):
         """
@@ -625,7 +626,7 @@ class ViewTest(TestCase):
         self.assertTrue(200, response.status_code)
                 
         # assert breadcrumb
-        self.assertContains(response, u'<a href="/patrimonio/relatorio/por_tipo">Patrimônio por tipo</a>')
+        self.assertContains(response, u'<a href="/patrimonio/relatorio/por_tipo">Inventário por tipo</a>')
         
         # asssert dos filtros
         self.assertContains(response, u'<option value="1" selected>TIPO</option>')

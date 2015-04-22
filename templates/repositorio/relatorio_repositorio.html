@@ -212,14 +212,12 @@
 <div style="clear:both;"></div>
 <div id="conteudo">
 {% for g in grupos %}
-    <h4>
-        {{g.entidade}} {% if g.nome %} - {{g.nome}}{% endif %}{% if g.natureza %} - {{g.natureza}}{% endif %}
-    </h4>
+    <h4>{{g.entidade}} {% if g.nome %} - {{g.nome}}{% endif %}{% if g.natureza %} - {{g.natureza}}{% endif %}</h4>
     {% for r in g.repositorios %}
     <fieldset>
         <legend class="legend_item_titulo">
             <a href="{% url 'admin:repositorio_repositorio_change' r.id %}">
-                {{r.data_ocorrencia}} - {{r.estado}}
+                <span id="span_repositorio_{{r.id}}">{{r.data_ocorrencia}} - {{r.estado}}</span>
             </a>
         </legend>
         <div class="div_item">
