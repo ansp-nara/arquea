@@ -136,9 +136,9 @@ class RepositorioRelatorioTest(TestCase):
          
         # asssert dos dados do relatório
         self.assertContains(response, u'<h4>SAC  - tipo_nome - problema</h4>')
-        self.assertContains(response, u'<legend class="legend_item_titulo">2014-02-14 - </legend>')
+        self.assertContains(response, u'<span id="span_repositorio_1">2014-02-14 - </span>')
         self.assertContains(response, u'<div class="div_item_conteudo">Ocorrência de teste número 1</div>')
-        self.assertContains(response, u'<legend class="legend_item_titulo">2014-02-10 - </legend>')
+        self.assertContains(response, u'<span id="span_repositorio_2">2014-02-10 - </span>')
         self.assertContains(response, u'<div class="div_item_conteudo">Ocorrência de teste número 2</div>')
         self.assertContains(response, u'    servico1')
         self.assertContains(response, u'    servico2')
@@ -166,9 +166,9 @@ class RepositorioRelatorioTest(TestCase):
          
         # asssert dos dados do relatório
         self.assertContains(response, u'<h4>SAC  - tipo_nome - problema</h4>')
-        self.assertNotContains(response, u'<legend class="legend_item_titulo">2014-02-14 - </legend>')
+        self.assertNotContains(response, u'<span id="span_repositorio_1">2014-02-14 - </span>')
         self.assertNotContains(response, u'<div class="div_item_conteudo">Ocorrência de teste número 1</div>')
-        self.assertContains(response, u'<legend class="legend_item_titulo">2014-02-10 - </legend>')
+        self.assertContains(response, u'<span id="span_repositorio_2">2014-02-10 - </span>')
         self.assertContains(response, u'<div class="div_item_conteudo">Ocorrência de teste número 2</div>')
         self.assertContains(response, u'    servico1')
         self.assertContains(response, u'    servico2')
@@ -196,9 +196,9 @@ class RepositorioRelatorioTest(TestCase):
          
         # asssert dos dados do relatório
         self.assertContains(response, u'<h4>DELL  - tipo_nome dell - incidente</h4>')
-        self.assertContains(response, u'<legend class="legend_item_titulo">2014-02-13 - </legend>')
+        self.assertContains(response, u'<span id="span_repositorio_3">2014-02-13 - </span>')
         self.assertContains(response, u'<div class="div_item_conteudo">Ocorrência de teste número 3</div>')
-        self.assertContains(response, u'<legend class="legend_item_titulo">2014-02-11 - </legend>')
+        self.assertContains(response, u'<span id="span_repositorio_4">2014-02-11 - </span>')
         self.assertContains(response, u'<div class="div_item_conteudo">Ocorrência de teste número 4</div>')
         self.assertNotContains(response, u'    servico1')
         self.assertNotContains(response, u'    servico2')
