@@ -24,7 +24,6 @@ from modelsResource import RelatorioPorTipoResource
 from identificacao.models import Entidade, EnderecoDetalhe, Endereco
 from outorga.models import Termo, Natureza_gasto, Item
 from financeiro.models import Pagamento
-from distutils.tests.setuptools_build_ext import if_dl
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
