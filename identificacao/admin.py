@@ -177,7 +177,7 @@ class EnderecoDetalheAdmin(admin.ModelAdmin):
 		 }),
     )
 
-    search_fields = ['', 'endereco__rua', 'detalhe__endereco__entidade__sigla']
+    search_fields = ['endereco__entidade__sigla', 'endereco__rua', 'detalhe__endereco__entidade__sigla']
     
     list_filter = (EnderecoDetalheEntidadeFilter, 'tipo')
 
