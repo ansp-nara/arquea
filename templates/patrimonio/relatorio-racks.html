@@ -149,7 +149,7 @@
                                         {% endfor %}
                                     </div>
                                 {% for eq in rack.equipamentos %}
-                                   <div {% if not eq.flag_traseiro %} style="z-index:10;"{% endif %}>
+                                   <div {% if not eq.flag_traseiro %} style="z-index:100;"{% endif %}>
                                    {% if eq.id %}
                                        <a href="{% url "admin:patrimonio_patrimonio_change" eq.id %}" onclick="return showAddAnotherPopup(this);">
                                    {% endif %}
@@ -242,7 +242,7 @@
                                         {% endfor %}
                                     </div>
                                 {% for eq in rack.equipamentos %}
-                                   <div {% if eq.flag_traseiro %} style="z-index:10;"{% endif %}>
+                                   <div {% if eq.flag_traseiro %} style="z-index:100;"{% endif %}>
                                    {% if eq.id %}
                                        <a href="{% url "admin:patrimonio_patrimonio_change" eq.id %}" onclick="return showAddAnotherPopup(this);">
                                    {% endif %}
