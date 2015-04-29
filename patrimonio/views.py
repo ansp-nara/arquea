@@ -1146,6 +1146,8 @@ def _rack_data(datacenter_id, rack_id):
                         
                         pos = pt.historico_atual_prefetched.posicao_furo - 1
                         
+                        eixoY = pt.eixoy_em_px()
+                        
                         last_equipamento = {'id': pt.id, 'tam': tam, 'eixoY': pt.eixoy_em_px(),
                                                   'tam_u':tamanho,
                                                   'altura':pt.altura_em_px(), 'profundidade':profundidade,
@@ -1155,6 +1157,11 @@ def _rack_data(datacenter_id, rack_id):
                                                   'sn':pt.ns, 'pn':pt.part_number, 'modelo':pt.modelo,
                                                   'nome':pt.apelido, 'descricao':pt.descricao or u'Sem descrição',
                                                   'conflito':False, 'flag_traseiro':pt.is_posicao_traseira()}
+                        
+                        
+
+                        
+                        
                         if pt.is_pdu():
                             # Guardando as calhas de tomadas para apresentar nas laterais do Rack
                             equipamentos_pdu.append(last_equipamento)
@@ -1170,7 +1177,6 @@ def _rack_data(datacenter_id, rack_id):
                             # Adiciona os equipamentos frontais e traseiros. 
                             # O layout deve ser tratado no template
                             equipamentos.append(last_equipamento)
-                            espaco_ocupado += tam
                         
                         # CHECAGEM DE PROBLEMAS
                         if pt.tamanho is None:
@@ -1223,6 +1229,8 @@ def _rack_data(datacenter_id, rack_id):
                             'equipamentos_pdu':equipamentos_pdu,
                             'conflitos':conflitos}
                 
+                    espaco_ocupado = calcula_ocupacao(equipamentos)
+                    
                     # Calculo de uso do rack
                     rack['vazio'] = '%.2f%%' % ((espaco_ocupado * 100.0) / (rack['altura'])) 
                     racks.append(rack)
@@ -1233,6 +1241,40 @@ def _rack_data(datacenter_id, rack_id):
             dcs.append(dc)
     return dcs
     
+    
+def calcula_ocupacao(pts):
+    """
+    Calculo de ocupação do rack
+    """
+    
+    tamanhos = []
+    
+    for pt in pts:
+        atualizou = False
+        for tm in tamanhos:
+            if tm['eixoYMin'] >= pt['eixoY'] and tm['eixoYMin'] <= pt['eixoY'] + pt['tam']:
+                # O ponto inferior está dentro do intervalo de tamanho do equipamento?
+                
+                tm['eixoYMin'] = min(tm['eixoYMin'], pt['eixoY'])
+                tm['eixoYMax'] = max(tm['eixoYMax'], pt['eixoY'] + pt['tam'])
+                atualizou = True
+            
+            elif tm['eixoYMax'] >= pt['eixoY'] and tm['eixoYMax'] <= pt['eixoY'] + pt['tam']:
+                # O ponto inferior está dentro do intervalo de tamanho do equipamento?
+                tm['eixoYMin'] = min(tm['eixoYMin'], pt['eixoY'])
+                tm['eixoYMax'] = max(tm['eixoYMax'], pt['eixoY'] + pt['tam'])
+                atualizou = True
+        
+        if not atualizou:
+            item = {'eixoYMin':pt['eixoY'], 'eixoYMax': pt['eixoY'] + pt['tam'] }
+            tamanhos.append(item)
+
+
+    ocupacao = 0
+    for tm in tamanhos:
+        ocupacao += tm['eixoYMax'] - tm['eixoYMin']
+    
+    return ocupacao
     
 @login_required
 @permission_required('patrimonio.rel_tec_relatorio_rack', raise_exception=True)
