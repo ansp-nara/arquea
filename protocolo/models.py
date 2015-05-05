@@ -10,6 +10,8 @@ from identificacao.models import Identificacao, Entidade
 from outorga.models import Termo
 from django.contrib.auth.models import User
 from django.db.models import Q
+from django.templatetags.static import static
+
 import logging
 
 # Get an instance of a logger
@@ -362,7 +364,7 @@ class Protocolo(models.Model):
 
     # Retorna um ícone se o protocolo tiver arquivos.
     def existe_arquivo(self):
-        a = '<center><a href="/protocolo/arquivo/?protocolo__id__exact=%s"><img src="/media/img/arquivo.png" /></a></center>' % self.id
+        a = '<center><a href="/protocolo/arquivo/?protocolo__id__exact=%s"><img src="%s" /></a></center>' % (self.id, static('img/arquivo.png'))
         if self.arquivo_set.all():
             return a
         else:
