@@ -8,7 +8,7 @@ from django.views.decorators.http import require_safe
 
 import os
 import json as simplejson
-import settings
+from django.conf import settings
 
 from models import *
 from financeiro.models import Pagamento
