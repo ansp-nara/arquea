@@ -3,7 +3,7 @@
 from setuptools import setup, find_packages
 import codecs
 
-version = '2.1.4.dev0'
+version = '2.2'
 
 """
 zest.releaser available commands
@@ -18,13 +18,13 @@ fullrelease: all of the above in order.
 
 """
 
-def read(filename):
-    return unicode(codecs.open(filename, encoding='utf-8').read())
+with open(os.path.join(os.path.dirname(__file__), 'README.rst')) as readme:
+        long_description = readme.read()
 
-long_description = '\n\n'.join([read('README.rst'),])
-                                
+#os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir))
+
 setup(
-        name = 'sistema',
+        name = 'django-sistema',
         version = version,
         description = "Sistema administrativo do ANSP",
         long_description = long_description,
@@ -40,5 +40,17 @@ setup(
         install_requires = [
           'setuptools',
           # -*- Extra requirements: -*-
+          'django<1.8',
+          'django-import-export',
+          'django-tinymce',
+          'django-ckeditor',
+          'django-treemenus',
+          'django-weasyprint',
+          'django-localflavor',
+          'python-dateutil',
+          'python-magic',
+          'pisa',
+          'pyyaml',
         ]
      )
+
