@@ -163,9 +163,6 @@ EMAIL_HOST_PASSWORD='1234'
 EMAIL_USE_TLS=True
 
 
-STATICFILES_DIRS = (
-     '/var/lib/sistema/staticfiles',
-)
 STATIC_ROOT = '/var/www/media/'
 STATIC_URL = '/media/'
 
