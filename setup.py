@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from setuptools import setup, find_packages
-import codecs
+import codecs, os
 
 version = '2.2'
 
@@ -19,10 +19,10 @@ fullrelease: all of the above in order.
 """
 
 with open(os.path.join(os.path.dirname(__file__), 'README.rst')) as readme:
-        long_description = readme.read()
+	long_description = readme.read()
 
 #os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir))
-
+ 
 setup(
         name = 'django-sistema',
         version = version,
@@ -41,16 +41,15 @@ setup(
           'setuptools',
           # -*- Extra requirements: -*-
           'django<1.8',
-          'django-import-export',
+	  'django-import-export',
           'django-tinymce',
           'django-ckeditor',
           'django-treemenus',
-          'django-weasyprint',
+	  'django-weasyprint',
           'django-localflavor',
-          'python-dateutil',
+	  'python-dateutil',
           'python-magic',
           'pisa',
-          'pyyaml',
+	  'pyyaml',
         ]
      )
-

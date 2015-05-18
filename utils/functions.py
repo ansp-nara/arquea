@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import settings
 from datetime import date, timedelta, datetime
 import calendar
 import httplib
