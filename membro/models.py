@@ -66,7 +66,7 @@ class SindicatoArquivo(models.Model):
     O método '__unicode__'    Retorna o nome.
     A 'class Meta'        Define a descrição (singular e plural) do modelo e a ordenação  dos dados pelo nome.
     """
-    membro = models.ForeignKey('membro.Membro', verbose_name=_(u'Membro'))
+    membro = models.ForeignKey('membro.Membro', verbose_name=_(u'Membro'), limit_choices_to=Q(historico__funcionario=True)&Q(historico__termino__isnull=True))
     arquivo = models.FileField(upload_to='membro__sindicatoarquivo', null=True, blank=True)
     ano = models.IntegerField(verbose_name=_(u'Ano'), blank=True, null=True)
 
@@ -539,7 +539,7 @@ class Arquivo(models.Model):
 
 
 class Controle(models.Model):
-    membro = models.ForeignKey('membro.Membro')
+    membro = models.ForeignKey('membro.Membro', verbose_name=_(u'Membro'), limit_choices_to=Q(historico__funcionario=True)&Q(historico__termino__isnull=True))
     entrada = models.DateTimeField()
     saida = models.DateTimeField(null=True, blank=True)
     obs = models.TextField(_(u'Comentários'), blank=True, null=True)
