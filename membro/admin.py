@@ -171,8 +171,28 @@ class DispensaLegalAdmin(admin.ModelAdmin):
 
 admin.site.register(DispensaLegal, DispensaLegalAdmin)
 
+
+class ControleMembroListFilter(admin.SimpleListFilter):
+    """
+    Tela de Controle > Filtro de Membros
+    Filtro somente por membros que têm lançamento de controle de horas.
+    """
+    title = _('membro')
+    parameter_name = 'membro'
+
+    def lookups(self, request, model_admin):
+        membros = set([c.membro for c in model_admin.model.objects.all()])
+        return [(c.id, c.nome) for c in membros]
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(membro__id__exact=self.value())
+        else:
+            return queryset
+            
+            
 class ControleAdmin(admin.ModelAdmin):
-    list_filter = ('membro',)
+    list_filter = (ControleMembroListFilter, )
     form = ControleAdminForms
     
     list_display = ('membro', 'format_entrada', 'format_saida', )
