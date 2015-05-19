@@ -56,7 +56,7 @@
 {% block object-tools %}
 {% if not is_popup %}
     <ul class="object-tools">
-        <li><a id="balloon" href="#" class="helplink">{% trans "Help" %}</a></li>
+        <li class="helplink"><a id="balloon" href="#" class="helplink">{% trans "Help" %}</a></li>
 {% if change %}
     <li><a href="history/" class="historylink">{% trans "History" %}</a></li>
   {% if has_absolute_url %}<li><a href="../../../r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif %}
