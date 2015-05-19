@@ -58,6 +58,22 @@
         border-top:1px darkgray solid;
     }
 </style>
+<script type="text/javascript">
+    $(function() {
+        $(".btn_collapse").click(function() {
+            $(this).hide();
+            $(".btn_expand").show();
+            $('.td_termo').hide();
+            $('.td_tipo').hide();
+        });
+        $(".btn_expand").click(function() {
+            $(this).hide();
+            $(".btn_collapse").show();
+            $('.td_termo').show();
+            $('.td_tipo').show();
+        });
+    });
+</script>
 {% endblock %}
 {% block breadcrumbs %}
     <div class="breadcrumbs">Você está em: 
@@ -74,6 +90,12 @@
             <form action="{% url 'outorga.views.acordo_progressivo' 1 %}" method="GET" id="id_form_recurso_pdf">
                 <div title="Imprimir" class="btn_print">
                    <input type="submit" title="Versão para impressão" class="btn_print" value="" />
+                </div>
+                <div title="Expandir processos" class="btn_expand" style="display:none;">
+                   <input type="button" title="Expandir processos" class="btn_expand" value="" />
+                </div>
+                <div title="Esconder processos" class="btn_collapse">
+                   <input type="button" title="Esconder processos" class="btn_collapse" value="" />
                 </div>
             </form>
         </div>

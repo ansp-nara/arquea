@@ -1096,7 +1096,7 @@ table#change-history tbody th {
 
 
 /* BREADCRUMBS */
-
+#container .breadcrumb,
 #container .breadcrumbs {
     /*background:url(../img/admin/nav-bg-reverse.gif) 0 -10px repeat-x;*/	
 	padding: 5px 0;
@@ -1109,6 +1109,7 @@ table#change-history tbody th {
 	height: 27px;
 }
 
+#container .breadcrumb a,
 #container .breadcrumbs a{
 	font-size:11px;
 	color:#fa6001;
@@ -1321,6 +1322,35 @@ table#change-history tbody th {
     margin: 0 !important;
 }
 
+div.btn_expand input {
+    background:url(../img/admin/expand.png) no-repeat;
+    background-size: contain;
+    cursor:pointer;
+    width: 30px;
+    height: 30px;
+    border: 1px solid #efefef;
+    color: transparent;
+}
+div.btn_expand input[type=button]:active {
+    background:url(../img/admin/expand.png) no-repeat;
+    background-size: contain;
+}
+
+div.btn_collapse input {
+    background:url(../img/admin/collapse.png) no-repeat;
+    background-size: contain;
+    cursor:pointer;
+    width: 30px;
+    height: 30px;
+    border: 1px solid #efefef;
+    color: transparent;
+}
+div.btn_collapse input[type=button]:active {
+    background:url(../img/admin/collapse.png) no-repeat;
+    background-size: contain;
+}
+
+
 div.btn_print input {
     background:url(../img/admin/printer-small.png) no-repeat;
     background-size: contain;
@@ -1334,11 +1364,7 @@ div.btn_print input[type=submit]:active {
     background:url(../img/admin/printer-small.png) no-repeat;
     background-size: contain;
 }
-div.btn_excel input[type=submit]:hover,
-div.btn_print input[type=submit]:hover {
-    border: 1px darkgray solid;
-    border-radius: 4px;
-}
+
 div.btn_excel input {
     background:url(../img/admin/xls_small.png) no-repeat;
     background-size: contain;
@@ -1353,11 +1379,18 @@ div.btn_excel input[type=submit]:active {
     background-size: contain;
 }
 
-div.btn_print {
-    display:inline-block;
+div.btn_expand input[type=submit]:hover,
+div.btn_collapse input[type=submit]:hover,
+div.btn_excel input[type=submit]:hover,
+div.btn_print input[type=submit]:hover {
+    border: 1px darkgray solid;
+    border-radius: 4px;
 }
 
-div.btn_excel {
+div.btn_expand,
+div.btn_collapse,
+div.btn_excel,
+div.btn_print {
     display:inline-block;
 }
 
@@ -1415,12 +1448,7 @@ Modulo do patrimonio
  display:inline;
 
  }
- 
- 
 }
-
-
-
 
 
 #div_filtro {
