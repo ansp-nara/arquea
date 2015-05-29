@@ -189,6 +189,7 @@ img.profundidade_curta {
     line-height:1.5em;
     width: 199px;
     z-index:1;
+    top: 6px;
 }
 .equip.pos_T01,
 .equip.pos_T01 div,
