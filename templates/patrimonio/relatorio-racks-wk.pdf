@@ -186,6 +186,7 @@ img.profundidade_curta {
     line-height:1.5em;
     width: 199px;
     z-index:1;
+    top:2px;
 }
 .equip.pos_T01,
 .equip.pos_T01 div,
@@ -298,7 +299,7 @@ body { font-family: Arial, Verdana, Helvetica, sans-serif; }
 .interno .rack_grid {
     position:absolute;
     width:202px;
-    top:42px;/* ajuste de posicao para o pdf*/
+    /*top:42px; ajuste de posicao para o pdf*/
 }
 .interno .rack_grid .rack_grid_item {
     position:relative;
