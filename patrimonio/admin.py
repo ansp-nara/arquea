@@ -69,7 +69,7 @@ class PatrimonioAdmin(ExportMixin, admin.ModelAdmin):
     readonly_fields = ('marca', 'part_number', 'modelo', 'ean')
     form = PatrimonioAdminForm
     change_list_template = 'admin/patrimonio/patrimonio/change_list.html'
-    list_display = ('tipo', 'descricao', 'complemento', 'posicao', 'agilis', 'modelo', 'ns', 'nf', 'valor', 'checado')
+    list_display = ('tipo', 'descricao', 'complemento', 'posicao', 'agilis', 'modelo', 'ns', 'nf', 'valor', 'estado')
     # list_select_related pode ser somente boolean no 1.5
     if django.VERSION[0:2] >= (1, 6):
         list_select_related = ('tipo', 'equipamento', 'pagamento__protocolo__termo')
