@@ -313,6 +313,12 @@ class Patrimonio(models.Model):
             return True
         return False
 
+    # Retorna o estado atual
+    def estado(self):
+        if not self.historico_atual:
+            return None
+        else: return self.historico_atual.estado
+
     # Define a descrição do modelo.
     class Meta:
         verbose_name = _(u'Patrimônio')
