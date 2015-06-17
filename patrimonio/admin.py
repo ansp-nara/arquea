@@ -5,6 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf.urls import *
 from django.contrib.admin.views.decorators import staff_member_required
 from django.template.response import TemplateResponse
+from django.db.models import Q, F, Prefetch
 from import_export.admin import ExportMixin
 import csv
 
@@ -50,15 +51,18 @@ class PatrimonioEstadoListFilter(admin.SimpleListFilter):
         """
         if self.value() is None:
             return queryset
+        
+        s_value = int(self.value())
+        q = queryset.filter(historicolocal__estado_id = s_value).distinct()
 
         ids = []
-        for p in queryset:
-            if p.historico_atual and p.historico_atual.estado.id == int(self.value()):
+        for p in q.prefetch_related(Prefetch('historicolocal_set')):
+            if p.historico_atual_prefetched and p.historico_atual_prefetched.estado_id == s_value:
                 pass
             else:
                 ids.append(p.id)
 
-        return queryset.exclude(id__in=ids)
+        return q.exclude(id__in=ids)
 
 class HistoricoLocalInline(admin.StackedInline):
     fieldsets = (('', {
