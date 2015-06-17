@@ -48,11 +48,12 @@ class PatrimonioEstadoListFilter(admin.SimpleListFilter):
         provided in the query string and retrievable via
         `self.value()`.
         """
-        # Compare the requested value (either '80s' or '90s')
-        # to decide how to filter the queryset.
+        if self.value() is None:
+            return queryset
+
         ids = []
         for p in queryset:
-            if p.historico_atual and p.historico_atual.estado.id == self.value():
+            if p.historico_atual and p.historico_atual.estado.id == int(self.value()):
                 pass
             else:
                 ids.append(p.id)
