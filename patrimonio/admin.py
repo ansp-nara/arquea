@@ -22,6 +22,42 @@ admin.site.register(UnidadeDimensao)
 admin.site.register(Direcao)
 admin.site.register(TipoEquipamento)
 
+class PatrimonioEstadoListFilter(admin.SimpleListFilter):
+    # Human-readable title which will be displayed in the
+    # right admin sidebar just above the filter options.
+    title = _('Estado')
+
+    # Parameter for the filter that will be used in the URL query.
+    parameter_name = 'estado'
+
+    def lookups(self, request, model_admin):
+        """
+        Returns a list of tuples. The first element in each
+        tuple is the coded value for the option that will
+        appear in the URL query. The second element is the
+        human-readable name for the option that will appear
+        in the right sidebar.
+        """
+        return (
+            (e.id, e.nome) for e in Estado.objects.all()
+        )
+
+    def queryset(self, request, queryset):
+        """
+        Returns the filtered queryset based on the value
+        provided in the query string and retrievable via
+        `self.value()`.
+        """
+        # Compare the requested value (either '80s' or '90s')
+        # to decide how to filter the queryset.
+        ids = []
+        for p in queryset:
+            if p.historico_atual and p.historico_atual.estado.id == self.value():
+                pass
+            else:
+                ids.append(p.id)
+
+        return queryset.exclude(id__in=ids)
 
 class HistoricoLocalInline(admin.StackedInline):
     fieldsets = (('', {
@@ -75,7 +111,7 @@ class PatrimonioAdmin(ExportMixin, admin.ModelAdmin):
         list_select_related = ('tipo', 'equipamento', 'pagamento__protocolo__termo')
     else:
         list_select_related = True
-    list_filter = ('tipo', 'pagamento__protocolo__termo',)
+    list_filter = ('tipo', 'pagamento__protocolo__termo', PatrimonioEstadoListFilter)
     inlines = [HistoricoLocalInline,]
     search_fields = ('descricao', 'ns', 'pagamento__protocolo__num_documento', 'ncm', 'historicolocal__descricao', \
                      'equipamento__entidade_fabricante__sigla', 'equipamento__part_number', 'equipamento__modelo', \
