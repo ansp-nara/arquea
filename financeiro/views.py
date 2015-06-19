@@ -581,8 +581,8 @@ def cheque(request, cc=1):
     if parciais.count() > 0:
         for p in parciais:
             pp = p.__unicode__()
-            name = pp.split('-')[-1]
-            name = name.split('ID')[0]
+            name = pp.split(' - ')[-1]
+            name = name.split('ID:')[0]
             pps.append(name)
     else:
         name = ''
