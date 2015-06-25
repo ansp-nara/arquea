@@ -117,7 +117,7 @@ class PatrimonioAdmin(ExportMixin, admin.ModelAdmin):
         list_select_related = True
     list_filter = ('tipo', 'pagamento__protocolo__termo', PatrimonioEstadoListFilter)
     inlines = [HistoricoLocalInline,]
-    search_fields = ('descricao', 'ns', 'pagamento__protocolo__num_documento', 'ncm', 'historicolocal__descricao', \
+    search_fields = ('descricao', 'ns', 'pagamento__protocolo__num_documento', 'historicolocal__descricao', \
                      'equipamento__entidade_fabricante__sigla', 'equipamento__part_number', 'equipamento__modelo', \
                      'historicolocal__posicao', 'apelido')
     actions = ['action_mark_agilis', 'action_unmark_agilis', 'action_mark_checado', 'action_clone']
