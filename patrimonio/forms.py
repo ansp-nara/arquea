@@ -246,7 +246,8 @@ class PatrimonioAdminForm(forms.ModelForm):
                 self.fields['filtro_equipamento'].widget = widget=forms.TextInput(attrs={'onkeydown':'if (event.keyCode == 13) {$(\'#id_equipamento\').focus(); return false;}','onchange': 'ajax_filter_equipamento(this.value, "%s", "%s");'%(instance.id, instance.equipamento.id)})
             else:
                 self.fields['filtro_equipamento'].widget = widget=forms.TextInput(attrs={'onkeydown':'if (event.keyCode == 13) {$(\'#id_equipamento\').focus(); return false;}','onchange': 'ajax_filter_equipamento(this.value, "%s");'%(instance.id)})
-                
+        else:
+            self.fields['filtro_equipamento'].widget = widget=forms.TextInput(attrs={'onkeydown':'if (event.keyCode == 13) {$(\'#id_equipamento\').focus(); return false;}','onchange': 'ajax_filter_equipamento(this.value, "");'})
                 
     class Meta:
         model = Patrimonio
