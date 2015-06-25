@@ -120,9 +120,6 @@ class Patrimonio(models.Model):
     revision = models.CharField(u'Revision', null=True, blank=True, max_length=30)
     version = models.CharField(u'Version', null=True, blank=True, max_length=30)
 
-    ncm = models.CharField(u'NCM/SH', null=True, blank=True, max_length=30)
-    ocst = models.CharField(u'O/CST', null=True, blank=True, max_length=30)
-    cfop = models.CharField(u'CFOP', null=True, blank=True, max_length=30)
     garantia_termino = NARADateField(_(u'Data de término da garantia'), null=True, blank=True)
 
     def __unicode__(self):
@@ -196,14 +193,7 @@ class Patrimonio(models.Model):
         if self.equipamento_id:
             retorno = self.equipamento.part_number
         return retorno
- 
-    @property
-    def ean(self):
-        retorno = ''
-        if self.equipamento_id:
-            retorno = self.equipamento.ean
-        return retorno
-     
+
     @cached_property
     def historico_atual(self):
         ht = self.historicolocal_set.order_by('-data', '-id')
@@ -561,8 +551,6 @@ class Equipamento(models.Model):
     entidade_fabricante = models.ForeignKey('identificacao.Entidade', verbose_name=_(u'Marca/Editora'), null=True, blank=True, help_text=u"Representa a Entidade que fabrica este equipamento.")
     
     modelo = models.CharField(null=True, blank=True, max_length=100)
-    ncm = models.CharField(u'NCM/SH', null=True, blank=True, max_length=30)
-    ean = models.CharField(u'EAN', max_length=45, null=True, blank=True)
     tamanho = models.DecimalField(u'Tamanho (em U)', max_digits=5, decimal_places=2, null=True, blank=True)
     dimensao = models.ForeignKey('patrimonio.Dimensao', null=True, blank=True)
     especificacao = models.FileField(u'Especificação', upload_to='patrimonio', null=True, blank=True)

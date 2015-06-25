@@ -88,11 +88,10 @@ class PatrimonioAdmin(ExportMixin, admin.ModelAdmin):
                       'fields': (('agilis', 'checado',),
                                  ('tipo', 'apelido', 'tem_numero_fmusp', 'numero_fmusp'), 
                                  ('filtro_equipamento', 'equipamento',),
-                                 ('marca', 'part_number', 'modelo', 'ean',),
+                                 ('marca', 'part_number', 'modelo',),
                                  'ns', 
-                                 ('ncm', 'ocst', 'cfop', ),
-                                 'descricao', 
-                                 ('complemento', 'tamanho'),  
+                                 'descricao',
+                                 ('complemento', 'tamanho',),
                                  ('entidade_procedencia',),
                                  ('nf', 'patrimonio'), 
                                 )
@@ -107,7 +106,7 @@ class PatrimonioAdmin(ExportMixin, admin.ModelAdmin):
                  }),
     )
     
-    readonly_fields = ('marca', 'part_number', 'modelo', 'ean')
+    readonly_fields = ('marca', 'part_number', 'modelo')
     form = PatrimonioAdminForm
     change_list_template = 'admin/patrimonio/patrimonio/change_list.html'
     list_display = ('tipo', 'descricao', 'complemento', 'posicao', 'agilis', 'modelo', 'ns', 'nf', 'valor', 'estado')
@@ -160,13 +159,6 @@ class PatrimonioAdmin(ExportMixin, admin.ModelAdmin):
             
         return mark_safe("<span id='id_part_number' class='input_readonly'>"+part_number+"</span>")
 
-    def ean(self, instance):
-        ean = ''
-        if instance != None and instance.equipamento != None:
-            ean = instance.equipamento.ean
-            
-        return mark_safe("<span id='id_ean' class='input_readonly'>"+ean+"</span>")
-        
     def action_clone(self, request, queryset):
         objs = clone_objects(queryset)
         total = queryset.count()
@@ -270,7 +262,7 @@ class DimensaoAdmin(admin.ModelAdmin):
 			'classes': ('wide',)
 			}
 		),
-		)
+	)
 
 admin.site.register(Dimensao, DimensaoAdmin)
 
