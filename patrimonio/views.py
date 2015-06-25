@@ -165,8 +165,6 @@ def ajax_escolhe_equipamento(request):
                             | Q(entidade_fabricante__sigla__icontains=filtro)\
                             | Q(entidade_fabricante__nome__icontains=filtro)\
                             | Q(modelo__icontains=filtro)\
-                            | Q(ncm__icontains=filtro)\
-                            | Q(ean__icontains=filtro)\
                             | Q(titulo_autor__icontains=filtro)\
                             | Q(isbn__icontains=filtro))] \
                or [{"pk":"0", "valor":"Nenhum registro"}]
@@ -224,7 +222,6 @@ def ajax_get_equipamento(request):
                 'modelo':p.modelo,
                 'part_number':p.part_number,
                 'marca':marca,
-                'ean':p.ean,
               }
     
     retorno_json = json.dumps(retorno)

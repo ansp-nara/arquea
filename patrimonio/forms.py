@@ -251,7 +251,7 @@ class PatrimonioAdminForm(forms.ModelForm):
     class Meta:
         model = Patrimonio
         fields = ['termo', 'npgto', 'pagamento', 'valor', 'agilis', 'checado','tipo', 'apelido', 'tem_numero_fmusp', 'numero_fmusp', \
-                  'filtro_equipamento', 'equipamento', 'ns', 'ncm', 'ocst', 'cfop', \
+                  'filtro_equipamento', 'equipamento', 'ns', \
                   'descricao', 'complemento', 'tamanho', 'entidade_procedencia', 'nf', 'patrimonio', 'obs', 'titulo_autor', 'isbn', \
                   'revision', 'version', 'garantia_termino', 'form_filhos',]
 
