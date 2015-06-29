@@ -48,7 +48,6 @@ body.loading .modal {
  #table-data .td_part_number,
  #table-data .td_modelo,
  #table-data .td_marca,
- #table-data .td_ncm,
  #table-data .td_tamanho
   {
     display:none;
@@ -126,9 +125,6 @@ $(document).ready(function() {
            {% if atributo == 'marca' %}
            <th width="40%" class="td_marca">Marca</th>
            {% endif %}
-           {% if atributo == 'ncm' %}
-           <th width="40%" class="td_ncm">NCM</th>
-           {% endif %}
            {% if atributo == 'tamanho' %}
            <th width="40%" class="td_tamanho">Tamanho</th>
            {% endif %}
@@ -145,9 +141,6 @@ $(document).ready(function() {
            {% endif %}
            {% if atributo == 'marca' %}
            <th width="40%" class="td_marca">Marca</th>
-           {% endif %}
-           {% if atributo == 'ncm' %}
-           <th width="40%" class="td_ncm">NCM</th>
            {% endif %}
            {% if atributo == 'tamanho' %}
            <th width="40%" class="td_tamanho">Tamanho</th>

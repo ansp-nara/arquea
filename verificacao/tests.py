@@ -88,16 +88,16 @@ class TestPatrimonioComEquipamenpoVazio(TestCase):
     Testa patrimonio e equipamentos com tamanhos diferente
     """
     def test_tamanho_diferente(self):
-            eq1 = Equipamento.objects.create(id=1, part_number="", modelo="", descricao="", ncm="n1", tamanho=1.0) 
-            eq2 = Equipamento.objects.create(id=2, part_number="", modelo="", descricao="", ncm="") 
-            eq3 = Equipamento.objects.create(id=3, part_number="", modelo="", descricao="", ncm="n3", tamanho=1.0) 
+            eq1 = Equipamento.objects.create(id=1, part_number="", modelo="", descricao="", tamanho=1.0) 
+            eq2 = Equipamento.objects.create(id=2, part_number="", modelo="", descricao="") 
+            eq3 = Equipamento.objects.create(id=3, part_number="", modelo="", descricao="", tamanho=1.0) 
         
             tipo1 = Tipo.objects.create(nome = 'tipo1')
             tipo2 = Tipo.objects.create(nome = 'tipo2')
         
-            patr1 = Patrimonio.objects.create(part_number="pt1", modelo="pt1", descricao="pt1", ncm="n1", tamanho=1.0,  tipo=tipo1, equipamento=eq1, checado=True)
-            patr2 = Patrimonio.objects.create(part_number="pt2", modelo="pt2", descricao="pt2", ncm="", tipo=tipo1, equipamento=eq2, checado=True)
-            patr3 = Patrimonio.objects.create(part_number="pt3", modelo="pt3", descricao="pt3", ncm="n1111", tamanho=11.0, tipo=tipo2, equipamento=eq3, checado=True)
+            patr1 = Patrimonio.objects.create(part_number="pt1", modelo="pt1", descricao="pt1", tamanho=1.0,  tipo=tipo1, equipamento=eq1, checado=True)
+            patr2 = Patrimonio.objects.create(part_number="pt2", modelo="pt2", descricao="pt2", tipo=tipo1, equipamento=eq2, checado=True)
+            patr3 = Patrimonio.objects.create(part_number="pt3", modelo="pt3", descricao="pt3", tamanho=11.0, tipo=tipo2, equipamento=eq3, checado=True)
             
             verficacao = VerificacaoPatrimonioEquipamento()
             retorno = verficacao.tamanhoDiferente()
@@ -124,9 +124,9 @@ class TestPatrimonioComEquipamenpoVazio(TestCase):
     Testa a copia de atributos entre patrimonio e equipamento
     """
     def test_copy_attribute__equipamento__descricao(self):
-            eq1 = Equipamento.objects.create(id=1, part_number="", modelo="", descricao="", ncm="") 
+            eq1 = Equipamento.objects.create(id=1, part_number="", modelo="", descricao="") 
             tipo = Tipo.objects.create()
-            patr = Patrimonio.objects.create(id = 2, part_number="part_number1", modelo="modelo1", descricao="descricao1", ncm="ncm1", tipo=tipo, equipamento=eq1, checado=True)
+            patr = Patrimonio.objects.create(id = 2, part_number="part_number1", modelo="modelo1", descricao="descricao1", tipo=tipo, equipamento=eq1, checado=True)
             
             # verifica se o valor do atributo está diferente ANTES do teste
             self.assertNotEqual(patr.descricao, patr.equipamento.descricao)
@@ -144,9 +144,9 @@ class TestPatrimonioComEquipamenpoVazio(TestCase):
     Testa a copia de atributos entre equipamento e patrimonio
     """
     def test_copy_attribute__patrimonio__descricao(self):
-            eq1 = Equipamento.objects.create(id=1, part_number="part_number1", modelo="modelo1", descricao="descricao1", ncm="ncm1") 
+            eq1 = Equipamento.objects.create(id=1, part_number="part_number1", modelo="modelo1", descricao="descricao1") 
             tipo = Tipo.objects.create()
-            patr = Patrimonio.objects.create(id = 2, part_number="", modelo="", descricao="", ncm="", tipo=tipo, equipamento=eq1, checado=False)
+            patr = Patrimonio.objects.create(id = 2, part_number="", modelo="", descricao="", tipo=tipo, equipamento=eq1, checado=False)
             
             # verifica se o valor do atributo está diferente ANTES do teste
             self.assertNotEqual(patr.descricao, patr.equipamento.descricao)
