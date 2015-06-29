@@ -213,9 +213,6 @@ class VerificacaoPatrimonioEquipamento():
             elif att_name == 'marca':
                 patr.marca = eq.marca
                 patr.save()
-            elif att_name == 'ncm':
-                patr.ncm = eq.ncm
-                patr.save()
             elif att_name == 'part_number':
                 patr.part_number = eq.part_number
                 patr.save()
@@ -237,9 +234,6 @@ class VerificacaoPatrimonioEquipamento():
                 eq.save()
             elif att_name == 'marca':
                 eq.marca = patr.marca
-                eq.save()
-            elif att_name == 'ncm':
-                eq.ncm = patr.ncm
                 eq.save()
             elif att_name == 'part_number':
                 eq.part_number = patr.part_number

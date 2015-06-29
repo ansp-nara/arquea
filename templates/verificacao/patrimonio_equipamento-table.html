@@ -14,9 +14,6 @@
            {% if atributo == 'marca' %}
                <td class="td_marca"><a href="{{ model.admin_url }}/admin/patrimonio/patrimonio/{{ pt.id }}/">{{ pt.marca }}</a></td>
            {% endif %}
-           {% if atributo == 'ncm' %}
-               <td class="td_ncm"><a href="{{ model.admin_url }}/admin/patrimonio/patrimonio/{{ pt.id }}/">{{ pt.ncm }}</a></td>
-           {% endif %}
            {% if atributo == 'tamanho' %}
                <td class="td_tamanho"><a href="{{ model.admin_url }}/admin/patrimonio/patrimonio/{{ pt.id }}/">{{ pt.tamanho }}</a></td>
            {% endif %}
@@ -38,9 +35,6 @@
            {% endif %}
            {% if atributo == 'marca' %}
                <td class="td_marca"><a href="{{ model.admin_url }}/admin/patrimonio/equipamento/{{ pt.equipamento.id }}/">{{ pt.equipamento.entidade_fabricante.sigla }}</a></td>
-           {% endif %}
-           {% if atributo == 'ncm' %}
-               <td class="td_ncm"><a href="{{ model.admin_url }}/admin/patrimonio/equipamento/{{ pt.equipamento.id }}/">{{ pt.equipamento.ncm }}</a></td>
            {% endif %}
            {% if atributo == 'tamanho' %}
                <td class="td_tamanho"><a href="{{ model.admin_url }}/admin/patrimonio/equipamento/{{ pt.equipamento.id }}/">{{ pt.equipamento.tamanho }}</a></td>

@@ -171,10 +171,6 @@ def checkPatrimonio():
             else:
                 if patrimonios[0].ns != item.nota_fiscal:
                     print 'Patrimonio com Nota fiscal diferente: ' + str(item.serial_number) +' <' + str(patrimonios[0].ns) + "> <" + str(item.nota_fiscal) + ">"
-                if patrimonios[0].ncm != item.ncm_sh:
-                    print 'Patrimonio com NCM diferente: ' + str(item.serial_number) +' <' + str(patrimonios[0].ncm) + "> <" + str(item.ncm_sh) + ">"
-                if patrimonios[0].ean != item.ean:
-                    print 'Patrimonio com EAN diferente: ' + str(item.serial_number) +' <' + str(patrimonios[0].ean) + "> <" + str(item.ean) + ">"
     
     print 'Patrimonio->part_number não encontrados: ' + str(count) + '/' + str(Carga_inventario.objects.count());
  

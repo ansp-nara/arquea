@@ -267,29 +267,6 @@ def patrimonio_equipamento_modelo_diferente(request):
                               {'desc':'Patrimonio e Equipamento com Modelo diferente', 'patrimonios':retorno, 'atributo':'modelo', 'filtros':filtros_saida})
 
 
-@login_required
-def patrimonio_equipamento_ncm_diferente(request):
-    ajax = request.GET.get('ajax')
-    filtros_entrada = {'filtro_tipo_patrimonio':request.GET.get('filtro_tipo_patrimonio')}
-    
-    retorno = []
-    verficacao = VerificacaoPatrimonioEquipamento()
-    retorno = verficacao.ncmDiferente(filtros_entrada)
-    
-
-    filtros_saida = []
-    if len(retorno) > 0:
-        filtros_saida = {"tipos":verficacao.listaFiltroTipoPatrimonio(verficacao.ncmDiferente()[0])}
-
-    
-    if ajax:
-        return render(request, 'verificacao/patrimonio_equipamento-table.html', 
-                              {'desc':'Patrimonio e Equipamento com NCM diferente', 'patrimonios':retorno, 'atributo':'ncm', 'filtros':filtros_saida})
-    else:    
-        return render(request, 'verificacao/patrimonio_equipamento.html', 
-                              {'desc':'Patrimonio e Equipamento com NCM diferente', 'patrimonios':retorno, 'atributo':'ncm', 'filtros':filtros_saida})
-
-
 
 @login_required
 def patrimonio_equipamento_tamanho_diferente(request):
@@ -331,8 +308,6 @@ def copy_attribute_to_patrimonio(request):
         return patrimonio_equipamento_modelo_diferente(request)
     elif att_name == 'marca':
         return patrimonio_equipamento_marca_diferente(request)
-    elif att_name == 'ncm':
-        return patrimonio_equipamento_ncm_diferente(request)
     elif att_name == 'part_number':
         return patrimonio_equipamento_part_number_diferente(request)
     elif att_name == 'tamanho':

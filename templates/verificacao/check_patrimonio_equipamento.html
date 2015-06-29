@@ -88,8 +88,6 @@ $(function(){
     <option value="pn">Part Number</option>
     <option value="descricao">Descrição</option>
     
-    <option value="ncm">NCM</option>
-    <option value="ean">EAN</option>
     <option value="tamanho">Tamanho</option>
 </select>
 <button>Esconder colunas</button>
@@ -102,16 +100,12 @@ $(function(){
         <th class="td_modelo">Patr. Modelo</th>
         <th class="td_pn">Patr. Part Number</th>
         <th class="td_descricao">Patr. Descrição</th>
-        <th class="td_ncm">Patr. NCM</th>
-        <th class="td_ean">Patr. EAN</th>
         <th class="td_tamanho">Patr. Tamanho</th>
         <th></th>
         <th class="td_marca">Eq. Marca</th>
         <th class="td_modelo">Eq. Modelo</th>
         <th class="td_pn">Eq. Part Number</th>
         <th class="td_descricao">Eq. Descrição</th>
-        <th class="td_ncm">Eq. NCM</th>
-        <th class="td_ean">Eq. EAN</th>
         <th class="td_tamanho">Eq. Tamanho</th>
     </tr>
     {% for p in patrimonios %}
@@ -120,8 +114,6 @@ $(function(){
 	       <td id="{{ p.id }}" class="patr td_modelo {% if p.equipamento and p.equipamento.modelo|default:"" == p.modelo|default:"" %} ok {% else %} nok {% endif %}">{{ p.modelo }}</td>
 	       <td id="{{ p.id }}" class="patr td_pn {% if p.equipamento and p.equipamento.part_number|default:"" == p.part_number|default:"" %} ok {% else %} nok {% endif %}">{{ p.part_number }}</td>
            <td id="{{ p.id }}" class="patr td_descricao {% if p.equipamento and p.equipamento.descricao|default:"" == p.descricao|default:"" %} ok {% else %} nok {% endif %}">{{p.descricao|default:"" }}</td>
-           <td id="{{ p.id }}" class="patr td_ncm {% if p.equipamento and p.equipamento.ncm|default:"" == p.ncm|default:"" %} ok {% else %} nok {% endif %}">{{p.ncm|default:"" }}</td>
-           <td id="{{ p.id }}" class="patr td_ean {% if p.equipamento and p.equipamento.ean|default:"" == p.ean|default:"" %} ok {% else %} nok {% endif %}">{{p.ean|default:"" }}</td>
            <td id="{{ p.id }}" class="patr td_tamanho {% if p.equipamento and p.equipamento.tamanho|default:"" == p.tamanho|default:"" %} ok {% else %} nok {% endif %}">{{p.tamanho|default:"" }}</td>
            
            <td></td>   
@@ -129,8 +121,6 @@ $(function(){
            <td id="{{ p.equipamento.id }}" class="equip td_modelo {% if p.equipamento and p.equipamento.modelo|default:"" == p.modelo|default:"" %} ok {% else %} nok {% endif %}">{{ p.equipamento.modelo }}</td>
            <td id="{{ p.equipamento.id }}" class="equip td_pn {% if p.equipamento and p.equipamento.part_number|default:"" == p.part_number|default:"" %} ok {% else %} nok {% endif %}">{{ p.equipamento.part_number }}</td>
            <td id="{{ p.equipamento.id }}" class="equip td_descricao {% if p.equipamento and p.equipamento.descricao|default:"" == p.descricao|default:"" %} ok {% else %} nok {% endif %}">{{p.equipamento.descricao|default:"" }}</td>
-           <td id="{{ p.equipamento.id }}" class="equip td_ncm {% if p.equipamento and p.equipamento.ncm|default:"" == p.ncm|default:"" %} ok {% else %} nok {% endif %}">{{p.equipamento.ncm|default:"" }}</td>
-           <td id="{{ p.equipamento.id }}" class="equip td_ean {% if p.equipamento and p.equipamento.ean|default:"" == p.ean|default:"" %} ok {% else %} nok {% endif %}">{{p.equipamento.ean|default:"" }}</td>
            <td id="{{ p.equipamento.id }}" class="equip td_tamanho {% if p.equipamento and p.equipamento.tamanho|default:"" == p.tamanho|default:"" %} ok {% else %} nok {% endif %}">{{p.equipamento.tamanho|default:"" }}</td>
            
 	    </tr>
