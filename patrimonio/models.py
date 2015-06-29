@@ -207,9 +207,9 @@ class Patrimonio(models.Model):
         Em caso de dúvida, ou se não for utilizado o prefetch, utilizar o método historico_atual, pois 
         o tempo de execução deste método será o dobro do normal.
         
-        Exemplo de utilização, com select_related:
+        Exemplo de utilização, com prefetch_related:
             from django.db.models import Prefetch
-            Patrimonio.objects.all().prefetch_related(Prefetch('historicolocal_set', queryset=HistoricoLocal.objects.select_related('estado')))
+            Patrimonio.objects.all().prefetch_related(Prefetch('historicolocal_set', queryset=HistoricoLocal.objects.select_related('k')))
         """
         #ht = self.historicolocal_set.order_by('-data', '-id')
         ht = sorted(self.historicolocal_set.all(), key=lambda x: x.id, reverse=True)

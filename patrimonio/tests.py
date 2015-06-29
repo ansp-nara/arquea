@@ -234,8 +234,7 @@ class PatrimonioTest(TestCase):
         tipoEquipamento = TipoEquipamento.objects.create(nome="Rack")
         entidade_fabricante = Entidade.objects.create(sigla='DELL', nome='Dell', cnpj='00.000.000/0000-00', fisco=True, url='')
         entidade_procedencia = Entidade.objects.create(sigla='PROC', nome='Entidade_Procedencia', cnpj='00.000.000/0000-00', fisco=True, url='')
-        equipamento = Equipamento.objects.create(tipo=tipoEquipamento, part_number="PN001", modelo="MODEL001", ncm="NCM001", \
-                                                 ean="EAN001", entidade_fabricante=entidade_fabricante)
+        equipamento = Equipamento.objects.create(tipo=tipoEquipamento, part_number="PN001", modelo="MODEL001", entidade_fabricante=entidade_fabricante)
         
         rt = Patrimonio.objects.create(equipamento=equipamento, ns='AF345678GB3489X', modelo='NetIron400', tipo=tipoPatr, \
                                        apelido="NetIron400", checado=True, entidade_procedencia=entidade_procedencia)
@@ -316,16 +315,6 @@ class PatrimonioTest(TestCase):
         patr = Patrimonio.objects.get(ns='AF345678GB3489X')
         patr.equipamento = None
         self.assertEquals('', patr.part_number)
-
-    def test_ean(self):
-        patr = Patrimonio.objects.get(ns='AF345678GB3489X')
-        ean = patr.ean
-        self.assertEquals('EAN001', ean)
-
-    def test_ean_vazio(self):
-        patr = Patrimonio.objects.get(ns='AF345678GB3489X')
-        patr.equipamento = None
-        self.assertEquals('', patr.ean)
 
     def test_procedencia(self):
         patr = Patrimonio.objects.get(ns='AF345678GB3489X')
@@ -445,8 +434,8 @@ class ViewTest(TestCase):
 
         tipoEquipamento = TipoEquipamento.objects.create(nome="Rack")
         entidade_fabricante = Entidade.objects.create(sigla='DELL', nome='Dell', cnpj='00.000.000/0000-00', fisco=True, url='')
-        equipamento = Equipamento.objects.create(tipo=tipoEquipamento, part_number="PN001", modelo="MODEL001", ncm="NCM001", \
-                                                 ean="EAN001", entidade_fabricante=entidade_fabricante, descricao="equipamento_descricao")
+        equipamento = Equipamento.objects.create(tipo=tipoEquipamento, part_number="PN001", modelo="MODEL001", \
+                                                 entidade_fabricante=entidade_fabricante, descricao="equipamento_descricao")
         
         tipoPatr = Tipo.objects.create(id=1, nome="TIPO")
         entidade_procedencia = Entidade.objects.create(sigla='PROC', nome='Entidade_Procedencia', cnpj='00.000.000/0000-00', fisco=True, url='')
