@@ -14,6 +14,7 @@ from modelsResource import *
 from forms import *
 from utils.admin import AdminImageWidget
 from utils.functions import clone_objects
+from utils.admin import RelatedOnlyFieldListFilter
 
 admin.site.register(Estado)
 admin.site.register(Tipo)
@@ -224,6 +225,7 @@ admin.site.register(HistoricoLocal, HistoricoLocalAdmin)
 class EquipamentoAdmin(admin.ModelAdmin):
     search_fields = ['part_number', 'descricao']
     list_display = ('descricao', 'part_number', 'tipo')
+    list_filter = (('tipo', RelatedOnlyFieldListFilter), )
     
     form = EquipamentoAdminForm
     
