@@ -119,3 +119,34 @@ class AdminImageWidget(AdminFileWidget):
         output.append(super(AdminFileWidget, self).render(name, value, attrs))
         return mark_safe(u''.join(output))
 
+
+from django.contrib.admin import RelatedFieldListFilter
+
+class RelatedOnlyFieldListFilter(RelatedFieldListFilter):
+    """
+    
+    Filtro reutilizável para o admin list_filter.
+    OBS: - Não funciona para subatributos, ex: user__name
+         - A ordenação deve estar especificada no Meta do Model
+    
+    Usage:
+        class MyAdmin(admin.ModelAdmin):
+            list_filter = (
+                ('user', RelatedOnlyFieldListFilter),
+                ('category', RelatedOnlyFieldListFilter),
+                # ...
+            )
+        
+    Ref: 
+        http://stackoverflow.com/questions/12215751/can-i-make-list-filter-in-django-admin-to-only-show-referenced-foreignkeys
+    
+    """
+    def __init__(self, field, request, params, model, model_admin, field_path):
+        super(RelatedOnlyFieldListFilter, self).__init__(
+            field, request, params, model, model_admin, field_path)
+        qs = field.related_field.model.objects.filter(
+            id__in=model_admin.get_queryset(request).values_list(
+                field.name, flat=True).distinct())
+        self.lookup_choices = [(each.id, unicode(each)) for each in qs]
+
+
