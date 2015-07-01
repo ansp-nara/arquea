@@ -137,7 +137,7 @@
     right: 0;
     /*z-index: 1000;*/
 	float:right;
-    width: 160px;
+    min-width: 160px;
     background: #efefef;
     margin: 0;
 	padding:10px;
