@@ -262,6 +262,11 @@ class Estado(models.Model):
     
     def __unicode__(self):
         return self.nome
+    
+    class Meta:
+        ordering = ('nome',)
+
+
 
 def ultimaparcial():
     from outorga.models import Termo

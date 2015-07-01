@@ -4,6 +4,7 @@ from financeiro.models import *
 from financeiro.forms import *
 from django.contrib import admin
 from utils.admin import PrintModelAdmin
+from utils.admin import RelatedOnlyFieldListFilter
 from rede.models import Recurso
 
 class RecursoInline(admin.StackedInline):
@@ -68,6 +69,10 @@ class ExtratoFinanceiroAdmin(admin.ModelAdmin):
     search_fields = ('historico',)
     form = ExtratoFinanceiroAdminForm
     
+
+
+
+
 class PagamentoAdmin(PrintModelAdmin):
     
     fieldsets = (
@@ -136,6 +141,9 @@ class AuditoriaAdmin(admin.ModelAdmin):
         list_select_related = True
 
     search_fields = ('parcial', 'pagina')
+    list_filter = (('tipo', RelatedOnlyFieldListFilter), 
+                   ('estado', RelatedOnlyFieldListFilter),
+                   )
     form = AuditoriaAdminForm
 
     def get_queryset(self, request):
