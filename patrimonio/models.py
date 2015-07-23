@@ -53,6 +53,10 @@ class Estado(models.Model):
 
 
 class Tipo(models.Model):
+    
+    # Declaração de variáveis estáticas
+    CONSIGNADO = 23
+
 
     """
     Uma instância dessa classe é um tipo de licença (ex. Free).

@@ -333,13 +333,28 @@ def por_estado(request):
 @login_required
 @permission_required('patrimonio.rel_tec_por_tipo', raise_exception=True)
 @require_safe
-def por_tipo(request):
+def por_tipo_consignado(request):
+    """
+     Relatório Técnico - Relatório de Patrimônio por tipo - Filtro por tipo Consignado.
+    
+    """
+    return por_tipo(request, Tipo.CONSIGNADO)
+
+
+@login_required
+@permission_required('patrimonio.rel_tec_por_tipo', raise_exception=True)
+@require_safe
+def por_tipo(request, param_tipo_id=None):
     """
      Relatório Técnico - Relatório de Patrimônio por tipo.
     
     """
-    if request.method == 'GET' and request.GET.get('tipo'):
-        tipo_id = request.GET.get('tipo')
+    if param_tipo_id or (request.method == 'GET' and request.GET.get('tipo')):
+        if param_tipo_id:
+            tipo_id = param_tipo_id
+        else:
+            tipo_id = request.GET.get('tipo')
+            
         tipo = get_object_or_404(Tipo, pk=tipo_id)
         
         procedencia = ''
@@ -368,9 +383,14 @@ def por_tipo(request):
     
             return response
         else:
-
+            
             # Listas para remontar o filtro de Tipos e o filtro e Procedencias
-            tipos = Tipo.objects.all()
+            if param_tipo_id:
+                # Se receber o tipo como parametro, não enviar a lista de filtro de tipos. 
+                tipos = []
+            else:
+                tipos = Tipo.objects.all()
+                
             entidades_ids = Patrimonio.objects.filter(tipo=tipo_id).order_by('tipo').values_list('entidade_procedencia', flat=True).distinct()
             procedencias = Entidade.objects.filter(id__in=entidades_ids)
         
@@ -1600,6 +1620,5 @@ def planta_baixa_edit(request):
     else:
         
         return render_to_response('patrimonio/planta_baixa_racks.html', context, RequestContext(request, context))
-
 
 

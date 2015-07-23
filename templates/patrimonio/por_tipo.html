@@ -20,12 +20,14 @@ td a { line-height: normal; }
 <h4>Patrimonios do tipo {{ tipo }}</h4>
 <form id="filtro" method="GET">
 	<p>
-		<label for="id_tipo">Tipo</label>:
-		<select name="tipo" id="id_tipo" onchange="ajax_get_procedencia_filter_tipo(this.value)">
-			{% for t in tipos %}
-		    	<option value="{{ t.id }}" {% if t.id == tipo.id %}selected{% endif %}>{{ t }}</option>
-			{% endfor %}
-		</select>
+        {% if tipos %}
+    		<label for="id_tipo">Tipo</label>:
+    		<select name="tipo" id="id_tipo" onchange="ajax_get_procedencia_filter_tipo(this.value)">
+    			{% for t in tipos %}
+    		    	<option value="{{ t.id }}" {% if t.id == tipo.id %}selected{% endif %}>{{ t }}</option>
+    			{% endfor %}
+    		</select>
+        {% endif %}
 		<label for="id_procedencia">Procedencia</label>:
 		<select name="procedencia" id="id_procedencia">
 		    <option value="">Todos</option>
