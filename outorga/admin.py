@@ -8,6 +8,7 @@ from django.template.response import TemplateResponse
 from rede.models import PlanejaAquisicaoRecurso
 from outorga.models import OrdemDeServico, Contrato, Termo, Outorga, Modalidade, Estado, Natureza_gasto, Item, Categoria, Arquivo, Acordo, OrigemFapesp, ArquivoOS, TipoContrato, EstadoOS
 from outorga.forms import *
+from utils.admin import RelatedOnlyFieldListFilter
 
 class Natureza_gastoInline(admin.TabularInline):
     model = Natureza_gasto
@@ -177,10 +178,10 @@ class ModalidadeAdmin(admin.ModelAdmin):
 
     list_display_links = ('sigla', 'nome', )
 
-    search_fields = ('sigla', 'nome')
-
     list_per_page = 10
     
+    search_fields = ('sigla', 'nome')
+
     form = ModalidadeAdminForm
 
 admin.site.register(Modalidade, ModalidadeAdmin)
@@ -188,7 +189,6 @@ admin.site.register(Modalidade, ModalidadeAdmin)
 
 
 class TermoAdmin(admin.ModelAdmin):
-
     """
     Permite consulta por:	'ano' e 'processo' do Termo,
 				'nome' do Outorgado,
@@ -202,14 +202,13 @@ class TermoAdmin(admin.ModelAdmin):
                  }),
     )
 
-    #list_display = ('__unicode__', 'inicio', 'duracao_meses', 'termo_real', 'termo_dolar', 'formata_realizado_dolar', 'estado')
-
     list_display = ('__unicode__', 'inicio', 'duracao_meses', 'termo_real', 'formata_realizado_real', 'formata_saldo_real', 'termo_dolar', 'formata_realizado_dolar', 'formata_saldo_dolar', 'estado')
-    inlines = (OutorgaInline, Natureza_gastoInline)
+
+    list_per_page = 10
 
     search_fields = ('ano', 'processo', 'inicio')
 
-    list_per_page = 10
+    inlines = (OutorgaInline, Natureza_gastoInline)
     
     form = TermoAdminForm
 
@@ -218,7 +217,6 @@ admin.site.register(Termo, TermoAdmin)
 
 
 class OutorgaAdmin(admin.ModelAdmin):
-
     """
     O método 'save_model'	Verifica se oo estado atual é diferente do estado anterior.
     O método 'response_change'	Encaminha o usuário para a tela de edição do termo se o estado for definido como 'Aprovado'.
@@ -244,12 +242,12 @@ class OutorgaAdmin(admin.ModelAdmin):
 
     list_display_links = ('mostra_categoria', )
 
-    search_fields = ('termo__ano', 'termo__processo', 'categoria__nome', 'data_presta_contas', 'data_solicitacao', 'termino')
-
     list_filter = ('termo', )
 
     list_per_page = 10
     
+    search_fields = ('termo__ano', 'termo__processo', 'categoria__nome', 'data_presta_contas', 'data_solicitacao', 'termino')
+
     form = OutorgaAdminForm
 
 admin.site.register(Outorga, OutorgaAdmin)
@@ -257,7 +255,6 @@ admin.site.register(Outorga, OutorgaAdmin)
 
 
 class Natureza_gastoAdmin(admin.ModelAdmin):
-
     """
     Filtra os dados pelo pedido e pela modalidade.
 
@@ -280,11 +277,11 @@ class Natureza_gastoAdmin(admin.ModelAdmin):
 
     list_display_links = ('termo', 'mostra_modalidade', )
 
-    search_fields = ('modalidade__sigla', 'modalidade__nome',  'termo__ano', 'termo__processo')
-
     list_filter = ('termo', 'modalidade')
 
     list_per_page = 10
+
+    search_fields = ('modalidade__sigla', 'modalidade__nome',  'termo__ano', 'termo__processo')
 
 admin.site.register(Natureza_gasto, Natureza_gastoAdmin)
 
@@ -312,15 +309,15 @@ class ItemAdmin(admin.ModelAdmin):
 
     list_display = ('mostra_termo', 'mostra_modalidade', 'mostra_descricao', 'entidade', 'mostra_quantidade', 'mostra_valor_realizado', 'pagamentos_pagina')
 
-    search_fields = ('natureza_gasto__modalidade__sigla', 'natureza_gasto__modalidade__nome', 'natureza_gasto__termo__ano', 'natureza_gasto__termo__processo', 'descricao', 'justificativa', 'obs')
-
     list_filter = ('natureza_gasto__termo', 'natureza_gasto__modalidade') 
+
+    list_per_page = 20
+
+    search_fields = ('natureza_gasto__modalidade__sigla', 'natureza_gasto__modalidade__nome', 'natureza_gasto__termo__ano', 'natureza_gasto__termo__processo', 'descricao', 'justificativa', 'obs')
 
     inlines = [OrigemFapespInline]
     
     list_display_links = ('mostra_descricao', )
-
-    list_per_page = 20
 
     form = ItemAdminForm
 
@@ -346,9 +343,10 @@ class ArquivoAdmin(admin.ModelAdmin):
 
     list_display_links = ('__unicode__', )
 
+    list_per_page = 10
+
     search_fields = ('outorga__termo__ano', 'outorga__termo__processo', 'outorga__categoria__nome', 'arquivo', )
 
-    list_per_page = 10
 
 admin.site.register(Arquivo,ArquivoAdmin)
 
@@ -367,12 +365,14 @@ class ContratoAdmin(admin.ModelAdmin):
     list_display = ('numero', 'data_inicio', 'limite_rescisao', 'entidade', 'auto_renova', 'existe_arquivo')
 
     list_display_links = ('entidade', )
+    
+    list_filter = (('entidade', RelatedOnlyFieldListFilter),)
+
+    list_per_page = 10
 
     search_fields = ('entidade__sigla', 'entidade__nome', 'data_inicio' )
 
     inlines = (OrdemDeServicoInline, )
-
-    list_per_page = 10
     
     form = ContratoAdminForm
 
@@ -380,10 +380,29 @@ admin.site.register(Contrato,ContratoAdmin)
 
 
 
+
+class OrdemDeServicoListEntidadeFilter(admin.SimpleListFilter):
+    """
+    Tela de Ordem de servico > Filtro de Entidades.
+    Filtro somente por ordem de serviços que possuem a entidade filtrada.
+    """
+    title = _('entidade')
+    parameter_name = 'entidade'
+
+    def lookups(self, request, model_admin):
+        entidades = set([c.contrato.entidade for c in model_admin.model.objects.all()])
+        return [(c.id, c.sigla) for c in entidades]
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(contrato__entidade__id__exact=self.value())
+        else:
+            return queryset
+            
+            
 class OrdemDeServicoAdmin(admin.ModelAdmin):
     """
     """
-
     fieldsets = (
                 (None, {
                     'fields': ('acordo', 'tipo')
@@ -396,12 +415,16 @@ class OrdemDeServicoAdmin(admin.ModelAdmin):
     list_display = ('numero', 'tipo', 'entidade', 'data_inicio', 'data_rescisao', 'mostra_prazo', 'estado', 'descricao')
 
     list_display_links = ('descricao', )
+    
+    list_filter = (OrdemDeServicoListEntidadeFilter,
+                   ('estado', RelatedOnlyFieldListFilter),)
+
+    list_per_page = 10
 
     inlines = (ArquivoOSInline, PlanejamentoInline)
 
     search_fields = ('numero', 'acordo__descricao', 'contrato__entidade__sigla', 'contrato__entidade__nome', 'descricao', 'data_inicio', 'data_rescisao', 'tipo__nome')
 
-    list_per_page = 10
     filter_horizontal = ('pergunta',)
 
 
