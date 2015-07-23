@@ -13,8 +13,10 @@ import json as simplejson
 from patrimonio.models import Patrimonio, Equipamento
 from financeiro.models import Pagamento, Auditoria
 from identificacao.models import *
-from outorga.models import Termo, Modalidade, Item, Natureza_gasto, Acordo, Outorga
+from outorga.models import Termo, Modalidade, Item, Natureza_gasto, Acordo, Outorga, Contrato, EstadoOS, OrdemDeServico
 from utils.functions import render_to_pdf, render_to_pdf_weasy, month_range
+
+
 
 import logging
 
@@ -246,30 +248,92 @@ def gastos_acordos(request):
 @login_required
 @permission_required('outorga.rel_ger_contratos', raise_exception=True)
 @require_safe
-def contratos(request):
+def contratos(request, pdf=False):
     """
      Relatório Gerencial - Relatório de Contratos por Entidade.
     
     """
-    entidades = []
-    for e in Entidade.objects.order_by('sigla'):
-        cts = e.contrato_set.order_by('-data_inicio')
-        if cts.count():
-            entidade = {'entidade':e.sigla}
-            contratos = []
-            for c in cts:
-                contrato = {'id':c.id, 'inicio':c.data_inicio, 'termino':c.limite_rescisao, 'numero':c.numero, 'arquivo':c.arquivo, 'auto':c.auto_renova}
-                oss = c.ordemdeservico_set.order_by('-data_inicio')
-                if oss.count():
-                    ordens = []
-                    for os in oss:
+    
+    # Filtrando as entidades pelo parametro de filtro 'entidade'
+    entidade_id = request.GET.get('entidade')
+    # Filtrando as entidades pelo parametro de filtro 'estadoos'
+    estadoos_id = request.GET.get('estadoos')
+    
+    # Obj da Entidade escolhida para o filtro 
+    param_entidade = None
+    # Obj da Entidade escolhida para o filtro
+    param_estadoos = None
+    
+    # 
+    entidades = Entidade.objects.prefetch_related(Prefetch('contrato_set', queryset=Contrato.objects.order_by('-data_inicio'))).order_by('sigla')
+    
+    #Filtrando as entidades
+    if entidade_id and entidade_id != '0' and entidade_id.isdigit():
+        entidades = entidades.filter(id = int(entidade_id))
+        param_entidade = Entidade.objects.get(id = int(entidade_id))
+        
+    if estadoos_id and estadoos_id != '0' and estadoos_id.isdigit():
+        param_estadoos = EstadoOS.objects.get(id = int(estadoos_id))
+        
+    # Selecionando os valores de Entidades para serem exibidas no filtro
+    contrato_entidades = Contrato.objects.values_list('entidade__id')
+    filtro_entidades = Entidade.objects.filter(id__in = contrato_entidades)
+    
+    # Selecionando os valores de Entidades para serem exibidas no filtro
+    os_estadoos = OrdemDeServico.objects.values_list('estado__id')
+    filtro_estadoos = EstadoOS.objects.filter(id__in = os_estadoos)
+    
+    retorno_entidades = []
+    for e in entidades:
+        
+        cts = e.contrato_set.all()
+        
+        
+        entidade = {'entidade':e.sigla}
+        contratos = []
+        for c in cts:
+            contrato = {'id':c.id, 'inicio':c.data_inicio, 'termino':c.limite_rescisao, 'numero':c.numero, 'arquivo':c.arquivo, 'auto':c.auto_renova, 'os':[]}
+        
+            ordens = []
+            oss = c.ordemdeservico_set.select_related('tipo', 'estado').prefetch_related('arquivos').order_by('-data_inicio')
+            
+            
+            
+            for os in oss:
+                if param_estadoos:
+                    # Se tiver filtro de EstadoOS, somente adicionamos as OS filtradas
+                    if param_estadoos.id == os.estado.id:
                         ordens.append(os)
-                    contrato.update({'os':ordens})
+                else:
+                    ordens.append(os)
+            
+            if len(ordens) > 0:
+                contrato.update({'os':ordens})
+        
+            if param_estadoos:
+                # Se tiver filtro de EstadoOS, somente adicionamos os contratos com alguma OS
+                if len(contrato['os']) > 0:
+                    contratos.append(contrato)
+            else:
                 contratos.append(contrato)
+        
+        # Somente adicionamos as entidades com algum contrato válido
+        if len(contratos) > 0:
             entidade.update({'contratos':contratos})
-            entidades.append(entidade)
+            retorno_entidades.append(entidade)
 
-    return render(request, 'outorga/contratos.html', {'entidades':entidades})
+    if pdf == '2':
+        return render(request, 'outorga/contratos.pdf', {'entidades':retorno_entidades, \
+                                                      'filtro_entidades':filtro_entidades, 'filtro_estadoos':filtro_estadoos, \
+                                                      'entidade':param_entidade, 'estadoos':param_estadoos})
+    elif pdf:
+        return render_to_pdf_weasy('outorga/contratos.pdf', {'entidades':retorno_entidades, \
+                                                      'entidade':param_entidade, 'estadoos':param_estadoos},\
+                              request=request, filename="relatorio_contratos.pdf")
+    else:
+        return render(request, 'outorga/contratos.html', {'entidades':retorno_entidades, \
+                                                      'filtro_entidades':filtro_entidades, 'filtro_estadoos':filtro_estadoos, \
+                                                      'entidade':param_entidade, 'estadoos':param_estadoos})
    
 
 #### ROGERIO: VERIFICAR SE EXISTE ALGUMA CHAMADA PARA ESTA VIEW
