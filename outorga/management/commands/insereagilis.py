@@ -72,7 +72,7 @@ class Command(BaseCommand):
         if 'STE' in mods:
             mods.remove('STE')
 
-	ha = EstadoP.objects.get(name__contains='Agilis')
+	ha = EstadoP.objects.get(nome__contains='Agilis')
 	protocolos_agilis = []
         for m in mods:
             data = urllib.urlencode([('processo', args[0]), ('parcial', parcial), ('tipoPrestacao', 'PRN'), ('tipoDespesa', TIPOS[m]), ('Prosseguir', 'Prosseguir')])

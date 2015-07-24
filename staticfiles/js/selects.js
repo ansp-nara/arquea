@@ -1268,7 +1268,7 @@ function ajax_get_marcas_por_termo(id_retorno, termo_id)
 /**
  * Ajax para preencher os campos de data de inicio e fim no relatório gerencial
 **/
-function termo_datas(termo_id)
+function termo_datas(termo_id, parcial)
 {
     if (termo_id == "") {
         $("#id_datas").hide();
@@ -1280,7 +1280,7 @@ function termo_datas(termo_id)
         type: "GET",
         url: "/outorga/json/termo_datas",
         dataType: "json",
-        data: {"termo":termo_id},
+        data: {"termo":termo_id, "parcial":parcial},
         success: function(retorno) {
             $("#id_inicio").empty();
             $("#id_termino").empty();
@@ -1296,6 +1296,35 @@ function termo_datas(termo_id)
         },
         error: function(erro) {
             alert('termo_datas - Erro: Sem retorno de requisição.');
+        }
+    });
+}
+
+/**
+ * Ajax para preencher as parciais no relatório gerencial
+**/
+function termo_parciais(termo_id)
+{
+    if (termo_id == "") {
+        $("#id_parciais").hide();
+        return;
+    }
+
+    $("#id_parciais").show();
+    $("#id_parcial").empty();
+    $.ajax({
+        type: "GET",
+        url: "/outorga/json/termo_parciais",
+        dataType: "json",
+        data: {"termo":termo_id},
+        success: function(retorno) {
+            $("#id_parcial").append('<option value="0">Todas</option>')/
+            $.each(retorno, function(i, item) {
+                $("#id_parcial").append('<option value="'+item+'">'+item+'</option>');
+            });
+        },
+        error: function(erro) {
+            alert('termo_parciais - Erro: Sem retorno de requisição.');
         }
     });
 }

@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import permission_required, login_required
 from django.http import Http404, HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators.http import require_safe
+from django.db.models import Min, Max
 
 from decimal import Decimal
 import json as simplejson
@@ -611,10 +612,34 @@ def ajax_termo_datas(request):
         raise Http404
 
     termo_id = request.GET.get('termo')
+    parcial = request.GET.get('parcial')
     termo = get_object_or_404(Termo, pk=termo_id)
+    pagamentos = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__termo=termo)
+    if parcial:
+        pagamentos = pagamentos.filter(auditoria__parcial=parcial)
+
+    datas = pagamentos.aggregate(min=Min('protocolo__data_chegada'))
+    datas.update(pagamentos.aggregate(max=Max('protocolo__data_chegada')))
 
     meses = []
-    for m in month_range(termo.inicio, termo.termino):
+    for m in month_range(datas['min'], datas['max']):
         meses.append({'value':'%s-%s' % (m.year, m.month), 'display':'%02d/%s' % (m.month, m.year)})
     return HttpResponse(simplejson.dumps(meses), content_type='application/json')
+
+
+@login_required
+@require_safe
+def ajax_termo_parciais(request):
+    """
+    Ajax utilizado para retornar as parciais abertas de um termo.
+    """
+
+    if not request.GET.has_key('termo'):
+        raise Http404
+
+    termo_id = request.GET.get('termo')
+    termo = get_object_or_404(Termo, pk=termo_id)
+
+    parciais = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__termo=termo).values_list('auditoria__parcial', flat=True).order_by('auditoria__parcial').distinct()
+    return HttpResponse(simplejson.dumps(list(parciais)), content_type='application/json')
 

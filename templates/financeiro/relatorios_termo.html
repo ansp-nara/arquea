@@ -72,12 +72,19 @@
             </p>
             <p>
                 <label for="id_termo">Termo de outorga:</label>
-                <select name="termo" id="id_termo"{% if view == 'relatorio_gerencial' %} onchange="termo_datas(this.value);"><option value="">Selecione o termo de outorga</option{% endif %}>
+                <select name="termo" id="id_termo"{% if view == 'relatorio_gerencial' or view == 'relatorio_acordos' %} onchange="termo_parciais(this.value);{% if view == 'relatorio_gerencial' %} termo_datas(this.value);{% endif %}"><option value="">Selecione o termo de outorga</option{% endif %}>
                   {% for t in termos %}
                      <option value="{{ t.id }}">{{ t }}</option>
                   {% endfor %}
                 </select>
             </p>
+            {% if view == 'relatorio_gerencial' or view == 'relatorio_acordos' %}
+            <p id="id_parciais" style="display: none;">
+                <label for="id_parcial">Parcial:</label>
+                <select name="parcial" id="id_parcial" onchange="termo_datas($('#id_termo').val(), this.value);">
+                </select>
+            </p>
+            {% endif %}
             {% if view == 'relatorio_gerencial' %}
             <p id="id_datas" style="display:none;">
                 <label for="id_inicio">Mês de início</label>
@@ -86,6 +93,16 @@
                 <br>
                 <label for="id_termino">Mês de término</label>
                 <select name="termino" id="id_termino">
+                </select>
+            </p>
+            {% endif %}
+            {% if view == 'relatorio_gerencial' or view == 'relatorio_acordos' %}
+            <p>
+                <label for="id_rt">Tipo de concessão:</label>
+                <select name="rt" id="id_rt">
+                    <option value="0">Tudo</option>
+                    <option value="1">Apenas reserva técnica</option>
+                    <option value="2">Apenas TO</option>
                 </select>
             </p>
             {% endif %}

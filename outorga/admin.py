@@ -6,7 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.admin.util import unquote
 from django.template.response import TemplateResponse
 from rede.models import PlanejaAquisicaoRecurso
-from outorga.models import OrdemDeServico, Contrato, Termo, Outorga, Modalidade, Estado, Natureza_gasto, Item, Categoria, Arquivo, Acordo, OrigemFapesp, ArquivoOS, TipoContrato, EstadoOS
+from outorga.models import OrdemDeServico, Contrato, Termo, Outorga, Modalidade, Estado, Natureza_gasto, Item, Categoria, Arquivo, Acordo, OrigemFapesp, ArquivoOS, TipoContrato, EstadoOS, TemplateRT
 from outorga.forms import *
 from utils.admin import RelatedOnlyFieldListFilter
 
@@ -92,7 +92,7 @@ class OrdemDeServicoInline(admin.StackedInline):
 
     fieldsets = (
                 (None, {
-                    'fields': ('acordo', ('tipo', 'numero'), ('data_inicio', 'data_rescisao', 'antes_rescisao'))
+                    'fields': (('acordo', 'estado'), ('tipo', 'numero'), ('data_inicio', 'data_rescisao', 'antes_rescisao'))
                  }),
                  (_(u'Descrição'), {
                      'fields': ('descricao', ),
@@ -449,3 +449,4 @@ admin.site.register(OrigemFapesp, OrigemFapespAdmin)
 #admin.site.register(ArquivoOS)
 admin.site.register(TipoContrato)
 admin.site.register(EstadoOS)
+admin.site.register(TemplateRT)

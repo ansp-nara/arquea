@@ -163,6 +163,9 @@ class Termo(models.Model):
             
         super(Termo, self).save(force_insert, force_update)
 
+        if not antigo:
+            self.insere_itens_rt()
+
     
     # Retorna a soma das naturezas (moeda nacional) de um termo.
     @property
@@ -339,6 +342,20 @@ class Termo(models.Model):
                 return t
 
         return None
+
+
+    def insere_itens_rt(self):
+        for irt in TemplateRT.objects.all():
+            (p, b) = Natureza_gasto.objects.get_or_create(termo=self, modalidade=irt.modalidade, defaults={'valor_concedido':0.0})
+            item = Item()
+            item.natureza_gasto = p
+            item.descricao = irt.descricao
+            item.justificativa= ' '
+            item.valor = 0.0
+            item.quantidade = 1
+            item.rt = True
+            item.save()
+
 
 class Categoria(models.Model):
     """
@@ -519,12 +536,15 @@ class Natureza_gasto(models.Model):
     # Calcula o total de despesas realizadas de uma modalidade e termo.
     @cached_property
     def total_realizado(self):
+        return self.total_realizado_rt()
+
+    def total_realizado_rt(self, rt=None):
         total = Decimal('0.00')
-        for item in self.todos_itens():
+        for item in self.todos_itens(rt=rt):
             total += item.valor_realizado_acumulado
         return total
 
-    def total_realizado_parcial(self, m1, a1, m2, a2):
+    def total_realizado_parcial(self, m1, a1, m2, a2, rt=0, parcial=0):
         from financeiro.models import Pagamento
 
         inicio = datetime.date(a1,m1,1)
@@ -534,11 +554,19 @@ class Natureza_gasto(models.Model):
                 fim = fim.replace(day=fim.day+1)
             except:
                 break
-                
+
+        pagamentos = Pagamento.objects.all()
+        if parcial > 0:
+            pag_ids = [p.id for p in pagamentos.filter(auditoria__parcial=parcial).distinct()]
+            pagamentos = pagamentos.filter(id__in=pag_ids)
+        if rt == 1:
+            pagamentos = pagamentos.filter(origem_fapesp__item_outorga__rt=True)
+        elif rt == 2:
+            pagamentos = pagamentos.filter(origem_fapesp__item_outorga__rt=False)
         if self.modalidade.moeda_nacional:
-            total = Pagamento.objects.filter(conta_corrente__data_oper__range=(inicio,fim), origem_fapesp__item_outorga__natureza_gasto=self).aggregate(Sum('valor_fapesp'))
+            total = pagamentos.filter(conta_corrente__data_oper__range=(inicio,fim), origem_fapesp__item_outorga__natureza_gasto=self).aggregate(Sum('valor_fapesp'))
         else:
-            total = Pagamento.objects.filter(protocolo__data_vencimento__range=(inicio,fim), origem_fapesp__item_outorga__natureza_gasto=self).aggregate(Sum('valor_fapesp'))
+            total = pagamentos.filter(protocolo__data_vencimento__range=(inicio,fim), origem_fapesp__item_outorga__natureza_gasto=self).aggregate(Sum('valor_fapesp'))
         return total['valor_fapesp__sum'] or Decimal('0.00')
 
     # Retorna o total de despesas realizadas em formato moeda.
@@ -570,9 +598,12 @@ class Natureza_gasto(models.Model):
 
 
     # Retorna todos os itens de uma natureza de gasto que não estão subordinados a outro item, considerando todas as concessões de um determinado Termo.
-    def todos_itens(self):
-        return Item.objects.filter(natureza_gasto__modalidade=self.modalidade,
-                                   natureza_gasto__termo=self.termo)
+    def todos_itens(self, rt=None):
+        itens = Item.objects.filter(natureza_gasto__modalidade=self.modalidade,
+                                    natureza_gasto__termo=self.termo)
+        if rt is not None:
+            itens = itens.filter(rt=rt)
+        return itens
 
     # Retorna a soma do valor total concedido considerando todas as naturezas de gasto de uma modalidade e Termo.
     def total_concedido_mod_termo(self):
@@ -609,6 +640,14 @@ class Natureza_gasto(models.Model):
         #ordering = ('-outorga__data_solicitacao', )
 
 
+class TemplateRT(models.Model):
+    modalidade = models.ForeignKey('outorga.Modalidade')
+    descricao = models.CharField(_(u'Descrição'), max_length=255)
+
+
+    def __unicode__(self):
+        return u'%s - %s' % (self.modalidade, self.descricao)
+
 class Item(models.Model):
 
     """
@@ -640,6 +679,7 @@ class Item(models.Model):
     quantidade = models.IntegerField(_(u'Quantidade'))
     obs = models.TextField(_(u'Observação'), blank=True)
     valor = models.DecimalField(_(u'Valor Concedido'), max_digits=12, decimal_places=2, help_text=_(u'ex. 150500.50'))
+    rt = models.BooleanField(default=False)
 
     # Retorna a descrição e o termo, se existir.
     def __unicode__(self):
@@ -688,9 +728,21 @@ class Item(models.Model):
     # Valor realizado por mês
     # dt = mes/ano para o filtro inicial
     # after = flag que especifica se o dt deve levar em conta a data cheia (dia/mes/ano) 
-    def calcula_realizado_mes(self, dt, after=False):
+    def calcula_realizado_mes(self, dt, after=False, pagamentos=None):
         total = Decimal('0.00')
-        if hasattr(self, 'origemfapesp_set'):
+        if pagamentos:
+            if after:
+                if self.natureza_gasto.modalidade.moeda_nacional:
+                    sumFapesp = pagamentos.filter(origem_fapesp__item_outorga=self,conta_corrente__data_oper__gte=dt).aggregate(Sum('valor_fapesp'))
+                else:
+                    sumFapesp = pagamentos.filter(origem_fapesp__item_outorga=self,protocolo__data_vencimento__gte=dt).aggregate(Sum('valor_fapesp'))
+            else:
+                if self.natureza_gasto.modalidade.moeda_nacional:
+                    sumFapesp = pagamentos.filter(origem_fapesp__item_outorga=self,conta_corrente__data_oper__month=dt.strftime('%m'), conta_corrente__data_oper__year=dt.strftime('%Y')).aggregate(Sum('valor_fapesp'))
+                else:
+                    sumFapesp = pagamentos.filter(origem_fapesp__item_outorga=self,protocolo__data_vencimento__month=dt.strftime('%m'), protocolo__data_vencimento__year=dt.strftime('%Y')).aggregate(Sum('valor_fapesp'))
+            total = sumFapesp['valor_fapesp__sum'] or Decimal('0.0')
+        elif hasattr(self, 'origemfapesp_set'):
             for of in self.origemfapesp_set.all():
                 if after:
                     if self.natureza_gasto.modalidade.moeda_nacional:

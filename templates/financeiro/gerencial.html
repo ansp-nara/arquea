@@ -130,10 +130,14 @@
 {% endblock %}
 {% block content %}
 <h1>Relatório gerencial do processo {{ termo }}, atualizado em {{ atualizado|date:"d/m/Y" }}</h1>
+<h3>Atençao: apenas o filtro por Reserva Tecnica esta aplicado aos totais. Os filtros de data e de parcial e aplicado apenas
+na coluna "Total realizado parcial".</h3>
 <div id="report_toolbar">
     <form action="{% url 'financeiro.views.relatorio_gerencial' 1 %}" method="GET" id="id_form_recurso">
         <input type="hidden" value="{{ inicio }}" name="inicio" />
         <input type="hidden" value="{{ termino }}" name="termino" />
+        <input type="hidden" value="{{ parcial }}" name="parcial" />
+        <input type="hidden" value="{{ rt }}" name="rt" />
         <input type="hidden" value="{{ termo.id }}" name="termo" />
         <div title="Imprimir" class="btn_print">
            <input type="submit" title="Versão para impressão" class="btn_print" name="acao" value="1"  />
@@ -170,7 +174,7 @@
 		    {% for t in totais|dictsort:"ord" %}
 		        <td><b>{{ t.total_real|moeda_valor_css }}</b></td>
 		    {% endfor %}
-            <td class="sp_real"></td>
+            <td class="sp_real"><span>{{ gerais.gasto_real_parcial|moeda_css }}</span></td>
 		    <td class="sp_real"><span>{{ gerais.gasto_real|moeda_css }}</span></td>
 		    <td class="sp_sald"><span>{{ gerais.saldo_real|moeda_css }}</span></td>
 	    </tr>
@@ -180,6 +184,7 @@
 		    {% for t in totais|dictsort:"ord" %}
 		        <td><b>{{ t.total_dolar|moeda_valor_css:0 }}</b></td>
 		    {% endfor %}
+		    <td class="sp_real"><span>{{ gerais.gasto_dolar_parcial|moeda_css:0 }}</span></td>
 		    <td class="sp_real"><span>{{ gerais.gasto_dolar|moeda_css:0 }}</span></td>
 		    <td class="sp_sald"><span>{{ gerais.saldo_dolar|moeda_css:0 }}</span></td>
 	    </tr>
