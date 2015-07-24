@@ -403,10 +403,12 @@ class OutorgaViewTest(UnitTestCase):
              
             from outorga.views import contratos
             mock_request = mock.Mock()
+            # mockin request GET parameters
             mock_request.method = "GET"
-            contratos(mock_request)
+            mock_request.GET = QueryDict("entidade=0&estadoos=0")
             
-            print mock_render.mock_calls
+            # call view
+            contratos(mock_request)
             
             _, args, _ = mock_render.mock_calls[0]
 
@@ -431,12 +433,18 @@ class OutorgaViewTest(UnitTestCase):
              
             from outorga.views import contratos
             mock_request = mock.Mock()
+            # mockin request GET parameters
             mock_request.method = "GET"
+            mock_request.GET = QueryDict("entidade=1&estadoos=0")
+            
             # call view
             contratos(mock_request)
             _, args, _ = mock_render.mock_calls[0]
+            
+            print args[2]
+            print args[2]['entidades'][0]['contratos'][0]
 
-            self.assertFalse('os' in args[2]['entidades'][0]['contratos'][0], 'Ordemdeservico não deve estar na resposta da view.')
+            self.assertTrue(len(args[2]['entidades'][0]['contratos'][0]['os']) == 0, 'Ordemdeservico não deve estar na resposta da view.')
 
 
     def test_call__relatorio_termos(self):

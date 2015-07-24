@@ -275,14 +275,6 @@ def contratos(request, pdf=False):
     if estadoos_id and estadoos_id != '0' and estadoos_id.isdigit():
         param_estadoos = EstadoOS.objects.get(id = int(estadoos_id))
         
-    # Selecionando os valores de Entidades para serem exibidas no filtro
-    contrato_entidades = Contrato.objects.values_list('entidade__id')
-    filtro_entidades = Entidade.objects.filter(id__in = contrato_entidades)
-    
-    # Selecionando os valores de Entidades para serem exibidas no filtro
-    os_estadoos = OrdemDeServico.objects.values_list('estado__id')
-    filtro_estadoos = EstadoOS.objects.filter(id__in = os_estadoos)
-    
     retorno_entidades = []
     for e in entidades:
         
@@ -324,13 +316,21 @@ def contratos(request, pdf=False):
 
     if pdf == '2':
         return render(request, 'outorga/contratos.pdf', {'entidades':retorno_entidades, \
-                                                      'filtro_entidades':filtro_entidades, 'filtro_estadoos':filtro_estadoos, \
                                                       'entidade':param_entidade, 'estadoos':param_estadoos})
     elif pdf:
         return render_to_pdf_weasy('outorga/contratos.pdf', {'entidades':retorno_entidades, \
                                                       'entidade':param_entidade, 'estadoos':param_estadoos},\
                               request=request, filename="relatorio_contratos.pdf")
     else:
+        
+        # Selecionando os valores de Entidades para serem exibidas no filtro
+        contrato_entidades = Contrato.objects.values_list('entidade__id')
+        filtro_entidades = Entidade.objects.filter(id__in = contrato_entidades)
+        
+        # Selecionando os valores de Entidades para serem exibidas no filtro
+        os_estadoos = OrdemDeServico.objects.values_list('estado__id')
+        filtro_estadoos = EstadoOS.objects.filter(id__in = os_estadoos)
+        
         return render(request, 'outorga/contratos.html', {'entidades':retorno_entidades, \
                                                       'filtro_entidades':filtro_entidades, 'filtro_estadoos':filtro_estadoos, \
                                                       'entidade':param_entidade, 'estadoos':param_estadoos})

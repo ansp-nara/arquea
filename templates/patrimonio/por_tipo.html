@@ -10,11 +10,11 @@ td a { line-height: normal; }
 {% block breadcrumbs %}
     <div class="breadcrumbs">Você está em: 
       <a href="../../">{% trans "Home" %}</a> &rsaquo; 
-      <a href="{% url 'patrimonio.views.por_tipo' %}">Inventário por tipo</a>
+      <a href="{% url 'patrimonio.views.por_tipo' %}">Patrimônios por tipo</a>
     </div>
 {% endblock %}
 {% block content %}
-<h1 repeat="1">Inventário por tipo</h1>
+<h1 repeat="1">Patrimônios por tipo</h1>
 {% comment %}<h4><a href="{% url 'patrimonio.views.por_local' 1 %}?endereco={{ end }}&detalhe={{ det }}">Imprimir</a></h4>{% endcomment %}
 
 <h4>Patrimonios do tipo {{ tipo }}</h4>
