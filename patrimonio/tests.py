@@ -615,7 +615,7 @@ class ViewTest(TestCase):
         self.assertTrue(200, response.status_code)
                 
         # assert breadcrumb
-        self.assertContains(response, u'<a href="/patrimonio/relatorio/por_tipo">Inventário por tipo</a>')
+        self.assertContains(response, u'<a href="/patrimonio/relatorio/por_tipo/">Patrimônios por tipo</a>')
         
         # asssert dos filtros
         self.assertContains(response, u'<option value="1" selected>TIPO</option>')
@@ -626,7 +626,7 @@ class ViewTest(TestCase):
         self.assertContains(response, u'name="acao" value="1"')
         
         # asssert dos dados do relatório
-        self.assertContains(response, u'<h1 repeat="1">Inventário por tipo</h1>')
+        self.assertContains(response, u'<h1 repeat="1">Patrimônios por tipo</h1>')
         self.assertContains(response, u'<h4>Patrimonios do tipo TIPO</h4>')
                 
         self.assertContains(response, u'<th>Checado</th>')
@@ -664,8 +664,8 @@ class ViewTest(TestCase):
         self.assertTrue(200, response.status_code)
                 
         # assert breadcrumb
-        self.assertContains(response, u'<a href="/patrimonio/relatorio/por_tipo">Patrimônio por tipo</a>')
-
+        self.assertContains(response, u'<a href="/patrimonio/relatorio/por_tipo/">Patrimônios por tipo</a>')
+        
         self.assertContains(response, u'<option value="1">TIPO</option>')
 
         self.assertNotContains(response, u'<h1 repeat="1">Inventário por tipo</h1>')
