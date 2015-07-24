@@ -108,11 +108,6 @@
     .tbl_conteudo_os .th_os_arquivo { width: 21%; }
     .tbl_conteudo_os .th_os_estado { width: 7%; }
     
-    
-    
-    
-    
-    
 </style>
 <script type="text/javascript" src="/media/js/selects.js"></script>
 {% endblock %}
@@ -190,7 +185,7 @@
                             <td>{{ c.inicio|date:"d/m/Y" }}</td>
                             <td>{{ c.termino|date:"d/m/Y" }}</td>
                             <td><a href="/admin/outorga/contrato/{{ c.id }}/">{{ c.numero }}</a></td>
-                            <td>{% if c.arquivo %}<a href="{{ c.arquivo.url }}"><img class="img_arquivo" title="{{ a.arquivo.name }}" src="{{ STATIC_PREFIX }}img/admin/3443640_orig_2.png" ></a>{% endif %}</td>
+                            <td>{% if c.arquivo %}<a href="{{ c.arquivo.url }}"><img class="img_arquivo" title="{{ a.arquivo.name }}" src="{{ STATIC_PREFIX }}img/icon_arquivo_documento.png" ></a>{% endif %}</td>
                             <td>{% if c.auto %}Auto{% endif %}</td>
                         </tr>
                     </table>
