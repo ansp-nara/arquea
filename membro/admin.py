@@ -2,6 +2,7 @@
 
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
+from utils.admin import RelatedOnlyFieldListFilter
 from forms import *
 from models import *
 
@@ -167,6 +168,8 @@ class DispensaLegalAdmin(admin.ModelAdmin):
                  }),
     )
     list_display = ('membro', 'tipo', 'inicio_direito', 'realizada')
+    list_filter = (('membro', RelatedOnlyFieldListFilter),)
+    ordering = ('-inicio_direito', 'membro__nome')
     form = DispensaLegalAdminForms
 
 admin.site.register(DispensaLegal, DispensaLegalAdmin)
@@ -197,6 +200,7 @@ class ControleAdmin(admin.ModelAdmin):
     
     list_display = ('membro', 'format_entrada', 'format_saida', )
     list_per_page = 20
+    ordering = ('-entrada', 'membro__nome')
     search_fields = ['membro__nome']
     
     def format_entrada(self, obj):
@@ -235,9 +239,10 @@ class SindicatoArquivosAdmin(admin.ModelAdmin):
     )
 
     list_display = ('membro', 'ano', 'arquivo', )
-
+    list_filter = (('membro', RelatedOnlyFieldListFilter),
+                   ('ano'),)
     search_fields = ['membro__nome', 'ano', 'arquivo', ]
-
+    ordering = ('-ano', 'membro__nome')
     list_per_page = 10
 
 admin.site.register(SindicatoArquivo, SindicatoArquivosAdmin)
