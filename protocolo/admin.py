@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 import django
 from django.contrib import admin
-from django.utils.translation import ugettext_lazy as _
+from django.contrib.admin import DateFieldListFilter
 from django.contrib.auth.models import Group
+from django.utils.translation import ugettext_lazy as _
 from django.core.mail import send_mail
 from django.http import HttpResponseRedirect
 from utils.functions import clone_objects
@@ -304,7 +305,25 @@ class CotacaoAdmin(admin.ModelAdmin):
 admin.site.register(Cotacao, CotacaoAdmin)
 
 
+class FeriadoListFilter(admin.SimpleListFilter):
+    """
+    Tela de Feriados > Filtro por ano do feriado
+    """
+    title = _('ano do feriado')
+    parameter_name = 'feriado__ano'
 
+    def lookups(self, request, model_admin):
+        feriados = set([c for c in model_admin.model.objects.extra(select={'year': 'extract( year from feriado )'}).values_list('year', flat=True)])
+        return [(int(c), int(c)) for c in feriados]
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(feriado__year = int(self.value()))
+        else:
+            return queryset
+        
+        
+        
 class FeriadoAdmin(admin.ModelAdmin):
     """
     Filtra os dados pelo campo 'movel'.
@@ -318,12 +337,16 @@ class FeriadoAdmin(admin.ModelAdmin):
 
     list_display = ('__unicode__', 'tipo', 'obs', 'get_movel', 'get_subtrai', )
 
-    search_fields = ('obs', 'tipo__nome')
-
     list_filter = ['tipo']
 
     list_per_page = 10
     
+    list_filter = (FeriadoListFilter,)
+    
+    ordering = ('-feriado', )
+    
+    search_fields = ('obs', 'tipo__nome')
+
     form = FeriadoAdminForm
     
 
