@@ -60,7 +60,7 @@ class Command(BaseCommand):
                 inte, dec = str(valor).split('.')
             except:
                 inte = str(valor)
-            dec = 0
+                dec = 0
 
             if f.cod == 'PGMP' or f.cod == 'PGRP':
                 codigo = 'L' 

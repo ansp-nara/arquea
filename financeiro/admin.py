@@ -6,6 +6,8 @@ from django.contrib import admin
 from utils.admin import PrintModelAdmin
 from utils.admin import RelatedOnlyFieldListFilter
 from rede.models import Recurso
+from utils.button import ButtonAdmin, Button
+from django.http import HttpResponseRedirect
 
 class RecursoInline(admin.StackedInline):
     model = Recurso
@@ -55,7 +57,7 @@ class ExtratoCCAdmin(admin.ModelAdmin):
     inlines = (PagamentoInline,)
     form = ExtratoCCAdminForm
     
-class ExtratoFinanceiroAdmin(admin.ModelAdmin):
+class ExtratoFinanceiroAdmin(ButtonAdmin):
     
     fieldsets = (
 		  (None, {
@@ -63,12 +65,19 @@ class ExtratoFinanceiroAdmin(admin.ModelAdmin):
 			  'classes': ('wide',)
 		  }),
     )
-    
+
+    buttons = (
+        Button('save_and_insert_cc', 'Salvar e inserir entrada no extrato de conta corrente', needSuperUser=False),
+    )
+
+    def tool_save_and_insert_cc(self, request, obj, button):
+        return HttpResponseRedirect('/')
+
     list_display = ('termo', 'data_libera', 'cod', 'historico', 'valor')
     list_filter = ('termo',)
     search_fields = ('historico',)
     form = ExtratoFinanceiroAdminForm
-    
+
 
 
 

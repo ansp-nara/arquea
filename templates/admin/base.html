@@ -192,7 +192,7 @@ $(document).ajaxSend(function(event, xhr, settings) {
         			{% if adm_app_list %}
         				{% for app in adm_app_list %}
         					<div class="module-header">
-        					
+
         						<a href="#" class="modal-call-header {{app.name}}" app="{{app.name}}">{% blocktrans with app.verbose_name as name %}{{ name }}{% endblocktrans %}</a>
         				
         						<div class="modal-box" id="mod-{{app.name}}" style="display:none;">
@@ -236,7 +236,7 @@ $(document).ajaxSend(function(event, xhr, settings) {
         		<h2>Módulos</h2>
         		{{ menu_type }}
         		{% load tree_menu_tags %}
-                {% show_menu "root" "ordered-list" %}
+                {# % show_menu "root" "ordered-list" % #}
         	</div>
         {% endif %}
 	{% endblock %}
