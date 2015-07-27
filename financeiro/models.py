@@ -3,6 +3,7 @@
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 from django.db.models import Max, Sum
 from django.utils.translation import ugettext_lazy as _
+from decimal import Decimal
 
 from utils.functions import formata_moeda
 from utils.models import NARADateField
@@ -122,7 +123,52 @@ class ExtratoFinanceiro(models.Model):
         except:
             return False
 
+    @staticmethod
+    def _insere_extrato_cc(extratoFinanceiro):
+        """
+        Rotina para inserir no extrato de conta corrente a liberação do financeiro para o Cartão Pesquisa BB.
+        Deve receber um objeto ExtratoFinanceiro.
+        
+        if (retorno == 1) {
+            "Extrato de conta corrente inserido com sucesso."
+        } else if (retorno == 2) {
+            "Extrato de conta corrente já existente."
+        } else {
+            "Extrato de conta corrente não inserido."
+        }
+        """
+        retorno = -1
+        
+        ef = extratoFinanceiro
 
+        if ef.extratocc_set.count() > 0:
+            retorno = 2
+        else:
+            ecc1 = ExtratoCC.objects.create(data_oper = ef.data_libera, 
+                                            historico = u'Liberação de verba MP', 
+                                            valor = -ef.valor, 
+                                            cod_oper = ef.data_libera.strftime('%Y%m%d9'))
+            if ef.taxas > 0:
+                ecc2 = ExtratoCC.objects.create(data_oper = ef.data_libera, 
+                                                historico = u'Liberação de verba TX', 
+                                                valor = ef.taxas * Decimal('1.00'), 
+                                                cod_oper = ef.data_libera.strftime('%Y%m%d9'))
+                 
+                ecc3 = ExtratoCC.objects.create(data_oper = ef.data_libera, 
+                                                historico = u'Pagamento TX', 
+                                                valor = ef.taxas * Decimal('-1.00'), 
+                                                cod_oper = ef.data_libera.strftime('%Y%m%d9'))
+                if not ecc2 or not ecc3:
+                    retorno = -2
+
+            if not ecc1:
+                retorno = -3
+            else:
+                retorno = 1
+
+        return retorno
+        
+        
 
 class Pagamento(models.Model):
     patrocinio = models.ForeignKey('financeiro.ExtratoPatrocinio', verbose_name=_(u'Extrato do patrocínio'), null=True, blank=True)

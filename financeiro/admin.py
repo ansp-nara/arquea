@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 import django
+from django.contrib import admin
+from django.contrib import messages
+from django.http import HttpResponseRedirect
 from financeiro.models import *
 from financeiro.forms import *
-from django.contrib import admin
 from utils.admin import PrintModelAdmin
 from utils.admin import RelatedOnlyFieldListFilter
 from rede.models import Recurso
@@ -71,14 +73,25 @@ class ExtratoFinanceiroAdmin(ButtonAdmin):
     )
 
     def tool_save_and_insert_cc(self, request, obj, button):
-        return HttpResponseRedirect('/')
+        """
+        Tratamento do novo botão de "Salvar e inserir extrato c/c"
+        """
+        retorno = ExtratoFinanceiro._insere_extrato_cc(obj)
+         
+        if (retorno == 1):
+            messages.add_message(request, messages.SUCCESS, u"Extrato de conta corrente inserido com sucesso.")
+        elif (retorno == 2):
+            messages.add_message(request, messages.WARNING, u"Extrato de conta corrente já existente.")
+        else:
+            messages.add_message(request, messages.WARNING, u"Extrato de conta corrente não inserido.")
+
+        return HttpResponseRedirect(reverse('admin:financeiro_extratofinanceiro_changelist'))
+
 
     list_display = ('termo', 'data_libera', 'cod', 'historico', 'valor')
     list_filter = ('termo',)
     search_fields = ('historico',)
     form = ExtratoFinanceiroAdminForm
-
-
 
 
 
