@@ -606,17 +606,16 @@ ul.messagelist span {
     display: block;
 }
 
-
+/* Utilizado caso haja multiplas mensagens */
+/* A regra li:only-child sobrescreve a regra abaixo para configurar uma mensagem única */
 ul.messagelist li {
+    height: 23px;
+    padding: 0px 5px 0px;
+    
     width: 100%;
-    position: absolute;
     top: 0;
-    height: 30px;
-    
-    
     font-size: 12px;
     display: block;
-    padding: 15px 5px 4px;
     margin: 0 0 3px 0;
     border-bottom: 1px solid #ddd;
     color: #666;
@@ -629,6 +628,13 @@ ul.messagelist li.warning{
 
 ul.messagelist li.error{
     background-image: url(../img/admin/icon_error.gif);
+}
+
+/* Utilizado caso haja somente uma mensagem */
+ul.messagelist li:only-child{
+    position: relative;
+    height: 30px;
+    padding: 15px 5px 4px;
 }
 
 .errornote {
@@ -1089,7 +1095,7 @@ table#change-history tbody th {
 	outline:none;
 	}
 
-#header .header-sites ul{float:left; padding:0; margin:60px 0;}
+#header .header-sites ul{padding:0; margin:0px 0; position:relative; top: 61px;}
 #header .header-sites ul li{list-style:none; float:left; line-height:30px; height:30px; padding:0 0 0 5px; margin:0;}
 #header .header-sites ul li a, #header .header-sites ul li a:visited{outline:none; color:#ccccff; text-decoration:none; font-size:12px;}
 #header .header-sites ul li a:hover{color:#ff9900;}
