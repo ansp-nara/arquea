@@ -116,7 +116,7 @@ class PatrimonioAdmin(ExportMixin, admin.ModelAdmin):
         list_select_related = ('tipo', 'equipamento', 'pagamento__protocolo__termo')
     else:
         list_select_related = True
-    list_filter = ('tipo', 'pagamento__protocolo__termo', PatrimonioEstadoListFilter)
+    list_filter = (('tipo', RelatedOnlyFieldListFilter), 'pagamento__protocolo__termo', PatrimonioEstadoListFilter)
     inlines = [HistoricoLocalInline,]
     search_fields = ('descricao', 'ns', 'pagamento__protocolo__num_documento', 'historicolocal__descricao', \
                      'equipamento__entidade_fabricante__sigla', 'equipamento__part_number', 'equipamento__modelo', \
@@ -225,7 +225,7 @@ admin.site.register(HistoricoLocal, HistoricoLocalAdmin)
 class EquipamentoAdmin(admin.ModelAdmin):
     search_fields = ['part_number', 'descricao']
     list_display = ('descricao', 'part_number', 'tipo')
-    list_filter = (('tipo', RelatedOnlyFieldListFilter), )
+    list_filter = (('tipo', RelatedOnlyFieldListFilter), ('entidade_fabricante', RelatedOnlyFieldListFilter),)
     
     form = EquipamentoAdminForm
     
