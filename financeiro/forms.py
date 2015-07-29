@@ -18,7 +18,7 @@ from outorga.models import Termo, OrigemFapesp
 from protocolo.models import Protocolo
 from memorando.models import Pergunta
 from rede.models import PlanejaAquisicaoRecurso, Recurso
-from financeiro.models import ExtratoPatrocinio, Estado, TipoComprovante
+from financeiro.models import ExtratoPatrocinio, Estado, TipoComprovante, CODIGO_FINANCEIRO
 from utils.request_cache import get_request_cache
 
 
@@ -156,6 +156,9 @@ class ExtratoFinanceiroAdminForm(forms.ModelForm):
     
         super(ExtratoFinanceiroAdminForm, self).__init__(data, files, auto_id, prefix, initial,
                                             error_class, label_suffix, empty_permitted, instance)
+
+        sorted_codigo = sorted(CODIGO_FINANCEIRO, key=lambda x: x[1])
+        self.fields['cod'].choices = [('','---------')] + sorted_codigo
 
         # mensagens de erro
         self.fields['termo'].error_messages['required'] = u'O campo TERMO DE OUTORGA é obrigatório'
