@@ -59,6 +59,12 @@ class ItemAdminForm(forms.ModelForm):
         else:
             self.fields['natureza_gasto'].choices = [(p.id, "%s"%(p.__unicode__())) for p in Natureza_gasto.objects.all().select_related('termo', 'modalidade')]
 
+        # mensagens de erro
+        self.fields['descricao'].error_messages['required'] = u'O campo DESCRIÇÃO é obrigatório'
+        self.fields['entidade'].error_messages['required'] = u'O campo ENTIDADE é obrigatório'
+        self.fields['quantidade'].error_messages['required'] = u'O campo QUANTIDADE é obrigatório'
+        self.fields['valor'].error_messages['required'] = u'O campo VALOR é obrigatório'
+        self.fields['justificativa'].error_messages['required'] = u'O campo JUSTIFICATIVA é obrigatório'
 
     termo = forms.ModelChoiceField(Termo.objects.all(), label=_(u'Termo'), required=False,
             widget=forms.Select(attrs={'onchange': 'ajax_filter_termo_natureza("/outorga/seleciona_termo_natureza", "natureza_gasto", this.value, this.id);',
@@ -98,6 +104,10 @@ class OrigemFapespAdminForm(forms.ModelForm):
 #
         self.fields['acordo'].choices = [('','---------')] + [(p.id, p.__unicode__()) for p in Acordo.objects.all().order_by('descricao') ]
         self.fields['item_outorga'].choices = [('','---------')] + [(p.id, p.__unicode__()) for p in Item.objects.all().select_related('natureza_gasto', 'natureza_gasto__termo') ]
+
+        # mensagens de erro
+        self.fields['acordo'].error_messages['required'] = u'O campo ACORDO é obrigatório'
+        self.fields['item_outorga'].error_messages['required'] = u'O campo ITEM DE OUTORGA é obrigatório'
 
 
     # Define o modelo
@@ -219,6 +229,83 @@ class TermoAdminForm(forms.ModelForm):
             del cleaned_data["ano"]
 
         return self.cleaned_data
+
+
+
+class AcordoAdminForm(forms.ModelForm):
+
+    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
+                 initial=None, error_class=ErrorList, label_suffix=':',
+                 empty_permitted=False, instance=None):
+
+        super(AcordoAdminForm, self).__init__(data, files, auto_id, prefix, initial,
+                                            error_class, label_suffix, empty_permitted, instance)
+
+        # mensagens de erro
+        self.fields['estado'].error_messages['required'] = u'O campo ESTADO é obrigatório'
+        self.fields['descricao'].error_messages['required'] = u'O campo DESCRIÇÃO é obrigatório'
+
+
+class ArquivoAdminForm(forms.ModelForm):
+
+    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
+                 initial=None, error_class=ErrorList, label_suffix=':',
+                 empty_permitted=False, instance=None):
+
+        super(ArquivoAdminForm, self).__init__(data, files, auto_id, prefix, initial,
+                                            error_class, label_suffix, empty_permitted, instance)
+
+        # mensagens de erro
+        self.fields['outorga'].error_messages['required'] = u'O campo OUTORGA é obrigatório'
+        self.fields['arquivo'].error_messages['required'] = u'O campo ARQUIVO é obrigatório'
+        
+
+
+class CategoriaAdminForm(forms.ModelForm):
+
+    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
+                 initial=None, error_class=ErrorList, label_suffix=':',
+                 empty_permitted=False, instance=None):
+
+        super(CategoriaAdminForm, self).__init__(data, files, auto_id, prefix, initial,
+                                            error_class, label_suffix, empty_permitted, instance)
+
+        # mensagens de erro
+        self.fields['nome'].error_messages['required'] = u'O campo NOME é obrigatório'
+
+
+class EstadoAdminForm(forms.ModelForm):
+
+    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
+                 initial=None, error_class=ErrorList, label_suffix=':',
+                 empty_permitted=False, instance=None):
+
+        super(EstadoAdminForm, self).__init__(data, files, auto_id, prefix, initial,
+                                            error_class, label_suffix, empty_permitted, instance)
+
+        # mensagens de erro
+        self.fields['nome'].error_messages['required'] = u'O campo NOME é obrigatório'
+
+
+class Natureza_gastoAdminForm(forms.ModelForm):
+
+    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
+                 initial=None, error_class=ErrorList, label_suffix=':',
+                 empty_permitted=False, instance=None):
+
+        super(Natureza_gastoAdminForm, self).__init__(data, files, auto_id, prefix, initial,
+                                            error_class, label_suffix, empty_permitted, instance)
+
+        # mensagens de erro
+        self.fields['termo'].error_messages['required'] = u'O campo TERMO DE OUTORGA é obrigatório'
+        self.fields['modalidade'].error_messages['required'] = u'O campo MODALIDADE é obrigatório'
+        self.fields['valor_concedido'].error_messages['required'] = u'O campo VALOR CONCEDIDO é obrigatório'
+        
+        
+
+
+
+
 
 
 
