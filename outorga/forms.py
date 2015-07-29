@@ -3,7 +3,8 @@
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.forms.util import ErrorList
-from models import Item, OrigemFapesp, Termo, Modalidade, Outorga, Natureza_gasto, Acordo
+from models import Item, OrigemFapesp, Termo, Modalidade, Outorga, Natureza_gasto, Acordo, Contrato
+from memorando.models import Pergunta
 from utils.request_cache import get_request_cache
 
 class OrigemFapespInlineForm(forms.ModelForm):
@@ -48,13 +49,15 @@ class ItemAdminForm(forms.ModelForm):
 
         super(ItemAdminForm, self).__init__(data, files, auto_id, prefix, initial,
                                             error_class, label_suffix, empty_permitted, instance)
-
+        
         if instance:
             # Permite selecionar as naturezas de gasto da outorga da natureza de gasto selecionada.
             n = self.fields['natureza_gasto']
-            n.queryset = Natureza_gasto.objects.filter(termo=instance.natureza_gasto.termo)
+            n.queryset = Natureza_gasto.objects.filter(termo=instance.natureza_gasto.termo).select_related('termo', 'modalidade')
 
             self.fields['termo'].initial = instance.natureza_gasto.termo.id
+        else:
+            self.fields['natureza_gasto'].choices = [(p.id, "%s"%(p.__unicode__())) for p in Natureza_gasto.objects.all().select_related('termo', 'modalidade')]
 
 
     termo = forms.ModelChoiceField(Termo.objects.all(), label=_(u'Termo'), required=False,
@@ -117,13 +120,38 @@ class ContratoAdminForm(forms.ModelForm):
         super(ContratoAdminForm, self).__init__(data, files, auto_id, prefix, initial,
                                             error_class, label_suffix, empty_permitted, instance)
 
+        self.fields['anterior'].choices = [('','---------')] + [(p.id, "%s | %s"%(p.__unicode__(), p.numero)) for p in Contrato.objects.all().order_by('entidade', '-data_inicio') ]
+        
         # mensagens de erro
         self.fields['numero'].error_messages['required'] = u'O campo NUMERO é obrigatório'
         self.fields['data_inicio'].error_messages['required'] = u'O campo INÍCIO é obrigatório'
         self.fields['entidade'].error_messages['required'] = u'O campo ENTIDADE é obrigatório'
         self.fields['arquivo'].error_messages['required'] = u'O campo ARQUIVO é obrigatório'
-        
 
+
+class OrdemDeServicoAdminForm(forms.ModelForm):
+
+    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
+                 initial=None, error_class=ErrorList, label_suffix=':',
+                 empty_permitted=False, instance=None):
+
+        super(OrdemDeServicoAdminForm, self).__init__(data, files, auto_id, prefix, initial,
+                                            error_class, label_suffix, empty_permitted, instance)
+
+        self.fields['contrato'].choices = [('','---------')] + [(p.id, "%s | %s"%(p.__unicode__(), p.numero)) for p in Contrato.objects.all().select_related('entidade').order_by('entidade', '-data_inicio') ]
+        
+        self.fields['pergunta'].choices = [(p.id, "%s"%(p.__unicode__())) for p in Pergunta.objects.all().select_related('memorando')]
+        
+        # mensagens de erro
+        self.fields['acordo'].error_messages['required'] = u'O campo ACORDO é obrigatório'
+        self.fields['tipo'].error_messages['required'] = u'O campo TIPO é obrigatório'
+        self.fields['numero'].error_messages['required'] = u'O campo NUMERO é obrigatório'
+        self.fields['estado'].error_messages['required'] = u'O campo ESTADO é obrigatório'
+        self.fields['estado'].error_messages['required'] = u'O campo ESTADO é obrigatório'
+        self.fields['data_inicio'].error_messages['required'] = u'O campo INÍCIO é obrigatório'
+        self.fields['contrato'].error_messages['required'] = u'O campo CONTRATO é obrigatório'
+        self.fields['descricao'].error_messages['required'] = u'O campo DESCRIÇÃO é obrigatório'
+        
 
 class OutorgaAdminForm(forms.ModelForm):
 
