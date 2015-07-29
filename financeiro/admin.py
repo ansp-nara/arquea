@@ -3,13 +3,14 @@ import django
 from django.contrib import admin
 from django.contrib import messages
 from django.http import HttpResponseRedirect
+from django.utils.translation import ugettext_lazy as _
+
 from financeiro.models import *
 from financeiro.forms import *
 from utils.admin import PrintModelAdmin
 from utils.admin import RelatedOnlyFieldListFilter
 from rede.models import Recurso
 from utils.button import ButtonAdmin, Button
-from django.http import HttpResponseRedirect
 
 class RecursoInline(admin.StackedInline):
     model = Recurso
@@ -59,6 +60,33 @@ class ExtratoCCAdmin(admin.ModelAdmin):
     inlines = (PagamentoInline,)
     form = ExtratoCCAdminForm
     
+class ExtratoFinanceiroListCodFilter(admin.SimpleListFilter):
+    """
+    Tela de Extrato Financeiro > Filtro de codigos.
+    Monta a lista de acordo com a lista de choices do CODIGO_FINANCEIRO somente com
+    os valores que já estão relacionados no Extrato Financeiro
+    """
+    title = _(u'código')
+    parameter_name = 'codigo'
+
+    def lookups(self, request, model_admin):
+        sorted_codigo = sorted(CODIGO_FINANCEIRO, key=lambda x: x[1])
+        cods = ExtratoFinanceiro.objects.order_by('cod').values_list('cod', flat=True).distinct()
+        
+        retorno = []
+        for c in sorted_codigo:
+            if c[0] in cods:
+                retorno.append( (c[0], c[1]) )
+        return retorno
+    
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(cod=self.value())
+        else:
+            return queryset
+            
+            
 class ExtratoFinanceiroAdmin(ButtonAdmin):
     
     fieldsets = (
@@ -89,7 +117,9 @@ class ExtratoFinanceiroAdmin(ButtonAdmin):
 
 
     list_display = ('termo', 'data_libera', 'cod', 'historico', 'valor')
-    list_filter = ('termo',)
+    list_filter = ('termo', 
+                   ExtratoFinanceiroListCodFilter, 
+                   ('tipo_comprovante', RelatedOnlyFieldListFilter))
     search_fields = ('historico',)
     form = ExtratoFinanceiroAdminForm
 

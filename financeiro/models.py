@@ -87,7 +87,11 @@ class TipoComprovanteFinanceiro(models.Model):
 
     def __unicode__(self):
         return self.nome
-
+    
+    class Meta:
+        verbose_name = _(u'Tipo de Comprovante Financeiro')
+        verbose_name_plural = _(u'Tipos de Comprovante Financeiro')
+        ordering = ('nome',)
 
 
 class ExtratoFinanceiro(models.Model):
