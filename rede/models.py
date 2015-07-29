@@ -109,11 +109,11 @@ class Rota(models.Model):
     def __unicode__(self):
         return u'%s %s' % (self.historico, self.blocoip)
 
+
 class Historico(models.Model):
     arquivo = models.FileField(upload_to='rede')
     horario = models.DateTimeField(auto_now=True)
     equipamento = models.ForeignKey('patrimonio.Patrimonio', null=True, blank=True)
-
 
     def __unicode__(self):
         return self.horario
@@ -138,6 +138,7 @@ class Banda(models.Model):
     class Meta:
         ordering = ('unidade', 'velocidade')
 
+
 class Operadora(models.Model):
     nome = models.CharField(max_length=40)
 
@@ -147,11 +148,13 @@ class Operadora(models.Model):
     class Meta:
         ordering = ('nome',)
 
+
 class IPBorda(models.Model):
     ip = models.GenericIPAddressField('IP de borda')
 
     def __unicode__(self):
         return u'%s' % self.ip
+
 
 class Enlace(models.Model):
     participante = models.ForeignKey('identificacao.Endereco')
@@ -172,6 +175,7 @@ class Enlace(models.Model):
 
     class Meta:
         ordering = ('participante',)
+        
 
 class EnlaceOperadora(models.Model):	
     enlace = models.ForeignKey('rede.Enlace')
@@ -186,6 +190,10 @@ class EnlaceOperadora(models.Model):
     def __unicode__(self):
         return u'%s - (Operadora %s)' % (self.enlace, self.operadora)
 
+    class Meta:
+        ordering = ('enlace', 'operadora',)
+        
+        
 class Segmento(models.Model):
     enlace = models.ForeignKey('rede.Enlace')
     operadora = models.ForeignKey('rede.Operadora')
@@ -204,6 +212,10 @@ class Segmento(models.Model):
     def __unicode__(self):
         return u'%s - (Operadora %s)' % (self.enlace, self.operadora)
 
+    class Meta:
+        ordering = ('enlace', 'operadora',)
+
+
 class Interface(models.Model):
     nome = models.CharField(max_length=100)
     tipo = models.ForeignKey('rede.TipoInterface')
@@ -212,11 +224,19 @@ class Interface(models.Model):
     def __unicode__(self):
         return self.nome
 
+    class Meta:
+        ordering = ('nome',)
+
+
 class TipoInterface(models.Model):
     nome = models.CharField(max_length=45)
 
     def __unicode__(self):
         return self.nome
+
+    class Meta:
+        ordering = ('nome',)
+
 
 class Midia(models.Model):
     nome = models.CharField(max_length=45)
@@ -224,11 +244,19 @@ class Midia(models.Model):
     def __unicode__(self):
         return self.nome
 
+    class Meta:
+        ordering = ('nome',)
+
+
 class Canal(models.Model):
     nome = models.CharField(max_length=45)
 
     def __unicode__(self):
         return self.nome
+
+    class Meta:
+        ordering = ('nome',)
+
 
 class Uso(models.Model):
     nome = models.CharField(max_length=20)
@@ -236,11 +264,19 @@ class Uso(models.Model):
     def __unicode__(self):
         return self.nome
 
+    class Meta:
+        ordering = ('nome',)
+
+
 class Sistema(models.Model):
     nome = models.CharField(max_length=100)
 
     def __unicode__(self):
         return self.nome
+
+    class Meta:
+        ordering = ('nome',)
+
 
 class TipoServico(models.Model):
     nome = models.CharField(max_length=200)
@@ -251,17 +287,26 @@ class TipoServico(models.Model):
     class Meta:
         ordering = ('nome',)
 
+
 class Projeto(models.Model):
     nome = models.CharField(max_length=200)
 
     def __unicode__(self):
         return u'%s' % self.nome
 
+    class Meta:
+        ordering = ('nome',)
+
+
 class Unidade(models.Model):
     nome = models.CharField(max_length=30)
 
     def __unicode__(self):
         return u'%s' % self.nome
+
+    class Meta:
+        ordering = ('nome',)
+
 
 class PlanejaAquisicaoRecurso(models.Model):
     os = models.ForeignKey('outorga.OrdemDeServico', null=True, blank=True, verbose_name=u'Alteração de contrato')
