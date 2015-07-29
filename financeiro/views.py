@@ -393,7 +393,7 @@ def relatorio_gerencial(request, pdf=False):
                     mes = 1
                     ano += 1
 
-            for it in item['itens']:
+            for it in item['itens'].values():
                 total_parcial = Decimal('0.0')
                 for mes in it:
                     total_parcial += mes['valor']
