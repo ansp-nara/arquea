@@ -285,7 +285,6 @@ class Natureza_gastoAdmin(admin.ModelAdmin):
 
     search_fields = ('modalidade__sigla', 'modalidade__nome',  'termo__ano', 'termo__processo')
     
-    form = Natureza_gastoAdminForm
 
 admin.site.register(Natureza_gasto, Natureza_gastoAdmin)
 
