@@ -5,11 +5,12 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import cached_property
 from utils.functions import formata_moeda
 from utils.models import NARADateField
-from django.db.models import Sum
+from django.db.models import Sum, Q
 from decimal import Decimal
 from datetime import date
 import datetime
 import logging
+
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -171,9 +172,16 @@ class Termo(models.Model):
     @property
     def real(self):
         total = Decimal('0.00')
-        for ng in self.natureza_gasto_set.all():
-            if ng.modalidade.moeda_nacional == True and ng.modalidade.sigla != 'REI':
-                total += ng.valor_concedido
+#         for ng in self.natureza_gasto_set.all():
+#             if ng.modalidade.moeda_nacional == True and ng.modalidade.sigla != 'REI':
+#                 total += ng.valor_concedido
+        soma = Natureza_gasto.objects.filter(termo_id = self.id) \
+                                     .filter(modalidade__moeda_nacional = True) \
+                                     .filter(~Q(modalidade__sigla = 'REI')) \
+                                     .aggregate(Sum('valor_concedido'))
+        
+        total = soma['valor_concedido__sum'] or Decimal('0.00')
+        
         return total
 
 
@@ -190,9 +198,15 @@ class Termo(models.Model):
     @property
     def dolar(self):
         total = Decimal('0.00')
-        for ng in self.natureza_gasto_set.all():
-            if ng.modalidade.moeda_nacional == False:
-                total += ng.valor_concedido
+#         for ng in self.natureza_gasto_set.all():
+#             if ng.modalidade.moeda_nacional == False:
+#                 total += ng.valor_concedido
+                
+        soma = Natureza_gasto.objects.filter(termo_id = self.id) \
+                                     .filter(modalidade__moeda_nacional = False) \
+                                     .aggregate(Sum('valor_concedido'))
+        total = soma['valor_concedido__sum'] or Decimal('0.00')
+                
         return total
 
 
@@ -204,7 +218,7 @@ class Termo(models.Model):
     termo_dolar.short_description=_(u'Concessão')
 
 
-    @property
+    @cached_property
     def termino(self):
         termino = datetime.date.min
 
@@ -269,7 +283,7 @@ class Termo(models.Model):
     @property
     def total_realizado_dolar(self):
         total = Decimal('0.00')
-        for n in self.natureza_gasto_set.all():
+        for n in self.natureza_gasto_set.all().select_related('modalidade'):
             if not n.modalidade.moeda_nacional:
                 total += n.total_realizado
         return total
@@ -688,7 +702,7 @@ class Item(models.Model):
 
     # Retorna o Termo se o pedido de concessão estiver conectado a um termo.
     def mostra_termo(self):
-        return '%s' % self.natureza_gasto.mostra_termo()
+        return u'%s' % self.natureza_gasto.mostra_termo()
     mostra_termo.short_description = _(u'Termo')
 
 
@@ -714,12 +728,17 @@ class Item(models.Model):
 
     # Calcula o valor total realizado de um determinado item.
     def calcula_total_despesas(self):
+        from financeiro.models import Pagamento
        
         total = Decimal('0.00')
-        if hasattr(self, 'origemfapesp_set'):
-            for of in self.origemfapesp_set.all():
-                sumFapesp = of.pagamento_set.all().aggregate(Sum('valor_fapesp'))
-                total += sumFapesp['valor_fapesp__sum'] or Decimal('0.0')
+#         if hasattr(self, 'origemfapesp_set'):
+#             for of in self.origemfapesp_set.all():
+#                 sumFapesp = of.pagamento_set.all().aggregate(Sum('valor_fapesp'))
+#                 total += sumFapesp['valor_fapesp__sum'] or Decimal('0.0')
+        
+        sumFapesp = Pagamento.objects.filter(origem_fapesp__item_outorga_id = self.id).aggregate(Sum('valor_fapesp'))
+        total = sumFapesp['valor_fapesp__sum'] or Decimal('0.0')
+        
         return total
     # Define um atributo com o valor total realizado
     valor_realizado_acumulado = property(calcula_total_despesas)

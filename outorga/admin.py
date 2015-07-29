@@ -203,8 +203,10 @@ class TermoAdmin(admin.ModelAdmin):
     )
 
     list_display = ('__unicode__', 'inicio', 'duracao_meses', 'termo_real', 'formata_realizado_real', 'formata_saldo_real', 'termo_dolar', 'formata_realizado_dolar', 'formata_saldo_dolar', 'estado')
+    
+    list_filter = (('estado', RelatedOnlyFieldListFilter),)
 
-    list_per_page = 10
+    list_per_page = 20
 
     search_fields = ('ano', 'processo', 'inicio')
 
@@ -282,6 +284,8 @@ class Natureza_gastoAdmin(admin.ModelAdmin):
     list_per_page = 10
 
     search_fields = ('modalidade__sigla', 'modalidade__nome',  'termo__ano', 'termo__processo')
+    
+    form = Natureza_gastoAdminForm
 
 admin.site.register(Natureza_gasto, Natureza_gastoAdmin)
 
@@ -309,15 +313,15 @@ class ItemAdmin(admin.ModelAdmin):
 
     list_display = ('mostra_termo', 'mostra_modalidade', 'mostra_descricao', 'entidade', 'mostra_quantidade', 'mostra_valor_realizado', 'pagamentos_pagina')
 
-    list_filter = ('natureza_gasto__termo', 'natureza_gasto__modalidade') 
-
+    list_filter = ('natureza_gasto__termo', 'natureza_gasto__modalidade', ('entidade', RelatedOnlyFieldListFilter),) 
+    
     list_per_page = 20
 
     search_fields = ('natureza_gasto__modalidade__sigla', 'natureza_gasto__modalidade__nome', 'natureza_gasto__termo__ano', 'natureza_gasto__termo__processo', 'descricao', 'justificativa', 'obs')
 
     inlines = [OrigemFapespInline]
     
-    list_display_links = ('mostra_descricao', )
+    list_display_links = ('mostra_termo', 'mostra_descricao', )
 
     form = ItemAdminForm
 
@@ -368,7 +372,7 @@ class ContratoAdmin(admin.ModelAdmin):
     
     list_filter = (('entidade', RelatedOnlyFieldListFilter),)
 
-    list_per_page = 10
+    list_per_page = 20
 
     search_fields = ('entidade__sigla', 'entidade__nome', 'data_inicio' )
 
@@ -390,7 +394,7 @@ class OrdemDeServicoListEntidadeFilter(admin.SimpleListFilter):
     parameter_name = 'entidade'
 
     def lookups(self, request, model_admin):
-        entidades = set([c.contrato.entidade for c in model_admin.model.objects.all()])
+        entidades = set([c.contrato.entidade for c in model_admin.model.objects.select_related('contrato__entidade').all()])
         return [(c.id, c.sigla) for c in entidades]
 
     def queryset(self, request, queryset):
@@ -419,13 +423,15 @@ class OrdemDeServicoAdmin(admin.ModelAdmin):
     list_filter = (OrdemDeServicoListEntidadeFilter,
                    ('estado', RelatedOnlyFieldListFilter),)
 
-    list_per_page = 10
+    list_per_page = 20
 
     inlines = (ArquivoOSInline, PlanejamentoInline)
 
     search_fields = ('numero', 'acordo__descricao', 'contrato__entidade__sigla', 'contrato__entidade__nome', 'descricao', 'data_inicio', 'data_rescisao', 'tipo__nome')
 
     filter_horizontal = ('pergunta',)
+    
+    form = OrdemDeServicoAdminForm
 
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
