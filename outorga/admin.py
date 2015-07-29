@@ -116,6 +116,7 @@ class AcordoAdmin(admin.ModelAdmin):
     search_fields = ('descricao', 'estado__nome', )
     list_per_page = 10
     inlines = [OrigemFapespInline]
+    form = AcordoAdminForm
 
 admin.site.register(Acordo,AcordoAdmin)
 
@@ -137,6 +138,8 @@ class EstadoAdmin(admin.ModelAdmin):
     search_fields = ('nome', )
 
     list_per_page = 10
+    
+    form = EstadoAdminForm
 
 admin.site.register(Estado, EstadoAdmin)
 
@@ -158,6 +161,8 @@ class CategoriaAdmin(admin.ModelAdmin):
     search_fields = ('nome', )
 
     list_per_page = 10
+    
+    form = CategoriaAdminForm
 
 admin.site.register(Categoria, CategoriaAdmin)
 
@@ -285,6 +290,8 @@ class Natureza_gastoAdmin(admin.ModelAdmin):
 
     search_fields = ('modalidade__sigla', 'modalidade__nome',  'termo__ano', 'termo__processo')
     
+    form = Natureza_gastoAdminForm
+    
 
 admin.site.register(Natureza_gasto, Natureza_gastoAdmin)
 
@@ -349,6 +356,8 @@ class ArquivoAdmin(admin.ModelAdmin):
     list_per_page = 10
 
     search_fields = ('outorga__termo__ano', 'outorga__termo__processo', 'outorga__categoria__nome', 'arquivo', )
+    
+    form = ArquivoAdminForm
 
 
 admin.site.register(Arquivo,ArquivoAdmin)
