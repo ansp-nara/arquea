@@ -223,7 +223,7 @@ class HistoricoLocalAdmin(admin.ModelAdmin):
 admin.site.register(HistoricoLocal, HistoricoLocalAdmin)
 
 class EquipamentoAdmin(admin.ModelAdmin):
-    search_fields = ['part_number', 'descricao']
+    search_fields = ['part_number', 'descricao', 'modelo', 'entidade_fabricante__sigla']
     list_display = ('descricao', 'part_number', 'tipo')
     list_filter = (('tipo', RelatedOnlyFieldListFilter), ('entidade_fabricante', RelatedOnlyFieldListFilter),)
     
