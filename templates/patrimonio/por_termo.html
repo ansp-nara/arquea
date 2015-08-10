@@ -44,6 +44,10 @@
     font-weight: bold;
     border-bottom:1px darkgray solid;
 }
+#tbl_conteudo a {
+    color: inherit;
+    line-height: inherit;
+}
 .th_nf {}
 .th_descricao {}
 .th_valor {}
@@ -196,7 +200,7 @@
                     {% if ver_numero_fmusp %}
                         <td></td>
                     {% endif %}
-                    <td>{{ pg.pg.protocolo.num_documento }}</td>
+                    <td><a href="{% url 'admin:protocolo_protocolo_change' pg.pg.protocolo.id %}">{{ pg.pg.protocolo.num_documento }}</a></td>
                     <td colspan="9"></td>
                   </tr>
                   {% for p in pg.patrimonios %}
@@ -205,14 +209,14 @@
                             <td>{{ p.numero_fmusp|default_if_none:"" }}</td>
                         {% endif %}
                         <td></td>
-                        <td colspan="2">{% if p.equipamento %}[{{ p.equipamento.tipo }}] {% endif %}{{ p.descricao }} - {{ p.complemento|default:"" }}</td>
+                        <td colspan="2"><a href="{% url 'admin:patrimonio_patrimonio_change' p.id %}">{% if p.equipamento %}[{{ p.equipamento.tipo }}] {% endif %}{{ p.descricao }} - {{ p.complemento|default:"" }}</a></td>
                         <td>{{ p.valor }}</td>
-                        <td>{{ p.equipamento.entidade_fabricante.sigla }}</td>
-                        <td>{{ p.ns }}</td>
+                        <td><a href="{% url 'admin:patrimonio_patrimonio_change' p.id %}">{{ p.equipamento.entidade_fabricante.sigla }}</a> </td>
+                        <td><a href="{% url 'admin:patrimonio_patrimonio_change' p.id %}">{{ p.ns }}</a></td>
                         {% with p.historico_atual as historico_atual %}  
-                        <td>{{ historico_atual.estado }}</td>
-                        <td>{{ historico_atual.endereco }}</td>
-                        <td>{{ historico_atual.posicao|default_if_none:"" }}</td>
+                        <td><a href="{% url 'admin:patrimonio_patrimonio_change' p.id %}">{{ historico_atual.estado }}</a></td>
+                        <td><a href="{% url 'admin:patrimonio_patrimonio_change' p.id %}">{{ historico_atual.endereco }}</a></td>
+                        <td><a href="{% url 'admin:patrimonio_patrimonio_change' p.id %}">{{ historico_atual.posicao|default_if_none:"" }}</a></td>
                         {% endwith %}
                      </tr>
                      {% if not numero_fmusp %}
@@ -225,11 +229,11 @@
                             <td width="10px"></td>
                             <td>{% if pf.equipamento %}[{{ pf.equipamento.tipo }}] {% endif %}{{ pf.descricao }} - {{ pf.complemento|default:"" }}</td>
                             <td>{{ pf.valor }}</td>
-                            <td>{{ pf.equipamento.entidade_fabricante.sigla }}</td>
-                            <td>{{ pf.ns }}</td>
-                            <td>{{ pf.historico_atual.estado }}</td>
-                            <td>{{ pf.historico_atual.endereco }}</td>
-                            <td>{{ pf.historico_atual.posicao|default_if_none:"" }}</td>
+                            <td><a href="{% url 'admin:patrimonio_patrimonio_change' p.id %}">{{ pf.equipamento.entidade_fabricante.sigla }}</a></td>
+                            <td><a href="{% url 'admin:patrimonio_patrimonio_change' p.id %}">{{ pf.ns }}</td>
+                            <td><a href="{% url 'admin:patrimonio_patrimonio_change' p.id %}">{{ pf.historico_atual.estado }}</td>
+                            <td><a href="{% url 'admin:patrimonio_patrimonio_change' p.id %}">{{ pf.historico_atual.endereco }}</td>
+                            <td><a href="{% url 'admin:patrimonio_patrimonio_change' p.id %}">{{ pf.historico_atual.posicao|default_if_none:"" }}</td>
                         </tr>
                        {% endfor %}
                      {% endif %}
