@@ -38,13 +38,13 @@ def ajax_termo_escolhido(request):
     retorno = {}
     if t:
         protocolos = Protocolo.objects.filter(termo=t).order_by('tipo_documento', 'num_documento', 'data_vencimento')
-        origens = OrigemFapesp.objects.filter(item_outorga__natureza_gasto__termo=t).order_by('acordo', 'item_outorga')
+        origens = OrigemFapesp.objects.filter(item_outorga__natureza_gasto__termo=t).order_by('acordo', 'item_outorga__natureza_gasto__modalidade', 'item_outorga')
         prot = []
         for p in protocolos:
             prot.append({'pk':p.id, 'valor':p.__unicode__()})
         orig = []
         for o in origens:
-            orig.append({'pk':o.id, 'valor':'%s - %s' % (o.acordo, o.item_outorga)})
+            orig.append({'pk':o.id, 'valor':u'%s - %s - %s' % (o.acordo, o.item_outorga.natureza_gasto.modalidade.sigla, o.item_outorga)})
 
         retorno = {'protocolos':prot, 'origens':orig}
     json = simplejson.dumps(retorno)
@@ -339,7 +339,7 @@ def relatorio_gerencial(request, pdf=False):
         treal = {}
         tdolar = {}
         
-        for ng in Natureza_gasto.objects.filter(termo=t).exclude(modalidade__sigla='REI').select_related('modalidade__moeda_nacional'):
+        for ng in Natureza_gasto.objects.filter(termo=t).exclude(modalidade__sigla='REI').select_related('modalidade__moeda_nacional').order_by('modalidade__sigla'):
 
             ng_itens = ng.item_set.all()
             if rt == 1:

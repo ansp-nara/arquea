@@ -203,7 +203,7 @@ class TermoAdmin(admin.ModelAdmin):
     fieldsets = (
                  (None, {
                      'fields': (('ano', 'processo', 'digito', 'inicio', 'estado'), \
-                                'parecer', 'parecer_final', 'projeto', 'orcamento', 'extrato_financeiro', 'quitacao', 'doacao', 'relatorio_final', 'exibe_rel_ger_progressivo'),
+                                'parecer', 'parecer_final', 'projeto', 'orcamento', 'extrato_financeiro', 'quitacao', 'doacao', 'relatorio_final', 'exibe_rel_ger_progressivo', 'rt'),
                  }),
     )
 
@@ -218,6 +218,11 @@ class TermoAdmin(admin.ModelAdmin):
     inlines = (OutorgaInline, Natureza_gastoInline)
     
     form = TermoAdminForm
+
+    def save_model(self, request, obj, form, change):
+	obj.save()
+        if not change and form.cleaned_data['rt']:
+	    obj.insere_itens_rt()
 
 admin.site.register(Termo, TermoAdmin)
 
@@ -317,7 +322,7 @@ class ItemAdmin(admin.ModelAdmin):
                  }),
     )
 
-    list_display = ('mostra_termo', 'mostra_modalidade', 'mostra_descricao', 'entidade', 'mostra_quantidade', 'mostra_valor_realizado', 'pagamentos_pagina')
+    list_display = ('mostra_termo', 'mostra_modalidade', 'mostra_descricao', 'entidade', 'rt', 'mostra_quantidade', 'mostra_valor_realizado', 'pagamentos_pagina')
 
     list_filter = ('natureza_gasto__termo', 'natureza_gasto__modalidade', ('entidade', RelatedOnlyFieldListFilter),) 
     

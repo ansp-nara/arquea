@@ -79,7 +79,7 @@ class PagamentoAdminForm(forms.ModelForm):
             t = termo #Termo.objects.get(id=termo)
             
         if t:
-            self.fields['origem_fapesp'].choices = [('','---------')] + [(p.id, p.__unicode__()) for p in OrigemFapesp.objects.filter(item_outorga__natureza_gasto__termo=t).select_related('acordo', 'item_outorga', 'item_outorga__natureza_gasto', 'item_outorga__natureza_gasto__termo', ).order_by('acordo__descricao')]
+            self.fields['origem_fapesp'].choices = [('','---------')] + [(p.id, p.__unicode__()) for p in OrigemFapesp.objects.filter(item_outorga__natureza_gasto__termo=t).select_related('acordo', 'item_outorga', 'item_outorga__natureza_gasto', 'item_outorga__natureza_gasto__termo', ).order_by('acordo__descricao', 'item_outorga__natureza_gasto__modalidade')]
             self.fields['protocolo'].choices = [('','---------')] + [(p.id, p.__unicode__()) for p in Protocolo.objects.filter(termo=t).prefetch_related('itemprotocolo_set').select_related('tipo_documento').order_by('data_vencimento')]
         else:
             cache = get_request_cache()
@@ -89,7 +89,7 @@ class PagamentoAdminForm(forms.ModelForm):
 
             cache = get_request_cache()
             if cache.get('outorga.OrigemFapesp.all') is None:
-                cache.set('outorga.OrigemFapesp.all', [('','---------')] + [(p.id, p.__unicode__()) for p in OrigemFapesp.objects.all().select_related('acordo', 'item_outorga', 'item_outorga__natureza_gasto', 'item_outorga__natureza_gasto__termo', ).order_by('acordo__descricao')])
+                cache.set('outorga.OrigemFapesp.all', [('','---------')] + [(p.id, p.__unicode__()) for p in OrigemFapesp.objects.all().select_related('acordo', 'item_outorga', 'item_outorga__natureza_gasto', 'item_outorga__natureza_gasto__termo', ).order_by('acordo__descricao', 'item_outorga__natureza_gasto__modalidade')])
             self.fields['origem_fapesp'].choices =  cache.get('outorga.OrigemFapesp.all')
 
 

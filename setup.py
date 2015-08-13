@@ -3,7 +3,7 @@
 from setuptools import setup, find_packages
 import codecs, os
 
-version = '2.2'
+version = '2.3.4'
 
 """
 zest.releaser available commands
@@ -51,5 +51,8 @@ setup(
           'python-magic',
           'pisa',
 	  'pyyaml',
+          'ipaddress',
+          'pillow',
+          'pypdf'
         ]
      )
