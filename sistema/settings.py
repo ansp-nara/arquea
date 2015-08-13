@@ -110,7 +110,6 @@ PROJECT_APPS = (
     'pesquisa',
     'processo',
     'protocolo',
-    'questionario',
     'rede',
     'verificacao',
     'repositorio',

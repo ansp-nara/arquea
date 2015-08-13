@@ -164,9 +164,6 @@ class Termo(models.Model):
             
         super(Termo, self).save(force_insert, force_update)
 
-        if not antigo:
-            self.insere_itens_rt()
-
     
     # Retorna a soma das naturezas (moeda nacional) de um termo.
     @property
@@ -662,6 +659,10 @@ class TemplateRT(models.Model):
     def __unicode__(self):
         return u'%s - %s' % (self.modalidade, self.descricao)
 
+    class Meta:
+        verbose_name=u'Template Reserva Técnica'
+        verbose_name_plural=u'Templates Reserva Técnica'
+
 class Item(models.Model):
 
     """
@@ -693,7 +694,7 @@ class Item(models.Model):
     quantidade = models.IntegerField(_(u'Quantidade'))
     obs = models.TextField(_(u'Observação'), blank=True)
     valor = models.DecimalField(_(u'Valor Concedido'), max_digits=12, decimal_places=2, help_text=_(u'ex. 150500.50'))
-    rt = models.BooleanField(default=False)
+    rt = models.BooleanField(u'Reserva técnica?', default=False)
 
     # Retorna a descrição e o termo, se existir.
     def __unicode__(self):
@@ -883,7 +884,7 @@ class OrigemFapesp(models.Model):
 
     # Retorna o acordo e o item de Outorga da Origem FAPESP.
     def __unicode__(self):
-        return u"%s - %s" % (self.acordo, self.item_outorga)
+        return u"%s - %s - %s" % (self.acordo, self.item_outorga.natureza_gasto.modalidade.sigla, self.item_outorga)
 
 
     # Define a descrição do modelo.

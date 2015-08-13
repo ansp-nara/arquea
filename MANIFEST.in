@@ -1,4 +1,6 @@
 include README.rst
+recursive-include configuracao/fixtures *
+recursive-include configuracao/management *
 recursive-include configuracao/static *
 recursive-include configuracao/templates *
 recursive-include carga/templates *

@@ -158,7 +158,7 @@ $(document).ajaxSend(function(event, xhr, settings) {
         					{% if logout_url %}
         					   <li><a class="sair" href="{{ logout_url }}">
         					{% else %}
-        					   <li><a class="sair" href="{{ root_path }}logout/">
+        					   <li><a class="sair" href="{% url 'admin:logout' %}">
         					{% endif %}
         					{% trans 'Log out' %}</a></li>
         				{% endblock %}
@@ -236,7 +236,7 @@ $(document).ajaxSend(function(event, xhr, settings) {
         		<h2>Módulos</h2>
         		{{ menu_type }}
         		{% load tree_menu_tags %}
-                {# % show_menu "root" "ordered-list" % #}
+                {% show_menu "root" "ordered-list" %}
         	</div>
         {% endif %}
 	{% endblock %}
