@@ -80,7 +80,7 @@ class ForeignKeySearchInput(forms.HiddenInput):
         ''') % {
             'search_fields': ','.join(self.search_fields),
             'admin_media_prefix': settings.ADMIN_MEDIA_PREFIX,
-            'model_name': self.rel.to._meta.module_name,
+            'model_name': self.rel.to._meta.model_name,
             'app_label': self.rel.to._meta.app_label,
             'label': label,
             'name': name,

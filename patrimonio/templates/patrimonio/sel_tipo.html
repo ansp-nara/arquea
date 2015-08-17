@@ -1,13 +1,14 @@
 {% extends "admin/base_site.html" %}
 {% load proto_tags %}
 {% load i18n admin_modify admin_static %}
+{% load static from staticfiles %}
 {% block extrahead %}
 <style>
     div#theader {font-weight:bold; clear:both;}
     div#div_filtro {margin-bottom:15px;}
     div#div_filtro label {width:100px; display:inline-block;}
 </style>
-<script type="text/javascript" src="/media/js/selects.js"></script>
+<script type="text/javascript" src="{% static "js/selects.js" %}"></script>
 {% endblock %}
 {% block breadcrumbs %}
     <div class="breadcrumbs">Você está em: 

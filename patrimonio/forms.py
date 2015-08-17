@@ -257,7 +257,7 @@ class PatrimonioAdminForm(forms.ModelForm):
                   'revision', 'version', 'garantia_termino', 'form_filhos',]
 
     class Media:
-        js = ('/media/js/selects.js', '/media/js/patrimonio.js')
+        js = ('js/selects.js', 'js/patrimonio.js')
 
     def clean(self):
         cleaned_data = super(PatrimonioAdminForm, self).clean()
@@ -277,7 +277,7 @@ class HistoricoLocalAdminForm(forms.ModelForm):
         fields = ['data', 'patrimonio', 'endereco', 'descricao',]
 
     class Media:
-        js = ('/media/js/selects.js',)
+        js = ('js/selects.js',)
 
 
     patrimonio = forms.ModelChoiceField(Patrimonio.objects.all().select_related('pagamento', 'pagamento__protocolo', 'pagamento__protocolo__num_documento'), \
@@ -328,7 +328,7 @@ class PatrimonioHistoricoLocalAdminForm(forms.ModelForm):
         fields = ['entidade', 'endereco', 'posicao', 'descricao', 'data', 'estado', 'memorando',]
 
     class Media:
-        js = ('/media/js/selects.js',)
+        js = ('js/selects.js',)
 
 
     entidade = EntidadeModelChoiceField(Entidade.objects.all(), required=False,

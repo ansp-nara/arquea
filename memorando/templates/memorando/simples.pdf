@@ -3,10 +3,10 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <style>
-@import url('/var/www/media/css/memorando.css');
+@import url('/var/www/static/css/memorando.css');
 @page {
   size: a4 portrait;
-  background-image: url('/var/www/media/img/papel_timbrado.jpg');
+  background-image: url('/var/www/static/img/papel_timbrado.jpg');
   top: {{ m.superior }}cm;
   left: {{ m.esquerda }}cm;
   right: {{ m.direita }}cm;

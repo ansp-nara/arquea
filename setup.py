@@ -3,7 +3,7 @@
 from setuptools import setup, find_packages
 import codecs, os
 
-version = '2.3.4'
+version = '2.3.6'
 
 """
 zest.releaser available commands
@@ -40,7 +40,7 @@ setup(
         install_requires = [
           'setuptools',
           # -*- Extra requirements: -*-
-          'django<1.8',
+          'django<1.9',
 	  'django-import-export',
           'django-tinymce',
           'django-ckeditor',
@@ -53,6 +53,7 @@ setup(
 	  'pyyaml',
           'ipaddress',
           'pillow',
-          'pypdf'
+          'pypdf',
+          'reportlab',
         ]
      )

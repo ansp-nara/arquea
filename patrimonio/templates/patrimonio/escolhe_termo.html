@@ -1,6 +1,7 @@
 {% extends "admin/base_site.html" %}
 {% load proto_tags %}
 {% load i18n %}
+{% load static from staticfiles %}
 {% block extrahead %}
 <style>
 #form_filtro {
@@ -25,7 +26,7 @@
     height: 125px;
 }
 </style>
-<script type="text/javascript" src="/media/js/selects.js"></script>
+<script type="text/javascript" src="{% static "js/selects.js" %}"></script>
 <script>
 	$( document ).ready(function() {
         $( "#id_termo" ).bind("change", function() {

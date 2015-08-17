@@ -1,10 +1,11 @@
+{% load static from staticfiles %}
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="pt-br" xml:lang="pt-br" >
 <head>
 	<meta HTTP-EQUIV="Refresh" CONTENT="300">
 	<meta HTTP-EQUIV="Pragma" CONTENT="no-cache">
 	<meta HTTP-EQUIV="Cache-Control" CONTENT="no-cache">
-	<link rel="stylesheet" type="text/css" href="/media/css/monitor.css" media="screen" /> 
+	<link rel="stylesheet" type="text/css" href="{% static "css/monitor.css" %}" media="screen" /> 
 	<title>Gráfico do link - {{ link.descricao }}</title>
 </head>
 
@@ -13,7 +14,7 @@
 		<span class="logo"></span>
 		<h2>Tráfego do link - {{ link.descricao }}</h2>
 		
-		<span class="indice-grafico"><em>Entrada</em><img class="bullet" src="/media/img/verde.png"> <em>Saída</em><img class="bullet" src="/media/img/azul.png"></span>
+		<span class="indice-grafico"><em>Entrada</em><img class="bullet" src="{% static "img/verde.png" %}"> <em>Saída</em><img class="bullet" src="{% static "img/azul.png" %}"></span>
 		
 		<p>
 		<h4 class="title-grafico">Um dia</h4>

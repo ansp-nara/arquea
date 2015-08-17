@@ -72,7 +72,7 @@ class CorpoAdminForm(forms.ModelForm):
         fields = ['pergunta', 'perg', 'resposta', 'anexo', 'concluido',]
 
     class Media:
-        js = ('/media/js/selects.js', )
+        js = ('js/selects.js', )
 
 
 class BaseCorpoInlineFormSet(BaseInlineFormSet):

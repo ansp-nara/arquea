@@ -95,7 +95,7 @@ class CotacaoAdminForm(forms.ModelForm):
         fields = ['estado', 'termo', 'entidade', 'identificacao', 'descricao2', 'moeda_estrangeira', 'data_validade', 'data_chegada', 'origem', 'valor_total', 'obs', 'aceito', 'entrega', 'protocolo', 'parecer',]
 
     class Media:
-        js = ('/media/js/selects.js', '/media/js/protocolo.js')
+        js = ('js/selects.js', 'js/protocolo.js')
 
 
     # Redefine os campos 'protocolo' e 'identificacao'.
@@ -155,7 +155,7 @@ class ProtocoloAdminForm(forms.ModelForm):
         fields = ['data_chegada', 'origem', 'valor_total', 'obs', 'estado', 'termo', 'descricao2', 'tipo_documento', 'num_documento', 'moeda_estrangeira', 'referente', 'procedencia', 'data_validade', 'data_vencimento', 'responsavel',]
 
     class Media:
-        js = ('/media/js/selects.js', '/media/js/protocolo.js',)
+        js = ('js/selects.js', 'js/protocolo.js',)
         
 
     # Verifica se o termo do protocolo é o mesmo termo do item do pedido de outorga relacionada a despesa desse protocolo.

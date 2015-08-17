@@ -1,6 +1,7 @@
 {% extends "admin/base_site.html" %}
 {% load proto_tags %}
 {% load i18n %}
+{% load static from staticfiles %}
 {% block breadcrumbs %}
     <div class="breadcrumbs">Você está em: 
       <a href="../../">{% trans "Home" %}</a> &rsaquo; 
@@ -20,8 +21,8 @@
   </style>
 {% endblock %}
 {% block extrahead %}
-<script type="text/javascript" src="/media/js/jstree/_lib/jquery.js"></script>
-<script type="text/javascript" src="/media/js/jstree/jquery.jstree.js"></script>
+<script type="text/javascript" src="{% static "js/jstree/_lib/jquery.js" %}"></script>
+<script type="text/javascript" src="{% static "js/jstree/jquery.jstree.js" %}"></script>
 {% endblock %}
 {% block content %}
 <div id="report_title">
