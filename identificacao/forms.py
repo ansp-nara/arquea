@@ -93,5 +93,5 @@ class EnderecoDetalheAdminForm(forms.ModelForm):
         fields = ['entidade', 'endereco', 'detalhe', 'tipo', 'complemento',]
 
     class Media:
-        js = ('/media/js/selects.js',)
+        js = ('js/selects.js',)
 

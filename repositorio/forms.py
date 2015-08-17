@@ -33,5 +33,5 @@ class RepositorioAdminForm(forms.ModelForm):
 
 
     class Media:
-        js = ('/media/js/selects.js',)
+        js = ('js/selects.js',)
 

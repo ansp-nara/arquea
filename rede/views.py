@@ -493,7 +493,7 @@ def custo_terremark(request, pdf=0, xls=0):
     datacenter_id = Variavel.objects.get(nome = Variavel.DATACENTER_IDS)
     
     # Filtrando por Entidade
-    recursos = Recurso.objects.filter(planejamento__os__contrato__entidade_id=datacenter_id) \
+    recursos = Recurso.objects.filter(planejamento__os__contrato__entidade_id=datacenter_id.valor) \
                               .order_by('planejamento__projeto__nome', \
                                         'planejamento__tipo__nome', \
                                         'planejamento__referente', \
@@ -548,7 +548,7 @@ def relatorio_recursos_operacional(request, pdf=0, xls=0):
     datacenter_id = Variavel.objects.get(nome = Variavel.DATACENTER_IDS)
     
     # Filtrando por Entidade
-    planejamentos = PlanejaAquisicaoRecurso.objects.filter(os__contrato__entidade_id=datacenter_id) \
+    planejamentos = PlanejaAquisicaoRecurso.objects.filter(os__contrato__entidade_id=datacenter_id.valor) \
                               .prefetch_related('beneficiado_set') \
                               .select_related('os', 'os__estado', 'os__contrato', 'projeto', 'tipo') \
                               .order_by('projeto__nome', \

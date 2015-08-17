@@ -118,7 +118,7 @@ class RecursoAdminForm(forms.ModelForm):
 
 
     class Media:
-        js = ('/media/js/selects.js',)
+        js = ('js/selects.js',)
 
 
 class IFCConectorAdminForm(forms.ModelForm):

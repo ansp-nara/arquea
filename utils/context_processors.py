@@ -7,6 +7,12 @@ from django.utils.text import capfirst
 site = admin.site
 
 
+def static_root(request):
+    """
+    Adds STATIC_ROOT settings to the context.
+    """
+    return {'STATIC_ROOT': settings.STATIC_ROOT }
+
 def applist(request):
     app_dict = {}
     user = request.user

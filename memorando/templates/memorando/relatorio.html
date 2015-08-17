@@ -1,6 +1,7 @@
 {% extends "admin/base_site.html" %}
 {% load proto_tags %}
 {% load i18n %}
+{% load static from staticfiles %}
 {% block breadcrumbs %}
     <div class="breadcrumbs">Você está em: 
       <a href="../../">{% trans "Home" %}</a> &rsaquo;
@@ -10,7 +11,7 @@
 {% block content %}
 
 {% block extrahead %}
-	<link rel="stylesheet" type="text/css" href="/media/css/relatorios.css" />
+	<link rel="stylesheet" type="text/css" href="{% static "css/relatorios.css" %}" />
 {% endblock %}
 
 <div id="relatorios-content">

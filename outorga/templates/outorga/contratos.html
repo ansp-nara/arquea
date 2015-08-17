@@ -1,5 +1,6 @@
 {% extends "admin/base_site.html" %}
 {% load i18n %}
+{% load static from staticfiles %}
 {% block extrahead %}
 <style>
     #div_filtro {
@@ -109,7 +110,7 @@
     .tbl_conteudo_os .th_os_estado { width: 7%; }
     
 </style>
-<script type="text/javascript" src="/media/js/selects.js"></script>
+<script type="text/javascript" src="{% static "js/selects.js" %}"></script>
 {% endblock %}
 
 {% block breadcrumbs %}

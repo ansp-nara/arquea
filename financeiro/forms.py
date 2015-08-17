@@ -4,7 +4,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.contrib.admin.widgets import FilteredSelectMultiple, RelatedFieldWidgetWrapper
 from django.db.models.fields.related import ManyToOneRel
-from django.forms.util import ErrorList
+from django.forms.utils import ErrorList
 from django.utils.html import mark_safe
 from decimal import Decimal
 from django.utils.translation import ugettext_lazy as _
@@ -109,7 +109,7 @@ class PagamentoAdminForm(forms.ModelForm):
 
         
     class Media:
-        js = ('/media/js/selects.js',)
+        js = ('js/selects.js',)
 
     cod_oper = forms.CharField(label=_(u'Código da operação'), required=False,
     	      widget=forms.TextInput(attrs={'onchange':'ajax_filter_cc_cod(this.value);', 'class':'auxiliary'}))

@@ -89,7 +89,7 @@ class ButtonAdminMixin(object):
         app_label = opts.app_label
         context = {
             'title': _('%s: %s') % (button.desc, force_unicode(obj)),
-            'module_name': capfirst(force_unicode(opts.verbose_name_plural)),
+            'model_name': capfirst(force_unicode(opts.verbose_name_plural)),
             'object': obj,
             'root_path': self.admin_site.root_path,
             'app_label': app_label,

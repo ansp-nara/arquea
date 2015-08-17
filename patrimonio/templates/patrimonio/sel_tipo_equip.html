@@ -1,7 +1,8 @@
 {% extends "admin/base_site.html" %}
 {% load i18n %}
+{% load static from staticfiles %}
 {% block extrahead %}
-    <script src="/media/js/por_tipo.js"></script>
+    <script src="{% static "js/por_tipo.js" %}"></script>
     <style type="text/css">
       div#theader {font-weight:bold; clear:both;}
       div#div_filtro {margin-bottom:15px;}
