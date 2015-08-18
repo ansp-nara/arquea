@@ -417,7 +417,7 @@ def por_marca(request, pdf=0):
         
         patrimonios = Patrimonio.objects.filter(equipamento__entidade_fabricante__sigla=marca) \
                                 .select_related('tipo', 'equipamento', 'pagamento__protocolo', 'entidade_procedencia') \
-                                .prefetch_related(Prefetch('historicolocal_set', queryset=HistoricoLocal.objects.select_related('estado', 'endereco__enderecodetalhe__entidade', 'endereco__endereco__entidade'))) \
+                                .prefetch_related(Prefetch('historicolocal_set', queryset=HistoricoLocal.objects.select_related('estado', 'endereco__detalhe__endereco__entidade', 'endereco__endereco__entidade'))) \
         
         if pdf:
             return render_to_pdf_weasy('patrimonio/por_marca.pdf', {'marca':marca, 'patrimonios':patrimonios}, request=request, filename='inventario_por_marca.pdf')
