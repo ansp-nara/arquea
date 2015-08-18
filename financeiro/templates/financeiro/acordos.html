@@ -73,6 +73,8 @@ $(function(){
 <div id="report_toolbar">
     <form action="{% url 'financeiro.views.relatorio_acordos' 1 %}" method="GET" id="id_form_recurso">
         <input type="hidden" value="{{ termo.id }}" name="termo" />
+        <input type="hidden" value="{{ rt }}" name="rt" />
+        <input type="hidden" value="{{ parcial }}" name="parcial" />
         <div title="Imprimir" class="btn_print">
            <input type="submit" title="Versão para impressão A4" class="btn_print" name="acao" value="1"  />
         </div>
