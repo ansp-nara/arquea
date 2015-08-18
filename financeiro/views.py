@@ -469,7 +469,7 @@ def relatorio_acordos(request, pdf=False):
         if pdf:
             return render_to_pdf_weasy(template_src='financeiro/acordos_weasy.pdf', context_dict={'termo':t, 'acordos':retorno}, request=request, filename='relatorio_de_acordos_da_outorga_%s.pdf'%t,)
         else:
-            return render_to_response('financeiro/acordos.html', {'termo':t, 'acordos':retorno}, context_instance=RequestContext(request))
+            return render_to_response('financeiro/acordos.html', {'termo':t, 'acordos':retorno, 'rt':rt, 'parcial':parcial}, context_instance=RequestContext(request))
     else:
         return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all(), 'view':'relatorio_acordos'}, context_instance=RequestContext(request))
 
