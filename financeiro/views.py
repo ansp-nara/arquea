@@ -263,8 +263,14 @@ def relatorio_gerencial(request, pdf=False):
         id = int(request.GET.get('termo'))
         t = get_object_or_404(Termo,id=id)
 
-        rt = int(request.GET.get('rt'))
-        parcial = int(request.GET.get('parcial'))
+        try:
+            rt = int(request.GET.get('rt'))
+        except TypeError:
+            rt = 0
+        try:
+            parcial = int(request.GET.get('parcial'))
+        except TypeError:
+            parcial = 0
         
         retorno = []
         meses = []
@@ -422,8 +428,14 @@ def relatorio_acordos(request, pdf=False):
     if request.GET.get('termo'):
         id = int(request.GET.get('termo'))
         t = get_object_or_404(Termo,id=id)
-        rt = int(request.GET.get('rt'))
-        parcial = int(request.GET.get('parcial'))
+        try:
+            rt = int(request.GET.get('rt'))
+        except TypeError:
+            rt = 0
+        try:
+            parcial = int(request.GET.get('parcial'))
+        except TypeError:
+            parcial = 0
         retorno = []
         
         for a in  Acordo.objects.all():
