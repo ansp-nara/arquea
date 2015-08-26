@@ -313,7 +313,9 @@ class FeriadoListFilter(admin.SimpleListFilter):
     parameter_name = 'feriado__ano'
 
     def lookups(self, request, model_admin):
-        feriados = set([c for c in model_admin.model.objects.extra(select={'year': 'extract( year from feriado )'}).values_list('year', flat=True)])
+        feriados = list(set([c for c in model_admin.model.objects.extra(select={'year': 'extract( year from feriado )'}).values_list('year', flat=True)]))
+        feriados.sort(reverse=True)
+        
         return [(int(c), int(c)) for c in feriados]
 
     def queryset(self, request, queryset):
