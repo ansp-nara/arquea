@@ -570,10 +570,12 @@ class ViewTest(TestCase):
         self.setUpPatrimonio('1234', '')
         
         url = reverse("patrimonio.views.ajax_escolhe_pagamento")
+        
         response = self.client.get(url, {'termo': '1', 'numero':'1234'})
         
         self.assertTrue(200, response.status_code)
-        self.assertContains(response, u'"valor": "Doc. 1234, cheque 333333, valor 1000"')
+        
+        self.assertContains(response, u'"valor": "Doc. 1234, cheque 333333, valor 1000.00"')
     
     def test_ajax_escolhe_pagamento__nao_encontrado(self):
         """
