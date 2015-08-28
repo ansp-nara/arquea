@@ -79,7 +79,7 @@ class ExtratoCCTest(TestCase):
 
     def test_unicode(self):
         extrato = ExtratoCC.objects.get(pk=1)
-        self.assertEquals(extrato.__unicode__(), u'2008-10-05 - 333333 - TED - 2650')
+        self.assertEquals(extrato.__unicode__(), u'2008-10-05 - 333333 - TED - 2650.00')
         
     def test_saldo(self):
         extrato = ExtratoCC.objects.get(pk=1)
@@ -117,7 +117,7 @@ class ExtratoFinanceiroTest(TestCase):
 
     def test_unicode(self):
         exf = ExtratoFinanceiro.objects.get(pk=1)
-        self.assertEquals(exf.__unicode__(), u'2013-08-10 - EFC - historico - 123456')
+        self.assertEquals(exf.__unicode__(), u'2013-08-10 - EFC - historico - 123456.00')
         
     def test_despesa_caixa_falso(self):
         exf = ExtratoFinanceiro.objects.get(pk=1)
@@ -198,13 +198,13 @@ class PagamentoTest(TestCase):
 
     def test_unicode(self):
         exf = Pagamento.objects.get(pk=1)
-        self.assertEquals(exf.__unicode__(), u'8888 - 2650 - STB    ID: 1')
+        self.assertEquals(exf.__unicode__(), u'8888 - 2650.00 - STB    ID: 1')
     
     def test_unicode_com_patrocinio(self):
         exf = Pagamento.objects.get(pk=1)
         exf.valor_patrocinio = 1234
         
-        self.assertEquals(exf.__unicode__(), u'8888 - 3884 - STB    ID: 1')
+        self.assertEquals(exf.__unicode__(), u'8888 - 3884.00 - STB    ID: 1')
 
     def test_unicode_com_auditoria(self):
         exf = Pagamento.objects.get(pk=1)
@@ -214,7 +214,7 @@ class PagamentoTest(TestCase):
 
         audit1 = Auditoria.objects.create(estado=efi1, pagamento=exf, tipo=tcomprov1, parcial=101.0, pagina=102.0, obs='observacao')
         
-        self.assertEquals(exf.__unicode__(), u'8888 - 2650 - STB, parcial 101, página 102    ID: 1')
+        self.assertEquals(exf.__unicode__(), u'8888 - 2650.00 - STB, parcial 101, página 102    ID: 1')
 
 
     def test_unicode_para_auditoria(self):
@@ -225,7 +225,7 @@ class PagamentoTest(TestCase):
 
         audit1 = Auditoria.objects.create(estado=efi1, pagamento=exf, tipo=tcomprov1, parcial=101.0, pagina=102.0, obs='observacao')
         
-        self.assertEquals(exf.unicode_para_auditoria(), u'8888 - 2650 - STB    ID: 1')
+        self.assertEquals(exf.unicode_para_auditoria(), u'8888 - 2650.00 - STB    ID: 1')
 
     def test_codigo_operacao(self):
         exf = Pagamento.objects.get(pk=1)
