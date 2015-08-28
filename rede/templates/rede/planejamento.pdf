@@ -1,13 +1,14 @@
 {% extends "base.pdf" %}
 {% load static %}
 {% load proto_tags %}
+{% load l10n %}
 {% block content %}
 <style>
 @page {
   size: a4;
   background-image: url('{% get_media_prefix %}{{papelaria.papel_timbrado_retrato_a4}}');
-  top: {{papelaria.retrato_a4_margem_superior|default:0.5}}cm;
-  bottom: {{papelaria.retrato_a4_margem_inferior|default:0.5}}cm;
+  top: {{papelaria.retrato_a4_margem_superior|default:0.5|unlocalize}}cm;
+  bottom: {{papelaria.retrato_a4_margem_inferior|default:0.5|unlocalize}}cm;
   left: 1.5cm;
   right: 1.5cm;
   @frame footer {

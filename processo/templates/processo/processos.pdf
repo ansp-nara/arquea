@@ -1,5 +1,6 @@
 {% load proto_tags %}
 {% load static %}
+{% load l10n %}
 <html xmlns="http://www.w3.org/1999/xhtml" lang="pt-br" xml:lang="pt-br" >
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -10,14 +11,14 @@
 
 {% if tamanho == '3' %}
   background-image: url('{% get_media_prefix %}{{papelaria.papel_timbrado_retrato_a3}}');
-  top: {{papelaria.retrato_a3_margem_superior|default:0.5}}cm;
-  bottom: {{papelaria.retrato_a3_margem_inferior|default:0.5}}cm;
+  top: {{papelaria.retrato_a3_margem_superior|default:0.5|unlocalize}}cm;
+  bottom: {{papelaria.retrato_a3_margem_inferior|default:0.5|unlocalize}}cm;
 {% endif %}
 {% if tamanho == '4' %}
   
   background-image: url('{% get_media_prefix %}{{papelaria.papel_timbrado_retrato_a4}}');
-  top: {{papelaria.retrato_a4_margem_superior|default:0.5}}cm;
-  bottom: {{papelaria.retrato_a4_margem_inferior|default:0.5}}cm;
+  top: {{papelaria.retrato_a4_margem_superior|default:0.5|unlocalize}}cm;
+  bottom: {{papelaria.retrato_a4_margem_inferior|default:0.5|unlocalize}}cm;
 {% endif %}
 
   background-size: contain;
@@ -29,7 +30,7 @@
                 bottom: 0.5cm;
                 margin-right: 1cm;
                 height: 1cm;
-		left: -2.3cm;
+                left: -2.3cm;
                 } 
 } 
 </style> 

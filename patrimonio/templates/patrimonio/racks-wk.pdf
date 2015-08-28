@@ -1,6 +1,7 @@
 {% load proto_tags %}
 {% load i18n proto_tags admin_static %}
 {% load static %}
+{% load l10n %}
 {% get_static_prefix as STATIC_PREFIX %}
 
 <style type="text/css">
@@ -318,14 +319,14 @@ img.profundidade_curta {
                   {{ rack.nome|default:'' }} ({{ rack.vazio }} ocupado)
                 </h2>
               <div class="rack_frontal" style="display:table-row">
-                    <div class="div_pdu" style="height: {{ rack.altura_pxs }}px;">
+                    <div class="div_pdu" style="height: {{ rack.altura_pxs|unlocalize }}px;">
                         {% for eq in rack.equipamentos_pdu %}
                             {% if eq.pos_col == 'LE' %}
                                {% if eq.id %}
                                    <a href="{% url "admin:patrimonio_patrimonio_change" eq.id %}" onclick="return showAddAnotherPopup(this);">
                                {% endif %}
                                <div class="equip " rel="tooltip" title="{{ eq.descricao }}" 
-                                    style="margin-top:{{ eq.eixoY }}px; height:{{ eq.altura }}px;">
+                                    style="margin-top:{{ eq.eixoY|unlocalize }}px; height:{{ eq.altura|unlocalize }}px;">
                                     {% if eq.imagem %}<img src="{{ eq.imagem }}" />{% endif %}
                                </div>
                                {% if eq.id %}
@@ -334,7 +335,7 @@ img.profundidade_curta {
                             {% endif %}
                         {% endfor %}
                     </div>
-                    <div id="rack{{ dc.id }}_{{forloop.counter}}" class="bloco-n" style="position:relative; height: {{ rack.altura_pxs }}px;">
+                    <div id="rack{{ dc.id }}_{{forloop.counter}}" class="bloco-n" style="position:relative; height: {{ rack.altura_pxs|unlocalize }}px;">
                         <script>
                         var content = '';
                         for(i={{rack.altura_pts}};i>0;i--){
@@ -359,9 +360,9 @@ img.profundidade_curta {
                     <div class="interno">
                     {% for eq in rack.equipamentos %}
                        <div class="{% if eq.pos_col %} pos_{{eq.pos_col}} {% endif %}  equip {% if eq.flag_traseiro and eq.profundidade < 1.0 %}profundidade_curta{% endif %}" 
-                           style="margin-top:{{ eq.eixoY }}px; height:{{ eq.altura }}px; {% if not eq.flag_traseiro %} z-index:10;{% endif %}">
+                           style="margin-top:{{ eq.eixoY|unlocalize }}px; height:{{ eq.altura|unlocalize }}px; {% if not eq.flag_traseiro %} z-index:10;{% endif %}">
                            <div>
-                               <div style="height:{{ eq.altura }}px;">
+                               <div style="height:{{ eq.altura|unlocalize }}px;">
                                 {% if eq.pos_col %}
                                     {% if eq.tam >= 15 %}
                                         {{ eq.nome|default:""|truncatechars:80 }}
@@ -388,7 +389,7 @@ img.profundidade_curta {
                                     {% endif %}
                                 {% endif %}
                                 </div>
-                                <div style="height:{{ eq.altura }}px;" style="position:absolute">
+                                <div style="height:{{ eq.altura|unlocalize }}px;" style="position:absolute">
                                 {% if eq.pos_col %}
                                     {% if eq.tam >= 15 %}
                                         {{ eq.descricao|truncatechars:80 }}
@@ -424,14 +425,14 @@ img.profundidade_curta {
                        </div>
                   {% endfor %}
                   </div>
-                  <div class="div_pdu" style="height: {{ rack.altura_pxs }}px;">
+                  <div class="div_pdu" style="height: {{ rack.altura_pxs|unlocalize }}px;">
                     {% for eq in rack.equipamentos_pdu %}
                         {% if eq.pos_col == 'LD' %}
                             {% if eq.id %}
                                 <a href="{% url "admin:patrimonio_patrimonio_change" eq.id %}" onclick="return showAddAnotherPopup(this);">
                             {% endif %}
                            <div class="equip " rel="tooltip" title="{{ eq.descricao }}" 
-                                style="margin-top:{{ eq.eixoY }}px; height:{{ eq.altura }}px;">
+                                style="margin-top:{{ eq.eixoY|unlocalize }}px; height:{{ eq.altura|unlocalize }}px;">
                                 {% if eq.imagem %}<img src="{{ eq.imagem }}" />{% endif %}
                            </div>
                             {% if eq.id %}
@@ -475,14 +476,14 @@ img.profundidade_curta {
                 {{ rack.nome|default:'' }} ({{ rack.vazio }} ocupado)
               </h2>
               <div class="rack_traseiro" style="display:table-row">
-                <div class="div_pdu" style="height: {{ rack.altura_pxs }}px;">
+                <div class="div_pdu" style="height: {{ rack.altura_pxs|unlocalize }}px;">
                     {% for eq in rack.equipamentos_pdu %}
                         {% if eq.pos_col == 'TE' %}
                            {% if eq.id %}
                                <a href="{% url "admin:patrimonio_patrimonio_change" eq.id %}" onclick="return showAddAnotherPopup(this);">
                            {% endif %}
                            <div class="equip " rel="tooltip" title="{{ eq.descricao }}" 
-                                style="margin-top:{{ eq.eixoY }}px; height:{{ eq.altura }}px;">
+                                style="margin-top:{{ eq.eixoY|unlocalize }}px; height:{{ eq.altura|unlocalize }}px;">
                                 {% if eq.imagem %}<img src="{{ eq.imagem }}" />{% endif %}
                            </div>
                            {% if eq.id %}
@@ -491,7 +492,7 @@ img.profundidade_curta {
                         {% endif %}
                     {% endfor %}
                 </div>
-                <div id="rack{{ dc.id }}_{{forloop.counter}}" class="bloco-n" style="position:relative; height: {{ rack.altura_pxs }}px;">
+                <div id="rack{{ dc.id }}_{{forloop.counter}}" class="bloco-n" style="position:relative; height: {{ rack.altura_pxs|unlocalize }}px;">
                     <script>
                     var content = '';
                     for(i={{rack.altura_pts}};i>0;i--){
@@ -516,9 +517,9 @@ img.profundidade_curta {
                 <div class="interno">
                 {% for eq in rack.equipamentos %}
                    <div class="{% if eq.pos_col %} pos_{{eq.pos_col}} {% endif %}  equip  {% if not eq.flag_traseiro and eq.profundidade < 1.0 %}profundidade_curta{% endif %} " 
-                       style="margin-top:{{ eq.eixoY }}px; height:{{ eq.altura }}px; {% if eq.flag_traseiro %} z-index:10;{% endif %}">
+                       style="margin-top:{{ eq.eixoY|unlocalize }}px; height:{{ eq.altura|unlocalize }}px; {% if eq.flag_traseiro %} z-index:10;{% endif %}">
                        <div>
-                           <div style="height:{{ eq.altura }}px;">
+                           <div style="height:{{ eq.altura|unlocalize }}px;">
                             {% if eq.pos_col %}
                                 {% if eq.tam >= 15 %}
                                     {{ eq.nome|default:""|truncatechars:80 }}
@@ -545,7 +546,7 @@ img.profundidade_curta {
                                 {% endif %}
                             {% endif %}
                             </div>
-                            <div style="height:{{ eq.altura }}px;" style="position:absolute">
+                            <div style="height:{{ eq.altura|unlocalize }}px;" style="position:absolute">
                             {% if eq.pos_col %}
                                 {% if eq.tam >= 15 %}
                                     {{ eq.descricao|truncatechars:80 }}
@@ -582,14 +583,14 @@ img.profundidade_curta {
                    </div>
                 {% endfor %}
                 </div>
-                <div class="div_pdu" style="height: {{ rack.altura_pxs }}px;">
+                <div class="div_pdu" style="height: {{ rack.altura_pxs|unlocalize }}px;">
                     {% for eq in rack.equipamentos_pdu %}
                         {% if eq.pos_col == 'TD' %}
                            {% if eq.id %}
                                <a href="{% url "admin:patrimonio_patrimonio_change" eq.id %}" onclick="return showAddAnotherPopup(this);">
                            {% endif %}
                            <div class="equip " rel="tooltip" title="{{ eq.descricao }}" 
-                                style="margin-top:{{ eq.eixoY }}px; height:{{ eq.altura }}px;">
+                                style="margin-top:{{ eq.eixoY|unlocalize }}px; height:{{ eq.altura|unlocalize }}px;">
                                 {% if eq.imagem %}<img src="{{ eq.imagem }}" />{% endif %}
                            </div>
                            {% if eq.id %}

@@ -1,5 +1,6 @@
 {% load proto_tags %}
 {% load static %}
+{% load l10n %}
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -10,10 +11,10 @@
   background-image: url('{% get_media_prefix %}{{papelaria.papel_timbrado_retrato_a4}}');
   background-size: contain;
   background-repeat:no-repeat;
-  top: {{papelaria.retrato_a4_margem_superior|default:0.5}}cm;
+  top: {{papelaria.retrato_a4_margem_superior|default:0.5|unlocalize}}cm;
   left: 1.5cm;
   right: 1.5cm;
-  bottom: {{papelaria.retrato_a4_margem_inferior|default:0.5}}cm;
+  bottom: {{papelaria.retrato_a4_margem_inferior|default:0.5|unlocalize}}cm;
   @frame footer {
                 -pdf-frame-content: footerContent;
                 bottom: 0.5cm;

@@ -1,6 +1,7 @@
 {% extends "admin/base_site.html" %}
 {% load proto_tags %}
 {% load i18n proto_tags admin_static %}
+{% load l10n %}
 {% block extrahead %}
 {% load static %}
 {% get_static_prefix as STATIC_PREFIX %}
@@ -125,7 +126,7 @@
                                                <a href="{% url "admin:patrimonio_patrimonio_change" eq.id %}" onclick="return showAddAnotherPopup(this);">
                                            {% endif %}
                                            <div class="equip " rel="tooltip" title="{{ eq.descricao }}" 
-                                                style="margin-top:{{ eq.eixoY }}px; height:{{ eq.altura }}px;">
+                                                style="margin-top:{{ eq.eixoY|unlocalize }}px; height:{{ eq.altura|unlocalize }}px;">
                                                 {% if eq.imagem %}<img src="{{ eq.imagem }}" />{% endif %}
                                            </div>
                                            {% if eq.id %}
@@ -136,12 +137,12 @@
                                 </div>
                             </div>
                             <div class="rack_frontal" style="display:table-row;">
-                                <div id="rack{{ dc.id }}_{{forloop.counter}}" class="bloco-n" style="height: {{ rack.altura_pxs }}px;">
+                                <div id="rack{{ dc.id }}_{{forloop.counter}}" class="bloco-n" style="height: {{ rack.altura_pxs|unlocalize }}px;">
                                     {% for i in rack.altura_pts|get_range reversed %}
                                         <div class="u-n"><div>{{ i|add:"1" }}</div></div>
                                     {% endfor %}
                                 </div>
-                                <div class="u" style="height: {{ rack.altura_pxs }}px;"></div>
+                                <div class="u" style="height: {{ rack.altura_pxs|unlocalize }}px;"></div>
                                 <div class="interno" style="">
                                     <div class="rack_grid">
                                         {% for i in rack.altura_pts|get_range %}
@@ -153,10 +154,10 @@
                                    {% if eq.id %}
                                        <a href="{% url "admin:patrimonio_patrimonio_change" eq.id %}" onclick="return showAddAnotherPopup(this);">
                                    {% endif %}
-                                   <div class="{% if eq.pos_col %} pos_{{eq.pos_col}} {% endif %} {% if eq.conflito %}conflito{% endif %} equip {% if eq.flag_traseiro and eq.profundidade < 1.0 %}profundidade_curta{% endif %}" rel="tooltip" title="{% if eq.nome %}{{ eq.nome|default:'' }} - {% endif %}{{ eq.descricao }} - pos:{{eq.pos_original|default:'0'}} pt" 
-                                       style="margin-top:{{ eq.eixoY }}px; height:{{ eq.altura }}px;">
+                                   <div class="{% if eq.pos_col %} pos_{{eq.pos_col}} {% endif %} {% if eq.conflito %}conflito{% endif %} equip {% if eq.flag_traseiro and eq.profundidade < 1.0 %}profundidade_curta{% endif %}" rel="tooltip" title="{% if eq.nome %}{{ eq.nome|default:'' }} - {% endif %}{{ eq.descricao }} - pos:{{eq.pos_original|default:'0'|unlocalize}} pt" 
+                                       style="margin-top:{{ eq.eixoY|unlocalize }}px; height:{{ eq.altura|unlocalize }}px;">
                                        <div>
-                                           <div class="{% if eq.pos_col %} pos_{{eq.pos_col}}_label {% endif %}" style="height:{{ eq.altura }}px;">
+                                           <div class="{% if eq.pos_col %} pos_{{eq.pos_col}}_label {% endif %}" style="height:{{ eq.altura|unlocalize }}px;">
                                             {% if eq.pos_col %}
                                                 {% if eq.tam >= 9 %}{{ eq.nome|default:""|truncatechars:50 }}
                                                 {% elif eq.tam >= 6 %}{{ eq.nome|default:""|truncatechars:35 }}
@@ -183,7 +184,7 @@
                                    </div>
                                 {% endfor %}
                                 </div>
-                                <div class="u" style="height: {{ rack.altura_pxs }}px;"></div>
+                                <div class="u" style="height: {{ rack.altura_pxs|unlocalize }}px;"></div>
                             </div>
                             <div class="rack_frontal_D rack_lateral">
                                 <div class="div_pdu">
@@ -193,7 +194,7 @@
                                             <a href="{% url "admin:patrimonio_patrimonio_change" eq.id %}" onclick="return showAddAnotherPopup(this);">
                                         {% endif %}
                                        <div class="equip " rel="tooltip" title="{{ eq.descricao }}" 
-                                            style="margin-top:{{ eq.eixoY }}px; height:{{ eq.altura }}px;">
+                                            style="margin-top:{{ eq.eixoY|unlocalize }}px; height:{{ eq.altura|unlocalize }}px;">
                                             {% if eq.imagem %}<img src="{{ eq.imagem }}" />{% endif %}
                                        </div>
                                         {% if eq.id %}
@@ -218,7 +219,7 @@
                                                <a href="{% url "admin:patrimonio_patrimonio_change" eq.id %}" onclick="return showAddAnotherPopup(this);">
                                            {% endif %}
                                            <div class="equip " rel="tooltip" title="{{ eq.descricao }}" 
-                                                style="margin-top:{{ eq.eixoY }}px; height:{{ eq.altura }}px;">
+                                                style="margin-top:{{ eq.eixoY|unlocalize }}px; height:{{ eq.altura|unlocalize }}px;">
                                                 {% if eq.imagem %}<img src="{{ eq.imagem }}" />{% endif %}
                                            </div>
                                            {% if eq.id %}
@@ -229,12 +230,12 @@
                                 </div>
                             </div>
                             <div class="rack_traseiro">
-                                <div id="rack{{ dc.id }}_{{forloop.counter}}" class="bloco-n" style="height: {{ rack.altura_pxs }}px;">
+                                <div id="rack{{ dc.id }}_{{forloop.counter}}" class="bloco-n" style="height: {{ rack.altura_pxs|unlocalize }}px;">
                                     {% for i in rack.altura_pts|get_range reversed %}
                                         <div class="u-n"><div>{{ i|add:"1" }}</div></div>
                                     {% endfor %}
                                 </div>
-                                <div class="u" style="height: {{ rack.altura_pxs }}px;"></div>
+                                <div class="u" style="height: {{ rack.altura_pxs|unlocalize }}px;"></div>
                                 <div class="interno">
                                     <div class="rack_grid">
                                         {% for i in rack.altura_pts|get_range %}
@@ -246,10 +247,10 @@
                                    {% if eq.id %}
                                        <a href="{% url "admin:patrimonio_patrimonio_change" eq.id %}" onclick="return showAddAnotherPopup(this);">
                                    {% endif %}
-                                   <div class="{% if eq.pos_col %} pos_{{eq.pos_col}} {% endif %} {% if eq.conflito %}conflito{% endif %} equip {% if not eq.flag_traseiro and eq.profundidade < 1.0 %}profundidade_curta{% endif %}" rel="tooltip" title="{% if eq.nome %}{{ eq.nome|default:'' }} - {% endif %}{{ eq.descricao }} - pos:{{eq.pos_original|default:'0'}} pt" 
-                                       style="margin-top:{{ eq.eixoY }}px; height:{{ eq.altura }}px;">
+                                   <div class="{% if eq.pos_col %} pos_{{eq.pos_col}} {% endif %} {% if eq.conflito %}conflito{% endif %} equip {% if not eq.flag_traseiro and eq.profundidade < 1.0 %}profundidade_curta{% endif %}" rel="tooltip" title="{% if eq.nome %}{{ eq.nome|default:'' }} - {% endif %}{{ eq.descricao }} - pos:{{eq.pos_original|default:'0'|unlocalize}} pt" 
+                                       style="margin-top:{{ eq.eixoY|unlocalize }}px; height:{{ eq.altura|unlocalize }}px;">
                                        <div>
-                                           <div class="{% if eq.pos_col %} pos_{{eq.pos_col}}_label {% endif %}" style="height:{{ eq.altura }}px;">
+                                           <div class="{% if eq.pos_col %} pos_{{eq.pos_col}}_label {% endif %}" style="height:{{ eq.altura|unlocalize }}px;">
                                             {% if eq.pos_col %}
                                                 {% if eq.tam >= 9 %}{{ eq.nome|default:""|truncatechars:50 }}
                                                 {% elif eq.tam >= 6 %}{{ eq.nome|default:""|truncatechars:35 }}
@@ -276,7 +277,7 @@
                                    </div>
                                 {% endfor %}
                                 </div>
-                                <div class="u" style="height: {{ rack.altura_pxs }}px;"></div>
+                                <div class="u" style="height: {{ rack.altura_pxs|unlocalize }}px;"></div>
                             </div>
                             <div class="rack_frontal_D rack_lateral">
                                 <div class="div_pdu">
@@ -286,7 +287,7 @@
                                                <a href="{% url "admin:patrimonio_patrimonio_change" eq.id %}" onclick="return showAddAnotherPopup(this);">
                                            {% endif %}
                                            <div class="equip " rel="tooltip" title="{{ eq.descricao }}" 
-                                                style="margin-top:{{ eq.eixoY }}px; height:{{ eq.altura }}px;">
+                                                style="margin-top:{{ eq.eixoY|unlocalize }}px; height:{{ eq.altura|unlocalize }}px;">
                                                 {% if eq.imagem %}<img src="{{ eq.imagem }}" />{% endif %}
                                            </div>
                                            {% if eq.id %}

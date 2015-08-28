@@ -1,8 +1,9 @@
 {% extends "admin/base_site.html" %}
 {% load proto_tags %}
 {% load i18n proto_tags admin_static %}
-{% block extrahead %}
+{% load l10n %}
 {% load static %}
+{% block extrahead %}
 {% get_static_prefix as STATIC_PREFIX %}
  
 <link rel="stylesheet" type="text/css" href="{% static "css/jquery-ui.min.css" %}" />
@@ -206,10 +207,10 @@
     </div>
     
     <div id="draggable_wrapper">
-        <div id="datacenter_wrapper" style="width:{{dc.w}}px; height:{{dc.h}}px;">
+        <div id="datacenter_wrapper" style="width:{{dc.w|unlocalize}}px; height:{{dc.h|unlocalize}}px;">
             {% for r in objetos %}
                 {% if r.posicao %}
-                    <div id="obj_drag_id_{{forloop.counter0}}" class="draggable ui-widget-content" style="position:absolute;top:{{r.posicao.y}}px;left:{{r.posicao.x}}px;width:{{r.posicao.w}}px;height:{{r.posicao.h}}px;background:#{{r.posicao.cor}};">
+                    <div id="obj_drag_id_{{forloop.counter0}}" class="draggable ui-widget-content" style="position:absolute;top:{{r.posicao.y|unlocalize}}px;left:{{r.posicao.x|unlocalize}}px;width:{{r.posicao.w|unlocalize}}px;height:{{r.posicao.h|unlocalize}}px;background:#{{r.posicao.cor}};">
                         <div class="draggable-content">
                           <p class="obj_drag_title"> {{r.posicao.objeto.titulo|default:r.nome}}</p>
                           <p id="obj_drag_desc_{{forloop.counter0}}" class="obj_drag_desc"> {{r.posicao.descricao|default:''}}</p>
