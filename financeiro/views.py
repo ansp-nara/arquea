@@ -963,7 +963,7 @@ def presta_contas(request, pdf=False):
             for p in Auditoria.objects.filter(pagamento__origem_fapesp__item_outorga__natureza_gasto=ng).values_list('parcial', flat=True).distinct():
                 pgtos = []
                 pag = None
-                for a in Auditoria.objects.filter(pagamento__origem_fapesp__item_outorga__natureza_gasto=ng, parcial=p).order_by('pagina').select_related('pagamento', 'pagamento__protocolo', 'pagamento__origem_fapesp__item_outorga', 'pagamento__conta_corrente', 'pagamento__contacorrente__extrato_financeiro', 'pagamento__conta_corrente__extrato_financeiro__comprovante'):
+                for a in Auditoria.objects.filter(pagamento__origem_fapesp__item_outorga__natureza_gasto=ng, parcial=p).order_by('pagina').select_related('pagamento', 'pagamento__protocolo', 'pagamento__origem_fapesp__item_outorga', 'pagamento__conta_corrente', 'pagamento__conta_corrente__extrato_financeiro', 'pagamento__conta_corrente__extrato_financeiro__comprovante'):
                     auditorias = []
                     if a.pagamento != pag:
                         pgtos.append({'pg':a.pagamento, 'pagina':a.pagina, 'auditorias':auditorias})
