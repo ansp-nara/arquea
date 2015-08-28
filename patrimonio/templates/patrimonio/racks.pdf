@@ -1,5 +1,6 @@
 {% load proto_tags %}
 {% load i18n proto_tags admin_static %}
+{% load l10n %}
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -208,21 +209,21 @@ h2 {
  <table>
     <tr>
         <td style="display:block; width:0.5cm; height:0.5cm;">           
-            <div id="rack{{ dc.id }}_{{forloop.counter}}" class="bloco-n" style="height: {{ rack.altura_pxs }}px;">
+            <div id="rack{{ dc.id }}_{{forloop.counter}}" class="bloco-n" style="height: {{ rack.altura_pxs|unlocalize }}px;">
                 {% for i in rack.altura_pts|get_range reversed %}
                     <div class="u-n"><div style="display:block; min-width:5pt; min-height:13.5pt;">{{ i|add:"1" }}</div></div>
                 {% endfor %}
             </div>
         </td>
         <td style="display:block; width:0.5cm; height:0.5cm;">
-            <div class="u" style="height: {{ rack.altura_pxs }}px;"></div>
+            <div class="u" style="height: {{ rack.altura_pxs|unlocalize }}px;"></div>
         </td>
         <td>
             <div class="interno">
           {% for eq in rack.equipamentos %}
-               <div class="{% if eq.pos_col %} pos_{{eq.pos_col}} {% endif %}{% if eq.descricao %}equip"{% endif %} style="margin-top:{{ eq.eixoY }}px; height:{{ eq.altura }}px;">
+               <div class="{% if eq.pos_col %} pos_{{eq.pos_col}} {% endif %}{% if eq.descricao %}equip"{% endif %} style="margin-top:{{ eq.eixoY|unlocalize }}px; height:{{ eq.altura|unlocalize }}px;">
                    <div>
-                       <div style="height:{{ eq.altura }}px;">
+                       <div style="height:{{ eq.altura|unlocalize }}px;">
                         {% if eq.pos_col %}
                             {% if eq.tam >= 15 %}
                                 {{ eq.descricao|truncatechars:80 }}
@@ -255,7 +256,7 @@ h2 {
             </div>
     </td>
     <td>
-           <div class="u" style="height: {{ rack.altura_pxs }}px;"></div>
+           <div class="u" style="height: {{ rack.altura_pxs|unlocalize }}px;"></div>
     </td>
     </tr>
 </table>

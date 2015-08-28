@@ -1,6 +1,6 @@
 {% load static %}
 {% load proto_tags %}
-{% load proto_tags %}
+{% load l10n %}
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -14,7 +14,7 @@
     margin-right:1cm;
     margin-bottom:1cm;
     margin-left:0;
-    padding: {{papelaria.paisagem_a4_margem_superior|default:0.5}}cm 1cm {{papelaria.paisagem_a4_margem_inferior|default:0.5}}cm 1cm;
+    padding: {{papelaria.paisagem_a4_margem_superior|default:0.5|unlocalize}}cm 1cm {{papelaria.paisagem_a4_margem_inferior|default:0.5|unlocalize}}cm 1cm;
 
   @bottom-right {
     content: 'Pág ' counter(page);

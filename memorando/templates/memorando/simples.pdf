@@ -1,4 +1,5 @@
 {% load proto_tags %}
+{% load l10n %}
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -7,10 +8,10 @@
 @page {
   size: a4 portrait;
   background-image: url('/var/www/media/img/papel_timbrado.jpg');
-  top: {{ m.superior }}cm;
-  left: {{ m.esquerda }}cm;
-  right: {{ m.direita }}cm;
-  bottom: {{ m.inferior}}cm;
+  top: {{ m.superior|unlocalize }}cm;
+  left: {{ m.esquerda|unlocalize }}cm;
+  right: {{ m.direita|unlocalize }}cm;
+  bottom: {{ m.inferior|unlocalize }}cm;
   @frame footer {
                 -pdf-frame-content: footerContent;
                 bottom: 0.5cm;

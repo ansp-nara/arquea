@@ -1,6 +1,7 @@
 {% extends "base.pdf" %}
 {% load proto_tags %}
 {% load static %}
+{% load l10n %}
 {% block content %}
 <style>
 @page {
@@ -8,10 +9,10 @@
   background-image: url('{% get_media_prefix %}{{papelaria.papel_timbrado_retrato_a4}}');
   background-size: contain;
   background-repeat:no-repeat;
-  top: {{papelaria.retrato_a4_margem_superior|default:0.5}}cm;
+  top: {{papelaria.retrato_a4_margem_superior|default:0.5|unlocalize}}cm;
   left: 1.5cm;
   right: 1.5cm;
-  bottom: {{papelaria.retrato_a4_margem_inferior|default:0.5}}cm;
+  bottom: {{papelaria.retrato_a4_margem_inferior|default:0.5|unlocalize}}cm;
   @frame footer {
     -pdf-frame-content: footerContent;
     bottom: 0.5cm;
@@ -28,94 +29,94 @@ table tr td {
 </style>
 <h2>Entidades ligadas à ANSP</h2>
 <table>
-{% for i in info %}
-<tr><td>
-<table border="1">
-<tr>
-	<th width="20%">Entidade</th>
-	<th width="10%">URL</th>
-	<th width="20%">Endereço</th>
-	<th width="10%">Cidade</th>
-	<th width="10%">CEP</th>
-	<th width="20%">Ponto de entrada na ANSP</th>
-</tr>
-
-
-<tr>
-	<td>{{ i.info.participante.entidade.sigla }} - {{ i.info.participante.entidade.nome }}</td>
-	<td>{{ i.info.participante.entidade.url }}</td>
-	<td>{{ i.info.participante.rua }}, {{ i.info.participante.num }}. {{ i.info.participante.bairro }}.</td>
-	<td>{{ i.info.participante.cidade }}</td>
-	<td>{{ i.info.participante.cep }}</td>
-	<td><a href="{% url 'admin:rede_enlace_change' i.info %}">{{ i.info.entrada_ansp }}</a></td>
-</tr>
-<tr><td></td><td colspan="5">      
-<table border="1">
-<tr>
-	<th width="10%">ASN</th>
-	<th width="25%">Bloco(s) Ip(s)</th>
-	<th width="20%">Operadora</th>
-	<th width="15%">Capacidade do link (Mbps)</th>
-	<th width="20%">IP de entrada</th>
-	<th width="10%">Link redundante?</th>
-</tr>
-<tr>
-	<td rowspan="{{i.operadoras.count|default:1}}">
-	{% for a in i.asn %} 
-		{{ a.numero }}{% if not forloop.last %}, {% endif %}
-    {% empty %}
-        AS não encontrado	
-	{% endfor %}
-	</td>
-	<td rowspan="{{i.operadoras.count|default:1}}">
-	{% for b in i.bloco_ip %} 
-		{{ b }}{% if not forloop.last %}, {% endif %}
-    {% empty %}
-        Bloco IP não encontrado	
-	{% endfor %}
-	</td>
-	{% for o in i.operadoras %}
-		{% if forloop.counter != 1 %} </tr> <tr> {% endif %}
-		<td><a href="{% url 'admin:rede_enlaceoperadora_change' o.id %}">{{ o.operadora|default:"Operadora não cadastrada" }}</a></td>
-		<td>{{ o.banda|default:"Banda não cadastrada" }}</td>
-		<td>
-		   {% for ib in o.ip_borda.all %}
-		      {{ ib.ip }}{% if not forloop.last %} - {% endif %}
-		   {% empty %}
-		      IP não cadastrado
-		   {% endfor %}
-		</td>
-		<td>
-		   {% if not o.link_redundante %}
-		      Não
-		   {% else %}
-		      Sim
-		   {% endif %}
-		</td>
-	{% endfor %}
-</tr>
-</table>
-{% if i.contatos_tec %}
-<table border="1">
-<tr>
-	<th>Contato</th>
-	<th>E-mail</th>
-	<th>Telefone</th>
-</tr>
-<tr>
-	{% for c in i.contatos_tec %}
-	    {% if forloop.counter != 1 %} </tr> <tr> {% endif %}
-		<td>{{ c.contato.nome|default:"Contato não cadastrado" }}</td>
-		<td>{{ c.contato.email|default:"E-Mail não cadastrado" }}</td>
-		<td>{{ c.contato.tel|default:"Fone não cadastrado" }}</td>
-	{% endfor %}
-</tr>
-</table>
-{% endif %}
-</td>
-</tr>
-</table>
-</td></tr>
-{% endfor %}
+    {% for i in info %}
+    <tr><td>
+        <table border="1">
+            <tr>
+                <th width="20%">Entidade</th>
+                <th width="10%">URL</th>
+                <th width="20%">Endereço</th>
+                <th width="10%">Cidade</th>
+                <th width="10%">CEP</th>
+                <th width="20%">Ponto de entrada na ANSP</th>
+            </tr>
+            <tr>
+                <td>{{ i.info.participante.entidade.sigla }} - {{ i.info.participante.entidade.nome }}</td>
+                <td>{{ i.info.participante.entidade.url }}</td>
+                <td>{{ i.info.participante.rua }}, {{ i.info.participante.num }}. {{ i.info.participante.bairro }}.</td>
+                <td>{{ i.info.participante.cidade }}</td>
+                <td>{{ i.info.participante.cep }}</td>
+                <td><a href="{% url 'admin:rede_enlace_change' i.info %}">{{ i.info.entrada_ansp }}</a></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td colspan="5">
+                    <table border="1">
+                        <tr>
+                            <th width="10%">ASN</th>
+                            <th width="25%">Bloco(s) Ip(s)</th>
+                            <th width="20%">Operadora</th>
+                            <th width="15%">Capacidade do link (Mbps)</th>
+                            <th width="20%">IP de entrada</th>
+                            <th width="10%">Link redundante?</th>
+                        </tr>
+                        <tr>
+                            <td rowspan="{{i.operadoras.count|default:1}}">
+                                {% for a in i.asn %} 
+                                    {{ a.numero }}{% if not forloop.last %}, {% endif %}
+                                    {% empty %}
+                                    AS não encontrado
+                                {% endfor %}
+                            </td>
+                            <td rowspan="{{i.operadoras.count|default:1}}">
+                                {% for b in i.bloco_ip %} 
+                                    {{ b }}{% if not forloop.last %}, {% endif %}
+                                    {% empty %}
+                                    Bloco IP não encontrado
+                                {% endfor %}
+                            </td>
+                            {% for o in i.operadoras %}
+                                {% if forloop.counter != 1 %} </tr> <tr> {% endif %}
+                                <td><a href="{% url 'admin:rede_enlaceoperadora_change' o.id %}">{{ o.operadora|default:"Operadora não cadastrada" }}</a></td>
+                                <td>{{ o.banda|default:"Banda não cadastrada" }}</td>
+                                <td>
+                                   {% for ib in o.ip_borda.all %}
+                                      {{ ib.ip }}{% if not forloop.last %} - {% endif %}
+                                      {% empty %}
+                                      IP não cadastrado
+                                   {% endfor %}
+                                </td>
+                                <td>
+                                   {% if not o.link_redundante %}
+                                      Não
+                                   {% else %}
+                                      Sim
+                                   {% endif %}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    </table>
+                    {% if i.contatos_tec %}
+                        <table border="1">
+                            <tr>
+                                <th>Contato</th>
+                                <th>E-mail</th>
+                                <th>Telefone</th>
+                            </tr>
+                            <tr>
+                                {% for c in i.contatos_tec %}
+                                    {% if forloop.counter != 1 %} </tr> <tr> {% endif %}
+                                    <td>{{ c.contato.nome|default:"Contato não cadastrado" }}</td>
+                                    <td>{{ c.contato.email|default:"E-Mail não cadastrado" }}</td>
+                                    <td>{{ c.contato.tel|default:"Fone não cadastrado" }}</td>
+                                {% endfor %}
+                            </tr>
+                        </table>
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+    </td></tr>
+    {% endfor %}
 </table>
 {% endblock %}

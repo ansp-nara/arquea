@@ -1,5 +1,6 @@
 {% load proto_tags %}
 {% load static %}
+{% load l10n %}
 <html xmlns="http://www.w3.org/1999/xhtml" lang="pt-br" xml:lang="pt-br" >
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -8,8 +9,8 @@
 @page {
   size: a3 landscape;
   background-image: url('{% get_media_prefix %}{{papelaria.papel_timbrado_paisagem_a3}}');
-  top: {{papelaria.paisagem_a3_margem_superior|default:0.5}}cm;
-  bottom: {{papelaria.paisagem_a3_margem_inferior|default:0.5}}cm;
+  top: {{papelaria.paisagem_a3_margem_superior|default:0.5|unlocalize}}cm;
+  bottom: {{papelaria.paisagem_a3_margem_inferior|default:0.5|unlocalize}}cm;
   background-size: contain;
   background-repeat:no-repeat;
   left: 1.5cm;
