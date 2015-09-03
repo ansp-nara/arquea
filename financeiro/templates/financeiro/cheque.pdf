@@ -20,7 +20,7 @@
 #cheque p {
 	  margin-left:100px;
 	  margin-right:100px;
-          font-size:14px;
+      font-size:14px;
 	  font-weight:bold;
 	  }
 
@@ -28,10 +28,11 @@
 	border-collapse:collapse;
 	text-align:center;
 	font-size:14px;
+   	margin: 0 auto;
 	}
 #box table, td, th {
 	border:1px solid black;
-	width:300px;
+	width: 300px;
 	}
 
 #box th {
@@ -69,7 +70,7 @@
         <p>UTILIZADO PARA: {{ cc.capa|default:'--' }}</p> 
         <br/><br/><br/><br/><br />
     </div>
-    <div id="box" style="float:left;">
+    <div id="box" style="float:left;width:100%;">
         <table cellpadding="1">
             <tr><th>CHEQUE ASSINADO POR:</th></tr>
             <tr><td>{{assinatura}}</td></tr>

@@ -107,9 +107,9 @@ JENKINS_TASKS = (
 )
 
 
-WKHTMLTOPDF_CMD = 'C:/Program Files (x86)/wkhtmltopdf/wkhtmltopdf.exe'
+#WKHTMLTOPDF_CMD = 'C:/Program Files (x86)/wkhtmltopdf/wkhtmltopdf.exe'
 WKHTMLTOPDF_CMD_OPTIONS = {
     'quiet': True,
     # Para o Linux, descomentar esta linha
-    # 'zoom':0.63,
+    'zoom':0.63,
 }
