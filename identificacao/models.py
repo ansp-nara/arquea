@@ -89,6 +89,23 @@ class EnderecoDetalhe(models.Model):
         else:
             return u'%s - %s' % (self.detalhe.detalhes(), self.complemento)
 
+    def entidade(self):
+        """
+        Busca entidade relacionada ao EnderecoDetalhe.
+        Como a Entidade está relacionada ao Endereço, ele faz a busca nos pais de
+            EnderecosDetalhes até encontrar um Endereco.
+        """
+        retorno = ''
+        if self.endereco_id:
+            # Se tiver endereço, retorno a entidade do endereço
+            if self.endereco.entidade_id:
+                retorno = self.endereco.entidade.sigla
+        elif self.detalhe_id:
+            # Se pertencer a outro EnderecoDetalhe, tenta navegar para pegar o endereço pai
+            retorno = self.detalhe.entidade()
+            
+        return retorno
+
     @property
     def end(self):
         if self.endereco: 

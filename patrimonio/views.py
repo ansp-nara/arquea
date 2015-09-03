@@ -1061,6 +1061,7 @@ def por_termo(request, pdf=0):
                                                                                 })
 
 
+
 @login_required
 @permission_required('patrimonio.rel_tec_racks', raise_exception=True)
 @require_safe
@@ -1077,8 +1078,15 @@ def racks(request):
 
     todos_dcs = []
     for local in locais:
-        dc = {'nome':local.complemento, 'id':local.id}
+        nome = local.complemento
+        
+        entidade = local.entidade()
+        if entidade:
+            nome = "%s - %s" % (entidade, nome)
+            
+        dc = {'nome':nome, 'id':local.id}
         todos_dcs.append(dc)
+    todos_dcs.sort(reverse=False)
 
     p_dc = request.GET.get('dc_id')
     p_rack = request.GET.get('rack_id')
@@ -1098,6 +1106,7 @@ def racks(request):
         return TemplateResponse(request, 'patrimonio/racks-wk.pdf', {'dcs':dcs, 'todos_dcs':todos_dcs, 'chk_legenda':chk_legenda, 'chk_legenda_desc':chk_legenda_desc, 'chk_stencil':chk_stencil, 'chk_outros':chk_outros, 'chk_avisos':chk_avisos, 'chk_traseira':chk_traseira})
     else:
         return TemplateResponse(request, 'patrimonio/racks.html', {'dcs':dcs, 'todos_dcs':todos_dcs, 'chk_legenda':chk_legenda, 'chk_legenda_desc':chk_legenda_desc, 'chk_stencil':chk_stencil, 'chk_outros':chk_outros, 'chk_avisos':chk_avisos, 'chk_traseira':chk_traseira})
+
 
 
 def _rack_data(datacenter_id, rack_id):
