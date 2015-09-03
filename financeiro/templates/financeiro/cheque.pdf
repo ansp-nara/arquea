@@ -2,13 +2,14 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <style>
-  @import url('/var/www/media/css/cheque.css');
+
   @page {
     size: a4;
-    top: 2cm;
-    left: 1.5cm;
-    right: 1.5cm;
-    bottom: 2cm;
+    padding-top: 2cm;
+    padding-left: 1.5cm;
+    padding-right: 1.5cm;
+    padding-bottom: 2cm;
+    margin: 0 0 0 0;
 
     @frame assinatura {
        -pdf-frame-content: box;
@@ -16,20 +17,52 @@
        left:6.8cm;
     }
   }
+#cheque p {
+	  margin-left:100px;
+	  margin-right:100px;
+          font-size:14px;
+	  font-weight:bold;
+	  }
+
+#box table {
+	border-collapse:collapse;
+	text-align:center;
+	font-size:14px;
+	}
+#box table, td, th {
+	border:1px solid black;
+	width:300px;
+	}
+
+#box th {
+	padding-top:3px;
+	font-weight:normal;
+	}
+#box td {
+	padding-top:12px;
+	}
+
+#pp-cheque p {
+        text-align:right;
+        font-size:18px;
+        font-weight:bold;
+        padding-bottom:15px;
+}
+
   </style>
 </head>
-<body>
+<body style="font-family:arial;">
 {% for pp in pps %}
     {% if not forloop.first %}
         <div style="page-break-before: always;" />
     {% endif %}
-    <div class="pp-cheque" ><p>{{ pp }}</p></div>
-        <div style="line-height:5cm">
+    <div id="pp-cheque" ><p>{{ pp }}</p></div>
+        <div>
           &nbsp;
-          <img src="/var/www{% if cc.imagem %}{{ cc.imagem.url }}{% else %}/files/extratocc/cheque_branco.jpg{% endif %}">
+          <img src="http://localhost{% if cc.imagem %}{{ cc.imagem.url }}{% else %}/files/extratocc/cheque_branco.jpg{% endif %}" style="max-width:17.5cm;">
         </div>
-    <div class="cheque">
-        <hr size="10" color="#999999" />
+    <div id="cheque">
+        <hr style="height:10pt;background-color:#999999;border-radius:5pt;" />
         <br />
         <p>CÓPIA DO CHEQUE Nº:{{ cc.cod_oper|default:'--' }}  /  Processo {{ termo|default:'--' }}</p>
         <p>DO BANCO: 001</p>
