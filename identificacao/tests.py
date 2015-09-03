@@ -68,6 +68,43 @@ class EnderecoTest(TestCase):
 
 
 
+class EnderecoDetalheTest(TestCase):
+    def setUp(self):
+        ent = Entidade.objects.create(sigla='SAC', nome='Global Crossing', cnpj='00.000.000/0000-00', fisco=True, url='')
+        c = Contato.objects.create(nome='Joao', email='joao@joao.com.br', tel='', ativo=True)
+        end = Endereco.objects.create(entidade=ent, rua='Dr. Ovidio', num=215, bairro='Cerqueira Cesar', cep='05403010', estado='SP', pais='Brasil')
+        
+        tipoDetalhe = TipoDetalhe.objects.create()
+        end_detalhe1 = EnderecoDetalhe.objects.create(endereco=end, tipo=tipoDetalhe, mostra_bayface=True, complemento='detalhe1')
+        
+        end_detalhe2 = EnderecoDetalhe.objects.create(detalhe=end_detalhe1, tipo=tipoDetalhe, mostra_bayface=True, complemento='detalhe2')
+        
+        end_detalhe3 = EnderecoDetalhe.objects.create(detalhe=end_detalhe2, tipo=tipoDetalhe, mostra_bayface=True, complemento='detalhe3')
+        
+        end_detalhe4 = EnderecoDetalhe.objects.create(detalhe=end_detalhe3, tipo=tipoDetalhe, mostra_bayface=True, complemento='detalhe4')
+
+
+    def test_unicode(self):
+        end_detalhe1 = EnderecoDetalhe.objects.get(pk=1)
+        self.assertIn("detalhe1", end_detalhe1.__unicode__())
+        
+        end_detalhe2 = EnderecoDetalhe.objects.get(pk=2)
+        self.assertIn("detalhe2", end_detalhe2.__unicode__())
+        
+    def test_entidade(self):
+        end_detalhe1 = EnderecoDetalhe.objects.get(pk=1)
+        self.assertEqual('SAC', end_detalhe1.entidade())
+        
+        end_detalhe2 = EnderecoDetalhe.objects.get(pk=2)
+        self.assertEqual('SAC', end_detalhe2.entidade())
+        
+        end_detalhe3 = EnderecoDetalhe.objects.get(pk=3)
+        self.assertEqual('SAC', end_detalhe3.entidade())
+        
+        end_detalhe4 = EnderecoDetalhe.objects.get(pk=4)
+        self.assertEqual('SAC', end_detalhe4.entidade())
+
+
 class EntidadeTest(TestCase):
     def setUp(self):
         ent = Entidade.objects.create(sigla='SAC', nome='Global Crossing', cnpj='00.000.000/0000-00', fisco=True, recebe_doacao=False, url='')
