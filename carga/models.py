@@ -105,7 +105,10 @@ class Carga_inventario(models.Model):
  
      
     def __unicode__(self):
-        return self.serial_number
+        if self.serial_number:
+            return self.serial_number
+        else:
+            return u''
 
 
 

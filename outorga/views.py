@@ -618,8 +618,8 @@ def ajax_termo_datas(request):
     if parcial:
         pagamentos = pagamentos.filter(auditoria__parcial=parcial)
 
-    datas = pagamentos.aggregate(min=Min('protocolo__data_chegada'))
-    datas.update(pagamentos.aggregate(max=Max('protocolo__data_chegada')))
+    datas = pagamentos.aggregate(min=Min('conta_corrente__data_oper'))
+    datas.update(pagamentos.aggregate(max=Max('conta_corrente__data_oper')))
 
     meses = []
     for m in month_range(datas['min'], datas['max']):

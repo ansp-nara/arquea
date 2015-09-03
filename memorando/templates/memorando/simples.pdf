@@ -7,22 +7,37 @@
 @import url('/var/www/media/css/memorando.css');
 @page {
   size: a4 portrait;
-  background-image: url('/var/www/media/img/papel_timbrado.jpg');
-  top: {{ m.superior|unlocalize }}cm;
-  left: {{ m.esquerda|unlocalize }}cm;
-  right: {{ m.direita|unlocalize }}cm;
-  bottom: {{ m.inferior|unlocalize }}cm;
-  @frame footer {
-                -pdf-frame-content: footerContent;
-                bottom: 0.5cm;
-                margin-right: 1cm;
-                height: 1cm;
-		left: -2.3cm;
-                } 
+  background-image: url('media:{{papelaria.papel_timbrado_retrato_a4}}');
+  background-size: contain;
+  background-repeat:no-repeat;
+  margin-top: 0cm;
+  margin-right: 0cm;
+  margin-bottom: 0cm;
+  margin-left: 0cm;
+  /*padding: {{ m.superior }}cm {{ m.direita }}cm {{ m.inferior }}cm {{ m.esquerda }}cm;*/
+  padding: 2.5cm 2.5cm 1.5cm 2.5cm;
+}
+ body {
+    position:relative;
+    margin: 0;
+    padding: 0;
+    width:100%;
+    height:100%;
+ }
+ #conteudo {
+    font-family: Arial;
+    font-size:11pt;
+    position:relative;
+    padding:0;
+    margin:0;
+ }
+table {
+    height:initial !important;
 }
 </style> 
 </head>
 <body>
+<div id="conteudo">
 <p style="text-align:left;">NARA {{ m.data.year }}/{{ m.numero|stringformat:"03d" }}</p>
 <br />
 <p style="text-align:right;">São Paulo, {{ m.data|date:"j \d\e F \d\e Y"|lower }}</p>
@@ -55,5 +70,6 @@ Recebido e conferido em __/__/_____
 <br />RG: ____________________________
 </p>
 {% endif %}
+</div>
 </body>
 </html>

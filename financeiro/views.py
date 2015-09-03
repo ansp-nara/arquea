@@ -658,8 +658,8 @@ def cheque(request, cc=1):
         assinatura = a.nome_assinatura
 
 
-    #return render_to_response('financeiro/cheque.pdf', {'cc':extrato, 'termo':termo})
-    return render_to_pdf('financeiro/cheque.pdf', {'cc':extrato, 'termo':termo, 'pps':pps, 'assinatura':assinatura}, request=request, filename='capa_%s.pdf' % extrato.cod_oper)
+    #return render_to_response('financeiro/cheque.pdf', {'cc':extrato, 'termo':termo, 'pps':pps, 'assinatura':assinatura})
+    return render_to_pdf_weasy('financeiro/cheque.pdf', {'cc':extrato, 'termo':termo, 'pps':pps, 'assinatura':assinatura}, request=request, filename='capa_%s.pdf' % extrato.cod_oper)
 
 
 
