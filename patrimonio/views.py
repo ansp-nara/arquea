@@ -1070,12 +1070,12 @@ def racks(request):
      Relatório Técnico - Relatório de racks (bayface).
     
     """
-        
     # Busca os endereços que possuem Racks no estadoAtivos
     locais = EnderecoDetalhe.objects.filter(historicolocal__estado__id=Estado.PATRIMONIO_ATIVO, \
                                             historicolocal__patrimonio__equipamento__tipo__nome='Rack', \
                                             mostra_bayface=True,).order_by('id').distinct()
 
+    # Buscando os datacenters, com Entidade e Nome do endereçco
     todos_dcs = []
     for local in locais:
         nome = local.complemento
@@ -1086,8 +1086,10 @@ def racks(request):
             
         dc = {'nome':nome, 'id':local.id}
         todos_dcs.append(dc)
-    todos_dcs.sort(reverse=False)
-
+    # Fazendo a ordenação pelo nome do Datacenter
+    todos_dcs.sort(key= lambda c: c['nome'].upper(), reverse=False)
+    
+    
     p_dc = request.GET.get('dc_id')
     p_rack = request.GET.get('rack_id')
     
