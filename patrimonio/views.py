@@ -545,6 +545,7 @@ def por_local_rack(request, pdf=0):
             if ht:
                 atuais.append(ht.id)
 
+
         if detalhe_id:
             detalhe = get_object_or_404(EnderecoDetalhe, pk=detalhe_id)
             detalhes = [detalhe]
@@ -1323,12 +1324,21 @@ def relatorio_rack(request):
     locais = EnderecoDetalhe.objects.filter(historicolocal__estado__id=Estado.PATRIMONIO_ATIVO, \
                                             historicolocal__patrimonio__equipamento__tipo__nome='Rack', \
                                             mostra_bayface=True,).order_by('id').distinct()
+                
     todos_dcs = []
     for local in locais:
-        dc = {'nome':local.complemento, 'id':local.id}
+        nome = local.complemento
+        
+        entidade = local.entidade()
+        if entidade:
+            nome = "%s - %s" % (entidade, nome)
+            
+        dc = {'nome':nome, 'id':local.id}
         todos_dcs.append(dc)
-        
-        
+    # Fazendo a ordenação pelo nome do Datacenter
+    todos_dcs.sort(key= lambda c: c['nome'].upper(), reverse=False)
+
+
     patrimonio_racks = []
     if p_dc:
         patrimonio_racks = PatrimonioRack.get_racks_as_list(p_dc)
