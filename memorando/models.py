@@ -166,7 +166,7 @@ class MemorandoSimples(models.Model):
 
     class Meta:
         verbose_name_plural = u'Memorandos Simples'
-        ordering = ('-data',)
+        ordering = ('-data', '-numero')
 
     '''
     O método para salvar uma instância é sobrescrito para que o número sequencial
