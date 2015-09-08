@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 from django import forms
-from repositorio.models import Repositorio
 from django.forms.util import ErrorList
-from patrimonio.models import Patrimonio
 from django.db.models import Q
+from repositorio.models import Repositorio, Tipo
+from patrimonio.models import Patrimonio
+from memorando.models import MemorandoSimples
+from membro.models import Membro
+
+
 
 class RepositorioAdminForm(forms.ModelForm):
     filtra_patrimonio = forms.CharField(label=u'Filtro do patrimônio', required=False,
@@ -20,12 +24,23 @@ class RepositorioAdminForm(forms.ModelForm):
 
         if data:
             search_string = data['filtra_patrimonio']
-            pt.queryset = Patrimonio.objects.filter(Q(ns__icontains=search_string)|Q(descricao__icontains=search_string)|Q(pagamento__protocolo__num_documento__icontains=search_string))
+            # Recuperando o dado do filtro do patrimonio, senão o form vai buscar todos os patrimonios
+            if search_string:
+                pt.queryset = Patrimonio.objects.filter(Q(ns__icontains=search_string)|Q(descricao__icontains=search_string)|Q(pagamento__protocolo__num_documento__icontains=search_string))
+            else:
+                pt.queryset = Patrimonio.objects.filter(id__in=[0])
         elif instance:
             pt.queryset = instance.patrimonios
         else:
             pt.queryset = Patrimonio.objects.filter(id__in=[0])
 
+        self.fields['anterior'].choices = [('','---------')] + [(p.id, p.__unicode__()) for p in Repositorio.objects.all().select_related('tipo', 'tipo__entidade', 'responsavel').prefetch_related('responsavel__historico_set', 'responsavel__historico_set__cargo').order_by('-data', '-numero', 'tipo') ]
+        self.fields['tipo'].choices = [('','---------')] + [(p.id, p.__unicode__()) for p in Tipo.objects.all().select_related('entidade').order_by('entidade__sigla', 'nome') ]
+        self.fields['responsavel'].choices = [('','---------')] + [(p.id, p.__unicode__()) for p in Membro.objects.filter(historico__funcionario=True, historico__termino__isnull=True).prefetch_related('historico_set', 'historico_set__cargo').order_by('nome')]
+        self.fields['demais'].choices = [(p.id, p.__unicode__()) for p in Membro.objects.all().prefetch_related('historico_set', 'historico_set__cargo').order_by('nome')]
+        self.fields['memorandos'].choices = [(p.id, p.__unicode__()) for p in MemorandoSimples.objects.all().select_related('assunto').order_by('-data', '-numero') ]
+        
+        
 
     class Meta:
         model = Repositorio
