@@ -324,7 +324,7 @@ class PatrimonioRack(Patrimonio):
 
     @staticmethod
     def get_racks_as_list(endereco_id):
-            patrimonio_racks = PatrimonioRack.objects.filter(equipamento__tipo__nome='Rack', historicolocal__endereco__id=endereco_id)
+            patrimonio_racks = PatrimonioRack.objects.filter(equipamento__tipo__nome='Rack', historicolocal__endereco__id=endereco_id).prefetch_related('historicolocal_set')
 
             patrimonio_racks = list(patrimonio_racks)
             # Ordena os racks pela posição. Ex: R042 - ordena pela fila 042 e depois pela posição R
