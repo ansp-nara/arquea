@@ -1074,7 +1074,9 @@ def racks(request):
     # Busca os endereços que possuem Racks no estadoAtivos
     locais = EnderecoDetalhe.objects.filter(historicolocal__estado__id=Estado.PATRIMONIO_ATIVO, \
                                             historicolocal__patrimonio__equipamento__tipo__nome='Rack', \
-                                            mostra_bayface=True,).order_by('id').distinct()
+                                            mostra_bayface=True,) \
+                                            .select_related('endereco__entidade') \
+                                            .order_by('id').distinct()
 
     # Buscando os datacenters, com Entidade e Nome do endereçco
     todos_dcs = []
