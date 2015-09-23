@@ -1,24 +1,34 @@
+{% load l10n %}
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" type="text/css" href="static:css/pdf_weasy.css">
+  {% block extrahead %}{% endblock %}
 <style>
-@import url('/var/www/media/css/pdf.css');
 {% block extrastyle %}
 {% endblock %}
 @page {
-          background-image: url('/var/www/media/img/papel_timbrado{% block landscape %}{% endblock %}.jpg');
-  size: {% block pagesize %}a4{% endblock %};
-  top: 5cm;
-  left: 1.5cm;
-  right: 1.5cm;
-  bottom: 2cm;
-  @frame footer {
-                -pdf-frame-content: footerContent;
-                bottom: 0.5cm;
-                margin-right: 1cm;
-                height: 1cm;
-                left: -2.3cm;
-                }
+  size: {% block size %}a4{% endblock %};
+  background-image: url('media:{% block background %}{{papelaria.papel_timbrado_retrato_a4}}{% endblock %}');
+  background-position: conter top;
+  background-size: 100% 102%;
+  background-repeat:no-repeat;
+  padding-top: {% block top %}{{papelaria.retrato_a4_margem_superior|default:0.5|unlocalize}}{% endblock %}cm;
+  padding-left: 1.5cm;
+  padding-right: 1.5cm;
+  padding-bottom: {% block bottom %}{{papelaria.retrato_a4_margem_inferior|default:0.5|unlocalize}}{% endblock %}cm;
+  margin: 0;
+  margin-bottom: 1cm;
+  @bottom-right {
+    content: 'Pág ' counter(page);
+    white-space: pre;
+    color: grey;
+    vertical-align: bottom;
+    font-family: Arial;
+    font-size: 0.7em;
+    padding-right:1cm;
+    padding-bottom:1cm;
+  }
 }
 </style>
 </head>

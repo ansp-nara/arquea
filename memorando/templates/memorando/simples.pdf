@@ -3,18 +3,18 @@
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" type="text/css" href="static:css/memorando.css">
 <style>
-@import url('/var/www/media/css/memorando.css');
 @page {
   size: a4 portrait;
   background-image: url('media:{{papelaria.papel_timbrado_retrato_a4}}');
-  background-size: contain;
+  background-position: center top;
+  background-size: 100% 102%;
   background-repeat:no-repeat;
   margin-top: 0cm;
   margin-right: 0cm;
   margin-bottom: 0cm;
   margin-left: 0cm;
-  /*padding: {{ m.superior }}cm {{ m.direita }}cm {{ m.inferior }}cm {{ m.esquerda }}cm;*/
   padding: 2.5cm 2.5cm 1.5cm 2.5cm;
 }
  body {
@@ -33,6 +33,13 @@
  }
 table {
     height:initial !important;
+    font-size:9px;
+}
+td {
+    height:2px;
+}
+tr {
+    height:2px;
 }
 </style> 
 </head>
@@ -52,7 +59,7 @@ table {
 {{ m.corpo|safe }}
 </p>
 {% if m.equipamento %}
-<p style="text-align:justify;font-weight:bold;font-size:10px;">
+<p style="text-align:justify;font-weight:bold;font-size:8pt;">
 Informamos para os devidos fins que a FAPESP (Fundação de Amparo à Pesquisa do
 Estado de São Paulo), por ser uma instituição Pública Estadual, está isenta da emissão de
 nota fiscal, conforme Decreto 48.034 de 19/08/2003.

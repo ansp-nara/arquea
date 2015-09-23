@@ -9,8 +9,8 @@ urlpatterns = patterns('outorga.views',
 #    (r'seleciona_mod_item_natureza$', 'seleciona_mod_item_natureza'),
 #    (r'seleciona_item_natureza$', 'seleciona_item_natureza'),
 
-    (r'relatorios/acordos$', 'gastos_acordos'),
-    (r'relatorios/acordos/$', 'gastos_acordos'),
+    # (r'relatorios/acordos$', 'gastos_acordos'),
+    # (r'relatorios/acordos/$', 'gastos_acordos'),
     
     (r'relatorios/contratos$', 'contratos'),
     (r'relatorios/contratos/$', 'contratos'),

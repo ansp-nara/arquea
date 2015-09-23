@@ -29,7 +29,7 @@ CODIGO_FINANCEIRO = (
 class ExtratoCC(models.Model):
     extrato_financeiro = models.ForeignKey('financeiro.ExtratoFinanceiro', verbose_name=_(u'Extrato Financeiro'), blank=True, null=True) 
     data_oper = NARADateField(_(u'Data da operação'))
-    cod_oper = models.IntegerField(verbose_name=_(u'Documento'), validators=[MinValueValidator(0), MaxValueValidator(999999999)], help_text=u'Código com máximo de 9 dígitos.')
+    cod_oper = models.IntegerField(verbose_name=_(u'Documento'), validators=[MinValueValidator(0), MaxValueValidator(9999999999)], help_text=u'Código com máximo de 10 dígitos.')
     despesa_caixa = models.BooleanField(_(u'Despesa de caixa?'), default=False)
     valor = models.DecimalField(_(u'Valor'), max_digits=12, decimal_places=2)
     historico = models.CharField(_(u'Histórico'), max_length=30)

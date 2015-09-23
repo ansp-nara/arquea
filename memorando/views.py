@@ -13,21 +13,26 @@ from django.conf import settings
 from models import *
 from financeiro.models import Pagamento
 from outorga.models import Termo
-from utils.functions import render_to_pdf, render_to_pdf_weasy
+from utils.functions import render_to_pdf, render_to_pdf_weasy, render_to_pdfxhtml2pdf
 
 
 @login_required
 def simples(request, mem):
     m = get_object_or_404(MemorandoSimples,pk=mem)
 
+    #return render_to_response('memorando/simples.pdf', {'m':m, 't':Termo.termo_ativo()})
     return render_to_pdf_weasy('memorando/simples.pdf', {'m':m, 't':Termo.termo_ativo()}, request=request, filename='memorando_%s.pdf' % m.__unicode__())
+
 
 
 @login_required
 @require_safe
 def ajax_escolhe_pagamentos(request):
     termo_id = request.GET.get('termo')
-    termo = get_object_or_404(Termo, pk=termo_id)
+    try:
+        termo = Termo.objects.get(pk=termo_id)
+    except (Termo.DoesNotExist, ValueError):
+        termo = None
 
     pagamentos = []
 
@@ -95,7 +100,7 @@ def fapesp(request, mem):
             incluidos.update({c.pergunta.numero:len(corpos)})
             corpos.append({'numero':c.pergunta.numero, 'pergunta':c.pergunta.questao, 'respostas':[c.resposta]})
 
-    return render_to_pdf('memorando/fapesp.pdf', {'m':m, 'corpos':corpos}, filename='memorando_%s.pdf' % m.data.strftime('%d_%m_%Y'), attachments=anexos)
+    return render_to_pdfxhtml2pdf('memorando/fapesp.pdf', {'m':m, 'corpos':corpos}, request=request, filename='memorando_%s.pdf' % m.data.strftime('%d_%m_%Y'), attachments=anexos)
 
 
 @login_required

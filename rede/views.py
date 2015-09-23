@@ -75,7 +75,7 @@ def planejamento(request, pdf=0):
         entidades.append(entidade)
 
     if pdf:
-        return render_to_pdf('rede/planejamento.pdf', {'entidades':entidades, 'ano':ano}, request=request, filename='planejamento%s.pdf' % ano)
+        return render_to_pdf_weasy('rede/planejamento.pdf', {'entidades':entidades, 'ano':ano}, request=request, filename='planejamento%s.pdf' % ano)
     return TemplateResponse(request, 'rede/planejamento.html', {'entidades':entidades, 'ano':ano, 'projeto':proj, 'os':os})
 
 
@@ -127,7 +127,7 @@ def imprime_informacoes_gerais(request):
         operadoras = e.segmento_set.filter(data_desativacao__isnull=True)
         info.append({'info':e, "contatos_tec":contato_tec, "asn":asn, "bloco_ip":blocos, "operadoras":operadoras})
 
-    return render_to_pdf('rede/informacoes_gerais.pdf', {'info':info}, request=request, filename='informacoes_gerais.pdf')
+    return render_to_pdf_weasy('rede/informacoes_gerais.pdf', {'info':info}, request=request, filename='informacoes_gerais.pdf')
 
 
 @login_required
@@ -206,7 +206,7 @@ def planejamento2(request, pdf=0):
             igeral += imposto
             tgeral += total
         if pdf:
-            return render_to_pdf('rede/planejamento2.pdf', {'beneficiado':beneficiado, 'entidade':entidade, 'termo':termo, 'pagamentos':pagamentos, 'sem':tgeral, 'com':igeral}, request=request, filename="servicos_contratados_por_processo.pdf")
+            return render_to_pdf_weasy('rede/planejamento2.pdf', {'beneficiado':beneficiado, 'entidade':entidade, 'termo':termo, 'pagamentos':pagamentos, 'sem':tgeral, 'com':igeral}, request=request, filename="servicos_contratados_por_processo.pdf")
         else:
             return TemplateResponse(request, 'rede/planejamento2.html', {'beneficiado':beneficiado, 'entidade':entidade, 'termo':termo, 'pagamentos':pagamentos, 'sem':tgeral, 'com':igeral, 'servicos':descricoes_ids})
     else:
@@ -526,9 +526,9 @@ def custo_terremark(request, pdf=0, xls=0):
 
     elif request.GET.get('acao') and request.GET.get('acao')=='1':
         # Export para PDF
-        return render_to_pdf(template_src='rede/tabela_terremark.pdf', context_dict={'recursos':recursos, 'estado_selected':estado_selected}, filename='custos_dos_recursos_contratados.pdf')
+        return render_to_pdf_weasy(template_src='rede/tabela_terremark.pdf', context_dict={'recursos':recursos, 'estado_selected':estado_selected}, request=request, filename='custos_dos_recursos_contratados.pdf')
 
-    return TemplateResponse(request, 'rede/tabela_terremark.html', 
+    return TemplateResponse(request, 'rede/tabela_terremark.html',
                             {'recursos':recursos, 
                              'filtro_estados':EstadoOS.objects.all(), 'estado_selected':estado_selected, 'estado':estado})
 

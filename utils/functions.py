@@ -34,6 +34,8 @@ url('{% get_media_prefix %}{{papelaria.papel_timbrado_retrato_a4}}');
 
 """
 def fetch_resources(uri, rel):
+    f = open('/tmp/debug', 'w')
+    f.write('entrou\n')
     # use short variable names
     sUrl = settings.STATIC_URL      # Typically /static/
     sRoot = settings.STATIC_ROOT    # Typically /home/userX/project_static/
@@ -53,6 +55,9 @@ def fetch_resources(uri, rel):
             raise Exception(
                     'media URI must start with %s or %s' % \
                     (sUrl, mUrl))
+
+    f.close()
+
     return path
 
 
@@ -111,37 +116,53 @@ def weasy_fetcher(url,**kwargs):
 
 
 def render_to_pdf_weasy(template_src, context_dict, request=None, filename='file.pdf'):
-    # Renderiza o HTML
-    template = loader.get_template(template_src)
-    if request: 
+
+    if list(template_src) != template_src:
+        template_src = [template_src]
+
+    docs = []
+    if request:
         context = RequestContext(request)
-        base_url = request.build_absolute_uri() 
-    else: 
+        base_url = request.build_absolute_uri()
+    else:
         context = Context()
         base_url = ''
-    
+
     context.update(context_dict)
-    html  = template.render(context)
-    
+
+    for t_src in template_src:
+        # Renderiza o HTML
+        template = loader.get_template(t_src)
+        html  = template.render(context)
+        docs.append(weasyprint.HTML(string=html, url_fetcher=weasy_fetcher).render())
+
+    all_pages = []
+    for doc in docs:
+        all_pages += doc.pages
+
     response = HttpResponse(content_type="application/pdf")
     
     # Necessário passar o base_url para poder resolver os caminhos relativos de imagens
-    weasyprint.HTML(string=html, url_fetcher=weasy_fetcher).write_pdf(response)
+    docs[0].copy(all_pages).write_pdf(response)
     response['Content-Disposition'] = 'attachment; filename=%s' % filename
     return response
 
 
 
-def render_to_pdfxhtml2pdf(template_src, context_dict, context_instance=None, filename='file.pdf', attachments=[]):
+def render_to_pdfxhtml2pdf(template_src, context_dict, request=None, context_instance=None, filename='file.pdf', attachments=[]):
     from xhtml2pdf import pisa
     from xhtml2pdf.pdf import pisaPDF
     # Renderiza o HTML
     template = loader.get_template(template_src)
-    context = context_instance or Context()
+    if request:
+        context = RequestContext(request)
+    else:
+        context = Context()
+
     context.update(context_dict)
     html  = template.render(context)
     pdf = pisaPDF()
-    pdf_princ = pisa.pisaDocument(StringIO.StringIO(html.encode("utf-8"))) #, link_callback=fetch_resources)
+    pdf_princ = pisa.pisaDocument(StringIO.StringIO(html.encode("utf-8")), link_callback=fetch_resources)
     pdf.addDocument(pdf_princ)
     a = 0
     for f,d,t in attachments:
@@ -155,7 +176,7 @@ def render_to_pdfxhtml2pdf(template_src, context_dict, context_instance=None, fi
         response.write(pdf.getvalue())
         response['Content-Disposition'] = 'attachment; filename=%s' % filename
         return response
-    return HttpResponse('We had some errors<pre>%s</pre>' % cgi.escape(html))
+    return HttpResponse('We  had some errors<pre>%s</pre>' % cgi.escape(html))
 
 
 def render_wk_to_pdf(template_src, context_dict, context_instance=None, filename=None, attachments=[], request=None, header_template=None, footer_template=None):

@@ -8,7 +8,8 @@
 @page {
   size: a3 landscape;
     background-image: url('media:{{papelaria.papel_timbrado_paisagem_a3}}');
-    background-size: contain;
+    background-position: center top;
+    background-size: 100% 102%;
     background-repeat:no-repeat;
     margin-top:0;
     margin-right:1cm;

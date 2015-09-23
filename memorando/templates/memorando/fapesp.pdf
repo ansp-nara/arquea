@@ -1,12 +1,13 @@
 {% load proto_tags %}
+{% load static %}
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" type="text/css" href="{% get_static_prefix %}css/memorando.css">
 <style>
-@import url('/var/www/media/css/memorando.css');
 @page {
   size: a4 portrait;
-  background-image: url('/var/www/media/img/papel_timbrado.jpg');
+  background-image: url('{% get_media_prefix %}{{papelaria.papel_timbrado_retrato_a4}}');
   top: 4cm;
   left: 3cm;
   right: 3cm;

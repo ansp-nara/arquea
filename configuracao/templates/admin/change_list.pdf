@@ -1,9 +1,7 @@
 {% extends "base.pdf" %}
 {% load admin_list i18n %}
 
-{% block extrastyle %}
-@import url('/var/www/media/css/pdf_changelist.css');
-{% endblock %}
+{% block extrahead %}<link rel="stylesheet" type="text/css" href="static:css/pdf_changelist.css">{% endblock %}
 
 {% block content %}
   <div id="content-main">
