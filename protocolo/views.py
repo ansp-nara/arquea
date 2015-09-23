@@ -9,7 +9,7 @@ from django.views.decorators.http import require_safe
 
 from outorga.models import Termo
 from protocolo.models import Protocolo, Cotacao, Descricao
-from utils.functions import pega_lista, render_to_pdf
+from utils.functions import pega_lista, render_to_pdf, render_to_pdf_weasy
 """
 Verifica se o usuário tem autorização (pertence ao grupo 'tecnico') e retorna uma lista das cotações de um 
 determinado protocolo.
@@ -49,11 +49,11 @@ def lista_protocolos(request, t_id):
     return render_to_response('protocolo/listagem.html', {'protocolos':retorno})
 
 
-@permission_required('protocolo.change_protocolo')
-def protocolos(request, termo_id):
-    termo = get_object_or_404(Termo, pk=termo_id)
-
-    return render_to_pdf('protocolo/protocolos.pdf', {'termo':termo, 'protocolos':termo.protocolo_set.order_by('descricao2')}, filename='protocolos.pdf')
+# @permission_required('protocolo.change_protocolo')
+# def protocolos(request, termo_id):
+#     termo = get_object_or_404(Termo, pk=termo_id)
+#
+#     return render_to_pdf('protocolo/protocolos.pdf', {'termo':termo, 'protocolos':termo.protocolo_set.order_by('descricao2')}, filename='protocolos.pdf')
 
 
 @login_required
@@ -73,7 +73,7 @@ def protocolos_descricao(request, pdf=False):
             retorno.append(desc)
 
         if pdf:
-            return render_to_pdf('protocolo/descricoes.pdf', {'protocolos':retorno})
+            return render_to_pdf_weasy('protocolo/descricoes.pdf', {'protocolos':retorno}, request=request, filename='protocolos.pdf')
         else:
             return render_to_response('protocolo/descricoes.html', {'protocolos':retorno}, context_instance=RequestContext(request))
     else:

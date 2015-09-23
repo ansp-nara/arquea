@@ -4,24 +4,30 @@
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" type="text/css" href="static:css/pdf_weasy.css">
 <style>
-@import url('/var/www/django/media/css/pdf.css');
 @page {
   size: a4;
-  background-image: url('{% get_media_prefix %}{{papelaria.papel_timbrado_retrato_a4}}');
-  background-size: contain;
+  background-image: url('media:{{papelaria.papel_timbrado_retrato_a4}}');
+  background-position: center top;
+  background-size: 100% 102%;
   background-repeat:no-repeat;
-  top: {{papelaria.retrato_a4_margem_superior|default:0.5|unlocalize}}cm;
-  left: 1.5cm;
-  right: 1.5cm;
-  bottom: {{papelaria.retrato_a4_margem_inferior|default:0.5|unlocalize}}cm;
-  @frame footer {
-                -pdf-frame-content: footerContent;
-                bottom: 0.5cm;
-                margin-right: 1cm;
-                height: 1cm;
-		left: -2.3cm;
-                } 
+  padding-top: {{papelaria.retrato_a4_margem_superior|default:0.5|unlocalize}}cm;
+  padding-left: 1.5cm;
+  padding-right: 1.5cm;
+  padding-bottom: {{papelaria.retrato_a4_margem_inferior|default:0.5|unlocalize}}cm;
+  margin: 0;
+  margin-bottom: 1cm;
+  @bottom-right {
+    content: 'Pág ' counter(page);
+    white-space: pre;
+    color: grey;
+    vertical-align: bottom;
+    font-family: Arial;
+    font-size: 0.7em;
+    padding-right:1cm;
+    padding-bottom:1cm;
+  }
 }
 
 th {
@@ -33,29 +39,31 @@ th {
 </style> 
 </head>
 <body>
-<h1 repeat="1">Pagamentos de {{ mes }} de {{ ano }}</h1>
+<h1>Pagamentos de {{ mes }} de {{ ano }}</h1>
 
-    <table border="0" repeat="1" cellpadding="5">
+    <table style="border:0;width:100%;">
+        <thead>
     	<tr>
-		    <th>Processo</th>
-			<th>Documento</th>
-			<th>Data</th>
-			<th>Número da operação</th>
-			<th>Valor</th>
-			<th>Modalidade</th>
-			<th>Parcial</th>
-			<th>Página</th>
+		    <th style="width:9%;">Processo</th>
+			<th style="width:37%;">Documento</th>
+			<th style="width:9%;">Data</th>
+			<th style="width:10%;">Número da operação</th>
+			<th style="width:10%;">Valor</th>
+			<th style="width:11%;">Modalidade</th>
+			<th style="width:7%;">Parcial</th>
+			<th style="width:7%;">Página</th>
 		</tr>
+        </thead>
 	    {% for p in pagamentos %}
 			<tr>
-				<td style="width:2cm;">{{ p.termo }}</td>
-				<td style="width:7cm;" class="peq">{{ p.documento }}</td>
-				<td style="width:2.5cm;">{{ p.data }}</td>
-				<td style="width:2.5cm;" class="peq">{{ p.oper }}</td>
-				<td style="width:2.5cm;" class="num peq">{{ p.valor }}</td>
-				<td style="width:2cm;">{{ p.modalidade }}</td>
-				<td style="width:1.4cm;">{{ p.parcial }}</td>
-				<td style="width:1.4cm;">{{ p.pagina }}</td>
+				<td>{{ p.termo }}</td>
+				<td>{{ p.documento }}</td>
+				<td>{{ p.data }}</td>
+				<td>{{ p.oper }}</td>
+				<td class="num">{{ p.valor }}</td>
+				<td>{{ p.modalidade }}</td>
+				<td>{{ p.parcial }}</td>
+				<td>{{ p.pagina }}</td>
 			</tr>
 	    {% endfor %}
 	    <tr style="font-weight:bolder; border-top:1px black solid;">
@@ -70,8 +78,5 @@ th {
 	       <tr><td style="width:5cm;">{{ p.modalidade }}:</td><td>R$ {{ p.total }}</td></tr>
 	    {% endfor %}
     </table>
-  <div id="footerContent">
-      pág <pdf:pagenumber example="00" />
-  </div> 
-</body>
+  </body>
 </html>

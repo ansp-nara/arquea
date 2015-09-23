@@ -9,7 +9,7 @@ from django.views.decorators.http import require_safe
 
 import json as simplejson
 from models import *
-from utils.functions import render_to_pdf
+from utils.functions import render_to_pdf, render_to_pdf_weasy
 
 @login_required
 @require_safe
@@ -109,7 +109,7 @@ def agenda(request, tipo=8, pdf=None):
                 entidades.append({'entidade':ef, 'filho':True, 'areas':areas})
 
         if pdf:
-            return render_to_pdf('identificacao/agenda.pdf', {'entidades':entidades}, request=request, filename='agenda.pdf')
+            return render_to_pdf_weasy('identificacao/agenda.pdf', {'entidades':entidades}, request=request, filename='agenda.pdf')
         return TemplateResponse(request, 'identificacao/agenda.html', {'entidades':entidades, 'tipo':int(tipo), 'tipos':tipos, 'agenda':agenda})
     else:
         agendas = Agenda.objects.order_by('nome')

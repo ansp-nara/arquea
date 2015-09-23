@@ -4,22 +4,7 @@
 {% load l10n %}
 {% block content %}
 <style>
-@page {
-  size: a4;
-  background-image: url('{% get_media_prefix %}{{papelaria.papel_timbrado_retrato_a4}}');
-  top: {{papelaria.retrato_a4_margem_superior|default:0.5|unlocalize}}cm;
-  bottom: {{papelaria.retrato_a4_margem_inferior|default:0.5|unlocalize}}cm;
-  left: 1.5cm;
-  right: 1.5cm;
-  @frame footer {
-    -pdf-frame-content: footerContent;
-    bottom: 0.5cm;
-    margin-right: 1cm;
-    height: 1cm;
-    left: -2.3cm;
-    } 
-}
- body {
+body {
     margin: 0;
     padding: 0;
     width:100%;
@@ -38,20 +23,21 @@ td {
 }
 /*.th_ano { width: 1.0cm; }*/
 /*.th_projeto { width: 1.2cm; }*/
-.th_contrato { width: 1.8cm; }
-.th_qtd { width: 1.2cm; }
-/*.th_tipo { width: 3.5cm; }*/
-.th_valor { width: 2.0cm; }
-.th_total { width: 2.0cm; }
-.th_instalacao { width: 1.2cm; }
+.th_contrato { width: 15%; }
+.th_qtd { width: 10.5%; }
+.th_tipo { width: 30%; }
+.th_valor { width: 17%; }
+.th_total { width: 17%; }
+.th_instalacao { width: 10.5%; }
 
 .tbl_nf {
     margin-left:0.5cm;
+    width:100%;
 }
-.td_nf{ margin:0; width: 2.6cm; }
-.td_meses{ margin:0; width: 4cm; }
-.td_mensal{ margin:0; width: 6.3cm; }
-.td_pago{ margin:0; width: 6.5cm; }
+.td_nf{ margin:0; width: 13.5%; }
+.td_meses{ margin:0; width: 20.5%; }
+.td_mensal{ margin:0; width: 32%; }
+.td_pago{ margin:0; width: 34%; }
 
 .titulo_ano {
     width:100%;
@@ -71,7 +57,7 @@ td {
     <div class="titulo_ano"><strong>Ano: </strong>{{ ano }}</div>
     {% for p in e.projetos %}
         <div class="titulo_projeto"><strong>Projeto: </strong>{{ p.projeto }}</div>
-        <table>
+        <table style="width:100%;">
             <thead>
             <tr>
                 <th class="th_contrato">Contrato/OS</th>

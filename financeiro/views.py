@@ -29,11 +29,11 @@ logger = logging.getLogger(__name__)
 @require_safe
 def ajax_termo_escolhido(request):
     termo_id = request.GET.get('termo_id')
-    t = None
+
     try:
         t = Termo.objects.get(id=termo_id)
-    except Termo.DoesNotExist:
-        pass
+    except (Termo.DoesNotExist, ValueError):
+        t = None
 
     retorno = {}
     if t:
@@ -56,12 +56,11 @@ def ajax_termo_escolhido(request):
 def ajax_numero_escolhido(request):
     termo_id = request.GET.get('termo_id')
     numero = request.GET.get('numero')
-    t = None
-    if termo_id:
-        try:
-            t = Termo.objects.get(id=termo_id)
-        except Termo.DoesNotExist:
-            pass
+
+    try:
+        t = Termo.objects.get(id=termo_id)
+    except (Termo.DoesNotExist, ValueError):
+        t = None
 
     retorno = {}
     if t:
@@ -202,7 +201,7 @@ def pagamentos_mensais(request, pdf=False):
         dados = _estrutura_pagamentos(pagamentos)
 
         if pdf:
-            return render_to_pdf('financeiro/pagamentos.pdf', {'pagamentos':dados['pg'], 'ano':ano, 'mes':mes, 'total':formata_moeda(dados['total']['valor_fapesp__sum'], ','), 'pm':dados['pm']}, request=request, filename='pagamentos_mensais.pdf')
+            return render_to_pdf_weasy('financeiro/pagamentos.pdf', {'pagamentos':dados['pg'], 'ano':ano, 'mes':mes, 'total':formata_moeda(dados['total']['valor_fapesp__sum'], ','), 'pm':dados['pm']}, request=request, filename='pagamentos_mensais.pdf')
         else:
             return render_to_response('financeiro/pagamentos.html', {'pagamentos':dados['pg'], 'ano':ano, 'mes':mes, 'total':formata_moeda(dados['total']['valor_fapesp__sum'], ','), 'pm':dados['pm']}, context_instance=RequestContext(request))
     else:
@@ -232,7 +231,7 @@ def pagamentos_parciais(request, pdf=False):
         dados = _estrutura_pagamentos(pagamentos)
 
         if pdf:
-            return render_to_pdf('financeiro/pagamentos_parciais.pdf', {'pagamentos':dados['pg'], 'parcial':parcial, 'termo':termo, 'total':formata_moeda(dados['total']['valor_fapesp__sum'], ','), 'pm':dados['pm']}, request=request, filename='pagamentos_parciais.pdf')
+            return render_to_pdf_weasy('financeiro/pagamentos_parciais.pdf', {'pagamentos':dados['pg'], 'parcial':parcial, 'termo':termo, 'total':formata_moeda(dados['total']['valor_fapesp__sum'], ','), 'pm':dados['pm']}, request=request, filename='pagamentos_parciais.pdf')
         else:
             return render_to_response('financeiro/pagamentos_parciais.html', {'pagamentos':dados['pg'], 'parcial':parcial, 'termo':termo, 'total':formata_moeda(dados['total']['valor_fapesp__sum'], ','), 'pm':dados['pm']}, context_instance=RequestContext(request))
     else:
@@ -271,6 +270,10 @@ def relatorio_gerencial(request, pdf=False):
             parcial = int(request.GET.get('parcial'))
         except TypeError:
             parcial = 0
+
+        if request.GET.has_key('tamanho'):
+            tamanho = request.GET.get('tamanho')
+        else: tamanho = 'a3'
         
         retorno = []
         meses = []
@@ -303,7 +306,8 @@ def relatorio_gerencial(request, pdf=False):
         mes = minicio
         while ano < afinal or (ano <= afinal and mes <= mfinal):
             dt = date(ano,mes,1)
-            meses.append(dt.strftime('%B de %Y').decode('latin1'))
+            #meses.append(dt.strftime('%B de %Y').decode('latin1'))
+            meses.append(dt)
             if ano == t.termino.year and mes == t.termino.month:
                 dt2 = date(ano+5,mes,1)
                 total_real = pagamentos.filter(origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional=True, conta_corrente__data_oper__range=(dt,dt2)).aggregate(Sum('valor_fapesp'))
@@ -408,7 +412,7 @@ def relatorio_gerencial(request, pdf=False):
             retorno.append(item)
 
         if pdf:
-            return render_to_pdf('financeiro/gerencial.pdf', {'atualizado':ultimo, 'termo':t, 'meses':meses, 'modalidades':retorno, 'totais':totalizador, 'gerais':gerais}, request=request, context_instance=RequestContext(request), filename='relatorio_gerencial.pdf')
+            return render_to_pdf_weasy('financeiro/gerencial.pdf', {'atualizado':ultimo, 'termo':t, 'meses':meses, 'modalidades':retorno, 'tamanho':tamanho, 'totais':totalizador, 'gerais':gerais}, request=request, filename='relatorio_gerencial.pdf')
         else:
             return render_to_response('financeiro/gerencial.html', {'inicio':inicio, 'termino':termino, 'rt':rt, 'parcial':parcial, 'atualizado':ultimo, 'termo':t, 'meses':meses, 'modalidades':retorno, 'totais':totalizador, 'gerais':gerais}, context_instance=RequestContext(request))
     else:
@@ -546,7 +550,7 @@ def extrato_mes(request, pdf=False):
             retorno.append(e1.saldo)
 
         if pdf:
-            return render_to_pdf('financeiro/contacorrente_mes.pdf', {'ano':ano, 'mes':mes, 'extrato':retorno}, request=request, filename='extrato_cc_%s/%s.pdf' % (mes,ano))
+            return render_to_pdf_weasy('financeiro/contacorrente_mes.pdf', {'ano':ano, 'mes':mes, 'extrato':retorno}, request=request, filename='extrato_cc_%s/%s.pdf' % (mes,ano))
         else:
             return render_to_response('financeiro/contacorrente_mes.html', {'ano':ano, 'mes':mes, 'extrato':retorno}, context_instance=RequestContext(request))
     else:
@@ -593,7 +597,7 @@ def extrato_financeiro(request, ano=dtime.now().year, pdf=False):
             extrato.append(ex)
 
         if pdf:
-            return render_to_pdf('financeiro/financeiro.pdf', {'ano':ano, 'extrato':extrato}, request=request, filename='financeiro_%s/%s.pdf' % (mes,ano))
+            return render_to_pdf_weasy('financeiro/financeiro.pdf', {'ano':ano, 'extrato':extrato}, request=request, filename='financeiro_%s/%s.pdf' % (mes,ano))
         else:
             return render_to_response('financeiro/financeiro.html', {'termo':termo, 'mes':mes, 'ano':ano, 'extrato':extrato}, context_instance=RequestContext(request))
     else:
@@ -604,7 +608,7 @@ def extrato_financeiro(request, ano=dtime.now().year, pdf=False):
 @login_required
 @permission_required('financeiro.rel_adm_extrato_tarifas', raise_exception=True)
 @require_safe
-def extrato_tarifas(request, pdf=False):
+def extrato_tarifas(request):
     """
      Relatório Administrativo - Relatório de Extrato de tarifas por mês.
      
@@ -620,10 +624,8 @@ def extrato_tarifas(request, pdf=False):
 
         context = {'total':total['valor__sum'], 'ano':ano, 'tarifas':tars}
         if mes > 0: context.update({'mes':mes})
-        if pdf:
-            return render_to_pdf('financeiro/tarifas.pdf', context, request=request, filename='tarifas_%s/%s.pdf' % (mes,ano))
-        else:
-            return render_to_response('financeiro/tarifas.html', context, context_instance=RequestContext(request))
+
+        return render_to_response('financeiro/tarifas.html', context, context_instance=RequestContext(request))
     else:
         meses = range(0,13)
         anos = range(1990,dtime.now().year+1)
@@ -919,10 +921,7 @@ def _parciais_or_caixa(request, caixa=False, pdf=False):
             parcs.update({'dados':ret, 'diff':-total_diff})
             retorno.append(parcs)
 
-        if pdf:
-            return render_to_pdf('financeiro/parciais.pdf', {'parciais':retorno, 'termo':termo}, request=request, filename='parciais.pdf')
-        else:
-            return render_to_response('financeiro/parciais.html', {'caixa':caixa, 'parciais':retorno, 'termo':termo}, context_instance=RequestContext(request))
+        return render_to_response('financeiro/parciais.html', {'caixa':caixa, 'parciais':retorno, 'termo':termo}, context_instance=RequestContext(request))
     else:
         view = 'parciais'
         if caixa:
@@ -934,8 +933,11 @@ def _parciais_or_caixa(request, caixa=False, pdf=False):
 @require_safe
 def ajax_escolhe_extrato(request):
     termo_id = request.GET.get('termo')
-    termo = get_object_or_404(Termo, id=termo_id)
-
+    try:
+        termo = Termo.objects.get(id=termo_id)
+    except (Termo.DoesNotExist, ValueError):
+        termo = None
+            
     ef = ExtratoFinanceiro.objects.filter(termo=termo)
     extratos = []
     for e in ef:

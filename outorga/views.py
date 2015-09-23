@@ -15,7 +15,7 @@ from patrimonio.models import Patrimonio, Equipamento
 from financeiro.models import Pagamento, Auditoria
 from identificacao.models import *
 from outorga.models import Termo, Modalidade, Item, Natureza_gasto, Acordo, Outorga, Contrato, EstadoOS, OrdemDeServico
-from utils.functions import render_to_pdf, render_to_pdf_weasy, month_range
+from utils.functions import render_to_pdf, render_to_pdf_weasy, render_to_pdfxhtml2pdf, month_range
 
 
 
@@ -226,24 +226,24 @@ logger = logging.getLogger(__name__)
 
 #### ROGERIO: VERIFICAR SE EXISTE ALGUMA CHAMADA PARA ESTA VIEW
 ####         PARA A SUA REMOÇÃO DO SISTEMA
-def gastos_acordos(request):
-    acordos = []
-    acordo = ['']
-    for t in Termo.objects.filter(ano__gte=2005).order_by('ano'):
-        acordo.append('%s (%s)' % (t.__unicode__(), t.duracao_meses()))
-          
-    acordos.append(acordo)
-    for a in Acordo.objects.all():
-   
-        acordo = [a.descricao]
-        for t in Termo.objects.filter(ano__gte=2005).order_by('ano'):
-            total = Decimal('0.0')
-            for o in a.origemfapesp_set.filter(item_outorga__natureza_gasto__termo=t):
-                total += o.gasto()
-            acordo.append(total)
-        acordos.append(acordo)
-  
-    return render_to_pdf('outorga/acordos.pdf', {'acordos':acordos}, request=request)
+# def gastos_acordos(request):
+#     acordos = []
+#     acordo = ['']
+#     for t in Termo.objects.filter(ano__gte=2005).order_by('ano'):
+#         acordo.append('%s (%s)' % (t.__unicode__(), t.duracao_meses()))
+#
+#     acordos.append(acordo)
+#     for a in Acordo.objects.all():
+#
+#         acordo = [a.descricao]
+#         for t in Termo.objects.filter(ano__gte=2005).order_by('ano'):
+#             total = Decimal('0.0')
+#             for o in a.origemfapesp_set.filter(item_outorga__natureza_gasto__termo=t):
+#                 total += o.gasto()
+#             acordo.append(total)
+#         acordos.append(acordo)
+#
+#     return render_to_pdf('outorga/acordos.pdf', {'acordos':acordos}, request=request)
 
 
 @login_required
@@ -397,7 +397,7 @@ def lista_acordos(request, pdf=False):
         processos.append(processo)
 
     if pdf:
-        return render_to_pdf('outorga/acordos.pdf', {'processos':processos}, request=request, filename="distribuicao_das_concessoes_por_acordo.pdf")
+        return render_to_pdf_weasy('outorga/acordos.pdf', {'processos':processos}, request=request, filename="distribuicao_das_concessoes_por_acordo.pdf")
     else:
         return render(request, 'outorga/acordos.html', {'processos':processos})
 
@@ -594,7 +594,7 @@ def acordo_progressivo(request, pdf=False):
         
         termos = Termo.objects.filter(exibe_rel_ger_progressivo=True).order_by('inicio')
     if pdf:
-        return render_to_pdf('outorga/acordo_progressivo.pdf', {'acordos':acordos, 'termos':termos}, request=request, filename='acordo_progressivo.pdf')
+        return render_to_pdfxhtml2pdf('outorga/acordo_progressivo.pdf', {'acordos':acordos, 'termos':termos}, request=request, filename='acordo_progressivo.pdf')
     else:
         return render(request, 'outorga/acordo_progressivo.html', {'acordos':acordos, 'termos':termos})
 
@@ -608,12 +608,15 @@ def ajax_termo_datas(request):
     
      Ex: Relatório Gerencial, Relatório de Acordos, etc.
     """
-    if not request.GET.has_key('termo'):
-        raise Http404
+    # if not request.GET.has_key('termo'):
+    #     raise Http404
 
     termo_id = request.GET.get('termo')
     parcial = request.GET.get('parcial')
-    termo = get_object_or_404(Termo, pk=termo_id)
+    try:
+        termo = Termo.objects.get(pk=termo_id)
+    except (Termo.DoesNotExist, ValueError):
+        termo = None
     pagamentos = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__termo=termo)
     if parcial:
         pagamentos = pagamentos.filter(auditoria__parcial=parcial)
@@ -622,8 +625,9 @@ def ajax_termo_datas(request):
     datas.update(pagamentos.aggregate(max=Max('conta_corrente__data_oper')))
 
     meses = []
-    for m in month_range(datas['min'], datas['max']):
-        meses.append({'value':'%s-%s' % (m.year, m.month), 'display':'%02d/%s' % (m.month, m.year)})
+    if datas['min'] and datas['max']:
+        for m in month_range(datas['min'], datas['max']):
+            meses.append({'value':'%s-%s' % (m.year, m.month), 'display':'%02d/%s' % (m.month, m.year)})
     return HttpResponse(simplejson.dumps(meses), content_type='application/json')
 
 
@@ -634,11 +638,14 @@ def ajax_termo_parciais(request):
     Ajax utilizado para retornar as parciais abertas de um termo.
     """
 
-    if not request.GET.has_key('termo'):
-        raise Http404
+    # if not request.GET.has_key('termo'):
+    #     raise Http404
 
     termo_id = request.GET.get('termo')
-    termo = get_object_or_404(Termo, pk=termo_id)
+    try:
+        termo = Termo.objects.get(pk=termo_id)
+    except (Termo.DoesNotExist, ValueError):
+        termo = None
 
     parciais = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__termo=termo).values_list('auditoria__parcial', flat=True).order_by('auditoria__parcial').distinct()
     return HttpResponse(simplejson.dumps(list(parciais)), content_type='application/json')

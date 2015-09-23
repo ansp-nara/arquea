@@ -10,7 +10,7 @@ from django.template.response import TemplateResponse
 from django.utils.encoding import smart_str
 from django.utils.translation import ugettext as _
 from django.utils.safestring import mark_safe
-from functions import render_to_pdf
+from functions import render_to_pdf, render_to_pdf_weasy
 
 
 class AutoCompleteAdmin(admin.ModelAdmin):
@@ -100,7 +100,7 @@ class PrintModelAdmin(admin.ModelAdmin):
             self.list_display_links = ldl
             self.actions = actions
             if isinstance(page, TemplateResponse):
-                page = render_to_pdf('admin/change_list.pdf', page.resolve_context(page.context_data), filename='list_%s.pdf' % self.opts.model_name)
+                page = render_to_pdf_weasy('admin/change_list.pdf', page.resolve_context(page.context_data), filename='list_%s.pdf' % self.opts.model_name)
         else:
             if extra_context: extra_context = extra_context.update({'pdf':True})
             else: extra_context = {'pdf':True}

@@ -2,43 +2,26 @@
 {% load proto_tags %}
 {% load static %}
 {% load l10n %}
-{% block content %}
-<style>
-@page {
-  size: a4;
-  background-image: url('{% get_media_prefix %}{{papelaria.papel_timbrado_retrato_a4}}');
-  background-size: contain;
-  background-repeat:no-repeat;
-  top: {{papelaria.retrato_a4_margem_superior|default:0.5|unlocalize}}cm;
-  left: 1.5cm;
-  right: 1.5cm;
-  bottom: {{papelaria.retrato_a4_margem_inferior|default:0.5|unlocalize}}cm;
-  @frame footer {
-    -pdf-frame-content: footerContent;
-    bottom: 0.5cm;
-    margin-right: 0.5cm;
-    height: 0.5cm;
-    left: -2.3cm;
-    } 
-} 
+{% block extrastyle %}
 td { padding-top:3px; padding-left:2px;}
 th { padding-top:3px; }
 table tr td {
   border:0;
 }
-</style>
+{% endblock %}
+{% block content %}
 <h2>Entidades ligadas à ANSP</h2>
 <table>
     {% for i in info %}
     <tr><td>
-        <table border="1">
+        <table style="border:1px;width:100%;">
             <tr>
-                <th width="20%">Entidade</th>
-                <th width="10%">URL</th>
-                <th width="20%">Endereço</th>
-                <th width="10%">Cidade</th>
-                <th width="10%">CEP</th>
-                <th width="20%">Ponto de entrada na ANSP</th>
+                <th style="width:20%;">Entidade</th>
+                <th style="width:10%;">URL</th>
+                <th style="width:20%;">Endereço</th>
+                <th style="width:10%;">Cidade</th>
+                <th style="width:10%;">CEP</th>
+                <th style="width:20%;">Ponto de entrada na ANSP</th>
             </tr>
             <tr>
                 <td>{{ i.info.participante.entidade.sigla }} - {{ i.info.participante.entidade.nome }}</td>
@@ -51,14 +34,14 @@ table tr td {
             <tr>
                 <td></td>
                 <td colspan="5">
-                    <table border="1">
+                    <table style="border:1;width:100%;">
                         <tr>
-                            <th width="10%">ASN</th>
-                            <th width="25%">Bloco(s) Ip(s)</th>
-                            <th width="20%">Operadora</th>
-                            <th width="15%">Capacidade do link (Mbps)</th>
-                            <th width="20%">IP de entrada</th>
-                            <th width="10%">Link redundante?</th>
+                            <th style="width:10%;">ASN</th>
+                            <th style="width:25%;">Bloco(s) Ip(s)</th>
+                            <th style="width:20%;">Operadora</th>
+                            <th style="width:15%;">Capacidade do link (Mbps)</th>
+                            <th style="width:20%;">IP de entrada</th>
+                            <th style="width:10%;">Link redundante?</th>
                         </tr>
                         <tr>
                             <td rowspan="{{i.operadoras.count|default:1}}">

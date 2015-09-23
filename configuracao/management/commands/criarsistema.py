@@ -5,6 +5,9 @@ class Command(BaseCommand):
     help = (u"Modifica um projeto Django para rodar o Sistema, com as configurações "
             u"padrão já criadas.")
 
+    def add_arguments(self, parser):
+        parser.add_argument('args', metavar='projeto', nargs=1)
+
     def handle(self, *args, **options):
         if len(args) < 1:
             self.stdout.write('Projeto faltando')
@@ -19,6 +22,13 @@ class Command(BaseCommand):
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.views.generic import TemplateView
+
+try:
+    import ckeditor.urls
+    ck = ''
+except ImportError:
+    ck = '_uploader'
+
 
 urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
@@ -40,7 +50,7 @@ urlpatterns = patterns('',
     url(r'^verifica$', 'utils.views.verifica'),
     url(r'^sempermissao$', TemplateView.as_view(template_name="401.html")),
     url(r'^tinymce/', include('tinymce.urls')),
-    url(r'^ckeditor/', include('ckeditor.urls')),
+    url(r'^ckeditor/', include('ckeditor%s.urls' % ck)),
     url(r'^', include(admin.site.urls)),
 )
         """)

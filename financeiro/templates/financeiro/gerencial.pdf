@@ -4,34 +4,45 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="pt-br" xml:lang="pt-br" >
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" type="text/css" href="static:css/pdf_weasy.css">
 <style>
-@import url('{% get_media_prefix %}css/pdf.css');
 @page {
-  size: a3 landscape;
-  background-image: url('{% get_media_prefix %}{{papelaria.papel_timbrado_paisagem_a3}}');
-  background-size: contain;
+  size: {{ tamanho }} landscape;
+  background-image: url('media:{% if tamanho == 'a3' %}{{papelaria.papel_timbrado_paisagem_a3}}{% else %}{{papelaria.papel_timbrado_paisagem_a4}}{% endif %}');
+  background-position: center top;
+  background-size: 100% 102%;
   background-repeat:no-repeat;
-  top: {{papelaria.paisagem_a3_margem_superior|default:0.5|unlocalize}}cm;
-  left: 1.5cm;
-  right: 1.5cm;
-  bottom: {{papelaria.paisagem_a3_margem_inferior|default:0.5|unlocalize}}cm;
-  @frame footer {
-                -pdf-frame-content: footerContent;
-                bottom: 0.5cm;
-                margin-right: 1cm;
-                height: 1cm;
-                left: -2.3cm;
-                } 
+  padding-top: {% if tamanho == 'a3' %}{{papelaria.paisagem_a3_margem_superior|default:0.5|unlocalize}}{% else %}{{papelaria.paisagem_a4_margem_superior|default:0.5|unlocalize}}{% endif %}cm;
+  padding-left: 1.5cm;
+  padding-right: 1.5cm;
+  padding-bottom: {% if tamanho == 'a3' %}{{papelaria.paisagem_a3_margem_inferior|default:0.5|unlocalize}}{% else %}{{papelaria.paisagem_a4_margem_inferior|default:0.5|unlocalize}}{% endif %}cm;
+  margin: 0;
+  margin-bottom: 1cm;
+  @bottom-right {
+    content: 'Pág ' counter(page);
+    white-space: pre;
+    color: grey;
+    vertical-align: bottom;
+    font-family: Arial;
+    font-size: 0.7em;
+    padding-right:1cm;
+    padding-bottom:1cm;
+  }
+
 } 
 
     /* Estilos da tabela de dados consolidados*/
+    #tbl_consolidado {
+        border:1px;
+    }
+    
     #tbl_consolidado th {
         background-color: lightgray;
     }
     #tbl_consolidado th,
     #tbl_consolidado td {
         padding: 2px 2px;
-        font-size:5pt;
+        font-size:10px;
     }
     /* dimensões das celulas de titulo horizontal */
     #tbl_consolidado .tit_vert span  {
@@ -78,7 +89,7 @@
     .tbl_modalidades th,
     .tbl_modalidades td {
         padding: 2px 2px;
-        font-size:5pt;
+        font-size:10px;
     }
     
     .tbl_modalidades th {
@@ -129,18 +140,20 @@
 </style>
 </head>
 <body>
-<h1 repeat="1">Relatório gerencial do processo {{ termo }}, atualizado em {{ atualizado|date:"d/m/Y" }}</h1>
+<h1>Relatório gerencial do processo {{ termo }}, atualizado em {{ atualizado|date:"SHORT_DATE_FORMAT" }}</h1>
 
-    <table border="1" cellpadding="5" id="tbl_consolidado">
+    <table id="tbl_consolidado">
+        <thead>
 	    <tr>
 		    <th class="sp_moda"><span>Modalidade</span></th>
 		    <th class="sp_conc"><span>Concessão</span></th>
 		    {% for m in meses %}
-		      <th class="tit_vert"><span>{{ m }}</span></th>
+		      <th class="tit_vert"><span>{{ m|date:"F \d\e Y"|localize }}</span></th>
 		    {% endfor %}
 		    <th class="sp_real"><span>Total realizado</span></th>
 		    <th class="sp_sald"><span>Saldo</span></th>
 	    </tr>
+        </thead>
 	    {% for m in modalidades %}
 		<tr>
 		    <td class="sp_moda"><span>{{ m.modalidade }}</span></td>
@@ -172,19 +185,20 @@
     </table>
 
 {% for m in modalidades %}
- <pdf:nextpage></pdf:nextpage>
   <h3>{{ m.modalidade.nome }}</h3>
   <table border="1" repeat="1" cellpadding="5" class="tbl_modalidades">
+  <thead>
   <tr>
 	  <th width="2%">Qtd.</th>
 	  <th width="15%" class="span_desc"><span>Descrição</span></th>
 	  <th width="5%" class="sp_conc"><span>Concessão</span></th>
 	    {% for m in meses %}
-	      <th class="tit_vert"><span>{{ m }}</span></th>
+	      <th class="tit_vert"><span>{{ m|date:"F \d\e Y"|localize }}</span></th>
 	    {% endfor %}
 	  <th width="5%" class="sp_real"><span>Total realizado</span></th>
 	  <th width="5%" class="sp_sald"><span>Saldo</span></th>
   </tr>
+  </thead>
   {% for it, valores in m.itens.items|dictsort:"0.descricao" %}
      <tr>
         <td>{{ it.quantidade }}</td>
@@ -197,12 +211,11 @@
          <td class="sp_sald"><span>{{ it.saldo|moeda_css:m.modalidade.moeda_nacional }}</span></td>
      </tr>
   {% endfor %}
+  {% if m.obs %}
      <tr><td class="obs" colspan="{{ meses|length|add:"6" }}">* {{ m.obs|linebreaksbr }}</td></tr>
+  {% endif %}
   </table>
 {% endfor %}
 
-  <div id="footerContent">
-      pág <pdf:pagenumber example="00" />
-  </div> 
 </body>
 </html>

@@ -9,6 +9,7 @@ from decimal import Decimal
 import unicodedata
 from membro.models import Membro
 from protocolo.models import Protocolo, Cotacao
+import re
 
 register = Library()
 
@@ -456,3 +457,8 @@ def menu_has_permission(context, menuitem):
 register.assignment_tag(takes_context=True)(menu_has_permission)
 
 
+@register.filter
+def replace(string, args):
+    args = args.split(args[0])
+
+    return re.sub (args[1], args[2], string)

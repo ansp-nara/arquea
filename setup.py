@@ -49,7 +49,7 @@ setup(
           'django-localflavor',
 	  'python-dateutil',
           'python-magic',
-          'pisa',
+          'xhtml2pdf',
 	  'pyyaml',
           'ipaddress',
           'pillow',

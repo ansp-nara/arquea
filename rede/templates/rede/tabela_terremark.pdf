@@ -1,77 +1,56 @@
 {% extends "base.pdf" %}
 {% load proto_tags %}
-{% block pagesize %}a3 landscape{% endblock %}
-{% block landscape %}_paisagem{% endblock %}
+{% load l10n %}
+{% block size %}a3 landscape{% endblock %}
+{% block background %}{{papelaria.papel_timbrado_paisagem_a3}}{% endblock %}
+{% block top %}{{papelaria.paisagem_a3_margem_superior|default:0.5|unlocalize}}{% endblock %}
+{% block bottom %}{{papelaria.paisagem_a3_margem_inferior|default:0.5|unlocalize}}{% endblock %}
 {% block extrastyle %}
-td { padding-top:3px; padding-left:2px;}
-th { padding-top:3px; }
+
 table tr td {
-  border:1;
+  border:1px;
 }
 
  #id_form_recurso {}
 
- td.td_os span,
- td.td_v_unit span,
- td.td_v_simp span,
- td.td_v_cimp span,
- td.td_t_simp span,
- td.td_t_geral span
- {
-     white-space:nowrap;
- }
+
  
-    #tbl_content tr td:nth-child(1) {background-color:red}
-    /* ID */
-    #tbl_content td:nth-child(1) { width:0.9cm; }
-    /* PROCESSO */
-    #tbl_content td:nth-child(2) { width:1.8cm; }
-    /* N.USP */
-    #tbl_content td:nth-child(3) { width:1.1cm; }
-    /* NF */
-    #tbl_content td:nth-child(4) { width:1.7cm; }
-    /* MODELO */
-    #tbl_content td:nth-child(5) { width:2.7cm; }
-    /* PART NUMBER */
-    #tbl_content td:nth-child(6) { width:2.5cm; }
-    /* NS */
-    #tbl_content td:nth-child(7) { width:2.5cm; }
-    /* APELIDO */
-    #tbl_content td:nth-child(8) { width:2.1cm; }
-    /* DESCRICAO */
-    #tbl_content td:nth-child(9) { width:8.1cm; }
-    /* POSICAO */
-    #tbl_content td:nth-child(10) { width:2cm; }
-    /* ESTADO */
-    #tbl_content td:nth-child(11) { width:1.2cm; }
+
+    
+    #tbl_content {
+        border:1px;
+        width:100%;
+    }
     
 {% endblock %}
 {% block content %}
 <h1>Custos dos recursos contratados</h1>
-<table border="1" repeat="1" id="tbl_content">
+<table id="tbl_content">
+<thead>
 <tr>
-    <th style="width:1.3cm;">Contrato</th>
-    <th style="width:1.5cm;">OS</th>
+    <th style="width:3.4%;">Contrato</th>
+    <th style="width:3.9%;">OS</th>
     {% if not estado_selected or estado_selected == '0' %}
-        <th style="width:1.2cm;">Est. OS</th>
+        <th style="width:3.1%;">Est. OS</th>
     {% endif %}
-    <th style="width:1.5cm;">Data Ini</th>
-    <th style="width:1.5cm;">Data Fim</th>
-    <th style="width:3.4cm;">Projeto</th>
-    <th style="">Descrição</th>
-    <th style="">Referente</th>
-    <th style="width:1.3cm;">Unidade</th>
-    <th style="width:2cm;">Preço unitário</th>
-    <th style="width:0.9cm;">Qtd</th>
-    <th style="width:2cm;">Custo mensal sem imposto</th>
-    <th style="width:2cm;">Custo mensal com imposto</th>
-    <th style="width:0.9cm;">Meses pagos</th>
-    <th style="width:1.3cm;">Ref.</th>
-    <th style="width:2cm;">Total sem imposto</th>
-    <th style="width:2cm;">Total com imposto</th>
-    <th style="width:1.2cm;">Nota fiscal</th>
-    <th style="width:1.6cm;">Termo</th>
+    <th style="width:3.9%;">Data Ini</th>
+    <th style="width:3.9%;">Data Fim</th>
+    <th style="width:8.9%;">Projeto</th>
+    <th style="width:7%;">Descrição</th>
+    <th style="width:14%;">Referente</th>
+    <th style="width:3.4%;">Unidade</th>
+    <th style="width:5.2%;">Preço unitário</th>
+    <th style="width:2.4%;">Qtd</th>
+    <th style="width:5.2%;">Custo mensal sem imposto</th>
+    <th style="width:5.2%;">Custo mensal com imposto</th>
+    <th style="width:2.4%;">Meses pagos</th>
+    <th style="width:3.4%;">Ref.</th>
+    <th style="width:5.2%;">Total sem imposto</th>
+    <th style="width:5.2%;">Total com imposto</th>
+    <th style="width:3.1%;">Nota fiscal</th>
+    <th style="width:4.2%;">Termo</th>
 <tr>
+</thead>
 {% for r in recursos %}
    <tr>
      <td>{{ r.planejamento.os.contrato.numero }}</td>
@@ -95,7 +74,7 @@ table tr td {
 	 <td class="td_ref"><span>{{r.mes_referencia|default:"-"}} / {{r.ano_referencia|default:"-"}}</span></td>
 	 <td class="td_t_simp"><span>{{ r.total_sem_imposto|moeda }}</span></td>
 	 <td>{{ r.total_geral|moeda }}</td>
-	 <td class="td_t_geral"><span>{{ r.pagamento.protocolo.num_documento }}</span></td>
+	 <td class="td_t_geral"><span>{{ r.pagamento.protocolo.num_documento|replace:"/,/, /" }}</span></td>
      <td class="td_termo"><span>{{ r.pagamento.termo }}</span></td>
    </tr>
 {% endfor %}
