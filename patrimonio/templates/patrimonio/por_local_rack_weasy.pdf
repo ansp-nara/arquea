@@ -122,7 +122,7 @@
 </head>
 <body>
     <div id="conteudo">
-        <h1 repeat="1">Inventário por local</h1>
+        <h1 repeat="1">Inventário por local e rack</h1>
         {% for end in enderecos %}
             <h3>
                 {% if end.endereco %}
