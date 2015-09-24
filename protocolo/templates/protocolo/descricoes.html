@@ -17,7 +17,7 @@
     </div>
 {% endblock %}
 {% block content %}
-    <h1>Relatório de Protocolos por Descrição</h1>
+    <h1>Relatório de Protocolos por Descrição {% if termo %}- {{ termo|default:'' }}{% endif %}</h1>
     <div id="report_toolbar">
         <form action="{% url 'protocolo.views.protocolos_descricao' 1 %}" method="GET">
             <input type="hidden" value="{{ termo.id }}" name="termo" />

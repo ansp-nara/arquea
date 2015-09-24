@@ -32,14 +32,14 @@
 <body>
 {% for prot in protocolos %}
 {% if prot.protocolos %}
-<h1>{{ prot.descricao }}</h1>
+<h1>{{ prot.descricao }} {% if termo %}- {{ termo|default:'' }}{% endif %}</h1>
 
     <table style="border:0;width:100%;">
     <tr>
-        <th>Tipo e número</th>
-        <th>Referente</th>
-        <th>Valor</th>
-        <th>Estado</th>
+        <th style="width:3cm">Tipo e número</th>
+        <th style="width:10cm">Referente</th>
+        <th style="width:2cm">Valor</th>
+        <th style="width:1.5cm">Estado</th>
     </tr>
     {% for p in prot.protocolos %}
 	<tr>

@@ -75,7 +75,7 @@ def protocolos_descricao(request, pdf=False):
         if pdf:
             return render_to_pdf_weasy('protocolo/descricoes.pdf', {'protocolos':retorno}, request=request, filename='protocolos.pdf')
         else:
-            return render_to_response('protocolo/descricoes.html', {'protocolos':retorno}, context_instance=RequestContext(request))
+            return render_to_response('protocolo/descricoes.html', {'protocolos':retorno, 'termo':termo}, context_instance=RequestContext(request))
     else:
         return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all(), 'view':'protocolos_descricao'}, context_instance=RequestContext(request))
 
