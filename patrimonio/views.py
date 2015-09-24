@@ -580,7 +580,7 @@ def por_local_rack(request, pdf=0):
             
         
         if pdf:
-            return render_to_pdf_weasy('patrimonio/por_local_rack_weasy.pdf', context, request=request, filename='inventario_por_local.pdf')
+            return render_to_pdf_weasy('patrimonio/por_local_rack_weasy.pdf', context, request=request, filename='inventario_por_local_rack.pdf')
         else:
             return render_to_response('patrimonio/por_local_rack.html', context, RequestContext(request, context))
     else:
