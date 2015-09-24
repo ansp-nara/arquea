@@ -72,11 +72,13 @@ th {
 	    </tr>
     </table>
     <br />
-    <h3>Total por modalidade</h3>
+    <div style="page-break-inside:avoid;">
+    <h3 style="page-break-before:auto;">Total por modalidade</h3>
     <table id="tbl_modalidade">
         {% for p in pm %}
 	       <tr><td style="width:5cm;">{{ p.modalidade }}:</td><td>R$ {{ p.total }}</td></tr>
 	    {% endfor %}
     </table>
+    </div>
   </body>
 </html>
