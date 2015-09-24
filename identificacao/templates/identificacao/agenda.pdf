@@ -1,5 +1,11 @@
 {% extends "base.pdf" %}
 {% load proto_tags %}
+{% block extrastyle %}
+    td {
+        padding:0;
+        margin:0;
+    }
+{% endblock %}
 {% block content %}
   <table>
   {% for e in entidades %}
