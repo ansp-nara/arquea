@@ -167,7 +167,7 @@ def lista_relatorios(context):
     if user.is_superuser or user.has_perm('rede.rel_tec_info'):
         tecnicos.append({'url':'/rede/info', 'nome':u'Dados cadastrais dos participantes'})
     if user.is_superuser or user.has_perm('patrimonio.rel_tec_racks'):
-        tecnicos.append({'url':'/patrimonio/racks', 'nome':u'Racks (em construção)'})
+        tecnicos.append({'url':'/patrimonio/racks', 'nome':u'Bayfaces'})
         
     if user.is_superuser or user.has_perm('patrimonio.rel_tec_racks'):
         tecnicos.append({'url':'/patrimonio/relatorio_rack', 'nome':u'Relatorio por rack (em construção)'})
