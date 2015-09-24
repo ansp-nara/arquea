@@ -10,7 +10,7 @@
 @page {
   size: {% block size %}a4{% endblock %};
   background-image: url('media:{% block background %}{{papelaria.papel_timbrado_retrato_a4}}{% endblock %}');
-  background-position: conter top;
+  background-position: center top;
   background-size: 100% 102%;
   background-repeat:no-repeat;
   padding-top: {% block top %}{{papelaria.retrato_a4_margem_superior|default:0.5|unlocalize}}{% endblock %}cm;
