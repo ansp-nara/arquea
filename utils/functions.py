@@ -34,8 +34,6 @@ url('{% get_media_prefix %}{{papelaria.papel_timbrado_retrato_a4}}');
 
 """
 def fetch_resources(uri, rel):
-    f = open('/tmp/debug', 'w')
-    f.write('entrou\n')
     # use short variable names
     sUrl = settings.STATIC_URL      # Typically /static/
     sRoot = settings.STATIC_ROOT    # Typically /home/userX/project_static/
@@ -55,8 +53,6 @@ def fetch_resources(uri, rel):
             raise Exception(
                     'media URI must start with %s or %s' % \
                     (sUrl, mUrl))
-
-    f.close()
 
     return path
 
