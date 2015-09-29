@@ -137,7 +137,7 @@ def relatorio_repositorio(request, pdf=0):
 
     template_name = "relatorio_repositorio"
     if pdf:
-        return render_to_pdf_weasy('repositorio/%s.pdf' % template_name, {'grupos': grupos.itervalues(),}, request=request, filename='repositorio/%s.pdf' % template_name)
+        return render_to_pdf_weasy('repositorio/%s.pdf' % template_name, {'grupos': grupos.itervalues(),}, request=request, filename='%s.pdf' % template_name)
 
     return TemplateResponse(request, 'repositorio/%s.html' % template_name, 
                             {
