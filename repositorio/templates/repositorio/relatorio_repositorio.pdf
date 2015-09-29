@@ -86,7 +86,7 @@
     display: inline-table;
  }
  .div_item_conteudo {
-    width: 88%;
+    width: 100%;
     vertical-align: top;
  }
  .div_item_conteudo ul {
@@ -107,11 +107,14 @@
     font-weight:bold;
     width: 100px;
     margin-bottom:7px;
- }
-
-.div_item_label {
     vertical-align: top;
-}
+ }
+ .div_item_label_arquivos {
+    font-weight:bold;
+    width: 80px;
+    margin-bottom:7px;
+    vertical-align: top;
+ }
 
 
 </style>
@@ -170,13 +173,19 @@
             {% endif %}
             {% if r.anexos %}
                 <div class="div_item_arquivos">
-                    <div class="div_item_label">Arquivos:</div>
-                    <div class="div_item_conteudo" style="width: 80%;">
+                    <div class="div_item_label_arquivos">Arquivos:</div>
+                    <div class="div_item_conteudo">
+                        <ul>
                         {% for a in r.anexos %}
-                            <div class="div_item_arquivo_nome">{{a.nome}}</div>
-                            <div class="div_item_arquivo_tamanho">({{a.tamanho}} KBytes)</div>
-                            <div class="div_item_arquivo_palavra">{{a.palavras_chave}}</div>
+                            {% if a and a.nome %}
+                                <li>
+                                    <div class="div_item_arquivo_nome">{{a.nome}}</div>
+                                    <div class="div_item_arquivo_tamanho">({{a.tamanho}} KBytes)</div>
+                                    <div class="div_item_arquivo_palavra">{{a.palavras_chave}}</div>
+                                </li>
+                            {% endif %}
                         {% empty %} --- {% endfor %}
+                        </ul>
                     </div>
                 </div>
             {% endif %}
