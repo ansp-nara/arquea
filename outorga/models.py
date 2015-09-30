@@ -343,7 +343,7 @@ class Termo(models.Model):
     class Meta:
         verbose_name = _(u'Termo de Outorga')
         verbose_name_plural = _(u'Termos de Outorga')
-        ordering = ("-ano", )
+        ordering = ("-ano", "-processo")
 
     @classmethod
     def termo_ativo(cls):
@@ -813,7 +813,7 @@ class Item(models.Model):
     class Meta:
         verbose_name = _(u'Item do Orçamento')
         verbose_name_plural = _(u'Itens do Orçamento')
-        ordering = ('-natureza_gasto__termo__ano', 'descricao')
+        ordering = ('natureza_gasto__termo', 'descricao')
 
 
 

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.contrib.auth.decorators import permission_required, login_required
+from utils.decorators import login_required_or_403
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
@@ -25,7 +26,7 @@ def simples(request, mem):
 
 
 
-@login_required
+@login_required_or_403
 @require_safe
 def ajax_escolhe_pagamentos(request):
     termo_id = request.GET.get('termo')
@@ -50,7 +51,7 @@ def ajax_escolhe_pagamentos(request):
     return HttpResponse(json, content_type="application/json")
 
 
-@login_required
+@login_required_or_403
 @require_safe
 def ajax_escolhe_pergunta(request):
     pergunta_id = request.GET.get('pergunta')
@@ -59,7 +60,7 @@ def ajax_escolhe_pergunta(request):
     return HttpResponse(json, content_type="application/json")
 
 
-@login_required
+@login_required_or_403
 @require_safe
 def ajax_filtra_perguntas(request):
     memorando_id = request.GET.get('memorando')

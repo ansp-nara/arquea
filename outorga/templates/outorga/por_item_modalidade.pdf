@@ -64,7 +64,7 @@
     <h1 repeat="1">Pagamentos por item de outorga do processo {{ termo }} e modalidade {{ modalidade }}</h1>
     <table  d="tbl_conteudo" border="0" cellpadding="5">
     {% for it in itens %}
-           <tr><th colspan="4" style="text-align:left;">{{ it.item.descricao }} - {{ it.total|moeda }}</th></tr>
+           <tr><th colspan="6" style="text-align:left;">{{ it.item.descricao }} - {{ it.total|moeda }}</th></tr>
           {% for pg in it.pagtos %}
               <tr class="{% cycle 'z1' 'z2' %}"><td width="5%"></td><td width="5%">{{ pg.p.conta_corrente.cod_oper }}</td><td width="5%">{{ pg.p.conta_corrente.data_oper|date:"d/m" }}</td><td>{{ pg.p.protocolo.descricao2 }}</td><td>{{ pg.p.protocolo.referente }}</td><td width="10%">{{ pg.p.valor_fapesp|moeda }}</td><td>[{{ pg.p.protocolo.tipo_documento.nome }} - {{ pg.p.protocolo.num_documento }}]</td></tr>
               {% for a in pg.docs %}
