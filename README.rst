@@ -71,7 +71,7 @@ Configuração
 
     python manage.py runserver
 
-   e acesse http://localhost:8080 para verificar se a aplicação está rodando.
+   e acesse http://localhost:8000 para verificar se a aplicação está rodando.
 
 7. Estando tudo ok nas etapas anteriores, é hora de colocar em produção. Abaixo, é utilizado o Apache + WSGI, mas
 pode ser feito de outras maneiras, como descrito em https://docs.djangoproject.com/en/1.7/howto/deployment/ .

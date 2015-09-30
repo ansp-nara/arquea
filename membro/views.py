@@ -3,6 +3,7 @@ from django.contrib.admin.models import LogEntry
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required, login_required
+from utils.decorators import login_required_or_403
 from django.core.urlresolvers import reverse
 from django.db.models import Max, Min
 from django.http import HttpResponseRedirect, Http404, HttpResponseForbidden, HttpResponse
@@ -237,7 +238,7 @@ def observacao(request, id):
         return TemplateResponse(request, 'membro/observacao.html', {'form':f})
 
 
-@login_required
+@login_required_or_403
 @require_safe
 def ajax_controle_mudar_almoco(request):
     controle_id = request.GET.get('id')
@@ -256,7 +257,7 @@ def ajax_controle_mudar_almoco(request):
     return HttpResponse(json, content_type="application/json")
 
 
-@login_required
+@login_required_or_403
 @require_safe
 def ajax_controle_avancar_bloco(request):
     controle_id = request.GET.get('id')
@@ -275,7 +276,7 @@ def ajax_controle_avancar_bloco(request):
     return HttpResponse(json, content_type="application/json")
 
 
-@login_required
+@login_required_or_403
 @require_safe
 def ajax_controle_voltar_bloco(request):
     controle_id = request.GET.get('id')
@@ -294,7 +295,7 @@ def ajax_controle_voltar_bloco(request):
     return HttpResponse(json, content_type="application/json")
 
 
-@login_required
+@login_required_or_403
 @require_safe
 def ajax_controle_adicionar_tempo_final(request):
     controle_id = request.GET.get('id')
@@ -312,7 +313,7 @@ def ajax_controle_adicionar_tempo_final(request):
     return HttpResponse(json, content_type="application/json")
 
 
-@login_required
+@login_required_or_403
 def ajax_controle_adicionar_tempo_inicial(request):
     controle_id = request.GET.get('id')
     tempo = request.GET.get('tempo')

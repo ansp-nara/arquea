@@ -3,6 +3,7 @@
 from django.db.models import Sum, Prefetch
 from django.contrib import admin
 from django.contrib.auth.decorators import permission_required, login_required
+from utils.decorators import login_required_or_403
 from django.http import Http404, HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators.http import require_safe
@@ -599,7 +600,7 @@ def acordo_progressivo(request, pdf=False):
         return render(request, 'outorga/acordo_progressivo.html', {'acordos':acordos, 'termos':termos})
 
 
-@login_required
+@login_required_or_403
 @require_safe
 def ajax_termo_datas(request):
     """
@@ -631,7 +632,7 @@ def ajax_termo_datas(request):
     return HttpResponse(simplejson.dumps(meses), content_type='application/json')
 
 
-@login_required
+@login_required_or_403
 @require_safe
 def ajax_termo_parciais(request):
     """

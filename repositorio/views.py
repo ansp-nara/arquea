@@ -111,7 +111,7 @@ def relatorio_repositorio(request, pdf=0):
                     anexo = {'nome': a.arquivo.__unicode__(),
                                'tamanho': str_size,
                                'palavras_chave': a.palavras_chave,
-                               'path':os.path.join(settings.ADMIN_MEDIA_PREFIX, a.arquivo.__unicode__())}
+                               'path':os.path.join(settings.MEDIA_URL, a.arquivo.__unicode__())}
                     anexos.append(anexo)
                     
             # Guardando os dados do repositório no grupo

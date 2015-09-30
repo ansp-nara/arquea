@@ -123,8 +123,15 @@ function ajax_soma_valores(url, objHtmlReturn, select)
       success: function(retorno){
           $("#"+objHtmlReturn).val(retorno);
       },
-      error: function(erro) {
-        alert('Erro: Sem valor.');
+	  statusCode: {
+	      403: function () {
+	           location.reload(true);
+	      },
+	  },
+	  error: function(erro) {
+	    if (erro.status != 403) {
+           alert('Erro: Sem valor.');
+        }
       }
   });
 }
@@ -156,8 +163,15 @@ function ajax_soma_valor_descricao(url, total, descricao, select)
           $("#"+total).val(retorno['total']);
           $("#"+descricao).val(retorno['desc']);
       },
-      error: function(erro) {
-        alert('Erro: Sem valor.');
+      statusCode: {
+	      403: function () {
+	           location.reload(true);
+	      },
+	  },
+	  error: function(erro) {
+	    if (erro.status != 403) {
+           alert('Erro: Sem valor.');
+        }
       }
   });
 }
@@ -182,9 +196,16 @@ function ajax_gera_despesas_internas(url, objHtmlReturn, pagina, select, auditor
           });
 
           $("#"+pagina).val(retorno['pag']);
-      },
-      error: function(erro) {
-        alert('ajax_gera_despesas_internas Erro. Sem retorno da requisicao.');
+       },
+	  statusCode: {
+	      403: function () {
+	           location.reload(true);
+	      },
+	  },
+	  error: function(erro) {
+	    if (erro.status != 403) {
+            alert('ajax_gera_despesas_internas Erro. Sem retorno da requisicao.');
+        }
       }
     });
     $("#"+objHtmlReturn).html('</select>');
@@ -215,8 +236,15 @@ function ajax_gera_despesas_fapesp(url, objHtmlReturn, parcial, pagina, select, 
           $("#"+parcial).val(retorno['parcial']);
           $("#"+pagina).val(retorno['pagina']);
       },
-      error: function(erro) {
-        alert('Erro. Sem retorno da requisicao.');
+	  statusCode: {
+	      403: function () {
+	           location.reload(true);
+	      },
+	  },
+	  error: function(erro) {
+	    if (erro.status != 403) {
+            alert('Erro. Sem retorno da requisicao.');
+        }
       }
     });
     $("#"+objHtmlReturn).html('</select>');
@@ -264,8 +292,15 @@ function ajax_filter(url, objHtmlReturn, id)
               $("#"+objHtmlReturn).append('<option value="'+item.pk+'">'+item.valor+'</option>'); 
           });
       },
-      error: function(erro) {
-        alert('ajax_filter Erro. Sem retorno da requisicao.');
+	  statusCode: {
+	      403: function () {
+	           location.reload(true);
+	      },
+	  },
+	  error: function(erro) {
+	    if (erro.status != 403) {
+	       alert('ajax_filter Erro. Sem retorno da requisicao.');
+	    }
       }
   });
 }
@@ -292,8 +327,15 @@ function ajax_filter2(url, objHtmlReturn, id, objHtmlPrevious)
               $("#"+objHtmlReturn).append('<option value="'+item.pk+'">'+item.valor+'</option>'); 
           });
       },
-      error: function(erro) {
-        alert('ajax_filter2 Erro. Sem retorno da requisicao.');
+	  statusCode: {
+	      403: function () {
+	           location.reload(true);
+	      },
+	  },
+	  error: function(erro) {
+	    if (erro.status != 403) {
+	        alert('ajax_filter2 Erro. Sem retorno da requisicao.');
+	    }
       }
   });
 }
@@ -318,8 +360,15 @@ function ajax_seleciona_extrato(url, objHtmlReturn, id, previous)
               $("#"+objHtmlReturn).append('<option value="'+item.pk+'">'+item.valor+'</option>');
           });
       },
-      error: function(erro) {
-        alert('ajax_seleciona_extrato Erro. Sem retorno da requisicao.');
+	  statusCode: {
+	      403: function () {
+	           location.reload(true);
+	      },
+	  },
+	  error: function(erro) {
+	    if (erro.status != 403) {
+	        alert('ajax_seleciona_extrato Erro. Sem retorno da requisicao.');
+	    }
       }
   });
 }
@@ -353,8 +402,15 @@ function ajax_filter_inline(url, id, name)
               $("#"+item_outorga).append('<option value="'+item.pk+'">'+item.valor+'</option>');
           });
       },
-      error: function(erro) {
-        alert('ajax_filter_inline Erro. Sem retorno da requisicao.');
+	  statusCode: {
+	      403: function () {
+	           location.reload(true);
+	      },
+	  },
+	  error: function(erro) {
+	    if (erro.status != 403) {
+	        alert('ajax_filter_inline Erro. Sem retorno da requisicao.');
+	    }
       }
   });
 }
@@ -398,8 +454,15 @@ function ajax_filter_item_natureza(url, termo, item_anterior, natureza, id, name
               $("#"+natureza).append('<option value="'+item.pk+'">'+item.valor+'</option>');
           });
       },
-      error: function(erro) {
-        alert('ajax_filter_item_natureza Erro. Sem retorno da requisicao.');
+	  statusCode: {
+	      403: function () {
+	           location.reload(true);
+	      },
+	  },
+	  error: function(erro) {
+	    if (erro.status != 403) {
+	        alert('ajax_filter_item_natureza Erro. Sem retorno da requisicao.');
+	    }
       }
   });
 }
@@ -453,9 +516,15 @@ function ajax_filter_mod_item_natureza(url, modalidade, item_anterior, natureza,
               $("#"+natureza).append('<option value="'+item.pk+'">'+item.valor+'</option>');
           });
       },
-      
-      error: function(erro) {
-        alert('ajax_filter_mod_item_natureza Erro. Sem retorno da requisicao.');
+	  statusCode: {
+	      403: function () {
+	           location.reload(true);
+	      },
+	  },
+	  error: function(erro) {
+	    if (erro.status != 403) {
+	        alert('ajax_filter_mod_item_natureza Erro. Sem retorno da requisicao.');
+	    }
       }
   });
 
@@ -499,8 +568,15 @@ function ajax_filter_modalidade_item_inline(url, id, name)
               $("#"+item_outorga).append('<option value="'+item.pk+'">'+item.valor+'</option>');
           });
       },
-      error: function(erro) {
-        alert('ajax_filter_modalidade_item_inline Erro. Sem retorno da requisicao.');
+	  statusCode: {
+	      403: function () {
+	           location.reload(true);
+	      },
+	  },
+	  error: function(erro) {
+	    if (erro.status != 403) {
+	        alert('ajax_filter_modalidade_item_inline Erro. Sem retorno da requisicao.');
+	    }
       }
   });
 }
@@ -528,9 +604,15 @@ function ajax_filter_termo_natureza(url, natureza, id, name)
               $("#"+natureza).append('<option value="'+item.pk+'">'+item.valor+'</option>');
           });
       },
-      
-      error: function(erro) {
-        alert('ajax_filter_termo_natureza Erro. Sem retorno da requisicao.');
+	  statusCode: {
+	      403: function () {
+	           location.reload(true);
+	      },
+	  },
+	  error: function(erro) {
+	    if (erro.status != 403) {
+	        alert('ajax_filter_termo_natureza Erro. Sem retorno da requisicao.');
+	    }
       }
   });
 
@@ -569,8 +651,15 @@ function ajax_filtra_item(url, item_pedido, modalidade, termo, select)
           $("#"+termo).val(retorno['termo']);
 
       },
-      error: function(erro) {
-        alert('ajax_filtra_item Erro: Sem retorno da requisição.');
+	  statusCode: {
+	      403: function () {
+	           location.reload(true);
+	      },
+	  },
+	  error: function(erro) {
+	    if (erro.status != 403) {
+	        alert('ajax_filtra_item Erro: Sem retorno da requisição.');
+	    }
       }
   });
 }
@@ -605,8 +694,15 @@ function ajax_filter_origem_protocolo(termo_campo, termo)
 		  $(nomes+"origem_fapesp").append('<option value="'+item.pk+'">'+item.valor+'</option>');
 	      });
 	  },
+	  statusCode: {
+	      403: function () {
+	           location.reload(true);
+	      },
+	  },
 	  error: function(erro) {
-	    alert('ajax_filter_origem_protocolo Erro: Sem retorno da requisição.');
+	    if (erro.status != 403) {
+	        alert('ajax_filter_origem_protocolo Erro: Sem retorno da requisição.');
+	    }
 	  }
       });
 /*      if (!$("#id_auditoria_set-0-pagina").val()){
@@ -643,8 +739,15 @@ function ajax_filter_protocolo_numero(numero)
 		  $("#id_protocolo").append('<option value="'+item.pk+'">'+item.valor+'</option>');
 	      });
 	  },
+	  statusCode: {
+	      403: function () {
+	           location.reload(true);
+	      },
+	  },
 	  error: function(erro) {
-	    alert('ajax_filter_protocolo_numero Erro: Sem retorno da requisição.');
+	    if (erro.status != 403) {
+	        alert('ajax_filter_protocolo_numero Erro: Sem retorno da requisição.');
+	    }
 	  }
       });
 }
@@ -665,16 +768,23 @@ function ajax_filter_cc_cod(codigo)
 	      	  $("#id_conta_corrente").append('<option value="'+item.pk+'">'+item.valor+'</option>');
 	      });
 	  },
+	  statusCode: {
+	      403: function () {
+	           location.reload(true);
+	      },
+	  },
 	  error: function(erro) {
-	     alert('ajax_filter_cc_cod Erro: Sem retorno de requisição.');
+	    if (erro.status != 403) {
+	        alert('ajax_filter_cc_cod Erro: Sem retorno de requisição.');
+	    }
 	  }
-       });
+      });
 }
 
 function ajax_filter_pagamentos(url, numero)
 {
       $("#id_pagamento").html('<option value="">Carregando...</option>');
-      termo = $("#id_termo").val()
+      termo = $("#id_termo").val();
       $.ajax({
       	  type: "GET",
 	  url: url,
@@ -687,8 +797,15 @@ function ajax_filter_pagamentos(url, numero)
 	      	  $("#id_pagamento").append('<option value="'+item.pk+'">'+item.valor+'</option>');
 	      });
 	  },
+	  statusCode: {
+	      403: function () {
+	           location.reload(true);
+	      },
+	  },
 	  error: function(erro) {
-	     alert('ajax_filter_pagamentos Erro: Sem retorno de requisição.');
+	    if (erro.status != 403) {
+	        alert('ajax_filter_pagamentos Erro: Sem retorno de requisição.');
+	    }
 	  }
        });
 	
@@ -709,10 +826,17 @@ function ajax_filter_financeiro(termo_id)
 		    $("#id_extrato_financeiro").append('<option value="'+item.pk+'">'+item.valor+'</option>');
 		});
 	   },
-           error: function(erro) {
-              alert('ajax_filter_financeiro Erro: Sem retorno de requisição.');
-           }
-       });
+	  statusCode: {
+	      403: function () {
+	           location.reload(true);
+	      },
+	  },
+	  error: function(erro) {
+	    if (erro.status != 403) {
+	       alert('ajax_filter_financeiro Erro: Sem retorno de requisição.');
+	    }
+      }
+     });
 }
 
 function ajax_select_endereco(id_field)
@@ -734,8 +858,15 @@ function ajax_select_endereco(id_field)
 		    $(e_id).append('<option value="'+item.pk+'">'+item.valor+'</option>');
 		});	   
 	   },
-	   error: function(erro) {
-	      alert('ajax_select_endereco Erro: Sem retorno de requisição.');
+	  statusCode: {
+	      403: function () {
+	           location.reload(true);
+	      },
+	  },
+	  error: function(erro) {
+	    if (erro.status != 403) {
+	        alert('ajax_select_endereco Erro: Sem retorno de requisição.');
+	    }
 	   }
        });
 }
@@ -757,9 +888,16 @@ function ajax_select_endereco2()
                     $(e_id).append('<option value="'+item.pk+'">'+item.valor+'</option>');
                 });
            },
-           error: function(erro) {
-              alert('ajax_select_endereco2 Erro: Sem retorno de requisição.');
-           }
+	  statusCode: {
+	      403: function () {
+	           location.reload(true);
+	      },
+	  },
+	  error: function(erro) {
+	    if (erro.status != 403) {
+	          alert('ajax_select_endereco2 Erro: Sem retorno de requisição.');
+        }
+      }
        });
 
 }
@@ -814,7 +952,17 @@ function ajax_filter_enderecos(id_ent) {
               $("#filhos").hide();
           }
        },
-     });
+	  statusCode: {
+	      403: function () {
+	           location.reload(true);
+	      },
+	  },
+	  error: function(erro) {
+	    if (erro.status != 403) {
+	        alert('ajax_filter_enderecos Erro: Sem retorno da requisição.');
+	    }
+	  }
+	 });
 } 
 
 function ajax_filter_locais() {
@@ -833,6 +981,16 @@ function ajax_filter_locais() {
               $("#id_detalhe").append('<option value="'+item.pk+'">'+item.valor+'</option>');
           });
        },
+	  statusCode: {
+	      403: function () {
+	           location.reload(true);
+	      },
+	  },
+	  error: function(erro) {
+	    if (erro.status != 403) {
+	        alert('ajax_filter_locais Erro: Sem retorno da requisição.');
+	    }
+	  }
      });
 }
 
@@ -882,9 +1040,16 @@ function ajax_filter_pagamentos_memorando(termo)
              SelectBox.redisplay("id_corpo_set-"+j+"-pagamento_from");
           }
        },
-       error: function(erro) {
-         alert('ajax_filter_pagamentos_memorando Erro. Sem retorno da requisicao.');
-       }
+	  statusCode: {
+	      403: function () {
+	           location.reload(true);
+	      },
+	  },
+	  error: function(erro) {
+	    if (erro.status != 403) {
+	       alert('ajax_filter_pagamentos_memorando Erro. Sem retorno da requisicao.');
+	    }
+      }
      });
 }
 
@@ -903,8 +1068,13 @@ function ajax_init_pagamentos()
               $("#id_corpo_set-__prefix__-pagamento_from").append('<option value="'+item.pk+'">'+item.valor+'</option>');
           });
        },
-       error: function(erro) {
-    	 // Rogério: verificar porque este disparo deve ser feito no window.onload. Com isso está dando erro toda vez que carrega o selects.js.
+	  statusCode: {
+	      403: function () {
+	           location.reload(true);
+	      },
+	  },
+	  error: function(erro) {
+	    // Rogério: verificar porque este disparo deve ser feito no window.onload. Com isso está dando erro toda vez que carrega o selects.js.
     	   
          //alert('ajax_init_pagamentos Erro. Sem retorno da requisicao.');
        }
@@ -932,8 +1102,15 @@ function ajax_filter_perguntas(memorando)
               $("#id_corpo_set-__prefix__-pergunta").append('<option value="'+item.pk+'">'+item.valor+'</option>');
           });
        },
-       error: function(erro) {
-         alert('ajax_filter_perguntas Erro. Sem retorno da requisicao.');
+	  statusCode: {
+	      403: function () {
+	           location.reload(true);
+	      },
+	  },
+	  error: function(erro) {
+	    if (erro.status != 403) {
+	     alert('ajax_filter_perguntas Erro. Sem retorno da requisicao.');
+	    }
        }
    });
 }
@@ -954,8 +1131,15 @@ function ajax_select_pergunta(id_field)
                 $(e_id).empty();
                 $(e_id).html(retorno);
            },
-           error: function(erro) {
-              alert('ajax_select_pergunta Erro: Sem retorno de requisição.');
+	       statusCode: {
+	            403: function () {
+	                location.reload(true);
+	            },
+	       },
+	       error: function(erro) {
+	            if (erro.status != 403) {
+	                alert('ajax_select_pergunta Erro: Sem retorno de requisição.');
+                }
            }
        });
 }
@@ -975,8 +1159,15 @@ function ajax_filter_pagamentos2(url)
                   $("#id_pagamento").append('<option value="'+item.pk+'">'+item.valor+'</option>');
               });
           },
-          error: function(erro) {
-             alert('ajax_filter_pagamentos2 Erro: Sem retorno de requisição.');
+	      statusCode: {
+	          403: function () {
+	              location.reload(true);
+	          },
+	      },
+	      error: function(erro) {
+	          if (erro.status != 403) {
+	              alert('ajax_filter_pagamentos2 Erro: Sem retorno de requisição.');
+              }
           }
        });
 
@@ -1001,8 +1192,15 @@ function ajax_filter_equipamento(num_doc, id_patrimonio, id_equipamento)
             	  }
               });
            },
-           error: function(erro) {
-              alert('ajax_filter_equipamento Erro: Sem retorno de requisição.');
+	       statusCode: {
+	          403: function () {
+	              location.reload(true);
+	          },
+	       },
+	       error: function(erro) {
+	          if (erro.status != 403) {
+	              alert('ajax_filter_equipamento Erro: Sem retorno de requisição.');
+              }
            }
        });
 }
@@ -1028,8 +1226,15 @@ function ajax_filter_patrimonio(num_doc)
                   $(p_id).append('<option value="'+item.pk+'">'+item.valor+'</option>');
               });
            },
-           error: function(erro) {
-              alert('ajax_filter_patrimonio Erro: Sem retorno de requisição.');
+	       statusCode: {
+	          403: function () {
+	              location.reload(true);
+	          },
+	       },
+	       error: function(erro) {
+	          if (erro.status != 403) {
+	              alert('ajax_filter_patrimonio Erro: Sem retorno de requisição.');
+              }
            }
        });
 }
@@ -1052,8 +1257,15 @@ function ajax_prox_audit(origem)
 	              $("#id_auditoria_set-0-parcial").val(retorno['parcial']);
 	              $("#id_auditoria_set-0-pagina").val(retorno['pagina']);
 	          },
+	          statusCode: {
+	              403: function () {
+	                  location.reload(true);
+	              },
+	          },
 	          error: function(erro) {
-	            alert('ajax_prox_audit Erro: Sem retorno da requisição.');
+	              if (erro.status != 403) {
+	                  alert('ajax_prox_audit Erro: Sem retorno da requisição.');
+	              }
 	          }
 	       });
     	}
@@ -1094,9 +1306,16 @@ function ajax_select_ano_proj()
 	            $.each(retorno.oss, function(i, item){
                      $("#id_os").append('<option value="'+item.pk+'">'+item.valor+'</option>');
  	            });
-	   },
-	   error: function(erro) {
-              alert('ajax_select_ano_proj Erro: Sem retorno de requisição.');
+	       },
+	       statusCode: {
+	            403: function () {
+	                location.reload(true);
+	            },
+	       },
+	       error: function(erro) {
+	            if (erro.status != 403) {
+	                alert('ajax_select_ano_proj Erro: Sem retorno de requisição.');
+	            }
            }
        });
 
@@ -1172,8 +1391,15 @@ function ajax_patr_form_get_equipamento(id_equipamento)
         	   $('#id_part_number').text(retorno.part_number);
         	   $('#id_ean').text(retorno.ean);
            },
-           error: function(erro) {
-              alert('ajax_patr_form_get_equipamento Erro: Sem retorno de requisição.');
+	       statusCode: {
+	           403: function () {
+	                location.reload(true);
+	           },
+	       },
+	       error: function(erro) {
+	           if (erro.status != 403) {
+	               alert('ajax_patr_form_get_equipamento Erro: Sem retorno de requisição.');
+	           }
            }
        });
     } else {
@@ -1205,8 +1431,15 @@ function ajax_get_procedencia_filter_tipo(id_tipo)
                   $(p_id).append('<option value="'+item.pk+'">'+ item.valor+'</option>');
               });
            },
-           error: function(erro) {
-              alert('ajax_get_procedencia_filter_tipo Erro: Sem retorno de requisição.');
+	       statusCode: {
+	          403: function () {
+	               location.reload(true);
+	          },
+	       },
+	       error: function(erro) {
+	           if (erro.status != 403) {
+	               alert('ajax_get_procedencia_filter_tipo Erro: Sem retorno de requisição.');
+	           }
            }
        });
 }
@@ -1232,8 +1465,15 @@ function ajax_get_recursos(id_retorno, estado)
                   $(p_id).append('<option value="'+item.pk+'">'+ item.valor+'</option>');
               });
            },
-           error: function(erro) {
-              alert('ajax_get_recursos Erro: Sem retorno de requisição.');
+	       statusCode: {
+	          403: function () {
+	               location.reload(true);
+	          },
+	       },
+	       error: function(erro) {
+	          if (erro.status != 403) {
+	              alert('ajax_get_recursos Erro: Sem retorno de requisição.');
+	          }
            }
        });
 }
@@ -1259,8 +1499,15 @@ function ajax_get_marcas_por_termo(id_retorno, termo_id)
                   $(p_id).append('<option value="'+item.pk+'">'+ item.valor+'</option>');
               });
            },
-           error: function(erro) {
-              alert('ajax_get_marcas_por_termo - Erro: Sem retorno de requisição.');
+	       statusCode: {
+	          403: function () {
+	               location.reload(true);
+	          },
+	       },
+	       error: function(erro) {
+	          if (erro.status != 403) {
+	              alert('ajax_get_marcas_por_termo - Erro: Sem retorno de requisição.');
+	          }
            }
        });
 }
@@ -1294,8 +1541,15 @@ function termo_datas(termo_id, parcial)
                 $("#id_termino").append('<option value="'+item.value+'" '+selected+'>'+item.display+'</option>');
             });
         },
+        statusCode: {
+            403: function() {
+                location.reload(true);
+            },
+        },
         error: function(erro) {
-            alert('termo_datas - Erro: Sem retorno de requisição.');
+            if (error.status != 403) {
+                alert('termo_datas - Erro: Sem retorno de requisição.');
+            }
         }
     });
 }
@@ -1305,6 +1559,7 @@ function termo_datas(termo_id, parcial)
 **/
 function termo_parciais(termo_id)
 {
+
     if (termo_id == "") {
         $("#id_parciais").hide();
         return;
@@ -1323,8 +1578,15 @@ function termo_parciais(termo_id)
                 $("#id_parcial").append('<option value="'+item+'">'+item+'</option>');
             });
         },
+        statusCode: {
+            403: function() {
+                location.reload(true);
+            },
+        },
         error: function(erro) {
-            alert('termo_parciais - Erro: Sem retorno de requisição.');
+            if (erro.status != 403) {
+                alert('termo_parciais - Erro: Sem retorno de requisição.');
+            }
         }
     });
 }
@@ -1366,8 +1628,15 @@ function ajax_repositorio_tipo_nomes(id_entidade)
                $("#id_nome").append('<option value="'+item+'">'+item+'</option>');
            });
         },
-        error: function(erro) {
-           alert('Erro: Sem retorno de requisição.');
+	    statusCode: {
+	       403: function () {
+	           location.reload(true);
+	       },
+	    },
+	    error: function(erro) {
+	       if (erro.status != 403) {
+	           alert('Erro: Sem retorno de requisição.');
+	       }
         }
     });
 }
@@ -1415,8 +1684,15 @@ function insere_entrada_extrato() {
                 $("#mensagem_insere").html("Extrato de conta corrente não inserido.");
             }
         },
-        error: function(erro){
-            alert('Erro: Sem retorno de requisição.');
+	    statusCode: {
+	        403: function () {
+	           location.reload(true);
+	        },
+	    },
+	    error: function(erro) {
+	        if (erro.status != 403) {
+	            alert('Erro: Sem retorno de requisição.');
+	        }
         }
     });
 }

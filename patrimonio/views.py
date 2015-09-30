@@ -2,6 +2,7 @@
 from operator import itemgetter
 from django.contrib import admin
 from django.contrib.auth.decorators import permission_required, login_required
+from utils.decorators import login_required_or_403
 from django.core.urlresolvers import reverse
 from django.db.models import Q, F, Prefetch
 from django.db import transaction
@@ -75,7 +76,7 @@ logger = logging.getLogger(__name__)
 #     return HttpResponse(retorno_json, content_type="application/json")
 
 
-@login_required
+@login_required_or_403
 @require_safe
 def ajax_escolhe_pagamento(request):
     """
@@ -119,7 +120,7 @@ def ajax_escolhe_pagamento(request):
 #     return HttpResponse(retorno_json, content_type="application/json")
 
 
-@login_required
+@login_required_or_403
 @require_safe
 def ajax_escolhe_entidade(request):
     """
@@ -144,7 +145,7 @@ def ajax_escolhe_entidade(request):
     return HttpResponse(retorno_json, content_type="application/json")
 
 
-@login_required
+@login_required_or_403
 @require_safe
 def ajax_escolhe_equipamento(request):
     """
@@ -180,7 +181,7 @@ def ajax_escolhe_equipamento(request):
     return HttpResponse(retorno_json, content_type="application/json")
 
 
-@login_required
+@login_required_or_403
 @require_safe
 def ajax_get_marcas_por_termo(request):
     """
@@ -202,7 +203,7 @@ def ajax_get_marcas_por_termo(request):
     return HttpResponse(retorno_json, content_type="application/json")
 
 
-@login_required
+@login_required_or_403
 @require_safe
 def ajax_get_equipamento(request):
     """
@@ -228,7 +229,7 @@ def ajax_get_equipamento(request):
     return HttpResponse(retorno_json, content_type="application/json")
 
 
-@login_required
+@login_required_or_403
 @require_safe
 def ajax_get_procedencia_filter_tipo(request):
     """
@@ -247,7 +248,7 @@ def ajax_get_procedencia_filter_tipo(request):
     return HttpResponse(retorno_json, content_type="application/json")
 
 
-@login_required
+@login_required_or_403
 @require_safe
 def ajax_escolhe_patrimonio(request):
     """
@@ -891,7 +892,7 @@ def por_tipo_equipamento_old(request, pdf=0):
     return TemplateResponse(request, 'patrimonio/por_tipo_equipamento.html', {'entidades':entidades, 'tipo':tipo})
 
 
-@login_required
+@login_required_or_403
 @require_safe
 def ajax_filtra_pn_estado(request):
     tipo_id = request.GET.get('id')
@@ -1371,7 +1372,7 @@ def presta_contas(request):
     return TemplateResponse(request, 'patrimonio/presta_contas.html', {'termos':termos})
 
 
-@login_required
+@login_required_or_403
 @require_safe
 def ajax_abre_arvore(request):
     ret = []
@@ -1408,7 +1409,7 @@ def por_tipo_equipamento2(request):
     return TemplateResponse(request, 'patrimonio/por_tipo_equipamento2.html')
 
 
-@login_required
+@login_required_or_403
 @require_safe
 def ajax_abre_arvore_tipo(request):
     ret = []
@@ -1468,7 +1469,7 @@ def ajax_abre_arvore_tipo(request):
     return HttpResponse(retorno_json, content_type="application/json")
 
 
-@login_required
+@login_required_or_403
 @require_safe
 def ajax_patrimonio_historico(request):
     """

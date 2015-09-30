@@ -1,6 +1,7 @@
 # -* coding: utf-8 -*-
 from django.contrib import admin
 from django.contrib.auth.decorators import permission_required, login_required
+from utils.decorators import login_required_or_403
 from django.db.models import Q, Max, Sum
 from django.http import HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404
@@ -25,7 +26,7 @@ from models import *
 logger = logging.getLogger(__name__)
 
 
-@login_required
+@login_required_or_403
 @require_safe
 def ajax_termo_escolhido(request):
     termo_id = request.GET.get('termo_id')
@@ -51,7 +52,7 @@ def ajax_termo_escolhido(request):
     return HttpResponse(json, content_type="application/json")
 
 
-@login_required
+@login_required_or_403
 @require_safe
 def ajax_numero_escolhido(request):
     termo_id = request.GET.get('termo_id')
@@ -75,7 +76,7 @@ def ajax_numero_escolhido(request):
     return HttpResponse(json, content_type="application/json")
 
 
-@login_required
+@login_required_or_403
 @require_safe
 def ajax_codigo_escolhido(request):
     codigo = request.GET.get('codigo')
@@ -156,7 +157,7 @@ def _estrutura_pagamentos(pagamentos):
 
     return {'pg':sorted(pg, key=itemgetter('modalidade', 'pagina')), 'pm':pm, 'total':total}
 
-@login_required
+@login_required_or_403
 @require_safe
 def ajax_parcial_pagina(request):
     orig = request.GET.get('orig_id')
@@ -171,7 +172,7 @@ def ajax_parcial_pagina(request):
     return HttpResponse(json, content_type="application/json")
 
 
-@login_required
+@login_required_or_403
 @require_safe
 def ajax_nova_pagina(request):
     origem_id = request.GET.get('orig_id')
@@ -929,7 +930,7 @@ def _parciais_or_caixa(request, caixa=False, pdf=False):
         return render_to_response('financeiro/relatorios_termo.html', {'termos':Termo.objects.all(), 'caixa':caixa, 'view':view}, context_instance=RequestContext(request))
 
 
-@login_required
+@login_required_or_403
 @require_safe
 def ajax_escolhe_extrato(request):
     termo_id = request.GET.get('termo')
@@ -1002,7 +1003,7 @@ def tipos_documentos(context):
     return render_to_response('financeiro/tipos.html', {'protocolos':protocolos})
 
 
-@login_required
+@login_required_or_403
 @require_safe
 def ajax_get_recursos_vigentes(request):
     """
@@ -1023,7 +1024,7 @@ def ajax_get_recursos_vigentes(request):
     return HttpResponse(json, content_type="application/json")
 
 
-@login_required
+@login_required_or_403
 @require_POST
 def ajax_insere_extrato_cc(request):
     """
