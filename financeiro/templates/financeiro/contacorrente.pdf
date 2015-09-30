@@ -38,6 +38,15 @@
     font-size:0.7em;
 }
 
+table {
+    width: 100%;
+    table-layout: fixed;
+}
+th {
+    background-color:#ddd;
+    font-weight: bold;
+    border-bottom:1px darkgray solid;
+}
 tr th { background-color: #eee; }
 tr td { padding-top:0.5em; }
 .th_data { width: 1.7cm; }
@@ -45,14 +54,8 @@ tr td { padding-top:0.5em; }
 .th_historico { width: 4.5cm; }
 .th_valor { width: 2.5cm; }
 .th_liberacao { width: 3.5cm; }
-.th_pagamento { width: 11cm; }
+.th_pagamento { width: 9cm; }
 .th_processo { width: 2.0cm; }
-
-th {
-    background-color:#ddd;
-    font-weight: bold;
-    border-bottom:1px darkgray solid;
-}
 .tr_saldo td{
     background-color:#f7f7f7;
 }
