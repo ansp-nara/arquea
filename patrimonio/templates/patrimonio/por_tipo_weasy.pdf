@@ -44,12 +44,20 @@
 h3 {font-size:1.5em;}
 thead {display: table-header-group;}
 tr, th, td { page-break-inside: avoid; }
-th {text-align: left;}
+th {
+    text-align: left;
+    font-weight: strong;
+    border-bottom: 1px dotted #
+}
 td {
     font-size:1.1em;
     word-wrap: break-word;
+    word-break: break-all;
 }
 
+#tbl_content {
+    table-layout:fixed;
+}
 /* PROCEDENCIA */
 #tbl_content td:nth-child(1) { width:1.8cm; }
 /* MARCA */
@@ -60,24 +68,24 @@ td {
 #tbl_content td:nth-child(4) { width:2.5cm; }
 
 /* DESCRICAO */
-#tbl_content td:nth-child(5) { width:4.5cm; }
+#tbl_content td:nth-child(5) { width:4.2cm; }
 
 /* NS */
 #tbl_content td:nth-child(6) { width:2.7cm; }
 /* LOCAL */
-#tbl_content td:nth-child(7) { width:5.5cm; }
+#tbl_content td:nth-child(7) { width:5cm; }
 /* POSICAO */
 #tbl_content td:nth-child(8) { width:3.0cm; }
 /* ESTADO */
-#tbl_content td:nth-child(9) { width:1.4cm; }
+#tbl_content td:nth-child(9) { width:1.7cm; }
 /* NF */
-#tbl_content td:nth-child(10) { width:2cm; }
+#tbl_content td:nth-child(10) { width:1.8cm; }
 </style>
 </head>
 <body>
 <div id="conteudo">
     <h3>Patrimonios do tipo {{ tipo }} {% if procedencia %} e procedencia {{procedencia}} {% endif %}</h3>
-    <table id="tbl_content" border="1" repeat="1" cellpadding="5">
+    <table id="tbl_content">
     <tr>
         <th>Procedência</th>
         <th>Marca</th>
