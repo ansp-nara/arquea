@@ -46,7 +46,7 @@
         <td>({{ p.tipo_documento }} {{ p.num_documento }})</td>
         <td>{{ p.referente }}</td>
 	    <td class="num peq">{{ p.mostra_valor }}</td>
-        <td class="num peq">{{ p.estado }}</td>
+        <td>{{ p.estado }}</td>
     </tr>
     {% endfor %}
     </table>
