@@ -16,17 +16,6 @@
         margin-bottom:1cm;
         margin-left:0;
         padding: {{papelaria.retrato_a4_margem_superior|default:0.5|unlocalize}}cm 0cm {{papelaria.retrato_a4_margem_inferior|default:0.5|unlocalize}}cm 1cm;
-
-        @bottom-left {
-            content: '{% now "d/m/Y H:i" %}';
-            white-space: pre;
-            color: grey;
-            vertical-align: bottom;
-            font-family: Arial;
-            font-size: 0.7em;
-            margin-left:1cm;
-            padding-bottom:1cm;
-        }
         
         @bottom-right {
             content: 'Pág ' counter(page);
