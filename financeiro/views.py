@@ -519,7 +519,7 @@ def extrato(request, pdf=False):
             retorno.append({'saldo':e1.saldo, 'data':e1.data_oper})
 
         if pdf:
-            return render_to_pdf_weasy('financeiro/contacorrente.pdf', {'ano':ano, 'extrato':retorno}, request=request, filename='extrato_cc_%s.pdf' % ano)
+            return render_to_pdf_weasy('financeiro/contacorrente.pdf', {'ano':ano, 'extrato':retorno}, request=request, filename='panorama_cc_%s.pdf' % ano)
         else:
             return render_to_response('financeiro/contacorrente.html', {'ano':ano, 'extrato':retorno}, context_instance=RequestContext(request))
     else:
