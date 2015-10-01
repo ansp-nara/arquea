@@ -1,6 +1,10 @@
 {% extends "base.pdf" %}
 {% load proto_tags %}
 {% block extrastyle %}
+    table {
+        table-layout: fixed;
+        width: 18cm;
+    }
     td {
         padding:0;
         margin:0;
@@ -8,15 +12,11 @@
 {% endblock %}
 {% block content %}
   <table>
+    <col style="width:10%;">
+    <col style="width:15%;">
+    <col style="width:55%;">
+    <col style="width:20%;">
   {% for e in entidades %}
-    <thead>
-        <tr>
-            <th style="width:10%;"></th>
-            <th style="width:15%;"></th>
-            <th style="width:55%;"></th>
-            <th style="width:20%;"></th>
-        </tr>
-    </thead>
     <tbody>
     <tr><td>{% if not e.filho %}{% if e.entidade.url %}<a href="{{ e.entidade.url }}">{{ e.entidade.sigla }}</a>{% else %}{{ e.entidade.sigla }}{% endif %}{% endif %}</td><td colspan="3">{% if e.filho %}<span style="font-weight:bold;">{{ e.entidade.sigla }}</span> - {% endif %}{{ e.entidade.nome }}</td></tr>
     {% for a in e.areas %}
