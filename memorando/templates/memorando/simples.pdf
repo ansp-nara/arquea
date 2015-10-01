@@ -3,7 +3,6 @@
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <link rel="stylesheet" type="text/css" href="static:css/memorando.css">
 <style>
 @page {
   size: a4 portrait;
@@ -25,7 +24,7 @@
     height:100%;
  }
  #conteudo {
-    font-family: Arial;
+    font-family: Arial, Helvetica, "Nimbus Sans L", "Liberation Sans";
     font-size:11pt;
     position:relative;
     padding:0;
