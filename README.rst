@@ -9,9 +9,9 @@ um projeto Fapesp.
 Instalação
 ..........
 
-1. Instale os pacotes de desenvolvimento do ``python``, ``xml``, ``ffi``, ``xslt``, ``zlib`` e ``yaml``. No caso do Ubuntu, seria::
+1. Instale os pacotes de desenvolvimento do ``python``, ``xml``, ``ffi``, ``xslt``, ``zlib`` e ``yaml`` e o pacote de fontes ``liberation``. No caso do Ubuntu, seria::
 
-    apt-get install libffi-dev libpython-dev libxml2-dev libxslt1-dev zlib1g-dev libyaml-dev
+    apt-get install libffi-dev libpython-dev libxml2-dev libxslt1-dev zlib1g-dev libyaml-dev fonts-liberation
 
 2. Instale o ``virtualenv``::
 
