@@ -157,6 +157,7 @@ def render_to_pdfxhtml2pdf(template_src, context_dict, request=None, context_ins
 
     context.update(context_dict)
     html  = template.render(context)
+    html = html.replace('-moz-use-text-color', '')
     pdf = pisaPDF()
     pdf_princ = pisa.pisaDocument(StringIO.StringIO(html.encode("utf-8")), link_callback=fetch_resources)
     pdf.addDocument(pdf_princ)
@@ -164,7 +165,7 @@ def render_to_pdfxhtml2pdf(template_src, context_dict, request=None, context_ins
     for f,d,t in attachments:
         a += 1
         pdf.addDocument(pisa.pisaDocument(StringIO.StringIO((u'<div style="text-align:center; font-size:22px; padding-top:12cm;"><strong>Anexo %s<br />%s</strong></div>' % (a,d)).encode('utf-8'))))
-        if t == 1: pdf.addFromFile(open(f, "rb"))
+        if t == 1: pdf.addFromFile(f)
         elif t == 2: pdf.addFromString(f)
         
     if not pdf_princ.err:
