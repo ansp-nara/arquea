@@ -12,7 +12,7 @@ from django.template import RequestContext
 from django.template.response import TemplateResponse
 from django.views.decorators.http import require_safe
 
-from utils.functions import render_wk_to_pdf, render_to_pdf_weasy
+from utils.functions import render_to_pdf_weasy
 import json
 import itertools
 import datetime
@@ -679,8 +679,10 @@ def por_local_termo(request, pdf=0):
                     enderecos.append(endereco)
             context = {'nivel1':nivel1, 'nivel2':nivel2, 'nivel3':nivel3, 'entidade': entidade, 'ent':entidade_id, 'enderecos': enderecos}
             
-        if pdf:
-            return render_to_pdf_weasy('patrimonio/por_local_termo_weasy.pdf', context, request=request, filename='inventario_por_local.pdf')
+        if pdf=="1":
+            return render_to_pdf_weasy('patrimonio/por_local_termo_weasy.pdf', context, request=request, filename='inventario_por_local_termo.pdf')
+        elif pdf=="2":
+            return render_to_response('patrimonio/por_local_termo_weasy.pdf', context, RequestContext(request, context))
         else:
             return render_to_response('patrimonio/por_local_termo.html', context, RequestContext(request, context))
     else:
@@ -1087,7 +1089,7 @@ def racks(request):
         entidade = local.entidade()
         if entidade:
             nome = "%s - %s" % (entidade, nome)
-            
+        
         dc = {'nome':nome, 'id':local.id}
         todos_dcs.append(dc)
     # Fazendo a ordenação pelo nome do Datacenter
@@ -1106,12 +1108,13 @@ def racks(request):
     chk_avisos = request.GET.get('chk_avisos') if request.GET.get('chk_avisos') else 1
     chk_traseira = request.GET.get('chk_traseira') if request.GET.get('chk_traseira') else 0
             
+    context = {'dcs':dcs, 'todos_dcs':todos_dcs, 'chk_legenda':chk_legenda, 'chk_legenda_desc':chk_legenda_desc, 'chk_stencil':chk_stencil, 'chk_outros':chk_outros, 'chk_avisos':chk_avisos, 'chk_traseira':chk_traseira}
     if request.GET.get('pdf') == "2":
-        return render_wk_to_pdf('patrimonio/racks-wk.pdf', {'dcs':dcs, 'todos_dcs':todos_dcs, 'chk_legenda':chk_legenda, 'chk_legenda_desc':chk_legenda, 'chk_legenda_desc':chk_legenda_desc, 'chk_stencil':chk_stencil, 'chk_outros':chk_outros, 'chk_avisos':chk_avisos, 'chk_traseira':chk_traseira}, request=request, filename='diagrama_de_racks.pdf',)
+        return render_to_pdf_weasy('patrimonio/racks-wk.pdf', context, request=request, filename='diagrama_de_racks.pdf', zoom=1)
     elif request.GET.get('pdf'):
-        return TemplateResponse(request, 'patrimonio/racks-wk.pdf', {'dcs':dcs, 'todos_dcs':todos_dcs, 'chk_legenda':chk_legenda, 'chk_legenda_desc':chk_legenda_desc, 'chk_stencil':chk_stencil, 'chk_outros':chk_outros, 'chk_avisos':chk_avisos, 'chk_traseira':chk_traseira})
+        return TemplateResponse(request, 'patrimonio/racks-wk.pdf', context)
     else:
-        return TemplateResponse(request, 'patrimonio/racks.html', {'dcs':dcs, 'todos_dcs':todos_dcs, 'chk_legenda':chk_legenda, 'chk_legenda_desc':chk_legenda_desc, 'chk_stencil':chk_stencil, 'chk_outros':chk_outros, 'chk_avisos':chk_avisos, 'chk_traseira':chk_traseira})
+        return TemplateResponse(request, 'patrimonio/racks.html', context)
 
 
 
@@ -1180,9 +1183,11 @@ def _rack_data(datacenter_id, rack_id):
                         
                         eixoY = pt.eixoy_em_px()
                         
-                        last_equipamento = {'id': pt.id, 'tam': tam, 'eixoY': pt.eixoy_em_px(),
+                        last_equipamento = {'id': pt.id, 'tam': tam, 
+                                            'eixoY': pt.eixoy_em_px(), 'eixoY_pt': pt.eixoy_em_pt(),
                                                   'tam_u':tamanho,
-                                                  'altura':pt.altura_em_px(), 'profundidade':profundidade,
+                                                  'altura':pt.altura_em_px(), 'altura_pt':pt.altura_em_pt(),
+                                                  'profundidade':profundidade,
                                                   'pos_original':pt.historico_atual_prefetched.posicao_furo,
                                                   'pos_col':pt.historico_atual_prefetched.posicao_colocacao,
                                                   'imagem':imagem, 'imagem_traseira':imagem_traseira,
@@ -1255,7 +1260,7 @@ def _rack_data(datacenter_id, rack_id):
                         ptAnterior = last_equipamento
     
                     rack = {'id':rack.id,
-                            'altura':int(rack.tamanho) * 3.0, 'altura_pts': rack.tamanho, 'altura_pxs': int(rack.tamanho) * 19.0,
+                            'altura':int(rack.tamanho) * 3.0, 'altura_pts': int(rack.tamanho) * Patrimonio.U_TO_PT, 'altura_pxs': int(rack.tamanho) * Patrimonio.U_TO_PX, 'altura_count':range(1, rack.tamanho+1),
                             'nome':rack.apelido, 'marca': rack.marca, 
                             'equipamentos':equipamentos, 'equipamentos_fora_visao':equipamentos_fora_visao,
                             'equipamentos_pdu':equipamentos_pdu,
@@ -1269,7 +1274,7 @@ def _rack_data(datacenter_id, rack_id):
                 
             dcEntidade = Entidade.objects.filter(endereco__enderecodetalhe=local)
             
-            dc = {'nome':local.complemento, 'fileiras':fileiras, 'id':local, 'entidade': dcEntidade[0].sigla, }
+            dc = {'id':local.id, 'nome':local.complemento, 'fileiras':fileiras, 'entidade': dcEntidade[0].sigla, }
             dcs.append(dc)
     return dcs
     
@@ -1348,12 +1353,18 @@ def relatorio_rack(request):
 
     dcs = _rack_data(p_dc, p_rack)
     
+    context = {'dcs':dcs, 'todos_dcs':todos_dcs, 'patrimonio_racks':patrimonio_racks}
+    
     if request.GET.get('pdf') == "2":
-        return render_wk_to_pdf('patrimonio/relatorio-racks-wk.pdf', {'dcs':dcs, 'todos_dcs':todos_dcs, 'patrimonio_racks':patrimonio_racks}, request=request, filename='diagrama_de_racks.pdf',)
+        return render_to_pdf_weasy('patrimonio/relatorio-racks-wk.pdf', context, request=request, filename='relatorio_de_racks.pdf', zoom=0.66)
     elif request.GET.get('pdf'):
-        return TemplateResponse(request, 'patrimonio/relatorio-racks-wk.pdf', {'dcs':dcs, 'todos_dcs':todos_dcs, 'patrimonio_racks':patrimonio_racks})
+        return TemplateResponse(request, 'patrimonio/relatorio-racks-wk.pdf', context)
     else:
-        return TemplateResponse(request, 'patrimonio/relatorio-racks.html', {'dcs':dcs, 'todos_dcs':todos_dcs, 'patrimonio_racks':patrimonio_racks})
+        return TemplateResponse(request, 'patrimonio/relatorio-racks.html', context)
+
+#    context = {'dcs':dcs, 'todos_dcs':todos_dcs, 'chk_legenda':chk_legenda, 'chk_legenda_desc':chk_legenda_desc, 'chk_stencil':chk_stencil, 'chk_outros':chk_outros, 'chk_avisos':chk_avisos, 'chk_traseira':chk_traseira}
+#    if request.GET.get('pdf') == "2":
+#        return render_to_pdf_weasy('patrimonio/racks-wk.pdf', context, request=request, filename='diagrama_de_racks.pdf', zoom=1)
 
 
 

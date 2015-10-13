@@ -138,14 +138,14 @@
                             </div>
                             <div class="rack_frontal" style="display:table-row;">
                                 <div id="rack{{ dc.id }}_{{forloop.counter}}" class="bloco-n" style="height: {{ rack.altura_pxs|unlocalize }}px;">
-                                    {% for i in rack.altura_pts|get_range reversed %}
-                                        <div class="u-n"><div>{{ i|add:"1" }}</div></div>
+                                    {% for i in rack.altura_count reversed %}
+                                        <div class="u-n"><div>{{ i }}</div></div>
                                     {% endfor %}
                                 </div>
                                 <div class="u" style="height: {{ rack.altura_pxs|unlocalize }}px;"></div>
                                 <div class="interno" style="">
                                     <div class="rack_grid">
-                                        {% for i in rack.altura_pts|get_range %}
+                                        {% for i in rack.altura_count %}
                                             <div class="rack_grid_item" style="{% if forloop.first %}border-top:1px solid lightgray;{% endif %}"></div>
                                         {% endfor %}
                                     </div>
@@ -231,14 +231,14 @@
                             </div>
                             <div class="rack_traseiro">
                                 <div id="rack{{ dc.id }}_{{forloop.counter}}" class="bloco-n" style="height: {{ rack.altura_pxs|unlocalize }}px;">
-                                    {% for i in rack.altura_pts|get_range reversed %}
-                                        <div class="u-n"><div>{{ i|add:"1" }}</div></div>
+                                    {% for i in rack.altura_count reversed %}
+                                        <div class="u-n"><div>{{ i }}</div></div>
                                     {% endfor %}
                                 </div>
                                 <div class="u" style="height: {{ rack.altura_pxs|unlocalize }}px;"></div>
                                 <div class="interno">
                                     <div class="rack_grid">
-                                        {% for i in rack.altura_pts|get_range %}
+                                        {% for i in rack.altura_count %}
                                             <div class="rack_grid_item" style="{% if forloop.first %}border-top:1px solid lightgray;{% endif %}"></div>
                                         {% endfor %}
                                     </div>
