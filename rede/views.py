@@ -524,7 +524,7 @@ def custo_terremark(request, pdf=0, xls=0):
 
         return response
 
-    elif request.GET.get('acao') and request.GET.get('acao')=='1':
+    elif pdf or (request.GET.get('acao') and request.GET.get('acao')=='1'):
         # Export para PDF
         return render_to_pdf_weasy(template_src='rede/tabela_terremark.pdf', context_dict={'recursos':recursos, 'estado_selected':estado_selected}, request=request, filename='custos_dos_recursos_contratados.pdf')
 
