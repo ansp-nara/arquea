@@ -3,7 +3,8 @@
 {% load static %}
 {% load l10n %}
 {% block size %}a3{% endblock %}
-{% block background %}{{papelaria.papel_timbrado_retrato_a3}}{% endblock %}
+{% block background %}background-image: url('media:{{papelaria.papel_timbrado_retrato_a3}}');{% endblock %}
+
 {% block top %}{{papelaria.retrato_a3_margem_superior|default:0.5|unlocalize}}{% endblock %}
 {% block bottom %}{{papelaria.retrato_a3_margem_inferior|default:0.5|unlocalize}}{% endblock %}
 
