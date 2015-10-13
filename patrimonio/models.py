@@ -85,6 +85,11 @@ class Tipo(models.Model):
 
 
 class Patrimonio(models.Model):
+    
+    U_TO_PX = 19
+    U_TO_PT = 15.0
+    U_TO_EM = 2.0
+    
 
     """
     Uma instância dessa classe representa um patrimônio.
@@ -260,7 +265,17 @@ class Patrimonio(models.Model):
             
         # calculando a altura em furos
         tam = int(round(tamanho * 3))
-        return (tam * 19.0 / 3.0)
+        return (tam * self.U_TO_PX / 3.0)
+    
+    def altura_em_pt(self):
+        if self.tamanho:
+            tamanho = self.tamanho
+        else:
+            tamanho = 0
+            
+        # calculando a altura em furos
+        tam = int(round(tamanho * 3))
+        return (tam * self.U_TO_PT / 3.0)
     
     # Retorna a posição Y em pixels.
     def eixoy_em_px(self):
@@ -273,6 +288,7 @@ class Patrimonio(models.Model):
                 rack_altura = int(rack.tamanho) * 3
             else:
                 # ISSO É UM PROBLEMA DE DADOS INVÁLIDOS. PRECISA SER TRATADO
+                # Configurando como 42Us ou 126 furos
                 rack_altura = 126
             pos = self.historico_atual_prefetched.posicao_furo - 1
         
@@ -285,9 +301,12 @@ class Patrimonio(models.Model):
             tam = int(round(tamanho * 3))
             
             # calculando a posição em pixels
-            eixoY = int(round(((rack_altura - (pos) - tam) * 19.0) / 3.0)) -5.0
+            eixoY = int(round(((rack_altura - (pos) - tam) * self.U_TO_PX) / 3.0)) -5.0
         
         return eixoY
+    
+    def eixoy_em_pt(self):
+        return (self.eixoy_em_px() / self.U_TO_PX * self.U_TO_PT) +5.0
 
     # Verifica se o patrimonio está em posição traseira no rack
     def is_posicao_traseira(self):
