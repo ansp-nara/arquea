@@ -1,33 +1,19 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+{% extends "base.pdf" %}
+{% load static %}
 {% load proto_tags %}
 {% load l10n %}
-<html>
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <style>
-    @page {
-        size:a4 landscape;
-        background-image: url('media:{{papelaria.papel_timbrado_paisagem_a4}}');
-        background-position: center top;
-        background-size: 100% 102%;
-        background-repeat:no-repeat;
-        margin-top:0;
-        margin-right:1cm;
-        margin-bottom:1cm;
-        margin-left:0;
-        padding: {{papelaria.paisagem_a4_margem_superior|default:0.5|unlocalize}}cm 1cm {{papelaria.paisagem_a4_margem_inferior|default:0.5|unlocalize}}cm 1cm;
+{% load i18n proto_tags admin_static %}
+{% get_static_prefix as STATIC_PREFIX %
 
-        @bottom-right {
-            content: 'Pág ' counter(page);
-            white-space: pre;
-            color: grey;
-            vertical-align: bottom;
-            font-family: Arial;
-            font-size: 0.7em;
-            margin-bottom: 0.8cm;
-        }
-    }
+{% block size %} a4 landscape {% endblock %}
+{% block background %}background-image: url('media:{{papelaria.papel_timbrado_paisagem_a4}}');{% endblock %}
+{% block top %} {{papelaria.paisagem_a4_margem_superior|default:0.5|unlocalize}}{% endblock %}
+{% block bottom %} {{papelaria.paisagem_a4_margem_inferior|default:0.5|unlocalize}}{% endblock %}
+{% block left %}0.8{% endblock %}
 
-    th { text-align:center; font-size:11px; font-weight:bolder; }
+{% block extrastyle %}
+    th { text-align:center; font-size:10px; font-weight:bolder; }
     td { text-align:left; }
     .num { text-align:right; }
     .peq { width: 100px; }
@@ -45,48 +31,52 @@
         padding:0;
         margin:0;
      }
-    h1, h3 {
+    h1, h2 {
         font-size:12px;
     }
     thead {display: table-header-group;}
     tr, th, td { page-break-inside: avoid; }
     th {text-align: left;}
     td {
-        font-size:10px;
+        font-size:9px;
         word-wrap: break-word;
+        word-break:break-all;
     }
 
     #tbl_title {
         border:1px black solid; 
         padding:0.5em;
         width: 27.80cm;
+        table-layout:fixed;
     }
     
     /* ID */
-    #tbl_content td:nth-child(1) { width:0.9cm; }
+    #tbl_content thead tr th:nth-child(1) { width:0.6cm; }
     /* PROCESSO */
-    #tbl_content td:nth-child(2) { width:1.8cm; }
+    #tbl_content thead tr th:nth-child(2) { width:1.3cm; }
     /* N.USP */
-    #tbl_content td:nth-child(3) { width:1.1cm; }
+    #tbl_content thead tr th:nth-child(3) { width:1cm; }
     /* NF */
-    #tbl_content td:nth-child(4) { width:1.7cm; }
+    #tbl_content thead tr th:nth-child(4) { width:1.7cm; }
     /* MODELO */
-    #tbl_content td:nth-child(5) { width:2.7cm; }
+    #tbl_content thead tr th:nth-child(5) { width:2.5cm; }
     /* PART NUMBER */
-    #tbl_content td:nth-child(6) { width:2.5cm; }
+    #tbl_content thead tr th:nth-child(6) { width:2.5cm; }
     /* NS */
-    #tbl_content td:nth-child(7) { width:2.5cm; }
+    #tbl_content thead tr th:nth-child(7) { width:2.5cm; }
     /* APELIDO */
-    #tbl_content td:nth-child(8) { width:2.1cm; }
+    #tbl_content thead tr th:nth-child(8) { width:2.1cm; }
     /* DESCRICAO */
-    #tbl_content td:nth-child(9) { width:8.1cm; }
+    #tbl_content thead tr th:nth-child(9) { width:7.3cm; }
     /* POSICAO */
-    #tbl_content td:nth-child(10) { width:2.5cm; }
+    #tbl_content thead tr th:nth-child(10) { width:1.8cm; }
     /* ESTADO */
-    #tbl_content td:nth-child(11) { width:1.2cm; }
+    #tbl_content thead tr th:nth-child(11) { width:1.2cm; }
     
     #tbl_content {
         border-collapse:collapse;
+        width: 27.80cm;
+        table-layout:fixed;
     }
     #tbl_content thead {
         background-color:lightgray;
@@ -124,36 +114,35 @@
     .level0.tr_border td {
         border-top:1px darkgray solid;
     }
-    </style>
-</head>
-<body>
+{% endblock %}
+{% block content %}
     <div id="conteudo">
         <h1 repeat="1">Inventário por local</h1>
         {% for end in enderecos %}
-            <h3>
+            <h2>
                 {% if end.endereco %}
                     {{ end.endereco }}
                 {% else %}
                     {{ end.detalhe }}
                 {% endif %}
-            </h3>
+            </h2>
             {% for d in end.detalhes %}
                     <p></p>
                     <table id="tbl_title"><tr><td><strong>{{ d.detalhe }}</strong></td></tr></table>
                     <table id="tbl_content" cellpadding="5">
                     <thead>
                     <tr>
-                        <th style="width:1cm">ID</th>
-                        <th style="width:1cm">Processo</th>
-                        <th style="width:1cm">Patr.Of.</th>
-                        <th style="width:1cm">NF</th>
-                        <th style="width:1cm">Modelo</th>
-                        <th style="width:1cm">Part number</th>
-                        <th style="width:1cm">NS</th>
-                        <th style="width:1cm">Apelido</th>
-                        <th style="width:1cm">Descrição</th>
-                        <th style="width:1cm">Posição</th>
-                        <th style="width:1cm">Estado</th>
+                        <th>ID</th>
+                        <th>Processo</th>
+                        <th>Patr.Of.</th>
+                        <th>NF</th>
+                        <th>Modelo</th>
+                        <th>Part number</th>
+                        <th>NS</th>
+                        <th>Apelido</th>
+                        <th>Descrição</th>
+                        <th>Posição</th>
+                        <th>Estado</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -222,11 +211,10 @@
                          {% endif %}
                       {% endfor %}
                       {% endif %}
-                      </tbody>
                    {% endfor %}
+                  </tbody>
             {% endfor %}
             </table>
         {% endfor %}
     </div>
-</body>
-</html>
+{% endblock %}
