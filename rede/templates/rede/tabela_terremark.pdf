@@ -2,7 +2,7 @@
 {% load proto_tags %}
 {% load l10n %}
 {% block size %}a3 landscape{% endblock %}
-{% block background %}{{papelaria.papel_timbrado_paisagem_a3}}{% endblock %}
+{% block background %}background-image: url('media:{{papelaria.papel_timbrado_paisagem_a3}}');{% endblock %}
 {% block top %}{{papelaria.paisagem_a3_margem_superior|default:0.5|unlocalize}}{% endblock %}
 {% block bottom %}{{papelaria.paisagem_a3_margem_inferior|default:0.5|unlocalize}}{% endblock %}
 {% block extrastyle %}
