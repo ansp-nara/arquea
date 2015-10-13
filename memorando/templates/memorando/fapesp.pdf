@@ -31,7 +31,7 @@
 <br />
 <p style="text-align:left;">Ref.: Processo {{ m.memorando.termo }} - memorando {{ m.memorando.numero }}</p>
 <br />
-<p style=text-align:center;">{{ m.assunto }}</p>
+<p style="text-align:center;">{{ m.assunto }}</p>
 <br />
 <p style="text-align:left;">Prezado Senhor</p>
 <p>{{ m.introducao|safe }}</p>

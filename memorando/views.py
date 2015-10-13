@@ -85,11 +85,11 @@ def fapesp(request, mem):
         from django.contrib.auth.models import User
         from django.http import HttpRequest
 
-        request = HttpRequest
-        request.user = User.objects.get(email='antonio@ansp.br')
-        request.GET = {'termo':m.memorando.termo.id, 'agilis':1, 'modalidade':1}
-        request.META = {}
-        response = por_termo(request, 1)
+        new_request = HttpRequest()
+        new_request.user = User.objects.get(email='antonio@ansp.br')
+        new_request.GET = {'termo':m.memorando.termo.id, 'agilis':1, 'modalidade':1}
+        new_request.META = {}
+        response = por_termo(new_request, 1)
         anexos.append((response.content, u'Lista patrimonial do processo %s' % m.memorando.termo, 2))
 
     for c in m.corpo_set.all():
