@@ -1,32 +1,18 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+{% extends "base.pdf" %}
+{% load static %}
 {% load proto_tags %}
 {% load l10n %}
-<html>
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<style>
-@page {
-    size:a4 landscape;
-    background-image: url('media:{{papelaria.papel_timbrado_paisagem_a4}}');
-    background-position: center top;
-    background-size: 100% 102%;
-    background-repeat:no-repeat;
-    margin-top:0;
-    margin-right:1cm;
-    margin-bottom:1cm;
-    margin-left:0;
-    padding: {{papelaria.paisagem_a4_margem_superior|default:0.5|unlocalize}}cm 1cm {{papelaria.paisagem_a4_margem_inferior|default:0.5|unlocalize}}cm 1cm;
+{% load i18n proto_tags admin_static %}
+{% get_static_prefix as STATIC_PREFIX %
 
-  @bottom-right {
-    content: 'Pág ' counter(page);
-    white-space: pre;
-    color: grey;
-    vertical-align: bottom;
-    font-family: Arial;
-    font-size: 0.7em;
-    margin:0;
-    padding-bottom:1cm;
-  }
-}
+{% block size %} a4 landscape {% endblock %}
+{% block background %}background-image: url('media:{{papelaria.papel_timbrado_paisagem_a4}}');{% endblock %}
+{% block top %} {{papelaria.paisagem_a4_margem_superior|default:0.5|unlocalize}}{% endblock %}
+{% block bottom %} {{papelaria.paisagem_a4_margem_inferior|default:0.5|unlocalize}}{% endblock %}
+{% block left %}0.8{% endblock %}
+
+{% block extrastyle %}
  body {
     position:relative;
     margin: 0;
@@ -62,6 +48,11 @@
     border:1px black solid;
     padding:0.5em;
 }
+ td {
+    word-break: break-all;
+    word-wrap:break-word;
+    font-size:1em;
+ }
  td p {
     line-height:inherit;
     margin:0;
@@ -73,26 +64,25 @@
  /* PROCEDENCIA */
   #tbl_conteudo td:nth-child(2) { width:1.7cm; }
  /* MODELO */
-  #tbl_conteudo td:nth-child(3) { width:2.7cm; }
+  #tbl_conteudo td:nth-child(3) { width:2.5cm; }
  /* PART NUMBER */
   #tbl_conteudo td:nth-child(4) { width:2.2cm; }
   /* DESCRICAO com largura variável*/
-  #tbl_conteudo td:nth-child(5) { width:5.5cm; }
+  #tbl_conteudo td:nth-child(5) { width:5.3cm; }
  /* NS */
-  #tbl_conteudo td:nth-child(6) { width:2.7cm; }
+  #tbl_conteudo td:nth-child(6) { width:2.5cm; }
  /* TIPO */
   #tbl_conteudo td:nth-child(7) { width:1.5cm; }
  /* LOCAL */
   #tbl_conteudo td:nth-child(8) { width:2.5cm; }
  /* POSICAO */
-  #tbl_conteudo td:nth-child(9) { width:2.8cm; }
+  #tbl_conteudo td:nth-child(9) { width:3cm; }
  /* ESTADO */
-  #tbl_conteudo td:nth-child(10) { width:1.0cm; }
+  #tbl_conteudo td:nth-child(10) { width:1.4cm; }
  /* NF */
   #tbl_conteudo td:nth-child(11) { width:2.0cm; }
-</style>
-</head>
-<body>
+{% endblock %}
+{% block content %}
 <div id="conteudo">
     <h1 repeat="1">Inventário por marca</h1>
     <h4>Patrimonios da marca {{ marca }}</h4>
@@ -131,6 +121,5 @@
         </tbody>
     </table>
 </div>
-</body>
-</html>
+{% endblock %}
 
