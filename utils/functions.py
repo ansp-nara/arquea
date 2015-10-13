@@ -103,15 +103,25 @@ def weasy_fetcher(url,**kwargs):
     """
     if url.startswith('static:'):
         url = url[len('static:'):]
-        return weasyprint.default_url_fetcher('file://' + os.path.join(settings.STATIC_ROOT, url))
+        file_path = os.path.join(settings.STATIC_ROOT, url)
+        if isReadableFile(file_path):
+            return weasyprint.default_url_fetcher('file://' + file_path)
     elif url.startswith('media:'):
         url = url[len('media:'):]
-        return weasyprint.default_url_fetcher('file://' + os.path.join(settings.MEDIA_ROOT, url))
-    else:
-        return weasyprint.default_url_fetcher(url)
+        
+        # Normalizando a URL;
+        # Removendo o sufixo de MEDIA_URL
+        url_path = os.path.normpath(url.lstrip(settings.MEDIA_URL)).split(os.sep)
+        # Normalizando o MEDIA_ROOT para path absoluto e juntando com a URL 
+        file_path = os.path.join(os.path.abspath(settings.MEDIA_ROOT), *url_path)
+        
+        if isReadableFile(file_path):
+            return weasyprint.default_url_fetcher('file:///' + file_path.replace(os.sep, '/'))
+    
+    return weasyprint.default_url_fetcher(url)
+    
 
-
-def render_to_pdf_weasy(template_src, context_dict, request=None, filename='file.pdf'):
+def render_to_pdf_weasy(template_src, context_dict, request=None, filename='file.pdf', zoom=0.5):
 
     if list(template_src) != template_src:
         template_src = [template_src]
@@ -139,7 +149,7 @@ def render_to_pdf_weasy(template_src, context_dict, request=None, filename='file
     response = HttpResponse(content_type="application/pdf")
     
     # Necessário passar o base_url para poder resolver os caminhos relativos de imagens
-    docs[0].copy(all_pages).write_pdf(response)
+    docs[0].copy(all_pages).write_pdf(response, zoom=zoom)
     response['Content-Disposition'] = 'attachment; filename=%s' % filename
     return response
 
@@ -157,7 +167,12 @@ def render_to_pdfxhtml2pdf(template_src, context_dict, request=None, context_ins
 
     context.update(context_dict)
     html  = template.render(context)
+    
+    # Removendo CSS microsoft que causam erro no XHTML2PDF
     html = html.replace('-moz-use-text-color', '')
+    html = html.replace('border: medium none;', 'border-width: medium 0 0 0;')
+    
+    
     pdf = pisaPDF()
     pdf_princ = pisa.pisaDocument(StringIO.StringIO(html.encode("utf-8")), link_callback=fetch_resources)
     pdf.addDocument(pdf_princ)
@@ -174,47 +189,6 @@ def render_to_pdfxhtml2pdf(template_src, context_dict, request=None, context_ins
         response['Content-Disposition'] = 'attachment; filename=%s' % filename
         return response
     return HttpResponse('We  had some errors<pre>%s</pre>' % cgi.escape(html))
-
-
-def render_wk_to_pdf(template_src, context_dict, context_instance=None, filename=None, attachments=[], request=None, header_template=None, footer_template=None):
-    from wkhtmltopdf.views import PDFTemplateResponse
-    
-    """
-    Renderiza o HTML utilizando o wkHTMLtoPDF, por linha de comando, utilizando a engine QT com webkit
-    """
-    context = context_instance or Context()
-    context.update(context_dict)
-    context_dict.update({'request': request})
-    
-    result = StringIO.StringIO()
-    
-    if header_template == None:
-        header_template = 'wkhtmltopdf_header_template.html'
-    
-    if footer_template == None:
-        footer_template = 'wkhtmltopdf_footer_template.html'
-    
-    today = datetime.today()
-    fileDate = "%s-%s-%s." % (today.year, today.month, today.day)
-    
-    if not filename:
-        localFilename = 'file.pdf'
-    else:
-        localFilename = filename
-    localFilename = localFilename.replace('.', fileDate, 1)
-             
-    cmd_options = {'orientation': 'landscape'}
-     
-    response = PDFTemplateResponse(request=request,
-                                   template=template_src,
-                                   context=context,
-                                   filename=localFilename,
-                                   footer_template=footer_template,
-                                   header_template=header_template,
-                                   show_content_in_browser=False, cmd_options=cmd_options)
-
-    return response
-
 
 
 def formata_moeda(n, s_d):
@@ -397,3 +371,20 @@ def month_range(start_date, end_date):
         carry, new_month = divmod(current_date.month, 12)
         new_month += 1
         current_date = current_date.replace(year=current_date.year + carry, month=new_month, day=1)
+
+
+
+def isReadableFile(full_path):
+    try:
+        if not os.path.isfile(full_path):
+            #print u"File does not exist: %s" % full_path
+            return False
+        elif not os.access(full_path, os.R_OK):
+            #print u"File cannot be read: %s" % full_path
+            return False
+        else:
+            #print "File can be read."
+            return True
+    except IOError as ex:
+        print "I/O error({0}): {1}".format(ex.errno, ex.strerror)
+        return False
