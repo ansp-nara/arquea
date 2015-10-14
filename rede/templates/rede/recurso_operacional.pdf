@@ -52,43 +52,34 @@ td {
 }
 tbody td { padding-top:3px; padding-left:2px;}
 tbody th { padding-top:3px; }
-table tbody tr td { border:1; }
 
- td.td_os span,
- td.td_v_unit span,
- td.td_v_simp span,
- td.td_v_cimp span,
- td.td_t_simp span,
- td.td_t_geral span
- {
- }
-  #tbl_relatorio thead{
+#tbl_relatorio {
+    table-layout:fixed;
+}
+#tbl_relatorio thead{
     font-weight:bold;
     background-color:#ddd;
-    white-space:nowrap;
-    table-layout:fixed;
- }
- #tbl_relatorio thead tr:nth-child(1) td{
+}
+#tbl_relatorio thead tr:nth-child(1) td{
     border-bottom:1px dotted #ccc;
- }
-    #tbl_relatorio .td_contrato      { width:1.2cm; }
-    #tbl_relatorio .td_os            { width:1.2cm; }
-    #tbl_relatorio .td_estado_os     { width:1.2cm; }
-    
-    #tbl_relatorio .td_classificacao { width:4.0cm; }
-    #tbl_relatorio .td_descricao     { width:4.0cm; }
-    /*
-    #tbl_relatorio .td_referente     { width:6.2cm; }
-    */
-    #tbl_relatorio .td_quantidade    { width:0.9cm; }
-    
-    .planejamento-tr {
-        background-color: #f9f9f9;
-    }
-    .planejamento-tr td {
-        border-top: 1px black solid;
-        border-bottom: 1px darkgray solid;
-    }
+    white-space:nowrap;
+}
+.td_contrato      { width:1.7cm; }
+.td_os            { width:1.7cm; }
+.td_estado_os     { width:1.7cm; }
+
+.td_classificacao { width:5.5cm; }
+.td_descricao     { width:5.5cm; }
+.td_referente     { width:8.7cm; }
+.td_quantidade    { width:1.7cm; }
+
+.planejamento-tr {
+    background-color: #f9f9f9;
+}
+.planejamento-tr td {
+    border-top: 1px black solid;
+    border-bottom: 1px darkgray solid;
+}
 </style>
 </head>
 <body>
@@ -97,15 +88,15 @@ table tbody tr td { border:1; }
 <table id="tbl_relatorio">
 <thead>
 <tr>
-    <td>Contrato</td>
-    <td>OS</td>
+    <td class="td_contrato">Contrato</td>
+    <td class="td_os">OS</td>
     {% if not estado_selected or estado_selected == 0 %}
-        <td>Est. OS</td>
+        <td class="td_estado_os">Est. OS</td>
     {% endif %}
-    <td>Classificação</td>
-    <td>Descrição</td>
-    <td>Referente</td>
-    <td><span title="Quantidade de recurso contratrado.">Qtd</span></td>
+    <td class="td_classificacao">Classificação</td>
+    <td class="td_descricao">Descrição</td>
+    <td class="td_referente">Referente</td>
+    <td class="td_quantidade"><span title="Quantidade de recurso contratrado.">Qtd</span></td>
 <tr>
 <tr>
     <td></td>
@@ -122,15 +113,15 @@ table tbody tr td { border:1; }
 <tbody>
 {% for r in planejamentos %}
    <tr class="planejamento-tr">
-        <td class="td_contrato">{{ r.contrato.numero }}</td>
-        <td class="td_os"><span>{{ r.os.numero }}</td>
+        <td>{{ r.contrato.numero }}</td>
+        <td><span>{{ r.os.numero }}</td>
         {% if not estado_selected or estado_selected == 0 %}
-            <td class="td_estado_os"><span>{{ r.os.estado|default:'-' }}</span></td>
+            <td><span>{{ r.os.estado|default:'-' }}</span></td>
         {% endif %}
-        <td class="td_classificacao">{{ r.classificacao }}</td>
-        <td class="td_descricao">{{ r.descricao }}</td>
-        <td class="td_referente">{{ r.referente }}</td>
-        <td class="td_quantidade">{{ r.quantidade }}</td>
+        <td>{{ r.classificacao }}</td>
+        <td>{{ r.descricao }}</td>
+        <td>{{ r.referente }}</td>
+        <td>{{ r.quantidade }}</td>
    </tr>
     {% for b in r.beneficiados %}
         <tr>
