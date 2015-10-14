@@ -135,7 +135,7 @@
                         <tr>
                             <td>{{ c.inicio|date:"d/m/Y" }}</td>
                             <td>{{ c.termino|date:"d/m/Y" }}</td>
-                            <td><a href="/admin/outorga/contrato/{{ c.id }}/">{{ c.numero }}</a></td>
+                            <td>{{ c.numero }}</td>
                             <td>{% if c.auto %}Auto{% endif %}</td>
                         </tr>
                     </table>
@@ -153,11 +153,11 @@
                                         </tr>
                                     {% endif %}
                                     <tr>
-                                        <td width="10%" style="text-align:center;">{{ os.data_inicio|date:"d/m/Y" }}</td>
-                                        <td width="10%" style="text-align:center;">{{ os.data_rescisao|date:"d/m/Y" }}</td>
-                                        <td width="20%"><a href="/admin/outorga/ordemdeservico/{{ os.id }}/">{{ os.tipo.nome }} - {{ os.numero }}</a></td>
-                                        <td width="50%">{{ os.descricao }}</td>
-                                        <td width="10%" style="text-align:center;">{{ os.estado }}</td>
+                                        <td style="text-align:center;">{{ os.data_inicio|date:"d/m/Y" }}</td>
+                                        <td style="text-align:center;">{{ os.data_rescisao|date:"d/m/Y" }}</td>
+                                        <td>{{ os.tipo.nome }} - {{ os.numero }}</td>
+                                        <td>{{ os.descricao }}</td>
+                                        <td style="text-align:center;">{{ os.estado }}</td>
                                     </tr>
                                 {% endfor %}
                             </table>
