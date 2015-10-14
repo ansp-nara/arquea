@@ -4,7 +4,7 @@
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<style>
+<style type="text/css">
 @page {
   size: a3 landscape;
     background-image: url('media:{{papelaria.papel_timbrado_paisagem_a3}}');
@@ -60,23 +60,52 @@
 </style> 
 </head>
 <body>
-<div id="conteudo">
-    <h1 repeat="1">Pagamentos por item de outorga do processo {{ termo }} e modalidade {{ modalidade }}</h1>
-    <table  d="tbl_conteudo" border="0" cellpadding="5">
-    {% for it in itens %}
-           <tr><th colspan="6" style="text-align:left;">{{ it.item.descricao }} - {{ it.total|moeda }}</th></tr>
-          {% for pg in it.pagtos %}
-              <tr class="{% cycle 'z1' 'z2' %}"><td width="5%"></td><td width="5%">{{ pg.p.conta_corrente.cod_oper }}</td><td width="5%">{{ pg.p.conta_corrente.data_oper|date:"d/m" }}</td><td>{{ pg.p.protocolo.descricao2 }}</td><td>{{ pg.p.protocolo.referente }}</td><td width="10%">{{ pg.p.valor_fapesp|moeda }}</td><td>[{{ pg.p.protocolo.tipo_documento.nome }} - {{ pg.p.protocolo.num_documento }}]</td></tr>
-              {% for a in pg.docs %}
-                 <tr><td colspan="3"></td><td>{{ a.tipo.nome }}</td><td>parc. {{ a.parcial }}/pag. {{ a.pagina }}</td><td>{% if a.arquivo %}arquivo{% endif %}</td></tr>
+    <div id="conteudo">
+        <h1>Pagamentos por item de outorga do processo {{ termo }} e modalidade {{ modalidade }}</h1>
+        <table id="tbl_conteudo" border="0" cellpadding="5">
+            <colgroup>
+                <col>
+                <col style="width:5%;">
+                <col style="width:5%;">
+                <col>
+                <col>
+                <col style="width:10%;">
+                <col>
+            </colgroup>
+        {% for it in itens %}
+              <tr>
+                <th colspan="6" style="text-align:left;">{{ it.item.descricao }} - {{ it.total|moeda }}</th>
+              </tr>
+              {% for pg in it.pagtos %}
+                  <tr class="{% cycle 'z1' 'z2' %}">
+                    <td></td>
+                    <td>{{ pg.p.conta_corrente.cod_oper }}</td>
+                    <td>{{ pg.p.conta_corrente.data_oper|date:"d/m" }}</td>
+                    <td>{{ pg.p.protocolo.descricao2 }}</td>
+                    <td>{{ pg.p.protocolo.referente }}</td>
+                    <td>{{ pg.p.valor_fapesp|moeda }}</td>
+                    <td>[{{ pg.p.protocolo.tipo_documento.nome }} - {{ pg.p.protocolo.num_documento }}]</td>
+                  </tr>
+                  {% for a in pg.docs %}
+                     <tr>
+                        <td colspan="3"></td>
+                        <td>{{ a.tipo.nome }}</td>
+                        <td>parc. {{ a.parcial }}/pag. {{ a.pagina }}</td>
+                        <td>{% if a.arquivo %}arquivo{% endif %}</td>
+                     </tr>
+                  {% endfor %}
+                  {% for pt in pg.p.patrimonio_set.all %}
+                     <tr>
+                        <td colspan="3"></td>
+                        <td>(Patrimônio: marca, modelo e número de série)</td><td>{{ pt.marca }}</td>
+                        <td>{{ pt.modelo }}</td>
+                        <td>{{ pt.ns }}</td>
+                     </tr>
+                  {% endfor %}
               {% endfor %}
-              {% for pt in pg.p.patrimonio_set.all %}
-                 <tr><td colspan="3"><td>(Patrimônio: marca, modelo e número de série)</td><td>{{ pt.marca }}</td><td>{{ pt.modelo }}</td><td>{{ pt.ns }}</td></tr>
-              {% endfor %}
-          {% endfor %}
-    {% endfor %}
-    </table>
-</div>
+        {% endfor %}
+        </table>
+    </div>
 </body>
 </html>
 
