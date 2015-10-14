@@ -34,7 +34,7 @@
  #conteudo {
     margin: 0;
     width: 100%;
-    word-break: break-all;
+    word-wrap:break-word;
  }
  #conteudo .fieldset {
     border: 1px lightgray solid;

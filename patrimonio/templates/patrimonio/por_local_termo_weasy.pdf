@@ -40,7 +40,6 @@
     td {
         font-size:9px;
         word-wrap: break-word;
-        word-break:break-all;
     }
 
     #tbl_title {

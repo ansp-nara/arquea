@@ -30,7 +30,7 @@
   }
 }
 tr th { background-color: #eee; }
-.th_data { width: 14.5%cm; }
+.th_data { width: 10%; }
 .th_documento { width: 12%; }
 .th_historico { width: 53%; }
 .th_valor { width: 20.5%; }
