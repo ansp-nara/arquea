@@ -262,7 +262,6 @@ caption {
 }
 .conflitos {
     display:inline-block;
-    #width:255px;
     width:100%;
 }
 .conflitos-content table { 

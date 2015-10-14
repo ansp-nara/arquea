@@ -123,9 +123,7 @@
     .rack {
         display:inline-block;
         margin-right:25px;
-        #margin-bottom:30px;
         font-size:0;
-        #top:20px;
         position:relative;
     }
     .outros,
