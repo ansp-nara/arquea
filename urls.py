@@ -55,7 +55,9 @@ urlpatterns = patterns('',
     # necessário instalar/atualizar o django_tinymce
     (r'^tinymce/', include('tinymce.urls')),
     # necessário instalar o django_ckeditor_updated (para o Django 1.6)
-    (r'^ckeditor/', include('ckeditor.urls')),
+    #(r'^ckeditor/', include('ckeditor.urls')),
+    # Utilizar com o CKEditor > 5.0
+    (r'^ckeditor/', include('ckeditor_uploader.urls')),
 
     
     (r'^', include(admin.site.urls)),
