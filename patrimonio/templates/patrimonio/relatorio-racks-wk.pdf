@@ -45,7 +45,7 @@ table {
     display: table-cell;
     width:7px;
     vertical-align:top;
-    background-image: url('{{ STATIC_PREFIX }}img/1u.png');
+    background-image: url('static:{{ STATIC_PREFIX }}img/1u.png');
 }
 .bloco-n {
     display: table-cell;
@@ -141,7 +141,6 @@ Coluna de furos do rack
 }
 img.profundidade_curta {
     opacity:0.3;
-    filter: alpha(opacity=30); /* For IE8 and earlier */
 }
 .interno {
     font-size:10px;
@@ -174,7 +173,6 @@ img.profundidade_curta {
 }
 .interno div div div {
     width:199px;
-    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black, -2px 0 1px black, 0 2px 1px black, 2px 0 1px black, 0 -2px 1px black;
     color:white;
     text-align:center;
     z-index:10;
@@ -250,13 +248,12 @@ caption {
     margin-top:10px;
     width:100%;
     table-layout:fixed;
-    word-break:break-all;
     word-wrap: break-word;
 }
 .rack_info th {
     border: 1px solid;
     font-size:10px;
-    font-weight: strong;
+    font-weight: bold;
     page-break-after:avoid;
 }
 .rack_info td {
@@ -291,7 +288,7 @@ caption {
 }
 
  .div_pdu {
-    display:block
+    display:block;
     width: 30px;
     color: black;
     font-size: 5px;

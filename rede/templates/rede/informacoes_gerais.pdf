@@ -45,7 +45,7 @@ table tr td {
             </tr>
             <tr>
                 <td>{{ i.info.participante.entidade.sigla }} - {{ i.info.participante.entidade.nome }}</td>
-                <td style="word-wrap:break-word; word-break: break-all;">{{ i.info.participante.entidade.url }}</td>
+                <td style="word-wrap:break-word; ">{{ i.info.participante.entidade.url }}</td>
                 <td>{{ i.info.participante.rua }}, {{ i.info.participante.num }}. {{ i.info.participante.bairro }}.</td>
                 <td>{{ i.info.participante.cidade }}</td>
                 <td>{{ i.info.participante.cep }}</td>

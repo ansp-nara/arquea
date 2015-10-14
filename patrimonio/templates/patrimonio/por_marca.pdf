@@ -49,7 +49,6 @@
     padding:0.5em;
 }
  td {
-    word-break: break-all;
     word-wrap:break-word;
     font-size:1em;
  }

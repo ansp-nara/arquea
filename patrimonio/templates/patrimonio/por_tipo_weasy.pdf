@@ -46,13 +46,12 @@ thead {display: table-header-group;}
 tr, th, td { page-break-inside: avoid; }
 th {
     text-align: left;
-    font-weight: strong;
-    border-bottom: 1px dotted #
+    font-weight: bold;
+    border-bottom: 1px dotted;
 }
 td {
     font-size:1.1em;
     word-wrap: break-word;
-    word-break: break-all;
 }
 
 #tbl_content {
