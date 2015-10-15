@@ -182,9 +182,11 @@ def planejamento2(request, pdf=0):
         entidade = entidade[0]
         termo = termo[0]
         pagamentos = []
-        pgs = Pagamento.objects.filter(recurso__id__isnull=False, protocolo__termo=termo).distinct()
+        pgs = Pagamento.objects.filter(recurso__id__isnull=False, protocolo__termo=termo).order_by('protocolo__num_documento').distinct()
         if beneficiado: pgs = pgs.filter(recurso__planejamento__beneficiado__entidade=beneficiado)
         if descricoes_ids: pgs = pgs.filter(recurso__planejamento__tipo__id__in=descricoes_ids)
+        pgs = pgs.select_related('protocolo')
+        
         for p in pgs:
             imposto = Decimal('0.0')
             total = Decimal('0.0')
@@ -192,6 +194,8 @@ def planejamento2(request, pdf=0):
             rcs = p.recurso_set.filter(planejamento__os__contrato__entidade=entidade)
             if beneficiado: rcs = rcs.filter(planejamento__beneficiado__entidade=beneficiado)
             if descricoes_ids: rcs = rcs.filter(planejamento__tipo__id__in=descricoes_ids)
+            rcs = rcs.select_related('planejamento', 'planejamento__os', 'planejamento__os__contrato', 'planejamento__os__tipo', 'planejamento__tipo')
+            
             for r in rcs:
                 if beneficiado:
                     b = r.planejamento.beneficiado_set.get(entidade=beneficiado)
@@ -201,7 +205,7 @@ def planejamento2(request, pdf=0):
                 unitario_com = r.valor_imposto_mensal*Decimal(str(b.porcentagem()/100)) if beneficiado else r.valor_imposto_mensal
                 sub_sem = Decimal(str(r.quantidade)) * unitario_sem
                 sub_com = Decimal(str(r.quantidade)) * unitario_com
-                recursos.append({'os':r.planejamento.os, 'quantidade':r.quantidade, 'sem':unitario_sem, 'com':unitario_com, 'sub_sem':sub_sem, 'sub_com':sub_com, 'tipo':r.planejamento.tipo, 'referente':r.planejamento.referente, 'beneficiados':None if beneficiado else r.planejamento.beneficiado_set.all() })
+                recursos.append({'os':r.planejamento.os, 'quantidade':r.quantidade, 'sem':unitario_sem, 'com':unitario_com, 'sub_sem':sub_sem, 'sub_com':sub_com, 'tipo':r.planejamento.tipo, 'referente':r.planejamento.referente, 'beneficiados':None if beneficiado else r.planejamento.beneficiado_set.all().select_related('entidade').order_by('quantidade') })
             pagamentos.append({'nf':p.protocolo.num_documento, 'sem':total, 'com':imposto, 'recursos':recursos})
             igeral += imposto
             tgeral += total
