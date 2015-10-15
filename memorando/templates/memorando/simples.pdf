@@ -44,39 +44,39 @@ tr {
 </style> 
 </head>
 <body>
-<div style="position:absolute;float:left;top:-0.7cm;">NARA {{ m.data.year }}/{{ m.numero|stringformat:"03d" }}</div>
-<div id="conteudo">
-<br />
-<p style="text-align:right;">São Paulo, {{ m.data|date:"j \d\e F \d\e Y"|lower }}</p>
-<br />
-<br />
-<br />
-<p>{{ m.destinatario|linebreaks }}</p>
-<br />
-<br />
-<p style="text-align:center;"><b>Assunto:</b> {{ m.assunto }}</p>
-<p style="text-align:justify;">
-{{ m.corpo|safe }}
-</p>
-{% if m.equipamento %}
-<p style="text-align:justify;font-weight:bold;font-size:8pt;">
-Informamos para os devidos fins que a FAPESP (Fundação de Amparo à Pesquisa do
-Estado de São Paulo), por ser uma instituição Pública Estadual, está isenta da emissão de
-nota fiscal, conforme Decreto 48.034 de 19/08/2003.
-</p>
-{% endif %}
-<p style="text-align:left;">Atenciosamente,</p>
-<br />
-<br />
-<p style="text-align:left;">{{ m.assinatura.nome }}<br />{{ m.assinatura.cargo_atual }} – ANSP</p>
-<br />
-{% if m.envio %}
-<p style="text-align:left;line-height:180%">
-Recebido e conferido em __/__/_____
-<br />Nome: _________________________________________________
-<br />RG: ____________________________
-</p>
-{% endif %}
-</div>
+    <div style="position:absolute;float:left;top:-0.7cm;">NARA {{ m.data.year }}/{{ m.numero|stringformat:"03d" }}</div>
+    <div id="conteudo">
+        <br />
+        <p style="text-align:right;">São Paulo, {{ m.data|date:"j \d\e F \d\e Y"|lower }}</p>
+        <br />
+        <br />
+        <br />
+        <p>{{ m.destinatario|linebreaks }}</p>
+        <br />
+        <br />
+        <p style="text-align:center;"><b>Assunto:</b> {{ m.assunto }}</p>
+        <p style="text-align:justify;">
+            {{ m.corpo|safe }}
+        </p>
+        {% if m.equipamento %}
+            <p style="text-align:justify;font-weight:bold;font-size:8pt;">
+            Informamos para os devidos fins que a FAPESP (Fundação de Amparo à Pesquisa do
+            Estado de São Paulo), por ser uma instituição Pública Estadual, está isenta da emissão de
+            nota fiscal, conforme Decreto 48.034 de 19/08/2003.
+            </p>
+        {% endif %}
+        <p style="text-align:left;">Atenciosamente,</p>
+        <br />
+        <br />
+        <p style="text-align:left;">{{ m.assinatura.nome }}<br />{{ m.assinatura.cargo_atual }} – ANSP</p>
+        {% if m.envio %}
+            <br />
+            <p style="text-align:left;line-height:180%;">
+            Recebido e conferido em __/__/_____
+            <br />Nome: _________________________________________________
+            <br />RG: ____________________________
+            </p>
+        {% endif %}
+    </div>
 </body>
 </html>
