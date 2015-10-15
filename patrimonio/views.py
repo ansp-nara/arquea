@@ -911,11 +911,11 @@ def ajax_filtra_pn_estado(request):
 
     estados = []
     for e in Estado.objects.all():
-        patrimonios_estado = patrimonios.all()
+        patrimonios_estado = patrimonios.all().prefetch_related(Prefetch('historicolocal_set', queryset=HistoricoLocal.objects.select_related('estado')))
         for p in patrimonios_estado:
-            if not p.historico_atual:
+            if not p.historico_atual_prefetched:
                 patrimonios_estado = patrimonios_estado.exclude(id=p.id)
-            elif p.historico_atual.estado != e:
+            elif p.historico_atual_prefetched.estado != e:
                 patrimonios_estado = patrimonios_estado.exclude(id=p.id)
 
         estados.append({'pk':e.id, 'value':'%s (%s)' % (e, patrimonios_estado.order_by('id').distinct().count())})
