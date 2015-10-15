@@ -1002,9 +1002,9 @@ class OrdemDeServico(models.Model):
         return self.contrato.entidade
 
     def primeiro_arquivo(self):
-        osf = self.arquivos.all()
-        if osf.count() > 0:
-            return osf[0].arquivo
+        if self.arquivos.all().exists():
+            osf = self.arquivos.all()[:1].get()
+            return osf.arquivo
         return None
 
     class Meta:
