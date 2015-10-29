@@ -15,6 +15,7 @@ class Area(models.Model):
         verbose_name_plural = u'Áreas'
         ordering = ('nome',)
 
+
 class Grupo(models.Model):
     nome = models.CharField(max_length=100)
     area = models.ForeignKey('processo.Area')
@@ -26,7 +27,6 @@ class Grupo(models.Model):
         ordering = ('area', 'nome')
 
 
-
 class Macroprocesso(models.Model):
     nome = models.TextField()
     grupo = models.ForeignKey('processo.Grupo')
@@ -36,11 +36,10 @@ class Macroprocesso(models.Model):
 
     def area(self):
         return self.grupo.area
-    area.admin_order_field='grupo__area'
+    area.admin_order_field = 'grupo__area'
 
     class Meta:
         ordering = ('grupo', 'nome')
-
 
 
 class Norma(models.Model):
@@ -52,6 +51,7 @@ class Norma(models.Model):
     class Meta:
         ordering = ('nome',)
 
+
 class Recurso(models.Model):
     nome = models.CharField(max_length=120)
 
@@ -62,7 +62,6 @@ class Recurso(models.Model):
         ordering = ('nome',)
 
 
-
 class OTRS(models.Model):
     nome = models.CharField(max_length=120)
   
@@ -71,7 +70,6 @@ class OTRS(models.Model):
 
     class Meta:
         ordering = ('nome',)
-
 
 
 class Processo(models.Model):
@@ -91,23 +89,22 @@ class Processo(models.Model):
 
     def somacro(self):
         return self.macroprocesso.nome
-    somacro.admin_order_field='macroprocesso'
-    somacro.short_description='Macroprocesso'
+    somacro.admin_order_field = 'macroprocesso'
+    somacro.short_description = 'Macroprocesso'
 
     def grupo(self):
         return self.macroprocesso.grupo
-    grupo.admin_order_field='macroprocesso__grupo'
+    grupo.admin_order_field = 'macroprocesso__grupo'
 
     def area(self):
         return self.grupo().area
-    area.admin_order_field='macroprocesso__grupo__area'
+    area.admin_order_field = 'macroprocesso__grupo__area'
 
     def procedimentos(self):
         return u', '.join(self.procedimento_set.all())
 
     class Meta:
         ordering = ('macroprocesso', 'nome')
-
 
 
 class Equipe(models.Model):
@@ -118,7 +115,6 @@ class Equipe(models.Model):
         return self.nome
 
 
-
 class Papel(models.Model):
     nome = models.CharField(max_length=45)
 
@@ -127,7 +123,6 @@ class Papel(models.Model):
 
     class Meta:
         verbose_name_plural = u'Papéis'
-
 
 
 class Atribuicao(models.Model):
@@ -143,7 +138,6 @@ class Atribuicao(models.Model):
         verbose_name_plural = u'Atribuições'
 
 
-
 class Visao(models.Model):
     nome = models.CharField(max_length=45)
 
@@ -155,7 +149,6 @@ class Visao(models.Model):
         verbose_name_plural = u'Visões'
 
 
-
 class Natureza(models.Model):
     nome = models.CharField(max_length=45)
 
@@ -164,7 +157,6 @@ class Natureza(models.Model):
 
     class Meta:
         ordering = ('nome',)
-
 
 
 class Procedimento(models.Model):
@@ -178,13 +170,12 @@ class Procedimento(models.Model):
         ordering = ('nome',)
 
 
-
 # Classe para definição de permissões de views e relatórios da app Processo
 class Permission(models.Model):
+
     class Meta:
         # remover as permissões padrões, pois essa é uma classe para configurar permissões customizadas
         default_permissions = ()
         permissions = (
-                    ("rel_ger_processos", "Rel. Ger. - Processos"),     #/processo/processos
-                )
-
+            ("rel_ger_processos", "Rel. Ger. - Processos"),     #/processo/processos
+        )

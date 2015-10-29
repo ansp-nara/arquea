@@ -1,21 +1,20 @@
 # -* coding: utf-8 -*-
+from datetime import date
 from django.contrib.auth.decorators import permission_required, login_required
-from django.db.models import Q
 from django.http import Http404, HttpResponse
 from django.template.response import TemplateResponse
 from django.views.decorators.http import require_safe
-from datetime import date
 
 import json as simplejson
+from financeiro.models import Pagamento
 
-from utils.functions import render_to_pdf, render_to_pdf_weasy
+from utils.functions import render_to_pdf_weasy
 from configuracao.models import Variavel
 from outorga.models import *
-from financeiro.models import Pagamento
 from identificacao.models import Entidade, Identificacao, ASN
-from rede.models import PlanejaAquisicaoRecurso
 from models import *
 from modelsResource import *
+
 
 @login_required
 @require_safe
@@ -26,14 +25,15 @@ def ajax_escolhe_pagamento(request):
     if termo:
         for p in Pagamento.objects.filter(protocolo__termo__id=termo):
             if p.conta_corrente:
-                descricao = 'Doc. %s, cheque %s, valor %s' % (p.protocolo.num_documento,p.conta_corrente.cod_oper, p.valor_fapesp)
+                descricao = 'Doc. %s, cheque %s, valor %s' % (p.protocolo.num_documento, p.conta_corrente.cod_oper,
+                                                              p.valor_fapesp)
             else:
                 descricao = 'Doc. %s, valor %s' % (p.protocolo.num_documento, p.valor_patrocinio)
 
-            retorno.append({'pk':p.pk, 'valor':descricao})
+            retorno.append({'pk': p.pk, 'valor': descricao})
 
     if not retorno:
-        retorno = [{"pk":"0","valor":"Nenhum registro"}]
+        retorno = [{"pk": "0", "valor": "Nenhum registro"}]
 
     json = simplejson.dumps(retorno)
     return HttpResponse(json, content_type="application/json")
@@ -57,26 +57,35 @@ def planejamento(request, pdf=0):
     os = request.GET.get('os')
 
     if not ano and not proj and not contrato and not os:
-        return TemplateResponse(request, 'rede/escolhe_ano.html', {'anoproj': [(p[0], Projeto.objects.get(id=p[1])) for p in PlanejaAquisicaoRecurso.objects.values_list('ano', 'projeto').order_by('ano').distinct()], 'oss':OrdemDeServico.objects.all()})
+        return TemplateResponse(request, 'rede/escolhe_ano.html',
+                                {'anoproj': [(p[0], Projeto.objects.get(id=p[1]))
+                                             for p in PlanejaAquisicaoRecurso.objects.values_list('ano', 'projeto')
+                                             .order_by('ano').distinct()],
+                                 'oss': OrdemDeServico.objects.all()})
 
     entidades = []
 
     for e in Entidade.objects.filter(contrato__ordemdeservico__planejaaquisicaorecurso__isnull=False).distinct():
-        entidade = {'entidade':e}
+        entidade = {'entidade': e}
         planejamentos = PlanejaAquisicaoRecurso.objects.filter(os__contrato__entidade=e)
-        if ano: planejamentos = planejamentos.filter(ano=ano)
-        if proj: planejamentos = planejamentos.filter(projeto__id=proj)
-        if os: planejamentos = planejamentos.filter(os__id=os)
+        if ano:
+            planejamentos = planejamentos.filter(ano=ano)
+        if proj:
+            planejamentos = planejamentos.filter(projeto__id=proj)
+        if os:
+            planejamentos = planejamentos.filter(os__id=os)
         projetos = []
         for p in Projeto.objects.filter(planejaaquisicaorecurso__in=planejamentos).distinct():
-            projeto = {'projeto':p, 'plan':planejamentos.filter(projeto=p)}
+            projeto = {'projeto': p, 'plan': planejamentos.filter(projeto=p)}
             projetos.append(projeto)
-        entidade.update({'projetos':projetos})
+        entidade.update({'projetos': projetos})
         entidades.append(entidade)
 
     if pdf:
-        return render_to_pdf_weasy('rede/planejamento.pdf', {'entidades':entidades, 'ano':ano}, request=request, filename='planejamento%s.pdf' % ano)
-    return TemplateResponse(request, 'rede/planejamento.html', {'entidades':entidades, 'ano':ano, 'projeto':proj, 'os':os})
+        return render_to_pdf_weasy('rede/planejamento.pdf', {'entidades': entidades, 'ano': ano}, request=request,
+                                   filename='planejamento%s.pdf' % ano)
+    return TemplateResponse(request, 'rede/planejamento.html',
+                            {'entidades': entidades, 'ano': ano, 'projeto': proj, 'os': os})
 
 
 @login_required
@@ -93,10 +102,11 @@ def planilha_informacoes_gerais(request):
 
 @login_required
 def planilha_informacoes_tecnicas(request, id=None):
-    if not id: raise Http404
+    if not id:
+        raise Http404
     tecnicos = Identificacao.objects.filter(area__contains='Tec')
-    adm = Identificacao.objects.filter(Q(area__contains='Adm')|Q(area__contains='Gest'))	
-    asns = ASN.objects.all() #filter(pais='BR')
+    adm = Identificacao.objects.filter(Q(area__contains='Adm') | Q(area__contains='Gest'))
+    asns = ASN.objects.all()  # filter(pais='BR')
     blocos_ips = BlocoIP.objects.all()
     dados = []
     for e in Enlace.objects.filter(id=id): 
@@ -105,9 +115,10 @@ def planilha_informacoes_tecnicas(request, id=None):
         contato_adm = adm.filter(endereco__entidade=entidade)
         asn = asns.filter(entidade=entidade)
         blocos = blocos_ips.filter(designado=entidade)
-        #operadoras = e.enlaceoperadora_set.all()
+        # operadoras = e.enlaceoperadora_set.all()
         operadoras = e.segmento_set.filter(data_desativacao__isnull=True)
-        dados.append({"enlace":e, "contatos_tec":contato_tec, "contatos_adm":contato_adm, "asn":asn, "bloco_ip":blocos, "operadoras":operadoras})
+        dados.append({"enlace": e, "contatos_tec": contato_tec, "contatos_adm": contato_adm, "asn": asn,
+                      "bloco_ip": blocos, "operadoras": operadoras})
     return TemplateResponse(request, 'rede/informacoes_tecnicas.html', {'dados': dados})
 
 
@@ -116,23 +127,26 @@ def imprime_informacoes_gerais(request):
     contatos = request.GET.get('contatos')
     info = []
     tecnicos = Identificacao.objects.filter(area__contains='Tec')
-    asns = ASN.objects.all() #filter(pais='BR')
+    asns = ASN.objects.all()  # filter(pais='BR')
     blocos_ips = BlocoIP.objects.all()
     for e in Enlace.objects.filter(participante__entidade__entidadehistorico__ativo=True):
         entidade = e.participante.entidade
-        if contatos: contato_tec = tecnicos.filter(endereco__entidade=entidade)
-        else: contato_tec = None
+        if contatos:
+            contato_tec = tecnicos.filter(endereco__entidade=entidade)
+        else:
+            contato_tec = None
         asn = asns.filter(entidade=entidade)
         blocos = blocos_ips.filter(designado=entidade)
         operadoras = e.segmento_set.filter(data_desativacao__isnull=True)
-        info.append({'info':e, "contatos_tec":contato_tec, "asn":asn, "bloco_ip":blocos, "operadoras":operadoras})
+        info.append({'info': e, "contatos_tec": contato_tec, "asn": asn, "bloco_ip": blocos, "operadoras": operadoras})
 
-    return render_to_pdf_weasy('rede/informacoes_gerais.pdf', {'info':info}, request=request, filename='informacoes_gerais.pdf')
+    return render_to_pdf_weasy('rede/informacoes_gerais.pdf', {'info': info}, request=request,
+                               filename='informacoes_gerais.pdf')
 
 
 @login_required
 def blocos_texto(request):
-    return TemplateResponse(request, 'rede/blocos.txt', {'blocos':BlocoIP.objects.all()}, content_type='text/plain')
+    return TemplateResponse(request, 'rede/blocos.txt', {'blocos': BlocoIP.objects.all()}, content_type='text/plain')
 
 
 @login_required
@@ -140,18 +154,19 @@ def blocos_texto(request):
 def planeja_contrato(request):
     """
     Ajax utilizado na tela de filtro do relatório em #Relatório Técnico - Relatório de Planejamento por ano.
-        
+
     Retorna as OSs de um dado Ano - Projeto. 
     
     """
     ano = request.GET.get('ano')
     proj_id = request.GET.get('proj_id')
 
-    os_ids = PlanejaAquisicaoRecurso.objects.filter(ano=ano, projeto__id=proj_id).order_by('os').values_list('os', flat=True)
-    oss = [{'pk':o.id, 'valor':'%s - %s' % (o.contrato, o)} for o in OrdemDeServico.objects.filter(id__in=os_ids)]
-    json = simplejson.dumps({'oss':oss})
+    os_ids = PlanejaAquisicaoRecurso.objects.filter(ano=ano, projeto__id=proj_id).order_by('os')\
+        .values_list('os', flat=True)
+    oss = [{'pk': o.id, 'valor': '%s - %s' % (o.contrato, o)} for o in OrdemDeServico.objects.filter(id__in=os_ids)]
+    json = simplejson.dumps({'oss': oss})
 
-    return HttpResponse(json,content_type="application/json")
+    return HttpResponse(json, content_type="application/json")
 
 
 @login_required
@@ -172,19 +187,25 @@ def planejamento2(request, pdf=0):
         termo = None
 
     beneficiado_id = request.GET.get('beneficiado')
-    if beneficiado_id: beneficiado = Entidade.objects.filter(id=beneficiado_id)
-    else: beneficiado = None
+    if beneficiado_id:
+        beneficiado = Entidade.objects.filter(id=beneficiado_id)
+    else:
+        beneficiado = None
     descricoes_ids = request.GET.getlist('tiposervico')
     if entidade and termo:
         igeral = Decimal('0.0')
         tgeral = Decimal('0.0')
-        if beneficiado: beneficiado = beneficiado[0]
+        if beneficiado:
+            beneficiado = beneficiado[0]
         entidade = entidade[0]
         termo = termo[0]
         pagamentos = []
-        pgs = Pagamento.objects.filter(recurso__id__isnull=False, protocolo__termo=termo).order_by('protocolo__num_documento').distinct()
-        if beneficiado: pgs = pgs.filter(recurso__planejamento__beneficiado__entidade=beneficiado)
-        if descricoes_ids: pgs = pgs.filter(recurso__planejamento__tipo__id__in=descricoes_ids)
+        pgs = Pagamento.objects.filter(recurso__id__isnull=False, protocolo__termo=termo)\
+            .order_by('protocolo__num_documento').distinct()
+        if beneficiado:
+            pgs = pgs.filter(recurso__planejamento__beneficiado__entidade=beneficiado)
+        if descricoes_ids:
+            pgs = pgs.filter(recurso__planejamento__tipo__id__in=descricoes_ids)
         pgs = pgs.select_related('protocolo')
         
         for p in pgs:
@@ -192,30 +213,49 @@ def planejamento2(request, pdf=0):
             total = Decimal('0.0')
             recursos = []
             rcs = p.recurso_set.filter(planejamento__os__contrato__entidade=entidade)
-            if beneficiado: rcs = rcs.filter(planejamento__beneficiado__entidade=beneficiado)
-            if descricoes_ids: rcs = rcs.filter(planejamento__tipo__id__in=descricoes_ids)
-            rcs = rcs.select_related('planejamento', 'planejamento__os', 'planejamento__os__contrato', 'planejamento__os__tipo', 'planejamento__tipo')
+            if beneficiado:
+                rcs = rcs.filter(planejamento__beneficiado__entidade=beneficiado)
+            if descricoes_ids:
+                rcs = rcs.filter(planejamento__tipo__id__in=descricoes_ids)
+            rcs = rcs.select_related('planejamento', 'planejamento__os', 'planejamento__os__contrato',
+                                     'planejamento__os__tipo', 'planejamento__tipo')
             
             for r in rcs:
                 if beneficiado:
                     b = r.planejamento.beneficiado_set.get(entidade=beneficiado)
-                imposto += Decimal(str(r.quantidade))*r.valor_imposto_mensal*Decimal(str(b.porcentagem()/100)) if beneficiado else Decimal(str(r.quantidade))*r.valor_imposto_mensal
-                total += Decimal(str(r.quantidade))*r.valor_mensal_sem_imposto*Decimal(str(b.porcentagem()/100)) if beneficiado else Decimal(str(r.quantidade))*r.valor_mensal_sem_imposto
-                unitario_sem = r.valor_mensal_sem_imposto*Decimal(str(b.porcentagem()/100)) if beneficiado else r.valor_mensal_sem_imposto
-                unitario_com = r.valor_imposto_mensal*Decimal(str(b.porcentagem()/100)) if beneficiado else r.valor_imposto_mensal
+                imposto += Decimal(str(r.quantidade))*r.valor_imposto_mensal*Decimal(str(b.porcentagem()/100)) \
+                    if beneficiado else Decimal(str(r.quantidade))*r.valor_imposto_mensal
+                total += Decimal(str(r.quantidade))*r.valor_mensal_sem_imposto*Decimal(str(b.porcentagem()/100)) \
+                    if beneficiado else Decimal(str(r.quantidade))*r.valor_mensal_sem_imposto
+                unitario_sem = r.valor_mensal_sem_imposto*Decimal(str(b.porcentagem()/100)) \
+                    if beneficiado else r.valor_mensal_sem_imposto
+                unitario_com = r.valor_imposto_mensal*Decimal(str(b.porcentagem()/100))\
+                    if beneficiado else r.valor_imposto_mensal
                 sub_sem = Decimal(str(r.quantidade)) * unitario_sem
                 sub_com = Decimal(str(r.quantidade)) * unitario_com
-                recursos.append({'os':r.planejamento.os, 'quantidade':r.quantidade, 'sem':unitario_sem, 'com':unitario_com, 'sub_sem':sub_sem, 'sub_com':sub_com, 'tipo':r.planejamento.tipo, 'referente':r.planejamento.referente, 'beneficiados':None if beneficiado else r.planejamento.beneficiado_set.all().select_related('entidade').order_by('quantidade') })
-            pagamentos.append({'nf':p.protocolo.num_documento, 'sem':total, 'com':imposto, 'recursos':recursos})
+                recursos.append({'os': r.planejamento.os, 'quantidade': r.quantidade, 'sem': unitario_sem,
+                                 'com': unitario_com, 'sub_sem': sub_sem, 'sub_com': sub_com,
+                                 'tipo': r.planejamento.tipo, 'referente': r.planejamento.referente,
+                                 'beneficiados': None if beneficiado else r.planejamento.beneficiado_set.all()
+                                                      .select_related('entidade').order_by('quantidade')})
+            pagamentos.append({'nf': p.protocolo.num_documento, 'sem': total, 'com': imposto, 'recursos': recursos})
             igeral += imposto
             tgeral += total
         if pdf:
-            return render_to_pdf_weasy('rede/planejamento2.pdf', {'beneficiado':beneficiado, 'entidade':entidade, 'termo':termo, 'pagamentos':pagamentos, 'sem':tgeral, 'com':igeral}, request=request, filename="servicos_contratados_por_processo.pdf")
+            return render_to_pdf_weasy('rede/planejamento2.pdf',
+                                       {'beneficiado': beneficiado, 'entidade': entidade, 'termo': termo,
+                                        'pagamentos': pagamentos, 'sem': tgeral, 'com': igeral},
+                                       request=request, filename="servicos_contratados_por_processo.pdf")
         else:
-            return TemplateResponse(request, 'rede/planejamento2.html', {'beneficiado':beneficiado, 'entidade':entidade, 'termo':termo, 'pagamentos':pagamentos, 'sem':tgeral, 'com':igeral, 'servicos':descricoes_ids})
+            return TemplateResponse(request, 'rede/planejamento2.html',
+                                    {'beneficiado': beneficiado, 'entidade': entidade, 'termo': termo,
+                                     'pagamentos': pagamentos, 'sem': tgeral, 'com': igeral,
+                                     'servicos': descricoes_ids})
     else:
-        return TemplateResponse(request, 'rede/escolhe_entidade_termo.html', {'entidades':Entidade.objects.filter(contrato__ordemdeservico__planejaaquisicaorecurso__id__isnull=False).distinct(), 'termos':Termo.objects.all(), 'beneficiados':Entidade.objects.all(), 'descricoes':TipoServico.objects.order_by('nome')})
-
+        return TemplateResponse(request, 'rede/escolhe_entidade_termo.html',
+                                {'entidades': Entidade.objects.filter(contrato__ordemdeservico__planejaaquisicaorecurso__id__isnull=False).distinct(),
+                                 'termos': Termo.objects.all(), 'beneficiados': Entidade.objects.all(),
+                                 'descricoes': TipoServico.objects.order_by('nome')})
 
 
 @login_required
@@ -224,11 +264,13 @@ def planejamento2(request, pdf=0):
 def blocosip(request, tipo=None):
     return _blocos_ip_superbloco(request, tipo)
 
+
 @login_required
 @permission_required('rede.rel_tec_blocosip_ansp', raise_exception=True)
 @require_safe
 def blocosip_ansp(request, tipo=None):
     return _blocos_ip_superbloco(request, 'ansp')
+
 
 def _blocos_ip_superbloco(request, tipo=None):
     """
@@ -241,8 +283,10 @@ def _blocos_ip_superbloco(request, tipo=None):
     # tipo: ansp
     #     Adiciona o filtro de superbloco com propriedade da ANSP para as QuerySets
     #
-    if tipo == 'ansp':          template = 'rede/blocosip_ansp.html'
-    else:                         template = 'rede/blocosip.html'
+    if tipo == 'ansp':
+        template = 'rede/blocosip_ansp.html'
+    else:
+        template = 'rede/blocosip.html'
     
     # Filtros selecionados
     anunciante = request.GET.get('anunciante')
@@ -251,11 +295,15 @@ def _blocos_ip_superbloco(request, tipo=None):
     designado = request.GET.get('designado')
 
     # Filtro - lista de dados
-    if tipo == 'ansp' or tipo =='inst_ansp':
-        ent_asn_ids = BlocoIP.objects.filter(proprietario__entidade__sigla="ANSP").values_list('asn', flat=True).distinct()
-        ent_proprietario_ids = BlocoIP.objects.filter(proprietario__entidade__sigla="ANSP").values_list('proprietario', flat=True).distinct()
-        ent_usuario_ids = BlocoIP.objects.filter(proprietario__entidade__sigla="ANSP").values_list('usuario', flat=True).distinct()
-        ent_designado_ids = BlocoIP.objects.filter(proprietario__entidade__sigla="ANSP").values_list('designado', flat=True).distinct()
+    if tipo == 'ansp' or tipo == 'inst_ansp':
+        ent_asn_ids = BlocoIP.objects.filter(proprietario__entidade__sigla="ANSP").values_list('asn', flat=True)\
+            .distinct()
+        ent_proprietario_ids = BlocoIP.objects.filter(proprietario__entidade__sigla="ANSP")\
+            .values_list('proprietario', flat=True).distinct()
+        ent_usuario_ids = BlocoIP.objects.filter(proprietario__entidade__sigla="ANSP")\
+            .values_list('usuario', flat=True).distinct()
+        ent_designado_ids = BlocoIP.objects.filter(proprietario__entidade__sigla="ANSP")\
+            .values_list('designado', flat=True).distinct()
     else:
         ent_asn_ids = BlocoIP.objects.values_list('asn', flat=True).distinct()
         ent_proprietario_ids = BlocoIP.objects.values_list('proprietario', flat=True).distinct()
@@ -268,13 +316,9 @@ def _blocos_ip_superbloco(request, tipo=None):
     filtro_designados = Entidade.objects.filter(id__in=ent_designado_ids)
 
     if len(request.GET) < 1:
-        return TemplateResponse(request, template, {
-                                                'tipo':tipo,
-                                                'filtro_asns':filtro_asns, 
-                                                'filtro_proprietario':filtro_proprietario,
-                                                'filtro_usuarios':filtro_usuarios, 
-                                                'filtro_designados':filtro_designados})
-
+        return TemplateResponse(request, template,
+                                {'tipo': tipo, 'filtro_asns': filtro_asns, 'filtro_proprietario': filtro_proprietario,
+                                 'filtro_usuarios': filtro_usuarios, 'filtro_designados': filtro_designados})
     else:
         # Buscando blocos filhos que são restritos pelos filtros
         blocos_filhos = BlocoIP.objects.all().filter(superbloco__isnull=False)
@@ -288,7 +332,8 @@ def _blocos_ip_superbloco(request, tipo=None):
             blocos_filhos = blocos_filhos.filter(designado__id=designado)
             
         # Buscando os superblocos dos filhos encontrados acima
-        blocos_com_filhos_filtrados = BlocoIP.objects.all().filter(id__in=blocos_filhos.values_list('superbloco__id', flat=True))
+        blocos_com_filhos_filtrados = BlocoIP.objects.all()\
+            .filter(id__in=blocos_filhos.values_list('superbloco__id', flat=True))
 #         if tipo == 'transito':
 #             blocos_com_filhos_filtrados = blocos_com_filhos_filtrados.filter(transito=True)
         
@@ -308,19 +353,18 @@ def _blocos_ip_superbloco(request, tipo=None):
         # combinando as duas listas
         # Obs: Fazendo o exclude no Union, para poder reaproveitar a queryset na geração do XLS,
         # que não deve incluir o 'bloco_com_filhos_filtrados' 
-        blocos = blocos_com_filhos_filtrados | blocos_filtrados.exclude(id__in = blocos_com_filhos_filtrados)
+        blocos = blocos_com_filhos_filtrados | blocos_filtrados.exclude(id__in=blocos_com_filhos_filtrados)
         if request.GET.get('porusuario'):
             blocos = blocos.order_by('usuario__sigla')
         else:
             blocos = blocos.order_by('ip', 'mask')
 
-        
         # Gerando o contexto para o template
         blocos_contexto = []
         for b in blocos:
             subnivel = []
-            for sb in blocos_filhos.filter(superbloco = b):
-                subnivel.append({'id':sb.id, 'obj':sb, 'netmask':sb.netmask, 'enabled':True})
+            for sb in blocos_filhos.filter(superbloco=b):
+                subnivel.append({'id': sb.id, 'obj': sb, 'netmask': sb.netmask, 'enabled': True})
 
             # O atributo 'enabled' serve para esconder os superblocos que não 
             # atendem ao filtro. Isso ocorre quando são encontrados itens somente nos filhos.
@@ -331,41 +375,40 @@ def _blocos_ip_superbloco(request, tipo=None):
                     (designado == '0' or (b.designado and str(b.designado.id) == designado)):
                 enabled = True
                 
-            blocos_contexto.append({'id':b.id, 'obj':b, 'subnivel':subnivel, 'netmask':b.netmask, 'enabled':enabled})
+            blocos_contexto.append({'id': b.id, 'obj': b, 'subnivel': subnivel, 'netmask': b.netmask,
+                                    'enabled': enabled})
 
-        if request.GET.get('xls') and request.GET.get('xls')=='1':
+        if request.GET.get('xls') and request.GET.get('xls') == '1':
             # Export para Excel/XLS
             # Obs: Não deve incluir o 'bloco_com_filhos_filtrados' pois
             # ele incluir os blocos pais mas que não satisfazem os filtros 
-            queryset = (blocos_filhos|blocos_filtrados)
+            queryset = (blocos_filhos | blocos_filtrados)
             
             if tipo == 'ansp':
                 queryset = queryset.filter(proprietario__entidade__sigla="ANSP")
              
             queryset = queryset.order_by('ip', 'mask')
-            dataset = BlocosIP_Rel_Lista_BlocoIP_Resource().export(queryset = queryset)
+            dataset = BlocosIP_Rel_Lista_BlocoIP_Resource().export(queryset=queryset)
             
             response = HttpResponse(dataset.xls, content_type='application/vnd.ms-excel;charset=utf-8')
             
             today = date.today()
             if tipo:
-                response['Content-Disposition'] = "attachment; filename=blocosip_%s_%d_%02d_%02d.xls" % (tipo, today.year, today.month, today.day)
+                response['Content-Disposition'] = "attachment; filename=blocosip_%s_%d_%02d_%02d.xls" %\
+                                                  (tipo, today.year, today.month, today.day)
             else:
-                response['Content-Disposition'] = "attachment; filename=blocosip_%d_%02d_%02d.xls" % (today.year, today.month, today.day)
+                response['Content-Disposition'] = "attachment; filename=blocosip_%d_%02d_%02d.xls" % \
+                                                  (today.year, today.month, today.day)
         
             return response
         
         elif request.GET.get('porusuario'):
-            return TemplateResponse(request, 'rede/blocosip.html.notree', {'blocos':blocos_contexto})
+            return TemplateResponse(request, 'rede/blocosip.html.notree', {'blocos': blocos_contexto})
         
-        return TemplateResponse(request, template, {
-                                                    'tipo':tipo,
-                                                    'blocos':blocos_contexto, 
-                                                    'filtro_asns':filtro_asns, 
-                                                    'filtro_proprietario':filtro_proprietario,
-                                                    'filtro_usuarios':filtro_usuarios, 
-                                                    'filtro_designados':filtro_designados})
-
+        return TemplateResponse(request, template,
+                                {'tipo': tipo, 'blocos': blocos_contexto, 'filtro_asns': filtro_asns,
+                                 'filtro_proprietario': filtro_proprietario, 'filtro_usuarios': filtro_usuarios,
+                                 'filtro_designados': filtro_designados})
 
 
 @login_required
@@ -374,11 +417,13 @@ def _blocos_ip_superbloco(request, tipo=None):
 def blocosip_transito(request):
     return _blocos_ip_continuo(request, 'rede/blocosip_transito.html', 'transito')
 
+
 @login_required
 @permission_required('rede.rel_tec_blocosip_inst_transito', raise_exception=True)
 @require_safe
 def blocosip_inst_transito(request):
     return _blocos_ip_continuo(request, 'rede/blocosip_inst_transito.html', 'inst_transito')
+
 
 @login_required
 @permission_required('rede.rel_tec_blocosip_inst_ansp', raise_exception=True)
@@ -408,16 +453,20 @@ def _blocos_ip_continuo(request, template, tipo=None):
     designado = request.GET.get('designado')
 
     # Filtro - lista de dados
-    if tipo =='transito' or tipo =='inst_transito':
+    if tipo == 'transito' or tipo == 'inst_transito':
         ent_asn_ids = BlocoIP.objects.filter(transito=True).values_list('asn', flat=True).distinct()
         ent_proprietario_ids = BlocoIP.objects.filter(transito=True).values_list('proprietario', flat=True).distinct()
         ent_usuario_ids = BlocoIP.objects.filter(transito=True).values_list('usuario', flat=True).distinct()
         ent_designado_ids = BlocoIP.objects.filter(transito=True).values_list('designado', flat=True).distinct()
-    elif tipo =='ansp' or tipo =='inst_ansp':
-        ent_asn_ids = BlocoIP.objects.filter(proprietario__entidade__sigla="ANSP").values_list('asn', flat=True).distinct()
-        ent_proprietario_ids = BlocoIP.objects.filter(proprietario__entidade__sigla="ANSP").values_list('proprietario', flat=True).distinct()
-        ent_usuario_ids = BlocoIP.objects.filter(proprietario__entidade__sigla="ANSP").values_list('usuario', flat=True).distinct()
-        ent_designado_ids = BlocoIP.objects.filter(proprietario__entidade__sigla="ANSP").values_list('designado', flat=True).distinct()
+    elif tipo == 'ansp' or tipo == 'inst_ansp':
+        ent_asn_ids = BlocoIP.objects.filter(proprietario__entidade__sigla="ANSP").\
+            values_list('asn', flat=True).distinct()
+        ent_proprietario_ids = BlocoIP.objects.filter(proprietario__entidade__sigla="ANSP")\
+            .values_list('proprietario', flat=True).distinct()
+        ent_usuario_ids = BlocoIP.objects.filter(proprietario__entidade__sigla="ANSP")\
+            .values_list('usuario', flat=True).distinct()
+        ent_designado_ids = BlocoIP.objects.filter(proprietario__entidade__sigla="ANSP")\
+            .values_list('designado', flat=True).distinct()
 
     filtro_asns = ASN.objects.filter(id__in=ent_asn_ids)
     filtro_proprietario = ASN.objects.filter(id__in=ent_proprietario_ids)
@@ -425,17 +474,13 @@ def _blocos_ip_continuo(request, template, tipo=None):
     filtro_designados = Entidade.objects.filter(id__in=ent_designado_ids)
 
     if len(request.GET) < 1:
-        return TemplateResponse(request, template, {
-                                                'tipo':tipo,
-                                                'filtro_asns':filtro_asns, 
-                                                'filtro_proprietario':filtro_proprietario,
-                                                'filtro_usuarios':filtro_usuarios, 
-                                                'filtro_designados':filtro_designados})
-
+        return TemplateResponse(request, template,
+                                {'tipo': tipo, 'filtro_asns': filtro_asns, 'filtro_proprietario': filtro_proprietario,
+                                 'filtro_usuarios': filtro_usuarios, 'filtro_designados': filtro_designados})
     else:
         # Buscando blocos filhos que são restritos pelos filtros
         blocos = BlocoIP.objects.all()
-        if tipo =='inst_transito' or tipo =='transito':
+        if tipo == 'inst_transito' or tipo == 'transito':
             blocos = blocos.filter(transito=True)
         if tipo == 'inst_ansp' or tipo == 'ansp':
             blocos = blocos.filter(proprietario__entidade__sigla="ANSP")
@@ -451,7 +496,7 @@ def _blocos_ip_continuo(request, template, tipo=None):
         # ordenando os blocos
         if tipo == 'inst_ansp' or tipo == 'ansp':
             blocos = blocos.order_by('usuario__sigla')
-        elif tipo =='inst_transito':
+        elif tipo == 'inst_transito':
             blocos = blocos.order_by('proprietario__entidade__sigla')
         else:  # tipo =='transito'
             blocos = blocos.order_by('ip', 'mask')
@@ -459,26 +504,24 @@ def _blocos_ip_continuo(request, template, tipo=None):
         # Gerando o contexto para o template
         blocos_contexto = []
         for b in blocos:
-            blocos_contexto.append({'id':b.id, 'obj':b, 'netmask':b.netmask})
+            blocos_contexto.append({'id': b.id, 'obj': b, 'netmask': b.netmask})
 
-        if request.GET.get('xls') and request.GET.get('xls')=='1':
+        if request.GET.get('xls') and request.GET.get('xls') == '1':
             # Export para Excel/XLS
             dataset = BlocosIP_Rel_Lista_Inst_BlocoIP_Resource().export(queryset=blocos)
             
             response = HttpResponse(dataset.xls, content_type='application/vnd.ms-excel;charset=utf-8')
             
             today = date.today()
-            response['Content-Disposition'] = "attachment; filename=blocosip_%s_%d_%02d_%02d.xls" % (tipo, today.year, today.month, today.day)
+            response['Content-Disposition'] = "attachment; filename=blocosip_%s_%d_%02d_%02d.xls" % \
+                                              (tipo, today.year, today.month, today.day)
 
             return response
         
-        return TemplateResponse(request, template, {
-                                                    'tipo':tipo,
-                                                    'blocos':blocos_contexto, 
-                                                    'filtro_asns':filtro_asns, 
-                                                    'filtro_proprietario':filtro_proprietario,
-                                                    'filtro_usuarios':filtro_usuarios, 
-                                                    'filtro_designados':filtro_designados})
+        return TemplateResponse(request, template,
+                                {'tipo': tipo, 'blocos': blocos_contexto, 'filtro_asns': filtro_asns,
+                                 'filtro_proprietario': filtro_proprietario, 'filtro_usuarios': filtro_usuarios,
+                                 'filtro_designados': filtro_designados})
 
 
 @login_required
@@ -492,25 +535,19 @@ def custo_terremark(request, pdf=0, xls=0):
      O relatório filtra implicitamente pela entidade Terremark.
  
     """
-    
     # Variável indicando o datacenter. Ex: 1 == terremark
-    datacenter_id = Variavel.objects.get(nome = Variavel.DATACENTER_IDS)
+    datacenter_id = Variavel.objects.get(nome=Variavel.DATACENTER_IDS)
     
     # Filtrando por Entidade
     recursos = Recurso.objects.filter(planejamento__os__contrato__entidade_id=datacenter_id.valor) \
-                              .order_by('planejamento__projeto__nome', \
-                                        'planejamento__tipo__nome', \
-                                        'planejamento__referente', \
-                                        'planejamento__os__numero', \
-                                        '-ano_referencia', \
-                                        '-mes_referencia')
+                              .order_by('planejamento__projeto__nome', 'planejamento__tipo__nome',
+                                        'planejamento__referente', 'planejamento__os__numero',
+                                        '-ano_referencia', '-mes_referencia')
     # Otimizando o queryset do relatorio
-    recursos = recursos.select_related('planejamento', 'planejamento__projeto', \
-                                       'planejamento__tipo', \
-                                       'planejamento__unidade', \
-                                       'planejamento__os', 'planejamento__os__contrato', \
-                                       'planejamento__os__tipo', \
-                                       'pagamento', 'pagamento__protocolo', 'pagamento__protocolo__termo')
+    recursos = recursos.select_related('planejamento', 'planejamento__projeto', 'planejamento__tipo',
+                                       'planejamento__unidade', 'planejamento__os', 'planejamento__os__contrato',
+                                       'planejamento__os__tipo', 'pagamento', 'pagamento__protocolo',
+                                       'pagamento__protocolo__termo')
     
     estado_selected = 0
     estado = request.GET.get('estado')
@@ -519,7 +556,7 @@ def custo_terremark(request, pdf=0, xls=0):
         estado_selected = int(request.GET.get('estado'))
         recursos = recursos.filter(planejamento__os__estado__id=estado_selected)
 
-    if request.GET.get('acao') and request.GET.get('acao')=='2':
+    if request.GET.get('acao') and request.GET.get('acao') == '2':
         # Export para Excel/XLS
         dataset = CustoTerremarkRecursoResource().export(queryset=recursos)
 
@@ -528,14 +565,15 @@ def custo_terremark(request, pdf=0, xls=0):
 
         return response
 
-    elif pdf or (request.GET.get('acao') and request.GET.get('acao')=='1'):
+    elif pdf or (request.GET.get('acao') and request.GET.get('acao') == '1'):
         # Export para PDF
-        return render_to_pdf_weasy(template_src='rede/tabela_terremark.pdf', context_dict={'recursos':recursos, 'estado_selected':estado_selected}, request=request, filename='custos_dos_recursos_contratados.pdf')
+        return render_to_pdf_weasy(template_src='rede/tabela_terremark.pdf',
+                                   context_dict={'recursos': recursos, 'estado_selected': estado_selected},
+                                   request=request, filename='custos_dos_recursos_contratados.pdf')
 
     return TemplateResponse(request, 'rede/tabela_terremark.html',
-                            {'recursos':recursos, 
-                             'filtro_estados':EstadoOS.objects.all(), 'estado_selected':estado_selected, 'estado':estado})
-
+                            {'recursos': recursos, 'filtro_estados': EstadoOS.objects.all(),
+                             'estado_selected': estado_selected, 'estado': estado})
 
 
 @login_required
@@ -548,16 +586,13 @@ def relatorio_recursos_operacional(request, pdf=0, xls=0):
     Relatório operacional para visualização dos recursos.
     """
     
-        # Variável indicando o datacenter. Ex: 1 == terremark
-    datacenter_id = Variavel.objects.get(nome = Variavel.DATACENTER_IDS)
+    # Variável indicando o datacenter. Ex: 1 == terremark
+    datacenter_id = Variavel.objects.get(nome=Variavel.DATACENTER_IDS)
     
     # Filtrando por Entidade
-    planejamentos = PlanejaAquisicaoRecurso.objects.filter(os__contrato__entidade_id=datacenter_id.valor) \
-                              .prefetch_related('beneficiado_set') \
-                              .select_related('os', 'os__estado', 'os__contrato', 'projeto', 'tipo') \
-                              .order_by('projeto__nome', \
-                                        'tipo__nome', \
-                                        'os__numero')
+    planejamentos = PlanejaAquisicaoRecurso.objects.filter(os__contrato__entidade_id=datacenter_id.valor)\
+        .prefetch_related('beneficiado_set').select_related('os', 'os__estado', 'os__contrato', 'projeto', 'tipo')\
+        .order_by('projeto__nome', 'tipo__nome', 'os__numero')
 
     estado_selected = 0
     
@@ -579,14 +614,11 @@ def relatorio_recursos_operacional(request, pdf=0, xls=0):
     # Restringindo a lista de dados do filtro de beneficiados de acordo com o 
     # filtro de Estado da OS selecionado 
     if estado and estado > '0':
-        filtro_beneficiados = Beneficiado.objects.filter(planejamento__os__estado__id=estado_selected) \
-                                          .distinct('entidade__nome') \
-                                          .order_by('entidade__nome') \
-                                          .select_related('entidade')
+        filtro_beneficiados = Beneficiado.objects.filter(planejamento__os__estado__id=estado_selected)\
+            .distinct('entidade__nome').order_by('entidade__nome').select_related('entidade')
     else:
-        filtro_beneficiados = Beneficiado.objects.all().distinct('entidade__nome') \
-                                          .order_by('entidade__nome') \
-                                          .select_related('entidade')
+        filtro_beneficiados = Beneficiado.objects.all().distinct('entidade__nome').order_by('entidade__nome')\
+            .select_related('entidade')
 
     # Montando os dados de contexto
     context_dict = []
@@ -603,19 +635,16 @@ def relatorio_recursos_operacional(request, pdf=0, xls=0):
         beneficiados = beneficiados.select_related('entidade', 'estado')
             
         for b in beneficiados:
-            beneficiado = {'id':b.id, 'entidade':b.entidade.nome, 'quantidade':b.quantidade, 'estado':b.estado}
+            beneficiado = {'id': b.id, 'entidade': b.entidade.nome, 'quantidade': b.quantidade, 'estado': b.estado}
             ctx_beneficiados.append(beneficiado)
 
         if beneficiado_selected == 0 or len(ctx_beneficiados) > 0:
-            ctx_planejamento = {'id':p.id, 'beneficiados':ctx_beneficiados, \
-                            'contrato':p.os.contrato,
-                            'os':p.os, \
-                            'classificacao':p.projeto, 'descricao':p.tipo, \
-                            'referente':p.referente, \
-                            'entidade':'', 'quantidade':p.quantidade, }
+            ctx_planejamento = {'id': p.id, 'beneficiados': ctx_beneficiados, 'contrato': p.os.contrato, 'os': p.os,
+                                'classificacao': p.projeto, 'descricao': p.tipo, 'referente': p.referente,
+                                'entidade': '', 'quantidade': p.quantidade, }
             context_dict.append(ctx_planejamento)
 
-    if request.GET.get('acao') and request.GET.get('acao')=='2':
+    if request.GET.get('acao') and request.GET.get('acao') == '2':
         # Export para Excel/XLS
         beneficiados = Beneficiado.objects.all()
         
@@ -625,9 +654,8 @@ def relatorio_recursos_operacional(request, pdf=0, xls=0):
         if estado and estado > '0':
             beneficiados = beneficiados.filter(planejamento__os__estado__id=estado_selected)
         
-        beneficiados = beneficiados.order_by('planejamento__projeto__nome', \
-                                            'planejamento__tipo__nome', \
-                                            'planejamento__os__numero')
+        beneficiados = beneficiados.order_by('planejamento__projeto__nome', 'planejamento__tipo__nome',
+                                             'planejamento__os__numero')
     
         dataset = RecursoOperacionalResource().export(queryset=beneficiados)
 
@@ -636,18 +664,16 @@ def relatorio_recursos_operacional(request, pdf=0, xls=0):
 
         return response
 
-    elif request.GET.get('acao') and request.GET.get('acao')=='1':
+    elif request.GET.get('acao') and request.GET.get('acao') == '1':
         # Export para PDF
-        return render_to_pdf_weasy(template_src='rede/recurso_operacional.pdf', context_dict={'planejamentos':context_dict,}, request=request, filename='recursos_tecnicos.pdf')
+        return render_to_pdf_weasy(template_src='rede/recurso_operacional.pdf',
+                                   context_dict={'planejamentos': context_dict}, request=request,
+                                   filename='recursos_tecnicos.pdf')
 
     return TemplateResponse(request, 'rede/recurso_operacional.html', 
-                            {'planejamentos':context_dict, 
-                             'filtro_estados':filtro_estados, 'estado_selected':estado_selected, 'estado':estado,
-                             'filtro_beneficiados':filtro_beneficiados, 'beneficiado_selected':beneficiado_selected, 'beneficiado':beneficiado})
-
-
-
-
+                            {'planejamentos': context_dict, 'filtro_estados': filtro_estados, 'estado': estado,
+                             'estado_selected': estado_selected, 'filtro_beneficiados': filtro_beneficiados,
+                             'beneficiado_selected': beneficiado_selected, 'beneficiado': beneficiado})
 
 
 @login_required
@@ -670,41 +696,36 @@ def crossconnection(request):
     filtro_projeto = CrossConnection.objects.order_by().values_list('ordemDeServico', flat=True).distinct()
 
     if len(request.GET) < 1:
-        return TemplateResponse(request, template, {
-                                                'filtro_rack':filtro_rack, 
-                                                'filtro_shelf':filtro_shelf,
-                                                'filtro_conector':filtro_conector, 
-                                                'filtro_projeto':filtro_projeto})
-
+        return TemplateResponse(request, template,
+                                {'filtro_rack': filtro_rack, 'filtro_shelf': filtro_shelf,
+                                 'filtro_conector': filtro_conector, 'filtro_projeto': filtro_projeto})
     else:
-        cross = CrossConnection.objects.all().order_by('origem__rack', 'origem__shelf', 'origem__porta', 'destino__rack','destino__shelf','destino__porta',)
+        cross = CrossConnection.objects.all().order_by('origem__rack', 'origem__shelf', 'origem__porta',
+                                                       'destino__rack', 'destino__shelf', 'destino__porta')
         
         # Filtrando o resultado
         if rack and rack != '0':
-            cross = cross.filter(Q(origem__rack=rack)|Q(destino__rack=rack))
+            cross = cross.filter(Q(origem__rack=rack) | Q(destino__rack=rack))
         if shelf and shelf != '0':
-            cross = cross.filter(Q(origem__shelf=shelf)|Q(destino__shelf=shelf))
+            cross = cross.filter(Q(origem__shelf=shelf) | Q(destino__shelf=shelf))
         if conector and conector != '0':
-            cross = cross.filter(Q(origem__tipoConector__sigla=conector)|Q(destino__tipoConector__sigla=conector))
+            cross = cross.filter(Q(origem__tipoConector__sigla=conector) | Q(destino__tipoConector__sigla=conector))
         if projeto and projeto != '0':
             cross = cross.filter(ordemDeServico=projeto)
         
-        if request.GET.get('xls') and request.GET.get('xls')=='1':
+        if request.GET.get('xls') and request.GET.get('xls') == '1':
             # Export para Excel/XLS
-            queryset = (cross)
-            dataset = CrossConnectionResource().export(queryset = queryset)
+            queryset = cross
+            dataset = CrossConnectionResource().export(queryset=queryset)
              
             response = HttpResponse(dataset.xls, content_type='application/vnd.ms-excel;charset=utf-8')
              
             today = date.today()
-            response['Content-Disposition'] = "attachment; filename=cross_connection_%d_%02d_%02d.xls" % (today.year, today.month, today.day)
+            response['Content-Disposition'] = "attachment; filename=cross_connection_%d_%02d_%02d.xls" % \
+                                              (today.year, today.month, today.day)
          
             return response
          
-        return TemplateResponse(request, template, {
-                                                'cross':cross,
-                                                'filtro_rack':filtro_rack, 
-                                                'filtro_shelf':filtro_shelf,
-                                                'filtro_conector':filtro_conector, 
-                                                'filtro_projeto':filtro_projeto})
-
+        return TemplateResponse(request, template,
+                                {'cross': cross, 'filtro_rack': filtro_rack, 'filtro_shelf': filtro_shelf,
+                                 'filtro_conector': filtro_conector, 'filtro_projeto': filtro_projeto})

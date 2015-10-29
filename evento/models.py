@@ -10,7 +10,6 @@ class Tipo(models.Model):
         return self.nome
 
 
-
 class Evento(models.Model):
     acordo = models.ForeignKey('outorga.Acordo', null=True, blank=True)
     tipo = models.ForeignKey('evento.Tipo')
@@ -18,12 +17,11 @@ class Evento(models.Model):
     descricao = models.CharField(_(u'Descrição'), max_length=200)
     inicio = models.DateTimeField(_(u'Início'))
     termino = models.DateTimeField(_(u'Término'))
-    url = models.URLField((u'URL'), null=True, blank=True)
+    url = models.URLField(u'URL', null=True, blank=True)
     obs = models.TextField(_(u'Observação'), null=True, blank=True)
 
     def __unicode__(self):
         return self.descricao
-
 
 
 class AreaPrograma(models.Model):
@@ -35,7 +33,6 @@ class AreaPrograma(models.Model):
     class Meta:
         verbose_name = _(u'Área do programa')
         verbose_name_plural = _(u'Áreas dos programas')
-
 
 
 class Sessao(models.Model):
@@ -56,7 +53,6 @@ class Sessao(models.Model):
         verbose_name_plural = _(u'Sessões')
 
 
-
 class Atribuicao(models.Model):
     membro = models.ForeignKey('membro.Membro')
     relatorio = models.FileField(u'Relatório', upload_to='evento', null=True, blank=True)
@@ -69,7 +65,6 @@ class Atribuicao(models.Model):
     class Meta:
         verbose_name = _(u'Atribuição')
         verbose_name_plural = _(u'Atribuições')
-
 
 
 class AreaOperacional(models.Model):

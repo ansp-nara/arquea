@@ -4,21 +4,17 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required, login_required
 from utils.decorators import login_required_or_403
-from django.core.urlresolvers import reverse
 from django.db.models import Max, Min
 from django.http import HttpResponseRedirect, Http404, HttpResponseForbidden, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
 from django.views.decorators.http import require_safe, require_POST
 
-from datetime import date, timedelta, datetime
-import calendar
-import logging
 import json as simplejson
 
 from forms import *
 from models import *
-from utils.functions import render_to_pdf
+
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
@@ -67,26 +63,27 @@ def controle(request):
         controle.saida = datetime.now()
     controle.save()
     messages.info(request, u'Sua %s foi registrada com sucesso.' % acao)
-    return HttpResponseRedirect(reverse('membro.views.observacao', kwargs={'id':controle.id}))
+    return HttpResponseRedirect(reverse('membro.views.observacao', kwargs={'id': controle.id}))
 
 
 @login_required
 def mensal(request, ano=2012, mes=7):
-    membro_ids = Controle.objects.filter(entrada__year=ano, entrada__month=mes).order_by('membro').values_list('membro', flat=True).distinct()
+    membro_ids = Controle.objects.filter(entrada__year=ano, entrada__month=mes).order_by('membro')\
+        .values_list('membro', flat=True).distinct()
     membros = Membro.objects.filter(id__in=membro_ids)
     from calendar import monthrange
     last_day = monthrange(int(ano), int(mes))[1]
-    dias = range(1,last_day+1)
+    dias = range(1, last_day+1)
     dados = []
     for m in membros:
         linha = [m.nome]
         controles = Controle.objects.filter(entrada__year=ano, entrada__month=mes, membro=m, saida__isnull=False)
         for dia in dias:
             min = sum([c.segundos for c in controles.filter(entrada__day=dia)], 0)/60
-            linha.append('%02d:%02d' % (min/60, min%60))
+            linha.append('%02d:%02d' % (min/60, min % 60))
         dados.append(linha)
 
-    return TemplateResponse(request, 'membro/mensal.html', {'dados':dados, 'dias':dias, 'ano':ano, 'mes':mes})
+    return TemplateResponse(request, 'membro/mensal.html', {'dados': dados, 'dias': dias, 'ano': ano, 'mes': mes})
 
 
 @login_required
@@ -94,8 +91,9 @@ def detalhes(request):
     membro = get_object_or_404(Membro, contato__email=request.user.email)
     agora = datetime.now()
 
-    return TemplateResponse(request, 'membro/detalhes.html', {'membro':membro, 'dados':Controle.objects.filter(membro=membro, entrada__month=agora.month)})
-
+    return TemplateResponse(request, 'membro/detalhes.html',
+                            {'membro': membro,
+                             'dados': Controle.objects.filter(membro=membro, entrada__month=agora.month)})
 
 
 @login_required
@@ -110,8 +108,8 @@ def mensal_func(request):
 
     if request.GET.get('ano') and funcionario != "-1":
         meses = []
-        membro = get_object_or_404(Membro,pk=funcionario)
-        if request.user.is_superuser == False and  request.user.email != membro.email: 
+        membro = get_object_or_404(Membro, pk=funcionario)
+        if request.user.is_superuser is False and request.user.email != membro.email:
             raise Http404
         
         ano = request.GET.get('ano')
@@ -130,12 +128,14 @@ def mensal_func(request):
             total_geral_banco_horas += m['total_banco_horas']
               
         if total_geral_banco_horas >= 0:
-            total_geral_banco_horas_str = '%2dh %02dmin' % (total_geral_banco_horas/3600, total_geral_banco_horas/60%60)
+            total_geral_banco_horas_str = '%2dh %02dmin' % (total_geral_banco_horas/3600,
+                                                            total_geral_banco_horas/60 % 60)
         else:
-            total_geral_banco_horas_str = '-%2dh %02dmin' % (-total_geral_banco_horas/3600, -total_geral_banco_horas/60%60)
+            total_geral_banco_horas_str = '-%2dh %02dmin' % (-total_geral_banco_horas/3600,
+                                                             -total_geral_banco_horas/60 % 60)
         total_geral_ferias = Ferias().total_dias_uteis_aberto(funcionario)
-        total_geral_ferias_str = '%2dh %02dmin' % (total_geral_ferias/3600, total_geral_ferias/60%60)
-#         
+        total_geral_ferias_str = '%2dh %02dmin' % (total_geral_ferias/3600, total_geral_ferias/60 % 60)
+
         meses = c.total_analitico_horas(ano, mes)
         
         total_banco_horas = 0
@@ -149,56 +149,63 @@ def mensal_func(request):
                         
             # total de horas trabalhadas
             total_horas += m['total']
-            total_str = '%2dh %02dmin' % (m['total']/3600, m['total']/60%60)
-            m.update({'total':total_str})
+            total_str = '%2dh %02dmin' % (m['total']/3600, m['total']/60 % 60)
+            m.update({'total': total_str})
              
             # as horas totais do período são as horas do total de dias do mes menos os finais de semana, ferias e dispensas
             total_horas_periodo += m['total_horas_periodo']
-            total_horas_periodo_str = '%2dh %02dmin' % (m['total_horas_periodo']/3600, m['total_horas_periodo']/60%60)
-            m.update({'total_horas_periodo':total_horas_periodo_str})
+            total_horas_periodo_str = '%2dh %02dmin' % (m['total_horas_periodo']/3600, m['total_horas_periodo']/60 % 60)
+            m.update({'total_horas_periodo': total_horas_periodo_str})
              
             total_horas_restante += m['total_horas_restante']
             if m['total_horas_restante'] >= 0:
-                total_horas_restante_str = '%02dh %02dmin' % (m['total_horas_restante']/3600.0, m['total_horas_restante']/60%60)
+                total_horas_restante_str = '%02dh %02dmin' % (m['total_horas_restante']/3600.0,
+                                                              m['total_horas_restante']/60 % 60)
             else:
-                total_horas_restante_str = '-%02dh %02dmin' % (-m['total_horas_restante']/3600.0, -m['total_horas_restante']/60%60)
-            m.update({'total_horas_restante':total_horas_restante_str})
+                total_horas_restante_str = '-%02dh %02dmin' % (-m['total_horas_restante']/3600.0,
+                                                               -m['total_horas_restante']/60 % 60)
+            m.update({'total_horas_restante': total_horas_restante_str})
             
             total_horas_ferias += m['total_horas_ferias']
-            total_horas_ferias_str = '%2dh %02dmin' % (m['total_horas_ferias']/3600, m['total_horas_ferias']/60%60)
-            m.update({'total_horas_ferias':total_horas_ferias_str})
+            total_horas_ferias_str = '%2dh %02dmin' % (m['total_horas_ferias']/3600, m['total_horas_ferias']/60 % 60)
+            m.update({'total_horas_ferias': total_horas_ferias_str})
             
             total_horas_dispensa += m['total_horas_dispensa']
-            total_horas_dispensa_str = '%2dh %02dmin' % (m['total_horas_dispensa']/3600, m['total_horas_dispensa']/60%60)
-            m.update({'total_horas_dispensa':total_horas_dispensa_str})
+            total_horas_dispensa_str = '%2dh %02dmin' % (m['total_horas_dispensa']/3600,
+                                                         m['total_horas_dispensa']/60 % 60)
+            m.update({'total_horas_dispensa': total_horas_dispensa_str})
             # soma horas extras somente dos meses que não forem o mês em andamento
             total_banco_horas += m['total_banco_horas']
             if m['total_banco_horas'] >= 0:
-                total_banco_horas_str = '%2dh %02dmin' % (m['total_banco_horas']/3600, m['total_banco_horas']/60%60)
+                total_banco_horas_str = '%2dh %02dmin' % (m['total_banco_horas']/3600, m['total_banco_horas']/60 % 60)
             else:
-                total_banco_horas_str = '-%2dh %02dmin' % (-m['total_banco_horas']/3600, -m['total_banco_horas']/60%60)
-            m.update({'total_banco_horas':total_banco_horas_str})
+                total_banco_horas_str = '-%2dh %02dmin' % (-m['total_banco_horas']/3600,
+                                                           -m['total_banco_horas']/60 % 60)
+            m.update({'total_banco_horas': total_banco_horas_str})
         
         if total_horas_restante >= 0:
-            total_horas_restante_str = '%2dh %02dmin' % (total_horas_restante/3600, total_horas_restante/60%60)
+            total_horas_restante_str = '%2dh %02dmin' % (total_horas_restante/3600, total_horas_restante/60 % 60)
         else:
-            total_horas_restante_str = '-%2dh %02dmin' % (-total_horas_restante/3600, -total_horas_restante/60%60)
+            total_horas_restante_str = '-%2dh %02dmin' % (-total_horas_restante/3600, -total_horas_restante/60 % 60)
              
         if total_banco_horas >= 0:
-            total_banco_horas_str = '%2dh %02dmin' % (total_banco_horas/3600, total_banco_horas/60%60)
+            total_banco_horas_str = '%2dh %02dmin' % (total_banco_horas/3600, total_banco_horas/60 % 60)
         else:
-            total_banco_horas_str = '-%2dh %02dmin' % (-total_banco_horas/3600, -total_banco_horas/60%60)
+            total_banco_horas_str = '-%2dh %02dmin' % (-total_banco_horas/3600, -total_banco_horas/60 % 60)
         
-        total_horas_str = '%2dh %02dmin' % (total_horas/3600, total_horas/60%60)
-        total_horas_periodo_str = '%2dh %02dmin' % (total_horas_periodo/3600, total_horas_periodo/60%60)
-        total_horas_dispensa_str = '%2dh %02dmin' % (total_horas_dispensa/3600, total_horas_dispensa/60%60)
-        total_horas_ferias_str = '%2dh %02dmin' % (total_horas_ferias/3600, total_horas_ferias/60%60)
+        total_horas_str = '%2dh %02dmin' % (total_horas/3600, total_horas/60 % 60)
+        total_horas_periodo_str = '%2dh %02dmin' % (total_horas_periodo/3600, total_horas_periodo/60 % 60)
+        total_horas_dispensa_str = '%2dh %02dmin' % (total_horas_dispensa/3600, total_horas_dispensa/60 % 60)
+        total_horas_ferias_str = '%2dh %02dmin' % (total_horas_ferias/3600, total_horas_ferias/60 % 60)
         
-        return TemplateResponse(request, 'membro/detalhe.html', {'meses':meses, 'membro':membro, 'total_banco_horas':total_banco_horas_str,
-                                'total_horas':total_horas_str, 'total_horas_periodo':total_horas_periodo_str,
-                                'total_horas_restante':total_horas_restante_str, 'total_horas_dispensa':total_horas_dispensa_str,
-                                'total_horas_ferias':total_horas_ferias_str,
-                                'total_geral_banco_horas':total_geral_banco_horas_str, 'total_geral_ferias':total_geral_ferias_str})
+        return TemplateResponse(request, 'membro/detalhe.html',
+                                {'meses': meses, 'membro': membro, 'total_banco_horas': total_banco_horas_str,
+                                 'total_horas': total_horas_str, 'total_horas_periodo': total_horas_periodo_str,
+                                 'total_horas_restante': total_horas_restante_str,
+                                 'total_horas_dispensa': total_horas_dispensa_str,
+                                 'total_horas_ferias': total_horas_ferias_str,
+                                 'total_geral_banco_horas': total_geral_banco_horas_str,
+                                 'total_geral_ferias': total_geral_ferias_str})
     else:
         hoje = datetime.now()
         anos = [0]+range(2012, hoje.year+1)
@@ -214,10 +221,11 @@ def mensal_func(request):
                 mes_inicio = entrada['entrada__min'].month
                 ano_fim = entrada['entrada__max'].year
                 mes_fim = entrada['entrada__max'].month
-                retorno.append({'funcionario':f, 'ano_inicio':ano_inicio, 'mes_inicio':mes_inicio,\
-                                      'ano_fim':ano_fim, 'mes_fim':mes_fim})
+                retorno.append({'funcionario': f, 'ano_inicio': ano_inicio, 'mes_inicio': mes_inicio,
+                                'ano_fim': ano_fim, 'mes_fim': mes_fim})
 
-        return TemplateResponse(request, 'membro/sel_func.html', {'anos':anos, 'meses':meses, 'funcionarios':retorno})
+        return TemplateResponse(request, 'membro/sel_func.html',
+                                {'anos': anos, 'meses': meses, 'funcionarios': retorno})
 
 
 @login_required
@@ -235,7 +243,7 @@ def observacao(request, id):
         return HttpResponseRedirect('/')
     else:
         f = ControleObs(instance=controle)
-        return TemplateResponse(request, 'membro/observacao.html', {'form':f})
+        return TemplateResponse(request, 'membro/observacao.html', {'form': f})
 
 
 @login_required_or_403
@@ -330,7 +338,6 @@ def ajax_controle_adicionar_tempo_inicial(request):
     return HttpResponse(json, content_type="application/json")
 
 
-
 @login_required
 @permission_required('membro.rel_adm_logs', raise_exception=True)
 @require_safe
@@ -343,7 +350,7 @@ def uso_admin(request):
     
     """
     if 'inicial' not in request.GET:
-        return TemplateResponse(request, 'admin/logs_escolha.html', {'anos':range(2008, datetime.now().year+1)})
+        return TemplateResponse(request, 'admin/logs_escolha.html', {'anos': range(2008, datetime.now().year+1)})
 
     inicial = request.GET.get('inicial')
     final = request.GET.get('final')
@@ -353,15 +360,18 @@ def uso_admin(request):
     except:
         raise Http404
         
-    user_ids = LogEntry.objects.filter(action_time__range=(date(inicial,1,1), date(final+1,1,1))).values_list('user', flat=True).order_by('user').distinct()
+    user_ids = LogEntry.objects.filter(action_time__range=(date(inicial, 1, 1), date(final+1, 1, 1)))\
+        .values_list('user', flat=True).order_by('user').distinct()
     emails = Membro.objects.values_list('email', flat=True).order_by('email').distinct()
     emails = list(emails)
-    if '' in emails: emails.remove('')
+    if '' in emails:
+        emails.remove('')
     user_ids = list(user_ids)
     users = []
     for u in user_ids:
         user = User.objects.get(id=u)
-        if user.email in emails: users.append(user)
+        if user.email in emails:
+            users.append(user)
         
     users.sort(key=lambda x: x.first_name)
         
@@ -374,10 +384,9 @@ def uso_admin(request):
         dados = []
         for ano in range(inicial, final+1):
             log_ano = log_user.filter(action_time__year=ano)
-            dados.append((ano, log_ano.filter(action_flag=1).count(), log_ano.filter(action_flag=2).count(), log_ano.filter(action_flag=3).count()))
+            dados.append((ano, log_ano.filter(action_flag=1).count(), log_ano.filter(action_flag=2).count(),
+                          log_ano.filter(action_flag=3).count()))
         user_return['dados'] = dados
         returned.append(user_return)
         
     return TemplateResponse(request, 'admin/logs.html', {'users':returned})
-
-

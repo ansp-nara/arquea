@@ -3,7 +3,7 @@
 from django import forms
 from django.forms.util import ErrorList
 from django.utils.translation import ugettext_lazy as _
-from models import Cotacao, TipoDocumento, Protocolo, Estado, Feriado, Arquivo, Descricao
+from models import Cotacao, TipoDocumento, Protocolo, Feriado, Arquivo, Descricao
 
 from outorga.models import Termo
 from identificacao.models import Entidade, Identificacao
@@ -14,89 +14,89 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-
-#class ContratoAdminForm(forms.ModelForm):
-
-    #"""
-    #Uma instância dessa classe faz algumas definições/limitações para a tela de cadastramento do modelo 'Contrato'.
-
-    #A função '__init__': Define o campo 'data_vencimento' como obrigatório no cadastramento de um Contrato.
-                        #Define um novo 'label' para o campo que indica o contrato anterior e permite selecionar como
-                        #'contrato anterior' os protocolos definidos como 'Contrato' ou 'Ordem de Serviço'
-                        #Define um novo 'label' para o campo 'identificacao'.
-                        #Limita a seleção do tipo do documento apenas para as opções 'Contrato' e 'Ordem de Serviço'.    
-    #Cria um campo 'entidade' para filtrar o campo identificação.
-    #A 'class Meta' define o modelo que será utilizado.
-    #"""
-
-
-    #entidade = forms.ModelChoiceField(Entidade.objects.all(), required=False,
-            #widget=forms.Select(attrs={'onchange': 'filter_select("id_identificacao", "id_entidade");'}))
-
-
-    #class Meta:
-        #model = Contrato
-
-
-    #class Media:
-        #js = ('/media/js/selects.js', '/media/js/protocolo.js')
-
-
-    ## Redefine os campos 'data_vencimento', 'protocolo', 'tipo_documento' e 'identificacao'.
-    #def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
-                #initial=None, error_class=ErrorList, label_suffix=':',
-                #empty_permitted=False, instance=None):
-
-        #super(ContratoAdminForm, self).__init__(data, files, auto_id, prefix, initial,
-                                            #error_class, label_suffix, empty_permitted, instance)
-
-        ## Define a data de vencimento como obrigatória.
-        #dv = self.fields['data_vencimento']
-        #dv.required = True
-        
-
-        ## Define novo 'label' para o campo do protocolo anterior e permite selecionar apenas 'Contrato'. 
-        #pt = self.fields['protocolo']
-        #pt.label = u'Contrato anterior'
-        #pt.queryset = Protocolo.objects.filter(tipo_documento__nome__in=[u'Contrato'])
-
-
-        ## Permite selecionar apenas as opções 'Contrato' e 'Ordem de Serviço' no tipo do documento.
-        #tp = self.fields['tipo_documento']
-        #tp.queryset = TipoDocumento.objects.filter(nome__in=[u'Contrato', u'Ordem de Serviço'])
-
-
-        ## Define novo 'label' para o campo da identificação.
-        #iden = self.fields['identificacao']
-        #iden.label = u'Contato'
-
+# class ContratoAdminForm(forms.ModelForm):
+#
+#     """
+#     Uma instância dessa classe faz algumas definições/limitações para a tela de cadastramento do modelo 'Contrato'.
+#
+#     A função '__init__': Define o campo 'data_vencimento' como obrigatório no cadastramento de um Contrato.
+#                         Define um novo 'label' para o campo que indica o contrato anterior e permite selecionar como
+#                         'contrato anterior' os protocolos definidos como 'Contrato' ou 'Ordem de Serviço'
+#                         Define um novo 'label' para o campo 'identificacao'.
+#                         Limita a seleção do tipo do documento apenas para as opções 'Contrato' e 'Ordem de Serviço'.
+#     Cria um campo 'entidade' para filtrar o campo identificação.
+#     A 'class Meta' define o modelo que será utilizado.
+#     """
+#
+#
+#     entidade = forms.ModelChoiceField(Entidade.objects.all(), required=False,
+#             widget=forms.Select(attrs={'onchange': 'filter_select("id_identificacao", "id_entidade");'}))
+#
+#
+#     class Meta:
+#         model = Contrato
+#
+#
+#     class Media:
+#         js = ('/media/js/selects.js', '/media/js/protocolo.js')
+#
+#
+#     # Redefine os campos 'data_vencimento', 'protocolo', 'tipo_documento' e 'identificacao'.
+#     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
+#                 initial=None, error_class=ErrorList, label_suffix=':',
+#                 empty_permitted=False, instance=None):
+#
+#         super(ContratoAdminForm, self).__init__(data, files, auto_id, prefix, initial,
+#                                             error_class, label_suffix, empty_permitted, instance)
+#
+#         # Define a data de vencimento como obrigatória.
+#         dv = self.fields['data_vencimento']
+#         dv.required = True
+#
+#
+#         # Define novo 'label' para o campo do protocolo anterior e permite selecionar apenas 'Contrato'.
+#         pt = self.fields['protocolo']
+#         pt.label = u'Contrato anterior'
+#         pt.queryset = Protocolo.objects.filter(tipo_documento__nome__in=[u'Contrato'])
+#
+#
+#         # Permite selecionar apenas as opções 'Contrato' e 'Ordem de Serviço' no tipo do documento.
+#         tp = self.fields['tipo_documento']
+#         tp.queryset = TipoDocumento.objects.filter(nome__in=[u'Contrato', u'Ordem de Serviço'])
+#
+#
+#         # Define novo 'label' para o campo da identificação.
+#         iden = self.fields['identificacao']
+#         iden.label = u'Contato'
 
 
 class CotacaoAdminForm(forms.ModelForm):
     """
     Uma instância dessa classe faz algumas definições para a tela de cadastramento do modelo 'Contacao'.
 
-    A função '__init__' Define um novo 'label' para o campo que indica o pedido anterior e permite selecionar como pedido
-                        anterior apenas os protocolos diferentes de 'Contrato' e 'Ordem de Serviço'.
+    A função '__init__' Define um novo 'label' para o campo que indica o pedido anterior e permite selecionar como
+                        pedido anterior apenas os protocolos diferentes de 'Contrato' e 'Ordem de Serviço'.
                         Define que o campo 'protocolo' será filtrado pelo campo 'termo'.
                         Define um novo 'label' para o campo 'identificacao'.
     Cria novos campos 'termo' para filtrar o campo 'protocolo'.
                       'entidade' para filtrar o campo 'identificacao'.
     A 'class Meta' define o modelo que será utilizado.
     """
-    termo = forms.ModelChoiceField(Termo.objects.all(),  
-            widget=forms.Select(attrs={'onchange': 'filter_select("id_protocolo", "id_termo");'}))
+    termo = forms.ModelChoiceField(Termo.objects.all(),
+                                   widget=forms.Select(
+                                       attrs={'onchange': 'filter_select("id_protocolo", "id_termo");'}))
 
     entidade = forms.ModelChoiceField(Entidade.objects.all(), required=False,
-            widget=forms.Select(attrs={'onchange': 'filter_select("id_identificacao", "id_entidade");'}))
+                                      widget=forms.Select(
+                                          attrs={'onchange': 'filter_select("id_identificacao", "id_entidade");'}))
 
     class Meta:
         model = Cotacao
-        fields = ['estado', 'termo', 'entidade', 'identificacao', 'descricao2', 'moeda_estrangeira', 'data_validade', 'data_chegada', 'origem', 'valor_total', 'obs', 'aceito', 'entrega', 'protocolo', 'parecer',]
+        fields = ['estado', 'termo', 'entidade', 'identificacao', 'descricao2', 'moeda_estrangeira', 'data_validade',
+                  'data_chegada', 'origem', 'valor_total', 'obs', 'aceito', 'entrega', 'protocolo', 'parecer']
 
     class Media:
         js = ('js/selects.js', 'js/protocolo.js')
-
 
     # Redefine os campos 'protocolo' e 'identificacao'.
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
@@ -104,7 +104,7 @@ class CotacaoAdminForm(forms.ModelForm):
                  empty_permitted=False, instance=None):
 
         super(CotacaoAdminForm, self).__init__(data, files, auto_id, prefix, initial,
-                                            error_class, label_suffix, empty_permitted, instance)
+                                               error_class, label_suffix, empty_permitted, instance)
 
         # Gera uma lista com os tipos de documento diferentes de 'Cotação', 'Contrato' e 'Ordem de Serviço'
         nomes = []
@@ -113,26 +113,30 @@ class CotacaoAdminForm(forms.ModelForm):
             if t.nome.lower() != u'contrato' and t.nome.lower() != u'ordem de serviço' and t.nome.lower() != u'cotação':
                 nomes.append(t.nome)
 
-
-        ## Define novo 'label' e permite selecionar protocolos diferentes de 'Cotação', 'Contrato' e 'Ordem de Serviço'.
-        #pt = self.fields['protocolo']
-        #pt.label = u'Pedido'
-        #pt.required = True
-        #pt.queryset = Protocolo.objects.filter(tipo_documento__nome__in=nomes)
-
+        # # Define novo 'label' e permite selecionar protocolos diferentes de 'Cotação', 'Contrato' e
+        # 'Ordem de Serviço'.
+        # pt = self.fields['protocolo']
+        # pt.label = u'Pedido'
+        # pt.required = True
+        # pt.queryset = Protocolo.objects.filter(tipo_documento__nome__in=nomes)
 
         # Define novo 'label' para o campo da identificação.
         iden = self.fields['identificacao']
         iden.label = u'Contato'
 
-        self.fields['protocolo'].choices = [('','---------')] + [(p.id, p.__unicode__()) for p in Protocolo.objects.all().prefetch_related('itemprotocolo_set').select_related('tipo_documento').order_by('data_vencimento')]
+        self.fields['protocolo'].choices = [('', '---------')] + \
+                                           [(p.id, p.__unicode__())
+                                            for p in Protocolo.objects.all().prefetch_related('itemprotocolo_set')
+                                               .select_related('tipo_documento').order_by('data_vencimento')]
         
-        self.fields['identificacao'].choices = [('','---------')] + [(p.id, p.__unicode__()) for p in Identificacao.objects.all().select_related('endereco', 'endereco__entidade', 'contato')]
+        self.fields['identificacao'].choices = [('', '---------')] + \
+                                               [(p.id, p.__unicode__())
+                                                for p in Identificacao.objects.all()
+                                                   .select_related('endereco', 'endereco__entidade', 'contato')]
         
-        self.fields['descricao2'].choices = [('','---------')] + [(p.id, p.__unicode__()) for p in Descricao.objects.all().select_related('entidade',)]
-
-        
-
+        self.fields['descricao2'].choices = [('', '---------')] + \
+                                            [(p.id, p.__unicode__())
+                                             for p in Descricao.objects.all().select_related('entidade',)]
 
 
 class ProtocoloAdminForm(forms.ModelForm):
@@ -147,18 +151,21 @@ class ProtocoloAdminForm(forms.ModelForm):
 #    entidade = forms.ModelChoiceField(Entidade.objects.all(), required=False,
 #            widget=forms.Select(attrs={'onchange': 'filter_select("id_identificacao", "id_entidade");'}))
 
-    #referencia = forms.ChoiceField(choices=[(obj['descricao'], obj['descricao']) for obj in Protocolo.objects.order_by().values('descricao').distinct()],
-            #label='Referente a', widget=forms.Select(attrs={'onchange':'referente("id_referencia", "id_descricao");'}))
+    # referencia = forms.ChoiceField(choices=[(obj['descricao'], obj['descricao']) for obj in
+    #  Protocolo.objects.order_by().values('descricao').distinct()],
+    # label='Referente a', widget=forms.Select(attrs={'onchange':'referente("id_referencia", "id_descricao");'}))
 
     class Meta:
         model = Protocolo
-        fields = ['data_chegada', 'origem', 'valor_total', 'obs', 'estado', 'termo', 'descricao2', 'tipo_documento', 'num_documento', 'moeda_estrangeira', 'referente', 'procedencia', 'data_validade', 'data_vencimento', 'responsavel',]
+        fields = ['data_chegada', 'origem', 'valor_total', 'obs', 'estado', 'termo', 'descricao2', 'tipo_documento',
+                  'num_documento', 'moeda_estrangeira', 'referente', 'procedencia', 'data_validade', 'data_vencimento',
+                  'responsavel']
 
     class Media:
         js = ('js/selects.js', 'js/protocolo.js',)
-        
 
-    # Verifica se o termo do protocolo é o mesmo termo do item do pedido de outorga relacionada a despesa desse protocolo.
+    # Verifica se o termo do protocolo é o mesmo termo do item do pedido de outorga relacionada a despesa
+    # desse protocolo.
 #    def clean(self):
 #        cleaned_data = self.cleaned_data
 #        termo1 = cleaned_data['termo']
@@ -177,10 +184,10 @@ class ProtocoloAdminForm(forms.ModelForm):
 #                    termo2 = item.natureza_gasto.outorga.termo
 
 #                    if termo1 != termo2:
-#                        raise forms.ValidationError(_(u'Este protocolo possui despesa atrelada a outro termo de outorga'))
+#                        raise forms.ValidationError(_(u'Este protocolo possui despesa atrelada a
+# outro termo de outorga'))
 
 #        return cleaned_data
-
 
     # Redefine o campo 'protocolo'.
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
@@ -189,10 +196,10 @@ class ProtocoloAdminForm(forms.ModelForm):
 
         termos = Termo.objects.order_by('-ano')
         if termos and not instance:
-            initial = {'termo':termos[0].id}
+            initial = {'termo': termos[0].id}
 
         super(ProtocoloAdminForm, self).__init__(data, files, auto_id, prefix, initial,
-                                            error_class, label_suffix, empty_permitted, instance)
+                                                 error_class, label_suffix, empty_permitted, instance)
 
         # Gera uma lista com os tipos de documento diferentes de 'Contrato' e 'Ordem de Serviço'
         nomes = []
@@ -201,10 +208,9 @@ class ProtocoloAdminForm(forms.ModelForm):
             if t.nome.lower() != u'contrato' and t.nome.lower() != u'ordem de serviço' and t.nome.lower() != u'cotação':
                 nomes.append(t.nome)
 
-
         # Permite selecionar protocolos diferentes de 'Contrato', 'Ordem de Serviço' e 'Cotação'. 
-        #pt = self.fields['protocolo']
-        #pt.queryset = Protocolo.objects.filter(tipo_documento__nome__in=nomes)
+        # pt = self.fields['protocolo']
+        # pt.queryset = Protocolo.objects.filter(tipo_documento__nome__in=nomes)
 
 
 class ItemAdminForm(forms.ModelForm):
@@ -216,14 +222,14 @@ class ItemAdminForm(forms.ModelForm):
 class FeriadoAdminForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super(FeriadoAdminForm, self).clean()
-
         feriado = self.cleaned_data.get('feriado')
-
         tipo = self.cleaned_data.get('tipo')
 
         # Verifica se um feriado fixo ocorre na data especificada do tipo de feriado
         if tipo and not tipo.movel and (tipo.dia != feriado.day or tipo.mes != feriado.month):
-            self._errors["tipo"] = self.error_class([u"Feriado fixo deve ser no mesmo dia/mês especificado no tipo do feriado. Este feriado ocorre no dia %s/%s" % (tipo.dia, tipo.mes)])
+            self._errors["tipo"] = self.error_class([u"Feriado fixo deve ser no mesmo dia/mês especificado no tipo do "
+                                                     u"feriado. Este feriado ocorre no dia %s/%s" %
+                                                     (tipo.dia, tipo.mes)])
             del cleaned_data["tipo"]
 
         fid = self.cleaned_data.get('id')
@@ -254,25 +260,23 @@ class TipoFeriadoAdminForm(forms.ModelForm):
         return self.cleaned_data
 
 
-
 class ArquivoAdminForm(forms.ModelForm):
     
     protocolo = forms.ModelChoiceField(Protocolo.objects.all().select_related('tipo_documento'))
 
     class Meta:
         model = Arquivo
-        fields = ['protocolo', 'arquivo',]
+        fields = ['protocolo', 'arquivo']
 
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=':',
                  empty_permitted=False, instance=None):
 
-        super(ArquivoAdminForm, self).__init__(data, files, auto_id, prefix, initial,
-                                            error_class, label_suffix, empty_permitted, instance)
         if instance:
             if initial:
-                initial.update({'protocolo':instance.protocolo})
+                initial.update({'protocolo': instance.protocolo})
             else:
-                initial = {'protocolo':instance.protocolo}
+                initial = {'protocolo': instance.protocolo}
 
-
+        super(ArquivoAdminForm, self).__init__(data, files, auto_id, prefix, initial,
+                                               error_class, label_suffix, empty_permitted, instance)

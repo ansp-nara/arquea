@@ -1,24 +1,24 @@
 # -*- coding: utf-8 -*-
 
-import urllib2, urllib
+import urllib2
+import urllib
 import cookielib
 from django.core.management.base import BaseCommand, CommandError
-from financeiro.models import *
 from outorga.models import Termo
-import sys
 import time
 import re
 import getpass
 
-TIPOS = {'STB':'STC',
-         'DET':'STR',
-         'MCN':'MCS',
-         'MPN':'MPE',
-         'DIA':'MNT',
-         'REL':'REL'}
+TIPOS = {'STB': 'STC',
+         'DET': 'STR',
+         'MCN': 'MCS',
+         'MPN': 'MPE',
+         'DIA': 'MNT',
+         'REL': 'REL'}
 
 mods = ['STB', 'DET', 'MCN', 'MPN', 'REL', 'DIA']
-     
+
+
 class Command(BaseCommand):
     args = '<processo parcial usuario>'
     help = u'Envia as informações de prestação de contas para o sistema Agilis'
@@ -53,12 +53,12 @@ class Command(BaseCommand):
         data = urllib.urlencode([('username', args[2]), ('password', password)])
         req = urllib2.Request(url='http://internet.aquila.fapesp.br/agilis/Login.do', data=data)
         urllib2.urlopen(req)
-        urllib2.urlopen('http://internet.aquila.fapesp.br/agilis/Solicitacao.do?method=prepararAcao&processo=%s&redirectPC=redirectPC' % args[0])
-        urllib2.urlopen('http://internet.aquila.fapesp.br/agilis/Pconline.do?method=iniciar&solicitacao=49&processo=%s' % args[0])
+        urllib2.urlopen('http://internet.aquila.fapesp.br/agilis/Solicitacao.do?'
+                        'method=prepararAcao&processo=%s&redirectPC=redirectPC' % args[0])
+        urllib2.urlopen('http://internet.aquila.fapesp.br/agilis/Pconline.do?'
+                        'method=iniciar&solicitacao=49&processo=%s' % args[0])
 
-
-
-        vezes = 0    
+        vezes = 0
         for m in mods:
                 
             params = [('processo', args[0]), ('parcial', parcial), ('Prosseguir', 'Prosseguir')]
@@ -67,7 +67,8 @@ class Command(BaseCommand):
             else:
                 params += [('tipoPrestacao', 'PRN'), ('tipoDespesa', TIPOS[m])]
             data = urllib.urlencode(params)
-            req = urllib2.Request(url='http://internet.aquila.fapesp.br/agilis/PconlineSelecao.do?method=pesquisar', data=data)
+            req = urllib2.Request(url='http://internet.aquila.fapesp.br/agilis/PconlineSelecao.do?method=pesquisar',
+                                  data=data)
             p = urllib2.urlopen(req)
 
             data = urllib.urlencode([('method', 'Excluir')])
@@ -87,10 +88,10 @@ class Command(BaseCommand):
                     tp = 'Mpe'
                 else:
                     tp = 'Oud'
-                req = urllib2.Request(url='http://internet.aquila.fapesp.br/agilis/PconlineExclui%s.do?method=Excluir&id=%s' % (tp,n))
+                req = urllib2.Request(url='http://internet.aquila.fapesp.br/agilis/PconlineExclui%s.do?'
+                                          'method=Excluir&id=%s' % (tp, n))
                 p3 = urllib2.urlopen(req)
                 vezes += 1
                 if vezes % 10 == 0: 
                     print ('Esperando...')
                     time.sleep(60)
-                            

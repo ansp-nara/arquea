@@ -1,4 +1,4 @@
-from django.template import loader, RequestContext, Context, Template
+from django.template import loader, RequestContext
 from django.http import HttpResponse, HttpResponseRedirect
 from django.utils.translation import ugettext as _
 from functools import update_wrapper
@@ -10,8 +10,9 @@ from django.contrib.admin import helpers
 from django.utils.text import capfirst
 from django.utils.html import escape
 from django.contrib import admin
-from django.http import QueryDict, Http404
+from django.http import Http404
 from django.core.exceptions import PermissionDenied
+
 
 class Button(object):
     def __init__(self, url, desc, kls=None, saveOnClick=True, forAll=False, display=True, needSuperUser=True):
@@ -47,6 +48,7 @@ class Button(object):
         else:
             self.show = True
 
+
 class ButtonAdminMixin(object):
     def tool_urls(self):
         """Mostly copied from django.contrib.admin.ModelAdmin.get_urls"""
@@ -65,14 +67,13 @@ class ButtonAdminMixin(object):
             urls.append(
                 url(r'^(.+)/tool_%s/$' % button.url,
                     wrap(self.button_url),
-                    kwargs = dict(button=button),
-                    name = '%s_%s_tool_%%s' % info % button.url,
+                    kwargs=dict(button=button),
+                    name='%s_%s_tool_%%s' % info % button.url,
+                    )
                 )
-            )
 
         urlpatterns = patterns('', *urls)
         return urlpatterns
-
 
     def button_url(self, request, object_id, button):
 
@@ -93,13 +94,14 @@ class ButtonAdminMixin(object):
             'object': obj,
             'root_path': self.admin_site.root_path,
             'app_label': app_label,
-            'bread_title' : button.desc,
+            'bread_title': button.desc,
         }
         context.update(extra or {})
 
         t = loader.get_template(File)
         c = RequestContext(request, context)
         return HttpResponse(t.render(c))
+
 
 class ButtonAdmin(admin.ModelAdmin, ButtonAdminMixin):
     """Unfortunately I can't add these to the mixin, but I still want to have the mixin stuff as a mixin"""
@@ -109,7 +111,7 @@ class ButtonAdmin(admin.ModelAdmin, ButtonAdminMixin):
             extra_context = {}
 
         [b.determineIfShow(request.user) for b in self.buttons]
-        extra_context['buttons']=self.buttons
+        extra_context['buttons'] = self.buttons
 
         return super(ButtonAdmin, self).changelist_view(request, extra_context=extra_context)
 
@@ -118,9 +120,10 @@ class ButtonAdmin(admin.ModelAdmin, ButtonAdminMixin):
             extra_context = {}
 
         [b.determineIfShow(request.user) for b in self.buttons]
-        extra_context['buttons']=self.buttons
+        extra_context['buttons'] = self.buttons
 
-        result = super(ButtonAdmin, self).change_view(request, object_id, form_url=form_url, extra_context=extra_context)
+        result = super(ButtonAdmin, self).change_view(request, object_id, form_url=form_url,
+                                                      extra_context=extra_context)
 
         redirect = None
         for key in request.POST.keys():
@@ -130,7 +133,7 @@ class ButtonAdmin(admin.ModelAdmin, ButtonAdminMixin):
         if not redirect:
             return result
         else:
-            #a lot of this is copied from django.contrib.admin.ModelAdmin.change_view
+            # a lot of this is copied from django.contrib.admin.ModelAdmin.change_view
             model = self.model
             opts = model._meta
 
@@ -146,9 +149,10 @@ class ButtonAdmin(admin.ModelAdmin, ButtonAdminMixin):
                 raise PermissionDenied
 
             if obj is None:
-                raise Http404(_('%(name)s object with primary key %(key)r does not exist.') % {'name': force_unicode(opts.verbose_name), 'key': escape(object_id)})
+                raise Http404(_('%(name)s object with primary key %(key)r does not exist.') %
+                              {'name': force_unicode(opts.verbose_name), 'key': escape(object_id)})
 
-            if request.method == 'POST' and request.POST.has_key("_saveasnew"):
+            if request.method == 'POST' and "_saveasnew" in request.POST:
                 return self.add_view(request, form_url='../add/')
 
             ModelForm = self.get_form(request, obj)
@@ -169,11 +173,10 @@ class ButtonAdmin(admin.ModelAdmin, ButtonAdminMixin):
                         prefix = "%s-%s" % (prefix, prefixes[prefix])
 
                     try:
-                        formset = FormSet(request.POST, request.FILES,
-                                      instance=None, prefix=prefix)
+                        formset = FormSet(request.POST, request.FILES, instance=None, prefix=prefix)
                         formsets.append(formset)
                     except:
-                        #Deleted items can cause this to fail.
+                        # Deleted items can cause this to fail.
                         pass
 
                 errors = helpers.AdminErrorList(form, formsets)

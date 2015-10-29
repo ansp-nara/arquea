@@ -21,7 +21,7 @@ def verifica(request):
 def serve_files(request, filename):
  
     # evita que o usuario tente acessar qualquer arquivo do sistema
-    filename = filename.replace('..','')
+    filename = filename.replace('..', '')
 
     path = '%s/%s' % (settings.MEDIA_ROOT, filename)
 

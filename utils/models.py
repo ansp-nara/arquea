@@ -1,10 +1,12 @@
 from django.db import models
 import forms
 
+
 class CNPJField(models.CharField):
     """
     """
     empty_strings_allowed = False
+
     def __init__(self, *args, **kwargs):
         kwargs['max_length'] = 18
         models.CharField.__init__(self, *args, **kwargs)
@@ -34,4 +36,3 @@ class NARADateField(models.DateField):
         else:
             data = datetime_safe.new_date(val).strftime("%d/%m/%Y")
         return data
-

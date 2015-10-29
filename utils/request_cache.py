@@ -4,9 +4,11 @@ from django.core.cache.backends.locmem import LocMemCache
 _request_cache = {}
 _installed_middleware = False
 
+
 def get_request_cache():
     assert _installed_middleware, 'RequestCacheMiddleware not loaded'
     return _request_cache[currentThread()]
+
 
 # LocMemCache is a threadsafe local memory cache
 class RequestCache(LocMemCache):
@@ -14,6 +16,7 @@ class RequestCache(LocMemCache):
         name = 'locmemcache@%i' % hash(currentThread())
         params = dict()
         super(RequestCache, self).__init__(name, params)
+
 
 class RequestCacheMiddleware(object):
     def __init__(self):

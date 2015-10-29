@@ -3,13 +3,12 @@
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.admin import SimpleListFilter
-from identificacao.models import Entidade
 from utils.functions import clone_objects
 from import_export.admin import ExportMixin
 
-from models import *
 from modelsResource import *
-from forms import *
+from .forms import *
+from identificacao.models import Entidade
 
 
 class DesignadoFilter(SimpleListFilter):
@@ -21,10 +20,12 @@ class DesignadoFilter(SimpleListFilter):
         return [(e.id, e.sigla) for e in Entidade.objects.filter(id__in=entidade_ids)]
 
     def queryset(self, request, queryset):
-        id=self.value()
+        id = self.value()
         if id:
             return queryset.filter(designado__id__exact=id)
-        else: return queryset
+        else:
+            return queryset
+
 
 class UsuarioFilter(SimpleListFilter):
     title = u'usado por'
@@ -35,10 +36,12 @@ class UsuarioFilter(SimpleListFilter):
         return [(e.id, e.sigla) for e in Entidade.objects.filter(id__in=entidade_ids)]
 
     def queryset(self, request, queryset):
-        id=self.value()
+        id = self.value()
         if id:
             return queryset.filter(usuario__id__exact=id)
-        else: return queryset
+        else:
+            return queryset
+
 
 class SuperblocoFilter(SimpleListFilter):
     title = 'tipo de bloco'
@@ -52,25 +55,28 @@ class SuperblocoFilter(SimpleListFilter):
             return queryset.filter(superbloco__isnull=True)
         return queryset
 
+
 class BlocoIPAdmin(ExportMixin, admin.ModelAdmin):
     resource_class = BlocosIPResource
     form = BlocoIPAdminForm
     
     fieldsets = (
         (None, {
-            'fields': (('ip', 'mask', 'net_mask', 'transito'), ('asn', 'proprietario'), ('designado', 'usuario'), ('superbloco', 'rir'), 'obs'),
+            'fields': (('ip', 'mask', 'net_mask', 'transito'), ('asn', 'proprietario'), ('designado', 'usuario'),
+                       ('superbloco', 'rir'), 'obs'),
             'classes': ('wide',)
             }
-        ),
-        )
+         ),
+    )
     
-    list_display = ('cidr', 'asn_anunciante_numero', 'asn_anunciante_sigla', \
+    list_display = ('cidr', 'asn_anunciante_numero', 'asn_anunciante_sigla',
                     'asn_proprietario_numero', 'asn_proprietario_sigla', 'usu', 'desig', 'rir', 'transito')
-    search_fields = ('ip', 'asn__numero', 'asn__entidade__sigla', 'proprietario__numero', \
+    search_fields = ('ip', 'asn__numero', 'asn__entidade__sigla', 'proprietario__numero',
                      'proprietario__entidade__sigla', 'usuario__sigla', 'designado__sigla', 'obs')
     list_filter = (SuperblocoFilter, 'asn', 'proprietario', DesignadoFilter, UsuarioFilter)
     ordering = ['ip', 'asn__entidade__sigla', 'proprietario']
-    admin_order_field = ['ip', 'asn__entidade__sigla', 'proprietario__entidade__sigla', 'usuario', 'designado', 'rir', 'transito']
+    admin_order_field = ['ip', 'asn__entidade__sigla', 'proprietario__entidade__sigla', 'usuario', 'designado', 'rir',
+                         'transito']
     
     def get_export_queryset(self, request):
         """
@@ -81,89 +87,88 @@ class BlocoIPAdmin(ExportMixin, admin.ModelAdmin):
 
     def asn_anunciante_numero(self, obj):
         if obj.asn:
-            return ("%d" % (obj.asn.numero))
+            return "%d" % obj.asn.numero
         return '-'
     asn_anunciante_numero.short_description = 'ASN Anunciante'
     asn_anunciante_numero.admin_order_field = 'asn__numero'
 
     def asn_anunciante_sigla(self, obj):
         if obj.asn and obj.asn.entidade:
-            return ("%s" % (obj.asn.entidade.sigla))
+            return "%s" % obj.asn.entidade.sigla
         return '-'
     asn_anunciante_sigla.short_description = 'Anunciante'
     asn_anunciante_sigla.admin_order_field = 'asn__entidade__sigla'
 
     def asn_proprietario_numero(self, obj):
         if obj.proprietario:
-            return ("%d" % (obj.proprietario.numero))
+            return "%d" % obj.proprietario.numero
         return '-'
     asn_proprietario_numero.short_description = 'ASN Proprietário'
     asn_proprietario_numero.admin_order_field = 'proprietario__numero'
 
     def asn_proprietario_sigla(self, obj):
         if obj.proprietario and obj.proprietario.entidade:
-            return ("%s" % (obj.proprietario.entidade.sigla))
+            return "%s" % obj.proprietario.entidade.sigla
         return '-'
     asn_proprietario_sigla.short_description = 'Proprietário'
     asn_proprietario_sigla.admin_order_field = 'proprietario__entidade__sigla'
 
 
-
 class SegmentoInline(admin.StackedInline):
     fieldsets = (
         (None, {
-            'fields': (('operadora', 'banda', 'link_redundante'), ('data_ativacao', 'data_desativacao', 'uso', 'sistema', 'canal'), ('designacao', 'interfaces'), 'obs'),
+            'fields': (('operadora', 'banda', 'link_redundante'),
+                       ('data_ativacao', 'data_desativacao', 'uso', 'sistema', 'canal'),
+                       ('designacao', 'interfaces'), 'obs'),
             'classes': ('wide',)
             }
-        ),
+         ),
         )
     model = Segmento
     extra = 1
+
 
 class EnlaceAdmin(admin.ModelAdmin):
     search_fields = ('participante__entidade__sigla',)
 
     inlines = [SegmentoInline]
-    #list_display = ('participante_display', 'entrada_display', 'banda', 'operadora')
+    # list_display = ('participante_display', 'entrada_display', 'banda', 'operadora')
+
 
 class RecursoAdmin(admin.ModelAdmin):
     form = RecursoAdminForm
 
     fieldsets = (
-                (None, {
-                    'fields': ('planejamento', 
-                              ('termo', 'pagamento'), 
-                              'obs', 
-                              ('quantidade', 'mes_referencia', 'ano_referencia'), 
-                              ('valor_imposto_mensal', 'valor_mensal_sem_imposto'),),
-                    'classes': ('wide',)
-                    }
-                ),
-                )
+        (None, {
+            'fields': ('planejamento', ('termo', 'pagamento'), 'obs',
+                       ('quantidade', 'mes_referencia', 'ano_referencia'),
+                       ('valor_imposto_mensal', 'valor_mensal_sem_imposto'),),
+            'classes': ('wide',)
+        }),
+    )
+
 
 class BeneficiadoInline(admin.TabularInline):
     model = Beneficiado
     extra = 2
 
+
 class PlanejaAquisicaoRecursoAdmin(admin.ModelAdmin):
 
     form = PlanejaAquisicaoRecursoAdminForm
     fieldsets = (
-                (None, {
-                        'fields': (('os', 'ano'), ('tipo', 'referente'), ('quantidade', 'valor_unitario'), ('projeto', 'unidade', 'instalacao'), 'banda', 'obs'),
-                        'classes': ('wide',)
-                        }
-                ),
-                )
+        (None, {
+            'fields': (('os', 'ano'), ('tipo', 'referente'), ('quantidade', 'valor_unitario'),
+                       ('projeto', 'unidade', 'instalacao'), 'banda', 'obs'),
+            'classes': ('wide',)
+        }),
+    )
     list_display = ('projeto', 'quantidade', 'tipo', 'os', 'referente', 'valor_unitario', 'instalacao')
-
     actions = ['action_clone']
-    
     search_fields = ('os__numero', 'referente', 'tipo__nome')
-
     inlines = [BeneficiadoInline]
     
-    def action_clone(self,request,queryset):
+    def action_clone(self, request, queryset):
         for obj in queryset:
             bs = obj.beneficiado_set.all()
             obj.pk = None
@@ -174,10 +179,11 @@ class PlanejaAquisicaoRecursoAdmin(admin.ModelAdmin):
                 b.planejamento = obj
                 b.save()
     action_clone.short_description = u'Clonar Planejamentos selecionados'
-    
+
+
 class TipoServicoAdmin(admin.ModelAdmin):
 
-    actions = ['action_clone',]
+    actions = ['action_clone']
     
     def action_clone(self, request, queryset):
         objs = clone_objects(queryset)
@@ -194,7 +200,7 @@ class TipoServicoAdmin(admin.ModelAdmin):
 class TipoConectorAdmin(admin.ModelAdmin):
     list_display = ('sigla', )
     search_fields = ('sigla',)
-    ordering = ['sigla',]
+    ordering = ['sigla']
     
 
 class TipoConectorFilter(SimpleListFilter):
@@ -209,20 +215,19 @@ class TipoConectorFilter(SimpleListFilter):
         id=self.value()
         if id:
             return queryset.filter(tipoConector__id__exact=id)
-        else: return queryset
+        else:
+            return queryset
         
         
 class IFCConectorAdmin(ExportMixin, admin.ModelAdmin):
     form = IFCConectorAdminForm
     
-    fieldsets = ((None, {
-                    'fields': (('rack', 'shelf', 'porta'),
-                              'tipoConector',
-                              'ativo', 
-                              'obs', ),
-                    'classes': ('wide',)
-                    }
-                ),)
+    fieldsets = (
+        (None, {
+            'fields': (('rack', 'shelf', 'porta'), 'tipoConector', 'ativo', 'obs', ),
+            'classes': ('wide',)
+        }),
+    )
 
     list_display = ('rack', 'shelf', 'porta', 'tipoConector', 'ativo')
     search_fields = ('rack', 'porta', 'tipoConector__sigla')
@@ -235,14 +240,15 @@ class OrigemRackFilter(SimpleListFilter):
     
     def lookups(self, request, model_admin):
         racks = CrossConnection.objects.values_list('origem__rack', flat=True).distinct().order_by()
-        return [(e, e) for e in IFCConector.objects.filter(rack__in=racks).values_list('rack', flat=True).distinct().order_by()]
+        return [(e, e) for e in IFCConector.objects.filter(rack__in=racks).values_list('rack', flat=True)
+                .distinct().order_by()]
 
     def queryset(self, request, queryset):
         rack = self.value()
         if rack:
             return queryset.filter(origem__rack__exact=rack)
-        else: return queryset
-
+        else:
+            return queryset
 
 
 class DestinoRackFilter(SimpleListFilter):
@@ -251,13 +257,15 @@ class DestinoRackFilter(SimpleListFilter):
     
     def lookups(self, request, model_admin):
         racks = CrossConnection.objects.values_list('destino__rack', flat=True).distinct().order_by()
-        return [(e, e) for e in IFCConector.objects.filter(rack__in=racks).values_list('rack', flat=True).distinct().order_by()]
+        return [(e, e) for e in IFCConector.objects.filter(rack__in=racks).values_list('rack', flat=True)
+                .distinct().order_by()]
 
     def queryset(self, request, queryset):
         rack = self.value()
         if rack:
             return queryset.filter(destino__rack__exact=rack)
-        else: return queryset
+        else:
+            return queryset
         
 
 class CrossConnectionAdmin(ExportMixin, admin.ModelAdmin):
@@ -265,27 +273,21 @@ class CrossConnectionAdmin(ExportMixin, admin.ModelAdmin):
     form = CrossConnectionAdminForm
     
     fieldsets = (
-                 ('IFC', {
-                      'fields': ('origem', 'destino'),
-                      'classes': ('wide',)
-                 }),
-                 ('Descrição', {
-                      'fields': ('circuito', 'ordemDeServico', 'obs', 'ativo')
-                 }),
+        ('IFC', {
+            'fields': ('origem', 'destino'),
+            'classes': ('wide',)
+        }),
+        ('Descrição', {
+            'fields': ('circuito', 'ordemDeServico', 'obs', 'ativo')
+        }),
     )
     
-    list_display = ('origem__rack', 'origem__shelf', 'origem__porta', 'origem__tipoConector', \
-                    'destino__rack', 'destino__shelf', 'destino__porta', 'destino__tipoConector', \
-                    'ordemDeServico', 'circuito', )
-    
+    list_display = ('origem__rack', 'origem__shelf', 'origem__porta', 'origem__tipoConector', 'destino__rack',
+                    'destino__shelf', 'destino__porta', 'destino__tipoConector', 'ordemDeServico', 'circuito', )
     search_fields = ('origem__rack', 'destino__rack', 'circuito', 'ordemDeServico',)
-    
-    ordering = ['origem__rack', 'origem__shelf', 'origem__porta', 'destino__rack','destino__shelf','destino__porta',]
-    
-    admin_order_field = ['origem__rack', 'destino__rack',]
-    
+    ordering = ['origem__rack', 'origem__shelf', 'origem__porta', 'destino__rack', 'destino__shelf', 'destino__porta']
+    admin_order_field = ['origem__rack', 'destino__rack']
     list_filter = (OrigemRackFilter, DestinoRackFilter, 'ordemDeServico')
-    
 
     def get_export_queryset(self, request):
         """
@@ -296,57 +298,56 @@ class CrossConnectionAdmin(ExportMixin, admin.ModelAdmin):
     
     def origem__rack(self, obj):
         if obj.origem:
-            return ("%s" % (obj.origem.rack))
+            return "%s" % obj.origem.rack
         return '-'
     origem__rack.short_description = 'Rack 1'
     origem__rack.admin_order_field = 'origem__rack'
 
     def origem__shelf(self, obj):
         if obj.origem:
-            return ("%s" % (obj.origem.shelf))
+            return "%s" % obj.origem.shelf
         return '-'
     origem__shelf.short_description = 'Shelf'
     origem__shelf.admin_order_field = 'origem__shelf'
 
     def origem__porta(self, obj):
         if obj.origem:
-            return ("%s" % (obj.origem.porta))
+            return "%s" % obj.origem.porta
         return '-'
     origem__porta.short_description = 'Porta'
     origem__porta.admin_order_field = 'origem__porta'
     
     def origem__tipoConector(self, obj):
         if obj.origem:
-            return ("%s" % (obj.origem.tipoConector))
+            return "%s" % obj.origem.tipoConector
         return '-'
     origem__tipoConector.short_description = 'Conector'
     origem__tipoConector.admin_order_field = 'origem__tipoConector'
-    
 
     def destino__rack(self, obj):
         if obj.destino:
-            return ("%s" % (obj.destino.rack))
+            return "%s" % obj.destino.rack
         return '-'
     destino__rack.short_description = 'Rack 2'
     destino__rack.admin_order_field = 'destino__rack'
 
     def destino__shelf(self, obj):
         if obj.destino:
-            return ("%s" % (obj.destino.shelf))
+            return "%s" % obj.destino.shelf
         return '-'
     destino__shelf.short_description = 'Shelf'
     destino__shelf.admin_order_field = 'destino__shelf'
 
     def destino__porta(self, obj):
         if obj.destino:
-            return ("%s" % (obj.destino.porta))
+            return "%s" % obj.destino.porta
         return '-'
     destino__porta.short_description = 'Porta'
     destino__porta.admin_order_field = 'destino__porta'
     
     def destino__tipoConector(self, obj):
         if obj.destino:
-            return ("%s" % (obj.destino.tipoConector))
+            return "%s" % obj.destino.tipoConector
         return '-'
     destino__tipoConector.short_description = 'Conector'
     destino__tipoConector.admin_order_field = 'destino__tipoConector'

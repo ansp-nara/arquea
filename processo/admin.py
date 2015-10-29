@@ -1,19 +1,23 @@
 from django.contrib import admin
-from models import Area, Macroprocesso, Processo, Equipe, Papel, Atribuicao, Grupo, Visao, Natureza, Recurso, Norma, OTRS, Procedimento
+from models import Area, Macroprocesso, Processo, Equipe, Papel, Atribuicao, Grupo, Visao, Natureza, Recurso, Norma, \
+    OTRS, Procedimento
 from membro.models import Membro
 from utils.functions import clone_objects
 from django.utils.translation import ugettext_lazy as _
+
 
 class AtribuicaoInline(admin.TabularInline):
     model = Atribuicao
     extra = 2
 
+
 class ProcedimentoInline(admin.TabularInline):
     model = Procedimento
     extra = 2
 
+
 class EquipeAdmin(admin.ModelAdmin):
-    def formfield_for_manytomany(self, db_field, request, **kwargs):
+    def formfield_for_manytomany(self, db_field, request=None, **kwargs):
         if db_field.name == "membros":
             membros = []
             for m in Membro.objects.all():
@@ -21,6 +25,7 @@ class EquipeAdmin(admin.ModelAdmin):
                     membros.append(m.id)
             kwargs["queryset"] = Membro.objects.filter(id__in=membros)
         return super(EquipeAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
+
 
 class ProcessoAdmin(admin.ModelAdmin):
     list_display = ('area', 'grupo', 'somacro', 'nome', 'procedimentos')
@@ -39,11 +44,14 @@ class ProcessoAdmin(admin.ModelAdmin):
 
     action_clone.short_description = _(u"Copiar os processos selecionados")
 
+
 class GrupoAdmin(admin.ModelAdmin):
     list_display = ('area', 'nome')
 
+
 class MacroprocessoAdmin(admin.ModelAdmin):
     list_display = ('area', 'grupo', 'nome')
+
 
 admin.site.register(Norma)
 admin.site.register(OTRS)

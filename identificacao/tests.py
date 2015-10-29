@@ -3,9 +3,11 @@
 from django.test import TestCase
 from identificacao.models import *
 
+
 class IdentificacaoTest(TestCase):
     def setUp(self):
-        ent = Entidade.objects.create(sigla='SAC', nome='Global Crossing', cnpj='00.000.000/0000-00', fisco=True, url='')
+        ent = Entidade.objects.create(sigla='SAC', nome='Global Crossing', cnpj='00.000.000/0000-00', fisco=True,
+                                      url='')
         c = Contato.objects.create(primeiro_nome='Joao', email='joao@joao.com.br', tel='', ativo=True)
         endereco = Endereco.objects.create(entidade=ent)
         iden = Identificacao.objects.create(endereco=endereco, contato=c, funcao='Tecnico', area='', ativo=True)
@@ -23,10 +25,12 @@ class IdentificacaoTest(TestCase):
 class ContatoTest(TestCase):
     
     def setUp(self):
-        ent1 = Entidade.objects.create(sigla='SAC', nome='Global Crossing', cnpj='00.000.000/0000-00', fisco=True, url='')
-        ent2 = Entidade.objects.create(sigla='GTECH', nome='Graneiro Tech', cnpj='00.000.000/0000-00', fisco=True, url='')
-        c = Contato.objects.create(primeiro_nome='Joao', ultimo_nome=u"José da Silva Xavier", email='joao@joao.com.br', tel='', ativo=True)
-        
+        ent1 = Entidade.objects.create(sigla='SAC', nome='Global Crossing', cnpj='00.000.000/0000-00', fisco=True,
+                                       url='')
+        ent2 = Entidade.objects.create(sigla='GTECH', nome='Graneiro Tech', cnpj='00.000.000/0000-00', fisco=True,
+                                       url='')
+        c = Contato.objects.create(primeiro_nome='Joao', ultimo_nome=u"José da Silva Xavier", email='joao@joao.com.br',
+                                   tel='', ativo=True)
         end1 = Endereco.objects.create(entidade=ent1)
         end2 = Endereco.objects.create(entidade=ent2)
         iden1 = Identificacao.objects.create(endereco=end1, contato=c, funcao='Tecnico', area='', ativo=True)
@@ -56,33 +60,34 @@ class ContatoTest(TestCase):
 
 class EnderecoTest(TestCase):
     def setUp(self):
-        ent = Entidade.objects.create(sigla='SAC', nome='Global Crossing', cnpj='00.000.000/0000-00', fisco=True, url='')
+        ent = Entidade.objects.create(sigla='SAC', nome='Global Crossing', cnpj='00.000.000/0000-00', fisco=True,
+                                      url='')
         c = Contato.objects.create(nome='Joao', email='joao@joao.com.br', tel='', ativo=True)
-        end = Endereco.objects.create(entidade=ent, rua='Dr. Ovidio', num=215, bairro='Cerqueira Cesar', cep='05403010', estado='SP', pais='Brasil')
+        end = Endereco.objects.create(entidade=ent, rua='Dr. Ovidio', num=215, bairro='Cerqueira Cesar', cep='05403010',
+                                      estado='SP', pais='Brasil')
         iden = Identificacao.objects.create(endereco=end, contato=c, funcao='Tecnico', area='', ativo=True)
-
 
     def test_unicode(self):
         e = Endereco.objects.get(pk=1)
         self.assertEquals(e.__unicode__(), u'SAC - Dr. Ovidio, 215')
 
 
-
 class EnderecoDetalheTest(TestCase):
     def setUp(self):
-        ent = Entidade.objects.create(sigla='SAC', nome='Global Crossing', cnpj='00.000.000/0000-00', fisco=True, url='')
+        ent = Entidade.objects.create(sigla='SAC', nome='Global Crossing', cnpj='00.000.000/0000-00', fisco=True,
+                                      url='')
         c = Contato.objects.create(nome='Joao', email='joao@joao.com.br', tel='', ativo=True)
-        end = Endereco.objects.create(entidade=ent, rua='Dr. Ovidio', num=215, bairro='Cerqueira Cesar', cep='05403010', estado='SP', pais='Brasil')
-        
+        end = Endereco.objects.create(entidade=ent, rua='Dr. Ovidio', num=215, bairro='Cerqueira Cesar', cep='05403010',
+                                      estado='SP', pais='Brasil')
         tipoDetalhe = TipoDetalhe.objects.create()
-        end_detalhe1 = EnderecoDetalhe.objects.create(endereco=end, tipo=tipoDetalhe, mostra_bayface=True, complemento='detalhe1')
-        
-        end_detalhe2 = EnderecoDetalhe.objects.create(detalhe=end_detalhe1, tipo=tipoDetalhe, mostra_bayface=True, complemento='detalhe2')
-        
-        end_detalhe3 = EnderecoDetalhe.objects.create(detalhe=end_detalhe2, tipo=tipoDetalhe, mostra_bayface=True, complemento='detalhe3')
-        
-        end_detalhe4 = EnderecoDetalhe.objects.create(detalhe=end_detalhe3, tipo=tipoDetalhe, mostra_bayface=True, complemento='detalhe4')
-
+        end_detalhe1 = EnderecoDetalhe.objects.create(endereco=end, tipo=tipoDetalhe, mostra_bayface=True,
+                                                      complemento='detalhe1')
+        end_detalhe2 = EnderecoDetalhe.objects.create(detalhe=end_detalhe1, tipo=tipoDetalhe, mostra_bayface=True,
+                                                      complemento='detalhe2')
+        end_detalhe3 = EnderecoDetalhe.objects.create(detalhe=end_detalhe2, tipo=tipoDetalhe, mostra_bayface=True,
+                                                      complemento='detalhe3')
+        end_detalhe4 = EnderecoDetalhe.objects.create(detalhe=end_detalhe3, tipo=tipoDetalhe, mostra_bayface=True,
+                                                      complemento='detalhe4')
 
     def test_unicode(self):
         end_detalhe1 = EnderecoDetalhe.objects.get(pk=1)
@@ -107,9 +112,10 @@ class EnderecoDetalheTest(TestCase):
 
 class EntidadeTest(TestCase):
     def setUp(self):
-        ent = Entidade.objects.create(sigla='SAC', nome='Global Crossing', cnpj='00.000.000/0000-00', fisco=True, recebe_doacao=False, url='')
-        ent2 = Entidade.objects.create(sigla='SAC2', nome='Entidade filha', cnpj='00.000.000/0000-00', fisco=True, entidade=ent, url='')
-
+        ent = Entidade.objects.create(sigla='SAC', nome='Global Crossing', cnpj='00.000.000/0000-00', fisco=True,
+                                      recebe_doacao=False, url='')
+        ent2 = Entidade.objects.create(sigla='SAC2', nome='Entidade filha', cnpj='00.000.000/0000-00', fisco=True,
+                                       entidade=ent, url='')
 
     def test_unicode(self):
         e = Entidade.objects.get(pk=1)

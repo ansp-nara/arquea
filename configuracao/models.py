@@ -5,32 +5,40 @@ from django.contrib.contenttypes.models import ContentType
 
 class Papelaria(models.Model):
     papel_timbrado_retrato_a4 = models.FileField(upload_to='papel_timbrado_retrato_a4', null=True, blank=True)
-    retrato_a4_margem_superior = models.DecimalField(_(u'Margem superior em cm'), max_digits=3, decimal_places=2, null=True, blank=True)
-    retrato_a4_margem_inferior = models.DecimalField(_(u'Margem inferior em cm'), max_digits=3, decimal_places=2, null=True, blank=True)
+    retrato_a4_margem_superior = models.DecimalField(_(u'Margem superior em cm'), max_digits=3, decimal_places=2,
+                                                     null=True, blank=True)
+    retrato_a4_margem_inferior = models.DecimalField(_(u'Margem inferior em cm'), max_digits=3, decimal_places=2,
+                                                     null=True, blank=True)
     
     papel_timbrado_paisagem_a4 = models.FileField(upload_to='papel_timbrado_paisagem_a4', null=True, blank=True)
-    paisagem_a4_margem_superior = models.DecimalField(_(u'Margem superior em cm'), max_digits=3, decimal_places=2, null=True, blank=True)
-    paisagem_a4_margem_inferior = models.DecimalField(_(u'Margem inferior em cm'), max_digits=3, decimal_places=2, null=True, blank=True)
+    paisagem_a4_margem_superior = models.DecimalField(_(u'Margem superior em cm'), max_digits=3, decimal_places=2,
+                                                      null=True, blank=True)
+    paisagem_a4_margem_inferior = models.DecimalField(_(u'Margem inferior em cm'), max_digits=3, decimal_places=2,
+                                                      null=True, blank=True)
     
     papel_timbrado_retrato_a3 = models.FileField(upload_to='papel_timbrado_retrato_a3', null=True, blank=True)
-    retrato_a3_margem_superior = models.DecimalField(_(u'Margem superior em cm'), max_digits=3, decimal_places=2, null=True, blank=True)
-    retrato_a3_margem_inferior = models.DecimalField(_(u'Margem inferior em cm'), max_digits=3, decimal_places=2, null=True, blank=True)
+    retrato_a3_margem_superior = models.DecimalField(_(u'Margem superior em cm'), max_digits=3, decimal_places=2,
+                                                     null=True, blank=True)
+    retrato_a3_margem_inferior = models.DecimalField(_(u'Margem inferior em cm'), max_digits=3, decimal_places=2,
+                                                     null=True, blank=True)
     
     papel_timbrado_paisagem_a3 = models.FileField(upload_to='papel_timbrado_paisagem_a3', null=True, blank=True)
-    paisagem_a3_margem_superior = models.DecimalField(_(u'Margem superior em cm'), max_digits=3, decimal_places=2, null=True, blank=True)
-    paisagem_a3_margem_inferior = models.DecimalField(_(u'Margem inferior em cm'), max_digits=3, decimal_places=2, null=True, blank=True)
-    
-    
+    paisagem_a3_margem_superior = models.DecimalField(_(u'Margem superior em cm'), max_digits=3, decimal_places=2,
+                                                      null=True, blank=True)
+    paisagem_a3_margem_inferior = models.DecimalField(_(u'Margem inferior em cm'), max_digits=3, decimal_places=2,
+                                                      null=True, blank=True)
+
     valido = models.BooleanField(u'Template válido?', default=True)
 
     def has_files(self):
         import os.path
  
-        return self.papel_timbrado_retrato_a4 != None and self.papel_timbrado_retrato_a4.name and os.path.isfile(self.papel_timbrado_retrato_a4.name) and \
-               self.papel_timbrado_paisagem_a4 != None and self.papel_timbrado_paisagem_a4.name and os.path.isfile(self.papel_timbrado_paisagem_a4.name) and \
-               self.papel_timbrado_retrato_a3 != None and self.papel_timbrado_retrato_a3.name and os.path.isfile(self.papel_timbrado_retrato_a3.name) and \
-               self.papel_timbrado_paisagem_a3 != None and self.papel_timbrado_paisagem_a3.name and os.path.isfile(self.papel_timbrado_paisagem_a3.name)
-               
+        return self.papel_timbrado_retrato_a4 is not None and self.papel_timbrado_retrato_a4.name and \
+               os.path.isfile(self.papel_timbrado_retrato_a4.name) and self.papel_timbrado_paisagem_a4 is not None and \
+               self.papel_timbrado_paisagem_a4.name and os.path.isfile(self.papel_timbrado_paisagem_a4.name) and \
+               self.papel_timbrado_retrato_a3 is not None and self.papel_timbrado_retrato_a3.name and \
+               os.path.isfile(self.papel_timbrado_retrato_a3.name) and self.papel_timbrado_paisagem_a3 is not None and \
+               self.papel_timbrado_paisagem_a3.name and os.path.isfile(self.papel_timbrado_paisagem_a3.name)
 
 
 class Cheque(models.Model):
@@ -44,9 +52,10 @@ class Variavel(models.Model):
     
     # Nome das variáveis e suas descrições que devem ser exibidas na tela do Administrador
     _NOMES = (
-                (DATACENTER_IDS, 'ID da Entidade do Datacenter principal.'),
-                (TERMO_EXCLUIDO_IDS, 'IDs de Termos a serem excluídos da visão de relatórios, como o de Patrimônio por Termo. Ex: 1,2,3'),
-            )
+        (DATACENTER_IDS, 'ID da Entidade do Datacenter principal.'),
+        (TERMO_EXCLUIDO_IDS, 'IDs de Termos a serem excluídos da visão de relatórios, '
+                             'como o de Patrimônio por Termo. Ex: 1,2,3'),
+    )
     
     nome = models.CharField(_(u'Nome da variável'), max_length=60, unique=True, choices=_NOMES)
     valor = models.CharField(_(u'Valor'), max_length=60, help_text=u'', )
@@ -56,7 +65,6 @@ class Variavel(models.Model):
         verbose_name = _(u'Variável')
         verbose_name_plural = _(u'Variáveis')
         ordering = ('nome',)
-
 
 
 class ClassesExtra(models.Model):
@@ -70,6 +78,7 @@ class ClassesExtra(models.Model):
         ordering = ('content_type__app_label', 'content_type__model')
         verbose_name = u'Ajuda dos modelos'
         verbose_name_plural = u'Ajudas dos modelos'
+
 
 class FieldsHelp(models.Model):
     model = models.ForeignKey(ClassesExtra)
