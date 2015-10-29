@@ -8,19 +8,19 @@ from django.db.models.query import QuerySet
 from django.http import HttpResponse, HttpResponseNotFound
 from django.template.response import TemplateResponse
 from django.utils.encoding import smart_str
-from django.utils.translation import ugettext as _
 from django.utils.safestring import mark_safe
-from functions import render_to_pdf, render_to_pdf_weasy
+from functions import render_to_pdf_weasy
 
 
 class AutoCompleteAdmin(admin.ModelAdmin):
     """
-	Define metodos para o uso da funcao do 'autocomplete' em campos de chave estrangeira
-	sem a necessidade de um select, utilizando apenas um campo de texto.
-	Para utiliza-la basta criar uma classe de admin para o seu modelo, herdando desta classe
-	ao inves de herdar do ModelAdmin. Nessa classe, defina o atributo related_field_search
-	para os campos em que deseja utilizar esta funcao, com os campos onde deve ser feita a busca.
+    Define metodos para o uso da funcao do 'autocomplete' em campos de chave estrangeira
+    sem a necessidade de um select, utilizando apenas um campo de texto.
+    Para utiliza-la basta criar uma classe de admin para o seu modelo, herdando desta classe
+    ao inves de herdar do ModelAdmin. Nessa classe, defina o atributo related_field_search
+    para os campos em que deseja utilizar esta funcao, com os campos onde deve ser feita a busca.
     """
+
     def __call__(self, request, url):
         if url is None:
             pass
@@ -55,7 +55,7 @@ class AutoCompleteAdmin(admin.ModelAdmin):
             for bit in query.split():
                 or_queries = [models.Q(**{construct_search(
                     smart_str(field_name)): smart_str(bit)})
-                        for field_name in search_fields.split(',')]
+                              for field_name in search_fields.split(',')]
                 other_qs = QuerySet(model)
                 other_qs.dup_select_related(qs)
                 other_qs = other_qs.filter(reduce(operator.or_, or_queries))
@@ -70,14 +70,13 @@ class AutoCompleteAdmin(admin.ModelAdmin):
         specified in the related_search_fields class attribute.
         """
         if isinstance(db_field, models.ForeignKey) and \
-                db_field.name in self.related_search_fields:
+                        db_field.name in self.related_search_fields:
             kwargs['widget'] = ForeignKeySearchInput(db_field.rel,
-                                    self.related_search_fields[db_field.name])
+                                                     self.related_search_fields[db_field.name])
         return super(AutoCompleteAdmin, self).formfield_for_dbfield(db_field, **kwargs)
 
 
 class PrintModelAdmin(admin.ModelAdmin):
-
     def changelist_view(self, request, extra_context=None):
         if request.method == 'GET' and request.GET.get('pdf') == '1':
             o = request.GET.get('o')
@@ -86,8 +85,9 @@ class PrintModelAdmin(admin.ModelAdmin):
             if o and self.actions is not None:
                 try:
                     o = int(o)
-                    q['o'] = o-1
-                except: pass
+                    q['o'] = o - 1
+                except:
+                    pass
             request.GET = q
             lpp = self.list_per_page
             self.list_per_page = 4000000000
@@ -95,16 +95,19 @@ class PrintModelAdmin(admin.ModelAdmin):
             self.list_display_links = (None,)
             actions = self.actions
             self.actions = None
-            page = super(PrintModelAdmin,self).changelist_view(request, extra_context)
+            page = super(PrintModelAdmin, self).changelist_view(request, extra_context)
             self.list_per_page = lpp
             self.list_display_links = ldl
             self.actions = actions
             if isinstance(page, TemplateResponse):
-                page = render_to_pdf_weasy('admin/change_list.pdf', page.resolve_context(page.context_data), filename='list_%s.pdf' % self.opts.model_name)
+                page = render_to_pdf_weasy('admin/change_list.pdf', page.resolve_context(page.context_data),
+                                           filename='list_%s.pdf' % self.opts.model_name)
         else:
-            if extra_context: extra_context = extra_context.update({'pdf':True})
-            else: extra_context = {'pdf':True}
-            page = super(PrintModelAdmin,self).changelist_view(request, extra_context)
+            if extra_context:
+                extra_context = extra_context.update({'pdf': True})
+            else:
+                extra_context = {'pdf': True}
+            page = super(PrintModelAdmin, self).changelist_view(request, extra_context)
         return page
 
 
@@ -113,18 +116,17 @@ class AdminImageWidget(AdminFileWidget):
         output = []
         if value and getattr(value, "url", None):
             image_url = value.url
-            file_name=str(value)
-            output.append(u'<br><img src="%s" alt="%s" style="max-width:400px;max-height:400px;"/><br> %s ' % \
-                (image_url, image_url,'',))
+            output.append(u'<br><img src="%s" alt="%s" style="max-width:400px;max-height:400px;"/><br> %s ' %
+                          (image_url, image_url, '',))
         output.append(super(AdminFileWidget, self).render(name, value, attrs))
         return mark_safe(u''.join(output))
 
 
 from django.contrib.admin import RelatedFieldListFilter
 
+
 class RelatedOnlyFieldListFilter(RelatedFieldListFilter):
     """
-    
     Filtro reutilizável para o admin list_filter.
     OBS: - Não funciona para subatributos, ex: user__name
          - A ordenação deve estar especificada no Meta do Model
@@ -148,5 +150,3 @@ class RelatedOnlyFieldListFilter(RelatedFieldListFilter):
             id__in=model_admin.get_queryset(request).values_list(
                 field.name, flat=True).distinct())
         self.lookup_choices = [(each.id, unicode(each)) for each in qs]
-
-

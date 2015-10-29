@@ -3,12 +3,10 @@ from django.db import models
 
 
 # Create your models here.
-
 class Tipo(models.Model):
     """
-	Tipo de ocorrência
-	"""
-
+    Tipo de ocorrência
+    """
     entidade = models.ForeignKey('identificacao.Entidade')
     nome = models.CharField(max_length=50)
 
@@ -21,9 +19,8 @@ class Tipo(models.Model):
 
 class Estado(models.Model):
     """
-	Estado da ocorrência
-	"""
-
+    Estado da ocorrência
+    """
     nome = models.CharField(max_length=50)
 
     def __unicode__(self):
@@ -35,8 +32,8 @@ class Estado(models.Model):
 
 class Natureza(models.Model):
     """
-	Natureza do ocorrido
-	"""
+    Natureza do ocorrido
+    """
     nome = models.CharField(max_length=50)
 
     def __unicode__(self):
@@ -48,8 +45,8 @@ class Natureza(models.Model):
 
 class Servico(models.Model):
     """
-	Serviços envolvidos
-	"""
+    Serviços envolvidos
+    """
     nome = models.CharField(max_length=50)
 
     def __unicode__(self):
@@ -61,8 +58,8 @@ class Servico(models.Model):
 
 class Ticket(models.Model):
     """
-	Tickets do OTRS
-	"""
+    Tickets do OTRS
+    """
     ticket = models.IntegerField()
     repositorio = models.ForeignKey('repositorio.Repositorio')
 
@@ -72,9 +69,9 @@ class Ticket(models.Model):
 
 class Repositorio(models.Model):
     """
-	Repositório de informações da ANSP, projetado para guardar todas
-	as informações de ocorrências
-	"""
+    Repositório de informações da ANSP, projetado para guardar todas
+    as informações de ocorrências
+    """
 
     # o número é gerado automaticamente
     numero = models.IntegerField(editable=False)
@@ -134,9 +131,8 @@ class Repositorio(models.Model):
 
 class Anexo(models.Model):
     """
-	Arquivos anexos ao repositório
-	"""
-
+    Arquivos anexos ao repositório
+    """
     arquivo = models.FileField(upload_to='repositorio')
     palavras_chave = models.TextField(u'Palavras chave')
     repositorio = models.ForeignKey('repositorio.Repositorio')
@@ -153,8 +149,3 @@ class Permission(models.Model):
         permissions = (
             ("rel_ger_repositorio", "Rel. admin. - Repositório"),  # /repositorio/relatorios/repositorio
         )
-
-
-
-
-

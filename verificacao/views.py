@@ -20,21 +20,24 @@ def equipamento_consolidado(request):
     
     partNumberVSModeloDiferente = verificacaoEquipamento.partNumberVSModeloDiferente()
     count = sum([len(equipamentos) for equipamentos in partNumberVSModeloDiferente])
-    retorno.append({'desc':u'Part Numbers iguais com Modelos diferentes', 'url':'equipamento_part_number_modelo_diferente', 'qtd':count})
+    retorno.append({'desc': u'Part Numbers iguais com Modelos diferentes',
+                    'url': 'equipamento_part_number_modelo_diferente', 'qtd': count})
     
     partNumberVazio = verificacaoEquipamento.partNumberVazio()
     count = sum([len(equipamentos) for equipamentos in partNumberVazio])
-    retorno.append({'desc':u'Part Numbers vazios', 'url':'equipamento_part_number_vazio', 'qtd':count})
+    retorno.append({'desc': u'Part Numbers vazios', 'url': 'equipamento_part_number_vazio', 'qtd': count})
     
     partNumberVazioModeloVazio = verificacaoEquipamento.partNumberVazioModeloVazio()
     count = sum([len(equipamentos) for equipamentos in partNumberVazioModeloVazio])
-    retorno.append({'desc':u'Part Numbers e Modelos vazios', 'url':'equipamento_part_number_modelo_vazio', 'qtd':count})
+    retorno.append({'desc': u'Part Numbers e Modelos vazios', 'url': 'equipamento_part_number_modelo_vazio',
+                    'qtd': count})
     
     marcaVazia = verificacaoEquipamento.marcaVazia()
     count = len(marcaVazia)
-    retorno.append({'desc':u'Marca/Entidade vazia', 'url':'equipamento_marca_vazia', 'qtd':count})
+    retorno.append({'desc': u'Marca/Entidade vazia', 'url': 'equipamento_marca_vazia', 'qtd': count})
     
-    return render(request, 'verificacao/equipamento_consolidado.html', {'verificacoes':retorno})
+    return render(request, 'verificacao/equipamento_consolidado.html', {'verificacoes': retorno})
+
 
 @login_required
 def equipamento_marca_vazia(request, json=False):
@@ -43,8 +46,8 @@ def equipamento_marca_vazia(request, json=False):
     verficacao = VerificacaoEquipamento()
     retorno = verficacao.marcaVazia()
     
-    return render(request, 'verificacao/equipamento_marca.html', 
-                              {'desc':'Marca/Entidade vazia', 'equipamentos':retorno})
+    return render(request, 'verificacao/equipamento_marca.html',
+                  {'desc': 'Marca/Entidade vazia', 'equipamentos': retorno})
 
 
 @login_required
@@ -54,9 +57,8 @@ def equipamento_part_number_modelo_diferente(request, json=False):
     verficacao = VerificacaoEquipamento()
     retorno = verficacao.partNumberVSModeloDiferente()
     
-    return render(request, 'verificacao/equipamento_part_number.html', 
-                              {'desc':'Part Numbers iguais com Modelos diferentes', 'equipamentos':retorno})
-
+    return render(request, 'verificacao/equipamento_part_number.html',
+                  {'desc': 'Part Numbers iguais com Modelos diferentes', 'equipamentos': retorno})
 
 
 @login_required
@@ -66,8 +68,8 @@ def equipamento_part_number_vazio(request, json=False):
     verficacao = VerificacaoEquipamento()
     retorno = verficacao.partNumberVazio()
     
-    return render(request, 'verificacao/equipamento_part_number.html', 
-                              {'desc':'Part Numbers vazios', 'equipamentos':retorno})
+    return render(request, 'verificacao/equipamento_part_number.html',
+                  {'desc': 'Part Numbers vazios', 'equipamentos': retorno})
 
 
 @login_required
@@ -77,17 +79,15 @@ def equipamento_part_number_modelo_vazio(request, json=False):
     verficacao = VerificacaoEquipamento()
     retorno = verficacao.partNumberVazioModeloVazio()
     
-    return render(request, 'verificacao/equipamento_part_number.html', 
-                              {'desc':'Part Numbers e Modelos vazios', 'equipamentos':retorno})
+    return render(request, 'verificacao/equipamento_part_number.html',
+                  {'desc': 'Part Numbers e Modelos vazios', 'equipamentos': retorno})
     
 
 @login_required
 def check_patrimonio_equipamento(request):
-
-   
     patrimonios = Patrimonio.objects.filter(equipamento_id__isnull=False).select_related('equipamento')
-    
-    patrimonios = patrimonios.filter(Q(~Q(equipamento__tamanho=F('tamanho')), Q(equipamento__tamanho__isnull=False), Q(tamanho__isnull=False)) 
+    patrimonios = patrimonios.filter(Q(~Q(equipamento__tamanho=F('tamanho')), Q(equipamento__tamanho__isnull=False),
+                                       Q(tamanho__isnull=False))
                                      )
     c = {}
     c.update({'patrimonios': patrimonios})
@@ -99,42 +99,46 @@ def check_patrimonio_equipamento(request):
 def patrimonio_consolidado(request):
     retorno = []
         
-    filtros_entrada = {'filtro_tipo_patrimonio':request.GET.get('filtro_tipo_patrimonio')}
+    filtros_entrada = {'filtro_tipo_patrimonio': request.GET.get('filtro_tipo_patrimonio')}
         
     verificacaoPatrimonio = VerificacaoPatrimonio()
     
     equipamentoVazio = verificacaoPatrimonio.equipamentoVazio(filtros_entrada)
     count = sum([len(patrimonios) for patrimonios in equipamentoVazio])
-    retorno.append({'desc':u'Patrimonios sem Equipamento', 'url':'patrimonio_equipamento_vazio', 'qtd':count})
+    retorno.append({'desc': u'Patrimonios sem Equipamento', 'url': 'patrimonio_equipamento_vazio', 'qtd': count})
     
     verificacaoPatrimonioEquipamento = VerificacaoPatrimonioEquipamento()
     
     descricaoDiferente = verificacaoPatrimonioEquipamento.descricaoDiferente(filtros_entrada)
     count = sum([len(patrimonios) for patrimonios in descricaoDiferente])
-    retorno.append({'desc':u'Patrimonio e Equipamento com Descricao diferente', 'url':'patrimonio_equipamento_descricao_diferente', 'qtd':count})
+    retorno.append({'desc': u'Patrimonio e Equipamento com Descricao diferente',
+                    'url': 'patrimonio_equipamento_descricao_diferente', 'qtd': count})
     
     tamanhoDiferente = verificacaoPatrimonioEquipamento.tamanhoDiferente(filtros_entrada)
     count = sum([len(patrimonios) for patrimonios in tamanhoDiferente])
-    retorno.append({'desc':u'Patrimonio e Equipamento com Tamanho diferente', 'url':'patrimonio_equipamento_tamanho_diferente', 'qtd':count})
+    retorno.append({'desc': u'Patrimonio e Equipamento com Tamanho diferente',
+                    'url': 'patrimonio_equipamento_tamanho_diferente', 'qtd': count})
     
     procedenciaVazia = verificacaoPatrimonio.procedenciaVazia(filtros_entrada)
     count = sum([len(patrimonios) for patrimonios in procedenciaVazia])
-    retorno.append({'desc':u'Patrimonio com procedecia vazia', 'url':'patrimonio_procedencia_vazia', 'qtd':count})
+    retorno.append({'desc': u'Patrimonio com procedecia vazia', 'url': 'patrimonio_procedencia_vazia', 'qtd': count})
     
     localidadeDiferente = verificacaoPatrimonio.localidadeDiferente(filtros=filtros_entrada)
     count = sum([len(patrimonios) for patrimonios in localidadeDiferente])
-    retorno.append({'desc':u'Patrimonio com localidade diferente dos filhos', 'url':'patrimonio_localidade_diferente', 'qtd':count})
+    retorno.append({'desc': u'Patrimonio com localidade diferente dos filhos',
+                    'url': 'patrimonio_localidade_diferente', 'qtd': count})
     
-    retorno.append({'desc':u'Verificação de Patrimônios e Equipamentos', 'url':'check_patrimonio_equipamento', 'qtd':None})
+    retorno.append({'desc': u'Verificação de Patrimônios e Equipamentos',
+                    'url': 'check_patrimonio_equipamento', 'qtd': None})
     
-    filtros = {"tipos":Tipo.objects.all()}
+    filtros = {"tipos": Tipo.objects.all()}
     
-    return render(request, 'verificacao/patrimonio_consolidado.html', {'verificacoes':retorno, 'filtros':filtros})
+    return render(request, 'verificacao/patrimonio_consolidado.html', {'verificacoes': retorno, 'filtros': filtros})
 
 
 @login_required
 def patrimonio_localidade_diferente(request):
-    filtros_entrada = {'filtro_tipo_patrimonio':request.GET.get('filtro_tipo_patrimonio')}
+    filtros_entrada = {'filtro_tipo_patrimonio': request.GET.get('filtro_tipo_patrimonio')}
     
     retorno = []
     verficacao = VerificacaoPatrimonio()
@@ -142,16 +146,17 @@ def patrimonio_localidade_diferente(request):
     
     filtros_saida = []
     if len(retorno) > 0:
-        filtros_saida = {"tipos":VerificacaoPatrimonioEquipamento().listaFiltroTipoPatrimonio(verficacao.equipamentoVazio()[0])}
+        filtros_saida = \
+            {"tipos": VerificacaoPatrimonioEquipamento().listaFiltroTipoPatrimonio(verficacao.equipamentoVazio()[0])}
 
-    return render(request, 'verificacao/patrimonio_localidade.html', 
-                              {'desc':'Patrimonios com componentes com historico local diferente', 'patrimonios':retorno, 'filtros':filtros_saida})
-
+    return render(request, 'verificacao/patrimonio_localidade.html',
+                  {'desc': 'Patrimonios com componentes com historico local diferente', 'patrimonios': retorno,
+                   'filtros': filtros_saida})
 
 
 @login_required
 def patrimonio_procedencia_vazia(request):
-    filtros_entrada = {'filtro_tipo_patrimonio':request.GET.get('filtro_tipo_patrimonio')}
+    filtros_entrada = {'filtro_tipo_patrimonio': request.GET.get('filtro_tipo_patrimonio')}
     
     retorno = []
     verficacao = VerificacaoPatrimonio()
@@ -159,15 +164,16 @@ def patrimonio_procedencia_vazia(request):
     
     filtros_saida = []
     if len(retorno) > 0:
-        filtros_saida = {"tipos":VerificacaoPatrimonioEquipamento().listaFiltroTipoPatrimonio(verficacao.equipamentoVazio()[0])}
+        filtros_saida = \
+            {"tipos": VerificacaoPatrimonioEquipamento().listaFiltroTipoPatrimonio(verficacao.equipamentoVazio()[0])}
     
-    return render(request, 'verificacao/patrimonio_procedencia.html', 
-                              {'desc':'Patrimonios com procedência vazia', 'patrimonios':retorno, 'filtros':filtros_saida})
+    return render(request, 'verificacao/patrimonio_procedencia.html',
+                  {'desc': 'Patrimonios com procedência vazia', 'patrimonios': retorno, 'filtros': filtros_saida})
 
 
 @login_required
 def patrimonio_equipamento_vazio(request):
-    filtros_entrada = {'filtro_tipo_patrimonio':request.GET.get('filtro_tipo_patrimonio')}
+    filtros_entrada = {'filtro_tipo_patrimonio': request.GET.get('filtro_tipo_patrimonio')}
     
     retorno = []
     verficacao = VerificacaoPatrimonio()
@@ -175,15 +181,17 @@ def patrimonio_equipamento_vazio(request):
     
     filtros_saida = []
     if len(retorno) > 0:
-        filtros_saida = {"tipos":VerificacaoPatrimonioEquipamento().listaFiltroTipoPatrimonio(verficacao.equipamentoVazio()[0])}
+        filtros_saida =\
+            {"tipos":VerificacaoPatrimonioEquipamento().listaFiltroTipoPatrimonio(verficacao.equipamentoVazio()[0])}
     
-    return render(request, 'verificacao/patrimonio.html', 
-                              {'desc':'Patrimonios sem Equipamento', 'patrimonios':retorno, 'filtros':filtros_saida})
+    return render(request, 'verificacao/patrimonio.html',
+                  {'desc': 'Patrimonios sem Equipamento', 'patrimonios': retorno, 'filtros': filtros_saida})
+
 
 @login_required
 def patrimonio_equipamento_part_number_diferente(request):
     ajax = request.GET.get('ajax')
-    filtros_entrada = {'filtro_tipo_patrimonio':request.GET.get('filtro_tipo_patrimonio')}
+    filtros_entrada = {'filtro_tipo_patrimonio': request.GET.get('filtro_tipo_patrimonio')}
 
     retorno = []
     verficacao = VerificacaoPatrimonioEquipamento()
@@ -191,20 +199,22 @@ def patrimonio_equipamento_part_number_diferente(request):
     
     filtros_saida = []
     if len(retorno) > 0:
-        filtros_saida = {"tipos":verficacao.listaFiltroTipoPatrimonio(verficacao.descricaoDiferente()[0])}
+        filtros_saida = {"tipos": verficacao.listaFiltroTipoPatrimonio(verficacao.descricaoDiferente()[0])}
     
     if ajax:
-        return render(request, 'verificacao/patrimonio_equipamento-table.html', 
-                              {'desc':'Patrimonio e Equipamento com Part Number diferente', 'patrimonios':retorno, 'atributo':'part_number', 'filtros':filtros_saida})
+        return render(request, 'verificacao/patrimonio_equipamento-table.html',
+                      {'desc': 'Patrimonio e Equipamento com Part Number diferente', 'patrimonios': retorno,
+                       'atributo': 'part_number', 'filtros': filtros_saida})
     else:
-        return render(request, 'verificacao/patrimonio_equipamento.html', 
-                              {'desc':'Patrimonio e Equipamento com Part Number diferente', 'patrimonios':retorno, 'atributo':'part_number', 'filtros':filtros_saida})
+        return render(request, 'verificacao/patrimonio_equipamento.html',
+                      {'desc': 'Patrimonio e Equipamento com Part Number diferente', 'patrimonios': retorno,
+                       'atributo': 'part_number', 'filtros': filtros_saida})
 
 
 @login_required
 def patrimonio_equipamento_descricao_diferente(request):
     ajax = request.GET.get('ajax')
-    filtros_entrada = {'filtro_tipo_patrimonio':request.GET.get('filtro_tipo_patrimonio')}
+    filtros_entrada = {'filtro_tipo_patrimonio': request.GET.get('filtro_tipo_patrimonio')}
 
     retorno = []
     verficacao = VerificacaoPatrimonioEquipamento()
@@ -212,20 +222,22 @@ def patrimonio_equipamento_descricao_diferente(request):
     
     filtros_saida = []
     if len(retorno) > 0:
-        filtros_saida = {"tipos":verficacao.listaFiltroTipoPatrimonio(verficacao.descricaoDiferente()[0])}
+        filtros_saida = {"tipos": verficacao.listaFiltroTipoPatrimonio(verficacao.descricaoDiferente()[0])}
     
     if ajax:
-        return render(request, 'verificacao/patrimonio_equipamento-table.html', 
-                              {'desc':'Patrimonio e Equipamento com Descricao diferente', 'patrimonios':retorno, 'atributo':'descricao', 'filtros':filtros_saida})
+        return render(request, 'verificacao/patrimonio_equipamento-table.html',
+                      {'desc': 'Patrimonio e Equipamento com Descricao diferente', 'patrimonios': retorno,
+                       'atributo': 'descricao', 'filtros': filtros_saida})
     else:
-        return render(request, 'verificacao/patrimonio_equipamento.html', 
-                              {'desc':'Patrimonio e Equipamento com Descricao diferente', 'patrimonios':retorno, 'atributo':'descricao', 'filtros':filtros_saida})
+        return render(request, 'verificacao/patrimonio_equipamento.html',
+                      {'desc': 'Patrimonio e Equipamento com Descricao diferente', 'patrimonios': retorno,
+                       'atributo': 'descricao', 'filtros': filtros_saida})
 
 
 @login_required
 def patrimonio_equipamento_marca_diferente(request):
     ajax = request.GET.get('ajax')
-    filtros_entrada = {'filtro_tipo_patrimonio':request.GET.get('filtro_tipo_patrimonio')}
+    filtros_entrada = {'filtro_tipo_patrimonio': request.GET.get('filtro_tipo_patrimonio')}
 
     retorno = []
     verficacao = VerificacaoPatrimonioEquipamento()
@@ -233,45 +245,45 @@ def patrimonio_equipamento_marca_diferente(request):
     
     filtros_saida = []
     if len(retorno) > 0:
-        filtros_saida = {"tipos":verficacao.listaFiltroTipoPatrimonio(verficacao.marcaDiferente()[0])}
-
+        filtros_saida = {"tipos": verficacao.listaFiltroTipoPatrimonio(verficacao.marcaDiferente()[0])}
     
     if ajax:
-        return render(request, 'verificacao/patrimonio_equipamento-table.html', 
-                              {'desc':'Patrimonio e Equipamento com Marca diferente', 'patrimonios':retorno, 'atributo':'marca', 'filtros':filtros_saida})
+        return render(request, 'verificacao/patrimonio_equipamento-table.html',
+                      {'desc': 'Patrimonio e Equipamento com Marca diferente', 'patrimonios': retorno,
+                       'atributo': 'marca', 'filtros': filtros_saida})
     else:
-        return render(request, 'verificacao/patrimonio_equipamento.html', 
-                              {'desc':'Patrimonio e Equipamento com Marca diferente', 'patrimonios':retorno, 'atributo':'marca', 'filtros':filtros_saida})
-
+        return render(request, 'verificacao/patrimonio_equipamento.html',
+                      {'desc': 'Patrimonio e Equipamento com Marca diferente', 'patrimonios': retorno,
+                       'atributo': 'marca', 'filtros': filtros_saida})
 
 
 @login_required
 def patrimonio_equipamento_modelo_diferente(request):
     ajax = request.GET.get('ajax')
-    filtros_entrada = {'filtro_tipo_patrimonio':request.GET.get('filtro_tipo_patrimonio')}
+    filtros_entrada = {'filtro_tipo_patrimonio': request.GET.get('filtro_tipo_patrimonio')}
 
     retorno = []
     verficacao = VerificacaoPatrimonioEquipamento()
     retorno = verficacao.modeloDiferente(filtros_entrada)
-    
 
     filtros_saida = []
     if len(retorno) > 0:
-        filtros_saida = {"tipos":verficacao.listaFiltroTipoPatrimonio(verficacao.modeloDiferente()[0])}
+        filtros_saida = {"tipos": verficacao.listaFiltroTipoPatrimonio(verficacao.modeloDiferente()[0])}
     
     if ajax:
-        return render(request, 'verificacao/patrimonio_equipamento-table.html', 
-                              {'desc':'Patrimonio e Equipamento com Modelo diferente', 'patrimonios':retorno, 'atributo':'modelo', 'filtros':filtros_saida})
+        return render(request, 'verificacao/patrimonio_equipamento-table.html',
+                      {'desc': 'Patrimonio e Equipamento com Modelo diferente', 'patrimonios': retorno,
+                       'atributo': 'modelo', 'filtros': filtros_saida})
     else:
-        return render(request, 'verificacao/patrimonio_equipamento.html', 
-                              {'desc':'Patrimonio e Equipamento com Modelo diferente', 'patrimonios':retorno, 'atributo':'modelo', 'filtros':filtros_saida})
-
+        return render(request, 'verificacao/patrimonio_equipamento.html',
+                      {'desc': 'Patrimonio e Equipamento com Modelo diferente', 'patrimonios': retorno,
+                       'atributo': 'modelo', 'filtros': filtros_saida})
 
 
 @login_required
 def patrimonio_equipamento_tamanho_diferente(request):
     ajax = request.GET.get('ajax')
-    filtros_entrada = {'filtro_tipo_patrimonio':request.GET.get('filtro_tipo_patrimonio')}
+    filtros_entrada = {'filtro_tipo_patrimonio': request.GET.get('filtro_tipo_patrimonio')}
     
     retorno = []
     verficacao = VerificacaoPatrimonioEquipamento()
@@ -279,16 +291,16 @@ def patrimonio_equipamento_tamanho_diferente(request):
 
     filtros_saida = []
     if len(retorno) > 0:
-        filtros_saida = {"tipos":verficacao.listaFiltroTipoPatrimonio(verficacao.tamanhoDiferente()[0])}
+        filtros_saida = {"tipos": verficacao.listaFiltroTipoPatrimonio(verficacao.tamanhoDiferente()[0])}
 
-    
     if ajax:
-        return render(request, 'verificacao/patrimonio_equipamento-table.html', 
-                              {'desc':'Patrimonio e Equipamento com Tamanho diferente', 'patrimonios':retorno, 'atributo':'tamanho', 'filtros':filtros_saida})
+        return render(request, 'verificacao/patrimonio_equipamento-table.html',
+                      {'desc': 'Patrimonio e Equipamento com Tamanho diferente', 'patrimonios': retorno,
+                       'atributo': 'tamanho', 'filtros': filtros_saida})
     else:    
-        return render(request, 'verificacao/patrimonio_equipamento.html', 
-                              {'desc':'Patrimonio e Equipamento com Tamanho diferente', 'patrimonios':retorno, 'atributo':'tamanho', 'filtros':filtros_saida})
-
+        return render(request, 'verificacao/patrimonio_equipamento.html',
+                      {'desc': 'Patrimonio e Equipamento com Tamanho diferente', 'patrimonios': retorno,
+                       'atributo': 'tamanho', 'filtros': filtros_saida})
 
 
 @login_required
@@ -334,7 +346,8 @@ def versao(request):
     from django.db import connection
     version = connection.pg_version
     lst = [str(i) for i in str(version)]
-    db_version = "%s (%s, %s, %s)" % (connection.vendor, ''.join(lst[:len(lst)-4]), ''.join(lst[len(lst)-4:len(lst)-2]), ''.join(lst[len(lst)-2:]))
+    db_version = "%s (%s, %s, %s)" % (connection.vendor, ''.join(lst[:len(lst)-4]), ''.join(lst[len(lst)-4:len(lst)-2]),
+                                      ''.join(lst[len(lst)-2:]))
     
     return render(request, 'verificacao/versao.html', 
-                  {'django_version':django_version, 'python_version':python_version, 'db_version':db_version})
+                  {'django_version': django_version, 'python_version': python_version, 'db_version': db_version})

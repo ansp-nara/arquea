@@ -4,15 +4,17 @@ from decimal import Decimal
 from django.db import IntegrityError
 from django.test import TestCase
 from membro.models import Membro, Cargo, Historico
-from protocolo.models import Feriado, TipoDocumento, Origem, Protocolo, ItemProtocolo, Descricao, Cotacao, Estado as ProtocoloEstado
+from protocolo.models import Feriado, TipoDocumento, Origem, Protocolo, ItemProtocolo, Descricao, Cotacao,\
+    Estado as ProtocoloEstado
 from identificacao.models import Identificacao, Contato, Entidade, Endereco
-from outorga.models import Termo, Outorga, Categoria, Modalidade, Natureza_gasto, Estado as OutorgaEstado
+from outorga.models import Termo, Outorga, Categoria, Estado as OutorgaEstado
 from protocolo.templatetags import proto_tags
 
 import logging
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
+
 
 # Testes do arquivo com funções localizado em protocolo.templatetags.proto_tags que é utilizado nos templates HTML
 class PrototagTest(TestCase):
@@ -65,7 +67,7 @@ class ProtocoloTest(TestCase):
         
         cg = Cargo.objects.create(nome='Outorgado')
 
-        ht = Historico.objects.create(inicio=datetime(2008,1,1), cargo=cg, membro=mb, funcionario=True)
+        ht = Historico.objects.create(inicio=datetime(2008, 1, 1), cargo=cg, membro=mb, funcionario=True)
         
         outorgaEstado = OutorgaEstado.objects.create(nome='Pendente')
         
@@ -73,24 +75,27 @@ class ProtocoloTest(TestCase):
         
         categoria = Categoria.objects.create(nome='Categoria')
         
-        outorga = Outorga.objects.create(data_solicitacao=datetime(2008,1,1), termino=datetime(2009,1,1), categoria=categoria, termo=t)
+        outorga = Outorga.objects.create(data_solicitacao=datetime(2008, 1, 1), termino=datetime(2009, 1, 1),
+                                         categoria=categoria, termo=t)
         
         td = TipoDocumento.objects.create(nome='Nota Fiscal')
         c = Contato.objects.create(primeiro_nome='Joao', email='joao@joao.com.br', tel='')
         og = Origem.objects.create(nome='Motoboy')
         ent = Entidade.objects.create(sigla='NEXTEL', nome='Nextel', cnpj='', fisco= True, url='')
         endereco = Endereco.objects.create(entidade=ent)
-        iden = Identificacao.objects.create(contato=c, funcao='Tecnico', area='', ativo= True, endereco=endereco)
+        iden = Identificacao.objects.create(contato=c, funcao='Tecnico', area='', ativo=True, endereco=endereco)
         
         desc = Descricao.objects.create(descricao='Descricao', entidade=ent)
         
         protocoloEstado = ProtocoloEstado.objects.create(nome='Pendente')
         
-        p = Protocolo.objects.create(termo=t, tipo_documento=td, num_documento=2008, estado=protocoloEstado, identificacao=iden, data_chegada=datetime(2008,9,30,10,10), \
-                      data_validade=datetime(2009,8,25), data_vencimento=datetime(2008,9,30), descricao="Conta mensal", origem=og, valor_total=None, \
-                      descricao2=desc, moeda_estrangeira=False)
-        ip = ItemProtocolo.objects.create(protocolo=p, descricao='Folha de pagamento', quantidade=2, valor_unitario=10000)
-
+        p = Protocolo.objects.create(termo=t, tipo_documento=td, num_documento=2008, estado=protocoloEstado,
+                                     identificacao=iden, data_chegada=datetime(2008, 9, 30, 10, 10),
+                                     data_validade=datetime(2009, 8, 25), data_vencimento=datetime(2008, 9, 30),
+                                     descricao="Conta mensal", origem=og, valor_total=None, descricao2=desc,
+                                     moeda_estrangeira=False)
+        ip = ItemProtocolo.objects.create(protocolo=p, descricao='Folha de pagamento', quantidade=2,
+                                          valor_unitario=10000)
 
     def test_doc_num(self):
         p = Protocolo.objects.get(num_documento=2008)
@@ -99,7 +104,7 @@ class ProtocoloTest(TestCase):
     def test_recebimento(self):
         p = Protocolo.objects.get(num_documento=2008)
         self.assertEquals('30/09/08 10:10', p.recebimento())
-# 
+
     def test_vencimento(self):
         p = Protocolo.objects.get(num_documento=2008)
         self.assertEquals('30/09/08', p.vencimento())
@@ -141,6 +146,7 @@ class ProtocoloTest(TestCase):
         p = Protocolo.protocolos_termo(t)
         self.assertEquals('[<Protocolo: 30/09 - Nota Fiscal 2008 - R$ 20.000,00>]', str(p))
 
+
 class ItemProtocoloTest(TestCase):
     def setUp(self):
         td = TipoDocumento.objects.create(nome='Anexo 9')
@@ -152,23 +158,25 @@ class ItemProtocoloTest(TestCase):
         
         cg = Cargo.objects.create(nome='Outorgado')
 
-        ht = Historico.objects.create(inicio=datetime(2008,1,1), cargo=cg, membro=mb, funcionario=True)
+        ht = Historico.objects.create(inicio=datetime(2008, 1, 1), cargo=cg, membro=mb, funcionario=True)
         
         outorgaEstado = OutorgaEstado.objects.create(nome='Pendente')
         
         t = Termo.objects.create(ano=2008, processo=52885, digito=8, estado=outorgaEstado)
         
-        ent = Entidade.objects.create(sigla='UNIEMP', nome='Instituto Uniemp', cnpj='', fisco= True, url='')
+        ent = Entidade.objects.create(sigla='UNIEMP', nome='Instituto Uniemp', cnpj='', fisco=True, url='')
         endereco = Endereco.objects.create(entidade=ent)
         iden = Identificacao.objects.create(contato=c, funcao='Tecnico', area='', ativo= True, endereco=endereco)
         
         desc = Descricao.objects.create(descricao='Descricao', entidade=ent)
 
-        p = Protocolo.objects.create(termo=t, tipo_documento=td, num_documento=2008, estado=e, identificacao=iden, data_chegada=datetime(2008,9,30,10,10), \
-                      data_validade=date(2009,8,25), data_vencimento=date(2008,9,30), descricao="Aditivo Uniemp", origem=og, valor_total=None, \
-                      descricao2=desc, moeda_estrangeira=False)
+        p = Protocolo.objects.create(termo=t, tipo_documento=td, num_documento=2008, estado=e, identificacao=iden,
+                                     data_chegada=datetime(2008, 9, 30, 10, 10), data_validade=date(2009, 8, 25),
+                                     data_vencimento=date(2008, 9, 30), descricao="Aditivo Uniemp", origem=og,
+                                     valor_total=None, descricao2=desc, moeda_estrangeira=False)
 
-        ip = ItemProtocolo.objects.create(protocolo=p, descricao='Servico de conexao', quantidade=1, valor_unitario='59613.59')
+        ip = ItemProtocolo.objects.create(protocolo=p, descricao='Servico de conexao', quantidade=1,
+                                          valor_unitario='59613.59')
 
     def test_unicode(self):
         ip = ItemProtocolo.objects.get(pk=1)
@@ -197,41 +205,38 @@ class TipoDocumentoTest(TestCase):
 
 class FeriadoTest(TestCase):
     def test_unicode(self):
-        f = Feriado.objects.create(feriado=date(2008,10,8))
+        f = Feriado.objects.create(feriado=date(2008, 10, 8))
         
         self.assertEquals('08/10/08', f.__unicode__())
         
     def test_dia_feriado(self):
-        f = Feriado.objects.create(feriado=date(2008,10,8))
-        f = Feriado.objects.create(feriado=date(2008,5,18))
-        f = Feriado.objects.create(feriado=date(2008,2,22))
+        f = Feriado.objects.create(feriado=date(2008, 10, 8))
+        f = Feriado.objects.create(feriado=date(2008, 5, 18))
+        f = Feriado.objects.create(feriado=date(2008, 2, 22))
     
-        self.assertEquals(Feriado.dia_de_feriado(date(2008,2,22)), True)
-        self.assertEquals(Feriado.dia_de_feriado(date(2008,10,8)), True)
-        self.assertEquals(Feriado.dia_de_feriado(date(2008,5,18)), True)
-        
-        
+        self.assertEquals(Feriado.dia_de_feriado(date(2008, 2, 22)), True)
+        self.assertEquals(Feriado.dia_de_feriado(date(2008, 10, 8)), True)
+        self.assertEquals(Feriado.dia_de_feriado(date(2008, 5, 18)), True)
+
     def test_dia_normal(self):
-        f = Feriado.objects.create(feriado=date(2008,2,22))
+        f = Feriado.objects.create(feriado=date(2008, 2, 22))
         
-        self.assertEquals(Feriado.dia_de_feriado(date(2007,2,22)), False)
-        self.assertEquals(Feriado.dia_de_feriado(date(2007,10,8)), False)
+        self.assertEquals(Feriado.dia_de_feriado(date(2007, 2, 22)), False)
+        self.assertEquals(Feriado.dia_de_feriado(date(2007, 10, 8)), False)
         
     def test_erro_para_feriado_unico(self):
-        f = Feriado.objects.create(feriado=date(2008,10,8))
+        f = Feriado.objects.create(feriado=date(2008, 10, 8))
         
-        f = Feriado(feriado=date(2008,10,8))
+        f = Feriado(feriado=date(2008, 10, 8))
         # deve disparar erro para feriado com data igual
         self.assertRaises(IntegrityError, f.save)
 
     def test_modificacao_de_feriado_unico(self):
-        f = Feriado.objects.create(feriado=date(2008,10,8))
+        f = Feriado.objects.create(feriado=date(2008, 10, 8))
         
-        f.obs ='teste'
-        # não deve dar nenhum erro
+        f.obs = 'teste'
         f.save()
 
-        
         
 class CotacaoTest(TestCase):
     def setUp(self):
@@ -239,24 +244,25 @@ class CotacaoTest(TestCase):
         
         cg = Cargo.objects.create(nome='Outorgado')
 
-        ht = Historico.objects.create(inicio=datetime(2008,1,1), cargo=cg, membro=mb, funcionario=True)
+        ht = Historico.objects.create(inicio=datetime(2008, 1, 1), cargo=cg, membro=mb, funcionario=True)
         
         outorgaEstado = OutorgaEstado.objects.create(nome='Pendente')
         
         t = Termo.objects.create(ano=2008, processo=52885, digito=8, estado=outorgaEstado)
         
-        ent = Entidade.objects.create(sigla='UNIEMP', nome='Instituto Uniemp', cnpj='', fisco= True, url='')
+        ent = Entidade.objects.create(sigla='UNIEMP', nome='Instituto Uniemp', cnpj='', fisco=True, url='')
         endereco = Endereco.objects.create(entidade=ent)
         
         td = TipoDocumento.objects.create(nome='Anexo 9')
         e = ProtocoloEstado.objects.create(nome='Pago')
         c = Contato.objects.create(primeiro_nome='Joao', email='joao@joao.com.br', tel='')
         og = Origem.objects.create(nome='Sedex')
-        iden = Identificacao.objects.create(contato=c, funcao='Tecnico', area='', ativo= True, endereco=endereco)
+        iden = Identificacao.objects.create(contato=c, funcao='Tecnico', area='', ativo=True, endereco=endereco)
         
-        cot = Cotacao.objects.create(termo=t, tipo_documento=td, estado=e, identificacao=iden, data_chegada=datetime(2008,12,12,9,10), \
-                      data_validade=date(2009,12,13), descricao='Compra de Aparelhos', origem=og, parecer='custo alto', aceito=False, \
-                      entrega='confirmada', moeda_estrangeira=False)
+        cot = Cotacao.objects.create(termo=t, tipo_documento=td, estado=e, identificacao=iden,
+                                     data_chegada=datetime(2008, 12, 12, 9, 10), data_validade=date(2009, 12, 13),
+                                     descricao='Compra de Aparelhos', origem=og, parecer='custo alto', aceito=False,
+                                     entrega='confirmada', moeda_estrangeira=False)
         
     def test_unicode(self):
         cot = Cotacao.objects.get(pk=1)
@@ -265,4 +271,3 @@ class CotacaoTest(TestCase):
     def existe_entrega(self):
         cot = Cotacao.objects.get(pk=1)
         self.assertEquals('confirmada', cot.existe_entrega())
-        

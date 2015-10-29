@@ -6,6 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 from datetime import datetime
 import re
 
+
 class Contato(models.Model):
     """
     Uma instância dessa classe representa um contato.
@@ -18,7 +19,8 @@ class Contato(models.Model):
     ultimo_nome = models.CharField(_(u'Último nome'), max_length=45)
     email = models.CharField(_(u'E-mail'), max_length=100, blank=True, help_text=_(u'ex. joao@joao.br'))
     ativo = models.BooleanField(_(u'Ativo'), default=True)
-    tel = models.CharField(_(u'Telefone'), max_length=100, help_text=_(u'ex. Com. (11)2222-2222, Cel. (11)9999-9999, Fax (11)3333-3333, ...'))
+    tel = models.CharField(_(u'Telefone'), max_length=100,
+                           help_text=_(u'ex. Com. (11)2222-2222, Cel. (11)9999-9999, Fax (11)3333-3333, ...'))
     documento = models.CharField(max_length=30, null=True, blank=True)
 
     @property
@@ -41,13 +43,12 @@ class Contato(models.Model):
                 ent.append(i.endereco.entidade)
         l = [e.sigla for e in ent]
         e = ', '.join(l)
-        return u'%s' % (e)
+        return u'%s' % e
     contato_ent.short_description = _(u'Entidade')
 
     # Define a ordenação dos dados pelo nome.
     class Meta:
         ordering = ('primeiro_nome', 'ultimo_nome')
-
 
 
 class TipoDetalhe(models.Model):
@@ -60,9 +61,9 @@ class TipoDetalhe(models.Model):
         ordering = ('nome',)
 
 
-
 class EnderecoDetalhe(models.Model):
-    endereco = models.ForeignKey('identificacao.Endereco', limit_choices_to={'data_inatividade__isnull':True}, null=True, blank=True)
+    endereco = models.ForeignKey('identificacao.Endereco', limit_choices_to={'data_inatividade__isnull':True},
+                                 null=True, blank=True)
     tipo = models.ForeignKey('identificacao.TipoDetalhe')
     complemento = models.TextField()
     detalhe = models.ForeignKey('identificacao.EnderecoDetalhe', verbose_name=u'ou Detalhe pai', null=True, blank=True)
@@ -70,12 +71,12 @@ class EnderecoDetalhe(models.Model):
     mostra_bayface = models.BooleanField(_(u'Mostra no bayface'), help_text=_(u''), default=False)
 
     def save(self, *args, **kwargs):
-        if self.endereco == None and self.detalhe == None:
+        if self.endereco is None and self.detalhe is None:
             return
-        if self.endereco != None and self.detalhe != None:
+        if self.endereco is not None and self.detalhe is not None:
             return
         self.ordena = self.__unicode__()
-        super(EnderecoDetalhe,self).save(*args,**kwargs)
+        super(EnderecoDetalhe, self).save(*args,**kwargs)
 
     def __unicode__(self):
         if self.endereco:
@@ -118,28 +119,26 @@ class EnderecoDetalhe(models.Model):
     #    verbose_name_plural = u'Detalhes dos endereços'
 
 
-
 class Endereco(models.Model):
 
     """
     Uma instância dessa classe representa um endereco de uma identificação.
 
     O método '__unicode__'	Retorna os campos 'rua', 'num' e 'compl' (se existir).
-    A 'class Meta'		Define a descrição do modelo (singular e plural), a ordenação dos dados e a unicidade que um endereço pelos 
-			    	campos 'identificacao', 'rua', 'num', 'compl', 'bairro', 'cidade', 'cep', 'estado' e 'pais'.
+    A 'class Meta'		Define a descrição do modelo (singular e plural), a ordenação dos dados e a unicidade que um
+    endereço pelos campos 'identificacao', 'rua', 'num', 'compl', 'bairro', 'cidade', 'cep', 'estado' e 'pais'.
     """
-
     entidade = models.ForeignKey('identificacao.Entidade', verbose_name=_(u'Entidade'))
     rua = models.CharField(_(u'Logradouro'), max_length=100, help_text=_(u'ex. R. Dr. Ovídio Pires de Campos'))
     num = models.IntegerField(_(u'Num.'), help_text=_(u'ex. 215'), null=True, blank=True)
-    compl = models.CharField(_(u'Complemento'), max_length=100, blank=True, help_text=_(u'ex. 2. andar - Prédio da PRODESP'))
+    compl = models.CharField(_(u'Complemento'), max_length=100, blank=True,
+                             help_text=_(u'ex. 2. andar - Prédio da PRODESP'))
     bairro = models.CharField(_(u'Bairro'), max_length=50, blank=True, help_text=_(u'ex. Cerqueira César'))
-    cidade =  models.CharField(_(u'Cidade'), max_length=50, blank=True, help_text=_(u'ex. São Paulo'))
+    cidade = models.CharField(_(u'Cidade'), max_length=50, blank=True, help_text=_(u'ex. São Paulo'))
     cep = models.CharField(_(u'CEP'), max_length=8, blank=True, help_text=_(u'ex. 05403010'))
     estado = models.CharField(_(u'Estado'), max_length=50, blank=True, help_text=_(u'ex. SP'))
     pais = models.CharField(_(u'País'), max_length=50, blank=True, help_text=_(u'ex. Brasil'))
     data_inatividade = models.DateField(_(u'Data de inatividade'), blank=True, null=True)
-
 
     # Retorna os campos rua, num e compl (se existir).
     def __unicode__(self):
@@ -159,12 +158,10 @@ class Endereco(models.Model):
         unique_together = (('rua', 'num', 'compl', 'bairro', 'cidade', 'cep', 'estado', 'pais'),)
 
 
-
 class ASN(models.Model):
     """
     Tabela com os ASs da Internet
     """
-
     numero = models.IntegerField(u'Número do AS')
     entidade = models.ForeignKey('identificacao.Entidade', null=True, blank=True)
     pais = models.CharField(u'País', null=True, blank=True, max_length=3)
@@ -172,13 +169,13 @@ class ASN(models.Model):
     def __unicode__(self):
         if self.entidade:
             return u'%s - %s' % (self.numero, self.entidade)
-        else: return self.numero
+        else:
+            return self.numero
 
     class Meta:
-        verbose_name = (u'ASN')
-        verbose_name_plural = (u'ASNs')
-        ordering = ('numero',)
-
+        verbose_name = u'ASN'
+        verbose_name_plural = u'ASNs'
+        ordering = ('numero', )
 
 
 class Entidade(models.Model):
@@ -192,14 +189,15 @@ class Entidade(models.Model):
 
     A unicidade dos dados é feita através do campo 'sigla'.
     """
-    
     TERREMARK_ID = 1
     
-    entidade = models.ForeignKey('identificacao.Entidade', verbose_name=_(u'Faz parte de'), null=True, blank=True, related_name='entidade_em')
-    nome = models.CharField(_(u'Nome'), max_length=255, help_text=_(u'Razão Social (ex. Telecomunicações de São Paulo S.A.)'))
+    entidade = models.ForeignKey('identificacao.Entidade', verbose_name=_(u'Faz parte de'), null=True, blank=True,
+                                 related_name='entidade_em')
+    nome = models.CharField(_(u'Nome'), max_length=255,
+                            help_text=_(u'Razão Social (ex. Telecomunicações de São Paulo S.A.)'))
     url = models.URLField(_(u'URL'), blank=True, help_text=_(u'ex. www.telefonica.com.br'))
     sigla = models.CharField(_(u'Sigla'), max_length=20, help_text=_(u'Nome Fantasia (ex. TELEFÔNICA)'), unique=True)
-    #asn = models.IntegerField(_(u'ASN'), blank=True, null=True, help_text=_(u' '))
+    # asn = models.IntegerField(_(u'ASN'), blank=True, null=True, help_text=_(u' '))
     cnpj = CNPJField(_(u'CNPJ'), blank=True, help_text=_(u'ex. 00.000.000/0000-00'))
     fisco = models.BooleanField(_(u'Fisco'), help_text=_(u'ex. Ativo no site da Receita Federal?'), default=False)
     recebe_doacao = models.BooleanField(_(u'Recebe doação de equipamentos?'), default=False)
@@ -214,15 +212,14 @@ class Entidade(models.Model):
         else:
             return u'%s' % self.sigla
     sigla_completa.short_description = _(u'Faz parte de')
-    
-    
-    #Retorna a sigla com 4 espaços iniciais para cada nível de entidade pai
+
+    # Retorna a sigla com 4 espaços iniciais para cada nível de entidade pai
     def sigla_tabulada(self):
         if self.entidade:
             entidade_pai = self.entidade.sigla_tabulada()
             # substitui qualquer string que não inicia com espaços por quatro espaços
-            retorno =  re.sub('[^\s]+.+', '    ', entidade_pai)
-            return u'%s%s' % (retorno,self.sigla)
+            retorno = re.sub('[^\s]+.+', '    ', entidade_pai)
+            return u'%s%s' % (retorno, self.sigla)
         else:
             return u'%s' % self.sigla
     sigla_tabulada.short_description = _(u'Faz parte de')
@@ -232,24 +229,21 @@ class Entidade(models.Model):
         return u'%s - %s' % (self.sigla, self.nome)
     sigla_nome.short_description = _(u'Entidade')
 
-
     # Grava o CNPJ no banco de dados com as devidas pontuações e converte a sigla em letras maiúsculas.
     def save(self, force_insert=False, force_update=False, using=None):
         if self.cnpj and len(self.cnpj) < 18:
             a = list(self.cnpj)
-            p = [(2,'.'), (6,'.'), (10,'/'), (15,'-')]
+            p = [(2, '.'), (6, '.'), (10, '/'), (15, '-')]
             for i in p:
                 if i[1] != a[i[0]]:
-                    a.insert(i[0],i[1])
+                    a.insert(i[0], i[1])
             self.cnpj = ''.join(a)
         self.sigla = self.sigla.upper()
-        super(Entidade,self).save(force_insert, force_update)
-
+        super(Entidade, self).save(force_insert, force_update)
 
     # Define a ordenação dos dados pela sigla.
     class Meta:
         ordering = ('sigla', )
-
 
 
 class EntidadeHistorico(models.Model):
@@ -264,26 +258,24 @@ class EntidadeHistorico(models.Model):
         return u'%s %s %s' % (self.entidade.sigla, self.tipo.nome, self.inicio)
 
 
-
 class Identificacao(models.Model):
     """
     Uma instância dessa classe representa uma identificação de uma empresa, fornecedor ou contato.
 
     O método 'formata_historico'	Retorna o histórico no formato dd/mm/aa hh:mm
     O método '__unicode__'		Retorna sigla da entidade e o nome do contato.
-    A 'class Meta'			Define a descrição do modelo (singular e plural), a ordenação dos dados pela entidade e a unicidade dos
-    					dados pelos campos contato, entidade.
+    A 'class Meta'			Define a descrição do modelo (singular e plural), a ordenação dos dados pela entidade e a
+    unicidade dosdados pelos campos contato, entidade.
     """
-
-#    monitor = models.ForeignKey('rede.Monitor', verbose_name=_(u'Monitor'))
+    # monitor = models.ForeignKey('rede.Monitor', verbose_name=_(u'Monitor'))
     # entidade = models.ForeignKey('identificacao.Entidade', null=True, blank=True)
-    endereco = models.ForeignKey('identificacao.Endereco', limit_choices_to={'data_inatividade__isnull':True}, verbose_name=_(u'Entidade'))
+    endereco = models.ForeignKey('identificacao.Endereco', limit_choices_to={'data_inatividade__isnull': True},
+                                 verbose_name=_(u'Entidade'))
     contato = models.ForeignKey('identificacao.Contato', verbose_name=_(u'Contato'))
     historico = models.DateTimeField(_(u'Histórico'), default=datetime.now(), editable=False)
     area = models.CharField(_(u'Área'), max_length=50, blank=True, help_text=_(u'ex. Administração'))
     funcao = models.CharField(_(u'Função'), max_length=50, blank=True, help_text=_(u'ex. Gerente Administrativo'))
     ativo = models.BooleanField(_(u'Ativo'), default=False)
-
 
     # Define a descrição do modelo, a ordenação dos dados pela entidade e a unicidade dos dados.
     class Meta:
@@ -299,12 +291,10 @@ class Identificacao(models.Model):
         else:
             return u'%s - %s' % (self.endereco.entidade, self.contato.nome)
 
-
     # Retorna o histórico formatado.
     def formata_historico(self):
         return self.historico.strftime('%d/%m/%y %H:%M')
     formata_historico.short_description = _(u'Histórico')
-
 
 
 class TipoArquivoEntidade(models.Model):
@@ -315,7 +305,6 @@ class TipoArquivoEntidade(models.Model):
   
     class Meta:
         ordering = ('nome',)
-
 
 
 class ArquivoEntidade(models.Model):
@@ -330,6 +319,7 @@ class ArquivoEntidade(models.Model):
     class Meta:
         ordering = ('tipo', '-data')
 
+
 class TipoEntidade(models.Model):
     nome = models.CharField(max_length=100)
     
@@ -338,7 +328,6 @@ class TipoEntidade(models.Model):
 
     class Meta:
         ordering = ('nome',)
-
 
 
 class PapelEntidade(models.Model):
@@ -350,14 +339,12 @@ class PapelEntidade(models.Model):
         return u'%s - %s' % (self.entidade, self.tipo)
 
 
-
 class Agenda(models.Model):
     nome = models.CharField(max_length=40)
     entidades = models.ManyToManyField('identificacao.Entidade', through='Agendado')
 
     def __unicode__(self):
         return u'%s' % self.nome
-
 
 
 class Agendado(models.Model):
@@ -369,10 +356,10 @@ class Agendado(models.Model):
         return u'%s - %s' % (self.agenda.nome, self.entidade.sigla)
 
 
-
 class Acesso(models.Model):
     identificacao = models.ForeignKey('identificacao.Identificacao', verbose_name=u'Identificação')
-    niveis = models.ManyToManyField('identificacao.NivelAcesso', verbose_name=u'Níveis de acesso', null=True, blank=True)
+    niveis = models.ManyToManyField('identificacao.NivelAcesso', verbose_name=u'Níveis de acesso', null=True,
+                                    blank=True)
     liberacao = models.DateTimeField(u'Liberação', null=True, blank=True)
     encerramento = models.DateTimeField(null=True, blank=True)
     obs = models.TextField(null=True, blank=True)
@@ -385,6 +372,7 @@ class Acesso(models.Model):
         lista = ', '.join([n.nome for n in self.niveis.all()])
         return lista
 
+
 class NivelAcesso(models.Model): 
     nome = models.CharField(max_length=50)
     explicacao = models.TextField('Explicação')
@@ -395,7 +383,6 @@ class NivelAcesso(models.Model):
     class Meta:
         verbose_name = u'Nível de acesso'
         verbose_name_plural = u'Níveis de acesso'
-
 
 
 class Ecossistema(models.Model):
@@ -424,8 +411,6 @@ class Ecossistema(models.Model):
 
     class Meta:
         ordering = ('identificacao__endereco__entidade__sigla',)
-                                                                         
-
 
 
 # Classe para definição de permissões de views e relatórios da app identificação
@@ -434,10 +419,8 @@ class Permission(models.Model):
         # remover as permissões padrões, pois essa é uma classe para configurar permissões customizadas
         default_permissions = ()
         permissions = (
-                    ("rel_adm_agenda", "Rel. Adm. - Agenda"),     #/identificacao/agenda
-                    ("rel_adm_ecossistema", "Rel. Adm. - Ecossistema"),     #/identificacao/ecossistema/par
-                    # movido de relatorio tecnico para administrativo
-                    ("rel_tec_arquivos", "Rel. Adm. - Documentos por entidade"),     #/identificacao/relatorios/arquivos
-                )
-
-
+            ("rel_adm_agenda", "Rel. Adm. - Agenda"), # /identificacao/agenda
+            ("rel_adm_ecossistema", "Rel. Adm. - Ecossistema"), # /identificacao/ecossistema/par
+            # movido de relatorio tecnico para administrativo
+            ("rel_tec_arquivos", "Rel. Adm. - Documentos por entidade"), # /identificacao/relatorios/arquivos
+        )

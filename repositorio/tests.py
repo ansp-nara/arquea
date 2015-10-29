@@ -4,27 +4,30 @@ from django.test import TestCase, client
 from datetime import date
 
 from identificacao.models import Entidade
-from repositorio.models import Tipo, Estado, Anexo, Repositorio, Natureza, Servico
+from repositorio.models import Tipo, Estado, Repositorio, Natureza, Servico
 from patrimonio.models import Tipo as TipoPatrimonio, Patrimonio
 from membro.models import Membro
 
+
 class RepositorioTest(TestCase):
     # Fixture para carregar dados de autenticação de usuário
-    fixtures = ['auth_user_superuser.yaml',]
+    fixtures = ['auth_user_superuser.yaml']
 
     def setUp(self):
         tipoPatr = TipoPatrimonio.objects.create(nome='roteador')
-        Patrimonio.objects.create(ns='AF345678GB3489X', modelo='NetIron400', tipo=tipoPatr, apelido="NetIron400", checado=True)
+        Patrimonio.objects.create(ns='AF345678GB3489X', modelo='NetIron400', tipo=tipoPatr, apelido="NetIron400",
+                                  checado=True)
 
         tipoPatrFilho = TipoPatrimonio.objects.create(nome='placa')
-        Patrimonio.objects.create(ns='kjfd1234cdf', modelo='Placa mãe', tipo=tipoPatrFilho, apelido="Placa mãe", checado=True)
+        Patrimonio.objects.create(ns='kjfd1234cdf', modelo='Placa mãe', tipo=tipoPatrFilho, apelido="Placa mãe",
+                                  checado=True)
 
         # Comando de login para passar pelo decorator @login_required
         self.response = self.client.login(username='john', password='123456')
 
-
     def test_save__numero_sequencial(self):
-        entidade = Entidade.objects.create(sigla='SAC', nome='Global Crossing', cnpj='00.000.000/0000-00', fisco=True, url='')
+        entidade = Entidade.objects.create(sigla='SAC', nome='Global Crossing', cnpj='00.000.000/0000-00', fisco=True,
+                                           url='')
         
         tipo = Tipo.objects.create(entidade=entidade, nome="tipo_nome")
         estado = Estado.objects.create()
@@ -32,16 +35,19 @@ class RepositorioTest(TestCase):
 
         responsavel = Membro.objects.create(nome='Antonio')
 
-        repositorio1 = Repositorio.objects.create(data_ocorrencia=date(2014,2,10), tipo=tipo, estado=estado, ocorrencia=u'Ocorrência de teste número 1', responsavel=responsavel, natureza=natureza)
-        repositorio2 = Repositorio.objects.create(data_ocorrencia=date(2014,2,13), tipo=tipo, estado=estado, ocorrencia=u'Ocorrência de teste número 2', responsavel=responsavel, natureza=natureza)
+        repositorio1 = Repositorio.objects.create(data_ocorrencia=date(2014, 2, 10), tipo=tipo, estado=estado,
+                                                  ocorrencia=u'Ocorrência de teste número 1', responsavel=responsavel,
+                                                  natureza=natureza)
+        repositorio2 = Repositorio.objects.create(data_ocorrencia=date(2014, 2, 13), tipo=tipo, estado=estado,
+                                                  ocorrencia=u'Ocorrência de teste número 2', responsavel=responsavel,
+                                                  natureza=natureza)
 
         self.assertEqual(repositorio1.numero + 1, repositorio2.numero)
-
 
     def test_view__filtra_patrimonio(self):
         
         url = reverse("repositorio.views.ajax_seleciona_patrimonios")
-        response = self.client.get(url, {'string':'3456'})
+        response = self.client.get(url, {'string': '3456'})
         
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, '"ns": "AF345678GB3489X"')
@@ -49,7 +55,7 @@ class RepositorioTest(TestCase):
 
 class RepositorioRelatorioTest(TestCase):
     # Fixture para carregar dados de autenticação de usuário
-    fixtures = ['auth_user_superuser.yaml', 'treemenus.yaml',]
+    fixtures = ['auth_user_superuser.yaml', 'treemenus.yaml']
     
     def setUp(self):
         super(RepositorioRelatorioTest, self).setUp()
@@ -57,13 +63,16 @@ class RepositorioRelatorioTest(TestCase):
         self.response = self.client.login(username='john', password='123456')
         
         tipoPatr = TipoPatrimonio.objects.create(nome='roteador')
-        Patrimonio.objects.create(ns='AF345678GB3489X', modelo='NetIron400', tipo=tipoPatr, apelido="NetIron400", checado=True)
+        Patrimonio.objects.create(ns='AF345678GB3489X', modelo='NetIron400', tipo=tipoPatr, apelido="NetIron400",
+                                  checado=True)
 
         tipoPatrFilho = TipoPatrimonio.objects.create(nome='placa')
-        Patrimonio.objects.create(ns='kjfd1234cdf', modelo='Placa mãe', tipo=tipoPatrFilho, apelido="Placa mãe", checado=True)
+        Patrimonio.objects.create(ns='kjfd1234cdf', modelo='Placa mãe', tipo=tipoPatrFilho, apelido="Placa mãe",
+                                  checado=True)
         
         # Grupo 1 de repositórios
-        entidade = Entidade.objects.create(sigla='SAC', nome='Global Crossing', cnpj='00.000.000/0000-00', fisco=True, url='')
+        entidade = Entidade.objects.create(sigla='SAC', nome='Global Crossing', cnpj='00.000.000/0000-00', fisco=True,
+                                           url='')
         tipo = Tipo.objects.create(entidade=entidade, nome="tipo_nome")
         natureza = Natureza.objects.create(nome="problema")
         servico1 = Servico.objects.create(nome="servico1")
@@ -72,9 +81,13 @@ class RepositorioRelatorioTest(TestCase):
         estado = Estado.objects.create()
         responsavel = Membro.objects.create(nome='Antonio')
 
-        repositorio1 = Repositorio.objects.create(data_ocorrencia=date(2014,2,14), tipo=tipo, estado=estado, ocorrencia=u'Ocorrência de teste número 1', responsavel=responsavel, natureza=natureza)
+        repositorio1 = Repositorio.objects.create(data_ocorrencia=date(2014, 2, 14), tipo=tipo, estado=estado,
+                                                  ocorrencia=u'Ocorrência de teste número 1', responsavel=responsavel,
+                                                  natureza=natureza)
         repositorio1.servicos.add(servico2)
-        repositorio2 = Repositorio.objects.create(data_ocorrencia=date(2014,2,10), tipo=tipo, estado=estado, ocorrencia=u'Ocorrência de teste número 2', responsavel=responsavel, natureza=natureza)
+        repositorio2 = Repositorio.objects.create(data_ocorrencia=date(2014, 2, 10), tipo=tipo, estado=estado,
+                                                  ocorrencia=u'Ocorrência de teste número 2', responsavel=responsavel,
+                                                  natureza=natureza)
         repositorio2.servicos.add(servico1, servico2)
 
         # Grupo 2 de repositórios
@@ -85,13 +98,13 @@ class RepositorioRelatorioTest(TestCase):
         estado = Estado.objects.create()
         responsavel = Membro.objects.create(nome='Rogerio')
 
-        repositorio3 = Repositorio.objects.create(data_ocorrencia=date(2014,2,13), tipo=tipo, estado=estado, 
-                                   ocorrencia=u'Ocorrência de teste número 3', responsavel=responsavel, natureza=natureza)
+        repositorio3 = Repositorio.objects.create(data_ocorrencia=date(2014, 2, 13), tipo=tipo, estado=estado,
+                                                  ocorrencia=u'Ocorrência de teste número 3', responsavel=responsavel,
+                                                  natureza=natureza)
         
-        repositorio4 = Repositorio.objects.create(data_ocorrencia=date(2014,2,11), tipo=tipo, estado=estado, 
-                                   ocorrencia=u'Ocorrência de teste número 4', responsavel=responsavel, natureza=natureza)
-        
-
+        repositorio4 = Repositorio.objects.create(data_ocorrencia=date(2014, 2, 11), tipo=tipo, estado=estado,
+                                                  ocorrencia=u'Ocorrência de teste número 4', responsavel=responsavel,
+                                                  natureza=natureza)
 
     def test_view__relatorio_repositorio__sem_filtro(self):
         url = reverse("repositorio.views.relatorio_repositorio")
@@ -113,10 +126,9 @@ class RepositorioRelatorioTest(TestCase):
         self.assertContains(response, u'<input name="data_ate" id="id_data_ate"  style="display:inline" value="" />')
         self.assertNotContains(response, u'<h4>')
 
-
     def test_view__relatorio_repositorio__entidade1(self):
         url = reverse("repositorio.views.relatorio_repositorio")
-        response = self.client.get(url, {'entidade':'1'})
+        response = self.client.get(url, {'entidade': '1'})
         
         self.assertTrue(200, response.status_code)
         
@@ -124,7 +136,8 @@ class RepositorioRelatorioTest(TestCase):
         self.assertContains(response, u'<a href="/repositorio/relatorio/repositorio">Relatório do Repositório</a>')
         
         # assert filtro
-        self.assertContains(response, u'<form action="/repositorio/relatorio/repositorio/1" method="GET" id="id_form_recurso">')
+        self.assertContains(response, u'<form action="/repositorio/relatorio/repositorio/1" method="GET" '
+                                      u'id="id_form_recurso">')
         self.assertContains(response, u'<input type="hidden" name="entidade" value="1" />')
         self.assertContains(response, u'<input type="hidden" name="natureza" value="0" />')
         self.assertContains(response, u'<input type="hidden" name="servico" value="0" />')
@@ -143,10 +156,9 @@ class RepositorioRelatorioTest(TestCase):
         self.assertContains(response, u'    servico1')
         self.assertContains(response, u'    servico2')
 
-
     def test_view__relatorio_repositorio__entidade1__servico(self):
         url = reverse("repositorio.views.relatorio_repositorio")
-        response = self.client.get(url, {'entidade':'1', 'servico':'1'})
+        response = self.client.get(url, {'entidade': '1', 'servico': '1'})
         
         self.assertTrue(200, response.status_code)
         
@@ -154,7 +166,8 @@ class RepositorioRelatorioTest(TestCase):
         self.assertContains(response, u'<a href="/repositorio/relatorio/repositorio">Relatório do Repositório</a>')
         
         # assert filtro
-        self.assertContains(response, u'<form action="/repositorio/relatorio/repositorio/1" method="GET" id="id_form_recurso">')
+        self.assertContains(response, u'<form action="/repositorio/relatorio/repositorio/1" method="GET" '
+                                      u'id="id_form_recurso">')
         self.assertContains(response, u'<input type="hidden" name="entidade" value="1" />')
         self.assertContains(response, u'<input type="hidden" name="natureza" value="0" />')
         self.assertContains(response, u'<input type="hidden" name="servico" value="1" />')
@@ -173,10 +186,9 @@ class RepositorioRelatorioTest(TestCase):
         self.assertContains(response, u'    servico1')
         self.assertContains(response, u'    servico2')
 
-
     def test_view__relatorio_repositorio__entidade2(self):
         url = reverse("repositorio.views.relatorio_repositorio")
-        response = self.client.get(url, {'entidade':'2'})
+        response = self.client.get(url, {'entidade': '2'})
         
         self.assertTrue(200, response.status_code)
         
@@ -184,7 +196,8 @@ class RepositorioRelatorioTest(TestCase):
         self.assertContains(response, u'<a href="/repositorio/relatorio/repositorio">Relatório do Repositório</a>')
         
         # assert filtro
-        self.assertContains(response, u'<form action="/repositorio/relatorio/repositorio/1" method="GET" id="id_form_recurso">')
+        self.assertContains(response, u'<form action="/repositorio/relatorio/repositorio/1" method="GET" '
+                                      u'id="id_form_recurso">')
         self.assertContains(response, u'<input type="hidden" name="entidade" value="2" />')
         self.assertContains(response, u'<input type="hidden" name="natureza" value="0" />')
         self.assertContains(response, u'<input type="hidden" name="servico" value="0" />')
@@ -203,23 +216,11 @@ class RepositorioRelatorioTest(TestCase):
         self.assertNotContains(response, u'    servico1')
         self.assertNotContains(response, u'    servico2')
 
-
     def test_view__ajax_repositorio_tipo_nomes(self):
         url = reverse("repositorio.views.ajax_repositorio_tipo_nomes")
-        response = self.client.get(url, {'id_entidade':'2'})
+        response = self.client.get(url, {'id_entidade': '2'})
         
         self.assertTrue(200, response.status_code)
         
         # asssert dos dados
         self.assertContains(response, u'tipo_nome dell')
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    

@@ -17,8 +17,6 @@ class VerificacaoEquipamento():
         """
         Verifica o equipamento com marca/fabricante/editora vazia
         """
-        
-        retorno = []
         retorno = Equipamento.objects.filter(entidade_fabricante__isnull=True).order_by('entidade_fabricante__sigla')
         
         return retorno
@@ -28,28 +26,26 @@ class VerificacaoEquipamento():
         Verifica o equipamento pelo part_number
         buscando por modelos diferentes
         """
-
         retorno = []
         # busca por part_number que possuam mais que um equipamento cadastrado
-        part_numbers = Equipamento.objects.exclude(part_number__exact='').values("part_number").annotate(qtd=Count("part_number")).order_by().filter(qtd__gt = 1)
+        part_numbers = Equipamento.objects.exclude(part_number__exact='').values("part_number")\
+            .annotate(qtd=Count("part_number")).order_by().filter(qtd__gt=1)
         
         for pn_item in part_numbers:
-            num_modelos = Equipamento.objects.filter(part_number=pn_item['part_number']).values("modelo").annotate(c=Count("modelo")).order_by().count()
+            num_modelos = Equipamento.objects.filter(part_number=pn_item['part_number']).values("modelo")\
+                .annotate(c=Count("modelo")).order_by().count()
             
             if num_modelos != 1:
                 equipamentos = Equipamento.objects.filter(part_number=pn_item['part_number']).order_by("id")
-                
                 retorno.append(equipamentos)
 
         return retorno
-    
 
     def partNumberVazio(self):
         """
         Verifica o equipamento pelo part_number
         que esteja vazio
         """
-
         # busca por part_number vazio
         retorno = []
         equipamentos = Equipamento.objects.filter(part_number='').order_by("id")
@@ -63,7 +59,6 @@ class VerificacaoEquipamento():
         Verifica o equipamento pelo part_number
         que esteja vazio
         """
-
         # busca por part_number vazio
         retorno = []
         equipamentos = Equipamento.objects.filter(part_number='').filter(modelo='').order_by("id")
@@ -81,7 +76,8 @@ class VerificacaoPatrimonio:
         """
         
         retorno = []
-        patrimonios = Patrimonio.objects.filter(entidade_procedencia__isnull=True).select_related("equipamento__entidade_fabricante").order_by("id")
+        patrimonios = Patrimonio.objects.filter(entidade_procedencia__isnull=True)\
+            .select_related("equipamento__entidade_fabricante").order_by("id")
         
         if filtros and filtros["filtro_tipo_patrimonio"]:
             patrimonios = patrimonios.filter(tipo=filtros["filtro_tipo_patrimonio"])
@@ -105,7 +101,6 @@ class VerificacaoPatrimonio:
 
         return retorno
 
-
     # busca de patrimonio cujos filhos estejam com historico_local diferente
     def localidadeDiferente(self, filtros=None):
         retorno = []
@@ -120,10 +115,10 @@ class VerificacaoPatrimonio:
             contido = self.localidadeDiferenteFilho(p, filtros)
             if len(contido) > 0:
                 patrimonio = {}
-                patrimonio.update({'id':p.id, 'modelo':p.modelo, 'descricao':p.descricao,
-                                'endereco':'', 'estado':'', 'posicao':'', 'data':'', 'contido':[]})
-                patrimonio.update({'endereco':p.historico_atual.endereco, 'estado':p.historico_atual.estado, 
-                                   'posicao':p.historico_atual.posicao, 'data':p.historico_atual.data})
+                patrimonio.update({'id': p.id, 'modelo': p.modelo, 'descricao': p.descricao,
+                                   'endereco': '', 'estado': '', 'posicao': '', 'data': '', 'contido': []})
+                patrimonio.update({'endereco': p.historico_atual.endereco, 'estado': p.historico_atual.estado,
+                                   'posicao': p.historico_atual.posicao, 'data': p.historico_atual.data})
                 patrimonio.update({'contido': contido})
                 retorno.append(patrimonio)
 
@@ -147,10 +142,10 @@ class VerificacaoPatrimonio:
                        patrimonioPai.historico_atual.posicao != p.historico_atual.posicao:
                     
                         patrimonio = {}
-                        patrimonio.update({'id':p.id, 'modelo':p.modelo, 'descricao':p.descricao,
-                                        'endereco':'', 'estado':'', 'posicao':'', 'data':'', 'contido':[]})
-                        patrimonio.update({'endereco':p.historico_atual.endereco, 'estado':p.historico_atual.estado, 
-                                           'posicao':p.historico_atual.posicao, 'data':p.historico_atual.data})
+                        patrimonio.update({'id': p.id, 'modelo': p.modelo, 'descricao': p.descricao,
+                                           'endereco': '', 'estado': '', 'posicao': '', 'data': '', 'contido': []})
+                        patrimonio.update({'endereco': p.historico_atual.endereco, 'estado': p.historico_atual.estado,
+                                           'posicao': p.historico_atual.posicao, 'data': p.historico_atual.data})
 
                         retorno.append(patrimonio)
         return retorno
@@ -162,15 +157,15 @@ class VerificacaoPatrimonioEquipamento():
         tipos = Tipo.objects.filter(id__in=pids)
         
         return tipos
-        
-    
-    
+
     # busca de patrimonio e equipamento
     # com descrição diferente
     def descricaoDiferente(self, filtros=None):
         retorno = []
 
-        patrimonios = Patrimonio.objects.filter(equipamento_id__isnull=False).filter(equipamento__descricao__isnull=False).exclude(equipamento__descricao=F('descricao')).select_related("equipamento").order_by("id")
+        patrimonios = Patrimonio.objects.filter(equipamento_id__isnull=False)\
+            .filter(equipamento__descricao__isnull=False).exclude(equipamento__descricao=F('descricao'))\
+            .select_related("equipamento").order_by("id")
 
         if filtros and filtros["filtro_tipo_patrimonio"]:
             patrimonios = patrimonios.filter(tipo=filtros["filtro_tipo_patrimonio"])
@@ -178,13 +173,14 @@ class VerificacaoPatrimonioEquipamento():
         retorno.append(patrimonios)
         return retorno
 
-        
     # busca de patrimonio e equipamento
     # com tamanho em Us diferente
     def tamanhoDiferente(self, filtros=None):
         retorno = []
         
-        patrimonios = Patrimonio.objects.filter(equipamento_id__isnull=False).filter(equipamento__tamanho__isnull=False).exclude(equipamento__tamanho=F('tamanho')).select_related("equipamento").order_by("id")
+        patrimonios = Patrimonio.objects.filter(equipamento_id__isnull=False)\
+            .filter(equipamento__tamanho__isnull=False).exclude(equipamento__tamanho=F('tamanho'))\
+            .select_related("equipamento").order_by("id")
 
         if filtros and filtros["filtro_tipo_patrimonio"]:
             patrimonios = patrimonios.filter(tipo=filtros["filtro_tipo_patrimonio"])
@@ -192,10 +188,10 @@ class VerificacaoPatrimonioEquipamento():
         retorno.append(patrimonios)
         return retorno
 
-
     def copy_attribute(self, to_object, patrimonio_id, att_name):
         """
-        to_object = ['patrimonio', 'equipamento']   objeto a ser copiado. deve ser de equipamento para patrimonio, ou de patrimonio para equipamento
+        to_object = ['patrimonio', 'equipamento']   objeto a ser copiado. deve ser de equipamento para patrimonio,
+        ou de patrimonio para equipamento
         patrimonio_id = id do patrimonio
         att_name = nome do atributo do objeto
         """
@@ -243,4 +239,3 @@ class VerificacaoPatrimonioEquipamento():
             
         else:
             raise ValueError('Valor inválido para o parametro. to_object=' + str(to_object))        
-

@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 
-import urllib2, urllib
+import urllib2
+import urllib
 import cookielib
 from django.core.management.base import BaseCommand, CommandError
-from financeiro.models import *
 from outorga.models import Termo
 from patrimonio.models import Patrimonio
-import sys
 import time
 import re
 import getpass
+
 
 class Command(BaseCommand):
     args = '<processo parcial usuario>'
@@ -45,24 +45,29 @@ class Command(BaseCommand):
         data = urllib.urlencode([('username', args[2]), ('password', password)])
         req = urllib2.Request(url='http://internet.aquila.fapesp.br/agilis/Login.do', data=data)
         urllib2.urlopen(req)
-        urllib2.urlopen('http://internet.aquila.fapesp.br/agilis/Solicitacao.do?method=prepararAcao&processo=%s&redirectPC=redirectPC' % args[0])
-        urllib2.urlopen('http://internet.aquila.fapesp.br/agilis/Pconline.do?method=iniciar&solicitacao=49&processo=%s' % args[0])
+        urllib2.urlopen('http://internet.aquila.fapesp.br/agilis/Solicitacao.do?'
+                        'method=prepararAcao&processo=%s&redirectPC=redirectPC' % args[0])
+        urllib2.urlopen('http://internet.aquila.fapesp.br/agilis/Pconline.do?'
+                        'method=iniciar&solicitacao=49&processo=%s' % args[0])
 
-        data = urllib.urlencode([('processo', args[0]), ('parcial', parcial), ('tipoPrestacao', 'PRN'), ('tipoDespesa', 'MPE'), ('Prosseguir', 'Prosseguir')])
-        req = urllib2.Request(url='http://internet.aquila.fapesp.br/agilis/PconlineSelecao.do?method=pesquisar', data=data)
+        data = urllib.urlencode([('processo', args[0]), ('parcial', parcial), ('tipoPrestacao', 'PRN'),
+                                 ('tipoDespesa', 'MPE'), ('Prosseguir', 'Prosseguir')])
+        req = urllib2.Request(url='http://internet.aquila.fapesp.br/agilis/PconlineSelecao.do?method=pesquisar',
+                              data=data)
         resp = urllib2.urlopen(req)
 
         eqs = {}
-        patrimonios = Patrimonio.objects.filter(pagamento__protocolo__termo=termo, pagamento__origem_fapesp__item_outorga__natureza_gasto__modalidade__sigla='MPN')
+        patrimonios = Patrimonio.objects.filter(pagamento__protocolo__termo=termo,
+                                        pagamento__origem_fapesp__item_outorga__natureza_gasto__modalidade__sigla='MPN')
         for e in patrimonios.filter(agilis=True):
             texto = '%s - %s - %s' % (e.equipamento.modelo, e.pagamento.id, e.equipamento.entidade_fabricante.sigla)
-            if e.pagamento.auditoria_set.filter(parcial=parcial).count() == 0: continue
+            if e.pagamento.auditoria_set.filter(parcial=parcial).count() == 0:
+                continue
             if texto in eqs.keys():
                 eqs[texto].append(e)
             else:
                 eqs[texto] = [e]
 
-        dt = []
         incluir = [('method', 'Incluir')]
         for eq in eqs.keys():
             qtd = len(eqs[eq])
@@ -78,13 +83,19 @@ class Command(BaseCommand):
             nf = pg.protocolo.num_documento
             sn = ','.join([pt.ns for pt in eqs[eq]])
             modelo, pgto, marca = eq.split(' - ')
-            for pt in patrimonios.filter(agilis=False, equipamento__modelo=modelo, pagamento__id=pgto, equipamento__entidade_fabricante__sigla=marca):
+            for pt in patrimonios.filter(agilis=False, equipamento__modelo=modelo, pagamento__id=pgto,
+                                         equipamento__entidade_fabricante__sigla=marca):
                 sn += ',%s' % pt.ns
             if len(sn) > 170: sn = sn[:170]
 
             if pg.protocolo.tipo_documento.nome.lower().find('anexo') == 0:
                 nf = '%s %s' % (pg.protocolo.tipo_documento.nome, nf)
-            dt = [('notaFiscal', nf), ('dataNotaFiscal', pg.protocolo.data_vencimento.strftime('%d/%m/%Y')), ('cheque', pg.conta_corrente.cod_oper), ('pagina', pg.auditoria_set.filter(parcial=parcial).values_list('pagina', flat=True)[0]), ('valorItem', '%s,%s' % (inte, dec)), ('descricao', e.equipamento.descricao), ('quantidade', qtd), ('marca', e.marca or ''), ('modelo', e.modelo or ''), ('observacao', sn), ('procedencia', e.procedencia or '')]
+            dt = [('notaFiscal', nf), ('dataNotaFiscal', pg.protocolo.data_vencimento.strftime('%d/%m/%Y')),
+                  ('cheque', pg.conta_corrente.cod_oper),
+                  ('pagina', pg.auditoria_set.filter(parcial=parcial).values_list('pagina', flat=True)[0]),
+                  ('valorItem', '%s,%s' % (inte, dec)), ('descricao', e.equipamento.descricao), ('quantidade', qtd),
+                  ('marca', e.marca or ''), ('modelo', e.modelo or ''), ('observacao', sn),
+                  ('procedencia', e.procedencia or '')]
 
             data = urllib.urlencode(dt+incluir)
             req = urllib2.Request(url='http://internet.aquila.fapesp.br/agilis/PconlineIncluiOuAlteraMpe.do', data=data)

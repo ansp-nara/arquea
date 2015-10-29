@@ -14,16 +14,16 @@ from django.conf import settings
 from models import *
 from financeiro.models import Pagamento
 from outorga.models import Termo
-from utils.functions import render_to_pdf, render_to_pdf_weasy, render_to_pdfxhtml2pdf
+from utils.functions import render_to_pdf_weasy, render_to_pdfxhtml2pdf
 
 
 @login_required
 def simples(request, mem):
-    m = get_object_or_404(MemorandoSimples,pk=mem)
+    m = get_object_or_404(MemorandoSimples, pk=mem)
 
-    #return render_to_response('memorando/simples.pdf', {'m':m, 't':Termo.termo_ativo()})
-    return render_to_pdf_weasy('memorando/simples.pdf', {'m':m, 't':Termo.termo_ativo()}, request=request, filename='memorando_%s.pdf' % m.__unicode__())
-
+    # return render_to_response('memorando/simples.pdf', {'m':m, 't':Termo.termo_ativo()})
+    return render_to_pdf_weasy('memorando/simples.pdf', {'m': m, 't': Termo.termo_ativo()}, request=request,
+                               filename='memorando_%s.pdf' % m.__unicode__())
 
 
 @login_required_or_403
@@ -45,7 +45,7 @@ def ajax_escolhe_pagamentos(request):
         else:
             valor = u'%s %s' % (p.protocolo.num_documento, p.valor_fapesp)
 
-            pagamentos.append({'pk':p.id, 'valor':valor})
+            pagamentos.append({'pk': p.id, 'valor': valor})
 
     json = simplejson.dumps(pagamentos)
     return HttpResponse(json, content_type="application/json")
@@ -66,16 +66,16 @@ def ajax_filtra_perguntas(request):
     memorando_id = request.GET.get('memorando')
     memorando = get_object_or_404(MemorandoFAPESP, pk=memorando_id)
     
-    perguntas = [{'pk':'', 'valor':'-----------'}]
+    perguntas = [{'pk': '', 'valor': '-----------'}]
     for p in memorando.pergunta_set.all():
-        perguntas.append({'pk':p.id, 'valor':p.__unicode__()})
+        perguntas.append({'pk': p.id, 'valor': p.__unicode__()})
 
     return HttpResponse(simplejson.dumps(perguntas), content_type="application/json")
 
 
 @login_required
 def fapesp(request, mem):
-    m = get_object_or_404(MemorandoResposta,pk=mem)
+    m = get_object_or_404(MemorandoResposta, pk=mem)
     corpos = []
     anexos = []
     incluidos = {}
@@ -87,7 +87,7 @@ def fapesp(request, mem):
 
         new_request = HttpRequest()
         new_request.user = User.objects.get(email='antonio@ansp.br')
-        new_request.GET = {'termo':m.memorando.termo.id, 'agilis':1, 'modalidade':1}
+        new_request.GET = {'termo': m.memorando.termo.id, 'agilis': 1, 'modalidade': 1}
         new_request.META = {}
         response = por_termo(new_request, 1)
         anexos.append((response.content, u'Lista patrimonial do processo %s' % m.memorando.termo, 2))
@@ -98,10 +98,11 @@ def fapesp(request, mem):
         if c.pergunta.numero in incluidos.keys():
             corpos[incluidos[c.pergunta.numero]]['respostas'].append(c.resposta)
         else:
-            incluidos.update({c.pergunta.numero:len(corpos)})
-            corpos.append({'numero':c.pergunta.numero, 'pergunta':c.pergunta.questao, 'respostas':[c.resposta]})
+            incluidos.update({c.pergunta.numero: len(corpos)})
+            corpos.append({'numero': c.pergunta.numero, 'pergunta': c.pergunta.questao, 'respostas': [c.resposta]})
 
-    return render_to_pdfxhtml2pdf('memorando/fapesp.pdf', {'m':m, 'corpos':corpos}, request=request, filename='memorando_%s.pdf' % m.data.strftime('%d_%m_%Y'), attachments=anexos)
+    return render_to_pdfxhtml2pdf('memorando/fapesp.pdf', {'m': m, 'corpos': corpos}, request=request,
+                                  filename='memorando_%s.pdf' % m.data.strftime('%d_%m_%Y'), attachments=anexos)
 
 
 @login_required
@@ -114,7 +115,7 @@ def relatorio(request):
     """
     mem = request.GET.get('mem')
     if not mem:
-        return render_to_response('memorando/escolhe_memorando.html', {'memorandos':MemorandoFAPESP.objects.all()}, context_instance=RequestContext(request))
-    m = get_object_or_404(MemorandoFAPESP,pk=mem)
-    return render_to_response('memorando/relatorio.html', {'memorando':m}, context_instance=RequestContext(request))
-
+        return render_to_response('memorando/escolhe_memorando.html', {'memorandos': MemorandoFAPESP.objects.all()},
+                                  context_instance=RequestContext(request))
+    m = get_object_or_404(MemorandoFAPESP, pk=mem)
+    return render_to_response('memorando/relatorio.html', {'memorando': m}, context_instance=RequestContext(request))

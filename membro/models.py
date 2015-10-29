@@ -2,7 +2,7 @@
 from datetime import timedelta, datetime, date
 from dateutil.relativedelta import *
 from django.db import models
-from django.db.models import Q, Sum
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import cached_property
 from django.core.urlresolvers import reverse
@@ -21,6 +21,7 @@ class CPFField(models.CharField):
     """
     """
     empty_strings_allowed = False
+
     def __init__(self, *args, **kwargs):
         kwargs['max_length'] = 14
         models.CharField.__init__(self, *args, **kwargs)
@@ -50,7 +51,6 @@ class TipoAssinatura(models.Model):
     def __unicode__(self):
         return u'%s' % self.nome
 
-
     # Define a descrição do modelo e a ordenação dos dados pelo nome.
     class Meta:
         verbose_name = _(u'Tipo de Assinatura')
@@ -66,7 +66,8 @@ class SindicatoArquivo(models.Model):
     O método '__unicode__'    Retorna o nome.
     A 'class Meta'        Define a descrição (singular e plural) do modelo e a ordenação  dos dados pelo nome.
     """
-    membro = models.ForeignKey('membro.Membro', verbose_name=_(u'Membro'), limit_choices_to=Q(historico__funcionario=True)&Q(historico__termino__isnull=True))
+    membro = models.ForeignKey('membro.Membro', verbose_name=_(u'Membro'),
+                               limit_choices_to=Q(historico__funcionario=True) & Q(historico__termino__isnull=True))
     arquivo = models.FileField(upload_to='membro__sindicatoarquivo', null=True, blank=True)
     ano = models.IntegerField(verbose_name=_(u'Ano'), blank=True, null=True)
 
@@ -88,9 +89,10 @@ class Membro(models.Model):
 
     O método '__unicode__'	Retorna os campos 'nome' e 'cargo'.
     O método 'existe_ramal' 	Retorna o campo 'ramal' se estiver preenchido.
-    O método 'existe_curriculo' Retorna um ícone com link para o currículo lattes se o campo 'url_lattes' se estiver preenchido.
-    A class 'Meta' 		Define a ordenação dos dados pelos campos 'equipe' e 'membro' e define que um membro deve ser único
-    				pelos campos 'equipe', 'nome' e 'funcao'.
+    O método 'existe_curriculo' Retorna um ícone com link para o currículo lattes se o campo 'url_lattes'
+    se estiver preenchido.
+    A class 'Meta' 		Define a ordenação dos dados pelos campos 'equipe' e 'membro' e define que um membro deve ser
+    único pelos campos 'equipe', 'nome' e 'funcao'.
     """
     nome = models.CharField(_(u'Nome'), max_length=50, help_text=_(u'ex. Caio Andrade'))
     rg = models.CharField(_(u'RG'), max_length=12, help_text=_(u'ex. 00.000.000-0'), blank=True, null=True)
@@ -109,8 +111,7 @@ class Membro(models.Model):
         cargo = self.cargo_atual
         if cargo:
             return u'%s (%s)' % (self.nome, cargo)
-        return u'%s' % (self.nome)
-
+        return u'%s' % self.nome
 
     # Verifica se o campo ramal está preenchido.
     def existe_ramal(self):
@@ -118,7 +119,6 @@ class Membro(models.Model):
             return self.ramal
         return ''
     existe_ramal.short_description = _(u'Ramal')
-
 
     # Retorna um ícone com o link para o currículo lattes.
     def existe_curriculo(self):
@@ -132,11 +132,11 @@ class Membro(models.Model):
     # cargo atual do membro, caso exista, a partir do histórico
     @property
     def cargo_atual(self):
-        
-        #cargos = [h.cargo.nome for h in Historico.ativos.filter(membro=self).select_related('cargo').only('cargo__nome')]
+        # cargos = [h.cargo.nome for h in Historico.ativos.filter(membro=self).select_related('cargo')
+        # .only('cargo__nome')]
         cargos = []
         for h in self.historico_set.all():
-            if h.termino == None:
+            if h.termino is None:
                 cargos.append(h.cargo.nome)
         return ' - '.join(cargos)
 
@@ -158,24 +158,22 @@ class Membro(models.Model):
         ordering = ('nome', )
 
 
-
 class Usuario(models.Model):
     """
     Uma instância dessa classe representa um usuário de um sistema.
 
     O método '__unicode__'		Retorna o campo 'username'.
     A classmethod 'usuarios_sistema'	Retorna os usuários de um sistema.
-    A class 'Meta' 			Define a descrição do modelo (singuar e plural), ordena os dados pelos campos 'username' e 
-					a unicidade de um usuário pelos campos 'membro', 'username' e 'sistema'.
+    A class 'Meta' 			Define a descrição do modelo (singuar e plural), ordena os dados pelos campos 'username' e
+    a unicidade de um usuário pelos campos 'membro', 'username' e 'sistema'.
     """
-    membro = models.ForeignKey('membro.Membro', verbose_name=_(u'Membro'))#, limit_choices_to=Q(funcionario=True))
+    membro = models.ForeignKey('membro.Membro', verbose_name=_(u'Membro'))  # , limit_choices_to=Q(funcionario=True))
     username = models.CharField(_(u'Usuário'), max_length=20, help_text=_(u'Nome de usuário no sistema'))
     sistema = models.CharField(_(u'Sistema'), max_length=50, help_text=_(u'Nome do Sistema'))
 
     # Retorna o usuário.
     def __unicode__(self):
-        return u'%s' % (self.username)
-
+        return u'%s' % self.username
 
     # Define a descrição do modelo, a ordenação e a unicidade dos dados.
     class Meta:
@@ -185,7 +183,6 @@ class Usuario(models.Model):
         unique_together = (('membro', 'username', 'sistema'),)
 
 
-
 class Assinatura(models.Model):
 
     """
@@ -193,17 +190,14 @@ class Assinatura(models.Model):
 
     O método '__unicode__'		Retorna os campos 'membro' e 'tipo_assinatura'.
     A classmethod 'assinaturas_membro'	Retorna as assinaturas de um membro específico.
-    A class 'Meta'			Define a ordenação dos dados pelo 'nome' e unicidade pelos campos 'tipo_assinatura' e 'membro'.
+    A class 'Meta'		Define a ordenação dos dados pelo 'nome' e unicidade pelos campos 'tipo_assinatura' e 'membro'.
     """
-
-    membro = models.ForeignKey('membro.Membro', verbose_name=_(u'Membro'))#, limit_choices_to=Q(funcionario=True))
+    membro = models.ForeignKey('membro.Membro', verbose_name=_(u'Membro'))  # , limit_choices_to=Q(funcionario=True))
     tipo_assinatura = models.ForeignKey('membro.TipoAssinatura', verbose_name=_(u'Tipo de Assinatura'))
-
 
     # Retorna o membro e o tipo de assinatura.
     def __unicode__(self):
         return u'%s | %s' % (self.membro.nome, self.tipo_assinatura)
-
 
     # Define a ordenação e a unicidade dos dados.
     class Meta:
@@ -211,12 +205,12 @@ class Assinatura(models.Model):
         unique_together = (('membro', 'tipo_assinatura'),)
 
 
-
 class Ferias(models.Model):
     """
     Controle de período aquisitivo para as férias
     """
-    membro = models.ForeignKey('membro.Membro', verbose_name=_(u'Membro'), limit_choices_to=Q(historico__funcionario=True)&Q(historico__termino__isnull=True))
+    membro = models.ForeignKey('membro.Membro', verbose_name=_(u'Membro'),
+                               limit_choices_to=Q(historico__funcionario=True) & Q(historico__termino__isnull=True))
     inicio = NARADateField(_(u'Início do período aquisitivo'), help_text=_(u'Início do período de trabalho'))
     realizado = models.BooleanField(_(u'Férias já tiradas?'), default=False)
 
@@ -230,19 +224,20 @@ class Ferias(models.Model):
         return u'%s | Início período: %s' % (self.membro, self.inicio.strftime('%d/%m/%Y'))
 
     def inicio_ferias(self):
-        if self.inicio != None:
+        if self.inicio is not None:
             return (self.inicio + timedelta(365)).strftime('%d/%m/%Y')
         return ''
     inicio_ferias.short_description = u'Início do período para férias'
 
     def fim_ferias(self):
-        if self.inicio != None:
+        if self.inicio is not None:
             return (self.inicio + timedelta(730)).strftime('%d/%m/%Y')
         return ''
     fim_ferias.short_description = u'Final do período para férias'
 
     def link_edit(self):
-        if not self.id: return ''
+        if not self.id:
+            return ''
         return '<a href="%s?" target="_blank">Detalhes</a>' % reverse('admin:membro_ferias_change', args=[self.id])
     link_edit.allow_tags = True
     link_edit.short_description = u'Detalhes do período de férias'
@@ -265,11 +260,10 @@ class Ferias(models.Model):
         umano = date(self.inicio.year+1, self.inicio.month, self.inicio.day)
         return umano <= datetime.now().date()
     completo.boolean = True
-    
-    
+
     @classmethod
     def total_dias_uteis_aberto(self, membro_id):
-    # Retorna o total de dias em aberto para o membro, em segundos
+        # Retorna o total de dias em aberto para o membro, em segundos
         total_dias_uteis_aberto = 0
         
         ferias = Ferias.objects.filter(membro=membro_id)
@@ -308,14 +302,14 @@ class ControleFerias(models.Model):
     dias_uteis_fato = models.IntegerField(_(u'Dias úteis tirados de fato'))
     dias_uteis_aberto = models.IntegerField(_(u'Dias úteis em aberto'))
     arquivo_oficial = models.FileField(upload_to='controleferias__arquivooficial', null=True, blank=True)
-    
-    
+
     def dia_ferias(self, dia):
         # verifica se tem algum período de férias com dias úteis tirados de fato
-        # não deve entrar na conta se forem período de férias com venda de dias, ou somente marcação de vencimento de férias
+        # não deve entrar na conta se forem período de férias com venda de dias, ou somente marcação de vencimento
+        # de férias
         is_ferias = False
         if self.dias_uteis_fato > 0:
-            is_ferias =  is_ferias or (self.inicio <= dia <= self.termino)
+            is_ferias = is_ferias or (self.inicio <= dia <= self.termino)
         return is_ferias
     
     def __unicode__(self):
@@ -325,17 +319,20 @@ class ControleFerias(models.Model):
         verbose_name = _(u'Controle de férias')
         verbose_name_plural = _(u'Controles de férias')
 
+
 class TipoDispensa(models.Model):
     nome = models.CharField(max_length=100)
 
     def __unicode__(self):
         return u'%s' % self.nome
 
+
 class DispensaLegal(models.Model):
     """
     Dispensas legais, como por exemplo dispensa médica, para trabalho em eleição, luto, casamento, etc
     """
-    membro = models.ForeignKey('membro.Membro', verbose_name=_(u'Membro'), limit_choices_to=Q(historico__funcionario=True)&Q(historico__termino__isnull=True))
+    membro = models.ForeignKey('membro.Membro', verbose_name=_(u'Membro'),
+                               limit_choices_to=Q(historico__funcionario=True) & Q(historico__termino__isnull=True))
     tipo = models.ForeignKey('membro.TipoDispensa', verbose_name=_('Tipo de dispensa'))
     justificativa = models.TextField()
     inicio_direito = NARADateField(_(u'Início do direito'))
@@ -374,14 +371,13 @@ class DispensaLegal(models.Model):
             
         return self.inicio_realizada
    
-
     def dia_dispensa(self, dia):
         is_dispensa = False
         horas_dispensa = 0
 
         if self.realizada and self.inicio_realizada:
     
-            is_dispensa = (self.inicio_realizada <= dia and  dia <= self.termino_realizada)
+            is_dispensa = self.inicio_realizada <= dia <= self.termino_realizada
             
             if is_dispensa:
                 if self.termino_realizada == dia:
@@ -397,11 +393,12 @@ class DispensaLegal(models.Model):
                 elif dia > self.termino_realizada:
                     horas_dispensa = 0
                 
-        return {'is_dispensa':is_dispensa, 'horas':horas_dispensa}
+        return {'is_dispensa': is_dispensa, 'horas': horas_dispensa}
 
     class Meta:
         verbose_name = _(u'Dispensa')
         verbose_name_plural = _(u'Dispensas')
+
 
 class Banco(models.Model):
     """
@@ -420,16 +417,13 @@ class Banco(models.Model):
     numero = models.IntegerField()
     nome = models.CharField(max_length=100)
 
-
     # Define a ordenação dos dados pelo nome.
     class Meta:
         ordering = ('nome',)
 
-
     # Retorna o nome e o número do banco.
     def __unicode__(self):
         return u'%s (%03d)' % (self.nome, self.numero)
-
 
 
 class DadoBancario(models.Model):
@@ -439,8 +433,8 @@ class DadoBancario(models.Model):
     O método '__unicode__'	Retorna os dados bancários (banco + agência + conta).
     O método 'agencia_digito'	Retorna o número da agência + o dígito.
     O método 'conta_digito'	Retorna o número da conta + o dígito.
-    A class 'Meta'		Define a descrição do modelo (singular e plural), a ordenação dos dados pelo 'banco' e a unicidade dos
-				dados pelos campos 'banco', 'agencia', 'ag_digito', 'conta', 'cc_digito'.
+    A class 'Meta'		Define a descrição do modelo (singular e plural), a ordenação dos dados pelo 'banco' e a
+    unicidade dos dados pelos campos 'banco', 'agencia', 'ag_digito', 'conta', 'cc_digito'.
     """
     membro = models.OneToOneField('membro.Membro', verbose_name=_(u'Membro'))
     banco = models.ForeignKey('membro.Banco', verbose_name=_(u'Banco'))
@@ -449,21 +443,17 @@ class DadoBancario(models.Model):
     conta = models.IntegerField(_(u'CC'), help_text=_(u'ex. 01222222'))
     cc_digito = models.CharField(' ', max_length=1, blank=True, help_text=_(u'ex. x'))
 
-
     # Retorna o banco, a agência e o número da conta.
     def __unicode__(self):
         if self.ag_digito:
             ag = u'%s-%s' % (self.agencia, self.ag_digito)
         else:
-            ag = u'%s' % (self.agencia)
-
+            ag = u'%s' % self.agencia
         if self.cc_digito:
             cc = u'%s-%s' % (self.conta, self.cc_digito)
         else:
-            cc = u'%s' % (self.conta)
-
+            cc = u'%s' % self.conta
         return u'%s AG. %s CC %s' % (self.banco, ag, cc)
-
 
     # Define a descrição do modelo, a ordenação dos dados pelo banco e a unicidade dos dados.
     class Meta:
@@ -471,7 +461,6 @@ class DadoBancario(models.Model):
         verbose_name_plural = _(u'Dados bancários')
         ordering = ('banco', )
         unique_together = (('banco', 'agencia', 'ag_digito', 'conta', 'cc_digito'),)
-
 
     # Retorna o número da agência completo (agência + dígito)
     def agencia_digito(self):
@@ -483,7 +472,6 @@ class DadoBancario(models.Model):
         return ' '
     agencia_digito.short_description = _(u'Agência')
 
-
     # Retorna o número da conta completo (conta + dígito)
     def conta_digito(self):
         if self.conta or self.cc_digito:
@@ -493,6 +481,7 @@ class DadoBancario(models.Model):
                 return self.conta
         return ' '
     conta_digito.short_description = _(u'Conta')
+
 
 class Cargo(models.Model):
     nome = models.CharField(max_length=100)
@@ -504,9 +493,11 @@ class Cargo(models.Model):
     class Meta:
         ordering = ('nome',)
 
+
 class AtivoManager(models.Manager):
     def get_queryset(self):
         return super(AtivoManager, self).get_queryset().filter(termino__isnull=True)
+
 
 class Historico(models.Model):
     inicio = models.DateField(_(u'Início'))
@@ -530,6 +521,7 @@ class Historico(models.Model):
         verbose_name = _(u'Histórico')
         verbose_name_plural = _(u'Históricos')
 
+
 class Arquivo(models.Model):
     membro = models.ForeignKey('membro.Membro')
     arquivo = models.FileField(upload_to='membro')
@@ -539,7 +531,8 @@ class Arquivo(models.Model):
 
 
 class Controle(models.Model):
-    membro = models.ForeignKey('membro.Membro', verbose_name=_(u'Membro'), limit_choices_to=Q(historico__funcionario=True)&Q(historico__termino__isnull=True))
+    membro = models.ForeignKey('membro.Membro', verbose_name=_(u'Membro'),
+                               limit_choices_to=Q(historico__funcionario=True) & Q(historico__termino__isnull=True))
     entrada = models.DateTimeField()
     saida = models.DateTimeField(null=True, blank=True)
     obs = models.TextField(_(u'Comentários'), blank=True, null=True)
@@ -554,18 +547,19 @@ class Controle(models.Model):
 
     @cached_property
     def segundos(self):
-        if not self.saida: return 0
+        if not self.saida:
+            return 0
         delta = self.saida-self.entrada
         
         try:
-            #### PYTHON 2.7
+            # PYTHON 2.7
             segundos_trabalhados = delta.total_seconds()
         except AttributeError:
-            #### AJUSTE PARA O PYTHON < 2.7
+            # AJUSTE PARA O PYTHON < 2.7
             segundos_trabalhados = delta.seconds + delta.days * 24 * 3600.0
         
         if self.almoco_devido and self.almoco:
-            segundos_trabalhados = segundos_trabalhados - (self.almoco * 60)
+            segundos_trabalhados -= self.almoco * 60
             
         return round(segundos_trabalhados)
     
@@ -593,7 +587,9 @@ class Controle(models.Model):
         meses = []
         if controles.exists():
             ultimoControle = controles.order_by('-entrada')[:1].get()
-            ultimoDiaFiltro = datetime(ultimoControle.entrada.year, ultimoControle.entrada.month, calendar.monthrange(ultimoControle.entrada.year, ultimoControle.entrada.month)[1], 23,59,59)
+            ultimoDiaFiltro = datetime(ultimoControle.entrada.year, ultimoControle.entrada.month,
+                                       calendar.monthrange(ultimoControle.entrada.year,
+                                                           ultimoControle.entrada.month)[1], 23, 59, 59)
     
             controles = controles.order_by('-entrada')
                 
@@ -605,19 +601,21 @@ class Controle(models.Model):
         
                     if dt.month != mes_anterior.month or dt.year != mes_anterior.year:
                         dias = []
-                        meses.insert(0, ({'mes':dt.month, 'ano': dt.year, 'dias':dias, 'total':0}))
+                        meses.insert(0, ({'mes': dt.month, 'ano': dt.year, 'dias': dias, 'total': 0}))
                         mes_anterior = dt
                     
                     itemControle = ItemControle()
                     itemControle.dia = date(dt.year, dt.month, dt.day) 
-                    itemControle.controles = controles.filter(entrada__year=dt.year, entrada__month=dt.month, entrada__day=dt.day)
+                    itemControle.controles = controles.filter(entrada__year=dt.year,
+                                                              entrada__month=dt.month,
+                                                              entrada__day=dt.day)
     #                 dias.append(itemControle)
                     dias.insert(0, itemControle)
                         
             total_banco_horas = 0
             feriado = Feriado()
-            ferias = ControleFerias.objects.filter(ferias__membro = self.membro_id)
-            dispensas = DispensaLegal.objects.filter(membro = self.membro_id)
+            ferias = ControleFerias.objects.filter(ferias__membro=self.membro_id)
+            dispensas = DispensaLegal.objects.filter(membro=self.membro_id)
             
             for m in meses:
                 total_segundos_trabalhos_mes = 0
@@ -636,7 +634,8 @@ class Controle(models.Model):
                     # total de horas trabalhadas            
                     total_segundos_trabalhos_mes = total_segundos_trabalhos_mes + sum([c.segundos for c in d.controles])
                     # verifica se tem algum período de férias com dias úteis tirados de fato
-                    # não deve entrar na conta se forem período de férias com venda de dias, ou somente marcação de vencimento de férias
+                    # não deve entrar na conta se forem período de férias com venda de dias, ou somente marcação de
+                    # vencimento de férias
                     for data_ferias in ferias:
                         d.is_ferias = data_ferias.dia_ferias(d.dia)
                         if d.is_ferias:
@@ -653,7 +652,7 @@ class Controle(models.Model):
                     
                     # é feriado?
                     diaFeriado = Feriado.get_dia_de_feriado(d.dia)
-                    if diaFeriado != None:
+                    if diaFeriado is not None:
                         d.obs = u'%s %s' % (d.obs, diaFeriado.tipo.nome)
                         # este feriado é facultativo ou não?
                         if not diaFeriado.tipo.subtrai_banco_hrs:
@@ -680,27 +679,29 @@ class Controle(models.Model):
                             # soma 8h
                             total_horas_ferias += 28800
                 
-                m.update({'total':total_segundos_trabalhos_mes})
+                m.update({'total': total_segundos_trabalhos_mes})
                 if self.membro.data_inicio > mes_corrente_ini:
                     # Leva em conta a data de admissão do membro para a contagem das horas úteis do período
                     total_horas_periodo = self.total_horas_uteis(self.membro.data_inicio, mes_corrente_fim)
                 else:
-                    # as horas totais do período são as horas do total de dias do mes menos os finais de semana, ferias e dispensas
+                    # as horas totais do período são as horas do total de dias do mes menos os finais de semana,
+                    # ferias e dispensas
                     total_horas_periodo = self.total_horas_uteis(mes_corrente_ini, mes_corrente_fim)
-                m.update({'total_horas_periodo':total_horas_periodo})
+                m.update({'total_horas_periodo': total_horas_periodo})
                 
-                total_horas_restante = total_horas_periodo -total_horas_dispensa -total_horas_ferias - total_segundos_trabalhos_mes
+                total_horas_restante = total_horas_periodo - total_horas_dispensa - total_horas_ferias - \
+                    total_segundos_trabalhos_mes
                  
-                m.update({'total_horas_restante':total_horas_restante})
-                m.update({'total_horas_dispensa':total_horas_dispensa})
-                m.update({'total_horas_ferias':total_horas_ferias})
+                m.update({'total_horas_restante': total_horas_restante})
+                m.update({'total_horas_dispensa': total_horas_dispensa})
+                m.update({'total_horas_ferias': total_horas_ferias})
                  
                  
                 # soma horas extras somente dos meses que não forem o mês em andamento
                 total_banco_horas = 0
                 if datetime.now().year != c.entrada.year or datetime.now().month != c.entrada.month:
                     total_banco_horas = -total_horas_restante
-                m.update({'total_banco_horas':total_banco_horas})
+                m.update({'total_banco_horas': total_banco_horas})
 #         
         return meses
     
@@ -719,12 +720,12 @@ class Controle(models.Model):
             diaFeriado = Feriado.get_dia_de_feriado(d)
 
             # verifica se o feriado é facultativo, ou seja, com desconto de banco de horas.
-            if diaFeriado != None and  not diaFeriado.tipo.subtrai_banco_hrs:
+            if diaFeriado is not None and not diaFeriado.tipo.subtrai_banco_hrs:
                 is_feriado = True
 
             # soma os dias de trabalho
             if not is_final_de_semana and not is_feriado:
-                soma_dias_de_trabalho = soma_dias_de_trabalho + 1
+                soma_dias_de_trabalho += 1
 
             d += timedelta(days=1)
 
@@ -737,7 +738,7 @@ class Controle(models.Model):
         ordering = ('-entrada',)
 
     def permanencia(self):
-        return '%2dh%2dmin' % (self.segundos/3600, self.segundos/60%60)
+        return '%2dh%2dmin' % (self.segundos/3600, self.segundos/60 % 60)
 
 
 class ItemControle:
@@ -762,7 +763,6 @@ class Permission(models.Model):
         # remover as permissões padrões, pois essa é uma classe para configurar permissões customizadas
         default_permissions = ()
         permissions = (
-                    ("rel_adm_logs", "Rel. Adm. - Registro de uso do sistema por ano"),     #/logs
-                    ("rel_adm_mensalf", "Rel. Adm. - Controle de horário mensal"),     #/membro/mensalf
-                )
-
+            ("rel_adm_logs", "Rel. Adm. - Registro de uso do sistema por ano"),     # /logs
+            ("rel_adm_mensalf", "Rel. Adm. - Controle de horário mensal"),     # /membro/mensalf
+        )

@@ -7,7 +7,6 @@ from utils.functions import formata_moeda
 from utils.models import NARADateField
 from django.db.models import Sum, Q
 from decimal import Decimal
-from datetime import date
 import datetime
 import logging
 
@@ -20,8 +19,10 @@ logger = logging.getLogger(__name__)
 def upload_dir(instance, filename):
     return 'outorga/%s/%s' % (str(instance.id), filename)
 
+
 def upload_dir_os(instance, filename):
     return 'OS/%s/%s' % (str(instance.os.id), filename)
+
 
 # Create your models here.
 class Modalidade(models.Model):
@@ -29,19 +30,17 @@ class Modalidade(models.Model):
     Uma instância dessa classe é uma das modalidades de gasto autorizadas pelo Departamento de Auditoria da FAPESP.
 
     O método '__unicode__' 		Retorna a sigla e o nome da modalidade.
-    A classmethod 'modalidades_termo'	Retorna as modalidades de um termo que possuem itens de outorga com o campo 'item=None'.
+    A classmethod 'modalidades_termo'	Retorna as modalidades de um termo que possuem itens de outorga com o campo
+    'item=None'.
     A class 'Meta'			Define a ordenação dos dados pela sigla.
     """
-
     sigla = models.CharField(_(u'Sigla'), max_length=10, blank=True, help_text=_(u'ex. STB'), unique=True)
     nome = models.CharField(_(u'Nome'), max_length=40, blank=True, help_text=_(u'ex. Serviços de Terceiros no Brasil'))
     moeda_nacional = models.BooleanField(_(u'R$'), help_text=_(u'ex. Moeda Nacional?'), default=True)
 
-
     # Retorna a sigla e o nome da modalidade.
     def __unicode__(self):
         return u'%s - %s' % (self.sigla, self.nome)
-
 
     # Retorna as modalidades de um termo que possuem itens do pedido de outorga com o campo 'item=None'.
     @classmethod
@@ -64,7 +63,6 @@ class Modalidade(models.Model):
         ordering = ('sigla', )
 
 
-
 class Estado(models.Model):
     """
     Uma instância dessa classe representa um estado (ex. Quitado, Vigente).
@@ -72,7 +70,6 @@ class Estado(models.Model):
     O método '__unicode__'	Retorna o nome do estado.
     A class 'Meta'		Define a ordenação dos dados pelo nome.
     """
-
     nome = models.CharField(_(u'Nome'), max_length=30, help_text=_(u'ex. Vigente'), unique=True)
 
     # Retorna o nome.
@@ -84,40 +81,35 @@ class Estado(models.Model):
         ordering = ('nome', )
 
 
-
 class Termo(models.Model):
     """
     Uma instância dessa classe representa um Termo de Outorga.
 
-    O método '__unicode__'				Retorna o número completo do processo no formato 'ano/número-digito'.
-    O método 'mostra_membro'				Retorna o nome do outorgado.
-    O método 'save'					Não permite que o número do termo de ortorga seja alterado.
-    O atributo 'real'                                   Calcula a concessão total em reais de um termo somando os totalizadores das naturezas de gasto
-							considerando todos os pedidos de concessão.
-    O método 'termo_real'                               Formata o atributo 'real' em formato moeda.
-    O atributo 'dolar'                                  Calcula a concessão total em dolares de um termo somando os totalizadores das naturezas de gasto
-							considerando todos os pedidos pedidos de concessão.
-    O método 'termo_dolar'                              Formata o atributo 'dolar' em formato moeda.
-    O método 'duracao_meses'				Calcula em meses a vigência do termo de outorga a partir das informações dos pedidos de
-							concessão.
-    O atributo 'total_realizado_real'                   Calcula o total das despesas realizadas em reais de um termo somando os totalizadores das 
-							naturezas de gasto considerando todos os pedidos de concessão.
-    O método 'formata_realizado_real'                   Formata o atributo 'total_realizado_real' em formato moeda.
-    O atributo 'total_realizado_dolar'                  Calcula o total das despesas realizadas em dolares de um termo somando os totalizadores das 
-							naturezas de gasto considerando todos os pedidos de concessão.
-    O método 'formata_realizado_dolar'                  Formata o atributo 'total_realizado_dolar' em formato moeda.
-
+    O método '__unicode__'		Retorna o número completo do processo no formato 'ano/número-digito'.
+    O método 'mostra_membro'	Retorna o nome do outorgado.
+    O método 'save'				Não permite que o número do termo de ortorga seja alterado.
+    O atributo 'real'           Calcula a concessão total em reais de um termo somando os totalizadores das
+    naturezas de gasto considerando todos os pedidos de concessão.
+    O método 'termo_real'       Formata o atributo 'real' em formato moeda.
+    O atributo 'dolar'          Calcula a concessão total em dolares de um termo somando os totalizadores das
+    naturezas de gasto considerando todos os pedidos pedidos de concessão.
+    O método 'termo_dolar'      Formata o atributo 'dolar' em formato moeda.
+    O método 'duracao_meses'	Calcula em meses a vigência do termo de outorga a partir das informações dos pedidos de
+    concessão.
+    O atributo 'total_realizado_real'   Calcula o total das despesas realizadas em reais de um termo somando os
+    totalizadores das naturezas de gasto considerando todos os pedidos de concessão.
+    O método 'formata_realizado_real'   Formata o atributo 'total_realizado_real' em formato moeda.
+    O atributo 'total_realizado_dolar'  Calcula o total das despesas realizadas em dolares de um termo somando os
+    totalizadores das naturezas de gasto considerando todos os pedidos de concessão.
+    O método 'formata_realizado_dolar'  Formata o atributo 'total_realizado_dolar' em formato moeda.
     O atributo 'vigencia'				Foi criado para retornar o método 'duracao_meses'.
-    O atributo 'num_processo'				Foi criado para retornar o método '__unicode__'.
-
-    A classmethod 'termos_auditoria_fapesp_em_aberto'   Retorna os termos que possuem fontes pagadoras (fapesp) que ainda não possuem registro no
-                                                        modelo Auditoria FAPESP.
-    A classmethod 'termos_auditoria_interna_em_aberto'  Retorna os termos que possuem fontes pagadoras (interna) que ainda não possuem registro no
-                                                        modelo Auditoria Interna.
-
-    A 'class Meta'					Define a descrição do modelo (singular e plural) e a ordenação dos dados pelo ano.
+    O atributo 'num_processo'			Foi criado para retornar o método '__unicode__'.
+    A classmethod 'termos_auditoria_fapesp_em_aberto'   Retorna os termos que possuem fontes pagadoras (fapesp) que
+    ainda não possuem registro no modelo Auditoria FAPESP.
+    A classmethod 'termos_auditoria_interna_em_aberto'  Retorna os termos que possuem fontes pagadoras (interna) que
+    ainda não possuem registro no modelo Auditoria Interna.
+    A 'class Meta'				Define a descrição do modelo (singular e plural) e a ordenação dos dados pelo ano.
     """
-    
     ano = models.IntegerField(_(u'Ano'), help_text=_(u'ex. 2008'), default=0)
     processo = models.IntegerField(_(u'Processo'), help_text=_(u'ex. 52885'), default=0)
     digito = models.IntegerField(_(u'Dígito'), help_text=_(u'ex. 8'), default=0)
@@ -133,24 +125,17 @@ class Termo(models.Model):
     extrato_financeiro = models.FileField(upload_to='termo', blank=True, null=True)
     relatorio_final = models.FileField(_(u'Relatório Final'), upload_to='termo', blank=True, null=True)
     # flag para indicar se o termo deve aparecer no relatório gerencial progressivo
-    exibe_rel_ger_progressivo = models.BooleanField(_(u'Exibe o processo no Relatório Gerencial Progressivo?'), default=True) 
+    exibe_rel_ger_progressivo = models.BooleanField(_(u'Exibe o processo no Relatório Gerencial Progressivo?'),
+                                                    default=True)
 #    membro = models.ForeignKey('membro.Membro', verbose_name=_(u'Outorga'))
-
 
     # Retorna o número completo do processo (ano, número e dígito).
     def __unicode__(self):
         ano = str(self.ano)[2:]
         return '%s/%s-%s' % (ano, self.processo, self.digito)
 
-
-    # Retorna o outorgado.
-#    def mostra_membro(self):
-#        return self.membro.nome
-#    mostra_membro.short_description = _(u'Outorgado')
-
-
     # Não permite fazer alteração no número do processo.
-    def save(self, force_insert=False, force_update=False, using=None):
+    def save(self, *args, **kwargs):
         pk = self.pk
         try:
             antigo = Termo.objects.get(pk=pk)
@@ -162,9 +147,8 @@ class Termo(models.Model):
             self.processo = antigo.processo
             self.digito = antigo.digito
             
-        super(Termo, self).save(force_insert, force_update)
+        super(Termo, self).save(*args, **kwargs)
 
-    
     # Retorna a soma das naturezas (moeda nacional) de um termo.
     @property
     def real(self):
@@ -172,24 +156,22 @@ class Termo(models.Model):
 #         for ng in self.natureza_gasto_set.all():
 #             if ng.modalidade.moeda_nacional == True and ng.modalidade.sigla != 'REI':
 #                 total += ng.valor_concedido
-        soma = Natureza_gasto.objects.filter(termo_id = self.id) \
-                                     .filter(modalidade__moeda_nacional = True) \
-                                     .filter(~Q(modalidade__sigla = 'REI')) \
+        soma = Natureza_gasto.objects.filter(termo_id=self.id) \
+                                     .filter(modalidade__moeda_nacional=True) \
+                                     .filter(~Q(modalidade__sigla='REI')) \
                                      .aggregate(Sum('valor_concedido'))
         
         total = soma['valor_concedido__sum'] or Decimal('0.00')
         
         return total
 
-
     # Formata o valor do atributo real.
     def termo_real(self):
         if self.real > 0:
             return '<b>R$ %s</b>' % (formata_moeda(self.real, ','))
         return '-'
-    termo_real.allow_tags=True
-    termo_real.short_description=_(u'Concessão  sem REI')
-
+    termo_real.allow_tags = True
+    termo_real.short_description = _(u'Concessão  sem REI')
 
     # Retorna a soma das naturezas (dolar) de um termo.
     @property
@@ -199,34 +181,33 @@ class Termo(models.Model):
 #             if ng.modalidade.moeda_nacional == False:
 #                 total += ng.valor_concedido
                 
-        soma = Natureza_gasto.objects.filter(termo_id = self.id) \
-                                     .filter(modalidade__moeda_nacional = False) \
+        soma = Natureza_gasto.objects.filter(termo_id=self.id) \
+                                     .filter(modalidade__moeda_nacional=False) \
                                      .aggregate(Sum('valor_concedido'))
         total = soma['valor_concedido__sum'] or Decimal('0.00')
                 
         return total
-
 
     # Formata o valor do atributo tdolar.
     def termo_dolar(self):
         if self.dolar > 0:
             return '$ %s' % (formata_moeda(self.dolar, '.'))
         return '-'
-    termo_dolar.short_description=_(u'Concessão')
-
+    termo_dolar.short_description = _(u'Concessão')
 
     @cached_property
     def termino(self):
         termino = datetime.date.min
 
         for pedido in self.outorga_set.all():
-            if pedido.termino > termino: termino = pedido.termino
+            if pedido.termino > termino:
+                termino = pedido.termino
 
         return termino
 
     # Duracao do termo como um 'timedelta'
     def duracao(self):
-        if self.termino != None and self.inicio != None:
+        if self.termino is not None and self.inicio is not None:
             return self.termino - self.inicio
         else:
             return None
@@ -234,10 +215,10 @@ class Termo(models.Model):
     # Calcula os meses de duração do processo a partir dos dados do modelo Outorga
     def duracao_meses(self):
         dif = self.duracao()
-        if dif != None:
-            meses = (dif.days) / 30
-            if (dif.days) % 30 >= 28:
-                meses = meses + 1
+        if dif is not None:
+            meses = dif.days / 30
+            if dif.days % 30 >= 28:
+                meses += 1
     
             if meses > 0:
                 if meses > 1:
@@ -246,22 +227,15 @@ class Termo(models.Model):
             return u'-'
         else:
             return u'-'
-    duracao_meses.short_description=_(u'Vigência')
+    duracao_meses.short_description = _(u'Vigência')
 
-
-    # Calcula total de despesas (R$) realizadas durante o termo.
-#     @ property
-#     def total_realizado_real_old(self):
-#         total = Decimal('0.00')
-# 	for n in self.natureza_gasto_set.all():
-# 	    if n.modalidade.moeda_nacional:
-# 		total += n.total_realizado
-#         return total
-
+    # Calcula total de despesas (R$) realizadas durante a outorga
     @property
     def total_realizado_real(self):
         from financeiro.models import Pagamento
-        total = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional=True, origem_fapesp__item_outorga__natureza_gasto__termo=self).aggregate(Sum('valor_fapesp'))
+        total = Pagamento.objects.filter(origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional=True,
+                                         origem_fapesp__item_outorga__natureza_gasto__termo=self)\
+            .aggregate(Sum('valor_fapesp'))
         return total['valor_fapesp__sum'] or Decimal('0.0')
 
     # Retorna o total de despesas (R$) em formato moeda.
@@ -274,7 +248,7 @@ class Termo(models.Model):
             return '<span style="color: red"><b>R$ %s</b></span>' % valor
         return '<b>R$ %s</b>' % valor
     formata_realizado_real.allow_tags = True
-    formata_realizado_real.short_description=_(u'Realizado')
+    formata_realizado_real.short_description = _(u'Realizado')
 
     # Calcula total de despesas ($) realizadas durante o termo.
     @property
@@ -295,8 +269,7 @@ class Termo(models.Model):
             return '<span style="color: red">$ %s</span>' % valor
         return '$ %s' % valor
     formata_realizado_dolar.allow_tags = True
-    formata_realizado_dolar.short_description=_(u'Realizado')
-
+    formata_realizado_dolar.short_description = _(u'Realizado')
 
     def saldo_real(self):
         return self.real - self.total_realizado_real
@@ -304,40 +277,18 @@ class Termo(models.Model):
     def saldo_dolar(self):
         return self.dolar - self.total_realizado_dolar
 
-
     def formata_saldo_real(self):
         return '<b>R$ %s</b>' % formata_moeda(self.saldo_real(), ',')
-    formata_saldo_real.allow_tags=True
-    formata_saldo_real.short_description=_(u'Saldo')
+    formata_saldo_real.allow_tags = True
+    formata_saldo_real.short_description = _(u'Saldo')
 
     def formata_saldo_dolar(self):
         return '$ %s' % formata_moeda(self.saldo_dolar(), '.')
-    formata_saldo_dolar.short_description=_(u'Saldo')
+    formata_saldo_dolar.short_description = _(u'Saldo')
 
     # Define atributos.
     vigencia = property(duracao_meses)
     num_processo = property(__unicode__)
-
-
-#     # Retorna os termos que possuem fontes pagadoras não-fapesp sem registro de auditoriainterna.
-#     @classmethod
-#     def termos_auditoria_interna_em_aberto(cls, ai=None):
-#         from financeiro.models import FontePagadora
-# 
-#         termos = [fp.protocolo.termo.id for fp in FontePagadora.objects.filter((Q(origem_fapesp=None) & ~Q(origem_outras_verbas=None) & Q(auditoriainterna=None)) | Q(auditoriainterna=ai))]
-#         t = list(set(termos))
-#         return cls.objects.filter(id__in=t)
-# 
-# 
-#     # Retorna os termos que possuem fontes pagadoras fapesp sem registro de auditoriafapesp.
-#     @classmethod
-#     def termos_auditoria_fapesp_em_aberto(cls, af=None):
-#         from financeiro.models import FontePagadora
-# 
-#         termos = [fp.protocolo.termo.id for fp in FontePagadora.objects.filter((~Q(origem_fapesp=None) & Q(origem_outras_verbas=None) & Q(auditoriafapesp=None)) | Q(auditoriafapesp=af))]
-#         t = list(set(termos))
-#         return cls.objects.filter(id__in=t)
-
 
     # Define a descrição do modelo (singular e plural), a ordenação dos dados pelo ano.
     class Meta:
@@ -349,19 +300,19 @@ class Termo(models.Model):
     def termo_ativo(cls):
         hoje = datetime.datetime.now().date()
         for t in Termo.objects.order_by('-inicio'):
-            if t.inicio <= hoje and t.termino >= hoje:
+            if t.inicio <= hoje <= t.termino:
                 return t
 
         return None
 
-
     def insere_itens_rt(self):
         for irt in TemplateRT.objects.all():
-            (p, b) = Natureza_gasto.objects.get_or_create(termo=self, modalidade=irt.modalidade, defaults={'valor_concedido':0.0})
+            (p, b) = Natureza_gasto.objects.get_or_create(termo=self, modalidade=irt.modalidade,
+                                                          defaults={'valor_concedido': 0.0})
             item = Item()
             item.natureza_gasto = p
             item.descricao = irt.descricao
-            item.justificativa= ' '
+            item.justificativa = ' '
             item.valor = 0.0
             item.quantidade = 1
             item.rt = True
@@ -375,19 +326,15 @@ class Categoria(models.Model):
     O método '__unicode__'	Retorna o campo 'nome'.
     A class 'Meta'		Define a ordenação dos dados pelo nome.
     """
-
     nome = models.CharField(_(u'Nome'), max_length=60, help_text=_(u'ex. Aditivo'), unique=True)
-
 
     # Retorna o nome da Categoria
     def __unicode__(self):
         return u'%s' % self.nome
 
-
     # Define a ordenação dos dados pelo nome.
     class Meta:
         ordering = ('nome', )
-
 
 
 class Outorga(models.Model):
@@ -400,15 +347,15 @@ class Outorga(models.Model):
     O método 'mostra_categoria'		Retorna o nome da categoria.
     O método 'mostra_termo'		Retorna o termo.
     O método 'existe_arquivo'		Retorna um ícone com link para consulta dos arquivos anexados.
-    A class 'Meta'			Define a descrição do modelo (singular e plural) e a ordenação dos dados pela data de solicitação.
+    A class 'Meta'			Define a descrição do modelo (singular e plural) e a ordenação dos dados pela
+    data de solicitação.
     """
-
     categoria = models.ForeignKey('outorga.Categoria', verbose_name=_(u'Categoria'))
     termo = models.ForeignKey('outorga.Termo', verbose_name=_(u'Termo'))
     termino = NARADateField(_(u'Término'), help_text=_(u'Término da vigência do processo'))
     obs = models.TextField(_(u'Observação'), blank=True)
-    data_solicitacao = NARADateField(_(u'Data de solicitação'), blank=True, null=True, help_text=_(u'Data de início desta outorga, caso não seja inicial. Um aditivo, por exemplo.'))
-    data_presta_contas = NARADateField(_(u'Prest. Contas'), blank=True, null=True, help_text=_(u'Data de Prestação de Contas'))
+    data_presta_contas = NARADateField(_(u'Prest. Contas'), blank=True, null=True,
+                                       help_text=_(u'Data de Prestação de Contas'))
     data_solicitacao = NARADateField(_(u'Solicitação'), help_text=_(u'Data de Solicitação do Pedido de Concessão'))
     arquivo = models.FileField(upload_to=upload_dir, null=True, blank=True)
     protocolo = models.FileField(upload_to=upload_dir, null=True, blank=True)
@@ -417,70 +364,37 @@ class Outorga(models.Model):
     def __unicode__(self):
         return u'%s - %s' % (self.termo.num_processo, self.categoria.nome)
 
-
     # Início do processo
     @ property
     def inicio(self):
         return self.termo.inicio.strftime("%d/%m/%Y")
-    #inicio.short_description = _(u'Início')
-
+    # inicio.short_description = _(u'Início')
 
     # Retorna a categoria.
     def mostra_categoria(self):
         return self.categoria.nome
     mostra_categoria.short_description = _(u'Categoria')
 
-
     # Retorna o termo.
     def mostra_termo(self):
         return self.termo.num_processo
     mostra_termo.short_description = _(u'Termo')
 
-
     # Retorna um ícone se o pedido de concessão tiver arquivos.
     def existe_arquivo(self):
-        a = '<center><a href="/admin/outorga/arquivo/?outorga__id__exact=%s"><img src="/media/img/arquivo.png" /></a></center>' % self.id
+        a = '<center><a href="/admin/outorga/arquivo/?outorga__id__exact=%s">' \
+            '<img src="/media/img/arquivo.png" /></a></center>' % self.id
         if self.arquivo:
             return a
         return ' '
     existe_arquivo.allow_tags = True
     existe_arquivo.short_description = _(u'Arquivo')
 
-
-    ## Salva o novo pedido com as infomações do pedido anterior.
-    #def save(self, force_insert=False, force_update=False):
-        #pk = self.pk
-        #try:
-            #antigo = Outorga.objects.get(pk=pk)
-        #except Outorga.DoesNotExist:
-            #antigo = None
-
-        #super(Outorga, self).save(force_insert, force_update)
-        #ant = self.anterior
-        #if ant and not pk:
-            #for ng in ant.natureza_gasto_set.all():
-                #ngc = copy.copy(ng)
-                #ngc.outorga = self
-                #ngc.id = None
-                #ngc.save(force_insert=True, force_update=False)
-                #for i in ng.item_set.all():
-                    #ic = copy.copy(i)
-                    #ic.natureza_gasto = ngc
-                    #ic.id = None
-                    #ic.save(force_insert=True, force_update=False)
-
-        #elif self.estado.nome == u'Aprovado' and antigo and antigo.estado.nome != u'Aprovado':
-            #for item in Item.objects.filter(natureza_gasto__outorga=self).iterator():
-                #item.estado = self.estado
-                #item.save()
-
-
     # Define a descrição do modelo e a ordenação dos dados pelo termo.
     class Meta:
         verbose_name = _(u'Concessão')
         verbose_name_plural = _(u'Histórico de Concessões')
         ordering = ('data_solicitacao', )
-
 
 
 class Natureza_gasto(models.Model):
@@ -492,57 +406,52 @@ class Natureza_gasto(models.Model):
     O método 'mostra_termo'		Retorna o termo.
     O método 'mostra_modalidade'	Retorna o nome da modalidade.
     O método 'get_absolute_url'		Retorna a URL de uma natureza de gasto.
-    O método 'formata_valor'		Retorna um valor em formato moeda conforme a moeda especificada no modelo Modalidade.
+    O método 'formata_valor'		Retorna um valor em formato moeda conforme a moeda especificada no modelo
+    Modalidade.
     O atributo 'total_realizado'	Retorna o total das despesas realizadas associadas a uma modalidade e termo.
     O método 'formata_total_realizado'	Retorna o atributo 'total_realizado' em formato moeda.
-    O método 'soma_itens'		Retorna a soma dos itens da natureza de gasto de um pedido de concessão e marca em vermelho se for diferente do 
-					valor_concedido.
-    O método 'todos_itens'		Retorna os itens que não estão subordinados a outro item, considerando todos os pedidos de uma determinada
-					modalidade e termo.
-    O método 'v_concedido' 		Retorna o valor do campo 'valor_concedido' em formato de moeda e marca em vermelho se o valor concedido for 
-					diferente do total dos itens.
-    A class 'Meta' 			Define a descrição do modelo (singular e plural) e a ordem de apresentação dos dados pela data de solicitação
-					do pedido de concessão.
+    O método 'soma_itens'		Retorna a soma dos itens da natureza de gasto de um pedido de concessão e marca em
+    vermelho se for diferente do valor_concedido.
+    O método 'todos_itens'		Retorna os itens que não estão subordinados a outro item, considerando todos os
+    pedidos de uma determinada modalidade e termo.
+    O método 'v_concedido' 		Retorna o valor do campo 'valor_concedido' em formato de moeda e marca em vermelho se
+    o valor concedido for diferente do total dos itens.
+    A class 'Meta' 			Define a descrição do modelo (singular e plural) e a ordem de apresentação dos dados pela
+    data de solicitação do pedido de concessão.
     """
-
     modalidade = models.ForeignKey('outorga.Modalidade', verbose_name=_(u'Modalidade'))
     termo = models.ForeignKey('outorga.Termo', verbose_name=_(u'Termo de outorga'))
-    valor_concedido =  models.DecimalField(_(u'Valor Concedido'), max_digits=12, decimal_places=2, help_text=_(u'ex. 150500.50'))
+    valor_concedido = models.DecimalField(_(u'Valor Concedido'), max_digits=12, decimal_places=2,
+                                          help_text=_(u'ex. 150500.50'))
     obs = models.TextField(_(u'Observação'), blank=True)
-
 
     # Retorna o pedido de concessão e a sigla da modalidade.
     def __unicode__(self):
         return u'%s - %s' % (self.mostra_termo(), self.modalidade.sigla)
-
 
     # Retorna o Termo do pedido de concessão.
     def mostra_termo(self):
         return '%s' % self.termo.num_processo
     mostra_termo.short_description = _(u'Termo')
 
-
     # Retorna a modalidade da Natureza do Gasto.
     def mostra_modalidade(self):
         return u'%s' % self.modalidade.sigla
     mostra_modalidade.short_description = _(u'Modalidade')
 
-
     # Retorna a URL de uma natureza de gasto.
     def get_absolute_url(self):
         return '/admin/outorga/natureza_gasto/%s' % self.id
 
-
     # Formata um valor em formato moeda conforme campo 'moeda_nacional' do modelo 'Modalidade'.
     def formata_valor(self, v):
-        if self.modalidade.moeda_nacional == True:
+        if self.modalidade.moeda_nacional:
             moeda = 'R$'
             sep_decimal = ','
         else:
             moeda = '$'
             sep_decimal = '.'
         return moeda + ' ' + formata_moeda(v, sep_decimal)
-
 
     # Calcula o total de despesas realizadas de uma modalidade e termo.
     @cached_property
@@ -558,8 +467,8 @@ class Natureza_gasto(models.Model):
     def total_realizado_parcial(self, m1, a1, m2, a2, rt=0, parcial=0):
         from financeiro.models import Pagamento
 
-        inicio = datetime.date(a1,m1,1)
-        fim = datetime.date(a2,m2,28)
+        inicio = datetime.date(a1, m1, 1)
+        fim = datetime.date(a2, m2, 28)
         while True:
             try:
                 fim = fim.replace(day=fim.day+1)
@@ -575,9 +484,11 @@ class Natureza_gasto(models.Model):
         elif rt == 2:
             pagamentos = pagamentos.filter(origem_fapesp__item_outorga__rt=False)
         if self.modalidade.moeda_nacional:
-            total = pagamentos.filter(conta_corrente__data_oper__range=(inicio,fim), origem_fapesp__item_outorga__natureza_gasto=self).aggregate(Sum('valor_fapesp'))
+            total = pagamentos.filter(conta_corrente__data_oper__range=(inicio, fim),
+                                      origem_fapesp__item_outorga__natureza_gasto=self).aggregate(Sum('valor_fapesp'))
         else:
-            total = pagamentos.filter(protocolo__data_vencimento__range=(inicio,fim), origem_fapesp__item_outorga__natureza_gasto=self).aggregate(Sum('valor_fapesp'))
+            total = pagamentos.filter(protocolo__data_vencimento__range=(inicio, fim),
+                                      origem_fapesp__item_outorga__natureza_gasto=self).aggregate(Sum('valor_fapesp'))
         return total['valor_fapesp__sum'] or Decimal('0.00')
 
     # Retorna o total de despesas realizadas em formato moeda.
@@ -585,14 +496,14 @@ class Natureza_gasto(models.Model):
         if not self.total_realizado:
             return '-'
 
-        if self.valor_concedido < self.total_realizado  :
+        if self.valor_concedido < self.total_realizado:
             return '<span style="color: red">%s</span>' % self.formata_valor(self.total_realizado)
         return self.formata_valor(self.total_realizado)
     formata_total_realizado.allow_tags = True
-    formata_total_realizado.short_description=_(u'Total Realizado')
+    formata_total_realizado.short_description = _(u'Total Realizado')
 
-        
-    # Calcula a soma de todos os itens da natureza do gasto e marca em vermelho se o valor for diferente do valor_concedido.
+    # Calcula a soma de todos os itens da natureza do gasto e marca em vermelho
+    # se o valor for diferente do valor_concedido.
     def soma_itens(self):
         total = Decimal('0.00')
         for item in self.item_set.all():
@@ -605,10 +516,10 @@ class Natureza_gasto(models.Model):
             return self.formata_valor(total)
         return '-'
     soma_itens.allow_tags = True
-    soma_itens.short_description=_(u'Total dos Itens')
+    soma_itens.short_description = _(u'Total dos Itens')
 
-
-    # Retorna todos os itens de uma natureza de gasto que não estão subordinados a outro item, considerando todas as concessões de um determinado Termo.
+    # Retorna todos os itens de uma natureza de gasto que não estão subordinados a outro item,
+    # considerando todas as concessões de um determinado Termo.
     def todos_itens(self, rt=None):
         itens = Item.objects.filter(natureza_gasto__modalidade=self.modalidade,
                                     natureza_gasto__termo=self.termo)
@@ -622,20 +533,19 @@ class Natureza_gasto(models.Model):
         for ng in Natureza_gasto.objects.filter(modalidade=self.modalidade, termo=self.termo):
             total += ng.valor_concedido
         return self.formata_valor(total)
-    total_concedido_mod_termo.short_description=_(u'Total concedido para a Modalidade')
-
+    total_concedido_mod_termo.short_description = _(u'Total concedido para a Modalidade')
 
     # Formata o valor do atributo 'valor_concedido'
     def v_concedido(self):
-        if self.valor_concedido or self.valor_concedido==0:
+        if self.valor_concedido or self.valor_concedido == 0:
             return self.formata_valor(self.valor_concedido)
         return '-'
-    v_concedido.short_description=_(u'Valor Concedido')
-
+    v_concedido.short_description = _(u'Valor Concedido')
 
     def saldo(self):
         if self.total_realizado > self.valor_concedido:
-            return '<span style="color: red">%s</span>' % self.formata_valor(self.valor_concedido - self.total_realizado)
+            return '<span style="color: red">%s</span>' % \
+                   self.formata_valor(self.valor_concedido - self.total_realizado)
         return self.formata_valor(self.valor_concedido - self.total_realizado)
     saldo.allow_tags = True
     
@@ -648,23 +558,22 @@ class Natureza_gasto(models.Model):
         verbose_name_plural = _(u'Pastas')
         ordering = ('-termo__ano', )
         unique_together = ('modalidade', 'termo',)
-        #ordering = ('-outorga__data_solicitacao', )
+        # ordering = ('-outorga__data_solicitacao', )
 
 
 class TemplateRT(models.Model):
     modalidade = models.ForeignKey('outorga.Modalidade')
     descricao = models.CharField(_(u'Descrição'), max_length=255)
 
-
     def __unicode__(self):
         return u'%s - %s' % (self.modalidade, self.descricao)
 
     class Meta:
-        verbose_name=u'Template Reserva Técnica'
-        verbose_name_plural=u'Templates Reserva Técnica'
+        verbose_name = u'Template Reserva Técnica'
+        verbose_name_plural = u'Templates Reserva Técnica'
+
 
 class Item(models.Model):
-
     """
     Uma instância dessa classe representa um item de um pedido de concessão.
 
@@ -682,14 +591,14 @@ class Item(models.Model):
     O método 'calcula_total_despesas'		Retorna a soma das fontespagadoras 'fapesp' referentes a um item.
     O atributo 'valor_realizado_acumulado' 	Foi definido para retornar o método 'calcula_total_despesa'.
     O método 'mostra_valor_realizado'		Retorna o atributo 'valor_realizado_acumulado' em formato moeda.
-    A class 'Meta'				Define a descrição do modelo (singular e plural) e a ordenação dos dados pela data de solicitação 
-						do pedido de concessão.
+    A class 'Meta'				Define a descrição do modelo (singular e plural) e a ordenação dos dados pela
+     data de solicitação do pedido de concessão.
     """
-
 
     entidade = models.ForeignKey('identificacao.Entidade', verbose_name=_(u'Entidade'), null=True)
     natureza_gasto = models.ForeignKey('outorga.Natureza_gasto', verbose_name=_(u'Pasta'))
-    descricao = models.CharField(_(u'Descrição'), max_length=255, help_text=_(u'ex. Locação e armazenamento especializado na Granero Tech.'))
+    descricao = models.CharField(_(u'Descrição'), max_length=255,
+                                 help_text=_(u'ex. Locação e armazenamento especializado na Granero Tech.'))
     justificativa = models.TextField(_(u'Justificativa'))
     quantidade = models.IntegerField(_(u'Quantidade'))
     obs = models.TextField(_(u'Observação'), blank=True)
@@ -698,34 +607,29 @@ class Item(models.Model):
 
     # Retorna a descrição e o termo, se existir.
     def __unicode__(self):
-        return u'%s - %s' % (self.natureza_gasto.termo,self.descricao)
-
+        return u'%s - %s' % (self.natureza_gasto.termo, self.descricao)
 
     # Retorna o Termo se o pedido de concessão estiver conectado a um termo.
     def mostra_termo(self):
         return u'%s' % self.natureza_gasto.mostra_termo()
     mostra_termo.short_description = _(u'Termo')
 
-
     # Retorna a descrição do item do pedido de concessão.
     def mostra_descricao(self):
         return u'%s' % self.descricao
     mostra_descricao.short_description = _(u'Descrição')
-
 
     # Retorna a modalidade do Item do Pedido de Concessão.
     def mostra_modalidade(self):
         return u'%s' % self.natureza_gasto.modalidade.sigla
     mostra_modalidade.short_description = _(u'Mod')
 
-
     # Retorna a quantidade.
     def mostra_quantidade(self):
         if self.quantidade > 0:
             return self.quantidade
         return '-'
-    mostra_quantidade.short_description=_(u'Qtde')
-
+    mostra_quantidade.short_description = _(u'Qtde')
 
     # Calcula o valor total realizado de um determinado item.
     def calcula_total_despesas(self):
@@ -737,13 +641,12 @@ class Item(models.Model):
 #                 sumFapesp = of.pagamento_set.all().aggregate(Sum('valor_fapesp'))
 #                 total += sumFapesp['valor_fapesp__sum'] or Decimal('0.0')
         
-        sumFapesp = Pagamento.objects.filter(origem_fapesp__item_outorga_id = self.id).aggregate(Sum('valor_fapesp'))
+        sumFapesp = Pagamento.objects.filter(origem_fapesp__item_outorga_id=self.id).aggregate(Sum('valor_fapesp'))
         total = sumFapesp['valor_fapesp__sum'] or Decimal('0.0')
         
         return total
     # Define um atributo com o valor total realizado
     valor_realizado_acumulado = property(calcula_total_despesas)
-
 
     # Valor realizado por mês
     # dt = mes/ano para o filtro inicial
@@ -753,27 +656,41 @@ class Item(models.Model):
         if pagamentos:
             if after:
                 if self.natureza_gasto.modalidade.moeda_nacional:
-                    sumFapesp = pagamentos.filter(origem_fapesp__item_outorga=self,conta_corrente__data_oper__gte=dt).aggregate(Sum('valor_fapesp'))
+                    sumFapesp = pagamentos.filter(origem_fapesp__item_outorga=self, conta_corrente__data_oper__gte=dt)\
+                        .aggregate(Sum('valor_fapesp'))
                 else:
-                    sumFapesp = pagamentos.filter(origem_fapesp__item_outorga=self,protocolo__data_vencimento__gte=dt).aggregate(Sum('valor_fapesp'))
+                    sumFapesp = pagamentos.filter(origem_fapesp__item_outorga=self, protocolo__data_vencimento__gte=dt)\
+                        .aggregate(Sum('valor_fapesp'))
             else:
                 if self.natureza_gasto.modalidade.moeda_nacional:
-                    sumFapesp = pagamentos.filter(origem_fapesp__item_outorga=self,conta_corrente__data_oper__month=dt.strftime('%m'), conta_corrente__data_oper__year=dt.strftime('%Y')).aggregate(Sum('valor_fapesp'))
+                    sumFapesp = pagamentos.filter(origem_fapesp__item_outorga=self,
+                                                  conta_corrente__data_oper__month=dt.strftime('%m'),
+                                                  conta_corrente__data_oper__year=dt.strftime('%Y'))\
+                        .aggregate(Sum('valor_fapesp'))
                 else:
-                    sumFapesp = pagamentos.filter(origem_fapesp__item_outorga=self,protocolo__data_vencimento__month=dt.strftime('%m'), protocolo__data_vencimento__year=dt.strftime('%Y')).aggregate(Sum('valor_fapesp'))
+                    sumFapesp = pagamentos.filter(origem_fapesp__item_outorga=self,
+                                                  protocolo__data_vencimento__month=dt.strftime('%m'),
+                                                  protocolo__data_vencimento__year=dt.strftime('%Y'))\
+                        .aggregate(Sum('valor_fapesp'))
             total = sumFapesp['valor_fapesp__sum'] or Decimal('0.0')
         elif hasattr(self, 'origemfapesp_set'):
             for of in self.origemfapesp_set.all():
                 if after:
                     if self.natureza_gasto.modalidade.moeda_nacional:
-                        sumFapesp = of.pagamento_set.filter(conta_corrente__data_oper__gte=dt).aggregate(Sum('valor_fapesp'))
+                        sumFapesp = of.pagamento_set.filter(conta_corrente__data_oper__gte=dt)\
+                            .aggregate(Sum('valor_fapesp'))
                     else:
-                        sumFapesp = of.pagamento_set.filter(protocolo__data_vencimento__gte=dt).aggregate(Sum('valor_fapesp'))
+                        sumFapesp = of.pagamento_set.filter(protocolo__data_vencimento__gte=dt)\
+                            .aggregate(Sum('valor_fapesp'))
                 else:
                     if self.natureza_gasto.modalidade.moeda_nacional:
-                        sumFapesp = of.pagamento_set.filter(conta_corrente__data_oper__month=dt.strftime('%m'), conta_corrente__data_oper__year=dt.strftime('%Y')).aggregate(Sum('valor_fapesp'))
+                        sumFapesp = of.pagamento_set.filter(conta_corrente__data_oper__month=dt.strftime('%m'),
+                                                            conta_corrente__data_oper__year=dt.strftime('%Y'))\
+                            .aggregate(Sum('valor_fapesp'))
                     else:
-                        sumFapesp = of.pagamento_set.filter(protocolo__data_vencimento__month=dt.strftime('%m'), protocolo__data_vencimento__year=dt.strftime('%Y')).aggregate(Sum('valor_fapesp'))
+                        sumFapesp = of.pagamento_set.filter(protocolo__data_vencimento__month=dt.strftime('%m'),
+                                                            protocolo__data_vencimento__year=dt.strftime('%Y'))\
+                            .aggregate(Sum('valor_fapesp'))
                 total += sumFapesp['valor_fapesp__sum'] or Decimal('0.0')
         return total
 
@@ -783,11 +700,11 @@ class Item(models.Model):
             return '-'
 
         total = self.natureza_gasto.formata_valor(self.valor_realizado_acumulado)
-        #if self.valor_realizado_acumulado > self.valor:
+        # if self.valor_realizado_acumulado > self.valor:
         #    return '<span style="color: red">%s</span>' % (total)
         return total
     mostra_valor_realizado.allow_tags = True
-    mostra_valor_realizado.short_description=_(u'Total Realizado')
+    mostra_valor_realizado.short_description = _(u'Total Realizado')
 
     def saldo(self):
         if self.valor:
@@ -800,7 +717,8 @@ class Item(models.Model):
 
     # Pagina com todos os protocolos ligados a este item
     def protocolos_pagina(self):
-        return '<a href="/protocolo/protocolo/?fontepagadora__origem_fapesp__item_outorga__id=%s">Despesas</a>' % self.id
+        return '<a href="/protocolo/protocolo/?fontepagadora__origem_fapesp__item_outorga__id=%s">Despesas</a>' \
+               % self.id
     protocolos_pagina.short_description = _(u'Lista de despesas')
     protocolos_pagina.allow_tags = True
 
@@ -816,7 +734,6 @@ class Item(models.Model):
         ordering = ('natureza_gasto__termo', 'descricao')
 
 
-
 class Arquivo(models.Model):
     """
     Uma instância dessa classe representa um arquivo de um pedido de concessão.
@@ -825,7 +742,6 @@ class Arquivo(models.Model):
     O método 'concessao'	Retorna o método '__unicode__' do modelo Outorga.
     A class 'Meta'		Define a ordenação dos dados pelo 'id' e a unicidade dos dados pelos campos 'arquivo' e 'outorga'.
     """
-
     arquivo = models.FileField(upload_to=upload_dir)
     outorga = models.ForeignKey('outorga.Outorga', related_name='arquivos')
 
@@ -841,18 +757,15 @@ class Arquivo(models.Model):
         return self.outorga
     concessao.short_description = _(u'Pedido de Concessão')
 
-
     # Retorna o termo do pedido de concessão.
     def mostra_termo(self):
         return self.outorga.mostra_termo()
     mostra_termo.short_description = _(u'Termo')
-    
 
     # Define a ordenação dos dados e a unicidade dos dados.
     class Meta:
         ordering = ('id', )
         unique_together = ('arquivo', 'outorga')
-
 
 
 class Acordo(models.Model):
@@ -861,7 +774,6 @@ class Acordo(models.Model):
 
     O método '__unicode__'	Retorna a descrição do acordo.
     """
-
     estado = models.ForeignKey('outorga.Estado')
     descricao = models.TextField(verbose_name=_(u'Descrição'))
     itens_outorga = models.ManyToManyField('outorga.Item', through='outorga.OrigemFapesp')
@@ -886,7 +798,6 @@ class OrigemFapesp(models.Model):
     def __unicode__(self):
         return u"%s - %s - %s" % (self.acordo, self.item_outorga.natureza_gasto.modalidade.sigla, self.item_outorga)
 
-
     # Define a descrição do modelo.
     class Meta:
         verbose_name = _(u'Origem FAPESP')
@@ -905,7 +816,6 @@ class Contrato(models.Model):
     """
     Uma instância dessa classe representa um contrato. (Ex. Instituto Uniemp e Telefônica)
     """
-
     numero = models.CharField(_(u'Número'), max_length=20)
     descricao = models.TextField(_(u'Descrição'), blank=True)
     data_inicio = NARADateField(_(u'Início'))
@@ -941,6 +851,7 @@ class TipoContrato(models.Model):
         verbose_name_plural = u'Tipos de documento'
         ordering = ('nome',)
 
+
 class EstadoOS(models.Model):
     nome = models.CharField(max_length=20)
     
@@ -959,7 +870,6 @@ class OrdemDeServico(models.Model):
     
     arquivos: related_name para ArquivoOS
     """
-
     numero = models.CharField(_(u'Número'), max_length=20)
     tipo = models.ForeignKey('outorga.TipoContrato')
     acordo = models.ForeignKey('outorga.Acordo')
@@ -968,16 +878,14 @@ class OrdemDeServico(models.Model):
     data_rescisao = NARADateField(_(u'Término'), null=True, blank=True)
     antes_rescisao = models.IntegerField(_(u'Prazo p/ solicitar rescisão (dias)'), null=True, blank=True)
     descricao = models.TextField(_(u'Descrição'))
-    #arquivo = models.FileField(upload_to='OS', null=True, blank=True)
+    # arquivo = models.FileField(upload_to='OS', null=True, blank=True)
     estado = models.ForeignKey('outorga.EstadoOS')
     pergunta = models.ManyToManyField('memorando.Pergunta', null=True, blank=True)
     substituicoes = models.TextField(null=True, blank=True)
 
-
     # Retorna a descrição.
     def __unicode__(self):
         return u"%s %s" % (self.tipo, self.numero)
-
 
     # Retorna o prazo para solicitar recisão (campo 'antes_rescisao').
     def mostra_prazo(self):
@@ -990,7 +898,8 @@ class OrdemDeServico(models.Model):
 
     # Retorna um ícone se a ordem de serviço tiver anexo.
     def existe_arquivo(self):
-        a = '<center><a href="/admin/outorga/arquivoos/?os__id__exact=%s"><img src="/media/img/arquivo.png" /></a></center>' % self.id
+        a = '<center><a href="/admin/outorga/arquivoos/?os__id__exact=%s">' \
+            '<img src="/media/img/arquivo.png" /></a></center>' % self.id
         if self.arquivos.count() > 0:
             return a
         else:
@@ -1035,9 +944,8 @@ class Permission(models.Model):
         # remover as permissões padrões, pois essa é uma classe para configurar permissões customizadas
         default_permissions = ()
         permissions = (
-                    ("rel_ger_acordo_progressivo", "Rel. Ger. - Gerencial progressivo"),     #/outorga/relatorios/acordo_progressivo
-                    ("rel_ger_contratos", "Rel. Ger. - Contratos"),     #/outorga/relatorios/contratos
-                    ("rel_adm_item_modalidade", "Rel. Adm. - Itens do orçamento por modalidade"),     #/outorga/relatorios/item_modalidade
-                    ("rel_ger_lista_acordos", "Rel. Ger. - Concessões por acordo"),     #/outorga/relatorios/lista_acordos
-                )
-
+            ("rel_ger_acordo_progressivo", "Rel. Ger. - Gerencial progressivo"), # /outorga/relatorios/acordo_progressivo
+            ("rel_ger_contratos", "Rel. Ger. - Contratos"),     # /outorga/relatorios/contratos
+            ("rel_adm_item_modalidade", "Rel. Adm. - Itens do orçamento por modalidade"), # /outorga/relatorios/item_modalidade
+            ("rel_ger_lista_acordos", "Rel. Ger. - Concessões por acordo"),     # /outorga/relatorios/lista_acordos
+        )

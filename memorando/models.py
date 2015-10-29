@@ -16,7 +16,6 @@ def proximo_numero():
     return max(n1, n2) + 1
 
 
-
 class Estado(models.Model):
 
     """
@@ -29,20 +28,15 @@ class Estado(models.Model):
     >>> e.__unicode__()
     'Aguardando assinatura'
     """
-
-
     nome = models.CharField(_(u'Nome'), max_length=30, help_text=_(u'ex. Aguardando assinatura'), unique=True)
-
 
     # Retorna o nome.
     def __unicode__(self):
         return self.nome
 
-
     # Define a ordenação dos dados pelo nome.
     class Meta:
         ordering = ("nome", )
-
 
 
 class Assunto(models.Model):
@@ -50,7 +44,6 @@ class Assunto(models.Model):
     
     def __unicode__(self):
         return self.descricao
-
 
 
 class MemorandoFAPESP(models.Model):
@@ -66,7 +59,6 @@ class MemorandoFAPESP(models.Model):
         verbose_name_plural = _(u'Memorandos da FAPESP')
 
 
-
 class Pergunta(models.Model):
     memorando = models.ForeignKey('memorando.MemorandoFAPESP')
     numero = models.CharField(_(u'Número da pergunta'), max_length=10)
@@ -77,7 +69,6 @@ class Pergunta(models.Model):
 
     class Meta:
         ordering = ('numero',)
-
 
 
 class MemorandoResposta(models.Model):
@@ -94,7 +85,7 @@ class MemorandoResposta(models.Model):
     obs = models.TextField(null=True, blank=True)
     introducao = models.TextField(_(u'Introdução'), null=True, blank=True)
     conclusao = models.TextField(_(u'Conclusão'), null=True, blank=True)
-    #classificacao = models.ForeignKey('financeiro.TipoComprovante', verbose_name=_(u'Classificação'))
+    # classificacao = models.ForeignKey('financeiro.TipoComprovante', verbose_name=_(u'Classificação'))
 
     def __unicode__(self):
         return u'%s/%s' % (self.data.year, self.numero)
@@ -117,12 +108,10 @@ class MemorandoResposta(models.Model):
         return self.memorando.termo
 
 
-
 class Corpo(models.Model):
     """ 
     Cada item de um memorando da FAPESP
     """
-
     memorando = models.ForeignKey('memorando.MemorandoResposta')
     pergunta = models.ForeignKey('memorando.Pergunta')
     resposta = models.TextField()
@@ -134,7 +123,6 @@ class Corpo(models.Model):
 
     class Meta:
         ordering = ('pergunta__numero', 'memorando__data')
-
 
 
 class MemorandoSimples(models.Model):
@@ -182,7 +170,6 @@ class MemorandoSimples(models.Model):
         return '<br />'.join(dest)		
 
 
-
 class Arquivo(models.Model):
     arquivo = models.FileField(upload_to='memorando')
     memorando = models.ForeignKey('memorando.MemorandoSimples')
@@ -191,14 +178,11 @@ class Arquivo(models.Model):
         return self.arquivo.name
 
 
-
 # Classe para definição de permissões de views e relatórios da app Memorando
 class Permission(models.Model):
     class Meta:
         # remover as permissões padrões, pois essa é uma classe para configurar permissões customizadas
         default_permissions = ()
         permissions = (
-                    ("rel_adm_memorando", "Rel. Adm. - Memorandos FAPESP"),     #/memorando/relatorio
-                )
-
-
+            ("rel_adm_memorando", "Rel. Adm. - Memorandos FAPESP"),     #/memorando/relatorio
+        )

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import django
 from django.contrib import admin
-from models import *
 from django.utils.translation import ugettext_lazy as _
 from forms import *
 from utils.functions import clone_objects
+
 
 class PerguntaInline(admin.TabularInline):
     fieldsets = ((None, {'fields': ('numero', 'questao')}),)
@@ -27,20 +27,19 @@ class CorpoInline(admin.TabularInline):
     model = Corpo
     extra = 10
 
+
 class MemorandoRespostaAdmin(admin.ModelAdmin):
     fieldsets = (
-
-                (_(u'Memorando'), {
-                    'fields': (('memorando', 'assunto'), 'identificacao', 'estado'), 
-                 }),
-                (None, {
-                    'fields': ('introducao', 'conclusao', ('assinatura', 'data'), 'arquivo', 'protocolo', 'anexa_relatorio'),
-                 }),
-
-                (_(u'Observação'), {
-                    'fields': ('obs', ),
-                    'classes': ('collapse',)
-                 }),
+        (_(u'Memorando'), {
+            'fields': (('memorando', 'assunto'), 'identificacao', 'estado'),
+            }),
+        (None, {
+            'fields': ('introducao', 'conclusao', ('assinatura', 'data'), 'arquivo', 'protocolo', 'anexa_relatorio'),
+            }),
+        (_(u'Observação'), {
+            'fields': ('obs', ),
+            'classes': ('collapse',)
+        }),
     )
     inlines = [CorpoInline]
     list_display = ('__unicode__', 'termo', 'memorando', 'assunto')
@@ -51,9 +50,11 @@ admin.site.register(MemorandoFAPESP, MemorandoFAPESPAdmin)
 admin.site.register(MemorandoResposta, MemorandoRespostaAdmin)
 admin.site.register(Assunto)
 
+
 class ArquivoInline(admin.TabularInline):
     model = Arquivo
     extra = 1
+
 
 class MemorandoSimplesAdmin(admin.ModelAdmin):
     form = MemorandoSimplesForm
@@ -68,12 +69,12 @@ class MemorandoSimplesAdmin(admin.ModelAdmin):
     search_fields = ['assunto__descricao', 'corpo', 'data']
 
     fieldsets = (
-                (u'Margens (em cm)', {
-                    'fields': (('superior', 'inferior', 'direita', 'esquerda'),),
-                 }),
-                (None, {
-                    'fields': ('destinatario', 'assunto', 'corpo', ('equipamento', 'envio'), ('assinatura', 'assinado', 'pai')),
-                 }),
+        (u'Margens (em cm)', {
+            'fields': (('superior', 'inferior', 'direita', 'esquerda'),),
+            }),
+        (None, {
+            'fields': ('destinatario', 'assunto', 'corpo', ('equipamento', 'envio'), ('assinatura', 'assinado', 'pai')),
+            }),
     )
     actions = ['action_clone']
 
@@ -89,4 +90,3 @@ class MemorandoSimplesAdmin(admin.ModelAdmin):
     action_clone.short_description = _(u"Duplicar os memorandos selecionados")
 
 admin.site.register(MemorandoSimples, MemorandoSimplesAdmin)
-

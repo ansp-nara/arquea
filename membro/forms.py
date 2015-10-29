@@ -4,7 +4,6 @@ from django import forms
 from django.forms.models import BaseInlineFormSet, inlineformset_factory
 from django.forms.utils import ErrorList
 from django.utils.translation import ugettext_lazy as _
-from identificacao.models import Entidade
 from models import *
 import logging
 import re
@@ -14,9 +13,8 @@ logger = logging.getLogger(__name__)
 
 EMAIL_RE = re.compile(
     r"(^[-!#$%&'*+/=?^_`{}|~0-9A-Z]+(\.[-!#$%&'*+/=?^_`{}|~0-9A-Z]+)*"  # dot-atom
-    r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-\011\013\014\016-\177])*"' # quoted-string
+    r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-\011\013\014\016-\177])*"'  # quoted-string
     r')@(?:[A-Z0-9-]+\.)+[A-Z]{2,6}$', re.IGNORECASE)  # domain
-
 
 
 # Faz a validação de um e-mmail
@@ -39,13 +37,12 @@ class MembroAdminForm(forms.ModelForm):
                  empty_permitted=False, instance=None):
 
         super(MembroAdminForm, self).__init__(data, files, auto_id, prefix, initial,
-                                            error_class, label_suffix, empty_permitted, instance)
+                                              error_class, label_suffix, empty_permitted, instance)
 
         try:
             self.id = instance.id
         except:
             self.id = None
-
 
     # Verifica se os e-mail são válidos.
     def clean_email(self):
@@ -61,7 +58,6 @@ class MembroAdminForm(forms.ModelForm):
 
         # Always return the cleaned data.
         return value
-
 
     # Verifica a unicidade do CPF.
     def clean_cpf(self):
@@ -79,10 +75,10 @@ class MembroAdminForm(forms.ModelForm):
         # Always return the cleaned data.
         return value
 
-
     class Meta:
         model = Membro
-        fields = ['nome', 'email', 'ramal', 'foto', 'site', 'contato', 'data_nascimento', 'rg', 'cpf', 'url_lattes', 'obs',]
+        fields = ['nome', 'email', 'ramal', 'foto', 'site', 'contato', 'data_nascimento', 'rg', 'cpf', 'url_lattes',
+                  'obs']
 
 
 class DadoBancarioAdminForm(forms.ModelForm):
@@ -95,11 +91,9 @@ class DadoBancarioAdminForm(forms.ModelForm):
     A class 'Meta'		Define o modelo que será utilizado.
     A class 'Media'		Define os arquivo .js que serão utilizados.
     """
-
     class Meta:
         model = DadoBancario
-        fields = ['membro', 'banco', 'agencia', 'ag_digito', 'conta', 'cc_digito',]
-
+        fields = ['membro', 'banco', 'agencia', 'ag_digito', 'conta', 'cc_digito']
 
     class Media:
         js = ('/site-media/js/selects.js', '/site-media/js/membro.js')
@@ -114,11 +108,12 @@ class FeriasAdminForm(forms.ModelForm):
                  empty_permitted=False, instance=None):
 
         super(FeriasAdminForm, self).__init__(data, files, auto_id, prefix, initial,
-                                            error_class, label_suffix, empty_permitted, instance)
+                                              error_class, label_suffix, empty_permitted, instance)
 
         funcionarios = Membro.objects.all()
         for m in funcionarios:
-            if not m.funcionario: funcionarios = funcionarios.exclude(id=m.id)
+            if not m.funcionario:
+                funcionarios = funcionarios.exclude(id=m.id)
         self.fields['membro'].queryset = funcionarios
 
     class Meta:
@@ -144,11 +139,13 @@ class ControleFeriasAdminForm(forms.ModelForm):
         if oficial and dias.days != 19 and dias.days != 29:
             raise forms.ValidationError(u'Férias oficiais devem durar 20 ou 30 dias')
         
-        # Restrição para termos um melhor controle do período de férias tirado de fato para conta no relatório de controle de horas trabalhadas.
+        # Restrição para termos um melhor controle do período de férias tirado de fato para conta no relatório de
+        # controle de horas trabalhadas.
         # A marcação de oficial fica para a 'configuração' das férias, adiantamento, venda de dias e período oficial.
         dias_uteis_fato = self.cleaned_data.get('dias_uteis_fato')
         if oficial and dias_uteis_fato:
-            raise forms.ValidationError(u'Não marcar os "Dias úteis tirados de fato" em férias oficiais. Criar um novo "Controle de Férias" para especificar o período de férias tirados de fato.')
+            raise forms.ValidationError(u'Não marcar os "Dias úteis tirados de fato" em férias oficiais. Criar um novo '
+                                        u'"Controle de Férias" para especificar o período de férias tirados de fato.')
         
         dias_uteis_aberto = self.cleaned_data.get('dias_uteis_aberto')
         if not oficial and dias_uteis_aberto:
@@ -156,10 +153,10 @@ class ControleFeriasAdminForm(forms.ModelForm):
         
         return self.cleaned_data
 
-
     class Meta:
         model = ControleFerias
-        fields = ['ferias', 'inicio', 'termino', 'oficial', 'obs', 'vendeu10', 'antecipa13', 'dias_uteis_fato', 'dias_uteis_aberto', 'arquivo_oficial']
+        fields = ['ferias', 'inicio', 'termino', 'oficial', 'obs', 'vendeu10', 'antecipa13', 'dias_uteis_fato',
+                  'dias_uteis_aberto', 'arquivo_oficial']
 
 
 class BaseControleFeriasAdminFormSet(BaseInlineFormSet):
@@ -175,14 +172,18 @@ class BaseControleFeriasAdminFormSet(BaseInlineFormSet):
         nao_oficiais = 1
         for i in range(0, self.total_form_count()-1):
             form = self.forms[i]
-            if form.cleaned_data.get('oficial') is True: oficiais += 1
-            else: nao_oficiais += 1
-
+            if form.cleaned_data.get('oficial') is True:
+                oficiais += 1
+            else:
+                nao_oficiais += 1
 
 #         if oficiais > 1 or nao_oficiais > 2:
 #             raise forms.ValidationError(u'No máximo um período oficial e dois não oficiais')
 
-ControleFeriasAdminFormSet = inlineformset_factory(Ferias, ControleFerias, formset=BaseControleFeriasAdminFormSet, fields=['ferias', 'inicio', 'termino', 'oficial', 'obs', 'vendeu10', 'antecipa13', 'dias_uteis_fato', 'dias_uteis_aberto', 'arquivo_oficial',],)
+ControleFeriasAdminFormSet = inlineformset_factory(Ferias, ControleFerias, formset=BaseControleFeriasAdminFormSet,
+                                                   fields=['ferias', 'inicio', 'termino', 'oficial', 'obs', 'vendeu10',
+                                                           'antecipa13', 'dias_uteis_fato', 'dias_uteis_aberto',
+                                                           'arquivo_oficial'],)
 
 
 class ControleObs(forms.ModelForm):
@@ -190,6 +191,7 @@ class ControleObs(forms.ModelForm):
     class Meta:
         model = Controle
         fields = ('obs',)
+
 
 class ControleAdminForms(forms.ModelForm):
     
@@ -229,7 +231,6 @@ class ControleAdminForms(forms.ModelForm):
                 self._errors["almoco"] = self.error_class([msg])
                 del cleaned_data["almoco"]
                 
-        
         # Always return the full collection of cleaned data.
         return cleaned_data
         
@@ -265,7 +266,3 @@ class DispensaLegalAdminForms(forms.ModelForm):
             self._errors["minutos"] = self.error_class([msg]) 
         
         return cleaned_data
-        
-        
-    
-    

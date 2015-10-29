@@ -5,8 +5,8 @@ from django.http import QueryDict
 from utils.UnitTestCase import UnitTestCase
 import mock
 
-from outorga.models import Termo, Item, OrigemFapesp, Estado as EstadoOutorga, Categoria, Outorga, Modalidade, Natureza_gasto, \
-                           Acordo, Contrato, OrdemDeServico, TipoContrato, ArquivoOS, Arquivo, EstadoOS
+from outorga.models import Termo, Item, OrigemFapesp, Estado as EstadoOutorga, Categoria, Outorga, Modalidade, \
+    Natureza_gasto, Acordo, Contrato, OrdemDeServico, TipoContrato, ArquivoOS, Arquivo, EstadoOS
 from financeiro.models import Pagamento, ExtratoCC, Estado as EstadoFinanceiro
 from identificacao.models import Entidade, Contato, Identificacao, Endereco
 from protocolo.models import Protocolo, ItemProtocolo, TipoDocumento, Origem, Estado as EstadoProtocolo
@@ -21,17 +21,19 @@ class TermoTest(UnitTestCase):
     def setUp(self):
         super(TermoTest, self).setUp()
 
-        #Cria Termo
+        # Cria Termo
         e = EstadoOutorga.objects.create(nome='Vigente')
-        t = Termo.objects.create(ano=2008, processo=22222, digito=2, inicio=date(2008,1,1), estado=e)
-        #Cria Outorga
+        t = Termo.objects.create(ano=2008, processo=22222, digito=2, inicio=date(2008, 1, 1), estado=e)
+        # Cria Outorga
         c1 = Categoria.objects.create(nome='Inicial')
         c2 = Categoria.objects.create(nome='Aditivo')
 
-        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007,12,1), termino=date(2008,12,31), data_presta_contas=date(2008,2,28))
-        o2 = Outorga.objects.create(termo=t, categoria=c2, data_solicitacao=date(2008,4,1), termino=date(2008,12,31), data_presta_contas=date(2008,2,28))
+        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007, 12, 1),
+                                    termino=date(2008, 12, 31), data_presta_contas=date(2008, 2, 28))
+        o2 = Outorga.objects.create(termo=t, categoria=c2, data_solicitacao=date(2008, 4, 1),
+                                    termino=date(2008, 12, 31), data_presta_contas=date(2008, 2, 28))
 
-        #Cria Natureza de gasto
+        # Cria Natureza de gasto
         m1 = Modalidade.objects.create(sigla='STB', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
         m11 = Modalidade.objects.create(sigla='STB1', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
         m2 = Modalidade.objects.create(sigla='STE', nome='Servicos de Terceiro no Exterior', moeda_nacional=False)
@@ -42,21 +44,27 @@ class TermoTest(UnitTestCase):
         n3 = Natureza_gasto.objects.create(modalidade=m2, termo=t, valor_concedido='1000000.00')
         n4 = Natureza_gasto.objects.create(modalidade=m22, termo=t, valor_concedido='2000000.00')
 
-        #Cria Item de Outorga
-        ent1 = Entidade.objects.create(sigla='GTECH', nome='Granero Tech', cnpj='00.000.000/0000-00', fisco=True, url='')
+        # Cria Item de Outorga
+        ent1 = Entidade.objects.create(sigla='GTECH', nome='Granero Tech', cnpj='00.000.000/0000-00', fisco=True,
+                                       url='')
         ent2 = Entidade.objects.create(sigla='SAC', nome='SAC do Brasil', cnpj='00.000.000/0000-00', fisco=True, url='')
-        ent3 = Entidade.objects.create(sigla='TERREMARK', nome='Terremark do Brasil', cnpj='00.000.000/0000-00', fisco=True, url='')
+        ent3 = Entidade.objects.create(sigla='TERREMARK', nome='Terremark do Brasil', cnpj='00.000.000/0000-00',
+                                       fisco=True, url='')
         
         end1 = Endereco.objects.create(entidade=ent1)
         end2 = Endereco.objects.create(entidade=ent2)
         end3 = Endereco.objects.create(entidade=ent3)
 
-        i1 = Item.objects.create(entidade=ent1, natureza_gasto=n1, descricao='Armazenagem', justificativa='Armazenagem de equipamentos', quantidade=12, valor=2500)
-        i2 = Item.objects.create(entidade=ent2, natureza_gasto=n2, descricao='Serviço de Conexão Internacional', justificativa='Link Internacional', quantidade=12, valor=250000)
-        i3 = Item.objects.create(entidade=ent3, natureza_gasto=n3, descricao='Serviço de Conexão', justificativa='Ligação SP-CPS', quantidade=12, valor=100000)
-        i4 = Item.objects.create(entidade=ent3, natureza_gasto=n4, descricao='Serviço de Conexão Internacional', justificativa='Ajuste na cobrança do Link Internacional', quantidade=6, valor=50000)
+        i1 = Item.objects.create(entidade=ent1, natureza_gasto=n1, descricao='Armazenagem',
+                                 justificativa='Armazenagem de equipamentos', quantidade=12, valor=2500)
+        i2 = Item.objects.create(entidade=ent2, natureza_gasto=n2, descricao='Serviço de Conexão Internacional',
+                                 justificativa='Link Internacional', quantidade=12, valor=250000)
+        i3 = Item.objects.create(entidade=ent3, natureza_gasto=n3, descricao='Serviço de Conexão',
+                                 justificativa='Ligação SP-CPS', quantidade=12, valor=100000)
+        i4 = Item.objects.create(entidade=ent3, natureza_gasto=n4, descricao='Serviço de Conexão Internacional',
+                                 justificativa='Ajuste na cobrança do Link Internacional', quantidade=6, valor=50000)
 
-        #Cria Protocolo
+        # Cria Protocolo
         ep = EstadoProtocolo.objects.create(nome='Aprovado')
         td = TipoDocumento.objects.create(nome='Nota Fiscal')
         og = Origem.objects.create(nome='Motoboy')
@@ -74,21 +82,31 @@ class TermoTest(UnitTestCase):
         p3 = Protocolo.objects.create(termo=t, identificacao=iden3, tipo_documento=td, data_chegada=datetime(2008,9,30,10,10), origem=og, estado=ep, num_documento=5555, data_vencimento=date(2008,10,15), descricao='Serviço de Conexão Local - 09/2009', valor_total=None, moeda_estrangeira=False)
 
         #Cria Item do Protocolo
-        ip1 = ItemProtocolo.objects.create(protocolo=p1, descricao='Tarifa mensal - 09/2009', quantidade=1, valor_unitario=2500)
-        ip2 = ItemProtocolo.objects.create(protocolo=p1, descricao='Reajuste tarifa mensal - 09/2009', quantidade=1, valor_unitario=150)
-        ip3 = ItemProtocolo.objects.create(protocolo=p2, descricao='Conexão Internacional - 09/2009', quantidade=1, valor_unitario=250000)
-        ip4 = ItemProtocolo.objects.create(protocolo=p2, descricao='Reajuste do serviço de Conexão Internacional - 09/2009', quantidade=1, valor_unitario=50000)
-        ip5 = ItemProtocolo.objects.create(protocolo=p3, descricao='Conexão Local - 09/2009', quantidade=1, valor_unitario=85000)
-        ip6 = ItemProtocolo.objects.create(protocolo=p3, descricao='Reajuste do serviço de Conexão Local - 09/2009', quantidade=1, valor_unitario=15000)
+        ip1 = ItemProtocolo.objects.create(protocolo=p1, descricao='Tarifa mensal - 09/2009', quantidade=1,
+                                           valor_unitario=2500)
+        ip2 = ItemProtocolo.objects.create(protocolo=p1, descricao='Reajuste tarifa mensal - 09/2009', quantidade=1,
+                                           valor_unitario=150)
+        ip3 = ItemProtocolo.objects.create(protocolo=p2, descricao='Conexão Internacional - 09/2009', quantidade=1,
+                                           valor_unitario=250000)
+        ip4 = ItemProtocolo.objects.create(descricao='Reajuste do serviço de Conexão Internacional - 09/2009',
+                                           protocolo=p2, quantidade=1, valor_unitario=50000)
+        ip5 = ItemProtocolo.objects.create(protocolo=p3, descricao='Conexão Local - 09/2009', quantidade=1,
+                                           valor_unitario=85000)
+        ip6 = ItemProtocolo.objects.create(protocolo=p3, descricao='Reajuste do serviço de Conexão Local - 09/2009',
+                                           quantidade=1, valor_unitario=15000)
 
-        #Criar Fonte Pagadora
+        # Criar Fonte Pagadora
         ef1 = EstadoOutorga.objects.create(nome='Aprovado')
         ef2 = EstadoOutorga.objects.create(nome='Concluído')
 
-        ex1 = ExtratoCC.objects.create(data_extrato=date(2008,10,30), data_oper=date(2008,10,5), cod_oper=333333, valor='2650', historico='TED', despesa_caixa=False)
-        ex2 = ExtratoCC.objects.create(data_extrato=date(2008,10,30), data_oper=date(2008,10,10), cod_oper=4444, valor='250000', historico='TED', despesa_caixa=False)
-        ex3 = ExtratoCC.objects.create(data_extrato=date(2008,10,30), data_oper=date(2008,10,10), cod_oper=4444, valor='50000', historico='TED', despesa_caixa=False)
-        ex4 = ExtratoCC.objects.create(data_extrato=date(2008,10,30), data_oper=date(2008,10,15), cod_oper=5555, valor='100000', historico='TED', despesa_caixa=False)
+        ex1 = ExtratoCC.objects.create(data_extrato=date(2008, 10, 30), data_oper=date(2008, 10, 5), cod_oper=333333,
+                                       valor='2650', historico='TED', despesa_caixa=False)
+        ex2 = ExtratoCC.objects.create(data_extrato=date(2008, 10, 30), data_oper=date(2008, 10, 10), cod_oper=4444,
+                                       valor='250000', historico='TED', despesa_caixa=False)
+        ex3 = ExtratoCC.objects.create(data_extrato=date(2008, 10, 30), data_oper=date(2008, 10, 10), cod_oper=4444,
+                                       valor='50000', historico='TED', despesa_caixa=False)
+        ex4 = ExtratoCC.objects.create(data_extrato=date(2008, 10, 30), data_oper=date(2008, 10, 15), cod_oper=5555,
+                                       valor='100000', historico='TED', despesa_caixa=False)
 
         a1 = Acordo.objects.create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e GTech')
         a2 = Acordo.objects.create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e SAC')
@@ -104,10 +122,8 @@ class TermoTest(UnitTestCase):
         fp3 = Pagamento.objects.create(protocolo=p2, conta_corrente=ex3, valor_patrocinio='50000', valor_fapesp=0)
         fp4 = Pagamento.objects.create(protocolo=p3, conta_corrente=ex4, origem_fapesp=of3, valor_fapesp='100000')
 
-       
     def tearDown(self):
         super(TermoTest, self).tearDown()
-    
 
     def test_unicode(self):
         termo = Termo.objects.get(pk=1)
@@ -153,19 +169,19 @@ class TermoTest(UnitTestCase):
 
     def test_duracao_meses__menos_1_mes(self):
         termo = Termo.objects.get(pk=1)
-        termo.inicio = date(2008,12,15)
+        termo.inicio = date(2008, 12, 15)
 
         self.assertEquals(termo.duracao_meses(), '-')
 
     def test_duracao_meses__1_mes(self):
         termo = Termo.objects.get(pk=1)
-        termo.inicio = date(2008,12,01)
+        termo.inicio = date(2008, 12, 1)
 
         self.assertEquals(termo.duracao_meses(), u'1 mês')
 
     def test_duracao_meses__2_meses(self):
         termo = Termo.objects.get(pk=1)
-        termo.inicio = date(2008,10,4)
+        termo.inicio = date(2008, 10, 4)
 
         self.assertEquals(termo.duracao_meses(), '3 meses')
 
@@ -304,28 +320,31 @@ class CategoriaTest(UnitTestCase):
 class OutorgaTest(UnitTestCase):
     def setUp(self):
         super(OutorgaTest, self).setUp()
-        #Cria Termo
+        # Cria Termo
         e = EstadoOutorga.objects.create(nome='Vigente')
-        t = Termo.objects.create(ano=2008, processo=22222, digito=2, inicio=date(2008,1,1), estado=e)
+        t = Termo.objects.create(ano=2008, processo=22222, digito=2, inicio=date(2008, 1, 1), estado=e)
 
-        #Cria Outorga
+        # Cria Outorga
         c1 = Categoria.objects.create(nome='Inicial')
-        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007,12,1), termino=date(2008,12,31), data_presta_contas=date(2008,2,28))
+        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007, 12, 1),
+                                    termino=date(2008, 12, 31), data_presta_contas=date(2008, 2, 28))
 
-        #Cria Natureza de gasto
+        # Cria Natureza de gasto
         m1 = Modalidade.objects.create(sigla='STB', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
         m2 = Modalidade.objects.create(sigla='STE', nome='Servicos de Terceiro no Exterior', moeda_nacional=False)
 
         n1 = Natureza_gasto.objects.create(modalidade=m1, termo=t, valor_concedido='1500000.00')
         n2 = Natureza_gasto.objects.create(modalidade=m2, termo=t, valor_concedido='1500000.00')
         
-        #Cria Item de Outorga
-        ent1 = Entidade.objects.create(sigla='GTECH', nome='Granero Tech', cnpj='00.000.000/0000-00', fisco=True, url='')
+        # Cria Item de Outorga
+        ent1 = Entidade.objects.create(sigla='GTECH', nome='Granero Tech', cnpj='00.000.000/0000-00', fisco=True,
+                                       url='')
         ent2 = Entidade.objects.create(sigla='SAC', nome='SAC do Brasil', cnpj='00.000.000/0000-00', fisco=True, url='')
 
-        i1 = Item.objects.create(entidade=ent1, natureza_gasto=n1, descricao='Armazenagem', justificativa='Armazenagem de equipamentos', quantidade=12, valor=2500)
-        i2 = Item.objects.create(entidade=ent2, natureza_gasto=n2, descricao='Serviço de Conexão Internacional', justificativa='Link Internacional', quantidade=12, valor=250000)
-        
+        i1 = Item.objects.create(entidade=ent1, natureza_gasto=n1, descricao='Armazenagem',
+                                 justificativa='Armazenagem de equipamentos', quantidade=12, valor=2500)
+        i2 = Item.objects.create(entidade=ent2, natureza_gasto=n2, descricao='Serviço de Conexão Internacional',
+                                 justificativa='Link Internacional', quantidade=12, valor=250000)
 
     def tearDown(self):
         super(OutorgaTest, self).tearDown()
@@ -354,52 +373,57 @@ class OutorgaTest(UnitTestCase):
         o1 = Outorga.objects.get(pk=1)
         o1.arquivo = 'teste.pdf'
         
-        self.assertEquals(o1.existe_arquivo(), '<center><a href="/admin/outorga/arquivo/?outorga__id__exact=1"><img src="/media/img/arquivo.png" /></a></center>')
+        self.assertEquals(o1.existe_arquivo(), '<center><a href="/admin/outorga/arquivo/?outorga__id__exact=1">'
+                                               '<img src="/media/img/arquivo.png" /></a></center>')
+
 
 class OutorgaViewTest(UnitTestCase):
     def setUp(self):
         super(OutorgaViewTest, self).setUp()
-        #Cria Termo
+        # Cria Termo
         e = EstadoOutorga.objects.create(nome='Vigente')
-        t = Termo.objects.create(ano=2008, processo=22222, digito=2, inicio=date(2008,1,1), estado=e)
+        t = Termo.objects.create(ano=2008, processo=22222, digito=2, inicio=date(2008, 1, 1), estado=e)
 
-        #Cria Outorga
+        # Cria Outorga
         c1 = Categoria.objects.create(nome='Inicial')
-        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007,12,1), termino=date(2008,12,31), data_presta_contas=date(2008,2,28))
+        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007, 12, 1),
+                                    termino=date(2008, 12, 31), data_presta_contas=date(2008, 2, 28))
 
-        #Cria Natureza de gasto
+        # Cria Natureza de gasto
         m1 = Modalidade.objects.create(sigla='STB', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
         m2 = Modalidade.objects.create(sigla='STE', nome='Servicos de Terceiro no Exterior', moeda_nacional=False)
 
         n1 = Natureza_gasto.objects.create(modalidade=m1, termo=t, valor_concedido='1500000.00')
         n2 = Natureza_gasto.objects.create(modalidade=m2, termo=t, valor_concedido='1500000.00')
         
-        #Cria Item de Outorga
-        ent1 = Entidade.objects.create(sigla='GTECH', nome='Granero Tech', cnpj= '00.000.000/0000-00', fisco=True, url='')
+        # Cria Item de Outorga
+        ent1 = Entidade.objects.create(sigla='GTECH', nome='Granero Tech', cnpj='00.000.000/0000-00', fisco=True,
+                                       url='')
         ent2 = Entidade.objects.create(sigla='SAC', nome='SAC do Brasil', cnpj='00.000.000/0000-00', fisco=True, url='')
 
-        i1 = Item.objects.create(entidade=ent1, natureza_gasto=n1, descricao='Armazenagem', justificativa='Armazenagem de equipamentos', quantidade=12, valor=2500)
-        i2 = Item.objects.create(entidade=ent2, natureza_gasto=n2, descricao='Serviço de Conexão Internacional', justificativa='Link Internacional', quantidade=12, valor=250000)
+        i1 = Item.objects.create(entidade=ent1, natureza_gasto=n1, descricao='Armazenagem',
+                                 justificativa='Armazenagem de equipamentos', quantidade=12, valor=2500)
+        i2 = Item.objects.create(entidade=ent2, natureza_gasto=n2, descricao='Serviço de Conexão Internacional',
+                                 justificativa='Link Internacional', quantidade=12, valor=250000)
         
-        ### Entidades para o teste da View ###
-        cont1 = Contrato.objects.create(numero='1111/11', descricao='contrato1', entidade=ent1, data_inicio=date(2013, 01, 02), limite_rescisao=date(2013,01,03), auto_renova=False)
+        # Entidades para o teste da View ###
+        cont1 = Contrato.objects.create(numero='1111/11', descricao='contrato1', entidade=ent1, auto_renova=False,
+                                        data_inicio=date(2013, 1, 02), limite_rescisao=date(2013, 1, 3))
         
-        #Cria uma Ordem de Serviço
+        # Cria uma Ordem de Serviço
         estadoOs = EstadoOS.objects.create(nome="Vigente")
         tipo = TipoContrato.objects.create(nome='Tipo Fixo')
         ef1 = EstadoOutorga.objects.create(nome='Aprovado')
         acordo = Acordo.objects.create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e SAC')
-        os = OrdemDeServico.objects.create(acordo=acordo, contrato=cont1, tipo=tipo, estado=estadoOs,
-                                   data_inicio=date(2008,2,1), data_rescisao=date(2008,11,1), antes_rescisao=2, numero=66666,   
-                                   descricao='OS 34567 - Contratação de mais um link')
+        os = OrdemDeServico.objects.create(acordo=acordo, contrato=cont1, tipo=tipo, estado=estadoOs, numero=66666,
+                                           data_inicio=date(2008, 2, 1), data_rescisao=date(2008, 11, 1),
+                                           antes_rescisao=2, descricao='OS 34567 - Contratação de mais um link')
         
         of1 = OrigemFapesp.objects.create(acordo=acordo, item_outorga=i1)
 
     def test_call__relatorio_contratos_por_entidade(self):
         mock_render = mock.MagicMock()
-        with mock.patch.multiple('outorga.views',
-            render=mock_render,
-            login_required=lambda x: x):
+        with mock.patch.multiple('outorga.views', render=mock_render, login_required=lambda x: x):
              
             from outorga.views import contratos
             mock_request = mock.Mock()
@@ -416,7 +440,7 @@ class OutorgaViewTest(UnitTestCase):
             self.assertEquals(args[2]['entidades'][0]['entidade'], 'GTECH')
             self.assertEquals(args[2]['entidades'][0]['contratos'][0]['numero'], '1111/11')
             self.assertEquals(args[2]['entidades'][0]['contratos'][0]['inicio'], date(2013, 1, 2))
-            self.assertEquals(args[2]['entidades'][0]['contratos'][0]['termino'], date(2013,01,03))
+            self.assertEquals(args[2]['entidades'][0]['contratos'][0]['termino'], date(2013, 1, 3))
 #             self.assertEquals(args[2]['entidades'][0]['contratos'][0]['arquivo'], '1111/11')
             self.assertEquals(args[2]['entidades'][0]['contratos'][0]['auto'], False)
             self.assertEquals(args[2]['entidades'][0]['contratos'][0]['os'][0].tipo.nome, 'Tipo Fixo')
@@ -427,9 +451,7 @@ class OutorgaViewTest(UnitTestCase):
         os.delete()
         
         mock_render = mock.MagicMock()
-        with mock.patch.multiple('outorga.views',
-            render=mock_render,
-            login_required=lambda x: x):
+        with mock.patch.multiple('outorga.views', render=mock_render, login_required=lambda x: x):
              
             from outorga.views import contratos
             mock_request = mock.Mock()
@@ -444,15 +466,13 @@ class OutorgaViewTest(UnitTestCase):
             print args[2]
             print args[2]['entidades'][0]['contratos'][0]
 
-            self.assertTrue(len(args[2]['entidades'][0]['contratos'][0]['os']) == 0, 'Ordemdeservico não deve estar na resposta da view.')
-
+            self.assertTrue(len(args[2]['entidades'][0]['contratos'][0]['os']) == 0,
+                            'Ordemdeservico não deve estar na resposta da view.')
 
     def test_call__relatorio_termos(self):
         
         mock_render = mock.MagicMock()
-        with mock.patch.multiple('outorga.views',
-            render=mock_render,
-            login_required=lambda x: x):
+        with mock.patch.multiple('outorga.views', render=mock_render, login_required=lambda x: x):
              
             from outorga.views import relatorio_termos
             mock_request = mock.Mock()
@@ -464,12 +484,9 @@ class OutorgaViewTest(UnitTestCase):
             self.assertEquals(args[1], 'outorga/termos.html')
             self.assertEquals(args[2]['termos'][0].processo, 22222)
 
-
     def test_call__relatorio_termos__request_post(self):
         mock_render = mock.MagicMock()
-        with mock.patch.multiple('outorga.views',
-            render=mock_render,
-            login_required=lambda x: x):
+        with mock.patch.multiple('outorga.views', render=mock_render, login_required=lambda x: x):
              
             from outorga.views import relatorio_termos
             mock_request = mock.Mock()
@@ -477,13 +494,10 @@ class OutorgaViewTest(UnitTestCase):
             # call view
             relatorio_termos(mock_request)
             self.assertTrue(len(mock_render.mock_calls) == 0, 'Não deve responder request com POST.')
-            
-            
+
     def test_call__lista_acordos(self):
         mock_render = mock.MagicMock()
-        with mock.patch.multiple('outorga.views',
-            render=mock_render,
-            login_required=lambda x: x):
+        with mock.patch.multiple('outorga.views', render=mock_render, login_required=lambda x: x):
              
             from outorga.views import lista_acordos
             mock_request = mock.Mock()
@@ -495,20 +509,18 @@ class OutorgaViewTest(UnitTestCase):
             self.assertEquals(args[1], 'outorga/acordos.html')
             
             self.assertEquals(args[2]['processos'][0]['processo'].processo, 22222)
-            self.assertEquals(args[2]['processos'][0]['acordos'][0]['acordo'].__unicode__(), u'Acordo entre Instituto UNIEMP e SAC')
+            self.assertEquals(args[2]['processos'][0]['acordos'][0]['acordo'].__unicode__(),
+                              u'Acordo entre Instituto UNIEMP e SAC')
             self.assertEquals(args[2]['processos'][0]['acordos'][0]['itens'][0]['modalidade'], u'STB')
             self.assertEquals(args[2]['processos'][0]['acordos'][0]['itens'][0]['entidade'].sigla, u'GTECH')
             self.assertEquals(args[2]['processos'][0]['acordos'][0]['itens'][0]['descricao'], u'Armazenagem')
-            
 
     def test_call__lista_acordos__sem_origemfapesp(self):
         origemFapesp = OrigemFapesp.objects.get(pk=1)
         origemFapesp.delete()
         
         mock_render = mock.MagicMock()
-        with mock.patch.multiple('outorga.views',
-            render=mock_render,
-            login_required=lambda x: x):
+        with mock.patch.multiple('outorga.views', render=mock_render, login_required=lambda x: x):
              
             from outorga.views import lista_acordos
             mock_request = mock.Mock()
@@ -524,9 +536,7 @@ class OutorgaViewTest(UnitTestCase):
 
     def test_call__lista_acordos__pdf(self):
         mock_render = mock.MagicMock()
-        with mock.patch.multiple('outorga.views',
-            render=mock_render,
-            login_required=lambda x: x):
+        with mock.patch.multiple('outorga.views', render=mock_render, login_required=lambda x: x):
              
             from outorga.views import lista_acordos
             mock_request = mock.Mock()
@@ -536,12 +546,9 @@ class OutorgaViewTest(UnitTestCase):
             logger.debug("Content-Type: application/pdf" in str(response))
             logger.debug("filename=file.pdf" in str(response))
 
-
     def test_call__item_modalidade__pagina_filtro_inicial(self):
         mock_render = mock.MagicMock()
-        with mock.patch.multiple('outorga.views',
-            render=mock_render,
-            login_required=lambda x: x):
+        with mock.patch.multiple('outorga.views', render=mock_render, login_required=lambda x: x):
              
             from outorga.views import item_modalidade
             mock_request = mock.Mock()
@@ -568,12 +575,9 @@ class OutorgaViewTest(UnitTestCase):
             # Verificando se não entrou no if errado dentro da view, buscando mais informações que deveria
             self.assertFalse('itens' in args[2])
 
-
     def test_call__item_modalidade__sem_entidade(self):
         mock_render = mock.MagicMock()
-        with mock.patch.multiple('outorga.views',
-            render=mock_render,
-            login_required=lambda x: x):
+        with mock.patch.multiple('outorga.views', render=mock_render, login_required=lambda x: x):
              
             from outorga.views import item_modalidade
             mock_request = mock.Mock()
@@ -590,14 +594,10 @@ class OutorgaViewTest(UnitTestCase):
             self.assertIsNotNone(args[2]['modalidade'])
             self.assertIsNotNone(args[2]['itens'])
             self.assertIsNone(args[2]['entidade'])
-            
-            
 
     def test_call__item_modalidade(self):
         mock_render = mock.MagicMock()
-        with mock.patch.multiple('outorga.views',
-            render=mock_render,
-            login_required=lambda x: x):
+        with mock.patch.multiple('outorga.views', render=mock_render, login_required=lambda x: x):
              
             from outorga.views import item_modalidade
             mock_request = mock.Mock()
@@ -620,36 +620,43 @@ class Natureza_gastoTest(UnitTestCase):
     def setUp(self):
         super(Natureza_gastoTest, self).setUp()
         
-        #Cria Termo
+        # Cria Termo
         e = EstadoOutorga.objects.create(nome='Vigente')
-        t = Termo.objects.create(ano=2008, processo=22222, digito=2, inicio=date(2008,1,1), estado=e)
+        t = Termo.objects.create(ano=2008, processo=22222, digito=2, inicio=date(2008, 1, 1), estado=e)
 
-        #Cria Outorga
+        # Cria Outorga
         c1 = Categoria.objects.create(nome='Inicial')
         c2 = Categoria.objects.create(nome='Aditivo')
 
-        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007,12,1), termino=date(2008,12,31), data_presta_contas=date(2008,2,28))
-        o2 = Outorga.objects.create(termo=t, categoria=c2, data_solicitacao=date(2008,4,1), termino=date(2008,12,31), data_presta_contas=date(2008,2,28))
+        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007, 12, 1),
+                                    termino=date(2008, 12, 31), data_presta_contas=date(2008, 2, 28))
+        o2 = Outorga.objects.create(termo=t, categoria=c2, data_solicitacao=date(2008, 4, 1),
+                                    termino=date(2008, 12, 31), data_presta_contas=date(2008, 2, 28))
 
-        #Cria Natureza de gasto
+        # Cria Natureza de gasto
         m1 = Modalidade.objects.create(sigla='STB', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
         m2 = Modalidade.objects.create(sigla='STB2', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
 
         n1 = Natureza_gasto.objects.create(modalidade=m1, termo=t, valor_concedido=Decimal('30000'))
         n2 = Natureza_gasto.objects.create(modalidade=m2, termo=t, valor_concedido=Decimal('100000'))
 
-        #Cria Item de Outorga
-        ent1 = Entidade.objects.create(sigla='GTECH', nome='Granero Tech', cnpj='00.000.000/0000-00', fisco=True, url='')
-        ent2 = Entidade.objects.create(sigla='TERREMARK', nome='Terremark do Brasil', cnpj='00.000.000/0000-00', fisco=True, url='')
+        # Cria Item de Outorga
+        ent1 = Entidade.objects.create(sigla='GTECH', nome='Granero Tech', cnpj='00.000.000/0000-00', fisco=True,
+                                       url='')
+        ent2 = Entidade.objects.create(sigla='TERREMARK', nome='Terremark do Brasil', cnpj='00.000.000/0000-00',
+                                       fisco=True, url='')
 
         end1 = Endereco.objects.create(entidade=ent1)
         end2 = Endereco.objects.create(entidade=ent2)
 
-        i1 = Item.objects.create(entidade=ent1, natureza_gasto=n1, descricao='Armazenagem', justificativa='Armazenagem de equipamentos', quantidade=12, valor=2500)
-        i2 = Item.objects.create(entidade=ent2, natureza_gasto=n1, descricao='Servico de Conexao', justificativa='Ligação SP-CPS', quantidade=12, valor=000000)
-        i3 = Item.objects.create(entidade=ent2, natureza_gasto=n2, descricao='Servico de Conexao', justificativa='Ligação SP-CPS', quantidade=12, valor=100000)
+        i1 = Item.objects.create(entidade=ent1, natureza_gasto=n1, descricao='Armazenagem',
+                                 justificativa='Armazenagem de equipamentos', quantidade=12, valor=2500)
+        i2 = Item.objects.create(entidade=ent2, natureza_gasto=n1, descricao='Servico de Conexao',
+                                 justificativa='Ligação SP-CPS', quantidade=12, valor=000000)
+        i3 = Item.objects.create(entidade=ent2, natureza_gasto=n2, descricao='Servico de Conexao',
+                                 justificativa='Ligação SP-CPS', quantidade=12, valor=100000)
 
-        #Cria Protocolo
+        # Cria Protocolo
         ep = EstadoProtocolo.objects.create(nome='Aprovado')
         td = TipoDocumento.objects.create(nome='Nota Fiscal')
         og = Origem.objects.create(nome='Motoboy')
@@ -660,21 +667,33 @@ class Natureza_gastoTest(UnitTestCase):
         iden1 = Identificacao.objects.create(endereco=end1, contato=cot1, funcao='Tecnico', area='Estoque', ativo=True)
         iden2 = Identificacao.objects.create(endereco=end2, contato=cot2, funcao='Diretor', area='Redes', ativo=True)
 
-        p1 = Protocolo.objects.create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,9,30,10,10), origem=og, estado=ep, num_documento=8888, data_vencimento=date(2008,10,5), descricao='Conta mensal - armazenagem 09/2008', valor_total=None, moeda_estrangeira=False)
-        p2 = Protocolo.objects.create(termo=t, identificacao=iden2, tipo_documento=td, data_chegada=datetime(2008,9,30,10,10), origem=og, estado=ep, num_documento=5555, data_vencimento=date(2008,10,15), descricao='Serviço de Conexão Local - 09/2009', valor_total=None, moeda_estrangeira=False)
+        p1 = Protocolo.objects.create(termo=t, identificacao=iden1, tipo_documento=td, valor_total=None,
+                                      data_chegada=datetime(2008, 9, 30, 10, 10), origem=og, estado=ep,
+                                      num_documento=8888, data_vencimento=date(2008, 10, 5),
+                                      descricao='Conta mensal - armazenagem 09/2008', moeda_estrangeira=False)
+        p2 = Protocolo.objects.create(termo=t, identificacao=iden2, tipo_documento=td, valor_total=None,
+                                      data_chegada=datetime(2008, 9, 30, 10, 10), origem=og, estado=ep,
+                                      num_documento=5555, data_vencimento=date(2008, 10, 15),
+                                      descricao='Serviço de Conexão Local - 09/2009', moeda_estrangeira=False)
 
-        #Cria Item do Protocolo
-        ip1 = ItemProtocolo.objects.create(protocolo=p1, descricao='Tarifa mensal - 09/2009', quantidade=1, valor_unitario=2500)
-        ip2 = ItemProtocolo.objects.create(protocolo=p1, descricao='Reajuste tarifa mensal - 09/2009', quantidade=1, valor_unitario=150)
-        ip3 = ItemProtocolo.objects.create(protocolo=p2, descricao='Conexão Local - 09/2009', quantidade=1, valor_unitario=85000)
-        ip4 = ItemProtocolo.objects.create(protocolo=p2, descricao='Reajuste do serviço de Conexão Local - 09/2009', quantidade=1, valor_unitario=15000)
+        # Cria Item do Protocolo
+        ip1 = ItemProtocolo.objects.create(protocolo=p1, descricao='Tarifa mensal - 09/2009', quantidade=1,
+                                           valor_unitario=2500)
+        ip2 = ItemProtocolo.objects.create(protocolo=p1, descricao='Reajuste tarifa mensal - 09/2009', quantidade=1,
+                                           valor_unitario=150)
+        ip3 = ItemProtocolo.objects.create(protocolo=p2, descricao='Conexão Local - 09/2009', quantidade=1,
+                                           valor_unitario=85000)
+        ip4 = ItemProtocolo.objects.create(protocolo=p2, descricao='Reajuste do serviço de Conexão Local - 09/2009',
+                                           quantidade=1, valor_unitario=15000)
 
-        #Criar Fonte Pagadora
+        # Criar Fonte Pagadora
         ef1 = EstadoOutorga.objects.create(nome='Aprovado')
         ef2 = EstadoOutorga.objects.create(nome='Concluído')
 
-        ex1 = ExtratoCC.objects.create(data_extrato=date(2008,10,30), data_oper=date(2008,9,25), cod_oper=333333, valor='2650', historico='TED', despesa_caixa=False)
-        ex2 = ExtratoCC.objects.create(data_extrato=date(2008,10,30), data_oper=date(2008,10,15), cod_oper=5555, valor='100000', historico='TED', despesa_caixa=False)
+        ex1 = ExtratoCC.objects.create(data_extrato=date(2008, 10, 30), data_oper=date(2008, 9, 25), cod_oper=333333,
+                                       valor='2650', historico='TED', despesa_caixa=False)
+        ex2 = ExtratoCC.objects.create(data_extrato=date(2008, 10, 30), data_oper=date(2008, 10, 15), cod_oper=5555,
+                                       valor='100000', historico='TED', despesa_caixa=False)
 
         a1 = Acordo.objects.create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e GTech')
         a2 = Acordo.objects.create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e Terremark')
@@ -686,7 +705,6 @@ class Natureza_gastoTest(UnitTestCase):
         fp1 = Pagamento.objects.create(protocolo=p1, conta_corrente=ex1, origem_fapesp=of1, valor_fapesp='2650')
         fp2 = Pagamento.objects.create(protocolo=p2, conta_corrente=ex2, origem_fapesp=of2, valor_fapesp='100000')
         fp3 = Pagamento.objects.create(protocolo=p2, conta_corrente=ex2, origem_fapesp=of3, valor_fapesp='100000')
-
 
     def tearDown(self):
         super(Natureza_gastoTest, self).tearDown()
@@ -717,9 +735,9 @@ class Natureza_gastoTest(UnitTestCase):
 
     def test_total_realizado_parcial(self):
         n1 = Natureza_gasto.objects.get(pk=1)
-        self.assertEqual(n1.total_realizado_parcial(5,2008,9,2008), Decimal('2650'))
-        self.assertEqual(n1.total_realizado_parcial(5,2008,12,2008), Decimal('102650'))
-        self.assertEqual(n1.total_realizado_parcial(10,2008,12,2008), Decimal('100000'))
+        self.assertEqual(n1.total_realizado_parcial(5, 2008, 9, 2008), Decimal('2650'))
+        self.assertEqual(n1.total_realizado_parcial(5, 2008, 12, 2008), Decimal('102650'))
+        self.assertEqual(n1.total_realizado_parcial(10, 2008, 12, 2008), Decimal('100000'))
         
     def test_formata_total_realizado__zero(self):
         pg1 = Pagamento.objects.get(pk=1)
@@ -735,7 +753,8 @@ class Natureza_gastoTest(UnitTestCase):
 
     def test_formata_total_realizado__negativo(self):
         n1 = Natureza_gasto.objects.get(pk=1)
-        self.assertEquals(n1.formata_total_realizado(), '<span style="color: red">R$ 102.650,00</span>', 'Total realizado não possui valor negativo.')
+        self.assertEquals(n1.formata_total_realizado(), '<span style="color: red">R$ 102.650,00</span>',
+                          'Total realizado não possui valor negativo.')
 
     def test_formata_total_realizado__positivo(self):
         n1 = Natureza_gasto.objects.get(pk=1)
@@ -753,21 +772,22 @@ class Natureza_gastoTest(UnitTestCase):
     def test_soma_itens__diff_total(self):
         n2 = Natureza_gasto.objects.get(pk=2)
         n2.valor_concedido = n2.valor_concedido - 100000
-        self.assertEquals(n2.soma_itens(), '<span style="color: red">R$ 100.000,00</span>', 'Valor concedido é diferente do total dos itens.')
+        self.assertEquals(n2.soma_itens(), '<span style="color: red">R$ 100.000,00</span>',
+                          'Valor concedido é diferente do total dos itens.')
 
     def test_soma_itens__zero(self):
         n2 = Natureza_gasto.objects.get(pk=2)
         n2.valor_concedido = 0
         i1 = Item.objects.get(pk=1)
-        i1.valor=0
+        i1.valor = 0
         i1.save()
         
         i2 = Item.objects.get(pk=2)
-        i2.valor=0
+        i2.valor = 0
         i2.save()
         
         i3 = Item.objects.get(pk=3)
-        i3.valor=0
+        i3.valor = 0
         i3.save()
         
         self.assertEquals(n2.soma_itens(), '-', 'A soma dos valores dos itens não é zero.')
@@ -824,61 +844,81 @@ class Natureza_gastoTest(UnitTestCase):
         self.assertEquals(n1.valor_saldo(), Decimal('-72650.00'))
 
 
-
 class ItemTest(UnitTestCase):
     def setUp(self):
         super(ItemTest, self).setUp()
-        #Cria Termo
+        # Cria Termo
         eo1 = EstadoOutorga.objects.create(nome='Vigente')
         t = Termo.objects.create(ano=2008, inicio=date(2008,1,1), estado=eo1, processo=22222, digito=2)
 
-        #Cria Outorga
+        # Cria Outorga
         c1 = Categoria.objects.create(nome='Inicial')
         c2 = Categoria.objects.create(nome='Aditivo')
 
-        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007,12,1), termino=date(2008,12,31), data_presta_contas=date(2008,2,28))
-        o2 = Outorga.objects.create(termo=t, categoria=c2, data_solicitacao=date(2008,4,1), termino=date(2008,12,31), data_presta_contas=date(2008,2,28))
+        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007, 12, 1),
+                                    termino=date(2008, 12, 31), data_presta_contas=date(2008, 2, 28))
+        o2 = Outorga.objects.create(termo=t, categoria=c2, data_solicitacao=date(2008,4,1), termino=date(2008, 12, 31),
+                                    data_presta_contas=date(2008, 2, 28))
 
-        #Cria Natureza de gasto
+        # Cria Natureza de gasto
         m1 = Modalidade.objects.create(sigla='STE', nome='Servicos de Terceiro no Exterior', moeda_nacional=False)
         m2 = Modalidade.objects.create(sigla='STF', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
 
         n1 = Natureza_gasto.objects.create(modalidade=m1, termo=t, valor_concedido='1500000.00')
         n2 = Natureza_gasto.objects.create(modalidade=m2, termo=t, valor_concedido='300000.00')
 
-        #Cria Item de Outorga
+        # Cria Item de Outorga
         ent1 = Entidade.objects.create(sigla='SAC', nome='SAC do Brasil', cnpj='00.000.000/0000-00', fisco=True, url='')
         endereco = Endereco.objects.create(entidade=ent1)
 
-        i1 = Item.objects.create(entidade=ent1, natureza_gasto=n1, descricao='Serviço de Conexão Internacional', justificativa='Link Internacional', quantidade=12, valor=250000)
-        i2 = Item.objects.create(entidade=ent1, natureza_gasto=n2, descricao='Serviço de Conexão Internacional', justificativa='Ajuste na cobrança do Link Internacional', quantidade=6, valor=50000)
+        i1 = Item.objects.create(entidade=ent1, natureza_gasto=n1, descricao='Serviço de Conexão Internacional',
+                                 justificativa='Link Internacional', quantidade=12, valor=250000)
+        i2 = Item.objects.create(entidade=ent1, natureza_gasto=n2, descricao='Serviço de Conexão Internacional',
+                                 justificativa='Ajuste na cobrança do Link Internacional', quantidade=6, valor=50000)
 
-        #Cria Protocolo
+        # Cria Protocolo
         ep = EstadoProtocolo.objects.create(nome='Aprovado')
         td = TipoDocumento.objects.create(nome='Nota Fiscal')
         og = Origem.objects.create(nome='Motoboy')
         
         cot1 = Contato.objects.create(primeiro_nome='Alex', email='alex@alex.com.br', tel='')
 
-        iden1 = Identificacao.objects.create(contato=cot1, funcao='Gerente', area='Redes', ativo=True, endereco=endereco)
+        iden1 = Identificacao.objects.create(contato=cot1, funcao='Gerente', area='Redes', ativo=True,
+                                             endereco=endereco)
 
-        p1 = Protocolo.objects.create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,9,30,10,10), origem=og, estado=ep, num_documento=7777, data_vencimento=date(2008,10,10), descricao='Serviço de Conexão Internacional - 09/2009', valor_total=None, moeda_estrangeira=False)
-        p2 = Protocolo.objects.create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,10,30,10,10), origem=og, estado=ep, num_documento=5555, data_vencimento=date(2008,11,10), descricao='Serviço de Conexão Internacional - 10/2009', valor_total=None, moeda_estrangeira=False)
-        p3 = Protocolo.objects.create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,10,31,10,10), origem=og, estado=ep, num_documento=666, data_vencimento=date(2008,11,12), descricao='Serviço de Conexão Internacional - 10/2009', valor_total=None, moeda_estrangeira=False)
+        p1 = Protocolo.objects.create(termo=t, identificacao=iden1, tipo_documento=td, valor_total=None,
+                                      data_chegada=datetime(2008, 9, 30, 10, 10), origem=og, estado=ep,
+                                      num_documento=7777, data_vencimento=date(2008, 10, 10),
+                                      descricao='Serviço de Conexão Internacional - 09/2009', moeda_estrangeira=False)
+        p2 = Protocolo.objects.create(termo=t, identificacao=iden1, tipo_documento=td, valor_total=None,
+                                      data_chegada=datetime(2008, 10, 30, 10, 10), origem=og, estado=ep,
+                                      num_documento=5555, data_vencimento=date(2008, 11, 10),
+                                      descricao='Serviço de Conexão Internacional - 10/2009', moeda_estrangeira=False)
+        p3 = Protocolo.objects.create(termo=t, identificacao=iden1, tipo_documento=td, valor_total=None,
+                                      data_chegada=datetime(2008, 10, 31, 10, 10), origem=og, estado=ep,
+                                      num_documento=666, data_vencimento=date(2008, 11, 12),
+                                      descricao='Serviço de Conexão Internacional - 10/2009', moeda_estrangeira=False)
 
-        #Cria Item do Protocolo
-        ip1 = ItemProtocolo.objects.create(protocolo=p1, descricao='Conexão Internacional - 09/2009', quantidade=1, valor_unitario=250000)
-        ip2 = ItemProtocolo.objects.create(protocolo=p1, descricao='Reajuste do serviço de Conexão Internacional - 09/2009', quantidade=1, valor_unitario=50000)
-        ip3 = ItemProtocolo.objects.create(protocolo=p2, descricao='Conexão Internacional - 10/2009', quantidade=1, valor_unitario=250000)
-        ip4 = ItemProtocolo.objects.create(protocolo=p2, descricao='Reajuste do serviço de Conexão Internacional - 10/2009', quantidade=1, valor_unitario=50000)
+        # Cria Item do Protocolo
+        ip1 = ItemProtocolo.objects.create(protocolo=p1, quantidade=1, valor_unitario=250000,
+                                           descricao='Conexão Internacional - 09/2009')
+        ip2 = ItemProtocolo.objects.create(protocolo=p1, quantidade=1, valor_unitario=50000,
+                                           descricao='Reajuste do serviço de Conexão Internacional - 09/2009')
+        ip3 = ItemProtocolo.objects.create(protocolo=p2, quantidade=1, valor_unitario=250000,
+                                           descricao='Conexão Internacional - 10/2009')
+        ip4 = ItemProtocolo.objects.create(protocolo=p2, quantidade=1, valor_unitario=50000,
+                                           descricao='Reajuste do serviço de Conexão Internacional - 10/2009')
 
-        #Criar Fonte Pagadora
+        # Criar Fonte Pagadora
         ef1 = EstadoFinanceiro.objects.create(nome='Aprovado')
         ef2 = EstadoFinanceiro.objects.create(nome='Concluído')
 
-        ex1 = ExtratoCC.objects.create(data_extrato=date(2008,10,30), data_oper=date(2008,10,10), cod_oper=333333, valor='300000', historico='TED', despesa_caixa=False)
-        ex2 = ExtratoCC.objects.create(data_extrato=date(2008,11,30), data_oper=date(2008,11,10), cod_oper=444444, valor='300000', historico='TED', despesa_caixa=False)
-        ex3 = ExtratoCC.objects.create(data_extrato=date(2008,11,30), data_oper=date(2008,11,12), cod_oper=555555, valor='10', historico='TED', despesa_caixa=False)
+        ex1 = ExtratoCC.objects.create(data_extrato=date(2008, 10, 30), data_oper=date(2008, 10, 10), cod_oper=333333,
+                                       valor='300000', historico='TED', despesa_caixa=False)
+        ex2 = ExtratoCC.objects.create(data_extrato=date(2008, 11, 30), data_oper=date(2008, 11, 10), cod_oper=444444,
+                                       valor='300000', historico='TED', despesa_caixa=False)
+        ex3 = ExtratoCC.objects.create(data_extrato=date(2008, 11, 30), data_oper=date(2008, 11, 12), cod_oper=555555,
+                                       valor='10', historico='TED', despesa_caixa=False)
 
         a1 = Acordo.objects.create(estado=eo1, descricao='Acordo entre Instituto UNIEMP e SAC')
 
@@ -888,7 +928,6 @@ class ItemTest(UnitTestCase):
         fp2 = Pagamento.objects.create(protocolo=p2, conta_corrente=ex2, origem_fapesp=of1, valor_fapesp='300000')
         fp3 = Pagamento.objects.create(protocolo=p3, conta_corrente=ex3, origem_fapesp=of1, valor_fapesp='10')
 
-    
     def test_unicode(self):
         item = Item.objects.get(pk=1)
         self.assertEquals(item.__unicode__(), u'08/22222-2 - Serviço de Conexão Internacional')
@@ -972,15 +1011,18 @@ class ItemTest(UnitTestCase):
 
     def test_protocolos_pagina(self):
         item = Item.objects.get(pk=1)
-        self.assertEquals(item.protocolos_pagina(), u'<a href="/protocolo/protocolo/?fontepagadora__origem_fapesp__item_outorga__id=1">Despesas</a>')
+        self.assertEquals(item.protocolos_pagina(),
+                          u'<a href="/protocolo/protocolo/?fontepagadora__origem_fapesp__item_outorga__id=1">'
+                          u'Despesas</a>')
 
     def test_pagamentos_pagina(self):
         item = Item.objects.get(pk=1)
-        self.assertEquals(item.pagamentos_pagina(), u'<a href="/financeiro/pagamento/?origem_fapesp__item_outorga=1">Despesas</a>')
+        self.assertEquals(item.pagamentos_pagina(),
+                          u'<a href="/financeiro/pagamento/?origem_fapesp__item_outorga=1">Despesas</a>')
 
     def test_calcula_realizado_mes(self):
         item = Item.objects.get(pk=1)
-        dt = date(2008,11,11)
+        dt = date(2008, 11, 11)
         self.assertEquals(item.calcula_realizado_mes(dt, False), 300010.00)
 
     def test_calcula_realizado_mes__vazio(self):
@@ -990,7 +1032,7 @@ class ItemTest(UnitTestCase):
         of.save()
         
         item = Item.objects.get(pk=1)
-        dt = date(2008,11,11)
+        dt = date(2008, 11, 11)
         self.assertEquals(item.calcula_realizado_mes(dt, False), Decimal(0.00))
 
     def test_calcula_realizado_mes__dolar(self):
@@ -999,12 +1041,12 @@ class ItemTest(UnitTestCase):
         modalidade.save()
 
         item = Item.objects.get(pk=1)
-        dt = date(2008,11,11)
+        dt = date(2008, 11, 11)
         self.assertEquals(item.calcula_realizado_mes(dt, False), 300010.00)
 
     def test_calcula_realizado_mes__filtro_dias(self):
         item = Item.objects.get(pk=1)
-        dt = date(2008,11,11)
+        dt = date(2008, 11, 11)
         self.assertEquals(item.calcula_realizado_mes(dt, True), 10.00)
 
 
@@ -1023,34 +1065,36 @@ class ModalidadeTest(UnitTestCase):
     def setUp(self):
         super(ModalidadeTest, self).setUp()
         eo1 = EstadoOutorga.objects.create(nome='Vigente')
-        t = Termo.objects.create(ano=2008, inicio=date(2008,1,1), estado=eo1, processo=22222, digito=2)
-        t2 = Termo.objects.create(ano=2007, inicio=date(2007,1,1), estado=eo1, processo=3333, digito=3)        
+        t = Termo.objects.create(ano=2008, inicio=date(2008, 1, 1), estado=eo1, processo=22222, digito=2)
+        t2 = Termo.objects.create(ano=2007, inicio=date(2007, 1, 1), estado=eo1, processo=3333, digito=3)
 
-        #Cria Outorga
+        # Cria Outorga
         c1 = Categoria.objects.create(nome='Inicial')
         c2 = Categoria.objects.create(nome='Aditivo')
 
-        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007,12,1), termino=date(2008,12,31), data_presta_contas=date(2008,2,28))
-        o2 = Outorga.objects.create(termo=t, categoria=c2, data_solicitacao=date(2008,4,1), termino=date(2008,12,31), data_presta_contas=date(2008,2,28))
+        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007, 12, 1),
+                                    termino=date(2008, 12, 31), data_presta_contas=date(2008, 2, 28))
+        o2 = Outorga.objects.create(termo=t, categoria=c2, data_solicitacao=date(2008, 4, 1),
+                                    termino=date(2008, 12, 31), data_presta_contas=date(2008, 2, 28))
 
-
-        #Cria Natureza de gasto
+        # Cria Natureza de gasto
         m1 = Modalidade.objects.create(sigla='STE', nome='Servicos de Terceiro no Exterior', moeda_nacional=False)
         m2 = Modalidade.objects.create(sigla='STF', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
 
         n1 = Natureza_gasto.objects.create(modalidade=m1, termo=t, valor_concedido='1500000.00')
         n2 = Natureza_gasto.objects.create(modalidade=m2, termo=t, valor_concedido='300000.00')
 
-        #Cria Item de Outorga
+        # Cria Item de Outorga
         ent1 = Entidade.objects.create(sigla='SAC', nome='SAC do Brasil', cnpj='00.000.000/0000-00', fisco=True, url='')
         endereco = Endereco.objects.create(entidade=ent1)
 
-        i1 = Item.objects.create(entidade=ent1, natureza_gasto=n1, descricao='Serviço de Conexão Internacional', justificativa='Link Internacional', quantidade=12, valor=250000)
+        i1 = Item.objects.create(entidade=ent1, natureza_gasto=n1, descricao='Serviço de Conexão Internacional',
+                                 justificativa='Link Internacional', quantidade=12, valor=250000)
 
-
-        #Cria Natureza de Gasto
+        # Cria Natureza de Gasto
 #         t = Termo.objects.create(ano=2008, processo=51885, digito=8, inicio=date(2008,1,1), 'estado=e)
-#         o = Outorga.objects.create(termo=t, categoria=c, data_solicitacao=date(2007,12,1), termino=date(2008,12,31), data_presta_contas=date(2009,1,31))
+#         o = Outorga.objects.create(termo=t, categoria=c, data_solicitacao=date(2007,12,1), termino=date(2008,12,31),
+#         data_presta_contas=date(2009,1,31))
 #         n = Natureza_gasto.objects.create(modalidade=m, outorga=o)
 
     def test_unicode(self):
@@ -1060,47 +1104,52 @@ class ModalidadeTest(UnitTestCase):
     def test_modalidades_termo(self):
         modalidade = Modalidade.objects.get(pk=1)
         termo = Termo.objects.get(pk=1)
-        self.assertEquals(str(modalidade.modalidades_termo(termo)), '[<Modalidade: STE - Servicos de Terceiro no Exterior>]')
+        self.assertEquals(str(modalidade.modalidades_termo(termo)),
+                          '[<Modalidade: STE - Servicos de Terceiro no Exterior>]')
 
 
 class EstadoTest(UnitTestCase):
     def setUp(self):
         super(EstadoTest, self).setUp()
-        #Cria Estado
+        # Cria Estado
         e = EstadoOutorga.objects.create(nome='Vigente')
         
     def test_unicode(self):
         e = EstadoOutorga.objects.get(pk=1)
         self.assertEquals(e.__unicode__(), u'Vigente')
-    
+
+
 class OrigemFapespTest(UnitTestCase):
     def setUp(self):
         super(OrigemFapespTest, self).setUp()
-        #Cria Termo
+        # Cria Termo
         eo1 = EstadoOutorga.objects.create(nome='Vigente')
-        t = Termo.objects.create(ano=2008, inicio=date(2008,1,1), estado=eo1, processo=22222, digito=2)
+        t = Termo.objects.create(ano=2008, inicio=date(2008, 1, 1), estado=eo1, processo=22222, digito=2)
 
-        #Cria Outorga
+        # Cria Outorga
         c1 = Categoria.objects.create(nome='Inicial')
         c2 = Categoria.objects.create(nome='Aditivo')
 
-        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007,12,1), termino=date(2008,12,31), data_presta_contas=date(2008,2,28))
-        o2 = Outorga.objects.create(termo=t, categoria=c2, data_solicitacao=date(2008,4,1), termino=date(2008,12,31), data_presta_contas=date(2008,2,28))
+        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007, 12, 1),
+                                    termino=date(2008, 12, 31), data_presta_contas=date(2008, 2, 28))
+        o2 = Outorga.objects.create(termo=t, categoria=c2, data_solicitacao=date(2008, 4, 1),
+                                    termino=date(2008, 12, 31), data_presta_contas=date(2008, 2, 28))
 
-
-        #Cria Natureza de gasto
+        # Cria Natureza de gasto
         m1 = Modalidade.objects.create(sigla='STE', nome='Servicos de Terceiro no Exterior', moeda_nacional=False)
         m2 = Modalidade.objects.create(sigla='STF', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
 
         n1 = Natureza_gasto.objects.create(modalidade=m1, termo=t, valor_concedido='1500000.00')
         n2 = Natureza_gasto.objects.create(modalidade=m2, termo=t, valor_concedido='300000.00')
 
-        #Cria Item de Outorga
+        # Cria Item de Outorga
         ent1 = Entidade.objects.create(sigla='SAC', nome='SAC do Brasil', cnpj='00.000.000/0000-00', fisco=True, url='')
         endereco = Endereco.objects.create(entidade=ent1)
 
-        i1 = Item.objects.create(entidade=ent1, natureza_gasto=n1, descricao='Serviço de Conexão Internacional', justificativa='Link Internacional', quantidade=12, valor=250000)
-        i2 = Item.objects.create(entidade=ent1, natureza_gasto=n2, descricao='Serviço de Conexão Internacional', justificativa='Ajuste na cobrança do Link Internacional', quantidade=6, valor=50000)
+        i1 = Item.objects.create(entidade=ent1, natureza_gasto=n1, descricao='Serviço de Conexão Internacional',
+                                 justificativa='Link Internacional', quantidade=12, valor=250000)
+        i2 = Item.objects.create(entidade=ent1, natureza_gasto=n2, descricao='Serviço de Conexão Internacional',
+                                 justificativa='Ajuste na cobrança do Link Internacional', quantidade=6, valor=50000)
 
         #Cria Protocolo
         ep = EstadoProtocolo.objects.create(nome='Aprovado')
@@ -1109,26 +1158,42 @@ class OrigemFapespTest(UnitTestCase):
         
         cot1 = Contato.objects.create(primeiro_nome='Alex', email='alex@alex.com.br', tel='', ativo=True)
 
-        iden1 = Identificacao.objects.create(contato=cot1, funcao='Gerente', area='Redes', ativo=True, endereco=endereco)
+        iden1 = Identificacao.objects.create(contato=cot1, funcao='Gerente', area='Redes', ativo=True,
+                                             endereco=endereco)
 
-        p1 = Protocolo.objects.create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,9,30,10,10), origem=og, estado=ep, num_documento=7777, data_vencimento=date(2008,10,10), descricao='Serviço de Conexão Internacional - 09/2009', valor_total=None, moeda_estrangeira=False)
-        p2 = Protocolo.objects.create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,10,30,10,10), origem=og, estado=ep, num_documento=5555, data_vencimento=date(2008,11,10), descricao='Serviço de Conexão Internacional - 10/2009', valor_total=None, moeda_estrangeira=False)
-        p3 = Protocolo.objects.create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,10,31,10,10), origem=og, estado=ep, num_documento=666, data_vencimento=date(2008,11,12), descricao='Serviço de Conexão Internacional - 10/2009', valor_total=None, moeda_estrangeira=False)
+        p1 = Protocolo.objects.create(termo=t, identificacao=iden1, tipo_documento=td, valor_total=None,
+                                      data_chegada=datetime(2008, 9, 30, 10, 10), origem=og, estado=ep,
+                                      num_documento=7777, data_vencimento=date(2008, 10, 10),
+                                      descricao='Serviço de Conexão Internacional - 09/2009', moeda_estrangeira=False)
+        p2 = Protocolo.objects.create(termo=t, identificacao=iden1, tipo_documento=td, valor_total=None,
+                                      data_chegada=datetime(2008, 10, 30, 10, 10), origem=og, estado=ep,
+                                      num_documento=5555, data_vencimento=date(2008, 11, 10),
+                                      descricao='Serviço de Conexão Internacional - 10/2009', moeda_estrangeira=False)
+        p3 = Protocolo.objects.create(termo=t, identificacao=iden1, tipo_documento=td, valor_total=None,
+                                      data_chegada=datetime(2008, 10, 31, 10, 10), origem=og, estado=ep,
+                                      num_documento=666, data_vencimento=date(2008, 11, 12),
+                                      descricao='Serviço de Conexão Internacional - 10/2009', moeda_estrangeira=False)
 
-        #Cria Item do Protocolo
-        ip1 = ItemProtocolo.objects.create(protocolo=p1, descricao='Conexão Internacional - 09/2009', quantidade=1, valor_unitario=250000)
-        ip2 = ItemProtocolo.objects.create(protocolo=p1, descricao='Reajuste do serviço de Conexão Internacional - 09/2009', quantidade=1, valor_unitario=50000)
-        ip3 = ItemProtocolo.objects.create(protocolo=p2, descricao='Conexão Internacional - 10/2009', quantidade=1, valor_unitario=250000)
-        ip4 = ItemProtocolo.objects.create(protocolo=p2, descricao='Reajuste do serviço de Conexão Internacional - 10/2009', quantidade=1, valor_unitario=50000)
+        # Cria Item do Protocolo
+        ip1 = ItemProtocolo.objects.create(protocolo=p1, quantidade=1, valor_unitario=250000,
+                                           descricao='Conexão Internacional - 09/2009')
+        ip2 = ItemProtocolo.objects.create(protocolo=p1, quantidade=1, valor_unitario=50000,
+                                           descricao='Reajuste do serviço de Conexão Internacional - 09/2009')
+        ip3 = ItemProtocolo.objects.create(protocolo=p2, quantidade=1, valor_unitario=250000,
+                                           descricao='Conexão Internacional - 10/2009')
+        ip4 = ItemProtocolo.objects.create(protocolo=p2, quantidade=1, valor_unitario=50000,
+                                           descricao='Reajuste do serviço de Conexão Internacional - 10/2009')
 
-
-        #Criar Fonte Pagadora
+        # Criar Fonte Pagadora
         ef1 = EstadoFinanceiro.objects.create(nome='Aprovado')
         ef2 = EstadoFinanceiro.objects.create(nome='Concluído')
 
-        ex1 = ExtratoCC.objects.create(data_extrato=date(2008,10,30), data_oper=date(2008,10,10), cod_oper=333333, valor='300000', historico='TED', despesa_caixa=False)
-        ex2 = ExtratoCC.objects.create(data_extrato=date(2008,11,30), data_oper=date(2008,11,10), cod_oper=444444, valor='300000', historico='TED', despesa_caixa=False)
-        ex3 = ExtratoCC.objects.create(data_extrato=date(2008,11,30), data_oper=date(2008,11,12), cod_oper=555555, valor='10', historico='TED', despesa_caixa=False)
+        ex1 = ExtratoCC.objects.create(data_extrato=date(2008, 10, 30), data_oper=date(2008, 10, 10), cod_oper=333333,
+                                       valor='300000', historico='TED', despesa_caixa=False)
+        ex2 = ExtratoCC.objects.create(data_extrato=date(2008, 11, 30), data_oper=date(2008, 11, 10), cod_oper=444444,
+                                       valor='300000', historico='TED', despesa_caixa=False)
+        ex3 = ExtratoCC.objects.create(data_extrato=date(2008, 11, 30), data_oper=date(2008, 11, 12), cod_oper=555555,
+                                       valor='10', historico='TED', despesa_caixa=False)
 
         a1 = Acordo.objects.create(estado=eo1, descricao='Acordo entre Instituto UNIEMP e SAC')
 
@@ -1138,13 +1203,13 @@ class OrigemFapespTest(UnitTestCase):
         fp2 = Pagamento.objects.create(protocolo=p2, conta_corrente=ex2, origem_fapesp=of1, valor_fapesp='300000')
         fp3 = Pagamento.objects.create(protocolo=p3, conta_corrente=ex3, origem_fapesp=of1, valor_fapesp='10')
 
-
     def tearDown(self):
         super(OrigemFapespTest, self).tearDown()
 
     def test_unicode(self):
         of = OrigemFapesp.objects.get(pk=1)
-        self.assertEquals(of.__unicode__(), u'Acordo entre Instituto UNIEMP e SAC - STE - 08/22222-2 - Serviço de Conexão Internacional')
+        self.assertEquals(of.__unicode__(),
+                          u'Acordo entre Instituto UNIEMP e SAC - STE - 08/22222-2 - Serviço de Conexão Internacional')
 
     def test_gasto_zero(self):
         pg1 = Pagamento.objects.get(pk=1)
@@ -1176,9 +1241,10 @@ class ContratoTest(UnitTestCase):
     def setUp(self):
         super(ContratoTest, self).setUp()
 
-        #Cria um Contrato
+        # Cria um Contrato
         ent = Entidade.objects.create(sigla='SAC', nome='SAC do Brasil', cnpj='00.000.000/0000-00', fisco=True, url='')
-        ct = Contrato.objects.create(data_inicio=date(2008,1,1), auto_renova=True, limite_rescisao=date(2008,1,11), entidade=ent)
+        ct = Contrato.objects.create(data_inicio=date(2008, 1, 1), auto_renova=True, limite_rescisao=date(2008, 1, 11),
+                                     entidade=ent)
 
     def tearDown(self):
         super(ContratoTest, self).tearDown()
@@ -1192,7 +1258,7 @@ class ContratoTest(UnitTestCase):
         
         ct.arquivo = ""
         ct.arquivo.name = 'test_img_file.gif'
-        ct.arquivo._commited=True
+        ct.arquivo._commited = True
         ct.save()
 
         self.assertEquals(ct.existe_arquivo(), u' ')
@@ -1202,16 +1268,16 @@ class ContratoTest(UnitTestCase):
         
         ct.arquivo = ""
         ct.arquivo.name = 'teste/teste/test_img_file.gif'
-        ct.arquivo._commited=True
+        ct.arquivo._commited = True
         ct.save()
 
-        self.assertEquals(ct.existe_arquivo(), u'<center><a href="/media/teste/teste/test_img_file.gif"><img src="/media/img/arquivo.png" /></a></center>')
+        self.assertEquals(ct.existe_arquivo(), u'<center><a href="/media/teste/teste/test_img_file.gif">'
+                                               u'<img src="/media/img/arquivo.png" /></a></center>')
 
     def test_existe_arquivo__nulo(self):
         ct = Contrato.objects.get(pk=1)
         ct.arquivo = None
-        
-        
+
         self.assertEquals(ct.existe_arquivo(), u' ')
 
 
@@ -1219,18 +1285,19 @@ class OrdemDeServicoTest(UnitTestCase):
     def setUp(self):
         super(OrdemDeServicoTest, self).setUp()
         
-        #Cria um Contrato
+        # Cria um Contrato
         ent = Entidade.objects.create(sigla='SAC', nome='SAC do Brasil', cnpj='00.000.000/0000-00', fisco=True, url='')
-        ct = Contrato.objects.create(data_inicio=date(2008,1,1), auto_renova=True, limite_rescisao=date(2008,1,11), entidade=ent)
+        ct = Contrato.objects.create(data_inicio=date(2008, 1, 1), auto_renova=True, limite_rescisao=date(2008, 1, 11),
+                                     entidade=ent)
 
         ef1 = EstadoOutorga.objects.create(nome='Aprovado')
         tipo = TipoContrato.objects.create(nome='Tipo Fixo')
-        #Cria uma Ordem de Serviço
+        # Cria uma Ordem de Serviço
         estadoOs = EstadoOS.objects.create(nome="Vigente")
         a = Acordo.objects.create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e SAC')
-        os = OrdemDeServico.objects.create(acordo=a, contrato=ct, tipo=tipo, estado=estadoOs,
-                                   data_inicio=date(2008,2,1), data_rescisao=date(2008,11,1), antes_rescisao=2, numero=66666,   
-                                   descricao='OS 34567 - Contratação de mais um link')
+        os = OrdemDeServico.objects.create(acordo=a, contrato=ct, tipo=tipo, estado=estadoOs, antes_rescisao=2,
+                                           data_inicio=date(2008, 2, 1), data_rescisao=date(2008, 11, 1), numero=66666,
+                                           descricao='OS 34567 - Contratação de mais um link')
 
     def tearDown(self):
         super(OrdemDeServicoTest, self).tearDown()
@@ -1266,7 +1333,8 @@ class OrdemDeServicoTest(UnitTestCase):
         
         arquivo.save()
         
-        self.assertEquals(os.existe_arquivo(), u'<center><a href="/admin/outorga/arquivoos/?os__id__exact=%s"><img src="/media/img/arquivo.png" /></a></center>' % os.id)
+        self.assertEquals(os.existe_arquivo(), u'<center><a href="/admin/outorga/arquivoos/?os__id__exact=%s">'
+                                               u'<img src="/media/img/arquivo.png" /></a></center>' % os.id)
         
         arquivo.arquivo.delete()
         arquivo.delete()
@@ -1294,28 +1362,28 @@ class OrdemDeServicoTest(UnitTestCase):
         arquivo.delete()
 
 
-
 class ArquivoTest(UnitTestCase):
     def setUp(self):
         super(ArquivoTest, self).setUp()
 
-        #Cria Termo
+        # Cria Termo
         e = EstadoOutorga.objects.create(nome='Vigente')
-        t = Termo.objects.create(ano=2008, processo=22222, digito=2, inicio=date(2008,1,1), estado=e)
+        t = Termo.objects.create(ano=2008, processo=22222, digito=2, inicio=date(2008, 1, 1), estado=e)
         
-        #Cria Outorga
+        # Cria Outorga
         c1 = Categoria.objects.create(nome='Inicial')
         c2 = Categoria.objects.create(nome='Aditivo')
         
-        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007,12,1), termino=date(2008,12,31), data_presta_contas=date(2008,2,28))
-        #Cria Arquivo
+        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007, 12, 1),
+                                    termino=date(2008, 12, 31), data_presta_contas=date(2008, 2, 28))
 
+        # Cria Arquivo
         arq = Arquivo(outorga=o1)
         arq.save()
         # Criando um dirty Mock para o teste do arquivo 
         arq.arquivo = ""
         arq.arquivo.name = 'test_img_file.gif'
-        arq.arquivo._commited=True
+        arq.arquivo._commited = True
         arq.save()
 
     def test_unicode(self):
@@ -1325,7 +1393,7 @@ class ArquivoTest(UnitTestCase):
     def test_unicode__path(self):
         arq = Arquivo.objects.get(pk=1)
         arq.arquivo.name = 'teste/teste/test_img_file.gif'
-        arq.arquivo._commited=True
+        arq.arquivo._commited = True
         arq.save()
         self.assertEquals(arq.__unicode__(), u'test_img_file.gif')
 
@@ -1342,18 +1410,19 @@ class ArquivoOSTest(UnitTestCase):
     def setUp(self):
         super(ArquivoOSTest, self).setUp()
         
-        #Cria um Contrato
+        # Cria um Contrato
         ent = Entidade.objects.create(sigla='SAC', nome='SAC do Brasil', cnpj='00.000.000/0000-00', fisco=True, url='')
-        ct = Contrato.objects.create(data_inicio=date(2008,1,1), auto_renova=True, limite_rescisao=date(2008,1,11), entidade=ent)
+        ct = Contrato.objects.create(data_inicio=date(2008, 1, 1), auto_renova=True, limite_rescisao=date(2008, 1, 11),
+                                     entidade=ent)
 
         ef1 = EstadoOutorga.objects.create(nome='Aprovado')
         tipo = TipoContrato.objects.create(nome='Tipo Fixo')
-        #Cria uma Ordem de Serviço
+        # Cria uma Ordem de Serviço
         estadoOs = EstadoOS.objects.create(nome="Vigente")
         a = Acordo.objects.create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e SAC')
-        os = OrdemDeServico.objects.create(acordo=a, contrato=ct, tipo=tipo, estado=estadoOs,
-                                   data_inicio=date(2008,2,1), data_rescisao=date(2008,11,1), antes_rescisao=2, numero=66666,   
-                                   descricao='OS 34567 - Contratação de mais um link')
+        os = OrdemDeServico.objects.create(acordo=a, contrato=ct, tipo=tipo, estado=estadoOs, antes_rescisao=2,
+                                           data_inicio=date(2008, 2, 1), data_rescisao=date(2008, 11, 1), numero=66666,
+                                           descricao='OS 34567 - Contratação de mais um link')
 
     def tearDown(self):
         super(ArquivoOSTest, self).tearDown()
@@ -1365,7 +1434,7 @@ class ArquivoOSTest(UnitTestCase):
         # Criando um dirty Mock para o teste do arquivo 
         arquivo.arquivo = ""
         arquivo.arquivo.name = 'test_img_file.gif'
-        arquivo.arquivo._commited=True
+        arquivo.arquivo._commited = True
         arquivo.save()
         
         orderServico.arquivo = arquivo
@@ -1381,7 +1450,7 @@ class ArquivoOSTest(UnitTestCase):
         # Criando um dirty Mock para o teste do arquivo 
         arquivo.arquivo = ""
         arquivo.arquivo.name = 'tmp/teste/test_img_file.gif'
-        arquivo.arquivo._commited=True
+        arquivo.arquivo._commited = True
         arquivo.save()
         
         orderServico.arquivo = arquivo
@@ -1389,10 +1458,3 @@ class ArquivoOSTest(UnitTestCase):
         self.assertEquals(arquivo.__unicode__(), u'test_img_file.gif')
         
         arquivo.delete()
-
-
-
-
-
-
-

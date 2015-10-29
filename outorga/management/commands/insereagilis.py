@@ -1,22 +1,23 @@
 # -*- coding: utf-8 -*-
 
-import urllib2, urllib
+import urllib2
+import urllib
 import cookielib
 from django.core.management.base import BaseCommand, CommandError
 from financeiro.models import *
 from outorga.models import Termo
 from protocolo.models import Protocolo, Estado as EstadoP
-import sys
 import time
 import re
 import getpass
 
-TIPOS = {'STB':'STC',
-         'DET':'STR',
-         'MCN':'MCS',
-         'STB_OUT':'STC',
-         'DIA':'MNT'}
-         
+TIPOS = {'STB': 'STC',
+         'DET': 'STR',
+         'MCN': 'MCS',
+         'STB_OUT': 'STC',
+         'DIA': 'MNT'}
+
+
 class Command(BaseCommand):
     args = '<processo parcial usuario>'
     help = u'Envia as informações de prestação de contas para o sistema Agilis'
@@ -49,8 +50,10 @@ class Command(BaseCommand):
         data = urllib.urlencode([('username', args[2]), ('password', password)])
         req = urllib2.Request(url='http://internet.aquila.fapesp.br/agilis/Login.do', data=data)
         urllib2.urlopen(req)
-        urllib2.urlopen('http://internet.aquila.fapesp.br/agilis/Solicitacao.do?method=prepararAcao&processo=%s&redirectPC=redirectPC' % args[0])
-        urllib2.urlopen('http://internet.aquila.fapesp.br/agilis/Pconline.do?method=iniciar&solicitacao=49&processo=%s' % args[0])
+        urllib2.urlopen('http://internet.aquila.fapesp.br/agilis/Solicitacao.do?'
+                        'method=prepararAcao&processo=%s&redirectPC=redirectPC' % args[0])
+        urllib2.urlopen('http://internet.aquila.fapesp.br/agilis/Pconline.do?'
+                        'method=iniciar&solicitacao=49&processo=%s' % args[0])
 
         
         pagamentos = Pagamento.objects.filter(protocolo__termo=termo)
@@ -62,7 +65,8 @@ class Command(BaseCommand):
                 
         pagamentos = pagtos
         mods = []
-        for m in pagamentos.values_list('origem_fapesp__item_outorga__natureza_gasto__modalidade__sigla', flat=True).distinct():
+        for m in pagamentos.values_list('origem_fapesp__item_outorga__natureza_gasto__modalidade__sigla',
+                                        flat=True).distinct():
             if not m in mods:
                 mods.append(m)
 
@@ -100,7 +104,9 @@ class Command(BaseCommand):
                 except:
                     data_nota = pg.protocolo.data_chegada.strftime('%d/%m/%Y')
             
-                dt += [('notaFiscal', nf), ('dataNotaFiscal', data_nota), ('cheque', pg.conta_corrente.cod_oper), ('pagina', pg.auditoria_set.filter(parcial=parcial).values_list('pagina', flat=True)[0]), ('valorItem', '%s,%s' % (inte, dec))]
+                dt += [('notaFiscal', nf), ('dataNotaFiscal', data_nota), ('cheque', pg.conta_corrente.cod_oper),
+                       ('pagina', pg.auditoria_set.filter(parcial=parcial).values_list('pagina', flat=True)[0]),
+                       ('valorItem', '%s,%s' % (inte, dec))]
 
             for k in range(0, 4):
                 dt += [('notaFiscal', ''), ('dataNotaFiscal', ''), ('cheque', ''), ('pagina', ''), ('valorItem', '')]

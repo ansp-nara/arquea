@@ -22,9 +22,8 @@ def teste():
         func['termino'] = cf.termino
         dias = cf.termino - cf.inicio
         func['dias'] = dias.days + 1
-        #func['decimo_terceiro'] = ferias.decimo_terceiro
+        # func['decimo_terceiro'] = ferias.decimo_terceiro
 
         funcionarios.append(func)
-
 
     print funcionarios

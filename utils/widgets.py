@@ -4,6 +4,7 @@ from django.conf import settings
 from django.utils.safestring import mark_safe
 from django.utils.text import Truncator
 
+
 class ForeignKeySearchInput(forms.HiddenInput):
     """
     A Widget for displaying ForeignKeys in an autocomplete search input 
@@ -94,4 +95,4 @@ class PlainTextWidget(forms.Widget):
             v = ''
         else:
             v = mark_safe(value)
-        return mark_safe(u'<span name="%s" id="id_%s">%s</span>' % (name,name,v))
+        return mark_safe(u'<span name="%s" id="id_%s">%s</span>' % (name, name, v))

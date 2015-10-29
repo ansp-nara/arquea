@@ -12,14 +12,14 @@ from django.forms.fields import ChoiceField
 from utils.request_cache import get_request_cache
 from financeiro.models import Pagamento
 from memorando.models import MemorandoSimples
-from identificacao.models import Identificacao, Entidade, Endereco, EnderecoDetalhe
+from identificacao.models import Entidade
 from outorga.models import Termo
 from patrimonio.models import *
 
 
 # Exibição de patrimonios filhos em forma de tabela, dentro do form de Patrimonio
 class PatrimonioReadOnlyWidget(forms.Widget):
-    def render(self, name, value, attrs):
+    def render(self, name, value, attrs=None):
         retorno = ''
         if value and len(value) > 0:
             retorno += u'<table>'
@@ -28,8 +28,10 @@ class PatrimonioReadOnlyWidget(forms.Widget):
                 for v in value:        
                     id = v[0] or ''
                     retorno += "<tr>"
-                    retorno += "<td style='white-space:nowrap;'><a href='/patrimonio/patrimonio/%s/'>%s</td>" % (id, v[1] or '')
-                    retorno += "<td style='white-space:nowrap;'><a href='/patrimonio/patrimonio/%s/'>%s</td>" % (id, v[2] or '')
+                    retorno += "<td style='white-space:nowrap;'>" \
+                               "<a href='/patrimonio/patrimonio/%s/'>%s</td>" % (id, v[1] or '')
+                    retorno += "<td style='white-space:nowrap;'>" \
+                               "<a href='/patrimonio/patrimonio/%s/'>%s</td>" % (id, v[2] or '')
                     retorno += "<td><a href='/patrimonio/patrimonio/%s/'>%s</td>" % (id, v[3] or '')
                     retorno += "</tr>"
             retorno += "</table>" 
@@ -38,21 +40,23 @@ class PatrimonioReadOnlyWidget(forms.Widget):
     def _has_changed(self, initial, data):
         return False
 
+
 class PatrimonioReadOnlyField(forms.FileField):
     widget = PatrimonioReadOnlyWidget
-    def __init__(self, widget=None, label=None, initial=None, help_text=None):
-        forms.Field.__init__(self, label=label, initial=initial,
-            help_text=help_text, widget=widget)
 
-    def clean(self, value, initial):
+    def __init__(self, widget=None, label=None, initial=None, help_text=None):
+        forms.Field.__init__(self, label=label, initial=initial, help_text=help_text, widget=widget)
+
+    def clean(self, value, initial=None):
         self.widget.initial = initial
         return initial
 
-"""
-Classe para exibição da Entidade no formato Select, ordenado pelo sigla_completa
-que inclui a Entidade pai, no formato "<sigla entidade pai> - <sigla entidade>"
-"""
+
 class AdvancedModelChoiceIterator(forms.models.ModelChoiceIterator):
+    """
+    Classe para exibição da Entidade no formato Select, ordenado pelo sigla_completa
+    que inclui a Entidade pai, no formato "<sigla entidade pai> - <sigla entidade>"
+    """
     def __iter__(self):
         if self.field.empty_label is not None:
             yield ("", self.field.empty_label)
@@ -72,6 +76,7 @@ class AdvancedModelChoiceIterator(forms.models.ModelChoiceIterator):
         for item in choices:
             yield (item[0], item[1])
 
+
 class EntidadeModelChoiceField(forms.ModelChoiceField):
     def __init__(self, *args, **kwargs):
         super(EntidadeModelChoiceField, self).__init__(*args, **kwargs)
@@ -81,9 +86,9 @@ class EntidadeModelChoiceField(forms.ModelChoiceField):
             return self._choices
         # Escolhe entre o empty_label ou senão coloca um valor padrão para o item vazio
         return AdvancedModelChoiceIterator(self)
-        
 
     choices = property(_get_choices, ChoiceField._set_choices)
+
 
 class EquipamentoContidoModelChoiceField(forms.ModelChoiceField):
     """
@@ -92,7 +97,7 @@ class EquipamentoContidoModelChoiceField(forms.ModelChoiceField):
     """
     def label_from_instance(self, obj):
         info = (obj.__unicode__()[:200] + '..') if len(obj.__unicode__()) > 200 else obj.__unicode__()
-        return u'%s' % (info)
+        return u'%s' % info
 
 
 class EquipamentoModelChoiceField(forms.ModelChoiceField):
@@ -104,71 +109,86 @@ class EquipamentoModelChoiceField(forms.ModelChoiceField):
         info = (obj.descricao[:150] + '..') if len(obj.descricao) > 150 else obj.descricao
         return u'%s - %s' % (info, obj.part_number)
 
+
 class PatrimonioAdminForm(forms.ModelForm):
 
     """
     Uma instância dessa classe faz algumas definições para a tela de cadastramento do modelo 'Patrimonio'.
 
-    O método '__init__'        Define as opções do campo 'protocolo' (apenas protocolos diferentes de 'Contrato', 'OS' e 'Cotação'.
+    O método '__init__'        Define as opções do campo 'protocolo' (apenas protocolos diferentes de 'Contrato', 'OS'
+     e 'Cotação'.
     O campo 'termo'        Foi criado para filtrar o campo 'protocolo'
     O campo 'protocolo'        Foi criado para filtrar o campo 'itemprotocolo'
     A class 'Meta'        Define o modelo que será utilizado.
     A class 'Media'        Define os arquivos .js que serão utilizados.
     """
-        
     termo = forms.ModelChoiceField(Termo.objects.all(), label=_(u'Termo de outorga'), required=False,
-                                   widget=forms.Select(attrs={'class':'auxiliary'}))
+                                   widget=forms.Select(attrs={'class': 'auxiliary'}))
 
     npgto = forms.CharField(label=_(u'Nº do cheque ou do documento'), required=False,
-            widget=forms.TextInput(attrs={'onchange': 'ajax_filter_pagamentos("/patrimonio/escolhe_pagamento", this.value);', 'class':'auxiliary'}))
+                            widget=forms.TextInput(
+                                attrs={'class': 'auxiliary',
+                                       'onchange': 'ajax_filter_pagamentos("/patrimonio/escolhe_pagamento", '
+                                                   'this.value);'}))
 
-#    part_number = forms.CharField(required=False, widget=forms.TextInput(attrs={'onchange':'ajax_patrimonio_existente(this.value);'}))
+#    part_number = forms.CharField(required=False, widget=forms.TextInput(
+# attrs={'onchange':'ajax_patrimonio_existente(this.value);'}))
 
     nf = forms.CharField(label=_(u'Nº da NF ou NS'), required=False,
-            widget=forms.TextInput(attrs={'onkeydown':'if (event.keyCode == 13) {$(\'#id_patrimonio\').focus(); return false;}', 
-                                          'onchange': 'ajax_filter_patrimonio(this.value);', 'class':'auxiliary'}))
+                         widget=forms.TextInput(attrs={'onkeydown': 'if (event.keyCode == 13) {$(\'#id_patrimonio\')'
+                                                                    '.focus(); return false;}',
+                                                       'onchange': 'ajax_filter_patrimonio(this.value);',
+                                                       'class': 'auxiliary'}))
 
     tem_numero_fmusp = forms.BooleanField(label=u'Tem nº de patrimônio oficial?', required=False, 
-            widget=forms.CheckboxInput(attrs={'onchange':'ajax_numero_fmusp();'}))
+                                          widget=forms.CheckboxInput(attrs={'onchange': 'ajax_numero_fmusp();'}))
 
-    descricao = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows':'2', 'cols':'152'}))
+    descricao = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows': '2', 'cols': '152'}))
     
-    filtro_equipamento = forms.CharField(label=_(u'Filtro para busca de Equipamento'), required=False,\
-        widget = forms.TextInput(attrs={'onchange': 'ajax_filter_equipamento(this.value);',
-                                        'onkeydown':'return false;',
-                                        'class': 'auxiliary'}))
+    filtro_equipamento = forms.CharField(label=_(u'Filtro para busca de Equipamento'), required=False,
+                                         widget=forms.TextInput(attrs={'onchange': 'ajax_filter_equipamento'
+                                                                                   '(this.value);',
+                                                                       'onkeydown': 'return false;',
+                                                                       'class': 'auxiliary'}))
     
     # Uso de Model específico para a adição de reticências na descrição
-    # e javascript para adição de link no label para a página do Equipamento selecionado 
-    equipamento = EquipamentoModelChoiceField(queryset=Equipamento.objects.all(), 
-                                     required=False,
-                                     label=mark_safe('<a href="#" onclick="window.open(\'/patrimonio/equipamento/\'+$(\'#id_equipamento\').val() + \'/\', \'_blank\');return true;">Equipamento</a>'),
-                                     widget=forms.Select(attrs={'style':'width:800px',
-                                                                'onchange':'ajax_patr_form_get_equipamento($(\'#id_equipamento\').val());',
-                                                                }))
-                                              
-    
-    patrimonio = EquipamentoContidoModelChoiceField(queryset=Patrimonio.objects.all(), 
-                                     required=False,
-                                     label=mark_safe('<a href="#" ' + 
-                                            'onclick="window.open(\'/patrimonio/patrimonio/\'+$(\'#id_patrimonio\').val() + \'/\', \'_blank\');return true;" '+
-                                            '>Contido em</a>'),
-                                     widget=forms.Select(attrs={
-                                                                'style':'width:800px ', 
-                                                                'onchange':'ajax_patrimonio_historico($(\'#id_patrimonio\').val());'
-                                                               }),
-                                     empty_label='---'
-                                     )
-    
-    entidade_procedencia = EntidadeModelChoiceField(queryset=Entidade.objects.all(),
-                                                 required=False, 
-                                                 label=mark_safe('<a href="#" onclick="window.open(\'/identificacao/entidade/\'+$(\'#id_entidade_procedencia\').val() + \'/\', \'_blank\');return true;">Procedência</a>'),)
+    # e javascript para adição de link no label para a página do Equipamento selecionado
+    equip_window = '<a href="#" onclick="window.open(\'/patrimonio/equipamento/\'+$(\'#id_equipamento\').val()' \
+                   ' + \'/\', \'_blank\');return true;">Equipamento</a>'
+    equipamento = EquipamentoModelChoiceField(queryset=Equipamento.objects.all(),
+                                              required=False,
+                                              label=mark_safe(equip_window),
+                                              widget=forms.Select(attrs={'style': 'width:800px',
+                                                                         'onchange': 'ajax_patr_form_get_equipamento'
+                                                                                     '($(\'#id_equipamento\').val());',
+                                                                         })
+                                              )
 
+    patrimonio_window = '<a href="#" onclick="window.open(\'/patrimonio/patrimonio/\'+' \
+                        '$(\'#id_patrimonio\').val() + \'/\', \'_blank\');return true;" >Contido em</a>'
+    patrimonio_historico = 'ajax_patrimonio_historico($(\'#id_patrimonio\').val());'
+    patrimonio = EquipamentoContidoModelChoiceField(queryset=Patrimonio.objects.all(), 
+                                                    required=False,
+                                                    label=mark_safe(patrimonio_window),
+                                                    widget=forms.Select(attrs={'style': 'width:800px ',
+                                                                               'onchange': patrimonio_historico
+                                                                               }),
+                                                    empty_label='---'
+                                                    )
+
+    procedencia_window = '<a href="#" onclick="window.open(\'/identificacao/entidade/\'+' \
+                         '$(\'#id_entidade_procedencia\').val() + \'/\', \'_blank\');return true;">Procedência</a>'
+    entidade_procedencia = EntidadeModelChoiceField(queryset=Entidade.objects.all(),
+                                                    required=False,
+                                                    label=mark_safe(procedencia_window),
+                                                    )
+
+    pagamento_window = '<a href="#" onclick="window.open(\'/admin/financeiro/pagamento/\'+' \
+                       '$(\'#id_pagamento\').val() + \'/\', \'_blank\');return true;">Pagamento</a>'
     pagamento = forms.ModelChoiceField(queryset=Pagamento.objects.all(), 
                                        required=False, 
-                                       label=mark_safe('<a href="#" onclick="window.open(\'/admin/financeiro/pagamento/\'+$(\'#id_pagamento\').val() + \'/\', \'_blank\');return true;">Pagamento</a>'),)
-
-
+                                       label=mark_safe(pagamento_window),
+                                       )
 
     form_filhos = PatrimonioReadOnlyField()
     
@@ -178,17 +198,18 @@ class PatrimonioAdminForm(forms.ModelForm):
 
         if instance: 
             if initial:
-                initial.update({'equipamento':instance.equipamento})
+                initial.update({'equipamento': instance.equipamento})
             else:
-                initial = {'equipamento':instance.equipamento}
+                initial = {'equipamento': instance.equipamento}
                 
-            initial.update({'patrimonio':instance.patrimonio})
-            initial.update({'form_filhos': [(p.id, p.apelido, p.ns, p.descricao) for p in Patrimonio.objects.filter(patrimonio=instance)]})
+            initial.update({'patrimonio': instance.patrimonio})
+            initial.update({'form_filhos': [(p.id, p.apelido, p.ns, p.descricao)
+                                            for p in Patrimonio.objects.filter(patrimonio=instance)]})
             if instance.pagamento_id:
-                initial.update({'termo':instance.pagamento.protocolo.termo})
+                initial.update({'termo': instance.pagamento.protocolo.termo})
                                                      
         super(PatrimonioAdminForm, self).__init__(data, files, auto_id, prefix, initial,
-                                            error_class, label_suffix, empty_permitted, instance)
+                                                  error_class, label_suffix, empty_permitted, instance)
         
         pg = self.fields['pagamento']
         if data and 'termo' in data and data['termo']:
@@ -215,7 +236,8 @@ class PatrimonioAdminForm(forms.ModelForm):
         else:
             rel = ManyToOneRel(Equipamento, 'id')
             
-        self.fields['equipamento'].widget = RelatedFieldWidgetWrapper(self.fields['equipamento'].widget, rel, self.admin_site)
+        self.fields['equipamento'].widget = RelatedFieldWidgetWrapper(self.fields['equipamento'].widget, rel,
+                                                                      self.admin_site)
         
         # Configurando a relação entre Equipamento e Entidade para aparecer o botão de +
         # O self.admin_site foi declarado no admin.py
@@ -223,8 +245,9 @@ class PatrimonioAdminForm(forms.ModelForm):
             rel = ManyToOneRel(field=Patrimonio._meta.get_field('entidade_procedencia'), to=Entidade, field_name='id')
         else:
             rel = ManyToOneRel(Entidade, 'id')
-            
-        self.fields['entidade_procedencia'].widget = RelatedFieldWidgetWrapper(self.fields['entidade_procedencia'].widget, rel, self.admin_site)
+
+        procedencia_field = self.fields['entidade_procedencia']
+        procedencia_field.widget = RelatedFieldWidgetWrapper(procedencia_field.widget, rel, self.admin_site)
 
         """
         et = self.fields['entidade_procedencia']
@@ -235,26 +258,38 @@ class PatrimonioAdminForm(forms.ModelForm):
             et.choices = [(p.id, p.__unicode__()) for p in Entidade.objects.filter(id=instance.entidade_procedencia.id)]
         else:
             # ************ROGERIO: MODIFICAR PARA UM FILTRO POR ATRIBUTO/ FLAG
-            #entidadeHistoricoList = EntidadeHistorico.objects.filter(tipo__nome= 'Fabricante').values_list('entidade_id', flat=True)
+            #entidadeHistoricoList = EntidadeHistorico.objects.filter(tipo__nome= 'Fabricante')
+            .values_list('entidade_id', flat=True)
             #et.queryset = Entidade.objects.filter(id__in=entidadeHistoricoList)
             et.queryset = Entidade.objects.all()
         """
         # Exibe a quantidade de patrimonios filhos no label
-        self.fields['form_filhos'].label = u'Patrimônios contidos (%s)' % Patrimonio.objects.filter(patrimonio=instance).count()
+        self.fields['form_filhos'].label = u'Patrimônios contidos (%s)' % \
+                                           Patrimonio.objects.filter(patrimonio=instance).count()
+
+        filtro_widget = self.fields['filtro_equipamento'].widget
         if instance:
             if instance.equipamento:
-                self.fields['filtro_equipamento'].widget = widget=forms.TextInput(attrs={'onkeydown':'if (event.keyCode == 13) {$(\'#id_equipamento\').focus(); return false;}','onchange': 'ajax_filter_equipamento(this.value, "%s", "%s");'%(instance.id, instance.equipamento.id)})
+                filtro_widget = forms.TextInput(attrs={'onkeydown': 'if (event.keyCode == 13) {$(\'#id_equipamento\')'
+                                                                    '.focus(); return false;}',
+                                                       'onchange': 'ajax_filter_equipamento(this.value, "%s", "%s");' %
+                                                                   (instance.id, instance.equipamento.id)})
             else:
-                self.fields['filtro_equipamento'].widget = widget=forms.TextInput(attrs={'onkeydown':'if (event.keyCode == 13) {$(\'#id_equipamento\').focus(); return false;}','onchange': 'ajax_filter_equipamento(this.value, "%s");'%(instance.id)})
+                filtro_widget = forms.TextInput(attrs={'onkeydown': 'if (event.keyCode == 13) {$(\'#id_equipamento\')'
+                                                                    '.focus(); return false;}',
+                                                       'onchange': 'ajax_filter_equipamento(this.value, "%s");' %
+                                                                   instance.id})
         else:
-            self.fields['filtro_equipamento'].widget = widget=forms.TextInput(attrs={'onkeydown':'if (event.keyCode == 13) {$(\'#id_equipamento\').focus(); return false;}','onchange': 'ajax_filter_equipamento(this.value, "");'})
+            filtro_widget = forms.TextInput(attrs={'onkeydown': 'if (event.keyCode == 13) {$(\'#id_equipamento\')'
+                                                                '.focus(); return false;}',
+                                                   'onchange': 'ajax_filter_equipamento(this.value, "");'})
                 
     class Meta:
         model = Patrimonio
-        fields = ['termo', 'npgto', 'pagamento', 'valor', 'agilis', 'checado','tipo', 'apelido', 'tem_numero_fmusp', 'numero_fmusp', \
-                  'filtro_equipamento', 'equipamento', 'ns', \
-                  'descricao', 'complemento', 'tamanho', 'entidade_procedencia', 'nf', 'patrimonio', 'obs', 'titulo_autor', 'isbn', \
-                  'revision', 'version', 'garantia_termino', 'form_filhos',]
+        fields = ['termo', 'npgto', 'pagamento', 'valor', 'agilis', 'checado', 'tipo', 'apelido', 'tem_numero_fmusp',
+                  'numero_fmusp', 'filtro_equipamento', 'equipamento', 'ns', 'descricao', 'complemento', 'tamanho',
+                  'entidade_procedencia', 'nf', 'patrimonio', 'obs', 'titulo_autor', 'isbn', 'revision', 'version',
+                  'garantia_termino', 'form_filhos']
 
     class Media:
         js = ('js/selects.js', 'js/patrimonio.js')
@@ -274,18 +309,18 @@ class HistoricoLocalAdminForm(forms.ModelForm):
     
     class Meta:
         model = HistoricoLocal
-        fields = ['data', 'patrimonio', 'endereco', 'descricao',]
+        fields = ['data', 'patrimonio', 'endereco', 'descricao']
 
     class Media:
         js = ('js/selects.js',)
 
-
-    patrimonio = forms.ModelChoiceField(Patrimonio.objects.all().select_related('pagamento', 'pagamento__protocolo', 'pagamento__protocolo__num_documento'), \
-                                        widget=forms.Select(attrs={'style':'width:800px'}),)
+    patrimonio = forms.ModelChoiceField(Patrimonio.objects.all().select_related('pagamento', 'pagamento__protocolo',
+                                                                                'pagamento__protocolo__num_documento'),
+                                        widget=forms.Select(attrs={'style': 'width:800px'}),)
 
     endereco = forms.ModelChoiceField(EnderecoDetalhe.objects.all().select_related('detalhe', 'endereco'))
     
-    descricao = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows':'2'}))    
+    descricao = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows': '2'}))
 
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=':',
@@ -294,11 +329,11 @@ class HistoricoLocalAdminForm(forms.ModelForm):
         if initial:
             if instance:
                 if instance.endereco and instance.endereco.endereco and instance.endereco.endereco.entidade:
-                    entidade.update({'entidade':instance.endereco.endereco.entidade})
+                    initial.update({'entidade': instance.endereco.endereco.entidade})
                 if instance.patrimonio:
-                    patrimonio.update({'patrimonio':instance.patrimonio})
+                    initial.update({'patrimonio': instance.patrimonio})
                 if instance.endereco:
-                    endereco.update({'endereco':instance.endereco})
+                    initial.update({'endereco': instance.endereco})
         else:
             initial = {}
             if instance and instance.endereco and instance.endereco.endereco and instance.endereco.endereco.entidade:
@@ -309,10 +344,9 @@ class HistoricoLocalAdminForm(forms.ModelForm):
                 initial['endereco'] = instance.endereco
 
         super(HistoricoLocalAdminForm, self).__init__(data, files, auto_id, prefix, initial,
-                                            error_class, label_suffix, empty_permitted, instance)
+                                                      error_class, label_suffix, empty_permitted, instance)
 
         if instance and instance.endereco:
-            end= None
             end = EnderecoDetalhe.objects.filter(id=instance.endereco.id)
     
             if not end:
@@ -325,18 +359,16 @@ class PatrimonioHistoricoLocalAdminForm(forms.ModelForm):
     
     class Meta:
         model = HistoricoLocal
-        fields = ['entidade', 'endereco', 'posicao', 'descricao', 'data', 'estado', 'memorando',]
+        fields = ['entidade', 'endereco', 'posicao', 'descricao', 'data', 'estado', 'memorando']
 
     class Media:
         js = ('js/selects.js',)
 
-
     entidade = EntidadeModelChoiceField(Entidade.objects.all(), required=False,
-                widget=forms.Select(attrs={'onchange': 'ajax_select_endereco(this.id);',
-                                           'class':'auxiliary'}))
+                                        widget=forms.Select(attrs={'onchange': 'ajax_select_endereco(this.id);',
+                                                                   'class': 'auxiliary'}))
 
-    descricao = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows':'2'}))    
-
+    descricao = forms.CharField(required=False, widget=forms.Textarea(attrs={'rows': '2'}))
 
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=':',
@@ -345,16 +377,16 @@ class PatrimonioHistoricoLocalAdminForm(forms.ModelForm):
         if initial:
             if instance:
                 if instance.endereco and instance.endereco.endereco and instance.endereco.endereco.entidade:
-                    entidade.update({'entidade':instance.endereco.endereco.entidade})
+                    initial.update({'entidade': instance.endereco.endereco.entidade})
         else:
             initial = {}
             if instance and instance.endereco and instance.endereco.endereco and instance.endereco.endereco.entidade:
                 initial['entidade'] = instance.endereco.endereco.entidade
 
         super(PatrimonioHistoricoLocalAdminForm, self).__init__(data, files, auto_id, prefix, initial,
-                                            error_class, label_suffix, empty_permitted, instance)
+                                                                error_class, label_suffix, empty_permitted, instance)
 
-        end= None
+        end = None
         if data:
             end_id = data.get(u'%s-endereco' % prefix)
             if end_id and end_id.isdigit():
@@ -370,22 +402,23 @@ class PatrimonioHistoricoLocalAdminForm(forms.ModelForm):
 
         if not end:
             end = EnderecoDetalhe.objects.filter(id__lte=0)
-            
 
-        #self.fields['endereco'].queryset = end
+        # self.fields['endereco'].queryset = end
         self.fields['endereco'].choices = [(e.id, e.__unicode__()) for e in end]
 
         # Cache dos valores do campo de memorando do histórico
         cache = get_request_cache()
         if cache.get('memorando.MemorandoSimples.all') is None:
-            cache.set('memorando.MemorandoSimples.all', [('','---------')] + [(p.id, p.__unicode__()) for p in MemorandoSimples.objects.all().select_related('assunto', )])
-        self.fields['memorando'].choices =  cache.get('memorando.MemorandoSimples.all')
+            cache.set('memorando.MemorandoSimples.all', [('', '---------')] +
+                      [(p.id, p.__unicode__()) for p in MemorandoSimples.objects.all().select_related('assunto', )])
+        self.fields['memorando'].choices = cache.get('memorando.MemorandoSimples.all')
 
         # Cache dos valores do campo de estado do patrionio do histórico
         cache = get_request_cache()
         if cache.get('patrimonio.Estado.all') is None:
-            cache.set('patrimonio.Estado.all', [('','---------')] + [(p.id, p.__unicode__()) for p in Estado.objects.all()])
-        self.fields['estado'].choices =  cache.get('patrimonio.Estado.all')
+            cache.set('patrimonio.Estado.all', [('', '---------')] +
+                      [(p.id, p.__unicode__()) for p in Estado.objects.all()])
+        self.fields['estado'].choices = cache.get('patrimonio.Estado.all')
 
 
 class BaseHistoricoLocalAdminFormSet(BaseInlineFormSet):
@@ -398,7 +431,7 @@ class BaseHistoricoLocalAdminFormSet(BaseInlineFormSet):
         cleaned_data = super(BaseHistoricoLocalAdminFormSet, self).clean()
         # Retorna erro para erros de sistemas não tratados
         if any(self.errors):
-            raise forms.ValidationError(u'Erro sistema %s'%self.errors)
+            raise forms.ValidationError(u'Erro sistema %s' % self.errors)
         
         form_mais_recente = None
         patrimonio = None
@@ -412,12 +445,12 @@ class BaseHistoricoLocalAdminFormSet(BaseInlineFormSet):
             
             data = form.cleaned_data.get('data')
             # Verifica o historico mais recente, que não foi removido
-            if data and (form.cleaned_data.get('DELETE') == None or form.cleaned_data.get('DELETE') == False):
-                if (form_mais_recente):
-                    if (data > form_mais_recente.cleaned_data.get('data')):
-                        form_mais_recente = form;
+            if data and (form.cleaned_data.get('DELETE') is None or form.cleaned_data.get('DELETE') is False):
+                if form_mais_recente:
+                    if data > form_mais_recente.cleaned_data.get('data'):
+                        form_mais_recente = form
                 else:
-                    form_mais_recente = form;
+                    form_mais_recente = form
             
         if form_mais_recente:
             cleaned_data = form_mais_recente.cleaned_data
@@ -426,56 +459,66 @@ class BaseHistoricoLocalAdminFormSet(BaseInlineFormSet):
                 contido_em = cleaned_data.get("patrimonio").patrimonio
                 endereco = cleaned_data.get("endereco")
                 
-                # Verifica se o patrimonio atual não tem endereço/localidade e está dentro de um patrimonio com endereço/localidade
+                # Verifica se o patrimonio atual não tem endereço/localidade e está dentro de um patrimonio com
+                # endereço/localidade
                 if (contido_em.historico_atual and not endereco):
-                    raise forms.ValidationError(u'Patrimônio deve estar na mesma localização do patrimônio em que está contido.')
+                    raise forms.ValidationError(u'Patrimônio deve estar na mesma localização do patrimônio em '
+                                                u'que está contido.')
                 
                 # Verifica se está no mesmo endereço do patrimonio pai
                 if (contido_em.historico_atual and contido_em.historico_atual.endereco != endereco):
-                    raise forms.ValidationError(u'Patrimônio deve estar na mesma localização do patrimônio em que está contido.')
+                    raise forms.ValidationError(u'Patrimônio deve estar na mesma localização do patrimônio em '
+                                                u'que está contido.')
                 
                 historicolocal = HistoricoLocal(posicao=cleaned_data.get("posicao"))
                 # Verifica se o patrimonio atual não tem posicao/rack e está dentro de um patrimonio com posicao/rack
-                if (contido_em.historico_atual.posicao_rack and (not historicolocal.posicao_rack or historicolocal.posicao_rack== '' )):
-                    raise forms.ValidationError(u'Patrimônio deve estar no mesmo rack do patrimônio em que está contido.')
+                if contido_em.historico_atual.posicao_rack and \
+                        (not historicolocal.posicao_rack or historicolocal.posicao_rack == ''):
+                    raise forms.ValidationError(u'Patrimônio deve estar no mesmo rack do patrimônio em '
+                                                u'que está contido.')
                 
                 # Verifica se está no mesmo rack do patrimonio pai
-                if (contido_em.historico_atual and \
-                    historicolocal and \
-                    contido_em.historico_atual.posicao_rack != historicolocal.posicao_rack):
-                    
-                    raise forms.ValidationError(u'Patrimônio deve estar no mesmo rack do patrimônio em que está contido.')
+                if contido_em.historico_atual and historicolocal and \
+                        contido_em.historico_atual.posicao_rack != historicolocal.posicao_rack:
+                    raise forms.ValidationError(u'Patrimônio deve estar no mesmo rack do patrimônio em '
+                                                u'que está contido.')
 
                 # Verifica se o patrimonio está no mesmo rack/furo do patrimonio pai
                 # Não verifica se o patrimonio pai for Rack, pois o Rack não tem posição de furo
-                if (contido_em.equipamento.tipo.nome != 'Rack' and \
-                    contido_em.historico_atual.posicao_furo != historicolocal.posicao_furo):
-                    
-                    raise forms.ValidationError(u'Patrimônio deve estar no mesmo furo do patrimônio em que está contido.')
+                if contido_em.equipamento.tipo.nome != 'Rack' and \
+                        contido_em.historico_atual.posicao_furo != historicolocal.posicao_furo:
+                    raise forms.ValidationError(u'Patrimônio deve estar no mesmo furo do patrimônio em '
+                                                u'que está contido.')
         else:
             if patrimonio:
                 contido_em = patrimonio.patrimonio
                 if contido_em:
                     # Esse caso deve ocorrer se o patrimonio está contido em outro e o histórico atual foi removido 
-                    raise forms.ValidationError(u'Patrimônio deve estar na mesma localização do patrimônio em que está contido.')
+                    raise forms.ValidationError(u'Patrimônio deve estar na mesma localização do patrimônio em '
+                                                u'que está contido.')
         
         return cleaned_data
 
-HistoricoLocalAdminFormSet = inlineformset_factory(Patrimonio, HistoricoLocal, formset=BaseHistoricoLocalAdminFormSet, fk_name='patrimonio', fields=['data', 'patrimonio', 'endereco', 'descricao',],)
-
+HistoricoLocalAdminFormSet = inlineformset_factory(Patrimonio, HistoricoLocal,
+                                                   formset=BaseHistoricoLocalAdminFormSet,
+                                                   fk_name='patrimonio',
+                                                   fields=['data', 'patrimonio', 'endereco', 'descricao'],)
 
 
 class EquipamentoAdminForm(forms.ModelForm):
+    entidade_window = '<a href="#" onclick="window.open(\'/identificacao/entidade/\'+' \
+                      '$(\'#id_entidade_fabricante\').val() + \'/\', \'_blank\');return true;">Marca</a>'
     entidade_fabricante = EntidadeModelChoiceField(queryset=Entidade.objects.all(),
-                                                 required=False, 
-                                                 label=mark_safe('<a href="#" onclick="window.open(\'/identificacao/entidade/\'+$(\'#id_entidade_fabricante\').val() + \'/\', \'_blank\');return true;">Marca</a>'),)
+                                                   required=False,
+                                                   label=mark_safe(entidade_window)
+                                                   )
     
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=':',
                  empty_permitted=False, instance=None):
 
         super(EquipamentoAdminForm, self).__init__(data, files, auto_id, prefix, initial,
-                                            error_class, label_suffix, empty_permitted, instance)
+                                                   error_class, label_suffix, empty_permitted, instance)
         
         # Configurando a relação entre Equipamento e Entidade para aparecer o botão de +
         # O self.admin_site foi declarado no admin.py                
@@ -484,9 +527,9 @@ class EquipamentoAdminForm(forms.ModelForm):
         else:
             rel = ManyToOneRel(Entidade, 'id')
             
-        self.fields['entidade_fabricante'].widget = RelatedFieldWidgetWrapper(self.fields['entidade_fabricante'].widget, rel, self.admin_site)
-        
-        
+        self.fields['entidade_fabricante'].widget = RelatedFieldWidgetWrapper(self.fields['entidade_fabricante'].widget,
+                                                                              rel, self.admin_site)
+
     def clean(self):
         cleaned_data = super(EquipamentoAdminForm, self).clean()
         
@@ -499,13 +542,15 @@ class PlantaBaixaObjetoForm(forms.ModelForm):
                  empty_permitted=False, instance=None):
     
         super(PlantaBaixaObjetoForm, self).__init__(data, files, auto_id, prefix, initial,
-                                            error_class, label_suffix, empty_permitted, instance)
+                                                    error_class, label_suffix, empty_permitted, instance)
 
-            
-        if self.fields.has_key('patrimonio'):
-            self.fields['patrimonio'].choices = [('','---------')] + [(p.id, "%s - %s"%(p.id, p.apelido)) for p in Patrimonio.objects.filter(equipamento__tipo__nome='Rack')]
-            self.fields['patrimonio'].label=mark_safe('<a href="#" onclick="window.open(\'/patrimonio/patrimonio/\'+$(\'#id_patrimonio\').val() + \'/\', \'_blank\');return true;">Patrimônio</a>')
-
+        if 'patrimonio' in self.fields:
+            self.fields['patrimonio'].choices = [('', '---------')] +\
+                                                [(p.id, "%s - %s" % (p.id, p.apelido))
+                                                 for p in Patrimonio.objects.filter(equipamento__tipo__nome='Rack')]
+            self.fields['patrimonio'].label = mark_safe('<a href="#" onclick="window.open(\'/patrimonio/patrimonio/\'+'
+                                                        '$(\'#id_patrimonio\').val() + \'/\', \'_blank\');'
+                                                        'return true;">Patrimônio</a>')
 
 
 class PlantaBaixaDataCenterForm(forms.ModelForm):
@@ -514,14 +559,12 @@ class PlantaBaixaDataCenterForm(forms.ModelForm):
                  empty_permitted=False, instance=None):
     
         super(PlantaBaixaDataCenterForm, self).__init__(data, files, auto_id, prefix, initial,
-                                            error_class, label_suffix, empty_permitted, instance)
+                                                        error_class, label_suffix, empty_permitted, instance)
 
-            
-        if self.fields.has_key('endereco'):
-            self.fields['endereco'].choices = [('','---------')] + \
-                                                 [(p.id, "%s - %s"%(p.id, p.complemento)) for p in EnderecoDetalhe.objects.filter(historicolocal__estado__id=Estado.PATRIMONIO_ATIVO, \
-                                                        historicolocal__patrimonio__equipamento__tipo__nome='Rack', \
-                                                        mostra_bayface=True,).order_by('id').distinct()]
-
-
-
+        if 'endereco' in self.fields:
+            self.fields['endereco'].choices = [('', '---------')] + \
+                                              [(p.id, "%s - %s" % (p.id, p.complemento))
+                                               for p in EnderecoDetalhe.objects.filter(
+                                                  historicolocal__estado__id=Estado.PATRIMONIO_ATIVO,
+                                                  historicolocal__patrimonio__equipamento__tipo__nome='Rack',
+                                                  mostra_bayface=True,).order_by('id').distinct()]

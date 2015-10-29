@@ -11,7 +11,8 @@ def static_root(request):
     """
     Adds STATIC_ROOT settings to the context.
     """
-    return {'STATIC_ROOT': settings.STATIC_ROOT }
+    return {'STATIC_ROOT': settings.STATIC_ROOT}
+
 
 def applist(request):
     app_dict = {}
@@ -54,24 +55,24 @@ def applist(request):
 
 def debug(context):
     """
-	Disponibiliza a variável de DEBUG para o template
-   """
+    Disponibiliza a variável de DEBUG para o template
+    """
     return {'DEBUG': settings.DEBUG}
 
 
 def papelaria(context):
     """
-	Disponibiliza o acesso aos arquivos de papel timbrado para o template django.
-	Ver as opções disponíveis em: configuracao.models.papelaria
-	Utilizar:
-	
-	no PisaPdF
-	{% load static %}
-	<img src="{% get_media_prefix %}{{papelaria.papel_timbrado_retrato_a4}}">
-	
-	no WeasyPDF utilizar
-	<img src="media:{{papelaria.papel_timbrado_retrato_a4}}">
-	"""
+    Disponibiliza o acesso aos arquivos de papel timbrado para o template django.
+    Ver as opções disponíveis em: configuracao.models.papelaria
+    Utilizar:
+
+    no PisaPdF
+    {% load static %}
+    <img src="{% get_media_prefix %}{{papelaria.papel_timbrado_retrato_a4}}">
+
+    no WeasyPDF utilizar
+    <img src="media:{{papelaria.papel_timbrado_retrato_a4}}">
+    """
     from configuracao.models import Papelaria
 
     arquivos = Papelaria.objects.all()
@@ -80,4 +81,3 @@ def papelaria(context):
         if a.valido:
             return {'papelaria': a}
     return {'papelaria': ''}
-

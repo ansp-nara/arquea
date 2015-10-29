@@ -35,18 +35,19 @@ class Command(BaseCommand):
                 historico = ' '.join(dados[1:-7])
                 cartao = True
                 (d, m, y) = map(int, data.split('/'))
-                codigo_data = '%s%02d%02d' % (y,m,d)
+                codigo_data = '%s%02d%02d' % (y, m, d)
                 if codigo_data > codigo_anterior:
                     seq = 1
                     codigo_anterior = codigo_data
                 codigo = '%s%s' % (codigo_data, seq)
                 seq += 1
 
-            data = date(y,m,d)
+            data = date(y, m, d)
 
             valor = re.sub('\.', '', valor)
             valor = re.sub(',', '.', valor)
-            sinal = '' if sinal=='C' else '-'
-            ex = ExtratoCC.objects.create(data_oper=data, cod_oper=codigo, valor=Decimal('%s%s' % (sinal, valor)), historico=historico, despesa_caixa=False, cartao=cartao)
+            sinal = '' if sinal == 'C' else '-'
+            ExtratoCC.objects.create(data_oper=data, cod_oper=codigo, valor=Decimal('%s%s' % (sinal, valor)),
+                                     historico=historico, despesa_caixa=False, cartao=cartao)
             
         self.stdout.write('Extrato inserido')

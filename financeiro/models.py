@@ -6,36 +6,44 @@ from django.utils.translation import ugettext_lazy as _
 from decimal import Decimal
 
 from utils.functions import formata_moeda
-from utils.models import NARADateField
-from protocolo.models import Protocolo, Estado as EstadoProtocolo, Cotacao
+from protocolo.models import Estado as EstadoProtocolo
 from membro.models import *
 
 CODIGO_FINANCEIRO = (
-  ('COMP', 'Concessao Bens/Serv. Pais'),
-  ('PGMP', 'Pgto. Bens/Serv. Pais'),
-  ('DVMP', 'Devl. Bens/Serv. Pais'),
-  ('SUMP', 'Supl. Bens/Serv. Pais'),
-  ('ANMP', 'Anulacao'),
-  ('ESMP', 'Estorno ANMP'),
-  ('CAMP', 'Canc. Bens/Serv. Pais'),
-  ('CORP', 'Concessao Reserva Tecnica Auxil. Pais'),
-  ('PGRP', 'Pgto. Reserva Tecnica Auxil. Pais'),
-  ('DVRP', 'Devl. Reserva Tecnica Auxil. Pais'),
-  ('SURP', 'Supl. Reserva Tecnica Auxil. Pais'),
-  ('ANRP', 'Anulacao Reserva Tecnica Auxil. Pais'),
-  ('ESRP', 'Estorno ANRP'),
-  ('CARP', 'Canc. Reserva Tecnica Auxil. Pais'),
+    ('COMP', 'Concessao Bens/Serv. Pais'),
+    ('PGMP', 'Pgto. Bens/Serv. Pais'),
+    ('DVMP', 'Devl. Bens/Serv. Pais'),
+    ('SUMP', 'Supl. Bens/Serv. Pais'),
+    ('ANMP', 'Anulacao'),
+    ('ESMP', 'Estorno ANMP'),
+    ('CAMP', 'Canc. Bens/Serv. Pais'),
+    ('CORP', 'Concessao Reserva Tecnica Auxil. Pais'),
+    ('PGRP', 'Pgto. Reserva Tecnica Auxil. Pais'),
+    ('DVRP', 'Devl. Reserva Tecnica Auxil. Pais'),
+    ('SURP', 'Supl. Reserva Tecnica Auxil. Pais'),
+    ('ANRP', 'Anulacao Reserva Tecnica Auxil. Pais'),
+    ('ESRP', 'Estorno ANRP'),
+    ('CARP', 'Canc. Reserva Tecnica Auxil. Pais'),
 )
+
+
 class ExtratoCC(models.Model):
-    extrato_financeiro = models.ForeignKey('financeiro.ExtratoFinanceiro', verbose_name=_(u'Extrato Financeiro'), blank=True, null=True) 
+    extrato_financeiro = models.ForeignKey('financeiro.ExtratoFinanceiro', verbose_name=_(u'Extrato Financeiro'),
+                                           blank=True, null=True)
     data_oper = NARADateField(_(u'Data da operação'))
-    cod_oper = models.IntegerField(verbose_name=_(u'Documento'), validators=[MinValueValidator(0), MaxValueValidator(9999999999)], help_text=u'Código com máximo de 10 dígitos.')
+    cod_oper = models.IntegerField(verbose_name=_(u'Documento'),
+                                   validators=[MinValueValidator(0), MaxValueValidator(9999999999)],
+                                   help_text=u'Código com máximo de 10 dígitos.')
     despesa_caixa = models.BooleanField(_(u'Despesa de caixa?'), default=False)
     valor = models.DecimalField(_(u'Valor'), max_digits=12, decimal_places=2)
     historico = models.CharField(_(u'Histórico'), max_length=30)
     cartao = models.BooleanField(_(u'Cartão?'), default=False)
     data_extrato = NARADateField(_(u'Data do extrato'), null=True, blank=True)
-    imagem = models.ImageField(_(u'Imagem do cheque'), upload_to='extratocc', null=True, blank=True, help_text=u'Somente imagem .jpeg', validators=[RegexValidator(regex=".+((\.jpg)|.+(\.jpeg))$", message="Enviar somente imagem jpeg. A proporção da largura / altura deve ser maior que 2."),])
+    imagem = models.ImageField(_(u'Imagem do cheque'), upload_to='extratocc', null=True, blank=True,
+                               help_text=u'Somente imagem .jpeg',
+                               validators=[RegexValidator(regex=".+((\.jpg)|.+(\.jpeg))$",
+                                                          message="Enviar somente imagem jpeg. A proporção da "
+                                                                  "largura / altura deve ser maior que 2."),])
     capa = models.TextField(null=True, blank=True)
     obs = models.TextField(null=True, blank=True)
     
@@ -59,7 +67,8 @@ class ExtratoCC(models.Model):
 
     def parciais(self):
         mods = {}
-        for p in self.pagamento_set.all().select_related('origem_fapesp', 'origem_fapesp__item_outorga__natureza_gasto__modalidade'):
+        for p in self.pagamento_set.all()\
+                .select_related('origem_fapesp', 'origem_fapesp__item_outorga__natureza_gasto__modalidade'):
             if p.origem_fapesp:
                 modalidade = p.origem_fapesp.item_outorga.natureza_gasto.modalidade.sigla
                 if modalidade not in mods.keys():
@@ -79,7 +88,6 @@ class ExtratoCC(models.Model):
             parc += ']  '
 
         return parc
-
 
 
 class TipoComprovanteFinanceiro(models.Model):
@@ -102,7 +110,8 @@ class ExtratoFinanceiro(models.Model):
     valor = models.DecimalField(_(u'Valor'), max_digits=12, decimal_places=2)
     comprovante = models.FileField(_(u'Comprovante da operação'), upload_to='extratofinanceiro', null=True, blank=True)
     tipo_comprovante = models.ForeignKey('financeiro.TipoComprovanteFinanceiro', null=True, blank=True)
-    parcial = models.IntegerField(null=False, blank=False, default=0, validators=[MinValueValidator(0), MaxValueValidator(999999999)])
+    parcial = models.IntegerField(null=False, blank=False, default=0,
+                                  validators=[MinValueValidator(0), MaxValueValidator(999999999)])
     taxas = models.IntegerField(default=0)
   
     class Meta:
@@ -172,14 +181,15 @@ class ExtratoFinanceiro(models.Model):
 
         return retorno
         
-        
 
 class Pagamento(models.Model):
-    patrocinio = models.ForeignKey('financeiro.ExtratoPatrocinio', verbose_name=_(u'Extrato do patrocínio'), null=True, blank=True)
+    patrocinio = models.ForeignKey('financeiro.ExtratoPatrocinio', verbose_name=_(u'Extrato do patrocínio'),
+                                   null=True, blank=True)
     conta_corrente = models.ForeignKey('financeiro.ExtratoCC', null=True, blank=True)
     protocolo = models.ForeignKey('protocolo.Protocolo')
     valor_fapesp = models.DecimalField(_(u'Valor originário da Fapesp'), max_digits=12, decimal_places=2)
-    valor_patrocinio = models.DecimalField(_(u'Valor originário de patrocínio'), max_digits=12, decimal_places=2, null=True, blank=True)
+    valor_patrocinio = models.DecimalField(_(u'Valor originário de patrocínio'), max_digits=12, decimal_places=2,
+                                           null=True, blank=True)
     reembolso = models.BooleanField(default=False)
     membro = models.ForeignKey('membro.Membro', null=True, blank=True)
     origem_fapesp = models.ForeignKey('outorga.OrigemFapesp', null=True, blank=True)
@@ -188,23 +198,27 @@ class Pagamento(models.Model):
     def __unicode__(self):
         if self.valor_patrocinio:
             valor = self.valor_fapesp+self.valor_patrocinio
-        else: valor = self.valor_fapesp
+        else:
+            valor = self.valor_fapesp
         mod = ''
         if self.origem_fapesp_id:
             mod = self.origem_fapesp.item_outorga.natureza_gasto.modalidade.sigla
             if self.auditoria_set.exists():
                 a = self.auditoria_set.only('pagamento', 'parcial', 'pagina')[:1].get()
-                return u"%s - %s - %s, parcial %s, página %s    ID: %s" % (self.protocolo.num_documento, valor, mod, a.parcial, a.pagina, self.pk)
+                return u"%s - %s - %s, parcial %s, página %s    ID: %s" % \
+                       (self.protocolo.num_documento, valor, mod, a.parcial, a.pagina, self.pk)
         return u"%s - %s - %s    ID: %s" % (self.protocolo.num_documento, valor, mod, self.pk)
 
     def unicode_para_auditoria(self):
         """
         Método para ser chamado de dentro da Auritoria.
-        Retorna um valor parecido com o unicode, mas removendo os valores de Auditoria, pois pertencem ao objeto Auditoria que está sendo chamado
+        Retorna um valor parecido com o unicode, mas removendo os valores de Auditoria,
+        pois pertencem ao objeto Auditoria que está sendo chamado
         """
         if self.valor_patrocinio:
-            valor = self.valor_fapesp+self.valor_patrocinio
-        else: valor = self.valor_fapesp
+            valor = self.valor_fapesp + self.valor_patrocinio
+        else:
+            valor = self.valor_fapesp
         mod = ''
         if self.origem_fapesp:
             mod = self.origem_fapesp.item_outorga.natureza_gasto.modalidade.sigla
@@ -238,7 +252,8 @@ class Pagamento(models.Model):
     def item(self):
         if self.origem_fapesp:
             return u'%s' % self.origem_fapesp.item_outorga.__unicode__()
-        else: return u'Não é Fapesp'
+        else:
+            return u'Não é Fapesp'
     item.short_description = u'Item do orçamento'	
 
     def data(self):
@@ -261,7 +276,6 @@ class Pagamento(models.Model):
     def pagina(self):
         if self.auditoria_set.exists():
             return self.auditoria_set.only('pagina', 'pagamento')[0].pagina
-    
         return ''
     pagina.short_description = u'Página'
     pagina.admin_order_field = 'auditoria__pagina'
@@ -269,13 +283,11 @@ class Pagamento(models.Model):
     def parcial(self):
         if self.auditoria_set.exists():
             return self.auditoria_set.only('parcial', 'pagamento')[0].parcial
-
         return ''
     parcial.admin_order_field = 'auditoria__parcial'
 
     class Meta:
         ordering = ('conta_corrente',)
-
 
 
 class LocalizaPatrocinio(models.Model):
@@ -289,11 +301,12 @@ class LocalizaPatrocinio(models.Model):
         return self.consignado
 
 
-
 class ExtratoPatrocinio(models.Model):
     localiza = models.ForeignKey('financeiro.LocalizaPatrocinio', verbose_name=_(u'Localização do patrocínio'))
     data_oper = NARADateField(_(u'Data da operação'))
-    cod_oper = models.IntegerField(_(u'Código da operação'), validators=[MinValueValidator(0), MaxValueValidator(999999999)], help_text=u'Código com máximo de 9 dígitos.')
+    cod_oper = models.IntegerField(_(u'Código da operação'),
+                                   validators=[MinValueValidator(0), MaxValueValidator(999999999)],
+                                   help_text=u'Código com máximo de 9 dígitos.')
     valor = models.DecimalField(max_digits=12, decimal_places=2)
     historico = models.CharField(max_length=30)
     obs = models.TextField()
@@ -306,7 +319,6 @@ class ExtratoPatrocinio(models.Model):
         return u'%s - %s - %s' % (self.localiza.consignado, self.data_oper, self.valor)
 
 
-
 class Estado(models.Model):
     nome = models.CharField(max_length=30)
     
@@ -317,7 +329,6 @@ class Estado(models.Model):
         ordering = ('nome',)
 
 
-
 def ultimaparcial():
     from outorga.models import Termo
 
@@ -325,12 +336,15 @@ def ultimaparcial():
     a = Auditoria.objects.filter(pagamento__protocolo__termo__ano=t['ano__max']).aggregate(Max('parcial'))
     return a['parcial__max']
 
+
 def ultimapagina():
     from outorga.models import Termo
 
     t = Termo.objects.aggregate(Max('ano'))
-    p = Auditoria.objects.filter(pagamento__protocolo__termo__ano=t['ano__max'], parcial=ultimaparcial()).aggregate(Max('pagina'))
+    p = Auditoria.objects.filter(pagamento__protocolo__termo__ano=t['ano__max'],
+                                 parcial=ultimaparcial()).aggregate(Max('pagina'))
     return p['pagina__max']+1
+
 
 class Auditoria(models.Model):
     estado = models.ForeignKey('financeiro.Estado')
@@ -345,7 +359,6 @@ class Auditoria(models.Model):
         return u'Parcial: %s, página: %s' % (self.parcial, self.pagina)
 
 
-
 class TipoComprovante(models.Model):
     nome = models.CharField(max_length=100)
     
@@ -358,27 +371,22 @@ class TipoComprovante(models.Model):
         return self.nome
 
 
-
 # Classe para definição de permissões de views e relatórios da app financeiro
 class Permission(models.Model):
     class Meta:
         # remover as permissões padrões, pois essa é uma classe para configurar permissões customizadas
         default_permissions = ()
         permissions = (
-                       ("rel_adm_extrato", "Rel. admin. - Panorama da conta corrente"),     #/financeiro/extrato
-                       ("rel_adm_extrato_financeiro", "Rel. admin. - Extrato do financeiro por mês"),     #/financeiro/extrato_financeiro
-                       ("rel_adm_extrato_financeiro_parciais", "Rel. admin. - Extrato do financeiro por parcial"),     #/financeiro/extrato_financeiro_parciais
-                       ("rel_adm_extrato_mes", "Rel. admin. - Extrato da conta corrente por mês"),     #/financeiro/extrato_mes
-                       ("rel_adm_extrato_tarifas", "Rel. admin. - Extrato de tarifas por mês"),     #/financeiro/extrato_tarifas
-                       ("rel_ger_acordos", "Rel. ger. - Acordos"),     #/financeiro/relatorios/acordos
-                       ("rel_adm_caixa", "Rel. admin. - Diferenças de caixa"),     #/financeiro/relatorios/caixa
-                       ("rel_ger_gerencial",  "Rel. ger. - Gerencial"),     #/financeiro/relatorios/gerencial
-                       ("rel_adm_pagamentos_mes", "Rel. admin. - Pagamentos po mês"),     #/financeiro/relatorios/pagamentos_mes
-                       ("rel_adm_pagamentos_parcial", "Rel. admin. - Pagamentos por parcial"),     #/financeiro/relatorios/pagamentos_parcial
-                       ("rel_adm_parciais", "Rel. admin. - Diferenças totais"),     #/financeiro/relatorios/parciais
-                       ("rel_adm_prestacao", "Rel. admin. - Prestação de contas"),     #/financeiro/relatorios/prestacao
-                      )
-
-
-
-
+            ("rel_adm_extrato", "Rel. admin. - Panorama da conta corrente"),  # /financeiro/extrato
+            ("rel_adm_extrato_financeiro", "Rel. admin. - Extrato do financeiro por mês"),  # /financeiro/extrato_financeiro
+            ("rel_adm_extrato_financeiro_parciais", "Rel. admin. - Extrato do financeiro por parcial"),     # /financeiro/extrato_financeiro_parciais
+            ("rel_adm_extrato_mes", "Rel. admin. - Extrato da conta corrente por mês"),     # /financeiro/extrato_mes
+            ("rel_adm_extrato_tarifas", "Rel. admin. - Extrato de tarifas por mês"),     # /financeiro/extrato_tarifas
+            ("rel_ger_acordos", "Rel. ger. - Acordos"),     # /financeiro/relatorios/acordos
+            ("rel_adm_caixa", "Rel. admin. - Diferenças de caixa"),     # /financeiro/relatorios/caixa
+            ("rel_ger_gerencial",  "Rel. ger. - Gerencial"),     # /financeiro/relatorios/gerencial
+            ("rel_adm_pagamentos_mes", "Rel. admin. - Pagamentos po mês"),     # /financeiro/relatorios/pagamentos_mes
+            ("rel_adm_pagamentos_parcial", "Rel. admin. - Pagamentos por parcial"),     # /financeiro/relatorios/pagamentos_parcial
+            ("rel_adm_parciais", "Rel. admin. - Diferenças totais"),     # /financeiro/relatorios/parciais
+            ("rel_adm_prestacao", "Rel. admin. - Prestação de contas"),     # /financeiro/relatorios/prestacao
+        )

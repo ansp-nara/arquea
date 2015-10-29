@@ -1,37 +1,37 @@
 # -*- coding: utf-8 -*-
 from django import forms
-from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
-from django.db.models import Q
-from django.db.models.fields.related import ManyToOneRel
 from django.forms.util import ErrorList
 from django.utils.html import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
 from models import *
-from outorga.models import Termo, OrdemDeServico
+from outorga.models import Termo
 from financeiro.models import Pagamento
+
 
 class PlanejaAquisicaoRecursoAdminForm(forms.ModelForm):
 
-    referente = forms.CharField(widget=forms.TextInput(attrs={'size':'150'}), required=False)
+    referente = forms.CharField(widget=forms.TextInput(attrs={'size': '150'}), required=False)
     
     class Meta:
         model = PlanejaAquisicaoRecurso
-        fields = ['os', 'ano', 'tipo', 'referente', 'quantidade', 'valor_unitario', 'projeto', 'unidade', 'instalacao', 'banda', 'obs',]
-
+        fields = ['os', 'ano', 'tipo', 'referente', 'quantidade', 'valor_unitario', 'projeto', 'unidade', 'instalacao',
+                  'banda', 'obs']
 
 
 class BlocoIPAdminForm(forms.ModelForm):
     
     # Campo de exibição de net mask. Utilizado somente para visualizar o netmask.
     net_mask = forms.CharField(label=_(u'Net Mask'), required=False,
-            widget=forms.TextInput(attrs={'disabled':'disabled'}))
+                               widget=forms.TextInput(attrs={'disabled': 'disabled'}))
 
     def __init__(self, *args, **kwargs):
         super(BlocoIPAdminForm, self).__init__(*args, **kwargs)
 
         # Adicionando link para o label do campo de Superbloco
-        self.fields['superbloco'].label = mark_safe('<a href="#" onclick="window.open(\'/admin/rede/blocoip/\'+$(\'#id_superbloco\').val() + \'/\', \'_blank\');return true;">Super bloco</a>')
+        self.fields['superbloco'].label = mark_safe('<a href="#" onclick="window.open(\'/admin/rede/blocoip/\'+'
+                                                    '$(\'#id_superbloco\').val() + \'/\', \'_blank\');return true;">'
+                                                    'Super bloco</a>')
 
         if 'instance' in kwargs and kwargs['instance']:
             ip = kwargs['instance'].ip
@@ -40,9 +40,7 @@ class BlocoIPAdminForm(forms.ModelForm):
             # Preenchendo o campo de exibição de net mask
             if ip and mask:
                 self.fields['net_mask'].initial = ipaddress.ip_network(u'%s/%s' % (ip, mask), strict=False).netmask
-                
 
-            
     def clean(self):
         cleaned_data = super(BlocoIPAdminForm, self).clean()
         
@@ -64,8 +62,6 @@ class BlocoIPAdminForm(forms.ModelForm):
         fields = '__all__'
 
 
-
-
 class RecursoAdminForm(forms.ModelForm):
     """
     Uma instância dessa classe faz algumas definições para a tela de cadastramento do modelo 'Patrimonio'.
@@ -79,43 +75,53 @@ class RecursoAdminForm(forms.ModelForm):
 
     termo = forms.ModelChoiceField(Termo.objects.all(), label=_(u'Termo de outorga'), required=False)
 
-    pagamento = forms.ModelChoiceField(Pagamento.objects.all().select_related('protocolo', 'origem_fapesp', 'protocolo', 'origem_fapesp__item_outorga__natureza_gasto__modalidade'),
-                                                 label=mark_safe('<a href="#" onclick="window.open(\'/financeiro/pagamento/\'+$(\'#id_pagamento\').val() + \'/\', \'_blank\');return true;">Pagamento</a>'),)
+    pagamento = forms.ModelChoiceField(
+        Pagamento.objects.all().select_related('protocolo', 'origem_fapesp', 'protocolo',
+                                               'origem_fapesp__item_outorga__natureza_gasto__modalidade'),
+        label=mark_safe('<a href="#" onclick="window.open(\'/financeiro/pagamento/\'+$(\'#id_pagamento\').val()'
+                        ' + \'/\', \'_blank\');return true;">Pagamento</a>'),)
 
-    planejamento = forms.ModelChoiceField(PlanejaAquisicaoRecurso.objects.all().select_related('os', 'os__tipo', 'projeto', 'tipo', ),
-                                                 label=mark_safe('<a href="#" onclick="window.open(\'/admin/rede/planejaaquisicaorecurso/\'+$(\'#id_planejamento\').val() + \'/\', \'_blank\');return true;">Planejamento</a>'),)
+    planejamento = forms.ModelChoiceField(
+        PlanejaAquisicaoRecurso.objects.all().select_related('os', 'os__tipo', 'projeto', 'tipo', ),
+        label=mark_safe('<a href="#" onclick="window.open(\'/admin/rede/planejaaquisicaorecurso/\'+$(\'#id_'
+                        'planejamento\').val() + \'/\', \'_blank\');return true;">Planejamento</a>'),)
 
-    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
-                 initial=None, error_class=ErrorList, label_suffix=':',
-                 empty_permitted=False, instance=None):
+    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None, initial=None, error_class=ErrorList,
+                 label_suffix=':', empty_permitted=False, instance=None):
 
         if instance: 
             if initial:
-                initial.update({'termo':instance.pagamento.protocolo.termo.id})
+                initial.update({'termo': instance.pagamento.protocolo.termo.id})
             else:
-                initial = {'termo':instance.pagamento.protocolo.termo.id}
+                initial = {'termo': instance.pagamento.protocolo.termo.id}
 
-        super(RecursoAdminForm, self).__init__(data, files, auto_id, prefix, initial,
-                                            error_class, label_suffix, empty_permitted, instance)
+        super(RecursoAdminForm, self).__init__(data, files, auto_id, prefix, initial, error_class, label_suffix,
+                                               empty_permitted, instance)
 
         pg = self.fields['pagamento']
         if instance:
             if instance.pagamento is not None:
-                pg.queryset = Pagamento.objects.filter(protocolo__termo__id=instance.pagamento.protocolo.termo.id).select_related('protocolo', 'origem_fapesp', 'protocolo', 'origem_fapesp__item_outorga__natureza_gasto__modalidade')
+                pg.queryset = Pagamento.objects.filter(protocolo__termo__id=instance.pagamento.protocolo.termo.id)\
+                    .select_related('protocolo', 'origem_fapesp', 'protocolo',
+                                    'origem_fapesp__item_outorga__natureza_gasto__modalidade')
             else:
-                pg.queryset = Pagamento.objects.filter(id__lte=0).select_related('protocolo', 'origem_fapesp', 'protocolo', 'origem_fapesp__item_outorga__natureza_gasto__modalidade')
+                pg.queryset = Pagamento.objects.filter(id__lte=0)\
+                    .select_related('protocolo', 'origem_fapesp', 'protocolo',
+                                    'origem_fapesp__item_outorga__natureza_gasto__modalidade')
         elif data and data['termo']:
             t = data['termo']
-            pg.queryset = Pagamento.objects.filter(protocolo__termo=t).select_related('protocolo', 'origem_fapesp', 'protocolo', 'origem_fapesp__item_outorga__natureza_gasto__modalidade')
+            pg.queryset = Pagamento.objects.filter(protocolo__termo=t)\
+                .select_related('protocolo', 'origem_fapesp', 'protocolo',
+                                'origem_fapesp__item_outorga__natureza_gasto__modalidade')
         else:
-            pg.queryset = Pagamento.objects.filter(id__lte=0).select_related('protocolo', 'origem_fapesp', 'protocolo', 'origem_fapesp__item_outorga__natureza_gasto__modalidade')
-
+            pg.queryset = Pagamento.objects.filter(id__lte=0)\
+                .select_related('protocolo', 'origem_fapesp', 'protocolo',
+                                'origem_fapesp__item_outorga__natureza_gasto__modalidade')
 
     class Meta:
         model = Recurso
-        fields = ['planejamento', 'termo', 'pagamento', 'obs', 'quantidade', 'mes_referencia', 'ano_referencia', 'valor_imposto_mensal', 'valor_mensal_sem_imposto',]
-        
-
+        fields = ['planejamento', 'termo', 'pagamento', 'obs', 'quantidade', 'mes_referencia', 'ano_referencia',
+                  'valor_imposto_mensal', 'valor_mensal_sem_imposto']
 
     class Media:
         js = ('js/selects.js',)
@@ -135,7 +141,9 @@ class IFCConectorAdminForm(forms.ModelForm):
             self.id = kwargs['instance'].id
 
         # Adicionando link para o label do campo de Tipo de Conector
-        self.fields['tipoConector'].label = mark_safe('<a href="#" onclick="window.open(\'/admin/rede/tipoconector/\'+$(\'#id_tipoConector\').val() + \'/\', \'_blank\');return true;">Tipo de Conector</a>')
+        self.fields['tipoConector'].label = mark_safe('<a href="#" onclick="window.open(\'/admin/rede/tipoconector/\'+'
+                                                      '$(\'#id_tipoConector\').val() + \'/\', \'_blank\');'
+                                                      'return true;">Tipo de Conector</a>')
 
 
 class CrossConnectionAdminForm(forms.ModelForm):
@@ -152,11 +160,12 @@ class CrossConnectionAdminForm(forms.ModelForm):
             self.id = kwargs['instance'].id
 
         # Adicionando link para o label do campo de Origem
-        self.fields['origem'].label = mark_safe('<a href="#" onclick="window.open(\'/admin/rede/ifcconector/\'+$(\'#id_origem\').val() + \'/\', \'_blank\');return true;">Origem</a>')
+        self.fields['origem'].label = mark_safe('<a href="#" onclick="window.open(\'/admin/rede/ifcconector/\'+$(\''
+                                                '#id_origem\').val() + \'/\', \'_blank\');return true;">Origem</a>')
         # Adicionando link para o label do campo de Destino
-        self.fields['destino'].label = mark_safe('<a href="#" onclick="window.open(\'/admin/rede/ifcconector/\'+$(\'#id_destino\').val() + \'/\', \'_blank\');return true;">Destino</a>')
-        
-        
+        self.fields['destino'].label = mark_safe('<a href="#" onclick="window.open(\'/admin/rede/ifcconector/\'+$(\''
+                                                 '#id_destino\').val() + \'/\', \'_blank\');return true;">Destino</a>')
+
     def clean(self):
         cleaned_data = super(CrossConnectionAdminForm, self).clean()
         
@@ -169,19 +178,18 @@ class CrossConnectionAdminForm(forms.ModelForm):
         
         # Verifica se as IFC especificadas já estão cadastradas em outra Cross conexão ativa.
         if origem_id:
-            qs = CrossConnection.objects.filter(Q(origem_id=origem_id)|Q(destino_id=origem_id))
-            qs = qs.filter(ativo = True)
+            qs = CrossConnection.objects.filter(Q(origem_id=origem_id) | Q(destino_id=origem_id))
+            qs = qs.filter(ativo=True)
             if self.id:
                 qs = qs.exclude(pk=self.id)
             if qs.count() > 0:
                 self._errors["origem"] = self.error_class([u'IFC já cadastrado em uma Cross Conexão.'])
         if destino_id:
-            qs = CrossConnection.objects.filter(Q(origem_id=destino_id)|Q(destino_id=destino_id))
-            qs = qs.filter(ativo = True)
+            qs = CrossConnection.objects.filter(Q(origem_id=destino_id) | Q(destino_id=destino_id))
+            qs = qs.filter(ativo=True)
             if self.id:
                 qs = qs.exclude(pk=self.id)
             if qs.count() > 0:
                 self._errors["destino"] = self.error_class([u'IFC já cadastrado em uma Cross Conexão.'])
-
 
         return cleaned_data

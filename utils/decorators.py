@@ -3,6 +3,7 @@ __author__ = 'antonio'
 from django.contrib.auth.decorators import user_passes_test
 from django.core.exceptions import PermissionDenied
 
+
 def login_required_or_403(function=None):
 
     def test_auth(user):
