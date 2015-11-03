@@ -285,45 +285,84 @@ def por_estado(request):
      Relatório Técnico - Relatório de Patrimônio por estado do item.
     
     """
+    
+    patrimonio_queryset = Patrimonio.objects \
+                        .prefetch_related(Prefetch('historicolocal_set', \
+                                queryset=HistoricoLocal.objects.all()
+                                    .select_related('estado', 'endereco', 'endereco__detalhe', 'endereco__detalhe__endereco__entidade', 'endereco__endereco__entidade'))) \
+                        .select_related('entidade_procedencia', 'equipamento__entidade_fabricante') \
+                        .order_by('ns')
+
+    filtro_estados = []
+    
+    entidades = []
+    for p in patrimonio_queryset:
+        ht = p.historico_atual_prefetched
+        
+        # Montando o filtro de estados
+        if ht:
+            achou_estado = False
+            for e in filtro_estados:
+                if e['estado'].id == ht.estado.id:
+                    e['count'] = e['count'] + 1
+                    achou_estado = True
+                    break
+            if not achou_estado:
+                filtro_estados.append({'estado': ht.estado, 'count': 1})
+    
+    
     if request.method == 'GET' and request.GET.get('estado'):
-            estado_id = request.GET.get('estado')
+        
+        estado_id = request.GET.get('estado')
+        
+        entidades = []
+        estado = ''
+        
+        if Estado.objects.filter(pk=estado_id).exists():
+            estado = get_object_or_404(Estado, pk=estado_id)
+                
+            for p in patrimonio_queryset:
+                ht = p.historico_atual_prefetched
+                
+                if ht and ht.estado_id == estado.id:
+                    #patrimonios_obj.append({'patrimonio':p, 'endereco':ht.endereco, 'entidade':ht.endereco.end.entidade})
+                    endereco = ht.endereco
+                    patrimonio = p
+                    entidade = ht.endereco.end.entidade
+ 
+                    # Montando o objeto contento entidades > enderecos > patrionios
+                    
+                    detalhe = {'detalhe': endereco, 'patrimonios': [patrimonio]}
+                    achou_entidade = False
+                    for e in entidades:
+                        # agrupando entidades
+                        if e['entidade'].id == entidade.id:
+                            achou_entidade = True
+                            achou_detalhe = False
+                            
+                            # agrupando enderecos
+                            for d in e['detalhes']:
+                                if d and d['detalhe'] and endereco and d['detalhe'].id == endereco.id:
+                                    achou_detalhe = True
+                                    
+                                    # agrupando patrimonios
+                                    d['patrimonios'].append(patrimonio)
+                                
+                            if not achou_detalhe:
+                                e['detalhes'].append(detalhe)
+                    
+                    if not achou_entidade:
+                        entidades.append({'entidade': entidade, 'detalhes': [detalhe]})
+                    
+                
+            entidades.sort(key=lambda x: x['entidade'].sigla, reverse=False)
+            filtro_estados.sort(key=lambda x: x['estado'].nome, reverse=False)
 
-            entidades = []
-            estado = ''
 
-            if Estado.objects.filter(pk=estado_id).exists():
-                estado = get_object_or_404(Estado, pk=estado_id)
 
-                no_estado = []
-                for p in Patrimonio.objects.filter(patrimonio__isnull=True):
-                    ht = p.historico_atual
-                    if ht and ht.estado == estado:
-                        no_estado.append(ht.id)
-
-                no_estado = HistoricoLocal.objects.filter(id__in=no_estado)
-                # entidades_ids = no_estado.values_list('endereco__endereco__entidade', flat=True).distinct()
-                entidades_ids = []
-                for h in no_estado:
-                    try:
-                        entidades_ids.append(h.endereco.end.entidade.id)
-                    except:
-                        pass
-                entidades = []
-                for e in Entidade.objects.filter(id__in=entidades_ids):
-                    detalhes = []
-                    # detalhes_ids = no_estado.values_list('endereco', flat=True).filter(endereco__endereco__entidade=e)
-                    detalhes_ids = [h.endereco.id for h in no_estado if h.endereco.end.entidade == e]
-                    for d in EnderecoDetalhe.objects.filter(id__in=detalhes_ids):
-                        detalhes.append({'detalhe': d,
-                                         'patrimonio': Patrimonio.objects.filter(
-                                             historicolocal__in=no_estado.filter(endereco=d))})
-                    entidades.append({'entidade': e, 'detalhes': detalhes})
-
-            return TemplateResponse(request, 'patrimonio/por_estado.html',
-                                    {'estado_id': estado_id, 'estado': estado, 'entidades': entidades,
-                                     'estados': Estado.objects.all()})
+        return TemplateResponse(request, 'patrimonio/por_estado.html', {'estado_id': estado_id, 'estado':estado, 'entidades':entidades, 'estados':filtro_estados})
     else:
-        return TemplateResponse(request, 'patrimonio/por_estado.html', {'estados': Estado.objects.all()})
+        return TemplateResponse(request, 'patrimonio/por_estado.html', {'estados':filtro_estados})
 
 
 @login_required
@@ -1415,10 +1454,11 @@ def relatorio_rack(request):
     todos_dcs.sort(key=lambda c: c['nome'].upper(), reverse=False)
 
     patrimonio_racks = []
+    dcs = []
     if p_dc:
         patrimonio_racks = PatrimonioRack.get_racks_as_list(p_dc)
-
-    dcs = _rack_data(p_dc, p_rack)
+    if p_rack:
+        dcs = _rack_data(p_dc, p_rack)
 
     context = {'dcs': dcs, 'todos_dcs': todos_dcs, 'patrimonio_racks': patrimonio_racks}
 
