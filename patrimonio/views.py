@@ -33,19 +33,19 @@ logger = logging.getLogger(__name__)
 # @require_safe
 # def ajax_escolhe_termo(request):
 #     retorno = []
-#      
+#
 #     t = request.GET.get('id')
 #     if t:
 #         termo = Termo.objects.get(pk=int(t))
 #         protocolos = Protocolo.objects.filter(termo=termo)
-# 
+#
 #         for p in protocolos:
 #             descricao = '%s: %s - %s' % (p.doc_num(), p.descricao2.__unicode__(), p.mostra_valor())
 #             retorno.append({'pk':p.pk, 'valor':descricao})
-#     
+#
 #     if not retorno:
 #         retorno = [{"pk":"0", "valor":"Nenhum registro"}]
-# 
+#
 #     retorno_json = json.dumps(retorno)
 #     return HttpResponse(retorno_json, content_type="application/json")
 
@@ -56,18 +56,18 @@ logger = logging.getLogger(__name__)
 #     retorno = []
 #     id = request.GET.get('id')
 #     previous = request.GET.get('previous')
-# 
+#
 #     if id and previous:
 #         t = Termo.objects.get(pk=int(previous))
 #         itens = ItemProtocolo.objects.filter(protocolo__id=int(id), protocolo__termo=t)
-# 
+#
 #         for i in itens:
 #             descricao = '%s - %s (%s)' % (i.quantidade, i.descricao, i.mostra_valor())
 #             retorno.append({'pk':i.pk, 'valor': descricao})
-# 
+#
 #         if not retorno:
 #             retorno = [{"pk":"0", "valor":"Nenhum registro"}]
-# 
+#
 #     retorno_json = json.dumps(retorno)
 #     return HttpResponse(retorno_json, content_type="application/json")
 
@@ -77,7 +77,7 @@ logger = logging.getLogger(__name__)
 def ajax_escolhe_pagamento(request):
     """
     Retorna os dados de pagamento, filtrado por termo e número de documento.
-    
+
     Utilizado no PatrimonioAdminForm, ou seja, no form do admin - patrimonio,
     para preencher os valores do combo do campo de Pagamento.
     """
@@ -109,11 +109,11 @@ def ajax_escolhe_pagamento(request):
 # def ajax_escolhe_detalhe(request):
 #     ed_id = request.GET.get('detalhe')
 #     detalhe = get_object_or_404(EnderecoDetalhe, pk=ed_id)
-# 
+#
 #     retorno = []
 #     for ed in EnderecoDetalhe.objects.filter(detalhe=detalhe):
 #         retorno.append({'pk':ed.pk, 'valor':ed.__unicode__()})
-# 
+#
 #     retorno_json = json.dumps(retorno)
 #     return HttpResponse(retorno_json, content_type="application/json")
 
@@ -123,7 +123,7 @@ def ajax_escolhe_pagamento(request):
 def ajax_escolhe_entidade(request):
     """
     Disparadao do atributo de entidade em PatrimonioHistoricoLocalAdminForm.
-    
+
     Utilizado para buscar dados de endereço a partir da escolha de uma entidade.
     """
     ent_id = request.GET.get('entidade')
@@ -148,7 +148,7 @@ def ajax_escolhe_entidade(request):
 def ajax_escolhe_equipamento(request):
     """
     Faz a busca de equipamentos por diversos atributos.
-    Utilizado para fazer o filtro de "Equipamentos" durante a tela de cadastro/modificação de patrimonio. 
+    Utilizado para fazer o filtro de "Equipamentos" durante a tela de cadastro/modificação de patrimonio.
     """
     filtro = request.GET.get('num_doc')
     id_equipamento = request.GET.get('id_equipamento')
@@ -156,14 +156,14 @@ def ajax_escolhe_equipamento(request):
     if filtro:
         retorno = [{'pk': p.pk, 'valor': p.__unicode__(), 'selected': (str(p.pk) == id_equipamento)}
                    for p in Equipamento.objects.filter(
-                       Q(tipo__nome__icontains=filtro)
-                       | Q(descricao__icontains=filtro)
-                       | Q(part_number__icontains=filtro)
-                       | Q(entidade_fabricante__sigla__icontains=filtro)
-                       | Q(entidade_fabricante__nome__icontains=filtro)
-                       | Q(modelo__icontains=filtro)
-                       | Q(titulo_autor__icontains=filtro)
-                       | Q(isbn__icontains=filtro))]
+                       Q(tipo__nome__icontains=filtro) |
+                       Q(descricao__icontains=filtro) |
+                       Q(part_number__icontains=filtro) |
+                       Q(entidade_fabricante__sigla__icontains=filtro) |
+                       Q(entidade_fabricante__nome__icontains=filtro) |
+                       Q(modelo__icontains=filtro) |
+                       Q(titulo_autor__icontains=filtro) |
+                       Q(isbn__icontains=filtro))]
     else:
         retorno = [{'pk': p.pk, 'valor': p.__unicode__(), 'selected': (str(p.pk) == id_equipamento)}
                    for p in Equipamento.objects.all()]
@@ -179,7 +179,7 @@ def ajax_escolhe_equipamento(request):
 @require_safe
 def ajax_get_marcas_por_termo(request):
     """
-    Utilizado para montar dados de "Equipamentos" durante a tela de cadastro/modificação de patrimonio. 
+    Utilizado para montar dados de "Equipamentos" durante a tela de cadastro/modificação de patrimonio.
     """
     termo_id = request.GET.get('termo')
 
@@ -203,7 +203,7 @@ def ajax_get_marcas_por_termo(request):
 def ajax_get_equipamento(request):
     """
     Faz a busca de equipamentos
-    Utilizado para montar dados de "Equipamentos" durante a tela de cadastro/modificação de patrimonio. 
+    Utilizado para montar dados de "Equipamentos" durante a tela de cadastro/modificação de patrimonio.
     """
     id_equipamento = request.GET.get('id_equipamento')
     p = Equipamento.objects.get(id=id_equipamento)
@@ -222,7 +222,7 @@ def ajax_get_equipamento(request):
 @require_safe
 def ajax_get_procedencia_filter_tipo(request):
     """
-    AJAX para buscar procedencias de patrimonio filtrados por tipo 
+    AJAX para buscar procedencias de patrimonio filtrados por tipo
     """
     id_tipo = request.GET.get('id_tipo')
     entidades_ids = Patrimonio.objects.filter(tipo=id_tipo).order_by('tipo')\
@@ -242,16 +242,15 @@ def ajax_get_procedencia_filter_tipo(request):
 def ajax_escolhe_patrimonio(request):
     """
     Faz a busca de patrimonios que estao relacionados a NFs.
-    Utilizado para fazer o filtro de "Patrimonios Contidos em" durante a tela de cadastro/modificação de patrimonio. 
+    Utilizado para fazer o filtro de "Patrimonios Contidos em" durante a tela de cadastro/modificação de patrimonio.
     """
     retorno = []
     num_doc = request.GET.get('num_doc')
 
     if num_doc:
-        retorno = [{'pk': p.pk, 'valor': p.__unicode__()}
-                   for p in Patrimonio.objects.filter(Q(pagamento__protocolo__num_documento__icontains=num_doc)
-                                                      | Q(ns__icontains=num_doc))] or \
-                  [{"pk": "0", "valor": "Nenhum registro"}]
+        retorno = ([{'pk': p.pk, 'valor': p.__unicode__()}
+                    for p in Patrimonio.objects.filter(Q(pagamento__protocolo__num_documento__icontains=num_doc) | Q(ns__icontains=num_doc))]) \
+                or [{"pk": "0", "valor": "Nenhum registro"}]
 
     if not retorno or len(retorno) == 0:
         retorno = [{"pk": "0", "valor": "Nenhum registro"}]
@@ -265,14 +264,14 @@ def ajax_escolhe_patrimonio(request):
 # def ajax_patrimonio_existente(request):
 #     retorno = {'marca':'', 'modelo':'', 'descricao':'', 'procedencia':''}
 #     part_number = request.GET.get('part_number')
-#     
+#
 #     existentes = Patrimonio.objects.filter(equipamento__part_number__iexact=part_number)
-# 
+#
 #     if part_number and existentes.count():
 #         p = existentes[0]
-#         
+#
 #         retorno = {'marca':p.marca, 'modelo':p.modelo, 'descricao':p.descricao, 'procedencia':p.procedencia}
-# 
+#
 #     retorno_json = json.dumps(retorno)
 #     return HttpResponse(retorno_json, content_type='application/json')
 
@@ -283,22 +282,25 @@ def ajax_escolhe_patrimonio(request):
 def por_estado(request):
     """
      Relatório Técnico - Relatório de Patrimônio por estado do item.
-    
+
     """
-    
-    patrimonio_queryset = Patrimonio.objects \
-                        .prefetch_related(Prefetch('historicolocal_set', \
-                                queryset=HistoricoLocal.objects.all()
-                                    .select_related('estado', 'endereco', 'endereco__detalhe', 'endereco__detalhe__endereco__entidade', 'endereco__endereco__entidade'))) \
-                        .select_related('entidade_procedencia', 'equipamento__entidade_fabricante') \
-                        .order_by('ns')
+
+    patrimonio_queryset = Patrimonio.objects.prefetch_related(
+                                                      Prefetch('historicolocal_set',
+                                                               queryset=HistoricoLocal.objects.all().select_related(
+                                                                                    'estado', 'endereco',
+                                                                                    'endereco__detalhe',
+                                                                                    'endereco__detalhe__endereco__entidade',
+                                                                                    'endereco__endereco__entidade'))) \
+                                            .select_related('entidade_procedencia', 'equipamento__entidade_fabricante') \
+                                            .order_by('ns')
 
     filtro_estados = []
-    
+
     entidades = []
     for p in patrimonio_queryset:
         ht = p.historico_atual_prefetched
-        
+
         # Montando o filtro de estados
         if ht:
             achou_estado = False
@@ -309,29 +311,28 @@ def por_estado(request):
                     break
             if not achou_estado:
                 filtro_estados.append({'estado': ht.estado, 'count': 1})
-    
-    
+
     if request.method == 'GET' and request.GET.get('estado'):
-        
+
         estado_id = request.GET.get('estado')
-        
+
         entidades = []
         estado = ''
-        
+
         if Estado.objects.filter(pk=estado_id).exists():
             estado = get_object_or_404(Estado, pk=estado_id)
-                
+
             for p in patrimonio_queryset:
                 ht = p.historico_atual_prefetched
-                
+
                 if ht and ht.estado_id == estado.id:
-                    #patrimonios_obj.append({'patrimonio':p, 'endereco':ht.endereco, 'entidade':ht.endereco.end.entidade})
+                    # patrimonios_obj.append({'patrimonio':p, 'endereco':ht.endereco, 'entidade':ht.endereco.end.entidade})
                     endereco = ht.endereco
                     patrimonio = p
                     entidade = ht.endereco.end.entidade
- 
+
                     # Montando o objeto contento entidades > enderecos > patrionios
-                    
+
                     detalhe = {'detalhe': endereco, 'patrimonios': [patrimonio]}
                     achou_entidade = False
                     for e in entidades:
@@ -339,30 +340,28 @@ def por_estado(request):
                         if e['entidade'].id == entidade.id:
                             achou_entidade = True
                             achou_detalhe = False
-                            
+
                             # agrupando enderecos
                             for d in e['detalhes']:
                                 if d and d['detalhe'] and endereco and d['detalhe'].id == endereco.id:
                                     achou_detalhe = True
-                                    
+
                                     # agrupando patrimonios
                                     d['patrimonios'].append(patrimonio)
-                                
+
                             if not achou_detalhe:
                                 e['detalhes'].append(detalhe)
-                    
+
                     if not achou_entidade:
                         entidades.append({'entidade': entidade, 'detalhes': [detalhe]})
-                    
-                
+
             entidades.sort(key=lambda x: x['entidade'].sigla, reverse=False)
             filtro_estados.sort(key=lambda x: x['estado'].nome, reverse=False)
 
-
-
-        return TemplateResponse(request, 'patrimonio/por_estado.html', {'estado_id': estado_id, 'estado':estado, 'entidades':entidades, 'estados':filtro_estados})
+        return TemplateResponse(request, 'patrimonio/por_estado.html',
+                                {'estado_id': estado_id, 'estado': estado, 'entidades': entidades, 'estados': filtro_estados})
     else:
-        return TemplateResponse(request, 'patrimonio/por_estado.html', {'estados':filtro_estados})
+        return TemplateResponse(request, 'patrimonio/por_estado.html', {'estados': filtro_estados})
 
 
 @login_required
@@ -371,7 +370,7 @@ def por_estado(request):
 def por_tipo_consignado(request):
     """
      Relatório Técnico - Relatório de Patrimônio por tipo - Filtro por tipo Consignado.
-    
+
     """
     return por_tipo(request, Tipo.CONSIGNADO)
 
@@ -382,7 +381,7 @@ def por_tipo_consignado(request):
 def por_tipo(request, param_tipo_id=None):
     """
      Relatório Técnico - Relatório de Patrimônio por tipo.
-    
+
     """
     if param_tipo_id or (request.method == 'GET' and request.GET.get('tipo')):
         if param_tipo_id:
@@ -420,7 +419,7 @@ def por_tipo(request, param_tipo_id=None):
         else:
             # Listas para remontar o filtro de Tipos e o filtro e Procedencias
             if param_tipo_id:
-                # Se receber o tipo como parametro, não enviar a lista de filtro de tipos. 
+                # Se receber o tipo como parametro, não enviar a lista de filtro de tipos.
                 tipos = []
             else:
                 tipos = Tipo.objects.all()
@@ -443,7 +442,7 @@ def por_tipo(request, param_tipo_id=None):
 def por_marca(request, pdf=0):
     """
      Relatório Técnico - Relatório de Patrimônio por marca.
-    
+
     """
     if request.method == 'GET' and request.GET.get('marca'):
         marca = request.GET.get('marca')
@@ -471,8 +470,8 @@ def por_marca(request, pdf=0):
 @require_safe
 def por_local(request, pdf=0):
     """
-     Relatório Técnico - Relatório de Patrimônio por localização.    
-    
+     Relatório Técnico - Relatório de Patrimônio por localização.
+
     """
     if request.GET.get('entidade') and request.GET.get('endereco'):
         atuais = []
@@ -574,7 +573,6 @@ def por_local(request, pdf=0):
             detalhes = []
             detalhes_ids = historicos.values_list('endereco', flat=True)
             for d in EnderecoDetalhe.objects.filter(id__in=detalhes_ids):
-                pat = {}
                 detalhes.append({'detalhe': d,
                                  'patrimonio': Patrimonio.objects.filter(
                                      historicolocal__in=historicos.filter(endereco=d))
@@ -603,7 +601,7 @@ def por_local(request, pdf=0):
 def por_local_rack(request, pdf=0):
     """
      Relatório Técnico - Relatório de Patrimônio por local e rack.
-    
+
     """
     entidade = request.GET.get('entidade')
     endereco_id = request.GET.get('endereco')
@@ -677,7 +675,7 @@ def por_local_rack(request, pdf=0):
 def por_local_termo(request, pdf=0):
     """
      Relatório Técnico - Relatório de Patrimônio por localização (com Termo).
-    
+
     """
     if request.GET.get('entidade'):
         atuais = []
@@ -893,7 +891,7 @@ def _iterate_patrimonio(p_pts, nivel=0, filtro_com_fmusp=False, order_fmusp=True
 def por_tipo_equipamento(request, pdf=0):
     """
      Relatório Técnico - Relatório de Busca por tipo de equipamento.
-    
+
     """
 
     if len(request.GET) < 1:
@@ -1049,7 +1047,7 @@ def ajax_filtra_pn_estado(request):
 def por_termo(request, pdf=0):
     """
      Relatório Administrativo - Relatório de Patrimônio por termo de outorga.
-     
+
     """
     termo_id = request.GET.get('termo') or request.POST.get('termo')
     modalidade = request.GET.get('modalidade') or request.POST.get('modalidade')
@@ -1161,11 +1159,11 @@ def por_termo(request, pdf=0):
         termos.append(termo)
 
     if pdf:
-        vars = {'termo': termo_filtro, 'termos': termos, 'i': itertools.count(1), 'numero_fmusp': numero_fmusp,
-                'ver_numero_fmusp': ver_numero_fmusp, }
+        context_dict = {'termo': termo_filtro, 'termos': termos, 'i': itertools.count(1), 'numero_fmusp': numero_fmusp,
+                        'ver_numero_fmusp': ver_numero_fmusp, }
         if termo_id != 0 and len(qs) > 0:
-            vars.update({'t': termo_filtro})
-        return render_to_pdf_weasy('patrimonio/%s.pdf' % template_name, vars, request=request,
+            context_dict.update({'t': termo_filtro})
+        return render_to_pdf_weasy('patrimonio/%s.pdf' % template_name, context_dict, request=request,
                                    filename='inventario_por_termo.pdf')
     else:
         return TemplateResponse(request, 'patrimonio/%s.html' % template_name,
@@ -1182,7 +1180,7 @@ def por_termo(request, pdf=0):
 def racks(request):
     """
      Relatório Técnico - Relatório de racks (bayface).
-    
+
     """
     # Busca os endereços que possuem Racks no estadoAtivos
     locais = EnderecoDetalhe.objects.filter(historicolocal__estado__id=Estado.PATRIMONIO_ATIVO,
@@ -1282,7 +1280,7 @@ def _rack_data(datacenter_id, rack_id):
                             imagem_traseira = pt.equipamento.imagem_traseira.url
 
                         # Verificando profundidade
-                        # Assinala somente se ocupa a profundidade toda, ou somente metade 
+                        # Assinala somente se ocupa a profundidade toda, ou somente metade
                         # da profundidade do rack
                         profundidade = 1.0
                         if rack.equipamento.dimensao_id and pt.equipamento.dimensao_id:
@@ -1316,7 +1314,7 @@ def _rack_data(datacenter_id, rack_id):
                             continue
                         else:
                             # x a partir do topo do container
-                            # Adiciona os equipamentos frontais e traseiros. 
+                            # Adiciona os equipamentos frontais e traseiros.
                             # O layout deve ser tratado no template
                             equipamentos.append(last_equipamento)
 
@@ -1370,7 +1368,7 @@ def _rack_data(datacenter_id, rack_id):
                     rack = {'id': rack.id, 'altura': int(rack.tamanho) * 3.0, 'nome': rack.apelido,
                             'altura_pts': int(rack.tamanho) * Patrimonio.U_TO_PT, 'marca': rack.marca,
                             'altura_pxs': int(rack.tamanho) * Patrimonio.U_TO_PX,
-                            'altura_count': range(1, rack.tamanho+1), 'equipamentos': equipamentos,
+                            'altura_count': range(1, rack.tamanho + 1), 'equipamentos': equipamentos,
                             'equipamentos_fora_visao': equipamentos_fora_visao, 'equipamentos_pdu': equipamentos_pdu,
                             'conflitos': conflitos
                             }
@@ -1426,11 +1424,11 @@ def calcula_ocupacao(pts):
 def relatorio_rack(request):
     """
      Relatório Técnico - Relatório por rack.
-     
+
      Relatório de patrimônio separados por rack.
      Exibe o bayface de visão frontal e traseira, além de uma lista dos equipamentos que estão
      localizados no rack e que não são exibidos no bayface.
-     
+
     """
     p_dc = request.GET.get('dc')
     p_rack = request.GET.get('rack')
@@ -1482,7 +1480,7 @@ def relatorio_rack(request):
 def presta_contas(request):
     """
      Relatório Administrativo - Relatório de Prestação de contas patrimonial.
-    
+
     """
     termos = []
     for t in Termo.objects.all():
@@ -1497,25 +1495,25 @@ def presta_contas(request):
 def ajax_abre_arvore(request):
     ret = []
     if request.GET.get('id'):
-        id = request.GET.get('id')
+        termo_id = request.GET.get('id')
         model = request.GET.get('model')
         if model == 'termo':
-            for n in Termo.objects.get(id=id).natureza_gasto_set\
+            for n in Termo.objects.get(id=termo_id).natureza_gasto_set\
                     .filter(item__origemfapesp__pagamento__patrimonio__isnull=False).distinct():
                 ret.append({'data': n.modalidade.sigla,
                             'attr': {'style': 'padding-top:4px;', 'o_id': n.id, 'o_model': n._meta.model_name}})
         elif model == 'natureza_gasto':
-            for i in Natureza_gasto.objects.get(id=id).item_set\
+            for i in Natureza_gasto.objects.get(id=termo_id).item_set\
                     .filter(origemfapesp__pagamento__patrimonio__isnull=False).distinct():
                 ret.append({'data': i.__unicode__(),
                             'attr': {'style': 'padding-top:4px;', 'o_id': i.id, 'o_model': i._meta.model_name}})
         elif model == 'item':
-            for o in Item.objects.get(id=id).origemfapesp_set.filter(pagamento__patrimonio__isnull=False).distinct():
+            for o in Item.objects.get(id=termo_id).origemfapesp_set.filter(pagamento__patrimonio__isnull=False).distinct():
                 for p in o.pagamento_set.filter(patrimonio__isnull=False).distinct():
                     ret.append({'data': '%s %s' % (p.protocolo.tipo_documento.sigla or '', p.protocolo.num_documento),
                                 'attr': {'style': 'padding-top:4px;', 'o_id': p.id, 'o_model': p._meta.model_name}})
         elif model == 'pagamento':
-            for pt in Pagamento.objects.get(id=id).patrimonio_set.all():
+            for pt in Pagamento.objects.get(id=termo_id).patrimonio_set.all():
                 ret.append({'data': '<div><div class="col1"></div><div class="col2"><div class="menor">%s</div>'
                                     '<div class="maior">%s</div><div class="maior">%s - %s</div>'
                                     '<div class="medio">%s</div><div class="menor">%s</div><div class="menor">%s</div>'
@@ -1536,7 +1534,7 @@ def ajax_abre_arvore(request):
 def por_tipo_equipamento2(request):
     """
      Relatório Técnico - Relatório de Patrimônio por tipo de equipamento.
-    
+
     """
     return TemplateResponse(request, 'patrimonio/por_tipo_equipamento2.html')
 
@@ -1546,14 +1544,14 @@ def por_tipo_equipamento2(request):
 def ajax_abre_arvore_tipo(request):
     ret = []
     if request.GET.get('id'):
-        id = request.GET.get('id')
+        tipo_id = request.GET.get('id')
         model = request.GET.get('model')
         if model == 'tipoequipamento':
-            for e in TipoEquipamento.objects.get(id=id).equipamento_set.all():
+            for e in TipoEquipamento.objects.get(id=tipo_id).equipamento_set.all():
                 ret.append({'data': e.descricao,
                             'attr': {'style': 'padding-top:4px;', 'o_id': e.id, 'o_model': e._meta.model_name}})
         elif model == 'equipamento':
-            patrimonios = list(Equipamento.objects.get(id=id).patrimonio_set.all())
+            patrimonios = list(Equipamento.objects.get(id=tipo_id).patrimonio_set.all())
             try:
                 patrimonios.sort(key=lambda x: x.historico_atual.endereco.end.entidade.sigla)
             except:
@@ -1619,7 +1617,7 @@ def ajax_abre_arvore_tipo(request):
 def ajax_patrimonio_historico(request):
     """
     Retorna os dados de um Historico Atual dado o ID de um patrimonio.
-    
+
     Utilizado no PatrimonioAdminForm, ou seja, no form do admin - patrimonio.
     """
     patr_id = request.GET.get('id')
@@ -1649,9 +1647,9 @@ def ajax_patrimonio_historico(request):
 def planta_baixa_edit(request):
     """
      Relatório Técnico - Relatório de Planta baixa - racks.
-     
+
      Página para configurar o design de Planta baixa dos cages
-     
+
     """
     # Busca os endereços que possuem Racks no estadoAtivos
     locais = PlantaBaixaDataCenter.objects.all()
@@ -1688,7 +1686,7 @@ def planta_baixa_edit(request):
                 posicao = None
 
                 if post_posicao_id:
-                    # recuperando uma posição de objeto 
+                    # recuperando uma posição de objeto
                     posicao = PlantaBaixaPosicao.objects.get(id=post_posicao_id)
                     objeto = posicao.objeto
                 elif post_objeto_id:
@@ -1731,7 +1729,6 @@ def planta_baixa_edit(request):
     p_dc = request.GET.get('dc')
 
     dc = {}
-    dcs = []
     objetos = []
     if p_dc is not None and p_dc != 0:
         planta_datacenter = PlantaBaixaDataCenter.objects.get(id=p_dc)
@@ -1745,8 +1742,6 @@ def planta_baixa_edit(request):
         patrimonio_racks.sort(key=lambda x: x.historico_atual_prefetched.posicao_rack_letra, reverse=False)
         patrimonio_racks.sort(key=lambda x: x.historico_atual_prefetched.posicao_rack_numero, reverse=True)
 
-        fileiras = []
-        rack_anterior = None
         for rack in patrimonio_racks:
             posicao = ''
             objeto = ''
