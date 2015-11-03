@@ -1,4 +1,4 @@
-{% load proto_tags admin_static %}
+{% load proto_tags admin_static cache %}
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="{{ LANGUAGE_CODE }}" xml:lang="{{ LANGUAGE_CODE }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
 <head>
@@ -122,6 +122,7 @@ $(document).ajaxSend(function(event, xhr, settings) {
 {% block header %}
         <!-- Header -->
     {% if not is_popup %}
+        {% cache 500 base-html-header request.user.username %}
         <div id="header">
             <div class="header-content">
                 <div id="branding" class="header-logo">
@@ -178,6 +179,7 @@ $(document).ajaxSend(function(event, xhr, settings) {
                 {% endif %}
     	   </div>
         </div><!-- END HEADER -->
+        {% endcache %}
     {% endif %}
 {% endblock %}
 <!-- END Header -->
@@ -232,12 +234,14 @@ $(document).ajaxSend(function(event, xhr, settings) {
     {% endif %}
 	{% block abas %}
         {% if not is_popup %}
-        	<div class="content-abas">
-        		<h2>Módulos</h2>
-        		{{ menu_type }}
-        		{% load tree_menu_tags %}
-                {% show_menu "root" "ordered-list" %}
-        	</div>
+            {% cache 500 base-html-modulos request.user.username %}
+            	<div class="content-abas">
+            		<h2>Módulos</h2>
+            		{{ menu_type }}
+            		{% load tree_menu_tags %}
+                    {% show_menu "root" "ordered-list" %}
+            	</div>
+            {% endcache %}
         {% endif %}
 	{% endblock %}
 	{% block breadcrumbs %}
