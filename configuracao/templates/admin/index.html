@@ -15,6 +15,7 @@
 
 
 <div id="content-actions">
+    {% comment %}
 	<!-- <h2>{% trans 'Recent Actions' %}</h2> -->
         <h3>{% trans 'My Actions' %}</h3>
             {% load log %}
@@ -35,19 +36,17 @@
             {% endfor %}
             </ul>
             {% endif %}
+    {% endcomment %}
 </div>
 {% endblock %}
+<p></p>
+{% comment %}
 <span class="slide-btn"><a href="#" class="btn-slide-actions">Ações recentes</a></span> 
-
+{% endcomment %}
 {% block content_title %}{% if title %}<h1>{{ title }}</h1>{% endif %}{% endblock %} 
-
-
 
 <!-- RELATORIOS E MODULOS -->
 <div class="content-main">
-
-	
-	
 	<!-- RELATORIOS - INICIO -->
 	<div class="content-relatorios">
 			{% lista_relatorios %}
