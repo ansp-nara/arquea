@@ -43,7 +43,7 @@ class Estado(models.Model):
 
 
 class Tipo(models.Model):
-    
+
     # Declaração de variáveis estáticas
     CONSIGNADO = 23
     """
@@ -125,10 +125,10 @@ class Patrimonio(models.Model):
 
     def save(self, *args, **kwargs):
         super(Patrimonio, self).save(*args, **kwargs)
-        
+
 #       ROGERIO: COMENTANDO O CODIGO DE SALVAMENTO DE HISTORICOS NO FILHO
 #       DEVIDO A INCONCISTENCIA NO CASO DE UPDATE DO HISTORICO ATUAL DO PATRIMONIO
-        
+
 #         # fazendo a busca do historico atual, pois está em cache
 #         # e esta requisição pode ter mudado este valor
 #         ht = self.historicolocal_set.order_by('-data', '-id')
@@ -140,7 +140,7 @@ class Patrimonio(models.Model):
 #         # Se não estiverem, cria um novo histórico de endereço para todos os filhos
 #         if Patrimonio.objects.filter(patrimonio=self).exists():
 #             filhos = Patrimonio.objects.filter(patrimonio=self)
-#             
+#
 #             for filho in filhos:
 #                 # Rogerio: se não tiver endereço, não faz nada com os patrimonios filhos,
 #                 # já que não podemos remover os endereços
@@ -151,7 +151,7 @@ class Patrimonio(models.Model):
 #                         (self_historico_atual.endereco != filho.historico_atual.endereco) or \
 #                         (self_historico_atual.posicao != filho.historico_atual.posicao) or \
 #                         (self_historico_atual.data > filho.historico_atual.data):
-#                         
+#
 #                         novoHistorico = HistoricoLocal.objects.create(memorando=self_historico_atual.memorando,
 #                                                        patrimonio=filho,
 #                                                        endereco=self_historico_atual.endereco,
@@ -175,7 +175,7 @@ class Patrimonio(models.Model):
         if self.equipamento_id:
             retorno = self.equipamento.modelo
         return retorno
- 
+
     @property
     def part_number(self):
         retorno = ''
@@ -194,21 +194,22 @@ class Patrimonio(models.Model):
     def historico_atual_prefetched(self):
         """
         Utilizar este método ao invés de historico_atual se for feito o prefetch_related antecipadamente.
-        Em caso de dúvida, ou se não for utilizado o prefetch, utilizar o método historico_atual, pois 
+        Em caso de dúvida, ou se não for utilizado o prefetch, utilizar o método historico_atual, pois
         o tempo de execução deste método será o dobro do normal.
-        
+
         Exemplo de utilização, com prefetch_related:
             from django.db.models import Prefetch
             Patrimonio.objects.all().prefetch_related(Prefetch('historicolocal_set',
             queryset=HistoricoLocal.objects.select_related('k')))
         """
-        # ht = self.historicolocal_set.order_by('-data', '-id')
         # ht = sorted(self.historicolocal_set.all(), key=lambda x: x.id, reverse=True)
-        ht = sorted(self.historicolocal_set.all(), key=lambda x: x.data, reverse=True)
-        if not ht: 
+        ht = sorted(self.historicolocal_set.all(), key=lambda x: x.id, reverse=True)
+        ht = sorted(ht, key=lambda x: x.data, reverse=True)
+
+        if not ht:
             return None
         return ht[0]
-    
+
     def posicao(self):
         ht = self.historico_atual
         if not ht:
@@ -243,7 +244,7 @@ class Patrimonio(models.Model):
             tamanho = self.tamanho
         else:
             tamanho = 0
-            
+
         # calculando a altura em furos
         tam = int(round(tamanho * 3))
         return tam * self.U_TO_PX / 3.0
@@ -253,7 +254,7 @@ class Patrimonio(models.Model):
             tamanho = self.tamanho
         else:
             tamanho = 0
-            
+
         # calculando a altura em furos
         tam = int(round(tamanho * 3))
         return tam * self.U_TO_PT / 3.0
@@ -273,20 +274,20 @@ class Patrimonio(models.Model):
                 # Configurando como 42Us ou 126 furos
                 rack_altura = 126
             pos = self.historico_atual_prefetched.posicao_furo - 1
-        
+
             if self.tamanho:
                 tamanho = self.tamanho
             else:
                 tamanho = 0
-                
+
             # calculando a altura em furos
             tam = int(round(tamanho * 3))
-            
+
             # calculando a posição em pixels
             eixoY = int(round(((rack_altura - pos - tam) * self.U_TO_PX) / 3.0)) - 5.0
         
         return eixoY
-    
+
     def eixoy_em_pt(self):
         return (self.eixoy_em_px() / self.U_TO_PX * self.U_TO_PT) + 5.0
 
@@ -295,7 +296,7 @@ class Patrimonio(models.Model):
         flag_traseiro = False
         if self.historico_atual_prefetched.posicao_colocacao in ('TD', 'TE', 'T', 'T01', 'T02', 'T03'):
             flag_traseiro = True
-            
+
         return flag_traseiro
 
     # Verifica se o patrimonio é uma régua de tomadas lateral
@@ -353,7 +354,7 @@ class PatrimonioRack(Patrimonio):
             # ISSO É UM PROBLEMA DE DADOS INVÁLIDOS. PRECISA SER TRATADO
             rack_altura = 126
         return rack_altura
-        
+
     class Meta:
         proxy = True
 
@@ -379,7 +380,6 @@ class HistoricoLocal(models.Model):
 
     # Retorna a data o patrimônio e o endereco.
     def __unicode__(self):
-        
         return u'%s - %s | %s' % (self.data.strftime('%d/%m/%Y'), self.patrimonio, self.endereco or '')
 
     # Define a descrição do modelo e a ordenação dos dados pelo campo 'nome'.
@@ -394,7 +394,7 @@ class HistoricoLocal(models.Model):
         retorno = None
         if self.posicao:
             rack_str = self.posicao.split('.')
-            
+
             if len(rack_str) == 1:
                 rack_str = self.posicao.split('-')
 
@@ -407,7 +407,7 @@ class HistoricoLocal(models.Model):
         retorno = None
         if self.posicao:
             rack_str = self.posicao.split('.')
-            
+
             if len(rack_str) == 1:
                 rack_str = self.posicao.split('-')
 
@@ -415,9 +415,9 @@ class HistoricoLocal(models.Model):
                 eixoLetra = re.findall(r'[a-zA-Z]+', rack_str[0])
                 if len(eixoLetra) == 1:
                     retorno = eixoLetra[0]
-                    
+
         return retorno
-    
+
     @cached_property
     def posicao_rack_numero(self):
         retorno = None
@@ -425,13 +425,13 @@ class HistoricoLocal(models.Model):
             rack_str = self.posicao.split('.')
             if len(rack_str) == 1:
                 rack_str = self.posicao.split('-')
-                
+
             if len(rack_str) >= 2:
                 eixoNumero = re.findall(r'\d+', rack_str[0])
                 if len(eixoNumero) == 1:
                     retorno = eixoNumero[0]
         return retorno
-        
+
     @cached_property
     def posicao_furo(self):
         retorno = -1
@@ -450,14 +450,14 @@ class HistoricoLocal(models.Model):
                         pos_str = furo_str[1].split('-')
                         if len(pos_str) > 1:
                             retorno = int(pos_str[0])
-        
+
         return retorno
 
     @cached_property
     def posicao_colocacao(self):
         retorno = None
         if self.posicao:
-            # verifica se é possível recuperar a posição TD de uma string como R042.F085.TD ou R042.F085-TD 
+            # verifica se é possível recuperar a posição TD de uma string como R042.F085.TD ou R042.F085-TD
             furo_str = self.posicao.split('.F')
             if len(furo_str) >= 2:
                 pos_str = furo_str[1].split('.')
@@ -467,7 +467,7 @@ class HistoricoLocal(models.Model):
                     pos_str = furo_str[1].split('-')
                     if len(pos_str) > 1:
                         retorno = pos_str[1]
-                        
+
             else:
                 # verifica se é possível recuperar a posição piso de uma string como R042.piso
                 pos_str = self.posicao.split('.')
@@ -478,10 +478,10 @@ class HistoricoLocal(models.Model):
                     pos_str = self.posicao.split('-')
                     if len(pos_str) == 2:
                         retorno = pos_str[1]
-            
+
         return retorno
 
-    
+
 class Direcao(models.Model):
     origem = models.CharField(max_length=15)
     destino = models.CharField(max_length=15)
@@ -518,7 +518,7 @@ class Distribuicao(models.Model):
 
 class UnidadeDimensao(models.Model):
     nome = models.CharField(max_length=15)
-    
+
     def __unicode__(self):
         return u'%s' % self.nome
 
@@ -560,7 +560,7 @@ class Equipamento(models.Model):
     tipo = models.ForeignKey('patrimonio.TipoEquipamento', null=True, blank=True)
     descricao = models.TextField(_(u'Descrição'))
     part_number = models.CharField(null=True, blank=True, max_length=50)
-    
+
     # TERMINADA A ASSOCIAÇÃO COM A ENTIDADE, DESABILITAR O CAMPO MARCA(CHARFIELD)
     # marca = models.CharField(_(u'Marca ou Editora'), null=True, blank=True, max_length=100)
     entidade_fabricante = models.ForeignKey('identificacao.Entidade', verbose_name=_(u'Marca/Editora'),
@@ -571,7 +571,7 @@ class Equipamento(models.Model):
     tamanho = models.DecimalField(u'Tamanho (em U)', max_digits=5, decimal_places=2, null=True, blank=True)
     dimensao = models.ForeignKey('patrimonio.Dimensao', null=True, blank=True)
     especificacao = models.FileField(u'Especificação', upload_to='patrimonio', null=True, blank=True)
-    
+
     imagem = models.ImageField(u'Imagem Frontal do equipamento', upload_to='patrimonio', null=True, blank=True)
     imagem_traseira = models.ImageField(u'Imagem Traseira do equipamento', upload_to='patrimonio',
                                         null=True, blank=True)
@@ -579,7 +579,7 @@ class Equipamento(models.Model):
     convencoes = models.ManyToManyField('patrimonio.Distribuicao', verbose_name=u'Convenções')
     titulo_autor = models.CharField(_(u'Título e autor'), null=True, blank=True, max_length=100)
     isbn = models.CharField(_(u'ISBN'), null=True, blank=True, max_length=20)
-    
+
     # utilizado somente para carga de arquivos de especificação
     # url_equipamento = models.CharField(_(u'url_equipamento'), null=True, blank=True, max_length=200)
 
