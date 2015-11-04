@@ -3,6 +3,7 @@ from django.contrib import admin
 import operator
 from widgets import ForeignKeySearchInput
 from django.contrib.admin.widgets import AdminFileWidget
+from django.contrib.admin import RelatedFieldListFilter
 from django.db import models
 from django.db.models.query import QuerySet
 from django.http import HttpResponse, HttpResponseNotFound
@@ -30,7 +31,7 @@ class AutoCompleteAdmin(admin.ModelAdmin):
 
     def search(self, request):
         """
-        Searches in the fields of the given related model and returns the 
+        Searches in the fields of the given related model and returns the
         result as a simple string to be used by the jQuery Autocomplete plugin
         """
         query = request.GET.get('q', None)
@@ -122,15 +123,13 @@ class AdminImageWidget(AdminFileWidget):
         return mark_safe(u''.join(output))
 
 
-from django.contrib.admin import RelatedFieldListFilter
-
-
 class RelatedOnlyFieldListFilter(RelatedFieldListFilter):
     """
     Filtro reutilizável para o admin list_filter.
     OBS: - Não funciona para subatributos, ex: user__name
          - A ordenação deve estar especificada no Meta do Model
-    
+
+
     Usage:
         class MyAdmin(admin.ModelAdmin):
             list_filter = (
@@ -138,15 +137,33 @@ class RelatedOnlyFieldListFilter(RelatedFieldListFilter):
                 ('category', RelatedOnlyFieldListFilter),
                 # ...
             )
-        
-    Ref: 
+
+    Se for necessário utilizar o select_related é necessário sobrescrever o método get_select_related.
+    Utilizar da seguinte forma:
+
+        class MyAdmin(admin.ModelAdmin):
+            list_filter = (
+                ('user', type("UserRelatedOnlyFieldListFilter",
+                              (RelatedOnlyFieldListFilter, object),
+                              {"get_select_related": lambda self: "<user_field_name>"}),
+                # ...
+            )
+
+    Ref:
         http://stackoverflow.com/questions/12215751/can-i-make-list-filter-in-django-admin-to-only-show-referenced-foreignkeys
-    
+
     """
     def __init__(self, field, request, params, model, model_admin, field_path):
         super(RelatedOnlyFieldListFilter, self).__init__(
             field, request, params, model, model_admin, field_path)
+
         qs = field.related_field.model.objects.filter(
             id__in=model_admin.get_queryset(request).values_list(
                 field.name, flat=True).distinct())
+        if self.get_select_related():
+            qs = qs.select_related(self.get_select_related())
+
         self.lookup_choices = [(each.id, unicode(each)) for each in qs]
+
+    def get_select_related(self):
+        return None
