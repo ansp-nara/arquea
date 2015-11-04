@@ -6,6 +6,8 @@ from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import cached_property
 from django.core.urlresolvers import reverse
+from django.core.cache import cache
+from django.db.models.signals import post_save
 from dateutil.rrule import rrule, DAILY
 import calendar
 from protocolo.models import Feriado
@@ -83,6 +85,7 @@ class SindicatoArquivo(models.Model):
 
 
 class Membro(models.Model):
+    CACHE_KEY__CARGO_ATUAL = 'model_membro__cargo_atual_%d'
 
     """
     Uma instância dessa classe representa um membro de uma equipe.
@@ -132,13 +135,17 @@ class Membro(models.Model):
     # cargo atual do membro, caso exista, a partir do histórico
     @property
     def cargo_atual(self):
-        # cargos = [h.cargo.nome for h in Historico.ativos.filter(membro=self).select_related('cargo')
-        # .only('cargo__nome')]
-        cargos = []
-        for h in self.historico_set.all():
-            if h.termino is None:
-                cargos.append(h.cargo.nome)
-        return ' - '.join(cargos)
+        retorno = cache.get(Membro.CACHE_KEY__CARGO_ATUAL % self.id)
+        if retorno is None:
+            cargos = []
+            for h in self.historico_set.all():
+                if h.termino is None:
+                    cargos.append(h.cargo.nome)
+            retorno = ' - '.join(cargos)
+
+            cache.set(Membro.CACHE_KEY__CARGO_ATUAL % self.id, retorno, 600)
+
+        return retorno
 
     # se o membro é atualmente funcionario
     @property
@@ -152,7 +159,7 @@ class Membro(models.Model):
     @cached_property
     def data_inicio(self):
         return Historico.objects.filter(membro=self).order_by('inicio').values_list('inicio')[0][0]
-    
+
     # Define a ordenação e unicidade dos dados.
     class Meta:
         ordering = ('nome', )
@@ -265,21 +272,21 @@ class Ferias(models.Model):
     def total_dias_uteis_aberto(self, membro_id):
         # Retorna o total de dias em aberto para o membro, em segundos
         total_dias_uteis_aberto = 0
-        
+
         ferias = Ferias.objects.filter(membro=membro_id)
-        
+
         for f in ferias:
             controles = ControleFerias.objects.filter(ferias=f).select_related().order_by('inicio')
-            
+
             for c in controles:
                 if c.dias_uteis_aberto and c.dias_uteis_aberto > 0:
                     total_dias_uteis_aberto = total_dias_uteis_aberto + c.dias_uteis_aberto
-                    
+
                 if c.dias_uteis_fato:
                     total_dias_uteis_aberto = total_dias_uteis_aberto - c.dias_uteis_fato
 
         return total_dias_uteis_aberto * 8 * 60 * 60
-    
+
     # Define a descrição do modelo, ordenação e a unicidade dos dados.
     class Meta:
         verbose_name = _(u'Férias')
@@ -311,7 +318,7 @@ class ControleFerias(models.Model):
         if self.dias_uteis_fato > 0:
             is_ferias = is_ferias or (self.inicio <= dia <= self.termino)
         return is_ferias
-    
+
     def __unicode__(self):
         return u"%s - %s" % (self.inicio, self.termino)
 
@@ -341,14 +348,14 @@ class DispensaLegal(models.Model):
     realizada = models.BooleanField(_(u'Já realizada?'), default=False)
     atestado = models.BooleanField(_(u'Há atestado?'), default=False)
     arquivo = models.FileField(upload_to='dispensas/', null=True, blank=True)
-    
+
     dias_corridos = models.IntegerField(_(u'Duração em dias corridos'), null=True, default=0)
     horas = models.IntegerField(_(u'Horas'), null=True, default=0)
     minutos = models.IntegerField(_(u'Minutos'), null=True, default=0)
 
     def __unicode__(self):
         return u"%s - %s" % (self.membro, self.justificativa)
-    
+
     @cached_property
     def termino_realizada(self):
         """
@@ -356,29 +363,29 @@ class DispensaLegal(models.Model):
         Leva em conta os feriados.
         """
         soma_dias = 0
-        
+
         if self.realizada and self.inicio_realizada:
-        
+
             if self.dias_corridos:
                 soma_dias += self.dias_corridos
             if self.horas:
                 soma_dias += self.horas / 8.0
             if self.minutos:
                 soma_dias += self.minutos / 60.0
-            
+
             if self.dias_corridos >= 1:
                 return self.inicio_realizada + timedelta(soma_dias - 1)
-            
+
         return self.inicio_realizada
-   
+
     def dia_dispensa(self, dia):
         is_dispensa = False
         horas_dispensa = 0
 
         if self.realizada and self.inicio_realizada:
-    
+
             is_dispensa = self.inicio_realizada <= dia <= self.termino_realizada
-            
+
             if is_dispensa:
                 if self.termino_realizada == dia:
                     if self.horas or self.minutos:
@@ -392,7 +399,7 @@ class DispensaLegal(models.Model):
                     horas_dispensa = 8.0
                 elif dia > self.termino_realizada:
                     horas_dispensa = 0
-                
+
         return {'is_dispensa': is_dispensa, 'horas': horas_dispensa}
 
     class Meta:
@@ -509,17 +516,25 @@ class Historico(models.Model):
 
     objects = models.Manager()
     ativos = AtivoManager()
- 
+
     def __unicode__(self):
         return u'%s - %s' % (self.membro.nome, self.cargo.nome)
 
     def ativo(self):
         return self.termino is None
-    
+
     class Meta:
         ordering = ('-inicio',)
         verbose_name = _(u'Histórico')
         verbose_name_plural = _(u'Históricos')
+
+
+def historico_post_save_signal(sender, instance, **kwargs):
+    # Post-save signal do Historico do Membro para limpar o cache do Membro.cargo_atual
+    cache.delete(Membro.CACHE_KEY__CARGO_ATUAL % instance.membro_id)
+
+# Registrando o sinal
+post_save.connect(historico_post_save_signal, sender=Historico, dispatch_uid="historico_post_save")
 
 
 class Arquivo(models.Model):
@@ -749,10 +764,10 @@ class ItemControle:
     is_feriado = False
     is_dispensa = False
     is_ferias = False
-    
+
     def almoco(self):
         return 0
-   
+
     def __unicode__(self):
         return u'%s' % (self.dia)
 
