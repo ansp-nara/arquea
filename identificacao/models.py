@@ -207,7 +207,7 @@ class Entidade(models.Model):
         return self.sigla
     
     def sigla_completa(self):
-        if self.entidade:
+        if self.entidade_id:
             return u'%s - %s' % (self.entidade.sigla_completa(), self.sigla)
         else:
             return u'%s' % self.sigla
@@ -215,7 +215,7 @@ class Entidade(models.Model):
 
     # Retorna a sigla com 4 espaços iniciais para cada nível de entidade pai
     def sigla_tabulada(self):
-        if self.entidade:
+        if self.entidade_id:
             entidade_pai = self.entidade.sigla_tabulada()
             # substitui qualquer string que não inicia com espaços por quatro espaços
             retorno = re.sub('[^\s]+.+', '    ', entidade_pai)
