@@ -1,15 +1,19 @@
 # -*- coding: utf-8 -*-
 
 import datetime
-from django.db import models
-from utils.functions import formata_moeda
 from dateutil.relativedelta import *
-from django.utils.translation import ugettext_lazy as _
 from decimal import Decimal
-from identificacao.models import Entidade
+from django.db import models
+from django.utils.translation import ugettext_lazy as _
+from django.core.cache import cache
 from django.contrib.auth.models import User
 from django.db.models import Q
+from django.db.models.signals import post_save
 from django.templatetags.static import static
+
+from identificacao.models import Identificacao, Entidade
+from outorga.models import Termo
+from utils.functions import formata_moeda
 
 import logging
 
@@ -97,6 +101,8 @@ class TipoFeriado(models.Model):
 
 
 class Feriado(models.Model):
+    
+    CACHE_KEY_FERIADOS = 'model_protocolo__feriados'
 
     """
     Uma instância desta classe diz que essa data é um feriado. Caso seja móvel, 
@@ -119,23 +125,28 @@ class Feriado(models.Model):
     # Define um método da classe que verifica se uma data é feriado.
     @staticmethod
     def dia_de_feriado(data):
-        dm = Feriado.objects.all().filter(feriado=data).exists()
-        
-        return dm
-    
+        feriados = cache.get(Feriado.CACHE_KEY_FERIADOS)
+        if feriados is None:
+            feriados = []
+            for f in Feriado.objects.all():
+                feriados.append(f.feriado)
+            cache.set(Feriado.CACHE_KEY_FERIADOS, feriados, 600)
+
+        return data in feriados
+
     @staticmethod
     def get_dia_de_feriado(data):
-        feriado_existe = Feriado.objects.filter(feriado=data).exists()
-        
+        feriado_existe = Feriado.dia_de_feriado(data)
+
         if feriado_existe:
             dm = Feriado.objects.filter(feriado=data).select_related('tipo')
             if len(dm) > 1:
                 raise ValueError("Há mais de um feriado em um único dia.")
-            
+
             if len(dm) == 1:
                 return dm.filter()[:1].get()
         else:
-            return None 
+            return None
 
     def get_movel(self):
         return self.tipo.movel
@@ -152,6 +163,13 @@ class Feriado(models.Model):
     # Define a ordenação da visualização dos dados.
     class Meta:
         ordering = ('feriado', )
+
+def feriado_post_save_signal(sender, instance, **kwargs):
+    # Post-save signal do Feriado para limpar o cache dos Feriados
+    cache.delete(Feriado.CACHE_KEY_FERIADOS)
+
+# Registrando o sinal
+post_save.connect(feriado_post_save_signal, sender=Feriado, dispatch_uid="feriado_post_save")
 
 
 class Protocolo(models.Model):
