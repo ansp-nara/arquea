@@ -112,9 +112,7 @@ class PagamentoAdminForm(forms.ModelForm):
 
         if self.fields.has_key('membro'):
             self.fields['membro'].choices = [('','---------')] + \
-                                            [(p.id, p.__unicode__()) for p in Membro.objects.all()
-                                                .prefetch_related('historico_set', 'historico_set__cargo')
-                                                .order_by('nome')]
+                                            [(p.id, p.__unicode__()) for p in Membro.objects.all().order_by('nome')]
         
         # mensagens de erro
         self.fields['protocolo'].error_messages['required'] = u'O campo PROTOCOLO é obrigatório'
