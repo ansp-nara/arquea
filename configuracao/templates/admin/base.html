@@ -122,51 +122,52 @@ $(document).ajaxSend(function(event, xhr, settings) {
 {% block header %}
         <!-- Header -->
     {% if not is_popup %}
-        {% cache 500 base-html-header request.user.username %}
         <div id="header">
             <div class="header-content">
-                <div id="branding" class="header-logo">
-                    {% block branding %}
-                    {% endblock %}
-                </div>
-    			<div class="header-sites">
-    				<ul>
-    					<li><span class="meta-label2">Sites:</span></li>
-    					<li><a href="http://www.ansp.br" target="_blank">Rede ANSP</a></li>
-    					<li><span class="meta-sep2">/</span></li>
-    					<li><a href="http://intranet.ansp.br/" target="_blank">Intranet NARA</a></li>
-    					<li><span class="meta-sep2">/</span></li>
-    					<li><a href="http://diariodebordo.ansp.br/" target="_blank">Diário de Bordo</a></li>
-    					<li><span class="meta-sep2">/</span></li>
-    					<li><a href="http://www.fapesp.br" target="_blank">FAPESP</a></li>
-    				</ul>			
-    			</div>
-    			
-    			{% if user.is_active and user.is_staff %}
-        			<div id="user-tools">
+                {% cache 500 base-html-header request.user.username %}
+                    <div id="branding" class="header-logo">
+                        {% block branding %}
+                        {% endblock %}
+                    </div>
+        			<div class="header-sites">
         				<ul>
-        				<li class="username">{% trans 'Welcome,' %}<strong> {% filter force_escape %}{% firstof user.first_name user.username %}{% endfilter %}</strong></li>
-        				{% block userlinks %}
-                            <li >{% controle_horario user %}</li>
-        					{% url 'admin:password_change' as password_change_url %}
-        					{% if password_change_url %}
-        					   <li><a class="change-pass" href="{{ password_change_url }}">
-        					{% else %}
-        					   <li><a class="change-pass" href="{{ root_path }}password_change/">
-        					{% endif %}
-        					{% trans 'Change password' %}</a></li>
-        					{% url 'django_cas_ng.views.logout' as logout_url %}
-        					{% if logout_url %}
-        					   <li><a class="sair" href="{{ logout_url }}">
-        					{% else %}
-        					   <li><a class="sair" href="{% url 'admin:logout' %}">
-        					{% endif %}
-        					{% trans 'Log out' %}</a></li>
-        				{% endblock %}
-        				</ul>
+        					<li><span class="meta-label2">Sites:</span></li>
+        					<li><a href="http://www.ansp.br" target="_blank">Rede ANSP</a></li>
+        					<li><span class="meta-sep2">/</span></li>
+        					<li><a href="http://intranet.ansp.br/" target="_blank">Intranet NARA</a></li>
+        					<li><span class="meta-sep2">/</span></li>
+        					<li><a href="http://diariodebordo.ansp.br/" target="_blank">Diário de Bordo</a></li>
+        					<li><span class="meta-sep2">/</span></li>
+        					<li><a href="http://www.fapesp.br" target="_blank">FAPESP</a></li>
+        				</ul>			
         			</div>
-    			{% endif %}
-    			{% block nav-global %}{% endblock %}
+        			
+        			{% if user.is_active and user.is_staff %}
+            			<div id="user-tools">
+            				<ul>
+            				<li class="username">{% trans 'Welcome,' %}<strong> {% filter force_escape %}{% firstof user.first_name user.username %}{% endfilter %}</strong></li>
+            				{% block userlinks %}
+                                <li >{% controle_horario user %}</li>
+            					{% url 'admin:password_change' as password_change_url %}
+            					{% if password_change_url %}
+            					   <li><a class="change-pass" href="{{ password_change_url }}">
+            					{% else %}
+            					   <li><a class="change-pass" href="{{ root_path }}password_change/">
+            					{% endif %}
+            					{% trans 'Change password' %}</a></li>
+            					{% url 'django_cas_ng.views.logout' as logout_url %}
+            					{% if logout_url %}
+            					   <li><a class="sair" href="{{ logout_url }}">
+            					{% else %}
+            					   <li><a class="sair" href="{% url 'admin:logout' %}">
+            					{% endif %}
+            					{% trans 'Log out' %}</a></li>
+            				{% endblock %}
+            				</ul>
+            			</div>
+        			{% endif %}
+        			{% block nav-global %}{% endblock %}
+                {% endcache %}
     
                 {% if messages %}
                     <ul class="messagelist">
@@ -179,7 +180,6 @@ $(document).ajaxSend(function(event, xhr, settings) {
                 {% endif %}
     	   </div>
         </div><!-- END HEADER -->
-        {% endcache %}
     {% endif %}
 {% endblock %}
 <!-- END Header -->
