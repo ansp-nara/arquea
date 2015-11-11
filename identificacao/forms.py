@@ -30,9 +30,9 @@ class ContatoAdminForm(forms.ModelForm):
 
     # Verifica se os e-mail são válidos.
     def clean_email(self):
-        
+
         value = self.cleaned_data['email']
-        
+
         if not value:
             return value
         emails = [e.strip() for e in value.split(',')]
@@ -66,7 +66,7 @@ class EnderecoDetalheAdminForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(EnderecoDetalheAdminForm, self).__init__(*args, **kwargs)
-        
+
         # Adicionando link para o label do campo de Tipo de Conector
         self.fields['endereco'].label = mark_safe('<a href="#" onclick="window.open(\'/admin/identificacao/endereco/\''
                                                   '+$(\'#id_endereco\').val() + \'/\', \'_blank\');return true;">%s</a>'
@@ -74,6 +74,17 @@ class EnderecoDetalheAdminForm(forms.ModelForm):
         self.fields['detalhe'].label = mark_safe('<a href="#" onclick="window.open(\'/admin/identificacao/endereco'
                                                  'detalhe/\'+$(\'#id_detalhe\').val() + \'/\', \'_blank\');return true;'
                                                  '">%s</a>' % self.fields['detalhe'].label)
+
+        # Populando campos
+        entidade_ids = Endereco.objects.all().values('entidade')
+
+        self.fields['entidade'].choices = [('', '---------')] + \
+                                          [(p.id, p.__unicode__()) for p in Entidade.objects.all().filter(id__in=entidade_ids)]
+        self.fields['endereco'].choices = [('', '---------')] + \
+                                          [(p.id, p.__unicode__()) for p in Endereco.objects.all().select_related('entidade')]
+        self.fields['detalhe'].choices = [('', '---------')] + \
+                                          [(p.id, p.__unicode__()) for p in EnderecoDetalhe.objects.all()
+                                           .select_related('detalhe__endereco__entidade__sigla', 'endereco__entidade__sigla')]
 
     def clean(self):
         cleaned_data = self.cleaned_data
@@ -89,7 +100,39 @@ class EnderecoDetalheAdminForm(forms.ModelForm):
 
     class Meta:
         model = EnderecoDetalhe
-        fields = ['entidade', 'endereco', 'detalhe', 'tipo', 'complemento',]
+        fields = ['entidade', 'endereco', 'detalhe', 'tipo', 'complemento']
 
     class Media:
         js = ('js/selects.js',)
+
+
+class AcessoAdminForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super(AcessoAdminForm, self).__init__(*args, **kwargs)
+
+        self.fields['identificacao'].choices = [('', '---------')] + \
+                                               [(p.id, p.__unicode__()) for p in Identificacao.objects.all()
+                                                .select_related('endereco__entidade', 'contato')
+                                                .order_by('endereco__entidade__sigla', 'area', 'contato__primeiro_nome')]
+
+        self.fields['detalhe'].choices = [(p.id, p.__unicode__()) for p in EnderecoDetalhe.objects.all()
+                                          .select_related('endereco__entidade', 'detalhe__endereco__entidade')]
+
+    class Meta:
+        model = Acesso
+        fields = ['identificacao', 'niveis', 'liberacao', 'encerramento', 'obs', 'detalhe']
+
+
+class EnderecoDetalheInlineAdminForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super(EnderecoDetalheInlineAdminForm, self).__init__(*args, **kwargs)
+
+        self.fields['detalhe'].choices = [('', '---------')] + \
+                                         [(p.id, p.__unicode__()) for p in EnderecoDetalhe.objects.all()
+                                          .select_related('endereco__entidade', 'detalhe__endereco__entidade')]
+
+    class Meta:
+        model = EnderecoDetalhe
+        fields = ['tipo', 'complemento', 'detalhe', 'mostra_bayface']

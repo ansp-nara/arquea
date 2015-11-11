@@ -8,6 +8,7 @@ from ckeditor.widgets import CKEditorWidget
 from tinymce.widgets import TinyMCE
 
 from utils import widgets
+from identificacao.models import Identificacao
 from models import *
 
 
@@ -18,6 +19,13 @@ class MemorandoRespostaForm(forms.ModelForm):
                                 widget=TinyMCE(attrs={'cols': 160, 'rows': 180}, mce_attrs={'height': 500}))
     memorando = forms.ModelChoiceField(MemorandoFAPESP.objects.all(), label=u'Memorando FAPESP',
                                        widget=forms.Select(attrs={'onchange': 'ajax_filter_perguntas(this.value);'}))
+
+    def __init__(self, *args, **kwargs):
+        super(MemorandoRespostaForm, self).__init__(*args, **kwargs)
+
+        self.fields['identificacao'].choices = [('', '---------')] + \
+                                  [(p.id, p.__unicode__()) for p in Identificacao.objects.all()
+                                   .select_related('endereco__entidade', 'contato')]
 
     class Meta:
         model = MemorandoResposta
@@ -56,7 +64,9 @@ class MemorandoSimplesForm(forms.ModelForm):
 
 
 class CorpoAdminForm(forms.ModelForm):
-    pergunta = forms.ModelChoiceField(Pergunta.objects.all(), label=_(u'Pergunta'),
+    # MemorandoResposta - corpo de cada pergunta/resposta do memorando
+    pergunta = forms.ModelChoiceField(Pergunta.objects.all().select_related('memorando'),
+                                      label=_(u'Pergunta'),
                                       widget=forms.Select(attrs={'onchange': 'ajax_select_pergunta(this.id);'}))
     perg = forms.CharField(label='Texto da pergunta', widget=widgets.PlainTextWidget, required=False)
     resposta = forms.CharField(label='Resposta',
@@ -71,7 +81,7 @@ class CorpoAdminForm(forms.ModelForm):
         if data:
             pergunta_id = data.get('pergunta')
             if pergunta_id:
-                pgta = Pergunta.objects.get(id=pergunta_id)
+                pgta = Pergunta.objects.select_related('memorando').get(id=pergunta_id)
                 self.fields['perg'].initial = pgta.questao
         elif instance and hasattr(instance, 'pergunta'):
             self.fields['perg'].initial = instance.pergunta.questao
@@ -85,7 +95,7 @@ class CorpoAdminForm(forms.ModelForm):
 
 
 class BaseCorpoInlineFormSet(BaseInlineFormSet):
-    
+    # MemorandoResposta - corpo de cada pergunta/resposta do memorando
     def __init__(self, data=None, files=None, instance=None,
                  save_as_new=False, prefix=None, queryset=None):
 
@@ -97,19 +107,19 @@ class BaseCorpoInlineFormSet(BaseInlineFormSet):
             if memorando_id:
                 m = MemorandoFAPESP.objects.get(id=memorando_id)
                 for f in self.forms:
-                    f.fields['pergunta'].queryset = Pergunta.objects.filter(memorando=m)
-                self.empty_form.fields['pergunta'].queryset = Pergunta.objects.filter(memorando=m)
+                    f.fields['pergunta'].queryset = Pergunta.objects.select_related('memorando').filter(memorando=m)
+                self.empty_form.fields['pergunta'].queryset = Pergunta.objects.select_related('memorando').filter(memorando=m)
 
         elif instance and hasattr(instance, 'memorando'):
             m = instance.memorando
             for f in self.forms:
-                f.fields['pergunta'].queryset = Pergunta.objects.filter(memorando=m)
-            self.empty_form.fields['pergunta'].queryset = Pergunta.objects.filter(memorando=m)
+                f.fields['pergunta'].queryset = Pergunta.objects.select_related('memorando').filter(memorando=m)
+            self.empty_form.fields['pergunta'].queryset = Pergunta.objects.select_related('memorando').filter(memorando=m)
 
         else:
             for f in self.forms:
                 f.fields['pergunta'].queryset = Pergunta.objects.none()
             self.empty_form.fields['pergunta'].queryset = Pergunta.objects.none()
-                
+
 CorpoFormSet = inlineformset_factory(MemorandoResposta, Corpo, formset=BaseCorpoInlineFormSet,
                                      fields=['pergunta', 'resposta', 'anexo', 'concluido'])

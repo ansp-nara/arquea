@@ -62,7 +62,7 @@ class TipoDetalhe(models.Model):
 
 
 class EnderecoDetalhe(models.Model):
-    endereco = models.ForeignKey('identificacao.Endereco', limit_choices_to={'data_inatividade__isnull':True},
+    endereco = models.ForeignKey('identificacao.Endereco', limit_choices_to={'data_inatividade__isnull': True},
                                  null=True, blank=True)
     tipo = models.ForeignKey('identificacao.TipoDetalhe')
     complemento = models.TextField()
@@ -76,10 +76,10 @@ class EnderecoDetalhe(models.Model):
         if self.endereco is not None and self.detalhe is not None:
             return
         self.ordena = self.__unicode__()
-        super(EnderecoDetalhe, self).save(*args,**kwargs)
+        super(EnderecoDetalhe, self).save(*args, **kwargs)
 
     def __unicode__(self):
-        if self.endereco:
+        if self.endereco_id:
             return u'%s - %s' % (self.endereco, self.complemento)
         else:
             return u'%s - %s' % (self.detalhe, self.complemento)
@@ -104,12 +104,12 @@ class EnderecoDetalhe(models.Model):
         elif self.detalhe_id:
             # Se pertencer a outro EnderecoDetalhe, tenta navegar para pegar o endereço pai
             retorno = self.detalhe.entidade()
-            
+
         return retorno
 
     @property
     def end(self):
-        if self.endereco: 
+        if self.endereco:
             return self.endereco
         return self.detalhe.end
 
@@ -190,7 +190,7 @@ class Entidade(models.Model):
     A unicidade dos dados é feita através do campo 'sigla'.
     """
     TERREMARK_ID = 1
-    
+
     entidade = models.ForeignKey('identificacao.Entidade', verbose_name=_(u'Faz parte de'), null=True, blank=True,
                                  related_name='entidade_em')
     nome = models.CharField(_(u'Nome'), max_length=255,
@@ -205,7 +205,7 @@ class Entidade(models.Model):
     # Retorna a sigla.
     def __unicode__(self):
         return self.sigla
-    
+
     def sigla_completa(self):
         if self.entidade_id:
             return u'%s - %s' % (self.entidade.sigla_completa(), self.sigla)
@@ -302,7 +302,7 @@ class TipoArquivoEntidade(models.Model):
 
     def __unicode__(self):
         return self.nome
-  
+
     class Meta:
         ordering = ('nome',)
 
@@ -312,7 +312,7 @@ class ArquivoEntidade(models.Model):
     entidade = models.ForeignKey('identificacao.Entidade')
     data = models.DateField()
     tipo = models.ForeignKey('identificacao.TipoArquivoEntidade')
-  
+
     def __unicode__(self):
         return u'%s - %s' % (self.entidade.sigla, self.arquivo.name)
 
@@ -322,7 +322,7 @@ class ArquivoEntidade(models.Model):
 
 class TipoEntidade(models.Model):
     nome = models.CharField(max_length=100)
-    
+
     def __unicode__(self):
         return self.nome
 
@@ -371,9 +371,10 @@ class Acesso(models.Model):
     def lista_niveis(self):
         lista = ', '.join([n.nome for n in self.niveis.all()])
         return lista
+    lista_niveis.short_description = 'Nivel de acesso'
 
 
-class NivelAcesso(models.Model): 
+class NivelAcesso(models.Model):
     nome = models.CharField(max_length=50)
     explicacao = models.TextField('Explicação')
 
@@ -400,7 +401,7 @@ class Ecossistema(models.Model):
     inscricoes_aceitas = models.IntegerField(u'Número de inscrições aceitas', null=True, blank=True)
     comentarios = models.TextField(u'Comentários', null=True, blank=True)
     hotel = models.BooleanField(u'Quer hotel?', default=False)
-    
+
     contato_pat = models.BooleanField(u'Contato para patrocínio?', default=False)
     vip = models.BooleanField(default=False)
     chaser = models.CharField(max_length=40, null=True, blank=True)
@@ -419,8 +420,8 @@ class Permission(models.Model):
         # remover as permissões padrões, pois essa é uma classe para configurar permissões customizadas
         default_permissions = ()
         permissions = (
-            ("rel_adm_agenda", "Rel. Adm. - Agenda"), # /identificacao/agenda
-            ("rel_adm_ecossistema", "Rel. Adm. - Ecossistema"), # /identificacao/ecossistema/par
+            ("rel_adm_agenda", "Rel. Adm. - Agenda"),  # /identificacao/agenda
+            ("rel_adm_ecossistema", "Rel. Adm. - Ecossistema"),  # /identificacao/ecossistema/par
             # movido de relatorio tecnico para administrativo
-            ("rel_tec_arquivos", "Rel. Adm. - Documentos por entidade"), # /identificacao/relatorios/arquivos
+            ("rel_tec_arquivos", "Rel. Adm. - Documentos por entidade"),  # /identificacao/relatorios/arquivos
         )

@@ -21,6 +21,7 @@ class MemorandoFAPESPAdmin(admin.ModelAdmin):
 
 
 class CorpoInline(admin.TabularInline):
+    # MemorandoResposta - corpo de cada pergunta/resposta do memorando
     fieldsets = ((None, {'fields': ('pergunta', 'perg', 'resposta', 'anexo', 'concluido')}),)
     form = CorpoAdminForm
     formset = CorpoFormSet

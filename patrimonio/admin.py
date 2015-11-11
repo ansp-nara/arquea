@@ -51,7 +51,7 @@ class PatrimonioEstadoListFilter(admin.SimpleListFilter):
         """
         if self.value() is None:
             return queryset
-        
+
         s_value = int(self.value())
         q = queryset.filter(historicolocal__estado_id=s_value).distinct()
 
@@ -82,7 +82,7 @@ class HistoricoLocalInline(admin.StackedInline):
 
 class PatrimonioAdmin(ExportMixin, admin.ModelAdmin):
     resource_class = PatrimonioResource
-    
+
     fieldsets = (
         ('Pagamento', {
             'fields': (('termo', 'npgto',), ('pagamento', 'valor',)),
@@ -108,7 +108,7 @@ class PatrimonioAdmin(ExportMixin, admin.ModelAdmin):
             'fields': ('form_filhos',),
         }),
     )
-    
+
     readonly_fields = ('marca', 'part_number', 'modelo')
     form = PatrimonioAdminForm
     change_list_template = 'admin/patrimonio/patrimonio/change_list.html'
@@ -151,14 +151,14 @@ class PatrimonioAdmin(ExportMixin, admin.ModelAdmin):
         modelo = ''
         if instance is not None and instance.equipamento is not None:
             modelo = instance.equipamento.modelo
-         
+
         return mark_safe("<span id='id_modelo' class='input_readonly'>"+modelo+"</span>")
-    
+
     def part_number(self, instance):
         part_number = ''
         if instance is not None and instance.equipamento is not None:
             part_number = instance.equipamento.part_number
-            
+
         return mark_safe("<span id='id_part_number' class='input_readonly'>"+part_number+"</span>")
 
     def action_clone(self, request, queryset):
@@ -186,11 +186,11 @@ class PatrimonioAdmin(ExportMixin, admin.ModelAdmin):
 
     def get_urls(self):
         urls = super(PatrimonioAdmin, self).get_urls()
-        
+
         my_urls = patterns("", url("^conserta/$", conserta_posicoes))
 
         return my_urls+urls
-            
+
 admin.site.register(Patrimonio, PatrimonioAdmin)
 
 
@@ -212,7 +212,7 @@ class HistoricoLocalAdmin(admin.ModelAdmin):
             'classes': ('wide',)
         }),
     )
-    
+
     list_display = ('data', 'patrimonio', 'endereco', 'descricao')
 
     search_fields = ['endereco__endereco__entidade__nome', 'endereco__endereco__entidade__sigla',
@@ -228,23 +228,24 @@ admin.site.register(HistoricoLocal, HistoricoLocalAdmin)
 class EquipamentoAdmin(admin.ModelAdmin):
     search_fields = ['part_number', 'descricao', 'modelo', 'entidade_fabricante__sigla']
     list_display = ('descricao', 'part_number', 'tipo')
+    list_select_related = ('tipo',)
     list_filter = (('tipo', RelatedOnlyFieldListFilter), ('entidade_fabricante', RelatedOnlyFieldListFilter),)
-    
+
     form = EquipamentoAdminForm
-    
+
     def __init__(self, model, admin_site):
         """
         Utilizado para setar o admin_site para o forms
         """
         self.form.admin_site = admin_site
         super(EquipamentoAdmin, self).__init__(model, admin_site)
-        
+
     def get_urls(self):
         urls = super(EquipamentoAdmin, self).get_urls()
-        
+
         my_urls = patterns("", url("^conserta/$", conserta_posicoes))
         return my_urls+urls
-        
+
     def formfield_for_dbfield(self, db_field, **kwargs):
         # Sobrescrevendo os campos de imagens para poder apresentar um preview na tela do admin
         if db_field.name == 'imagem' or db_field.name == 'imagem_traseira':
@@ -257,7 +258,7 @@ admin.site.register(Equipamento, EquipamentoAdmin)
 
 
 class DimensaoAdmin(admin.ModelAdmin):
- 
+
     fieldsets = (
         (None, {
             'fields': (('unidade', 'altura', 'largura', 'profundidade'), 'peso'),
@@ -284,14 +285,14 @@ admin.site.register(PlantaBaixaDataCenter, PlantaBaixaDataCenterAdmin)
 class PlantaBaixaPosicaoAdmin(admin.ModelAdmin):
     form = PlantaBaixaObjetoForm
     list_display = ('objeto', 'descricao', 'x', 'y', 'w', 'h', 'cor')
-    
+
 
 admin.site.register(PlantaBaixaPosicao, PlantaBaixaPosicaoAdmin)
 
 
 @staff_member_required
 def conserta_posicoes(request):
-    
+
     if request.method == 'GET':
         return TemplateResponse(request, 'patrimonio/conserta.html')
     ok = []
@@ -319,5 +320,5 @@ def conserta_posicoes(request):
                     ok.append('%s - %s' % (p.apelido or p.id, row['posicao']))
                 except:
                     failed.append('%s - %s' % (row['id'], row['posicao']))
-                    
+
     return TemplateResponse(request, 'patrimonio/conserta.html', {'ok': ok, 'failed': failed})
