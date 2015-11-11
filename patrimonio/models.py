@@ -69,7 +69,7 @@ class Tipo(models.Model):
 
 
 class Patrimonio(models.Model):
-    
+
     U_TO_PX = 19
     U_TO_PT = 15.0
     U_TO_EM = 2.0
@@ -248,7 +248,7 @@ class Patrimonio(models.Model):
         # calculando a altura em furos
         tam = int(round(tamanho * 3))
         return tam * self.U_TO_PX / 3.0
-    
+
     def altura_em_pt(self):
         if self.tamanho:
             tamanho = self.tamanho
@@ -258,11 +258,11 @@ class Patrimonio(models.Model):
         # calculando a altura em furos
         tam = int(round(tamanho * 3))
         return tam * self.U_TO_PT / 3.0
-    
+
     # Retorna a posição Y em pixels.
     def eixoy_em_px(self):
         eixoY = 0
-         
+
         # Este patrimonio precisa estar contido em um Rack para definirmos a posição 
         if self.patrimonio_id is not None and self.patrimonio.equipamento_id and self.patrimonio.equipamento.tipo_id\
                 and self.patrimonio.equipamento.tipo.nome == 'Rack':
@@ -305,7 +305,7 @@ class Patrimonio(models.Model):
                 and self.equipamento.tipo_id \
                 and 'tomada' in self.equipamento.tipo.nome \
                 and self.historico_atual_prefetched.posicao_colocacao in ('TD', 'TE', 'lD', 'lE', 'LD', 'LE'):
-            
+
             return True
         return False
 
@@ -341,10 +341,10 @@ class PatrimonioRack(Patrimonio):
     def get_patrimonios(self):
         # ordena os equipamentos do rack conforme a posição no rack
         hist = self.contido.annotate(hist=Max('historicolocal__data')).values_list('pk')
-        pts = list(self.contido.filter(pk__in=hist).select_related('equipamento', 'equipamento__tipo')
+        pts = list(self.contido.filter(pk__in=hist).select_related('equipamento', 'equipamento__tipo', 'equipamento__dimensao', 'patrimonio__equipamento', 'patrimonio__equipamento__tipo', 'patrimonio__equipamento__dimensao')
                    .prefetch_related('historicolocal_set'))
         pts.sort(key=lambda x: x.historico_atual_prefetched.posicao_furo, reverse=True)
-        
+
         return pts
 
     def altura_furos(self):
@@ -566,7 +566,7 @@ class Equipamento(models.Model):
     entidade_fabricante = models.ForeignKey('identificacao.Entidade', verbose_name=_(u'Marca/Editora'),
                                             null=True, blank=True,
                                             help_text=u"Representa a Entidade que fabrica este equipamento.")
-    
+
     modelo = models.CharField(null=True, blank=True, max_length=100)
     tamanho = models.DecimalField(u'Tamanho (em U)', max_digits=5, decimal_places=2, null=True, blank=True)
     dimensao = models.ForeignKey('patrimonio.Dimensao', null=True, blank=True)
@@ -575,7 +575,7 @@ class Equipamento(models.Model):
     imagem = models.ImageField(u'Imagem Frontal do equipamento', upload_to='patrimonio', null=True, blank=True)
     imagem_traseira = models.ImageField(u'Imagem Traseira do equipamento', upload_to='patrimonio',
                                         null=True, blank=True)
-    
+
     convencoes = models.ManyToManyField('patrimonio.Distribuicao', verbose_name=u'Convenções')
     titulo_autor = models.CharField(_(u'Título e autor'), null=True, blank=True, max_length=100)
     isbn = models.CharField(_(u'ISBN'), null=True, blank=True, max_length=20)
@@ -650,17 +650,17 @@ class Permission(models.Model):
         # remover as permissões padrões, pois essa é uma classe para configurar permissões customizadas
         default_permissions = ()
         permissions = (
-            ("rel_tec_planta_baixa_edit", u"Rel. Téc. - Planta baixa - Racks"),     #/patrimonio/planta_baixa_edit
-            ("rel_tec_racks", u"Rel. Téc. - Racks "),     #/patrimonio/racks
-            ("rel_tec_por_estado", u"Rel. Téc. - Patr por estado do item"),     #/patrimonio/relatorio/por_estado
-            ("rel_tec_por_local", u"Rel. Téc. - Patr por localização"),     #/patrimonio/relatorio/por_local
-            ("rel_tec_por_local_rack", u"Rel. Téc. - Patr por local e rack"),     #/patrimonio/relatorio/por_local_rack
-            ("rel_tec_por_local_termo", u"Rel. Téc. - Patr por localização (com Termo)"),     #/patrimonio/relatorio/por_local_termo
-            ("rel_tec_por_marca", u"Rel. Téc. - Patr por marca"),     #/patrimonio/relatorio/por_marca
-            ("rel_adm_por_termo", u"Rel. Adm. - Patr por termo de outorga"),     #/patrimonio/relatorio/por_termo
-            ("rel_tec_por_tipo", u"Rel. Téc. - Patr por tipo"),     #/patrimonio/relatorio/por_tipo
-            ("rel_tec_por_tipo_equipamento", u"Rel. Téc. - Busca por tipo de equip"),     #/patrimonio/relatorio/por_tipo_equipamento
-            ("rel_tec_patr_tipo_equipamento", u"Rel. Téc. - Patr por tipo de equip"),     #/patrimonio/relatorio/por_tipo_equipamento2
-            ("rel_adm_presta_contas", u"Rel. Adm. - Prestação de contas patrimonial"),     #/patrimonio/relatorio/presta_contas
-            ("rel_tec_relatorio_rack", u"Rel. Téc. - Relatório por rack"),     #/patrimonio/relatorio_rack
+            ("rel_tec_planta_baixa_edit", u"Rel. Téc. - Planta baixa - Racks"),  # /patrimonio/planta_baixa_edit
+            ("rel_tec_racks", u"Rel. Téc. - Racks "),     # /patrimonio/racks
+            ("rel_tec_por_estado", u"Rel. Téc. - Patr por estado do item"),     # /patrimonio/relatorio/por_estado
+            ("rel_tec_por_local", u"Rel. Téc. - Patr por localização"),     # /patrimonio/relatorio/por_local
+            ("rel_tec_por_local_rack", u"Rel. Téc. - Patr por local e rack"),     # /patrimonio/relatorio/por_local_rack
+            ("rel_tec_por_local_termo", u"Rel. Téc. - Patr por localização (com Termo)"),     # /patrimonio/relatorio/por_local_termo
+            ("rel_tec_por_marca", u"Rel. Téc. - Patr por marca"),     # /patrimonio/relatorio/por_marca
+            ("rel_adm_por_termo", u"Rel. Adm. - Patr por termo de outorga"),     # /patrimonio/relatorio/por_termo
+            ("rel_tec_por_tipo", u"Rel. Téc. - Patr por tipo"),     # /patrimonio/relatorio/por_tipo
+            ("rel_tec_por_tipo_equipamento", u"Rel. Téc. - Busca por tipo de equip"),     # /patrimonio/relatorio/por_tipo_equipamento
+            ("rel_tec_patr_tipo_equipamento", u"Rel. Téc. - Patr por tipo de equip"),     # /patrimonio/relatorio/por_tipo_equipamento2
+            ("rel_adm_presta_contas", u"Rel. Adm. - Prestação de contas patrimonial"),     # /patrimonio/relatorio/presta_contas
+            ("rel_tec_relatorio_rack", u"Rel. Téc. - Relatório por rack"),     # /patrimonio/relatorio_rack
         )

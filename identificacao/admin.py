@@ -28,6 +28,7 @@ class AgendadoInline(admin.TabularInline):
 class EnderecoDetalheInline(admin.TabularInline):
     model = EnderecoDetalhe
     extra = 1
+    form = EnderecoDetalheInlineAdminForm
 
 
 class ASNInline(admin.TabularInline):
@@ -146,14 +147,14 @@ class EnderecoDetalheEntidadeFilter(SimpleListFilter):
         return [(e.id, e.sigla) for e in Entidade.objects.filter(id__in=entidade_ids)]
 
     def queryset(self, request, queryset):
-        id = self.value()
-        if id:
-            return queryset.filter(endereco__entidade__id__exact=id) | \
-                   queryset.filter(detalhe__endereco__entidade__id__exact=id)
+        entidade_id = self.value()
+        if entidade_id:
+            return queryset.filter(endereco__entidade__id__exact=entidade_id) | \
+                   queryset.filter(detalhe__endereco__entidade__id__exact=entidade_id)
         else:
             return queryset
 
-    
+
 class EnderecoDetalheAdmin(admin.ModelAdmin):
     form = EnderecoDetalheAdminForm
 
@@ -174,12 +175,40 @@ class ASNAdmin(admin.ModelAdmin):
     search_fields = ('entidade__sigla', 'numero')
 
 
-admin.site.register(EnderecoDetalhe,EnderecoDetalheAdmin)
+class AcessoAdmin(admin.ModelAdmin):
+    form = AcessoAdminForm
+
+    list_display = ('get_entidade', 'get_area', 'get_contato', 'lista_niveis')
+    ordering = ('identificacao__endereco__entidade__sigla', 'identificacao__area', 'identificacao__contato__primeiro_nome')
+
+    def get_entidade(self, obj):
+        return obj.identificacao.endereco.entidade.sigla
+    get_entidade.admin_order_field = 'identificacao__endereco__entidade__sigla'
+    get_entidade.short_description = 'Entidade'
+
+    def get_area(self, obj):
+        return obj.identificacao.area
+    get_area.admin_order_field = 'identificacao__area'
+    get_area.short_description = 'Area'
+
+    def get_contato(self, obj):
+        return obj.identificacao.contato.nome
+    get_contato.admin_order_field = 'identificacao__contato__nome'
+    get_contato.short_description = 'Contato'
+
+    def get_queryset(self, request):
+        # Sobrescrevendo o get_queryset para poder fazer a otimização com select_related
+        return super(AcessoAdmin, self).get_queryset(request) \
+            .prefetch_related('niveis') \
+            .select_related('identificacao__endereco__entidade', 'identificacao__contato')
+
+
+admin.site.register(EnderecoDetalhe, EnderecoDetalheAdmin)
 admin.site.register(TipoDetalhe)
 admin.site.register(TipoEntidade)
 admin.site.register(Agenda)
 admin.site.register(TipoArquivoEntidade)
-admin.site.register(Acesso)
+admin.site.register(Acesso, AcessoAdmin)
 admin.site.register(NivelAcesso)
 admin.site.register(ASN, ASNAdmin)
 admin.site.register(Ecossistema)
