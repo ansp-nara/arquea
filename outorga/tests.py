@@ -34,7 +34,7 @@ class TermoTest(UnitTestCase):
                                     termino=date(2008, 12, 31), data_presta_contas=date(2008, 2, 28))
 
         # Cria Natureza de gasto
-        m1 = Modalidade.objects.create(sigla='STB', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
+        m1 = Modalidade.objects.create(sigla='STB0', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
         m11 = Modalidade.objects.create(sigla='STB1', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
         m2 = Modalidade.objects.create(sigla='STE', nome='Servicos de Terceiro no Exterior', moeda_nacional=False)
         m22 = Modalidade.objects.create(sigla='STE1', nome='Servicos de Terceiro no Exterior', moeda_nacional=False)
@@ -330,7 +330,7 @@ class OutorgaTest(UnitTestCase):
                                     termino=date(2008, 12, 31), data_presta_contas=date(2008, 2, 28))
 
         # Cria Natureza de gasto
-        m1 = Modalidade.objects.create(sigla='STB', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
+        m1 = Modalidade.objects.create(sigla='STB0', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
         m2 = Modalidade.objects.create(sigla='STE', nome='Servicos de Terceiro no Exterior', moeda_nacional=False)
 
         n1 = Natureza_gasto.objects.create(modalidade=m1, termo=t, valor_concedido='1500000.00')
@@ -390,7 +390,7 @@ class OutorgaViewTest(UnitTestCase):
                                     termino=date(2008, 12, 31), data_presta_contas=date(2008, 2, 28))
 
         # Cria Natureza de gasto
-        m1 = Modalidade.objects.create(sigla='STB', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
+        m1 = Modalidade.objects.create(sigla='STB0', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
         m2 = Modalidade.objects.create(sigla='STE', nome='Servicos de Terceiro no Exterior', moeda_nacional=False)
 
         n1 = Natureza_gasto.objects.create(modalidade=m1, termo=t, valor_concedido='1500000.00')
@@ -511,7 +511,7 @@ class OutorgaViewTest(UnitTestCase):
             self.assertEquals(args[2]['processos'][0]['processo'].processo, 22222)
             self.assertEquals(args[2]['processos'][0]['acordos'][0]['acordo'].__unicode__(),
                               u'Acordo entre Instituto UNIEMP e SAC')
-            self.assertEquals(args[2]['processos'][0]['acordos'][0]['itens'][0]['modalidade'], u'STB')
+            self.assertEquals(args[2]['processos'][0]['acordos'][0]['itens'][0]['modalidade'], u'STB0')
             self.assertEquals(args[2]['processos'][0]['acordos'][0]['itens'][0]['entidade'].sigla, u'GTECH')
             self.assertEquals(args[2]['processos'][0]['acordos'][0]['itens'][0]['descricao'], u'Armazenagem')
 
@@ -634,7 +634,7 @@ class Natureza_gastoTest(UnitTestCase):
                                     termino=date(2008, 12, 31), data_presta_contas=date(2008, 2, 28))
 
         # Cria Natureza de gasto
-        m1 = Modalidade.objects.create(sigla='STB', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
+        m1 = Modalidade.objects.create(sigla='STB0', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
         m2 = Modalidade.objects.create(sigla='STB2', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
 
         n1 = Natureza_gasto.objects.create(modalidade=m1, termo=t, valor_concedido=Decimal('30000'))
@@ -711,7 +711,7 @@ class Natureza_gastoTest(UnitTestCase):
 
     def test_unicode(self):
         n1 = Natureza_gasto.objects.get(pk=1)
-        self.assertEquals(n1.__unicode__(), u'08/22222-2 - STB')
+        self.assertEquals(n1.__unicode__(), u'08/22222-2 - STB0')
 
     def test_mostra_termo(self):
         n1 = Natureza_gasto.objects.get(pk=1)
@@ -719,7 +719,7 @@ class Natureza_gastoTest(UnitTestCase):
 
     def test_mostra_modalidade(self):
         n1 = Natureza_gasto.objects.get(pk=1)
-        self.assertEquals(n1.mostra_modalidade(), u'STB')
+        self.assertEquals(n1.mostra_modalidade(), u'STB0')
 
     def test_get_absolute_url(self):
         n1 = Natureza_gasto.objects.get(pk=1)

@@ -364,7 +364,7 @@ class PatrimonioTest(TestCase):
                                     termino=date(2008, 12, 31), data_presta_contas=date(2008, 2, 28))
 
         # Cria Natureza de gasto
-        m1 = Modalidade.objects.create(sigla='STB', )
+        m1 = Modalidade.objects.create(sigla='STB1', )
         n1 = Natureza_gasto.objects.create(modalidade=m1, termo=t, valor_concedido='1500000.00')
 
         # Cria Item de Outorga
@@ -400,7 +400,7 @@ class PatrimonioTest(TestCase):
         patr = Patrimonio.objects.get(ns='AF345678GB3489X')
         patr.pagamento = fp1
         
-        self.assertEquals('STB (101/102)', patr.auditoria())
+        self.assertEquals('STB1 (101/102)', patr.auditoria())
 
     def test_auditoria_vazia(self):
         patr = Patrimonio.objects.get(ns='AF345678GB3489X')
