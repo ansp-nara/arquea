@@ -516,7 +516,7 @@ class ViewTest(TestCase):
         self.assertContains(response, u'<a href="/patrimonio/relatorio/por_estado">Patrimônio por estado do item</a>')
 
         # asssert dos dados do relatório
-        self.assertContains(response, u'<h4>Estado Ativo</h4>')
+        self.assertContains(response, u'<h1 repeat="1">Patrimônio por estado - Ativo</h1>')
         self.assertContains(response, u'<th>Entidade</th>')
         self.assertContains(response, u'<th>Local</th>')
         self.assertContains(response, u'<th>Procedência</th>')
