@@ -36,7 +36,7 @@ class TermoTest(UnitTestCase):
         # Cria Natureza de gasto
         m1 = Modalidade.objects.create(sigla='STB0', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
         m11 = Modalidade.objects.create(sigla='STB1', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
-        m2 = Modalidade.objects.create(sigla='STE', nome='Servicos de Terceiro no Exterior', moeda_nacional=False)
+        m2 = Modalidade.objects.create(sigla='STE0', nome='Servicos de Terceiro no Exterior', moeda_nacional=False)
         m22 = Modalidade.objects.create(sigla='STE1', nome='Servicos de Terceiro no Exterior', moeda_nacional=False)
 
         n1 = Natureza_gasto.objects.create(modalidade=m1, termo=t, valor_concedido='1500000.00')
@@ -331,7 +331,7 @@ class OutorgaTest(UnitTestCase):
 
         # Cria Natureza de gasto
         m1 = Modalidade.objects.create(sigla='STB0', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
-        m2 = Modalidade.objects.create(sigla='STE', nome='Servicos de Terceiro no Exterior', moeda_nacional=False)
+        m2 = Modalidade.objects.create(sigla='STE0', nome='Servicos de Terceiro no Exterior', moeda_nacional=False)
 
         n1 = Natureza_gasto.objects.create(modalidade=m1, termo=t, valor_concedido='1500000.00')
         n2 = Natureza_gasto.objects.create(modalidade=m2, termo=t, valor_concedido='1500000.00')
@@ -391,7 +391,7 @@ class OutorgaViewTest(UnitTestCase):
 
         # Cria Natureza de gasto
         m1 = Modalidade.objects.create(sigla='STB0', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
-        m2 = Modalidade.objects.create(sigla='STE', nome='Servicos de Terceiro no Exterior', moeda_nacional=False)
+        m2 = Modalidade.objects.create(sigla='STE0', nome='Servicos de Terceiro no Exterior', moeda_nacional=False)
 
         n1 = Natureza_gasto.objects.create(modalidade=m1, termo=t, valor_concedido='1500000.00')
         n2 = Natureza_gasto.objects.create(modalidade=m2, termo=t, valor_concedido='1500000.00')
@@ -861,8 +861,8 @@ class ItemTest(UnitTestCase):
                                     data_presta_contas=date(2008, 2, 28))
 
         # Cria Natureza de gasto
-        m1 = Modalidade.objects.create(sigla='STE', nome='Servicos de Terceiro no Exterior', moeda_nacional=False)
-        m2 = Modalidade.objects.create(sigla='STF', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
+        m1 = Modalidade.objects.create(sigla='STE0', nome='Servicos de Terceiro no Exterior', moeda_nacional=False)
+        m2 = Modalidade.objects.create(sigla='STF0', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
 
         n1 = Natureza_gasto.objects.create(modalidade=m1, termo=t, valor_concedido='1500000.00')
         n2 = Natureza_gasto.objects.create(modalidade=m2, termo=t, valor_concedido='300000.00')
@@ -942,7 +942,7 @@ class ItemTest(UnitTestCase):
     
     def test_mostra_modalidade(self):
         item = Item.objects.get(pk=1)
-        self.assertEquals(item.mostra_modalidade(), u'STE')
+        self.assertEquals(item.mostra_modalidade(), u'STE0')
         
     def test_mostra_quantidade(self):
         item = Item.objects.get(pk=1)
@@ -1078,8 +1078,8 @@ class ModalidadeTest(UnitTestCase):
                                     termino=date(2008, 12, 31), data_presta_contas=date(2008, 2, 28))
 
         # Cria Natureza de gasto
-        m1 = Modalidade.objects.create(sigla='STE', nome='Servicos de Terceiro no Exterior', moeda_nacional=False)
-        m2 = Modalidade.objects.create(sigla='STF', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
+        m1 = Modalidade.objects.create(sigla='STE0', nome='Servicos de Terceiro no Exterior', moeda_nacional=False)
+        m2 = Modalidade.objects.create(sigla='STF0', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
 
         n1 = Natureza_gasto.objects.create(modalidade=m1, termo=t, valor_concedido='1500000.00')
         n2 = Natureza_gasto.objects.create(modalidade=m2, termo=t, valor_concedido='300000.00')
@@ -1099,13 +1099,13 @@ class ModalidadeTest(UnitTestCase):
 
     def test_unicode(self):
         m = Modalidade.objects.get(pk=1)
-        self.assertEquals(m.__unicode__(), u'STE - Servicos de Terceiro no Exterior')
+        self.assertEquals(m.__unicode__(), u'STE0 - Servicos de Terceiro no Exterior')
 
     def test_modalidades_termo(self):
         modalidade = Modalidade.objects.get(pk=1)
         termo = Termo.objects.get(pk=1)
         self.assertEquals(str(modalidade.modalidades_termo(termo)),
-                          '[<Modalidade: STE - Servicos de Terceiro no Exterior>]')
+                          '[<Modalidade: STE0 - Servicos de Terceiro no Exterior>]')
 
 
 class EstadoTest(UnitTestCase):
@@ -1136,8 +1136,8 @@ class OrigemFapespTest(UnitTestCase):
                                     termino=date(2008, 12, 31), data_presta_contas=date(2008, 2, 28))
 
         # Cria Natureza de gasto
-        m1 = Modalidade.objects.create(sigla='STE', nome='Servicos de Terceiro no Exterior', moeda_nacional=False)
-        m2 = Modalidade.objects.create(sigla='STF', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
+        m1 = Modalidade.objects.create(sigla='STE0', nome='Servicos de Terceiro no Exterior', moeda_nacional=False)
+        m2 = Modalidade.objects.create(sigla='STF0', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
 
         n1 = Natureza_gasto.objects.create(modalidade=m1, termo=t, valor_concedido='1500000.00')
         n2 = Natureza_gasto.objects.create(modalidade=m2, termo=t, valor_concedido='300000.00')
@@ -1209,7 +1209,7 @@ class OrigemFapespTest(UnitTestCase):
     def test_unicode(self):
         of = OrigemFapesp.objects.get(pk=1)
         self.assertEquals(of.__unicode__(),
-                          u'Acordo entre Instituto UNIEMP e SAC - STE - 08/22222-2 - Serviço de Conexão Internacional')
+                          u'Acordo entre Instituto UNIEMP e SAC - STE0 - 08/22222-2 - Serviço de Conexão Internacional')
 
     def test_gasto_zero(self):
         pg1 = Pagamento.objects.get(pk=1)
