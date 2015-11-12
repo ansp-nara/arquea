@@ -28,7 +28,7 @@ class ExtratoCCTest(TestCase):
         # Cria Natureza de gasto
         m1 = Modalidade.objects.create(sigla='STB1', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
         m11 = Modalidade.objects.create(sigla='STB2', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
-        m2 = Modalidade.objects.create(sigla='STE', nome='Servicos de Terceiro no Exterior', moeda_nacional=False)
+        m2 = Modalidade.objects.create(sigla='STE1', nome='Servicos de Terceiro no Exterior', moeda_nacional=False)
 
         n1 = Natureza_gasto.objects.create(modalidade=m1, termo=t, valor_concedido='1500000.00')
         n2 = Natureza_gasto.objects.create(modalidade=m11, termo=t, valor_concedido='3000000.00')
@@ -167,7 +167,7 @@ class PagamentoTest(TestCase):
         # Cria Natureza de gasto
         m1 = Modalidade.objects.create(sigla='STB1', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
         m11 = Modalidade.objects.create(sigla='STB2', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
-        m2 = Modalidade.objects.create(sigla='STE', nome='Servicos de Terceiro no Exterior', moeda_nacional=False)
+        m2 = Modalidade.objects.create(sigla='STE1', nome='Servicos de Terceiro no Exterior', moeda_nacional=False)
 
         n1 = Natureza_gasto.objects.create(modalidade=m1, termo=t, valor_concedido='1500000.00')
         n2 = Natureza_gasto.objects.create(modalidade=m11, termo=t, valor_concedido='3000000.00')
@@ -405,7 +405,7 @@ class AuditoriaTest(TestCase):
         #Cria Natureza de gasto
         m1 = Modalidade.objects.create(sigla='STB1', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
         m11 = Modalidade.objects.create(sigla='STB2', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
-        m2 = Modalidade.objects.create(sigla='STE', nome='Servicos de Terceiro no Exterior', moeda_nacional=False)
+        m2 = Modalidade.objects.create(sigla='STE1', nome='Servicos de Terceiro no Exterior', moeda_nacional=False)
 
         n1 = Natureza_gasto.objects.create(modalidade=m1, termo=t, valor_concedido='1500000.00')
         n2 = Natureza_gasto.objects.create(modalidade=m11, termo=t, valor_concedido='3000000.00')
