@@ -124,24 +124,27 @@ $(document).ajaxSend(function(event, xhr, settings) {
     {% if not is_popup %}
         <div id="header">
             <div class="header-content">
-                {% cache 1800 base-html-header request.user.username %}
                     <div id="branding" class="header-logo">
                         {% block branding %}
                         {% endblock %}
                     </div>
         			<div class="header-sites">
+                        {% if linksHeader %}
         				<ul>
-        					<li><span class="meta-label2">Sites:</span></li>
-        					<li><a href="http://www.ansp.br" target="_blank">Rede ANSP</a></li>
-        					<li><span class="meta-sep2">/</span></li>
-        					<li><a href="http://intranet.ansp.br/" target="_blank">Intranet NARA</a></li>
-        					<li><span class="meta-sep2">/</span></li>
-        					<li><a href="http://diariodebordo.ansp.br/" target="_blank">Diário de Bordo</a></li>
-        					<li><span class="meta-sep2">/</span></li>
-        					<li><a href="http://www.fapesp.br" target="_blank">FAPESP</a></li>
-        				</ul>			
+                            {% for link in linksHeader %}
+                                {% if forloop.first %}
+                                    <li><span class="meta-label2">Sites:</span></li>
+                                    <li><a href="{{ link.url }}" target="_blank">{{ link.titulo }}</a></li>
+                                {% else %}
+                                    <li><span class="meta-sep2">/</span></li>
+                                    <li><a href="{{ link.url }}" target="_blank">{{ link.titulo }}</a></li>
+                                {% endif %}
+                            {% endfor %}
+        				</ul>
+                        {% endif %}
         			</div>
         			
+                {% cache 1800 base-html-header request.user.username %}
         			{% if user.is_active and user.is_staff %}
             			<div id="user-tools">
             				<ul>
@@ -284,34 +287,39 @@ $(document).ajaxSend(function(event, xhr, settings) {
 		<div class="footer-content">
 		
             {% if not is_popup %}
-			<div class="content-modules-footer">
-				<h2>Módulos carregados</h2>
-				<ul>
-                    {% if adm_app_list %}
-    				    {% for app in adm_app_list %}
-    						<li>
-    							<a href="#" class="section modal-call2" app="{{app.name}}">{% blocktrans with app.name as name %}{{ name }}{% endblocktrans %}</a>
-                            </li>
-    				    {% endfor %}
-			        {% else %}
-				        <p class="edit-alert">{% trans "You don't have permission to edit anything." %}</p>
-			        {% endif %}
-				</ul>
-			</div><!-- end content-modules-footer -->
-			<div class="footer-sites">
-				<h2>Sites</h2>
-				<ul>
-					<li><a href="http://www.ansp.br">Rede ANSP</a></li>
-					<li><a href="http://intranet.ansp.br">Intranet NARA</a></li>
-					<li><a href="http://diariodebordo.ansp.br">Diário de Bordo</a></li>
-					<li><a href="http://www.fapesp.br">FAPESP</a></li>
-				</ul>
-			</div>
-			
-			<div class="nara-logo">
-				<a href="http://www.ansp.br/index.php/br/nara">Sobre nós</a>
-			</div>
-			{% endif %}
+    			<div class="content-modules-footer">
+    				<h2>Módulos carregados</h2>
+    				<ul>
+                        {% if adm_app_list %}
+        				    {% for app in adm_app_list %}
+        						<li>
+        							<a href="#" class="section modal-call2" app="{{app.name}}">{% blocktrans with app.name as name %}{{ name }}{% endblocktrans %}</a>
+                                </li>
+        				    {% endfor %}
+    			        {% else %}
+    				        <p class="edit-alert">{% trans "You don't have permission to edit anything." %}</p>
+    			        {% endif %}
+    				</ul>
+    			</div><!-- end content-modules-footer -->
+    			<div class="footer-sites">
+                    {% if linksFooter %}
+                        <h2>Sites</h2>
+                        <ul>
+                            {% for link in linksFooter %}
+                                <li><a href="{{ link.url }}" target="_blank">{{ link.titulo }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+    			</div>
+                {% if logoFooter %}
+                        <div class="nara-logo" title="{{logoFooter.titulo}}" {% if logoFooter %}style="background-image:url({{ logoFooter.logo.url }});"{% endif %}>
+                        </div>
+                {% else %}
+                    <div class="nara-logo">
+                        <a href="http://www.ansp.br/index.php/br/nara">Sobre nós</a>
+                    </div>
+    			{% endif %}
+            {% endif %}
 			<div class="footer-copy">
 				Copyright©2010 <span class="meta-sep2">/</span> NARA <span class="meta-sep2">/</span> {% trans "Todos os direitos reservados" %}
 				<span class="meta-sep2">/</span>

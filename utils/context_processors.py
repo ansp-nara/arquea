@@ -3,6 +3,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
+from configuracao.models import LayoutPagina, LayoutLinkHeader, LayoutLinkFooter
 
 site = admin.site
 
@@ -81,3 +82,31 @@ def papelaria(context):
         if a.valido:
             return {'papelaria': a}
     return {'papelaria': ''}
+
+
+def layoutPagina(context):
+    """
+    """
+    layoutPagina = LayoutPagina.objects.all().first()
+
+    logoHeader = ''
+    if layoutPagina and layoutPagina.logo_cabecalho and layoutPagina.logo_cabecalho.logo:
+        logoHeader = layoutPagina.logo_cabecalho
+
+    logoFooter = ''
+    if layoutPagina and layoutPagina.logo_rodape and layoutPagina.logo_rodape.logo:
+        logoFooter = layoutPagina.logo_rodape
+
+    linksHeader = None
+    if layoutPagina:
+        linksHeader = LayoutLinkHeader.objects.all().filter(pagina=layoutPagina).order_by('ordem')
+
+    linksFooter = None
+    if layoutPagina:
+        linksFooter = LayoutLinkFooter.objects.all().filter(pagina=layoutPagina).order_by('ordem')
+
+    return {'layoutPagina': layoutPagina,
+            'logoHeader': logoHeader,
+            'linksHeader': linksHeader,
+            'logoFooter': logoFooter,
+            'linksFooter': linksFooter}

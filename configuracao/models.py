@@ -9,19 +9,19 @@ class Papelaria(models.Model):
                                                      null=True, blank=True)
     retrato_a4_margem_inferior = models.DecimalField(_(u'Margem inferior em cm'), max_digits=3, decimal_places=2,
                                                      null=True, blank=True)
-    
+
     papel_timbrado_paisagem_a4 = models.FileField(upload_to='papel_timbrado_paisagem_a4', null=True, blank=True)
     paisagem_a4_margem_superior = models.DecimalField(_(u'Margem superior em cm'), max_digits=3, decimal_places=2,
                                                       null=True, blank=True)
     paisagem_a4_margem_inferior = models.DecimalField(_(u'Margem inferior em cm'), max_digits=3, decimal_places=2,
                                                       null=True, blank=True)
-    
+
     papel_timbrado_retrato_a3 = models.FileField(upload_to='papel_timbrado_retrato_a3', null=True, blank=True)
     retrato_a3_margem_superior = models.DecimalField(_(u'Margem superior em cm'), max_digits=3, decimal_places=2,
                                                      null=True, blank=True)
     retrato_a3_margem_inferior = models.DecimalField(_(u'Margem inferior em cm'), max_digits=3, decimal_places=2,
                                                      null=True, blank=True)
-    
+
     papel_timbrado_paisagem_a3 = models.FileField(upload_to='papel_timbrado_paisagem_a3', null=True, blank=True)
     paisagem_a3_margem_superior = models.DecimalField(_(u'Margem superior em cm'), max_digits=3, decimal_places=2,
                                                       null=True, blank=True)
@@ -32,7 +32,7 @@ class Papelaria(models.Model):
 
     def has_files(self):
         import os.path
- 
+
         return self.papel_timbrado_retrato_a4 is not None and self.papel_timbrado_retrato_a4.name and \
                os.path.isfile(self.papel_timbrado_retrato_a4.name) and self.papel_timbrado_paisagem_a4 is not None and \
                self.papel_timbrado_paisagem_a4.name and os.path.isfile(self.papel_timbrado_paisagem_a4.name) and \
@@ -49,18 +49,18 @@ class Variavel(models.Model):
     # Nome da variável. É utilizada nos outros models para identificar a variável.
     DATACENTER_IDS = 'DATACENTER_IDS'
     TERMO_EXCLUIDO_IDS = 'TERMO_EXCLUIDO_IDS'
-    
+
     # Nome das variáveis e suas descrições que devem ser exibidas na tela do Administrador
     _NOMES = (
         (DATACENTER_IDS, 'ID da Entidade do Datacenter principal.'),
         (TERMO_EXCLUIDO_IDS, 'IDs de Termos a serem excluídos da visão de relatórios, '
                              'como o de Patrimônio por Termo. Ex: 1,2,3'),
     )
-    
+
     nome = models.CharField(_(u'Nome da variável'), max_length=60, unique=True, choices=_NOMES)
     valor = models.CharField(_(u'Valor'), max_length=60, help_text=u'', )
-    obs = models.TextField(null=True, blank=True) 
-  
+    obs = models.TextField(null=True, blank=True)
+
     class Meta:
         verbose_name = _(u'Variável')
         verbose_name_plural = _(u'Variáveis')
@@ -87,3 +87,45 @@ class FieldsHelp(models.Model):
 
     def __unicode__(self):
         return '%s/%s - %s' % (self.model.content_type.app_label, self.model.content_type.model, self.field)
+
+
+class LayoutPagina(models.Model):
+    logo_cabecalho = models.ForeignKey('configuracao.LayoutLogo', related_name="+")
+    logo_rodape = models.ForeignKey('configuracao.LayoutLogo', related_name="+")
+
+
+class LayoutLogo(models.Model):
+    logo = models.ImageField(null=True, blank=True)
+    titulo = models.CharField(_(u'Título do logo'), max_length=200)
+    url = models.CharField(_(u'URL do logo'), max_length=400, null=True, blank=True)
+
+    def __unicode__(self):
+        return '%s' % (self.titulo)
+
+
+class LayoutLink(models.Model):
+    titulo = models.CharField(max_length=200)
+    url = models.URLField(max_length=400)
+    ordem = models.PositiveSmallIntegerField(help_text=u"Ordem de exibição do link.")
+
+    def __unicode__(self):
+        return '%s' % (self.titulo)
+
+    class Meta:
+        ordering = ('ordem', 'titulo')
+
+
+class LayoutLinkHeader(LayoutLink):
+    pagina = models.ForeignKey('configuracao.LayoutPagina')
+
+    class Meta:
+        verbose_name = u'Link do cabeçalho'
+        verbose_name_plural = u'Links do cabeçalho'
+
+
+class LayoutLinkFooter(LayoutLink):
+    pagina = models.ForeignKey('configuracao.LayoutPagina')
+
+    class Meta:
+        verbose_name = u'Link do rodapé'
+        verbose_name_plural = u'Links do rodapé'

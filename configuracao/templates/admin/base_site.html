@@ -7,7 +7,13 @@
 {% if DEBUG %}
 <div style="width:1170px; background-color:orange;text-align: center; font-weight: bold; padding: 0; height: 15px; position: absolute;top:140px;">SISTEMA EM AMBIENTE DE DESENVOLVIMENTO.</div>
 {% endif %}
-<h1><a href="/admin">ANSP - Sistema administrativo - página inicial</a></h1>
+<h1>
+    {% if logoHeader %}
+        <a href="{{ logoHeader.url }}" title="{{ logoHeader.titulo }}" {% if logoHeader.logo %}style="background-image:url({{ logoHeader.logo.url }});"{% endif %}>{{ logoHeader.title }}</a>
+    {% else %}
+        <a href="/admin" ">ANSP - Sistema administrativo - página inicial</a>
+    {% endif %}
+</h1>
 {% endblock %}
 
 {% block nav-global %}{% endblock %}
