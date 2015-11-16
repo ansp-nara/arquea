@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
 from models import *
+from forms import *
 from .forms import ClassesExtraForm
 
 
 class PapelariaAdmin(admin.ModelAdmin):
-    
     fieldsets = (
         (u'Papel timbrado retrato A4', {
             'fields': ('papel_timbrado_retrato_a4', ('retrato_a4_margem_superior', 'retrato_a4_margem_inferior')),
@@ -26,22 +26,21 @@ class PapelariaAdmin(admin.ModelAdmin):
     list_per_page = 10
     list_display = ('valido', 'papel_timbrado_retrato_a4', 'papel_timbrado_paisagem_a4', 'papel_timbrado_retrato_a3',
                     'papel_timbrado_paisagem_a3')
-    
+
 admin.site.register(Papelaria, PapelariaAdmin)
 
 
 class ChequeAdmin(admin.ModelAdmin):
-    
     list_per_page = 10
     list_display = ('nome_assinatura',)
-    
+
 admin.site.register(Cheque, ChequeAdmin)
 
 
 class VariavelAdmin(admin.ModelAdmin):
     list_per_page = 20
     list_display = ('nome', 'valor')
-    
+
 admin.site.register(Variavel, VariavelAdmin)
 
 
@@ -49,4 +48,23 @@ class ClassesExtraAdmin(admin.ModelAdmin):
     form = ClassesExtraForm
 
 admin.site.register(ClassesExtra, ClassesExtraAdmin)
+
+
+class LinkHeaderInline(admin.TabularInline):
+    model = LayoutLinkHeader
+
+
+class LinkFooterInline(admin.TabularInline):
+    model = LayoutLinkFooter
+
+
+class LayoutPaginaAdmin(admin.ModelAdmin):
+    inlines = (LinkHeaderInline, LinkFooterInline,)
+    form = LayoutPaginaAdminForm
+
+admin.site.register(LayoutPagina, LayoutPaginaAdmin)
+
+admin.site.register(LayoutLogo)
+admin.site.register(LayoutLink)
 admin.site.register(FieldsHelp)
+

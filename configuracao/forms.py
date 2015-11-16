@@ -1,7 +1,8 @@
-from .models import ClassesExtra
-from ckeditor.widgets import CKEditorWidget
 from django import forms
 from django.contrib.contenttypes.models import ContentType
+from django.utils.html import mark_safe
+from ckeditor.widgets import CKEditorWidget
+from .models import ClassesExtra
 
 
 class ContentTypeChoiceField(forms.ModelChoiceField):
@@ -16,3 +17,17 @@ class ClassesExtraForm(forms.ModelForm):
     class Meta:
         model = ClassesExtra
         fields = '__all__'
+
+
+class LayoutPaginaAdminForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super(LayoutPaginaAdminForm, self).__init__(*args, **kwargs)
+
+        self.fields['logo_cabecalho'].label = mark_safe('<a href="#" onclick="window.open(\'/admin/configuracao/layoutlogo/\'+'
+                                                    '$(\'#id_logo_cabecalho\').val() + \'/\', \'_blank\');'
+                                                    'return true;">Logo do cabecalho</a> (185x150)')
+
+        self.fields['logo_rodape'].label = mark_safe('<a href="#" onclick="window.open(\'/admin/configuracao/layoutlogo/\'+'
+                                                    '$(\'#id_logo_rodape\').val() + \'/\', \'_blank\');'
+                                                    'return true;">Logo do rodape</a> (150x150)')
