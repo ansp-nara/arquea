@@ -15,7 +15,14 @@ def static_root(request):
     return {'STATIC_ROOT': settings.STATIC_ROOT}
 
 
-def applist(request):
+def debug(context):
+    """
+    Disponibiliza a variável de DEBUG para o template
+    """
+    return {'DEBUG': settings.DEBUG}
+
+
+def _applist(request):
     app_dict = {}
     user = request.user
     for model, model_admin in site._registry.items():
@@ -54,14 +61,7 @@ def applist(request):
     return {'adm_app_list': app_list}
 
 
-def debug(context):
-    """
-    Disponibiliza a variável de DEBUG para o template
-    """
-    return {'DEBUG': settings.DEBUG}
-
-
-def papelaria(context):
+def _papelaria(context):
     """
     Disponibiliza o acesso aos arquivos de papel timbrado para o template django.
     Ver as opções disponíveis em: configuracao.models.papelaria
@@ -84,7 +84,7 @@ def papelaria(context):
     return {'papelaria': ''}
 
 
-def layoutPagina(context):
+def _layoutPagina(context):
     """
     """
     layoutPagina = LayoutPagina.objects.all().first()
@@ -110,3 +110,13 @@ def layoutPagina(context):
             'linksHeader': linksHeader,
             'logoFooter': logoFooter,
             'linksFooter': linksFooter}
+
+
+def sistema(context):
+    # Agrega
+    new_context_values = {}
+    new_context_values.update(_applist(context))
+    new_context_values.update(_papelaria(context))
+    new_context_values.update(_layoutPagina(context))
+
+    return new_context_values

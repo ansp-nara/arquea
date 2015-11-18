@@ -1,7 +1,7 @@
 # Django settings for sistema project.
 
-#DEBUG = False
-DEBUG = True
+DEBUG = False
+# DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -15,8 +15,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'HOST': 'localhost',
         'NAME': 'sistema',
-        #'USER': 'sistema',
-        #'PASSWORD': 'sistema'
+        # 'USER': 'sistema',
+        # 'PASSWORD': 'sistema'
     }
 }
 
@@ -56,7 +56,7 @@ ADMIN_MEDIA_PREFIX = '/media/'
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.load_template_source',
+# 'django.template.loaders.eggs.load_template_source',
 )
 
 ROOT_URLCONF = 'urls'
@@ -69,16 +69,16 @@ TEMPLATE_DIRS = (
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
-    'django.contrib.auth.context_processors.auth', 
-    'django.core.context_processors.debug', 
-    'django.core.context_processors.i18n', 
+    'django.contrib.auth.context_processors.auth',
+    'django.core.context_processors.debug',
+    'django.core.context_processors.i18n',
     'django.core.context_processors.media',
-    'django.core.context_processors.static', 
+    'django.core.context_processors.static',
     'django.core.context_processors.request',
-    'django.contrib.messages.context_processors.messages', 
-    'utils.context_processors.applist',
+    'django.contrib.messages.context_processors.messages',
     'utils.context_processors.debug',
-    'utils.context_processors.papelaria',)
+    'utils.context_processors.sistema',
+    )
 
 INSTALLED_APPS = (
     'django.contrib.auth',
@@ -139,10 +139,17 @@ AUTHENTICATION_BACKENDS = (
     'django_cas_ng.backends.CASBackend',
 )
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-sistema-django',
+        }
+    }
+
 CAS_SERVER_URL = 'https://cas.ansp.br/cas/'
 CAS_VERSION = '1'
 CAS_LOGOUT_COMPLETELY = True
-## end django_cas settings
+# end django_cas settings
 
 # Faz com que os cookies sejam descartados quando o browser for fechado
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
@@ -151,22 +158,23 @@ SESSION_SAVE_EVERY_REQUEST = True
 
 LOGIN_REDIRECT_URL = '/'
 
-SERVER_EMAIL='sistema@ansp.br'
+SERVER_EMAIL = 'sistema@ansp.br'
 
-#CACHE_BACKEND = 'memcached://127.0.0.1:11211/'
-#EMAIL_HOST='gmail-smtp-in.l.google.com'
-EMAIL_HOST='smtp.gmail.com'
-EMAIL_PORT=587
-EMAIL_HOST_USER='nara@ansp.br'
-EMAIL_HOST_PASSWORD='1234'
-EMAIL_USE_TLS=True
+# CACHE_BACKEND = 'memcached://127.0.0.1:11211/'
+# EMAIL_HOST='gmail-smtp-in.l.google.com'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'nara@ansp.br'
+EMAIL_HOST_PASSWORD = '1234'
+EMAIL_USE_TLS = True
 
 
 STATIC_ROOT = '/var/www/media/'
 STATIC_URL = '/media/'
 
-TINYMCE_JS_URL='/media/js/tiny_mce/tiny_mce.js'
-TINYMCE_DEFAULT_CONFIG={'theme':'advanced', 'plugins': 'table,style', 'theme_advanced_buttons3_add_before' : 'styleprops,tablecontrols,separator', 'height':80}
+TINYMCE_JS_URL = '/media/js/tiny_mce/tiny_mce.js'
+TINYMCE_DEFAULT_CONFIG = {'theme': 'advanced', 'plugins': 'table,style',
+                          'theme_advanced_buttons3_add_before': 'styleprops,tablecontrols,separator',
+                          'height': 80}
 
-
-CKEDITOR_UPLOAD_PATH='/var/www/files/ckeditor'
+CKEDITOR_UPLOAD_PATH = '/var/www/files/ckeditor'

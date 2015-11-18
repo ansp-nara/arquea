@@ -177,9 +177,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
         'django.core.context_processors.static',
         'django.core.context_processors.request',
         'django.contrib.messages.context_processors.messages',
-        'utils.context_processors.applist',
         'utils.context_processors.debug',
-        'utils.context_processors.papelaria',
+        'utils.context_processors.sistema',
     )
 
 CKEDITOR_UPLOAD_PATH = 'ckeditor/'
