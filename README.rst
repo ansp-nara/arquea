@@ -40,11 +40,12 @@ Configuração
 
 2. Adicione a seguinte linha no final seu ``settings.py``::
 
+    cd <nome do projeto>
+    vi <nome do projeto>/settings.py
     INSTALLED_APPS += ('configuracao',)
 
 3. Crie as configurações padrão::
 
-    cd <nome do projeto>
     python manage.py criarsistema <nome do projeto>
 
 4. Execute
@@ -73,7 +74,52 @@ Configuração
 
    e acesse http://localhost:8000 para verificar se a aplicação está rodando.
 
-7. Estando tudo ok nas etapas anteriores, é hora de colocar em produção. Abaixo, é utilizado o Apache + WSGI, mas
+
+Colocando em produção
+.....................
+
+1. Estando tudo ok nas etapas anteriores, é hora de colocar em produção. Por padrão, é criada
+uma base de dados SQLite, que é ótima para testes, mas não é muito indicada para um ambiente de 
+produção. Recomendamos utilizar o PostgreSQL ou o MySQL. Mostraremos como instalar e configurar 
+o PostgreSQL no Ubuntu.
+
+    a. Instale a biblioteca de desenvolvimento do PostgreSQL::
+        apt-get install libpq-dev
+    b. Instale o servidor do PostgreSQL::
+        apt-get install postgresql
+    c. Crie a base de dados::
+        sudo su - postgres
+        createdb <base>
+        createuser <user>
+        psql <base>
+        grant all on database <base> to <user>;
+        alter user <user> password '<pass>';
+        quit
+        CTRL+D
+
+    d. Repita o passo 4 de "Instalação" e instale o ``psycopg``::
+        pip install psycopg2
+
+    e. Edite o arquivo ``settings.py`` e altere as informações do banco de dados::
+        cd <nome do projeto>
+        vi <nome do projeto>/settings.py
+        
+        DATABASES = {
+	    'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'HOST': 'localhost', # se instalar o servidor em outra máquina, ip ou hostname dele
+            'NAME': '<base>',
+            'USER': '<user>',
+            'PASSWORD': '<pass>'
+            } 
+        }
+
+    f. Execute os passos 4 e 5 de "Configuração".
+
+    g. Execute o passo 6 de "Configuração" para verificar se com o PostgreSQL tudo continua
+funcionando.
+
+2. Para colocarmos em produção, precisamos de um webserver. Abaixo, é utilizado o Apache + WSGI, mas
 pode ser feito de outras maneiras, como descrito em https://docs.djangoproject.com/en/1.7/howto/deployment/ .
 
     a. Instale o ``apache2``, o ``mod_wsgi``;
