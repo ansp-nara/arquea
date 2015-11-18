@@ -510,7 +510,7 @@ class ViewTest(TestCase):
         url = reverse("patrimonio.views.por_estado")
         response = self.client.get(url, {'estado': '1'})
         
-        self.assertTrue(200, response.status_code)
+        self.assertEqual(200, response.status_code)
         
         # assert breadcrumb
         self.assertContains(response, u'<a href="/patrimonio/relatorio/por_estado">Patrimônio por estado do item</a>')

@@ -39,8 +39,6 @@ class RepositorioAdminForm(forms.ModelForm):
                                           [(p.id, p.__unicode__())
                                            for p in Repositorio.objects.all()
                                               .select_related('tipo', 'tipo__entidade', 'responsavel')
-                                              .prefetch_related('responsavel__historico_set',
-                                                                'responsavel__historico_set__cargo')
                                               .order_by('-data', '-numero', 'tipo')]
         self.fields['tipo'].choices = [('', '---------')] + \
                                       [(p.id, p.__unicode__())
@@ -50,11 +48,9 @@ class RepositorioAdminForm(forms.ModelForm):
                                              [(p.id, p.__unicode__())
                                               for p in Membro.objects
                                                  .filter(historico__funcionario=True, historico__termino__isnull=True)
-                                                 .prefetch_related('historico_set', 'historico_set__cargo')
                                                  .order_by('nome')]
         self.fields['demais'].choices = [(p.id, p.__unicode__())
                                          for p in Membro.objects.all()
-                                                        .prefetch_related('historico_set', 'historico_set__cargo')
                                                         .order_by('nome')]
         self.fields['memorandos'].choices = [(p.id, p.__unicode__())
                                              for p in MemorandoSimples.objects.all()

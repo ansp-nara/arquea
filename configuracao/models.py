@@ -100,7 +100,7 @@ class LayoutLogo(models.Model):
     url = models.CharField(_(u'URL do logo'), max_length=400, null=True, blank=True)
 
     def __unicode__(self):
-        return '%s' % (self.titulo)
+        return '%s' % self.titulo
 
 
 class LayoutLink(models.Model):
@@ -109,8 +109,8 @@ class LayoutLink(models.Model):
     ordem = models.PositiveSmallIntegerField(help_text=u"Ordem de exibição do link.")
 
     def __unicode__(self):
-        return '%s' % (self.titulo)
-
+        return '%s' % self.titulo
+    
     class Meta:
         ordering = ('ordem', 'titulo')
 

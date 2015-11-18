@@ -277,7 +277,9 @@ def ajax_controle_avancar_bloco(request):
     
     controle = get_object_or_404(Controle, pk=controle_id)
     controle.entrada = controle.entrada + timedelta(minutes=int(tempo))
-    controle.saida = controle.saida + timedelta(minutes=int(tempo)) 
+    # Saida pode estar vazio (None) no caso do dia corrente
+    if controle.saida:
+        controle.saida = controle.saida + timedelta(minutes=int(tempo))
     controle.save()
     
     json = simplejson.dumps('ok')
@@ -296,7 +298,9 @@ def ajax_controle_voltar_bloco(request):
     
     controle = get_object_or_404(Controle, pk=controle_id)
     controle.entrada = controle.entrada - timedelta(minutes=int(tempo))
-    controle.saida = controle.saida - timedelta(minutes=int(tempo)) 
+    # Saida pode estar vazio (None) no caso do dia corrente
+    if controle.saida:
+        controle.saida = controle.saida - timedelta(minutes=int(tempo))
     controle.save()
     
     json = simplejson.dumps('ok')
