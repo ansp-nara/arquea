@@ -88,11 +88,17 @@ class FieldsHelp(models.Model):
     def __unicode__(self):
         return '%s/%s - %s' % (self.model.content_type.app_label, self.model.content_type.model, self.field)
 
+    class Meta:
+        verbose_name = u'Ajuda dos campos'
+        verbose_name_plural = u'Ajudas dos campos'
 
 class LayoutPagina(models.Model):
     logo_cabecalho = models.ForeignKey('configuracao.LayoutLogo', related_name="+")
     logo_rodape = models.ForeignKey('configuracao.LayoutLogo', related_name="+")
 
+    class Meta:
+        verbose_name = u'Layout da página'
+        verbose_name_plural = u'Layout das páginas'
 
 class LayoutLogo(models.Model):
     logo = models.ImageField(null=True, blank=True)
@@ -101,6 +107,10 @@ class LayoutLogo(models.Model):
 
     def __unicode__(self):
         return '%s' % self.titulo
+
+    class Meta:
+        verbose_name = u'Logotipo do layout'
+        verbose_name_plural = u'Logotipos do layout'
 
 
 class LayoutLink(models.Model):
@@ -113,6 +123,10 @@ class LayoutLink(models.Model):
     
     class Meta:
         ordering = ('ordem', 'titulo')
+
+    class Meta:
+        verbose_name = u'Link do layout'
+        verbose_name_plural = u'Links do layout'
 
 
 class LayoutLinkHeader(LayoutLink):
