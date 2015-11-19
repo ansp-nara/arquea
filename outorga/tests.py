@@ -50,7 +50,7 @@ class TermoTest(UnitTestCase):
         ent2 = Entidade.objects.create(sigla='SAC', nome='SAC do Brasil', cnpj='00.000.000/0000-00', fisco=True, url='')
         ent3 = Entidade.objects.create(sigla='TERREMARK', nome='Terremark do Brasil', cnpj='00.000.000/0000-00',
                                        fisco=True, url='')
-        
+
         end1 = Endereco.objects.create(entidade=ent1)
         end2 = Endereco.objects.create(entidade=ent2)
         end3 = Endereco.objects.create(entidade=ent3)
@@ -81,7 +81,7 @@ class TermoTest(UnitTestCase):
         p2 = Protocolo.objects.create(termo=t, identificacao=iden2, tipo_documento=td, data_chegada=datetime(2008,9,30,10,10), origem=og, estado=ep, num_documento=7777, data_vencimento=date(2008,10,10), descricao='Serviço de Conexão Internacional - 09/2009', valor_total=None, moeda_estrangeira=False)
         p3 = Protocolo.objects.create(termo=t, identificacao=iden3, tipo_documento=td, data_chegada=datetime(2008,9,30,10,10), origem=og, estado=ep, num_documento=5555, data_vencimento=date(2008,10,15), descricao='Serviço de Conexão Local - 09/2009', valor_total=None, moeda_estrangeira=False)
 
-        #Cria Item do Protocolo
+        # Cria Item do Protocolo
         ip1 = ItemProtocolo.objects.create(protocolo=p1, descricao='Tarifa mensal - 09/2009', quantidade=1,
                                            valor_unitario=2500)
         ip2 = ItemProtocolo.objects.create(protocolo=p1, descricao='Reajuste tarifa mensal - 09/2009', quantidade=1,
@@ -139,11 +139,11 @@ class TermoTest(UnitTestCase):
 
     def test_termo_real_negativo(self):
         termo = Termo.objects.get(pk=1)
-        
+
         n1 = Natureza_gasto.objects.get(pk=1)
         n1.valor_concedido = -5000000
         n1.save()
-        
+
         self.assertEquals(termo.termo_real(), '-')
 
     def test_valor_concedido_dolar(self):
@@ -156,11 +156,11 @@ class TermoTest(UnitTestCase):
 
     def test_termo_dolar_negativo(self):
         termo = Termo.objects.get(pk=1)
-        
+
         n1 = Natureza_gasto.objects.get(pk=3)
         n1.valor_concedido = -9000000
         n1.save()
-        
+
         self.assertEquals(termo.termo_dolar(), '-')
 
     def test_duracao_meses(self):
@@ -195,11 +195,11 @@ class TermoTest(UnitTestCase):
 
     def test_formata_realizado_real__vazio(self):
         termo = Termo.objects.get(pk=1)
-        
+
         pg1 = Pagamento.objects.get(pk=1)
         pg1.valor_fapesp = 0
         pg1.save()
-        
+
         pg2 = Pagamento.objects.get(pk=2)
         pg2.valor_fapesp = 0
         pg2.save()
@@ -208,13 +208,13 @@ class TermoTest(UnitTestCase):
 
     def test_formata_realizado_real__negativo(self):
         termo = Termo.objects.get(pk=1)
-        
+
         pg1 = Pagamento.objects.get(pk=1)
         pg1.valor_fapesp = 9000000
         pg1.save()
-        
+
         self.assertEquals(termo.formata_realizado_real(), u'<span style="color: red"><b>R$ 9.250.000,00</b></span>')
-        
+
     def test_total_realizado_dolar(self):
         termo = Termo.objects.get(pk=1)
         self.assertEquals(termo.total_realizado_dolar, Decimal('100000.00'))
@@ -225,7 +225,7 @@ class TermoTest(UnitTestCase):
 
     def test_formata_realizado_dolar__vazio(self):
         termo = Termo.objects.get(pk=1)
-        
+
         pg2 = Pagamento.objects.get(pk=2)
         pg2.valor_fapesp = 0
         pg2.save()
@@ -238,20 +238,20 @@ class TermoTest(UnitTestCase):
 
     def test_formata_realizado_dolar__negativo(self):
         termo = Termo.objects.get(pk=1)
-        
+
         m1 = Modalidade.objects.get(pk=1)
         m1.moeda_nacional = False
         m1.save()
         m2 = Modalidade.objects.get(pk=2)
         m2.moeda_nacional = False
         m2.save()
-        
+
         pg1 = Pagamento.objects.get(pk=1)
         pg1.valor_fapesp = 9000000
         pg1.save()
-        
+
         self.assertEquals(termo.formata_realizado_dolar(), u'<span style="color: red">$ 9,350,000.00</span>')
-        
+
     def test_num_processo(self):
         termo = Termo.objects.get(pk=1)
         self.assertEquals(termo.num_processo, '08/22222-2')
@@ -282,15 +282,15 @@ class TermoTest(UnitTestCase):
 
     def test_termo_ativo(self):
         hoje = datetime.now().date()
-        
+
         termo = Termo.objects.get(pk=1)
         termo.inicio = hoje - timedelta(days=1)
         termo.save()
-        
+
         outorga = Outorga.objects.get(pk=1)
         outorga.termino = hoje + timedelta(days=1)
         outorga.save()
-        
+
         termo = Termo.termo_ativo()
         self.assertEquals(termo.id, 1)
 
@@ -298,7 +298,7 @@ class TermoTest(UnitTestCase):
 #     def test_real(self):
 #         termo = Termo.objects.get(pk=1)
 #         self.assertEquals(Termo.termos_auditoria_fapesp_em_aberto(), ['<Termo: 08/22222-2>'])
-# 
+#
 #     def test_real(self):
 #         termo = Termo.objects.get(pk=1)
 #         self.assertEquals(Termo.termos_auditoria_interna_em_aberto(), ['<Termo: 08/22222-2>'])
@@ -335,7 +335,7 @@ class OutorgaTest(UnitTestCase):
 
         n1 = Natureza_gasto.objects.create(modalidade=m1, termo=t, valor_concedido='1500000.00')
         n2 = Natureza_gasto.objects.create(modalidade=m2, termo=t, valor_concedido='1500000.00')
-        
+
         # Cria Item de Outorga
         ent1 = Entidade.objects.create(sigla='GTECH', nome='Granero Tech', cnpj='00.000.000/0000-00', fisco=True,
                                        url='')
@@ -372,7 +372,7 @@ class OutorgaTest(UnitTestCase):
     def test_existe_arquivo__com_arquivo(self):
         o1 = Outorga.objects.get(pk=1)
         o1.arquivo = 'teste.pdf'
-        
+
         self.assertEquals(o1.existe_arquivo(), '<center><a href="/admin/outorga/arquivo/?outorga__id__exact=1">'
                                                '<img src="/media/img/arquivo.png" /></a></center>')
 
@@ -395,7 +395,7 @@ class OutorgaViewTest(UnitTestCase):
 
         n1 = Natureza_gasto.objects.create(modalidade=m1, termo=t, valor_concedido='1500000.00')
         n2 = Natureza_gasto.objects.create(modalidade=m2, termo=t, valor_concedido='1500000.00')
-        
+
         # Cria Item de Outorga
         ent1 = Entidade.objects.create(sigla='GTECH', nome='Granero Tech', cnpj='00.000.000/0000-00', fisco=True,
                                        url='')
@@ -405,11 +405,11 @@ class OutorgaViewTest(UnitTestCase):
                                  justificativa='Armazenagem de equipamentos', quantidade=12, valor=2500)
         i2 = Item.objects.create(entidade=ent2, natureza_gasto=n2, descricao='Serviço de Conexão Internacional',
                                  justificativa='Link Internacional', quantidade=12, valor=250000)
-        
+
         # Entidades para o teste da View ###
         cont1 = Contrato.objects.create(numero='1111/11', descricao='contrato1', entidade=ent1, auto_renova=False,
                                         data_inicio=date(2013, 1, 02), limite_rescisao=date(2013, 1, 3))
-        
+
         # Cria uma Ordem de Serviço
         estadoOs = EstadoOS.objects.create(nome="Vigente")
         tipo = TipoContrato.objects.create(nome='Tipo Fixo')
@@ -418,22 +418,22 @@ class OutorgaViewTest(UnitTestCase):
         os = OrdemDeServico.objects.create(acordo=acordo, contrato=cont1, tipo=tipo, estado=estadoOs, numero=66666,
                                            data_inicio=date(2008, 2, 1), data_rescisao=date(2008, 11, 1),
                                            antes_rescisao=2, descricao='OS 34567 - Contratação de mais um link')
-        
+
         of1 = OrigemFapesp.objects.create(acordo=acordo, item_outorga=i1)
 
     def test_call__relatorio_contratos_por_entidade(self):
         mock_render = mock.MagicMock()
         with mock.patch.multiple('outorga.views', render=mock_render, login_required=lambda x: x):
-             
+
             from outorga.views import contratos
             mock_request = mock.Mock()
             # mockin request GET parameters
             mock_request.method = "GET"
             mock_request.GET = QueryDict("entidade=0&estadoos=0")
-            
+
             # call view
             contratos(mock_request)
-            
+
             _, args, _ = mock_render.mock_calls[0]
 
             self.assertEquals(args[1], 'outorga/contratos.html', 'Template errado.')
@@ -449,20 +449,20 @@ class OutorgaViewTest(UnitTestCase):
     def test_call__relatorio_contratos_por_entidade__sem_os(self):
         os = OrdemDeServico.objects.get(pk=1)
         os.delete()
-        
+
         mock_render = mock.MagicMock()
         with mock.patch.multiple('outorga.views', render=mock_render, login_required=lambda x: x):
-             
+
             from outorga.views import contratos
             mock_request = mock.Mock()
             # mockin request GET parameters
             mock_request.method = "GET"
             mock_request.GET = QueryDict("entidade=1&estadoos=0")
-            
+
             # call view
             contratos(mock_request)
             _, args, _ = mock_render.mock_calls[0]
-            
+
             print args[2]
             print args[2]['entidades'][0]['contratos'][0]
 
@@ -470,10 +470,10 @@ class OutorgaViewTest(UnitTestCase):
                             'Ordemdeservico não deve estar na resposta da view.')
 
     def test_call__relatorio_termos(self):
-        
+
         mock_render = mock.MagicMock()
         with mock.patch.multiple('outorga.views', render=mock_render, login_required=lambda x: x):
-             
+
             from outorga.views import relatorio_termos
             mock_request = mock.Mock()
             mock_request.method = "GET"
@@ -487,7 +487,7 @@ class OutorgaViewTest(UnitTestCase):
     def test_call__relatorio_termos__request_post(self):
         mock_render = mock.MagicMock()
         with mock.patch.multiple('outorga.views', render=mock_render, login_required=lambda x: x):
-             
+
             from outorga.views import relatorio_termos
             mock_request = mock.Mock()
             mock_request.method = "POST"
@@ -498,7 +498,7 @@ class OutorgaViewTest(UnitTestCase):
     def test_call__lista_acordos(self):
         mock_render = mock.MagicMock()
         with mock.patch.multiple('outorga.views', render=mock_render, login_required=lambda x: x):
-             
+
             from outorga.views import lista_acordos
             mock_request = mock.Mock()
             mock_request.method = "GET"
@@ -507,7 +507,7 @@ class OutorgaViewTest(UnitTestCase):
             _, args, _ = mock_render.mock_calls[0]
 
             self.assertEquals(args[1], 'outorga/acordos.html')
-            
+
             self.assertEquals(args[2]['processos'][0]['processo'].processo, 22222)
             self.assertEquals(args[2]['processos'][0]['acordos'][0]['acordo'].__unicode__(),
                               u'Acordo entre Instituto UNIEMP e SAC')
@@ -518,10 +518,10 @@ class OutorgaViewTest(UnitTestCase):
     def test_call__lista_acordos__sem_origemfapesp(self):
         origemFapesp = OrigemFapesp.objects.get(pk=1)
         origemFapesp.delete()
-        
+
         mock_render = mock.MagicMock()
         with mock.patch.multiple('outorga.views', render=mock_render, login_required=lambda x: x):
-             
+
             from outorga.views import lista_acordos
             mock_request = mock.Mock()
             mock_request.method = "GET"
@@ -530,14 +530,14 @@ class OutorgaViewTest(UnitTestCase):
             _, args, _ = mock_render.mock_calls[0]
 
             self.assertEquals(args[1], 'outorga/acordos.html')
-            
+
             self.assertEquals(args[2]['processos'][0]['processo'].processo, 22222)
             self.assertTrue(len(args[2]['processos'][0]['acordos']) == 0)
 
     def test_call__lista_acordos__pdf(self):
         mock_render = mock.MagicMock()
         with mock.patch.multiple('outorga.views', render=mock_render, login_required=lambda x: x):
-             
+
             from outorga.views import lista_acordos
             mock_request = mock.Mock()
             mock_request.method = "GET"
@@ -549,36 +549,36 @@ class OutorgaViewTest(UnitTestCase):
     def test_call__item_modalidade__pagina_filtro_inicial(self):
         mock_render = mock.MagicMock()
         with mock.patch.multiple('outorga.views', render=mock_render, login_required=lambda x: x):
-             
+
             from outorga.views import item_modalidade
             mock_request = mock.Mock()
             # mockin request GET parameters
             mock_request.method = "GET"
             mock_request.GET = QueryDict([])
-            
+
             # call view
             item_modalidade(mock_request)
             _, args, _ = mock_render.mock_calls[0]
 
             self.assertEquals(args[1], 'outorga/termo_mod.html')
-            
+
             self.assertIsNotNone(args[2]['termos'])
             self.assertIsNotNone(args[2]['modalidades'])
             self.assertIsNotNone(args[2]['entidadesProcedencia'])
             self.assertIsNotNone(args[2]['entidadesFabricante'])
             self.assertIsNotNone(args[2]['entidadesItemOutorga'])
-            
+
             self.assertIsNone(args[2]['termo'])
             self.assertIsNone(args[2]['modalidade'])
             self.assertIsNone(args[2]['entidade'])
-            
+
             # Verificando se não entrou no if errado dentro da view, buscando mais informações que deveria
             self.assertFalse('itens' in args[2])
 
     def test_call__item_modalidade__sem_entidade(self):
         mock_render = mock.MagicMock()
         with mock.patch.multiple('outorga.views', render=mock_render, login_required=lambda x: x):
-             
+
             from outorga.views import item_modalidade
             mock_request = mock.Mock()
             # mockin request GET parameters
@@ -598,7 +598,7 @@ class OutorgaViewTest(UnitTestCase):
     def test_call__item_modalidade(self):
         mock_render = mock.MagicMock()
         with mock.patch.multiple('outorga.views', render=mock_render, login_required=lambda x: x):
-             
+
             from outorga.views import item_modalidade
             mock_request = mock.Mock()
             # mockin request GET parameters
@@ -619,7 +619,7 @@ class OutorgaViewTest(UnitTestCase):
 class Natureza_gastoTest(UnitTestCase):
     def setUp(self):
         super(Natureza_gastoTest, self).setUp()
-        
+
         # Cria Termo
         e = EstadoOutorga.objects.create(nome='Vigente')
         t = Termo.objects.create(ano=2008, processo=22222, digito=2, inicio=date(2008, 1, 1), estado=e)
@@ -738,12 +738,12 @@ class Natureza_gastoTest(UnitTestCase):
         self.assertEqual(n1.total_realizado_parcial(5, 2008, 9, 2008), Decimal('2650'))
         self.assertEqual(n1.total_realizado_parcial(5, 2008, 12, 2008), Decimal('102650'))
         self.assertEqual(n1.total_realizado_parcial(10, 2008, 12, 2008), Decimal('100000'))
-        
+
     def test_formata_total_realizado__zero(self):
         pg1 = Pagamento.objects.get(pk=1)
         pg1.valor_fapesp = 0
         pg1.save()
-        
+
         pg2 = Pagamento.objects.get(pk=2)
         pg2.valor_fapesp = 0
         pg2.save()
@@ -781,15 +781,15 @@ class Natureza_gastoTest(UnitTestCase):
         i1 = Item.objects.get(pk=1)
         i1.valor = 0
         i1.save()
-        
+
         i2 = Item.objects.get(pk=2)
         i2.valor = 0
         i2.save()
-        
+
         i3 = Item.objects.get(pk=3)
         i3.valor = 0
         i3.save()
-        
+
         self.assertEquals(n2.soma_itens(), '-', 'A soma dos valores dos itens não é zero.')
 
     def test_todos_itens(self):
@@ -807,7 +807,7 @@ class Natureza_gastoTest(UnitTestCase):
         n1 = Natureza_gasto.objects.get(pk=1)
         n1.valor_concedido = 0
         n1.save()
-        
+
         self.assertEquals(n1.total_concedido_mod_termo(), 'R$ 0,00')
 
     def test_v_concedido(self):
@@ -849,7 +849,7 @@ class ItemTest(UnitTestCase):
         super(ItemTest, self).setUp()
         # Cria Termo
         eo1 = EstadoOutorga.objects.create(nome='Vigente')
-        t = Termo.objects.create(ano=2008, inicio=date(2008,1,1), estado=eo1, processo=22222, digito=2)
+        t = Termo.objects.create(ano=2008, inicio=date(2008, 1, 1), estado=eo1, processo=22222, digito=2)
 
         # Cria Outorga
         c1 = Categoria.objects.create(nome='Inicial')
@@ -857,7 +857,7 @@ class ItemTest(UnitTestCase):
 
         o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007, 12, 1),
                                     termino=date(2008, 12, 31), data_presta_contas=date(2008, 2, 28))
-        o2 = Outorga.objects.create(termo=t, categoria=c2, data_solicitacao=date(2008,4,1), termino=date(2008, 12, 31),
+        o2 = Outorga.objects.create(termo=t, categoria=c2, data_solicitacao=date(2008, 4, 1), termino=date(2008, 12, 31),
                                     data_presta_contas=date(2008, 2, 28))
 
         # Cria Natureza de gasto
@@ -880,7 +880,7 @@ class ItemTest(UnitTestCase):
         ep = EstadoProtocolo.objects.create(nome='Aprovado')
         td = TipoDocumento.objects.create(nome='Nota Fiscal')
         og = Origem.objects.create(nome='Motoboy')
-        
+
         cot1 = Contato.objects.create(primeiro_nome='Alex', email='alex@alex.com.br', tel='')
 
         iden1 = Identificacao.objects.create(contato=cot1, funcao='Gerente', area='Redes', ativo=True,
@@ -931,19 +931,19 @@ class ItemTest(UnitTestCase):
     def test_unicode(self):
         item = Item.objects.get(pk=1)
         self.assertEquals(item.__unicode__(), u'08/22222-2 - Serviço de Conexão Internacional')
-        
+
     def test_mostra_termo(self):
         item = Item.objects.get(pk=1)
         self.assertEquals(item.mostra_termo(), u'08/22222-2')
-        
+
     def test_mostra_descricao(self):
         item = Item.objects.get(pk=1)
         self.assertEquals(item.mostra_descricao(), u'Serviço de Conexão Internacional')
-    
+
     def test_mostra_modalidade(self):
         item = Item.objects.get(pk=1)
         self.assertEquals(item.mostra_modalidade(), u'STE0')
-        
+
     def test_mostra_quantidade(self):
         item = Item.objects.get(pk=1)
         self.assertEquals(item.mostra_quantidade(), 12)
@@ -952,7 +952,7 @@ class ItemTest(UnitTestCase):
         item = Item.objects.get(pk=1)
         item.quantidade = 0
         self.assertEquals(item.mostra_quantidade(), '-')
-        
+
     def test_mostra_valor_realizado(self):
         item = Item.objects.get(pk=1)
         self.assertEquals(item.mostra_valor_realizado(), '$ 600,010.00')
@@ -963,7 +963,7 @@ class ItemTest(UnitTestCase):
         pg1 = Pagamento.objects.get(pk=1)
         pg1.valor_fapesp = 0
         pg1.save()
-        
+
         pg2 = Pagamento.objects.get(pk=2)
         pg2.valor_fapesp = 0
         pg2.save()
@@ -999,7 +999,7 @@ class ItemTest(UnitTestCase):
     def test_calcula_total_despesas(self):
         item = Item.objects.get(pk=1)
         self.assertEquals(item.calcula_total_despesas(), 600010.00)
-        
+
     def test_calcula_total_despesas__vazia(self):
         item2 = Item.objects.get(pk=2)
         of = OrigemFapesp.objects.get(pk=1)
@@ -1030,7 +1030,7 @@ class ItemTest(UnitTestCase):
         of = OrigemFapesp.objects.get(pk=1)
         of.item_outorga = item2
         of.save()
-        
+
         item = Item.objects.get(pk=1)
         dt = date(2008, 11, 11)
         self.assertEquals(item.calcula_realizado_mes(dt, False), Decimal(0.00))
@@ -1098,11 +1098,11 @@ class ModalidadeTest(UnitTestCase):
 #         n = Natureza_gasto.objects.create(modalidade=m, outorga=o)
 
     def test_unicode(self):
-        m = Modalidade.objects.get(pk=1)
+        m = Modalidade.objects.get(sigla='STE0')
         self.assertEquals(m.__unicode__(), u'STE0 - Servicos de Terceiro no Exterior')
 
     def test_modalidades_termo(self):
-        modalidade = Modalidade.objects.get(pk=1)
+        modalidade = Modalidade.objects.get(sigla='STE0')
         termo = Termo.objects.get(pk=1)
         self.assertEquals(str(modalidade.modalidades_termo(termo)),
                           '[<Modalidade: STE0 - Servicos de Terceiro no Exterior>]')
@@ -1113,7 +1113,7 @@ class EstadoTest(UnitTestCase):
         super(EstadoTest, self).setUp()
         # Cria Estado
         e = EstadoOutorga.objects.create(nome='Vigente')
-        
+
     def test_unicode(self):
         e = EstadoOutorga.objects.get(pk=1)
         self.assertEquals(e.__unicode__(), u'Vigente')
@@ -1151,11 +1151,11 @@ class OrigemFapespTest(UnitTestCase):
         i2 = Item.objects.create(entidade=ent1, natureza_gasto=n2, descricao='Serviço de Conexão Internacional',
                                  justificativa='Ajuste na cobrança do Link Internacional', quantidade=6, valor=50000)
 
-        #Cria Protocolo
+        # Cria Protocolo
         ep = EstadoProtocolo.objects.create(nome='Aprovado')
         td = TipoDocumento.objects.create(nome='Nota Fiscal')
         og = Origem.objects.create(nome='Motoboy')
-        
+
         cot1 = Contato.objects.create(primeiro_nome='Alex', email='alex@alex.com.br', tel='', ativo=True)
 
         iden1 = Identificacao.objects.create(contato=cot1, funcao='Gerente', area='Redes', ativo=True,
@@ -1215,11 +1215,11 @@ class OrigemFapespTest(UnitTestCase):
         pg1 = Pagamento.objects.get(pk=1)
         pg1.valor_fapesp = 0
         pg1.save()
-        
+
         pg2 = Pagamento.objects.get(pk=2)
         pg2.valor_fapesp = 0
         pg2.save()
-        
+
         pg3 = Pagamento.objects.get(pk=3)
         pg3.valor_fapesp = 0
         pg3.save()
@@ -1255,7 +1255,7 @@ class ContratoTest(UnitTestCase):
 
     def test_existe_arquivo__com_arquivo(self):
         ct = Contrato.objects.get(pk=1)
-        
+
         ct.arquivo = ""
         ct.arquivo.name = 'test_img_file.gif'
         ct.arquivo._commited = True
@@ -1265,7 +1265,7 @@ class ContratoTest(UnitTestCase):
 
     def test_existe_arquivo__com_arquivo_e_path(self):
         ct = Contrato.objects.get(pk=1)
-        
+
         ct.arquivo = ""
         ct.arquivo.name = 'teste/teste/test_img_file.gif'
         ct.arquivo._commited = True
@@ -1284,7 +1284,7 @@ class ContratoTest(UnitTestCase):
 class OrdemDeServicoTest(UnitTestCase):
     def setUp(self):
         super(OrdemDeServicoTest, self).setUp()
-        
+
         # Cria um Contrato
         ent = Entidade.objects.create(sigla='SAC', nome='SAC do Brasil', cnpj='00.000.000/0000-00', fisco=True, url='')
         ct = Contrato.objects.create(data_inicio=date(2008, 1, 1), auto_renova=True, limite_rescisao=date(2008, 1, 11),
@@ -1330,12 +1330,12 @@ class OrdemDeServicoTest(UnitTestCase):
         arquivo.data = "2013-01-01"
         arquivo.arquivo = ""
         arquivo.arquivo.name = 'test_img_file.gif'
-        
+
         arquivo.save()
-        
+
         self.assertEquals(os.existe_arquivo(), u'<center><a href="/admin/outorga/arquivoos/?os__id__exact=%s">'
                                                u'<img src="/media/img/arquivo.png" /></a></center>' % os.id)
-        
+
         arquivo.arquivo.delete()
         arquivo.delete()
 
@@ -1349,15 +1349,15 @@ class OrdemDeServicoTest(UnitTestCase):
 
     def test_primeiro_arquivo(self):
         os = OrdemDeServico.objects.get(pk=1)
-        
+
         arquivo = ArquivoOS(os=os)
         arquivo.data = "2013-01-01"
         arquivo.arquivo = ""
         arquivo.arquivo.name = 'test_img_file.gif'
         arquivo.save()
-        
+
         self.assertEquals(os.primeiro_arquivo(), 'test_img_file.gif')
-        
+
         arquivo.arquivo.delete()
         arquivo.delete()
 
@@ -1369,18 +1369,18 @@ class ArquivoTest(UnitTestCase):
         # Cria Termo
         e = EstadoOutorga.objects.create(nome='Vigente')
         t = Termo.objects.create(ano=2008, processo=22222, digito=2, inicio=date(2008, 1, 1), estado=e)
-        
+
         # Cria Outorga
         c1 = Categoria.objects.create(nome='Inicial')
         c2 = Categoria.objects.create(nome='Aditivo')
-        
+
         o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007, 12, 1),
                                     termino=date(2008, 12, 31), data_presta_contas=date(2008, 2, 28))
 
         # Cria Arquivo
         arq = Arquivo(outorga=o1)
         arq.save()
-        # Criando um dirty Mock para o teste do arquivo 
+        # Criando um dirty Mock para o teste do arquivo
         arq.arquivo = ""
         arq.arquivo.name = 'test_img_file.gif'
         arq.arquivo._commited = True
@@ -1409,7 +1409,7 @@ class ArquivoTest(UnitTestCase):
 class ArquivoOSTest(UnitTestCase):
     def setUp(self):
         super(ArquivoOSTest, self).setUp()
-        
+
         # Cria um Contrato
         ent = Entidade.objects.create(sigla='SAC', nome='SAC do Brasil', cnpj='00.000.000/0000-00', fisco=True, url='')
         ct = Contrato.objects.create(data_inicio=date(2008, 1, 1), auto_renova=True, limite_rescisao=date(2008, 1, 11),
@@ -1431,30 +1431,31 @@ class ArquivoOSTest(UnitTestCase):
         orderServico = OrdemDeServico.objects.get(pk=1)
         arquivo = ArquivoOS(os=orderServico)
         arquivo.data = "2013-01-01"
-        # Criando um dirty Mock para o teste do arquivo 
+        # Criando um dirty Mock para o teste do arquivo
         arquivo.arquivo = ""
         arquivo.arquivo.name = 'test_img_file.gif'
         arquivo.arquivo._commited = True
         arquivo.save()
-        
+
         orderServico.arquivo = arquivo
-        
+
         self.assertEquals(arquivo.__unicode__(), u'test_img_file.gif')
-        
+
         arquivo.delete()
 
     def test_unicode_com_path(self):
         orderServico = OrdemDeServico.objects.get(pk=1)
         arquivo = ArquivoOS(os=orderServico)
         arquivo.data = "2013-01-01"
-        # Criando um dirty Mock para o teste do arquivo 
+
+        # Criando um dirty Mock para o teste do arquivo
         arquivo.arquivo = ""
         arquivo.arquivo.name = 'tmp/teste/test_img_file.gif'
         arquivo.arquivo._commited = True
         arquivo.save()
-        
+
         orderServico.arquivo = arquivo
-        
+
         self.assertEquals(arquivo.__unicode__(), u'test_img_file.gif')
-        
+
         arquivo.delete()

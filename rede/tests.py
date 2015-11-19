@@ -259,9 +259,6 @@ class ViewBlocoIPTest(TestCase):
         self._test_view__blocosip__filtros__cabecalhos(response)
 
         # asssert dos dados do relatório. Verificação dos cabeçalhos das colunas.
-        self.assertContains(response, u"""   <div class="col1">
-   Bloco IP
-   </div>""")
         self.assertContains(response, u'<div class="colunas">AS anunciante</div>')
         self.assertContains(response, u'<div class="colunas">AS proprietário</div>')
         self.assertContains(response, u'<div class="colunas">Usado por</div>')
