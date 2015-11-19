@@ -84,10 +84,15 @@ produção. Recomendamos utilizar o PostgreSQL ou o MySQL. Mostraremos como inst
 o PostgreSQL no Ubuntu.
 
     a. Instale a biblioteca de desenvolvimento do PostgreSQL::
+
         apt-get install libpq-dev
+
     b. Instale o servidor do PostgreSQL::
+
         apt-get install postgresql
+
     c. Crie a base de dados::
+
         sudo su - postgres
         createdb <base>
         createuser <user>
@@ -98,9 +103,11 @@ o PostgreSQL no Ubuntu.
         CTRL+D
 
     d. Repita o passo 4 de "Instalação" e instale o ``psycopg``::
+
         pip install psycopg2
 
     e. Edite o arquivo ``settings.py`` e altere as informações do banco de dados::
+
         cd <nome do projeto>
         vi <nome do projeto>/settings.py
         
@@ -116,8 +123,7 @@ o PostgreSQL no Ubuntu.
 
     f. Execute os passos 4 e 5 de "Configuração".
 
-    g. Execute o passo 6 de "Configuração" para verificar se com o PostgreSQL tudo continua
-funcionando.
+    g. Execute o passo 6 de "Configuração" para verificar se com o PostgreSQL tudo continua funcionando.
 
 2. Para colocarmos em produção, precisamos de um webserver. Abaixo, é utilizado o Apache + WSGI, mas
 pode ser feito de outras maneiras, como descrito em https://docs.djangoproject.com/en/1.7/howto/deployment/ .
