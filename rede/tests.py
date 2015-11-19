@@ -33,15 +33,15 @@ class BlocoIPModelTest(TestCase):
 
     def test_unicode(self):
         p = BlocoIP.objects.get(ip='192.168.1.0')
-        self.assertEquals('192.168.1.0/20', p.__unicode__())
+        self.assertEqual('192.168.1.0/20', p.__unicode__())
 
     def test_cidr(self):
         p = BlocoIP.objects.get(ip='192.168.1.0')
-        self.assertEquals('192.168.1.0/20', p.cidr())
+        self.assertEqual('192.168.1.0/20', p.cidr())
 
     def test_netmask(self):
         p = BlocoIP.objects.get(ip='192.168.1.0')
-        self.assertEquals('255.255.240.0', p.netmask())
+        self.assertEqual('255.255.240.0', p.netmask())
 
     def test_ipv4(self):
         p = BlocoIP.objects.get(ip='192.168.1.0')
@@ -55,19 +55,19 @@ class BlocoIPModelTest(TestCase):
 
     def test_AS(self):
         p = BlocoIP.objects.get(ip='192.168.1.0')
-        self.assertEquals(1234, p.AS())
+        self.assertEqual(1234, p.AS())
 
     def test_prop(self):
         p = BlocoIP.objects.get(ip='192.168.1.0')
-        self.assertEquals('ANSP_PROP', p.prop().entidade.sigla)
+        self.assertEqual('ANSP_PROP', p.prop().entidade.sigla)
 
     def test_usu(self):
         p = BlocoIP.objects.get(ip='192.168.1.0')
-        self.assertEquals('ANSP_USUARIO', p.usu())
+        self.assertEqual('ANSP_USUARIO', p.usu())
 
     def test_desig(self):
         p = BlocoIP.objects.get(ip='192.168.1.0')
-        self.assertEquals('ANSP_DESIGNADO', p.desig())
+        self.assertEqual('ANSP_DESIGNADO', p.desig())
 
     def test_leaf(self):
         p = BlocoIP.objects.get(ip='192.168.1.0')
@@ -233,7 +233,7 @@ class ViewBlocoIPTest(TestCase):
         url = reverse("rede.views.blocosip")
         response = self.client.get(url, {})
 
-        self.assertTrue(200, response.status_code)
+        self.assertEqual(200, response.status_code)
 
         # assert breadcrumb
         self._test_view__blocosip__breadcrumb(response)
@@ -249,9 +249,9 @@ class ViewBlocoIPTest(TestCase):
 
         url = reverse("rede.views.blocosip")
         response = self.client.get(url, {'anunciante': '0', 'proprietario': '0', 'usuario': '0', 'designado': '0'})
-        
+
         self.assertEqual(200, response.status_code)
-        
+
         # assert breadcrumb
         self._test_view__blocosip__breadcrumb(response)
 
@@ -295,7 +295,7 @@ class ViewBlocoIPTest(TestCase):
         url = reverse("rede.views.blocosip")
         response = self.client.get(url, {'anunciante': '1', 'proprietario': '0', 'usuario': '0', 'designado': '0'})
 
-        self.assertTrue(200, response.status_code)
+        self.assertEqual(200, response.status_code)
 
         # assert breadcrumb
         self._test_view__blocosip__breadcrumb(response)
@@ -317,7 +317,7 @@ class ViewBlocoIPTest(TestCase):
         url = reverse("rede.views.blocosip")
         response = self.client.get(url, {'anunciante': '0', 'proprietario': '2', 'usuario': '0', 'designado': '0'})
 
-        self.assertTrue(200, response.status_code)
+        self.assertEqual(200, response.status_code)
 
         # assert breadcrumb
         self._test_view__blocosip__breadcrumb(response)
@@ -339,7 +339,7 @@ class ViewBlocoIPTest(TestCase):
         url = reverse("rede.views.blocosip")
         response = self.client.get(url, {'anunciante': '0', 'proprietario': '0', 'usuario': '4', 'designado': '0'})
 
-        self.assertTrue(200, response.status_code)
+        self.assertEqual(200, response.status_code)
 
         # assert breadcrumb
         self._test_view__blocosip__breadcrumb(response)
@@ -361,7 +361,7 @@ class ViewBlocoIPTest(TestCase):
         url = reverse("rede.views.blocosip")
         response = self.client.get(url, {'anunciante': '0', 'proprietario': '0', 'usuario': '0', 'designado': '3'})
 
-        self.assertTrue(200, response.status_code)
+        self.assertEqual(200, response.status_code)
 
         # assert breadcrumb
         self._test_view__blocosip__breadcrumb(response)
@@ -459,7 +459,7 @@ class ViewBlocoIPANSPTest(TestCase):
         url = reverse("rede.views.blocosip_ansp")
         response = self.client.get(url, {'anunciante': '0', 'proprietario': '0'})
 
-        self.assertTrue(200, response.status_code)
+        self.assertEqual(200, response.status_code)
 
         # assert breadcrumb
         self._test_view__blocosip_ansp__breadcrumb(response)
@@ -514,7 +514,7 @@ class ViewBlocoIPANSPTest(TestCase):
         url = reverse("rede.views.blocosip_ansp")
         response = self.client.get(url, {'anunciante': '0', 'proprietario': '3', 'usuario': '0', 'designado': '0'})
 
-        self.assertTrue(200, response.status_code)
+        self.assertEqual(200, response.status_code)
 
         # assert breadcrumb
         self._test_view__blocosip_ansp__breadcrumb(response)
@@ -611,7 +611,7 @@ class ViewBlocoIPTransitoTest(TestCase):
         url = reverse("rede.views.blocosip_transito")
         response = self.client.get(url, {'anunciante': '0', 'proprietario': '0'})
 
-        self.assertTrue(200, response.status_code)
+        self.assertEqual(200, response.status_code)
 
         # assert breadcrumb
         self._test_view__blocosip_transito__breadcrumb(response)
@@ -893,7 +893,7 @@ class ViewBlocoIPInstTransitoTest(TestCase):
         url = reverse("rede.views.blocosip_inst_transito")
         response = self.client.get(url, {'anunciante': '0', 'proprietario': '3'})
 
-        self.assertTrue(200, response.status_code)
+        self.assertEqual(200, response.status_code)
 
         # assert breadcrumb
         self._test_view__blocosip_inst_transito__breadcrumb(response)
@@ -995,7 +995,7 @@ class ViewBlocoIPInstTransitoTest(TestCase):
 #         url = reverse("rede.views.crossconnection")
 #         response = self.client.get(url, {})
 #
-#         self.assertTrue(200, response.status_code)
+#         self.assertEqual(200, response.status_code)
 #
 #         # assert breadcrumb
 #         self._test_view__cross_connection__breadcrumb(response)
@@ -1013,7 +1013,7 @@ class ViewBlocoIPInstTransitoTest(TestCase):
 #         url = reverse("rede.views.crossconnection")
 #         response = self.client.get(url, {'rack':'0', 'shelf':'0', 'conector':'0', 'projeto':'0'})
 #
-#         self.assertTrue(200, response.status_code)
+#         self.assertEqual(200, response.status_code)
 #
 #         # assert breadcrumb
 #         self._test_view__cross_connection__breadcrumb(response)
@@ -1052,7 +1052,7 @@ class ViewBlocoIPInstTransitoTest(TestCase):
 #         url = reverse("rede.views.crossconnection")
 #         response = self.client.get(url, {'rack':'rack1', 'shelf':'0', 'conector':'0', 'projeto':'0'})
 #
-#         self.assertTrue(200, response.status_code)
+#         self.assertEqual(200, response.status_code)
 #
 #         # assert breadcrumb
 #         self._test_view__cross_connection__breadcrumb(response)
@@ -1078,7 +1078,7 @@ class ViewBlocoIPInstTransitoTest(TestCase):
 #         url = reverse("rede.views.crossconnection")
 #         response = self.client.get(url, {'rack':'rack1', 'shelf':'shelf1', 'conector':'0', 'projeto':'0'})
 #
-#         self.assertTrue(200, response.status_code)
+#         self.assertEqual(200, response.status_code)
 #
 #         # assert breadcrumb
 #         self._test_view__cross_connection__breadcrumb(response)
@@ -1104,7 +1104,7 @@ class ViewBlocoIPInstTransitoTest(TestCase):
 #         url = reverse("rede.views.crossconnection")
 #         response = self.client.get(url, {'rack':'0', 'shelf':'0', 'conector':'PC SM', 'projeto':'0'})
 #
-#         self.assertTrue(200, response.status_code)
+#         self.assertEqual(200, response.status_code)
 #
 #         # assert breadcrumb
 #         self._test_view__cross_connection__breadcrumb(response)
@@ -1125,7 +1125,7 @@ class ViewBlocoIPInstTransitoTest(TestCase):
 #         url = reverse("rede.views.crossconnection")
 #         response = self.client.get(url, {'rack':'0', 'shelf':'0', 'conector':'0', 'projeto':'OS3'})
 #
-#         self.assertTrue(200, response.status_code)
+#         self.assertEqual(200, response.status_code)
 #
 #         # assert breadcrumb
 #         self._test_view__cross_connection__breadcrumb(response)

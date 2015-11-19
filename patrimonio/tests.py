@@ -23,32 +23,32 @@ class EstadoTest(TestCase):
     def test_unicode(self):
         est = Estado.objects.create(nome="ESTADO_NOME")
         
-        self.assertEquals(u'ESTADO_NOME', est.__unicode__())
+        self.assertEqual(u'ESTADO_NOME', est.__unicode__())
 
 
 class TipoTest(TestCase):
     def test_unicode(self):
         tipo = Tipo.objects.create(nome="TIPO_NOME")
         
-        self.assertEquals(u'TIPO_NOME', tipo.__unicode__())
+        self.assertEqual(u'TIPO_NOME', tipo.__unicode__())
 
 
 class DirecaoTest(TestCase):
     def test_unicode(self):
         direcao = Direcao.objects.create(origem="ORIGEM", destino="DESTINO")
         
-        self.assertEquals(u'ORIGEM - DESTINO', direcao.__unicode__())
+        self.assertEqual(u'ORIGEM - DESTINO', direcao.__unicode__())
 
     def test_meta(self):
-        self.assertEquals(u'Direção', Direcao._meta.verbose_name)
-        self.assertEquals(u'Direções', Direcao._meta.verbose_name_plural)
+        self.assertEqual(u'Direção', Direcao._meta.verbose_name)
+        self.assertEqual(u'Direções', Direcao._meta.verbose_name_plural)
 
 
 class DistribuicaoUnidadeTest(TestCase):
     def test_unicode(self):
         distribuicaoUnidade = DistribuicaoUnidade.objects.create(nome="NOME", sigla="SIGLA")
         
-        self.assertEquals(u'SIGLA - NOME', distribuicaoUnidade.__unicode__())
+        self.assertEqual(u'SIGLA - NOME', distribuicaoUnidade.__unicode__())
 
 
 class DistribuicaoTest(TestCase):
@@ -57,18 +57,18 @@ class DistribuicaoTest(TestCase):
         direcao = Direcao.objects.create(origem="ORIGEM", destino="DESTINO")
         distribuicao = Distribuicao.objects.create(inicio=1, final=2, unidade=distribuicaoUnidade, direcao=direcao)
         
-        self.assertEquals(u'1 - 2', distribuicao.__unicode__())
+        self.assertEqual(u'1 - 2', distribuicao.__unicode__())
 
 
 class UnidadeDimensaoTest(TestCase):
     def test_unicode(self):
         unidadeDimensao = UnidadeDimensao.objects.create(nome="NOME")
         
-        self.assertEquals(u'NOME', unidadeDimensao.__unicode__())
+        self.assertEqual(u'NOME', unidadeDimensao.__unicode__())
 
     def test_meta(self):
-        self.assertEquals(u'Unidade da dimensão', UnidadeDimensao._meta.verbose_name)
-        self.assertEquals(u'Unidade das dimensões', UnidadeDimensao._meta.verbose_name_plural)
+        self.assertEqual(u'Unidade da dimensão', UnidadeDimensao._meta.verbose_name)
+        self.assertEqual(u'Unidade das dimensões', UnidadeDimensao._meta.verbose_name_plural)
 
 
 class DimensaoTest(TestCase):
@@ -76,11 +76,11 @@ class DimensaoTest(TestCase):
         unidadeDimensao = UnidadeDimensao.objects.create(nome="UNIDADE")
         dimensao = Dimensao.objects.create(altura=1, largura=2, profundidade=3, peso=4, unidade=unidadeDimensao)
         
-        self.assertEquals(u'1 x 2 x 3 UNIDADE - 4 kg', dimensao.__unicode__())
+        self.assertEqual(u'1 x 2 x 3 UNIDADE - 4 kg', dimensao.__unicode__())
 
     def test_meta(self):
-        self.assertEquals(u'Dimensão', Dimensao._meta.verbose_name)
-        self.assertEquals(u'Dimensões', Dimensao._meta.verbose_name_plural)
+        self.assertEqual(u'Dimensão', Dimensao._meta.verbose_name)
+        self.assertEqual(u'Dimensões', Dimensao._meta.verbose_name_plural)
 
 
 class HistoricoLocalTest(TestCase):
@@ -99,44 +99,44 @@ class HistoricoLocalTest(TestCase):
         hl = HistoricoLocal.objects.create(patrimonio=rt, endereco=endDet, descricao='Emprestimo',
                                            data=date(2009, 2, 5), estado=est)
 
-        self.assertEquals(u'05/02/2009 - NetIron400 - AF345678GB3489X -  | SAC - Dr. Ovidio, 215 - ', hl.__unicode__())
+        self.assertEqual(u'05/02/2009 - NetIron400 - AF345678GB3489X -  | SAC - Dr. Ovidio, 215 - ', hl.__unicode__())
 
     def test_posicao_furo(self):
         """
         Teste de posicionamento de um equipamento em um furo de um rack
         """
         historico = HistoricoLocal(posicao="R042.F085")
-        self.assertEquals(historico.posicao_furo, 85)
+        self.assertEqual(historico.posicao_furo, 85)
         
         historico = HistoricoLocal(posicao="P042.F017")
-        self.assertEquals(historico.posicao_furo, 17)
+        self.assertEqual(historico.posicao_furo, 17)
         
         historico = HistoricoLocal(posicao="S042.F040")
-        self.assertEquals(historico.posicao_furo, 40)
+        self.assertEqual(historico.posicao_furo, 40)
         
         historico = HistoricoLocal(posicao="S042.F049")
-        self.assertEquals(historico.posicao_furo, 49)
+        self.assertEqual(historico.posicao_furo, 49)
         
         historico = HistoricoLocal(posicao="60")
-        self.assertEquals(historico.posicao_furo, 60)
+        self.assertEqual(historico.posicao_furo, 60)
         
         historico = HistoricoLocal(posicao="")
-        self.assertEquals(historico.posicao_furo, -1)
+        self.assertEqual(historico.posicao_furo, -1)
         
         historico = HistoricoLocal()
-        self.assertEquals(historico.posicao_furo, -1)
+        self.assertEqual(historico.posicao_furo, -1)
         
         historico = HistoricoLocal(posicao="S042.F049-TD")
-        self.assertEquals(historico.posicao_furo, 49)
+        self.assertEqual(historico.posicao_furo, 49)
 
         historico = HistoricoLocal(posicao="S042.F049.TD")
-        self.assertEquals(historico.posicao_furo, 49)
+        self.assertEqual(historico.posicao_furo, 49)
         
         historico = HistoricoLocal(posicao="S042.piso")
-        self.assertEquals(historico.posicao_furo, -1)
+        self.assertEqual(historico.posicao_furo, -1)
         
         historico = HistoricoLocal(posicao="S042.F001")
-        self.assertEquals(historico.posicao_furo, 1)
+        self.assertEqual(historico.posicao_furo, 1)
 
     def test_posicao_colocacao(self):
         """
@@ -144,86 +144,86 @@ class HistoricoLocalTest(TestCase):
         Pode ser traseiro, lateral, piso
         """
         historico = HistoricoLocal(posicao="R042.F085.TD")
-        self.assertEquals(historico.posicao_colocacao, 'TD')
+        self.assertEqual(historico.posicao_colocacao, 'TD')
         
         historico = HistoricoLocal(posicao="P042.F017-TD")
-        self.assertEquals(historico.posicao_colocacao, 'TD')
+        self.assertEqual(historico.posicao_colocacao, 'TD')
         
         historico = HistoricoLocal(posicao="S042.piso")
-        self.assertEquals(historico.posicao_colocacao, 'piso')
+        self.assertEqual(historico.posicao_colocacao, 'piso')
         
         historico = HistoricoLocal(posicao="S042-piso")
-        self.assertEquals(historico.posicao_colocacao, 'piso')
+        self.assertEqual(historico.posicao_colocacao, 'piso')
         
         historico = HistoricoLocal(posicao="60")
-        self.assertEquals(historico.posicao_colocacao, None)
+        self.assertEqual(historico.posicao_colocacao, None)
                 
         historico = HistoricoLocal(posicao="S042.F049")
-        self.assertEquals(historico.posicao_colocacao, None)
+        self.assertEqual(historico.posicao_colocacao, None)
         
         historico = HistoricoLocal(posicao="")
-        self.assertEquals(historico.posicao_colocacao, None)
+        self.assertEqual(historico.posicao_colocacao, None)
         
         historico = HistoricoLocal()
-        self.assertEquals(historico.posicao_colocacao, None)
+        self.assertEqual(historico.posicao_colocacao, None)
 
     def test_posicao_rack__letra_numero(self):
         historico = HistoricoLocal(posicao="R042.F085.TD")
-        self.assertEquals(historico.posicao_rack_letra, 'R')
-        self.assertEquals(historico.posicao_rack_numero, '042')
+        self.assertEqual(historico.posicao_rack_letra, 'R')
+        self.assertEqual(historico.posicao_rack_numero, '042')
         
         historico = HistoricoLocal(posicao="P042.F017-TD")
-        self.assertEquals(historico.posicao_rack_letra, 'P')
-        self.assertEquals(historico.posicao_rack_numero, '042')
+        self.assertEqual(historico.posicao_rack_letra, 'P')
+        self.assertEqual(historico.posicao_rack_numero, '042')
         
         historico = HistoricoLocal(posicao="S042.piso")
-        self.assertEquals(historico.posicao_rack_letra, 'S')
-        self.assertEquals(historico.posicao_rack_numero, '042')
+        self.assertEqual(historico.posicao_rack_letra, 'S')
+        self.assertEqual(historico.posicao_rack_numero, '042')
         
         historico = HistoricoLocal(posicao="S042-piso")
-        self.assertEquals(historico.posicao_rack_letra, 'S')
-        self.assertEquals(historico.posicao_rack_numero, '042')
+        self.assertEqual(historico.posicao_rack_letra, 'S')
+        self.assertEqual(historico.posicao_rack_numero, '042')
         
         historico = HistoricoLocal(posicao="60")
-        self.assertEquals(historico.posicao_rack_letra, None)
-        self.assertEquals(historico.posicao_rack_numero, None)
+        self.assertEqual(historico.posicao_rack_letra, None)
+        self.assertEqual(historico.posicao_rack_numero, None)
                 
         historico = HistoricoLocal(posicao="S042.F049")
-        self.assertEquals(historico.posicao_rack_letra, 'S')
-        self.assertEquals(historico.posicao_rack_numero, '042')                
+        self.assertEqual(historico.posicao_rack_letra, 'S')
+        self.assertEqual(historico.posicao_rack_numero, '042')                
 
         historico = HistoricoLocal(posicao="AB42.F049")
-        self.assertEquals(historico.posicao_rack_letra, 'AB')
-        self.assertEquals(historico.posicao_rack_numero, '42')      
+        self.assertEqual(historico.posicao_rack_letra, 'AB')
+        self.assertEqual(historico.posicao_rack_numero, '42')      
         
         historico = HistoricoLocal(posicao="ABC42.F049")
-        self.assertEquals(historico.posicao_rack_letra, 'ABC')
-        self.assertEquals(historico.posicao_rack_numero, '42')
+        self.assertEqual(historico.posicao_rack_letra, 'ABC')
+        self.assertEqual(historico.posicao_rack_numero, '42')
         
     def test_posicao_rack(self):
         historico = HistoricoLocal(posicao="R042.F085.TD")
-        self.assertEquals(historico.posicao_rack, 'R042')
+        self.assertEqual(historico.posicao_rack, 'R042')
         
         historico = HistoricoLocal(posicao="P042.F017-TD")
-        self.assertEquals(historico.posicao_rack, 'P042')
+        self.assertEqual(historico.posicao_rack, 'P042')
         
         historico = HistoricoLocal(posicao="S042.piso")
-        self.assertEquals(historico.posicao_rack, 'S042')
+        self.assertEqual(historico.posicao_rack, 'S042')
         
         historico = HistoricoLocal(posicao="S042-piso")
-        self.assertEquals(historico.posicao_rack, 'S042')
+        self.assertEqual(historico.posicao_rack, 'S042')
         
         historico = HistoricoLocal(posicao="60")
-        self.assertEquals(historico.posicao_rack, None)
+        self.assertEqual(historico.posicao_rack, None)
                 
         historico = HistoricoLocal(posicao="S042.F049")
-        self.assertEquals(historico.posicao_rack, 'S042')
+        self.assertEqual(historico.posicao_rack, 'S042')
 
         historico = HistoricoLocal(posicao="AB42.F049")
-        self.assertEquals(historico.posicao_rack, 'AB42')
+        self.assertEqual(historico.posicao_rack, 'AB42')
         
         historico = HistoricoLocal(posicao="ABC42.F049")
-        self.assertEquals(historico.posicao_rack, 'ABC42')
+        self.assertEqual(historico.posicao_rack, 'ABC42')
 
 
 class PatrimonioTest(TestCase):
@@ -263,7 +263,7 @@ class PatrimonioTest(TestCase):
         self._setUpHistorico(patr)
 
         hist = patr.historico_atual
-        self.assertEquals('Emprestimo 2', hist.descricao)
+        self.assertEqual('Emprestimo 2', hist.descricao)
         
     def test_historico_atual_vazio(self):
         """
@@ -281,62 +281,62 @@ class PatrimonioTest(TestCase):
         patr = Patrimonio.objects.get(ns='AF345678GB3489X')
         self._setUpHistorico(patr)
         hist = patr.historico_atual
-        self.assertEquals('Emprestimo 2', hist.descricao)
+        self.assertEqual('Emprestimo 2', hist.descricao)
 
     def test_marca(self):
         patr = Patrimonio.objects.get(ns='AF345678GB3489X')
         marca = patr.marca
-        self.assertEquals('DELL', marca)
+        self.assertEqual('DELL', marca)
 
     def test_marca_vazia(self):
         patr = Patrimonio.objects.get(ns='AF345678GB3489X')
         patr.equipamento.entidade_fabricante.sigla = None
-        self.assertEquals('', patr.marca)
+        self.assertEqual('', patr.marca)
         
         patr.equipamento.entidade_fabricante = None
-        self.assertEquals('', patr.marca)
+        self.assertEqual('', patr.marca)
         
         patr.equipamento = None
-        self.assertEquals('', patr.marca)
+        self.assertEqual('', patr.marca)
 
     def test_modelo(self):
         patr = Patrimonio.objects.get(ns='AF345678GB3489X')
         modelo = patr.modelo
-        self.assertEquals('MODEL001', modelo)
+        self.assertEqual('MODEL001', modelo)
 
     def test_modelo_vazio(self):
         patr = Patrimonio.objects.get(ns='AF345678GB3489X')
         patr.equipamento = None
-        self.assertEquals('', patr.modelo)
+        self.assertEqual('', patr.modelo)
 
     def test_part_number(self):
         patr = Patrimonio.objects.get(ns='AF345678GB3489X')
         part_number = patr.part_number
-        self.assertEquals('PN001', part_number)
+        self.assertEqual('PN001', part_number)
     
     def test_part_number_vazio(self):
         patr = Patrimonio.objects.get(ns='AF345678GB3489X')
         patr.equipamento = None
-        self.assertEquals('', patr.part_number)
+        self.assertEqual('', patr.part_number)
 
     def test_procedencia(self):
         patr = Patrimonio.objects.get(ns='AF345678GB3489X')
         procedencia = patr.procedencia
-        self.assertEquals('PROC', procedencia)
+        self.assertEqual('PROC', procedencia)
 
     def test_procedencia_vazio(self):
         patr = Patrimonio.objects.get(ns='AF345678GB3489X')
         patr.entidade_procedencia = None
-        self.assertEquals('', patr.procedencia)
+        self.assertEqual('', patr.procedencia)
 
     def test_posicao(self):
         patr = Patrimonio.objects.get(ns='AF345678GB3489X')
         self._setUpHistorico(patr)
-        self.assertEquals(' - S043', patr.posicao())
+        self.assertEqual(' - S043', patr.posicao())
 
     def test_posicao_vazio(self):
         patr = Patrimonio.objects.get(ns='AF345678GB3489X')
-        self.assertEquals('', patr.posicao())
+        self.assertEqual('', patr.posicao())
 
     def test_nf(self):
         patr = Patrimonio.objects.get(ns='AF345678GB3489X')
@@ -346,13 +346,13 @@ class PatrimonioTest(TestCase):
         pagamento = Pagamento.objects.create(id=1, protocolo=protocolo, valor_fapesp=0)
         patr.pagamento = pagamento
         
-        self.assertEquals('00001', patr.nf())
+        self.assertEqual('00001', patr.nf())
 
     def test_nf_vazio_pagamento_vazio(self):
         patr = Patrimonio.objects.get(ns='AF345678GB3489X')
         patr.pagamento = None
         
-        self.assertEquals('', patr.nf())
+        self.assertEqual('', patr.nf())
 
     def test_auditoria(self):
         # Cria Termo
@@ -400,13 +400,13 @@ class PatrimonioTest(TestCase):
         patr = Patrimonio.objects.get(ns='AF345678GB3489X')
         patr.pagamento = fp1
         
-        self.assertEquals('STB1 (101/102)', patr.auditoria())
+        self.assertEqual('STB1 (101/102)', patr.auditoria())
 
     def test_auditoria_vazia(self):
         patr = Patrimonio.objects.get(ns='AF345678GB3489X')
         patr.pagamento = None
         
-        self.assertEquals('', patr.auditoria())
+        self.assertEqual('', patr.auditoria())
 
     def nf(self):
         if self.pagamento is not None and self.pagamento.protocolo is not None:
@@ -470,7 +470,7 @@ class ViewTest(TestCase):
         """
         url = reverse("patrimonio.views.ajax_escolhe_patrimonio")
         self.response = self.client.get(url)
-        self.assertTrue(200, self.response.status_code)
+        self.assertEqual(200, self.response.status_code)
         
         self.assertIn(b'Nenhum registro', self.response.content)
 
@@ -543,7 +543,7 @@ class ViewTest(TestCase):
         url = reverse("patrimonio.views.por_estado")
         response = self.client.get(url)
         
-        self.assertTrue(200, response.status_code)
+        self.assertEqual(200, response.status_code)
         
         # assert breadcrumb
         self.assertContains(response, u'<a href="/patrimonio/relatorio/por_estado">Patrimônio por estado do item</a>')
@@ -559,7 +559,7 @@ class ViewTest(TestCase):
         url = reverse("patrimonio.views.ajax_patrimonio_historico")
         response = self.client.get(url, {'id': '1'})
                 
-        self.assertTrue(200, response.status_code)
+        self.assertEqual(200, response.status_code)
         
         self.assertContains(response, u'"estado_desc": "Ativo"')
         self.assertContains(response, u'"entidade_id": 3')
@@ -580,7 +580,7 @@ class ViewTest(TestCase):
         
         response = self.client.get(url, {'termo': '1', 'numero': '1234'})
         
-        self.assertTrue(200, response.status_code)
+        self.assertEqual(200, response.status_code)
         
         self.assertContains(response, u'"valor": "Doc. 1234, cheque 333333, valor 1000.00"')
     
@@ -593,7 +593,7 @@ class ViewTest(TestCase):
         url = reverse("patrimonio.views.ajax_escolhe_pagamento")
         response = self.client.get(url, {'termo': '1', 'numero': '7777777'})
         
-        self.assertTrue(200, response.status_code)
+        self.assertEqual(200, response.status_code)
         self.assertContains(response, u'"valor": "Nenhum registro"')
     
     def test_ajax_escolhe_entidade(self):
@@ -609,7 +609,7 @@ class ViewTest(TestCase):
         url = reverse("patrimonio.views.ajax_escolhe_pagamento")
         response = self.client.get(url, {'termo': '1', 'numero': '1234'})
         
-        self.assertTrue(200, response.status_code)
+        self.assertEqual(200, response.status_code)
         self.assertContains(response, u'"valor": "Doc. 1234, valor None"')
     
     def test_view__por_tipo(self):
@@ -621,7 +621,7 @@ class ViewTest(TestCase):
         url = reverse("patrimonio.views.por_tipo")
         response = self.client.get(url, {'tipo': '1', 'procedencia': '2'})
         
-        self.assertTrue(200, response.status_code)
+        self.assertEqual(200, response.status_code)
                 
         # assert breadcrumb
         self.assertContains(response, u'<a href="/patrimonio/relatorio/por_tipo/">Patrimônios por tipo</a>')
@@ -669,7 +669,7 @@ class ViewTest(TestCase):
         url = reverse("patrimonio.views.por_tipo")
         response = self.client.get(url)
         
-        self.assertTrue(200, response.status_code)
+        self.assertEqual(200, response.status_code)
                 
         # assert breadcrumb
         self.assertContains(response, u'<a href="/patrimonio/relatorio/por_tipo/">Patrimônios por tipo</a>')
@@ -688,7 +688,7 @@ class ViewTest(TestCase):
         url = reverse("patrimonio.views.por_tipo")
         response = self.client.get(url, {'tipo': '1', 'procedencia': '1', 'acao': '1'})
         
-        self.assertTrue(200, response.status_code)
+        self.assertEqual(200, response.status_code)
         self.assertContains(response, '%PDF-')
         
     def test_view__por_tipo__xls(self):
@@ -700,7 +700,7 @@ class ViewTest(TestCase):
         url = reverse("patrimonio.views.por_tipo")
         response = self.client.get(url, {'tipo': '1', 'procedencia': '2', 'acao': '2'})
 
-        self.assertTrue(200, response.status_code)
+        self.assertEqual(200, response.status_code)
         self.assertContains(response, 'Tablib')  # identifica a biblioteca que gera o xls
         self.assertContains(response, 'PROC')
     
@@ -713,7 +713,7 @@ class ViewTest(TestCase):
         url = reverse("patrimonio.views.por_marca")
         response = self.client.get(url, {'marca': 'DELL'})
         
-        self.assertTrue(200, response.status_code)
+        self.assertEqual(200, response.status_code)
         
         # assert breadcrumb
         self.assertContains(response, u'<a href="/patrimonio/relatorio/por_marca">Patrimônio por marca</a>')
@@ -738,7 +738,7 @@ class ViewTest(TestCase):
         url = reverse("patrimonio.views.por_marca")
         response = self.client.get(url, {})
         
-        self.assertTrue(200, response.status_code)
+        self.assertEqual(200, response.status_code)
         
         # assert breadcrumb
         self.assertContains(response, u'<a href="/patrimonio/relatorio/por_marca">Patrimônio por marca</a>')
@@ -757,7 +757,7 @@ class ViewTest(TestCase):
         url = reverse("patrimonio.views.por_marca", kwargs={'pdf': 1})
         response = self.client.get(url, {'marca': 'DELL'})
         
-        self.assertTrue(200, response.status_code)
+        self.assertEqual(200, response.status_code)
         self.assertContains(response, '%PDF-')
 
     def test_view__por_local(self):
@@ -769,7 +769,7 @@ class ViewTest(TestCase):
         url = reverse("patrimonio.views.por_local")
         response = self.client.get(url, {'entidade': '1', 'endereco': '1', 'detalhe2': '1'})
         
-        self.assertTrue(200, response.status_code)
+        self.assertEqual(200, response.status_code)
         
         # assert breadcrumb
         self.assertContains(response, u'<a href="/patrimonio/relatorio/por_local">Patrimônio por localização</a>')
@@ -802,7 +802,7 @@ class ViewTest(TestCase):
         url = reverse("patrimonio.views.por_local")
         response = self.client.get(url, {'entidade': '1', 'endereco': '1'})
         
-        self.assertTrue(200, response.status_code)
+        self.assertEqual(200, response.status_code)
         
         # assert breadcrumb
         self.assertContains(response, u'<a href="/patrimonio/relatorio/por_local">Patrimônio por localização</a>')
@@ -835,7 +835,7 @@ class ViewTest(TestCase):
         url = reverse("patrimonio.views.por_local", kwargs={'pdf': 1})
         response = self.client.get(url, {'entidade': '1', 'endereco': '1'})
         
-        self.assertTrue(200, response.status_code)
+        self.assertEqual(200, response.status_code)
         
         self.assertContains(response, '%PDF-')
         
@@ -848,7 +848,7 @@ class ViewTest(TestCase):
         url = reverse("patrimonio.views.por_local")
         response = self.client.get(url, {})
         
-        self.assertTrue(200, response.status_code)
+        self.assertEqual(200, response.status_code)
         
         # assert breadcrumb
         self.assertContains(response, u'<a href="/patrimonio/relatorio/por_local">Patrimônio por localização</a>')
@@ -867,7 +867,7 @@ class ViewTest(TestCase):
         url = reverse("patrimonio.views.por_local_rack")
         response = self.client.get(url, {'entidade': '1', 'endereco': '1', 'detalhe': '1'})
         
-        self.assertTrue(200, response.status_code)
+        self.assertEqual(200, response.status_code)
         
         # assert breadcrumb
         self.assertContains(response, u'<a href="/patrimonio/relatorio/por_local_rack">Patrimônio por local e rack</a>')
@@ -915,7 +915,7 @@ class ViewTest(TestCase):
         url = reverse("patrimonio.views.por_local_rack", kwargs={'pdf': 0})
         response = self.client.get(url, {})
         
-        self.assertTrue(200, response.status_code)
+        self.assertEqual(200, response.status_code)
         
         # assert breadcrumb
         self.assertContains(response, u'<a href="/patrimonio/relatorio/por_local_rack">Patrimônio por local e rack</a>')
@@ -935,7 +935,7 @@ class ViewTest(TestCase):
         url = reverse("patrimonio.views.por_local_rack", kwargs={'pdf': 1})
         response = self.client.get(url, {'entidade': '1', 'endereco': '1', 'detalhe': '1'})
         
-        self.assertTrue(200, response.status_code)
+        self.assertEqual(200, response.status_code)
         
         self.assertContains(response, '%PDF-')
 
@@ -948,7 +948,7 @@ class ViewTest(TestCase):
         url = reverse("patrimonio.views.por_local_termo")
         response = self.client.get(url, {'entidade': '1', 'endereco': '1', 'detalhe': '1'})
         
-        self.assertTrue(200, response.status_code)
+        self.assertEqual(200, response.status_code)
 
         # assert breadcrumb
         self.assertContains(response, u'<a href="/patrimonio/relatorio/por_local_termo">'
@@ -999,7 +999,7 @@ class ViewTest(TestCase):
         url = reverse("patrimonio.views.por_local_termo")
         response = self.client.get(url, {'entidade': '1', 'endereco': '1', 'detalhe': '1', 'com_fmusp': "True"})
         
-        self.assertTrue(200, response.status_code)
+        self.assertEqual(200, response.status_code)
         
         # assert breadcrumb
         self.assertContains(response, u'<a href="/patrimonio/relatorio/por_local_termo">'
@@ -1029,7 +1029,7 @@ class ViewTest(TestCase):
         url = reverse("patrimonio.views.por_local_termo")
         response = self.client.get(url, {'entidade': '1', 'endereco': '1'})
         
-        self.assertTrue(200, response.status_code)
+        self.assertEqual(200, response.status_code)
         
         # assert breadcrumb
         self.assertContains(response, u'<a href="/patrimonio/relatorio/por_local_termo">'
@@ -1059,7 +1059,7 @@ class ViewTest(TestCase):
         url = reverse("patrimonio.views.por_local_termo")
         response = self.client.get(url, {'entidade': '3'})
         
-        self.assertTrue(200, response.status_code)
+        self.assertEqual(200, response.status_code)
         
         # assert breadcrumbx
         self.assertContains(response, u'<a href="/patrimonio/relatorio/por_local_termo">'
@@ -1089,7 +1089,7 @@ class ViewTest(TestCase):
         url = reverse("patrimonio.views.por_local_termo", kwargs={'pdf': 0})
         response = self.client.get(url, {})
         
-        self.assertTrue(200, response.status_code)
+        self.assertEqual(200, response.status_code)
         
         # assert breadcrumb
         self.assertContains(response, u'<a href="/patrimonio/relatorio/por_local_termo">'
@@ -1118,7 +1118,7 @@ class ViewTest(TestCase):
         url = reverse("patrimonio.views.por_local_termo", kwargs={'pdf': 1})
         response = self.client.get(url, {'entidade': '1', 'endereco': '1', 'detalhe': '1'})
         
-        self.assertTrue(200, response.status_code)
+        self.assertEqual(200, response.status_code)
         
         self.assertContains(response, '%PDF-') 
 
@@ -1131,7 +1131,7 @@ class ViewTest(TestCase):
         url = reverse("patrimonio.views.por_tipo_equipamento2")
         response = self.client.get(url)
         
-        self.assertTrue(200, response.status_code)
+        self.assertEqual(200, response.status_code)
         
         # assert breadcrumb
         self.assertContains(response, u'<a href="/patrimonio/relatorio/por_tipo_equipamento2">'
@@ -1150,7 +1150,7 @@ class ViewTest(TestCase):
         url = reverse("patrimonio.views.ajax_abre_arvore_tipo")
         response = self.client.get(url, {"id": "1", "model": "tipoequipamento"})
         
-        self.assertTrue(200, response.status_code)
+        self.assertEqual(200, response.status_code)
         
         # asssert dos dados do relatório
         self.assertContains(response, u'"data": "equipamento_descricao"')
@@ -1166,7 +1166,7 @@ class ViewTest(TestCase):
         url = reverse("patrimonio.views.ajax_abre_arvore_tipo")
         response = self.client.get(url, {"id": "1", "model": "equipamento"})
         
-        self.assertTrue(200, response.status_code)
+        self.assertEqual(200, response.status_code)
         
         # asssert dos dados do relatório
         # verificando os cabeçalhos/titulos
@@ -1193,7 +1193,7 @@ class ViewTest(TestCase):
         url = reverse("patrimonio.views.ajax_abre_arvore_tipo")
         response = self.client.get(url)
         
-        self.assertTrue(200, response.status_code)
+        self.assertEqual(200, response.status_code)
         
         # asssert dos dados do relatório
         self.assertContains(response, u'"data": "Rack')
@@ -1231,7 +1231,7 @@ class ViewTest(TestCase):
         url = reverse("patrimonio.views.por_tipo_equipamento")
         response = self.client.get(url, {'tipo': '1', 'estado': '1', 'partnumber': 'PN001'})
         
-        self.assertTrue(200, response.status_code)
+        self.assertEqual(200, response.status_code)
 
         # assert breadcrumb
         self.assertContains(response, u'<a href="/patrimonio/relatorio/por_tipo_equipamento">'
@@ -1268,7 +1268,7 @@ class ViewTest(TestCase):
         url = reverse("patrimonio.views.por_tipo_equipamento")
         response = self.client.get(url, {'tipo': '0', 'estado': '1', 'partnumber': 'PN001'})
         
-        self.assertTrue(200, response.status_code)
+        self.assertEqual(200, response.status_code)
 
         # assert breadcrumb
         self.assertContains(response, u'<a href="/patrimonio/relatorio/por_tipo_equipamento">'
@@ -1329,7 +1329,7 @@ class ViewTest(TestCase):
         url = reverse("patrimonio.views.por_termo")
         response = self.client.get(url, {'tipo': '1', 'estado': '1', 'partnumber': 'PN001'})
         
-        self.assertTrue(200, response.status_code)
+        self.assertEqual(200, response.status_code)
 
         # assert breadcrumb
         self.assertContains(response, u'<a href="/patrimonio/relatorio/por_termo">Patrimônio por termo de outorga</a>')
