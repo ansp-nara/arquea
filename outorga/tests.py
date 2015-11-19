@@ -239,10 +239,10 @@ class TermoTest(UnitTestCase):
     def test_formata_realizado_dolar__negativo(self):
         termo = Termo.objects.get(pk=1)
 
-        m1 = Modalidade.objects.get(pk=1)
+        m1 = Modalidade.objects.get(sigla='STB0')
         m1.moeda_nacional = False
         m1.save()
-        m2 = Modalidade.objects.get(pk=2)
+        m2 = Modalidade.objects.get(sigla='STB1')
         m2.moeda_nacional = False
         m2.save()
 
@@ -1036,7 +1036,7 @@ class ItemTest(UnitTestCase):
         self.assertEquals(item.calcula_realizado_mes(dt, False), Decimal(0.00))
 
     def test_calcula_realizado_mes__dolar(self):
-        modalidade = Modalidade.objects.get(pk=1)
+        modalidade = Modalidade.objects.get(sigla='STE0')
         modalidade.moeda_nacional = True
         modalidade.save()
 
