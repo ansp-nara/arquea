@@ -123,8 +123,6 @@ class LayoutLink(models.Model):
     
     class Meta:
         ordering = ('ordem', 'titulo')
-
-    class Meta:
         verbose_name = u'Link do layout'
         verbose_name_plural = u'Links do layout'
 
