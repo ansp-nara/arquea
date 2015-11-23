@@ -3,7 +3,7 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase
 
 from identificacao.models import ASN, Entidade
-from rede.models import *
+from rede.models import RIR, BlocoIP
 
 
 class BlocoIPModelTest(TestCase):
@@ -21,12 +21,12 @@ class BlocoIPModelTest(TestCase):
 
         rir = RIR.objects.create(nome="RIR1")
 
-        ipv4 = BlocoIP.objects.create(ip='192.168.1.0', mask='20',
+        ipv4 = BlocoIP.objects.create(ip='192.168.1.0', mask='20',  # @UnusedVariable
                                       asn=asn, proprietario=proprietario, superbloco=None,
                                       designado=designado, usuario=usuario, rir=rir,
                                       obs="OBS ipv4 - n1", transito=True)
 
-        ipv6 = BlocoIP.objects.create(ip='2001:0db8::7344', mask='20',
+        ipv6 = BlocoIP.objects.create(ip='2001:0db8::7344', mask='20',  # @UnusedVariable
                                       asn=asn, proprietario=proprietario, superbloco=None,
                                       designado=designado, usuario=usuario, rir=rir,
                                       obs="OBS ipv6 - n1", transito=True)
@@ -188,7 +188,7 @@ class ViewBlocoIPTest(TestCase):
 
         rir = RIR.objects.create(nome="RIR_1")
 
-        ipv4 = BlocoIP.objects.create(ip='192.168.1.0', mask='20',
+        ipv4 = BlocoIP.objects.create(ip='192.168.1.0', mask='20',  # @UnusedVariable
                                       asn=asn, proprietario=proprietario, superbloco=None,
                                       designado=designado, usuario=usuario, rir=rir,
                                       obs="OBS ipv4 - n1", transito=True)
@@ -207,7 +207,7 @@ class ViewBlocoIPTest(TestCase):
 
         rir = RIR.objects.create(nome="RIR_2")
 
-        ipv6 = BlocoIP.objects.create(ip='2001:0db8::7344', mask='20', asn=asn, proprietario=proprietario,
+        ipv6 = BlocoIP.objects.create(ip='2001:0db8::7344', mask='20', asn=asn, proprietario=proprietario,  # @UnusedVariable
                                       superbloco=None, designado=designado, usuario=usuario, rir=rir,
                                       obs="OBS ipv6 - n1", transito=True)
 
@@ -401,7 +401,7 @@ class ViewBlocoIPANSPTest(TestCase):
 
         proprietario_2 = ASN.objects.create(numero=4322, entidade=entidade_ansp, pais="BR")
 
-        ipv4_2 = BlocoIP.objects.create(ip='192.168.1.1', mask='20', asn=asn, proprietario=proprietario_2,
+        ipv4_2 = BlocoIP.objects.create(ip='192.168.1.1', mask='20', asn=asn, proprietario=proprietario_2,  # @UnusedVariable
                                         superbloco=ipv4_1, designado=designado, usuario=usuario, rir=rir,
                                         obs="OBS ipv4 - n1_1", transito=True)
 
@@ -420,7 +420,7 @@ class ViewBlocoIPANSPTest(TestCase):
 
         rir = RIR.objects.create(nome="RIR_2")
 
-        ipv6 = BlocoIP.objects.create(ip='2001:0db8::7344', mask='20', asn=asn, proprietario=proprietario,
+        ipv6 = BlocoIP.objects.create(ip='2001:0db8::7344', mask='20', asn=asn, proprietario=proprietario,  # @UnusedVariable
                                       superbloco=None, designado=designado, usuario=usuario, rir=rir,
                                       obs="OBS ipv6 - n1", transito=True)
 
@@ -545,33 +545,33 @@ class ViewBlocoIPTransitoTest(TestCase):
         # Registro 1
         entidade_uninove = Entidade.objects.create(sigla='UNINOVE', nome='', cnpj='', fisco=True, url='')
         asn_uninove = ASN.objects.create(numero=52914, entidade=entidade_uninove, pais="BR")
-        ipv4_uninove = BlocoIP.objects.create(ip='186.251.39.0', mask='24', asn=asn_uninove, proprietario=asn_uninove,
+        ipv4_uninove = BlocoIP.objects.create(ip='186.251.39.0', mask='24', asn=asn_uninove, proprietario=asn_uninove,  # @UnusedVariable
                                               superbloco=None, designado=entidade_uninove, usuario=entidade_uninove,
                                               rir=rir, obs="", transito=True)
 
         # Registro 2
         entidade_unicamp = Entidade.objects.create(sigla='UNICAMP', nome='', cnpj='', fisco=True, url='')
         asn_unicamp = ASN.objects.create(numero=53187, entidade=entidade_unicamp, pais="BR")
-        ipv4_unicamp1 = BlocoIP.objects.create(ip='143.106.0.0', mask='16', asn=asn_unicamp, proprietario=asn_unicamp,
+        ipv4_unicamp1 = BlocoIP.objects.create(ip='143.106.0.0', mask='16', asn=asn_unicamp, proprietario=asn_unicamp,  # @UnusedVariable
                                                superbloco=None, designado=entidade_unicamp, usuario=entidade_unicamp,
                                                rir=rir, obs="", transito=True)
 
         # Registro 3
-        ipv4_unicamp2 = BlocoIP.objects.create(ip='177.8.96.0', mask='20', asn=asn_unicamp, proprietario=asn_unicamp,
+        ipv4_unicamp2 = BlocoIP.objects.create(ip='177.8.96.0', mask='20', asn=asn_unicamp, proprietario=asn_unicamp,  # @UnusedVariable
                                                superbloco=None, designado=entidade_unicamp, usuario=entidade_unicamp,
                                                rir=rir, obs="", transito=True)
 
         # Registro 4
         entidade_unesp = Entidade.objects.create(sigla='UNESP', nome='', cnpj='', fisco=True, url='')
         asn_unesp = ASN.objects.create(numero=53166, entidade=entidade_unesp, pais="BR")
-        ipv4_unesp = BlocoIP.objects.create(ip='186.217.0.0', mask='16', asn=asn_unesp, proprietario=asn_unesp,
+        ipv4_unesp = BlocoIP.objects.create(ip='186.217.0.0', mask='16', asn=asn_unesp, proprietario=asn_unesp,  # @UnusedVariable
                                             superbloco=None, designado=entidade_unesp, usuario=entidade_unesp,
                                             rir=rir, obs="", transito=True)
 
         # Registro 5
         entidade_inpe = Entidade.objects.create(sigla='INPE', nome='', cnpj='', fisco=True, url='')
         asn_inpe = ASN.objects.create(numero=53166, entidade=entidade_inpe, pais="BR")
-        ipv4_unesp = BlocoIP.objects.create(ip='150.163.0.0', mask='17', asn=asn_inpe, proprietario=asn_inpe,
+        ipv4_unesp = BlocoIP.objects.create(ip='150.163.0.0', mask='17', asn=asn_inpe, proprietario=asn_inpe,  # @UnusedVariable
                                             superbloco=None, designado=entidade_inpe, usuario=entidade_inpe,
                                             rir=rir, obs="", transito=True)
 
@@ -736,32 +736,32 @@ class ViewBlocoIPInstTransitoTest(TestCase):
         # Registro 1
         entidade_uninove = Entidade.objects.create(sigla='UNINOVE', nome='', cnpj='', fisco=True, url='')
         asn_uninove = ASN.objects.create(numero=52914, entidade=entidade_uninove, pais="BR")
-        ipv4_uninove = BlocoIP.objects.create(ip='186.251.39.0', mask='24', asn=asn_uninove, proprietario=asn_uninove,
+        ipv4_uninove = BlocoIP.objects.create(ip='186.251.39.0', mask='24', asn=asn_uninove, proprietario=asn_uninove,  # @UnusedVariable
                                               superbloco=None, designado=entidade_uninove, usuario=entidade_uninove,
                                               rir=rir, obs="", transito=True)
 
         # Registro 2
         entidade_unicamp = Entidade.objects.create(sigla='UNICAMP', nome='', cnpj='', fisco=True, url='')
         asn_unicamp = ASN.objects.create(numero=53187, entidade=entidade_unicamp, pais="BR")
-        ipv4_unicamp1 = BlocoIP.objects.create(ip='143.106.0.0', mask='16', asn=asn_unicamp, proprietario=asn_unicamp,
+        ipv4_unicamp1 = BlocoIP.objects.create(ip='143.106.0.0', mask='16', asn=asn_unicamp, proprietario=asn_unicamp,  # @UnusedVariable
                                                superbloco=None, designado=entidade_unicamp, usuario=entidade_unicamp,
                                                rir=rir, obs="", transito=True)
         # Registro 3
-        ipv4_unicamp2 = BlocoIP.objects.create(ip='177.8.96.0', mask='20', asn=asn_unicamp, proprietario=asn_unicamp,
+        ipv4_unicamp2 = BlocoIP.objects.create(ip='177.8.96.0', mask='20', asn=asn_unicamp, proprietario=asn_unicamp,  # @UnusedVariable
                                                superbloco=None, designado=entidade_unicamp, usuario=entidade_unicamp,
                                                rir=rir, obs="", transito=True)
 
         # Registro 4
         entidade_unesp = Entidade.objects.create(sigla='UNESP', nome='', cnpj='', fisco=True, url='')
         asn_unesp = ASN.objects.create(numero=53166, entidade=entidade_unesp, pais="BR")
-        ipv4_unesp = BlocoIP.objects.create(ip='186.217.0.0', mask='16', asn=asn_unesp, proprietario=asn_unesp,
+        ipv4_unesp = BlocoIP.objects.create(ip='186.217.0.0', mask='16', asn=asn_unesp, proprietario=asn_unesp,  # @UnusedVariable
                                             superbloco=None, designado=entidade_unesp, usuario=entidade_unesp, rir=rir,
                                             obs="", transito=True)
 
         # Registro 5
         entidade_inpe = Entidade.objects.create(sigla='INPE', nome='', cnpj='', fisco=True, url='')
         asn_inpe = ASN.objects.create(numero=53166, entidade=entidade_inpe, pais="BR")
-        ipv4_unesp = BlocoIP.objects.create(ip='150.163.0.0', mask='17', asn=asn_inpe, proprietario=asn_inpe,
+        ipv4_unesp = BlocoIP.objects.create(ip='150.163.0.0', mask='17', asn=asn_inpe, proprietario=asn_inpe,  # @UnusedVariable
                                             superbloco=None, designado=entidade_inpe, usuario=entidade_inpe, rir=rir,
                                             obs="", transito=True)
 

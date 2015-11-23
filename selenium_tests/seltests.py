@@ -5,39 +5,41 @@ import logging
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
+
 class HomeTest(SeleniumServerTestCase):
-    
+
     def setUp(self):
         super(HomeTest, self).setUp()
-        
+
     def tearDown(self):
         super(HomeTest, self).tearDown()
-    
+
     def test_home_page(self):
         self.browser.get(self.sistema_url + '/admin/')
-         
+
         elemHeader = self.browser.find_element_by_css_selector('div#container h1')
         self.assertEquals(elemHeader.text, u'Administração do Site')
- 
+
     def test_controle_500(self):
         url = self.sistema_url + '/membro/mensalf?ano=2012&mes=1&'
 
         self.browser.get(url)
-        self.assertFalse(self.is_http_404(), u'Requisicao %s retornou HTTP (404)'%url)
-        self.assertTrue(self.is_http_500(), u'Requisicao %s retornou HTTP (500)'%url)
-                
+        self.assertFalse(self.is_http_404(), u'Requisicao %s retornou HTTP (404)' % url)
+        self.assertTrue(self.is_http_500(), u'Requisicao %s retornou HTTP (500)' % url)
+
     def test_controle_404(self):
         url = self.sistema_url + '/admin/asdfasdfasdf/'
 
         self.browser.get(url)
-        self.assertTrue(self.is_http_404(), u'Requisicao %s etornou HTTP (404)'%url)
-        self.assertFalse(self.is_http_500(), u'Requisicao %s retornou HTTP (500)'%url)
+        self.assertTrue(self.is_http_404(), u'Requisicao %s etornou HTTP (404)' % url)
+        self.assertFalse(self.is_http_500(), u'Requisicao %s retornou HTTP (500)' % url)
+
 
 class PesquisaTest(SeleniumServerTestCase):
-    
+
     def setUp(self):
         super(PesquisaTest, self).setUp()
-        
+
     def tearDown(self):
         super(PesquisaTest, self).tearDown()
 
@@ -70,7 +72,7 @@ class PesquisaTest(SeleniumServerTestCase):
         url = self.sistema_url + '/admin/pesquisa/l3/2/'
         self.browser.get(url)
         self.assertLoadPageAndSaveEdit(url)
-# 
+#
 #     def test__kyatera__lista(self):
 #         url = self.sistema_url + '/admin/pesquisa/pesquisa/'
 #         self.browser.get(url)
@@ -90,10 +92,10 @@ class PesquisaTest(SeleniumServerTestCase):
 
 
 class AuthTest(SeleniumServerTestCase):
-    
+
     def setUp(self):
         super(AuthTest, self).setUp()
-        
+
     def tearDown(self):
         super(AuthTest, self).tearDown()
 
@@ -139,10 +141,10 @@ class AuthTest(SeleniumServerTestCase):
 
 
 class EventoTest(SeleniumServerTestCase):
-    
+
     def setUp(self):
         super(EventoTest, self).setUp()
-        
+
     def tearDown(self):
         super(EventoTest, self).tearDown()
 
@@ -233,10 +235,10 @@ class EventoTest(SeleniumServerTestCase):
 
 
 class MembroTest(SeleniumServerTestCase):
-    
+
     def setUp(self):
         super(MembroTest, self).setUp()
-        
+
     def tearDown(self):
         super(MembroTest, self).tearDown()
 
@@ -250,7 +252,7 @@ class MembroTest(SeleniumServerTestCase):
 #         url = self.sistema_url + '/membro/mensalf?ano=2013&mes=0&funcionario=49'
 #         self.browser.get(url)
 #         self.assertLoadPage(url)
-#         
+#
 
     def test__arq_sindicato__lista(self):
         url = self.sistema_url + '/admin/membro/sindicatoarquivo/'
@@ -332,7 +334,7 @@ class MembroTest(SeleniumServerTestCase):
 #         url = self.sistema_url + '/admin/membro/controle/2242/'
 #         self.browser.get(url)
 #         self.assertLoadPage(url)
-#         
+#
 
     def test__dispensas__lista(self):
         url = self.sistema_url + '/admin/membro/dispensalegal/'
@@ -354,11 +356,6 @@ class MembroTest(SeleniumServerTestCase):
         self.browser.get(url)
         self.assertLoadPage(url)
 
-    def test__ferias__busca(self):
-        url = self.sistema_url + '/admin/membro/ferias/?q=anna'
-        self.browser.get(url)
-        self.assertLoadPage(url)
-        
     def test__ferias__busca(self):
         url = self.sistema_url + '/admin/membro/ferias/?q=anna'
         self.browser.get(url)
@@ -399,16 +396,6 @@ class MembroTest(SeleniumServerTestCase):
         self.browser.get(url)
         self.assertLoadPage(url)
 
-    def test__membro__registro(self):
-        url = self.sistema_url + '/admin/membro/membro/45/'
-        self.browser.get(url)
-        self.assertLoadPage(url)
-
-    def test__membro__registro__save(self):
-        url = self.sistema_url + '/admin/membro/membro/45/'
-        self.browser.get(url)
-        self.assertLoadPageAndSaveEdit(url)
-
     def test__tipo_dispensa__lista(self):
         url = self.sistema_url + '/admin/membro/tipodispensa/'
         self.browser.get(url)
@@ -441,10 +428,10 @@ class MembroTest(SeleniumServerTestCase):
 
 
 class MemorandoTest(SeleniumServerTestCase):
-    
+
     def setUp(self):
         super(MemorandoTest, self).setUp()
-        
+
     def tearDown(self):
         super(MemorandoTest, self).tearDown()
 
@@ -550,12 +537,11 @@ class MemorandoTest(SeleniumServerTestCase):
         self.assertLoadPage(url)
 
 
-
 class IdentificacaoTest(SeleniumServerTestCase):
-    
+
     def setUp(self):
         super(IdentificacaoTest, self).setUp()
-        
+
     def tearDown(self):
         super(IdentificacaoTest, self).tearDown()
 
@@ -830,12 +816,11 @@ class IdentificacaoTest(SeleniumServerTestCase):
         self.assertLoadPageAndSaveEdit(url)
 
 
-
 class MonitorTest(SeleniumServerTestCase):
-    
+
     def setUp(self):
         super(MonitorTest, self).setUp()
-        
+
     def tearDown(self):
         super(MonitorTest, self).tearDown()
 
@@ -855,9 +840,8 @@ class MonitorTest(SeleniumServerTestCase):
         self.assertLoadPageAndSaveEdit(url)
 
 
-
 class FinanceiroTest(SeleniumServerTestCase):
-    
+
     def setUp(self):
         super(FinanceiroTest, self).setUp()
 
@@ -869,9 +853,9 @@ class FinanceiroTest(SeleniumServerTestCase):
         Verifica se o filtro de acordo lista ao menos os últimos 5 acordos
         """
         self.browser.get(self.sistema_url + '/financeiro/relatorios/acordos')
-         
+
         elem = self.browser.find_element_by_css_selector('select#id_termo')
-        
+
         self.assertTrue(elem.text.find('13/11711-5') >= 0)
         self.assertTrue(elem.text.find('11/52044-6') >= 0)
         self.assertTrue(elem.text.find('10/52277-8') >= 0)
@@ -883,13 +867,13 @@ class FinanceiroTest(SeleniumServerTestCase):
         Verifica se o relatorio foi aberto
         """
         self.browser.get(self.sistema_url + '/financeiro/relatorios/acordos?termo=21')
-         
+
         elem = self.browser.find_element_by_css_selector('div#content.colM h1')
         self.assertTrue(elem.text.find('13/11711-5') >= 0)
-        
-        #elem = self.browser.find_element_by_css_selector('tr#tr_1_2.nivel1 td')
-        #self.assertTrue(elem.text.find(u'Colaboração') >= 0)
-        
+
+        # elem = self.browser.find_element_by_css_selector('tr#tr_1_2.nivel1 td')
+        # self.assertTrue(elem.text.find(u'Colaboração') >= 0)
+
         elem = self.browser.find_element_by_css_selector('.nivel3 td a')
 
     def test__relatorio_gerencial__gerencial__filtro_inicial(self):
@@ -1203,15 +1187,14 @@ class FinanceiroTest(SeleniumServerTestCase):
         self.assertLoadPageAndSaveEdit(url)
 
 
-
 class OutorgaTest(SeleniumServerTestCase):
-    
+
     def setUp(self):
         super(OutorgaTest, self).setUp()
-        
+
     def tearDown(self):
         super(OutorgaTest, self).tearDown()
-    
+
     def test__relatorio_gerencial__concessoes_por_acordo__lista(self):
         url = self.sistema_url + '/outorga/relatorios/lista_acordos'
         self.browser.get(url)
@@ -1487,21 +1470,6 @@ class OutorgaTest(SeleniumServerTestCase):
         self.browser.get(url)
         self.assertLoadPageAndSaveEdit(url)
 
-    def test__tipo_de_documento__lista(self):
-        url = self.sistema_url + '/admin/outorga/tipocontrato/'
-        self.browser.get(url)
-        self.assertLoadPage(url)
-
-    def test__tipo_de_documento__registro(self):
-        url = self.sistema_url + '/admin/outorga/tipocontrato/2/'
-        self.browser.get(url)
-        self.assertLoadPage(url)
-
-    def test__tipo_de_documento__registro__save(self):
-        url = self.sistema_url + '/admin/outorga/tipocontrato/2/'
-        self.browser.get(url)
-        self.assertLoadPageAndSaveEdit(url)
-
     def test__termo_de_outorga__lista(self):
         url = self.sistema_url + '/admin/outorga/termo/'
         self.browser.get(url)
@@ -1523,115 +1491,114 @@ class OutorgaTest(SeleniumServerTestCase):
         self.assertLoadPageAndSaveEdit(url)
 
 
-
 class RedeTest(SeleniumServerTestCase):
-    
+
     def setUp(self):
         super(RedeTest, self).setUp()
-        
+
     def tearDown(self):
         super(RedeTest, self).tearDown()
-    
+
     def test__relatorio_gerencial__custo_de_recursos_contratados__lista(self):
         url = self.sistema_url + '/rede/custo_terremark'
-        req = self.browser.get(url)
-        
+        req = self.browser.get(url)  # @UnusedVariable
+
         self.assertLoadPage(url)
 
     def test__relatorio_tecnico__dados_cadastrais_dos_participantes__lista(self):
         url = self.sistema_url + '/rede/info'
-        req = self.browser.get(url)
-        
+        req = self.browser.get(url)  # @UnusedVariable
+
         self.assertLoadPage(url)
 
     def test__relatorio_tecnico__dados_cadastrais_dos_participantes__lista_info_tec(self):
         url = self.sistema_url + '/rede/info_tec/3'
-        req = self.browser.get(url)
-        
+        req = self.browser.get(url)  # @UnusedVariable
+
         self.assertLoadPage(url)
 
     def test__relatorio_tecnico__lista_de_bloco_ip__filtro_inicial(self):
         url = self.sistema_url + '/rede/blocosip'
-        req = self.browser.get(url)
-        
+        req = self.browser.get(url)  # @UnusedVariable
+
         self.assertLoadPage(url)
 
     def test__relatorio_tecnico__lista_de_bloco_ip__busca_todos(self):
         url = self.sistema_url + '/rede/blocosip?anunciante=0&proprietario=0&usuario=0&designado=0'
-        req = self.browser.get(url)
-        
+        req = self.browser.get(url)  # @UnusedVariable
+
         self.assertLoadPage(url)
 
     def test__relatorio_tecnico__lista_de_bloco_ip__busca_anunciante(self):
         url = self.sistema_url + '/rede/blocosip?anunciante=32&proprietario=0&usuario=0&designado=0'
-        req = self.browser.get(url)
-        
+        req = self.browser.get(url)  # @UnusedVariable
+
         self.assertLoadPage(url)
 
     def test__relatorio_tecnico__lista_de_bloco_ip__busca_proprietario(self):
         url = self.sistema_url + '/rede/blocosip?anunciante=0&proprietario=32&usuario=0&designado=0'
-        req = self.browser.get(url)
-        
+        req = self.browser.get(url)  # @UnusedVariable
+
         self.assertLoadPage(url)
 
     def test__relatorio_tecnico__lista_de_bloco_ip__busca_usuario(self):
         url = self.sistema_url + '/rede/blocosip?anunciante=0&proprietario=0&usuario=215&designado=0'
-        req = self.browser.get(url)
-        
+        req = self.browser.get(url)  # @UnusedVariable
+
         self.assertLoadPage(url)
 
     def test__relatorio_tecnico__lista_de_bloco_ip__busca_designado(self):
         url = self.sistema_url + '/rede/blocosip?anunciante=0&proprietario=0&usuario=0&designado=215'
-        req = self.browser.get(url)
-        
+        req = self.browser.get(url)  # @UnusedVariable
+
         self.assertLoadPage(url)
 
     def test__relatorio_tecnico__lista_de_bloco_ip__busca_anunciante_designado(self):
         url = self.sistema_url + '/rede/blocosip?anunciante=32&proprietario=32&usuario=0&designado=215'
-        req = self.browser.get(url)
-        
+        req = self.browser.get(url)  # @UnusedVariable
+
         self.assertLoadPage(url)
 
     def test__relatorio_tecnico__lista_de_bloco_ip__busca_anunciante_usuario(self):
         url = self.sistema_url + '/rede/blocosip?anunciante=32&proprietario=32&usuario=215&designado=0'
-        req = self.browser.get(url)
-        
+        req = self.browser.get(url)  # @UnusedVariable
+
         self.assertLoadPage(url)
 
     def test__relatorio_tecnico__lista_de_bloco_ip__busca_todos_filtros(self):
         url = self.sistema_url + '/rede/blocosip?anunciante=32&proprietario=32&usuario=215&designado=215'
-        req = self.browser.get(url)
-        
+        req = self.browser.get(url)  # @UnusedVariable
+
         self.assertLoadPage(url)
 
     def test__relatorio_tecnico__planejamento_por_ano__filtro_inicial(self):
         url = self.sistema_url + '/rede/planejamento'
-        req = self.browser.get(url)
-        
+        req = self.browser.get(url)  # @UnusedVariable
+
         self.assertLoadPage(url)
 
     def test__relatorio_tecnico__planejamento_por_ano__busca(self):
         url = self.sistema_url + '/rede/planejamento?anoproj=2013%2F1&os='
-        req = self.browser.get(url)
-        
+        req = self.browser.get(url)  # @UnusedVariable
+
         self.assertLoadPage(url)
 
     def test__relatorio_tecnico__planejamento_por_ano__busca_os(self):
         url = self.sistema_url + '/rede/planejamento?anoproj=2013%2F1&os=109'
-        req = self.browser.get(url)
-        
+        req = self.browser.get(url)  # @UnusedVariable
+
         self.assertLoadPage(url)
 
     def test__relatorio_tecnico__servicos_contratados_por_processo__filtro_inicial(self):
         url = self.sistema_url + '/rede/planejamento2'
-        req = self.browser.get(url)
-        
+        req = self.browser.get(url)  # @UnusedVariable
+
         self.assertLoadPage(url)
 
     def test__relatorio_tecnico__servicos_contratados_por_processo__lista(self):
         url = self.sistema_url + '/rede/planejamento2?entidade=1&termo=17&beneficiado='
-        req = self.browser.get(url)
-        
+        req = self.browser.get(url)  # @UnusedVariable
+
         self.assertLoadPage(url)
 
     def test__banda__lista(self):
@@ -1896,10 +1863,10 @@ class RedeTest(SeleniumServerTestCase):
 
 
 class SitesTest(SeleniumServerTestCase):
-    
+
     def setUp(self):
         super(SitesTest, self).setUp()
-        
+
     def tearDown(self):
         super(SitesTest, self).tearDown()
 
@@ -1924,15 +1891,14 @@ class SitesTest(SeleniumServerTestCase):
         self.assertLoadPageAndSaveEdit(url)
 
 
-
 class ProcessoTest(SeleniumServerTestCase):
-    
+
     def setUp(self):
         super(ProcessoTest, self).setUp()
-        
+
     def tearDown(self):
         super(ProcessoTest, self).tearDown()
-    
+
     def test__relatorio_gerencial__processos__lista(self):
         url = self.sistema_url + '/processo/processos'
         self.browser.get(url)
@@ -2028,16 +1994,6 @@ class ProcessoTest(SeleniumServerTestCase):
         self.browser.get(url)
         self.assertLoadPage(url)
 
-    def test__norma__registro(self):
-        url = self.sistema_url + '/admin/processo/papel/22/'
-        self.browser.get(url)
-        self.assertLoadPage(url)
-
-    def test__norma__registro__save(self):
-        url = self.sistema_url + '/admin/processo/papel/22/'
-        self.browser.get(url)
-        self.assertLoadPageAndSaveEdit(url)
-
     def test__procedimentos__lista(self):
         url = self.sistema_url + '/admin/processo/procedimento/'
         self.browser.get(url)
@@ -2119,12 +2075,11 @@ class ProcessoTest(SeleniumServerTestCase):
         self.assertLoadPageAndSaveEdit(url)
 
 
-
 class ProtocoloTest(SeleniumServerTestCase):
-    
+
     def setUp(self):
         super(ProtocoloTest, self).setUp()
-        
+
     def tearDown(self):
         super(ProtocoloTest, self).tearDown()
 
@@ -2309,12 +2264,11 @@ class ProtocoloTest(SeleniumServerTestCase):
         self.assertLoadPageAndSaveEdit(url)
 
 
-
 class QuestionarioTest(SeleniumServerTestCase):
-    
+
     def setUp(self):
         super(QuestionarioTest, self).setUp()
-        
+
     def tearDown(self):
         super(QuestionarioTest, self).tearDown()
 
@@ -2334,12 +2288,11 @@ class QuestionarioTest(SeleniumServerTestCase):
         self.assertLoadPageAndSaveEdit(url)
 
 
-
 class PatrimonioTest(SeleniumServerTestCase):
-    
+
     def setUp(self):
         super(PatrimonioTest, self).setUp()
-        
+
     def tearDown(self):
         super(PatrimonioTest, self).tearDown()
 
@@ -2634,12 +2587,11 @@ class PatrimonioTest(SeleniumServerTestCase):
         self.assertLoadPageAndSaveEdit(url)
 
 
-
 class LogsTest(SeleniumServerTestCase):
-    
+
     def setUp(self):
         super(LogsTest, self).setUp()
-        
+
     def tearDown(self):
         super(LogsTest, self).tearDown()
 
@@ -2652,5 +2604,3 @@ class LogsTest(SeleniumServerTestCase):
         url = self.sistema_url + '/logs?inicial=2008&final=2008'
         self.browser.get(url)
         self.assertLoadPage(url)
-
-

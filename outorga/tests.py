@@ -28,9 +28,9 @@ class TermoTest(UnitTestCase):
         c1 = Categoria.objects.create(nome='Inicial')
         c2 = Categoria.objects.create(nome='Aditivo')
 
-        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007, 12, 1),
+        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007, 12, 1),  # @UnusedVariable
                                     termino=date(2008, 12, 31), data_presta_contas=date(2008, 2, 28))
-        o2 = Outorga.objects.create(termo=t, categoria=c2, data_solicitacao=date(2008, 4, 1),
+        o2 = Outorga.objects.create(termo=t, categoria=c2, data_solicitacao=date(2008, 4, 1),  # @UnusedVariable
                                     termino=date(2008, 12, 31), data_presta_contas=date(2008, 2, 28))
 
         # Cria Natureza de gasto
@@ -61,7 +61,7 @@ class TermoTest(UnitTestCase):
                                  justificativa='Link Internacional', quantidade=12, valor=250000)
         i3 = Item.objects.create(entidade=ent3, natureza_gasto=n3, descricao='Serviço de Conexão',
                                  justificativa='Ligação SP-CPS', quantidade=12, valor=100000)
-        i4 = Item.objects.create(entidade=ent3, natureza_gasto=n4, descricao='Serviço de Conexão Internacional',
+        i4 = Item.objects.create(entidade=ent3, natureza_gasto=n4, descricao='Serviço de Conexão Internacional',  # @UnusedVariable
                                  justificativa='Ajuste na cobrança do Link Internacional', quantidade=6, valor=50000)
 
         # Cria Protocolo
@@ -77,27 +77,35 @@ class TermoTest(UnitTestCase):
         iden2 = Identificacao.objects.create(endereco=end2, contato=cot2, funcao='Gerente', area='Redes', ativo=True)
         iden3 = Identificacao.objects.create(endereco=end3, contato=cot3, funcao='Diretor', area='Redes', ativo=True)
 
-        p1 = Protocolo.objects.create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008,9,30,10,10), origem=og, estado=ep, num_documento=8888, data_vencimento=date(2008,10,5), descricao='Conta mensal - armazenagem 09/2008', valor_total=None, moeda_estrangeira=False)
-        p2 = Protocolo.objects.create(termo=t, identificacao=iden2, tipo_documento=td, data_chegada=datetime(2008,9,30,10,10), origem=og, estado=ep, num_documento=7777, data_vencimento=date(2008,10,10), descricao='Serviço de Conexão Internacional - 09/2009', valor_total=None, moeda_estrangeira=False)
-        p3 = Protocolo.objects.create(termo=t, identificacao=iden3, tipo_documento=td, data_chegada=datetime(2008,9,30,10,10), origem=og, estado=ep, num_documento=5555, data_vencimento=date(2008,10,15), descricao='Serviço de Conexão Local - 09/2009', valor_total=None, moeda_estrangeira=False)
+        p1 = Protocolo.objects.create(termo=t, identificacao=iden1, tipo_documento=td, data_chegada=datetime(2008, 9, 30, 10, 10), origem=og,
+                                      estado=ep, num_documento=8888, data_vencimento=date(2008, 10, 5),
+                                      descricao='Conta mensal - armazenagem 09/2008', valor_total=None, moeda_estrangeira=False)
+
+        p2 = Protocolo.objects.create(termo=t, identificacao=iden2, tipo_documento=td, data_chegada=datetime(2008, 9, 30, 10, 10), origem=og,
+                                      estado=ep, num_documento=7777, data_vencimento=date(2008, 10, 10),
+                                      descricao='Serviço de Conexão Internacional - 09/2009', valor_total=None, moeda_estrangeira=False)
+
+        p3 = Protocolo.objects.create(termo=t, identificacao=iden3, tipo_documento=td, data_chegada=datetime(2008, 9, 30, 10, 10),
+                                      origem=og, estado=ep, num_documento=5555, data_vencimento=date(2008, 10, 15),
+                                      descricao='Serviço de Conexão Local - 09/2009', valor_total=None, moeda_estrangeira=False)
 
         # Cria Item do Protocolo
-        ip1 = ItemProtocolo.objects.create(protocolo=p1, descricao='Tarifa mensal - 09/2009', quantidade=1,
+        ip1 = ItemProtocolo.objects.create(protocolo=p1, descricao='Tarifa mensal - 09/2009', quantidade=1,  # @UnusedVariable
                                            valor_unitario=2500)
-        ip2 = ItemProtocolo.objects.create(protocolo=p1, descricao='Reajuste tarifa mensal - 09/2009', quantidade=1,
+        ip2 = ItemProtocolo.objects.create(protocolo=p1, descricao='Reajuste tarifa mensal - 09/2009', quantidade=1,  # @UnusedVariable
                                            valor_unitario=150)
-        ip3 = ItemProtocolo.objects.create(protocolo=p2, descricao='Conexão Internacional - 09/2009', quantidade=1,
+        ip3 = ItemProtocolo.objects.create(protocolo=p2, descricao='Conexão Internacional - 09/2009', quantidade=1,  # @UnusedVariable
                                            valor_unitario=250000)
-        ip4 = ItemProtocolo.objects.create(descricao='Reajuste do serviço de Conexão Internacional - 09/2009',
+        ip4 = ItemProtocolo.objects.create(descricao='Reajuste do serviço de Conexão Internacional - 09/2009',  # @UnusedVariable
                                            protocolo=p2, quantidade=1, valor_unitario=50000)
-        ip5 = ItemProtocolo.objects.create(protocolo=p3, descricao='Conexão Local - 09/2009', quantidade=1,
+        ip5 = ItemProtocolo.objects.create(protocolo=p3, descricao='Conexão Local - 09/2009', quantidade=1,  # @UnusedVariable
                                            valor_unitario=85000)
-        ip6 = ItemProtocolo.objects.create(protocolo=p3, descricao='Reajuste do serviço de Conexão Local - 09/2009',
+        ip6 = ItemProtocolo.objects.create(protocolo=p3, descricao='Reajuste do serviço de Conexão Local - 09/2009',  # @UnusedVariable
                                            quantidade=1, valor_unitario=15000)
 
         # Criar Fonte Pagadora
         ef1 = EstadoOutorga.objects.create(nome='Aprovado')
-        ef2 = EstadoOutorga.objects.create(nome='Concluído')
+        ef2 = EstadoOutorga.objects.create(nome='Concluído')  # @UnusedVariable
 
         ex1 = ExtratoCC.objects.create(data_extrato=date(2008, 10, 30), data_oper=date(2008, 10, 5), cod_oper=333333,
                                        valor='2650', historico='TED', despesa_caixa=False)
@@ -111,16 +119,16 @@ class TermoTest(UnitTestCase):
         a1 = Acordo.objects.create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e GTech')
         a2 = Acordo.objects.create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e SAC')
         a3 = Acordo.objects.create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e Terremark')
-        a4 = Acordo.objects.create(estado=ef1, descricao='Acordo de patrocínio entre ANSP e Telefônica')
+        a4 = Acordo.objects.create(estado=ef1, descricao='Acordo de patrocínio entre ANSP e Telefônica')  # @UnusedVariable
 
         of1 = OrigemFapesp.objects.create(acordo=a1, item_outorga=i1)
         of2 = OrigemFapesp.objects.create(acordo=a2, item_outorga=i2)
         of3 = OrigemFapesp.objects.create(acordo=a3, item_outorga=i3)
 
-        fp1 = Pagamento.objects.create(protocolo=p1, conta_corrente=ex1, origem_fapesp=of1, valor_fapesp='2650')
-        fp2 = Pagamento.objects.create(protocolo=p2, conta_corrente=ex2, origem_fapesp=of2, valor_fapesp='250000')
-        fp3 = Pagamento.objects.create(protocolo=p2, conta_corrente=ex3, valor_patrocinio='50000', valor_fapesp=0)
-        fp4 = Pagamento.objects.create(protocolo=p3, conta_corrente=ex4, origem_fapesp=of3, valor_fapesp='100000')
+        fp1 = Pagamento.objects.create(protocolo=p1, conta_corrente=ex1, origem_fapesp=of1, valor_fapesp='2650')  # @UnusedVariable
+        fp2 = Pagamento.objects.create(protocolo=p2, conta_corrente=ex2, origem_fapesp=of2, valor_fapesp='250000')  # @UnusedVariable
+        fp3 = Pagamento.objects.create(protocolo=p2, conta_corrente=ex3, valor_patrocinio='50000', valor_fapesp=0)  # @UnusedVariable
+        fp4 = Pagamento.objects.create(protocolo=p3, conta_corrente=ex4, origem_fapesp=of3, valor_fapesp='100000')  # @UnusedVariable
 
     def tearDown(self):
         super(TermoTest, self).tearDown()
@@ -307,7 +315,7 @@ class TermoTest(UnitTestCase):
 class CategoriaTest(UnitTestCase):
     def setUp(self):
         super(CategoriaTest, self).setUp()
-        c = Categoria.objects.create(nome='Transposicao')
+        c = Categoria.objects.create(nome='Transposicao')  # @UnusedVariable
 
     def tearDown(self):
         super(CategoriaTest, self).tearDown()
@@ -326,7 +334,7 @@ class OutorgaTest(UnitTestCase):
 
         # Cria Outorga
         c1 = Categoria.objects.create(nome='Inicial')
-        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007, 12, 1),
+        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007, 12, 1),  # @UnusedVariable
                                     termino=date(2008, 12, 31), data_presta_contas=date(2008, 2, 28))
 
         # Cria Natureza de gasto
@@ -341,9 +349,9 @@ class OutorgaTest(UnitTestCase):
                                        url='')
         ent2 = Entidade.objects.create(sigla='SAC', nome='SAC do Brasil', cnpj='00.000.000/0000-00', fisco=True, url='')
 
-        i1 = Item.objects.create(entidade=ent1, natureza_gasto=n1, descricao='Armazenagem',
+        i1 = Item.objects.create(entidade=ent1, natureza_gasto=n1, descricao='Armazenagem',  # @UnusedVariable
                                  justificativa='Armazenagem de equipamentos', quantidade=12, valor=2500)
-        i2 = Item.objects.create(entidade=ent2, natureza_gasto=n2, descricao='Serviço de Conexão Internacional',
+        i2 = Item.objects.create(entidade=ent2, natureza_gasto=n2, descricao='Serviço de Conexão Internacional',  # @UnusedVariable
                                  justificativa='Link Internacional', quantidade=12, valor=250000)
 
     def tearDown(self):
@@ -386,7 +394,7 @@ class OutorgaViewTest(UnitTestCase):
 
         # Cria Outorga
         c1 = Categoria.objects.create(nome='Inicial')
-        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007, 12, 1),
+        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007, 12, 1),  # @UnusedVariable
                                     termino=date(2008, 12, 31), data_presta_contas=date(2008, 2, 28))
 
         # Cria Natureza de gasto
@@ -403,7 +411,7 @@ class OutorgaViewTest(UnitTestCase):
 
         i1 = Item.objects.create(entidade=ent1, natureza_gasto=n1, descricao='Armazenagem',
                                  justificativa='Armazenagem de equipamentos', quantidade=12, valor=2500)
-        i2 = Item.objects.create(entidade=ent2, natureza_gasto=n2, descricao='Serviço de Conexão Internacional',
+        i2 = Item.objects.create(entidade=ent2, natureza_gasto=n2, descricao='Serviço de Conexão Internacional',  # @UnusedVariable
                                  justificativa='Link Internacional', quantidade=12, valor=250000)
 
         # Entidades para o teste da View ###
@@ -415,15 +423,15 @@ class OutorgaViewTest(UnitTestCase):
         tipo = TipoContrato.objects.create(nome='Tipo Fixo')
         ef1 = EstadoOutorga.objects.create(nome='Aprovado')
         acordo = Acordo.objects.create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e SAC')
-        os = OrdemDeServico.objects.create(acordo=acordo, contrato=cont1, tipo=tipo, estado=estadoOs, numero=66666,
+        os = OrdemDeServico.objects.create(acordo=acordo, contrato=cont1, tipo=tipo, estado=estadoOs, numero=66666,  # @UnusedVariable
                                            data_inicio=date(2008, 2, 1), data_rescisao=date(2008, 11, 1),
                                            antes_rescisao=2, descricao='OS 34567 - Contratação de mais um link')
 
-        of1 = OrigemFapesp.objects.create(acordo=acordo, item_outorga=i1)
+        of1 = OrigemFapesp.objects.create(acordo=acordo, item_outorga=i1)  # @UnusedVariable
 
     def test_call__relatorio_contratos_por_entidade(self):
         mock_render = mock.MagicMock()
-        with mock.patch.multiple('outorga.views', render=mock_render, login_required=lambda x: x):
+        with mock.patch.multiple('outorga.views', render=mock_render, login_required=lambda x: x):  # @UndefinedVariable
 
             from outorga.views import contratos
             mock_request = mock.Mock()
@@ -451,7 +459,7 @@ class OutorgaViewTest(UnitTestCase):
         os.delete()
 
         mock_render = mock.MagicMock()
-        with mock.patch.multiple('outorga.views', render=mock_render, login_required=lambda x: x):
+        with mock.patch.multiple('outorga.views', render=mock_render, login_required=lambda x: x):  # @UndefinedVariable
 
             from outorga.views import contratos
             mock_request = mock.Mock()
@@ -472,7 +480,7 @@ class OutorgaViewTest(UnitTestCase):
     def test_call__relatorio_termos(self):
 
         mock_render = mock.MagicMock()
-        with mock.patch.multiple('outorga.views', render=mock_render, login_required=lambda x: x):
+        with mock.patch.multiple('outorga.views', render=mock_render, login_required=lambda x: x):  # @UndefinedVariable
 
             from outorga.views import relatorio_termos
             mock_request = mock.Mock()
@@ -486,7 +494,7 @@ class OutorgaViewTest(UnitTestCase):
 
     def test_call__relatorio_termos__request_post(self):
         mock_render = mock.MagicMock()
-        with mock.patch.multiple('outorga.views', render=mock_render, login_required=lambda x: x):
+        with mock.patch.multiple('outorga.views', render=mock_render, login_required=lambda x: x):  # @UndefinedVariable
 
             from outorga.views import relatorio_termos
             mock_request = mock.Mock()
@@ -497,7 +505,7 @@ class OutorgaViewTest(UnitTestCase):
 
     def test_call__lista_acordos(self):
         mock_render = mock.MagicMock()
-        with mock.patch.multiple('outorga.views', render=mock_render, login_required=lambda x: x):
+        with mock.patch.multiple('outorga.views', render=mock_render, login_required=lambda x: x):  # @UndefinedVariable
 
             from outorga.views import lista_acordos
             mock_request = mock.Mock()
@@ -520,7 +528,7 @@ class OutorgaViewTest(UnitTestCase):
         origemFapesp.delete()
 
         mock_render = mock.MagicMock()
-        with mock.patch.multiple('outorga.views', render=mock_render, login_required=lambda x: x):
+        with mock.patch.multiple('outorga.views', render=mock_render, login_required=lambda x: x):  # @UndefinedVariable
 
             from outorga.views import lista_acordos
             mock_request = mock.Mock()
@@ -536,7 +544,7 @@ class OutorgaViewTest(UnitTestCase):
 
     def test_call__lista_acordos__pdf(self):
         mock_render = mock.MagicMock()
-        with mock.patch.multiple('outorga.views', render=mock_render, login_required=lambda x: x):
+        with mock.patch.multiple('outorga.views', render=mock_render, login_required=lambda x: x):  # @UndefinedVariable
 
             from outorga.views import lista_acordos
             mock_request = mock.Mock()
@@ -548,7 +556,7 @@ class OutorgaViewTest(UnitTestCase):
 
     def test_call__item_modalidade__pagina_filtro_inicial(self):
         mock_render = mock.MagicMock()
-        with mock.patch.multiple('outorga.views', render=mock_render, login_required=lambda x: x):
+        with mock.patch.multiple('outorga.views', render=mock_render, login_required=lambda x: x):  # @UndefinedVariable
 
             from outorga.views import item_modalidade
             mock_request = mock.Mock()
@@ -577,7 +585,7 @@ class OutorgaViewTest(UnitTestCase):
 
     def test_call__item_modalidade__sem_entidade(self):
         mock_render = mock.MagicMock()
-        with mock.patch.multiple('outorga.views', render=mock_render, login_required=lambda x: x):
+        with mock.patch.multiple('outorga.views', render=mock_render, login_required=lambda x: x):  # @UndefinedVariable
 
             from outorga.views import item_modalidade
             mock_request = mock.Mock()
@@ -597,7 +605,7 @@ class OutorgaViewTest(UnitTestCase):
 
     def test_call__item_modalidade(self):
         mock_render = mock.MagicMock()
-        with mock.patch.multiple('outorga.views', render=mock_render, login_required=lambda x: x):
+        with mock.patch.multiple('outorga.views', render=mock_render, login_required=lambda x: x):  # @UndefinedVariable
 
             from outorga.views import item_modalidade
             mock_request = mock.Mock()
@@ -628,9 +636,9 @@ class Natureza_gastoTest(UnitTestCase):
         c1 = Categoria.objects.create(nome='Inicial')
         c2 = Categoria.objects.create(nome='Aditivo')
 
-        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007, 12, 1),
+        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007, 12, 1),  # @UnusedVariable
                                     termino=date(2008, 12, 31), data_presta_contas=date(2008, 2, 28))
-        o2 = Outorga.objects.create(termo=t, categoria=c2, data_solicitacao=date(2008, 4, 1),
+        o2 = Outorga.objects.create(termo=t, categoria=c2, data_solicitacao=date(2008, 4, 1),  # @UnusedVariable
                                     termino=date(2008, 12, 31), data_presta_contas=date(2008, 2, 28))
 
         # Cria Natureza de gasto
@@ -677,18 +685,18 @@ class Natureza_gastoTest(UnitTestCase):
                                       descricao='Serviço de Conexão Local - 09/2009', moeda_estrangeira=False)
 
         # Cria Item do Protocolo
-        ip1 = ItemProtocolo.objects.create(protocolo=p1, descricao='Tarifa mensal - 09/2009', quantidade=1,
+        ip1 = ItemProtocolo.objects.create(protocolo=p1, descricao='Tarifa mensal - 09/2009', quantidade=1,  # @UnusedVariable
                                            valor_unitario=2500)
-        ip2 = ItemProtocolo.objects.create(protocolo=p1, descricao='Reajuste tarifa mensal - 09/2009', quantidade=1,
+        ip2 = ItemProtocolo.objects.create(protocolo=p1, descricao='Reajuste tarifa mensal - 09/2009', quantidade=1,  # @UnusedVariable
                                            valor_unitario=150)
-        ip3 = ItemProtocolo.objects.create(protocolo=p2, descricao='Conexão Local - 09/2009', quantidade=1,
+        ip3 = ItemProtocolo.objects.create(protocolo=p2, descricao='Conexão Local - 09/2009', quantidade=1,  # @UnusedVariable
                                            valor_unitario=85000)
-        ip4 = ItemProtocolo.objects.create(protocolo=p2, descricao='Reajuste do serviço de Conexão Local - 09/2009',
+        ip4 = ItemProtocolo.objects.create(protocolo=p2, descricao='Reajuste do serviço de Conexão Local - 09/2009',  # @UnusedVariable
                                            quantidade=1, valor_unitario=15000)
 
         # Criar Fonte Pagadora
         ef1 = EstadoOutorga.objects.create(nome='Aprovado')
-        ef2 = EstadoOutorga.objects.create(nome='Concluído')
+        ef2 = EstadoOutorga.objects.create(nome='Concluído')  # @UnusedVariable
 
         ex1 = ExtratoCC.objects.create(data_extrato=date(2008, 10, 30), data_oper=date(2008, 9, 25), cod_oper=333333,
                                        valor='2650', historico='TED', despesa_caixa=False)
@@ -702,9 +710,9 @@ class Natureza_gastoTest(UnitTestCase):
         of2 = OrigemFapesp.objects.create(acordo=a2, item_outorga=i2)
         of3 = OrigemFapesp.objects.create(acordo=a2, item_outorga=i3)
 
-        fp1 = Pagamento.objects.create(protocolo=p1, conta_corrente=ex1, origem_fapesp=of1, valor_fapesp='2650')
-        fp2 = Pagamento.objects.create(protocolo=p2, conta_corrente=ex2, origem_fapesp=of2, valor_fapesp='100000')
-        fp3 = Pagamento.objects.create(protocolo=p2, conta_corrente=ex2, origem_fapesp=of3, valor_fapesp='100000')
+        fp1 = Pagamento.objects.create(protocolo=p1, conta_corrente=ex1, origem_fapesp=of1, valor_fapesp='2650')  # @UnusedVariable
+        fp2 = Pagamento.objects.create(protocolo=p2, conta_corrente=ex2, origem_fapesp=of2, valor_fapesp='100000')  # @UnusedVariable
+        fp3 = Pagamento.objects.create(protocolo=p2, conta_corrente=ex2, origem_fapesp=of3, valor_fapesp='100000')  # @UnusedVariable
 
     def tearDown(self):
         super(Natureza_gastoTest, self).tearDown()
@@ -855,9 +863,9 @@ class ItemTest(UnitTestCase):
         c1 = Categoria.objects.create(nome='Inicial')
         c2 = Categoria.objects.create(nome='Aditivo')
 
-        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007, 12, 1),
+        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007, 12, 1),  # @UnusedVariable
                                     termino=date(2008, 12, 31), data_presta_contas=date(2008, 2, 28))
-        o2 = Outorga.objects.create(termo=t, categoria=c2, data_solicitacao=date(2008, 4, 1), termino=date(2008, 12, 31),
+        o2 = Outorga.objects.create(termo=t, categoria=c2, data_solicitacao=date(2008, 4, 1), termino=date(2008, 12, 31),  # @UnusedVariable
                                     data_presta_contas=date(2008, 2, 28))
 
         # Cria Natureza de gasto
@@ -873,7 +881,7 @@ class ItemTest(UnitTestCase):
 
         i1 = Item.objects.create(entidade=ent1, natureza_gasto=n1, descricao='Serviço de Conexão Internacional',
                                  justificativa='Link Internacional', quantidade=12, valor=250000)
-        i2 = Item.objects.create(entidade=ent1, natureza_gasto=n2, descricao='Serviço de Conexão Internacional',
+        i2 = Item.objects.create(entidade=ent1, natureza_gasto=n2, descricao='Serviço de Conexão Internacional',  # @UnusedVariable
                                  justificativa='Ajuste na cobrança do Link Internacional', quantidade=6, valor=50000)
 
         # Cria Protocolo
@@ -900,18 +908,18 @@ class ItemTest(UnitTestCase):
                                       descricao='Serviço de Conexão Internacional - 10/2009', moeda_estrangeira=False)
 
         # Cria Item do Protocolo
-        ip1 = ItemProtocolo.objects.create(protocolo=p1, quantidade=1, valor_unitario=250000,
+        ip1 = ItemProtocolo.objects.create(protocolo=p1, quantidade=1, valor_unitario=250000,  # @UnusedVariable
                                            descricao='Conexão Internacional - 09/2009')
-        ip2 = ItemProtocolo.objects.create(protocolo=p1, quantidade=1, valor_unitario=50000,
+        ip2 = ItemProtocolo.objects.create(protocolo=p1, quantidade=1, valor_unitario=50000,  # @UnusedVariable
                                            descricao='Reajuste do serviço de Conexão Internacional - 09/2009')
-        ip3 = ItemProtocolo.objects.create(protocolo=p2, quantidade=1, valor_unitario=250000,
+        ip3 = ItemProtocolo.objects.create(protocolo=p2, quantidade=1, valor_unitario=250000,  # @UnusedVariable
                                            descricao='Conexão Internacional - 10/2009')
-        ip4 = ItemProtocolo.objects.create(protocolo=p2, quantidade=1, valor_unitario=50000,
+        ip4 = ItemProtocolo.objects.create(protocolo=p2, quantidade=1, valor_unitario=50000,  # @UnusedVariable
                                            descricao='Reajuste do serviço de Conexão Internacional - 10/2009')
 
         # Criar Fonte Pagadora
-        ef1 = EstadoFinanceiro.objects.create(nome='Aprovado')
-        ef2 = EstadoFinanceiro.objects.create(nome='Concluído')
+        ef1 = EstadoFinanceiro.objects.create(nome='Aprovado')  # @UnusedVariable
+        ef2 = EstadoFinanceiro.objects.create(nome='Concluído')  # @UnusedVariable
 
         ex1 = ExtratoCC.objects.create(data_extrato=date(2008, 10, 30), data_oper=date(2008, 10, 10), cod_oper=333333,
                                        valor='300000', historico='TED', despesa_caixa=False)
@@ -924,9 +932,9 @@ class ItemTest(UnitTestCase):
 
         of1 = OrigemFapesp.objects.create(acordo=a1, item_outorga=i1)
 
-        fp1 = Pagamento.objects.create(protocolo=p1, conta_corrente=ex1, origem_fapesp=of1, valor_fapesp='300000')
-        fp2 = Pagamento.objects.create(protocolo=p2, conta_corrente=ex2, origem_fapesp=of1, valor_fapesp='300000')
-        fp3 = Pagamento.objects.create(protocolo=p3, conta_corrente=ex3, origem_fapesp=of1, valor_fapesp='10')
+        fp1 = Pagamento.objects.create(protocolo=p1, conta_corrente=ex1, origem_fapesp=of1, valor_fapesp='300000')  # @UnusedVariable
+        fp2 = Pagamento.objects.create(protocolo=p2, conta_corrente=ex2, origem_fapesp=of1, valor_fapesp='300000')  # @UnusedVariable
+        fp3 = Pagamento.objects.create(protocolo=p3, conta_corrente=ex3, origem_fapesp=of1, valor_fapesp='10')  # @UnusedVariable
 
     def test_unicode(self):
         item = Item.objects.get(pk=1)
@@ -1054,7 +1062,7 @@ class AcordoTest(UnitTestCase):
     def setUp(self):
         super(AcordoTest, self).setUp()
         eo1 = EstadoOutorga.objects.create(nome='Vigente')
-        a = Acordo.objects.create(estado=eo1, descricao='Acordo entre Instituto UNIEMP e SAC')
+        a = Acordo.objects.create(estado=eo1, descricao='Acordo entre Instituto UNIEMP e SAC')  # @UnusedVariable
 
     def test_unicode(self):
         a = Acordo.objects.get(pk=1)
@@ -1066,15 +1074,15 @@ class ModalidadeTest(UnitTestCase):
         super(ModalidadeTest, self).setUp()
         eo1 = EstadoOutorga.objects.create(nome='Vigente')
         t = Termo.objects.create(ano=2008, inicio=date(2008, 1, 1), estado=eo1, processo=22222, digito=2)
-        t2 = Termo.objects.create(ano=2007, inicio=date(2007, 1, 1), estado=eo1, processo=3333, digito=3)
+        t2 = Termo.objects.create(ano=2007, inicio=date(2007, 1, 1), estado=eo1, processo=3333, digito=3)  # @UnusedVariable
 
         # Cria Outorga
         c1 = Categoria.objects.create(nome='Inicial')
         c2 = Categoria.objects.create(nome='Aditivo')
 
-        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007, 12, 1),
+        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007, 12, 1),  # @UnusedVariable
                                     termino=date(2008, 12, 31), data_presta_contas=date(2008, 2, 28))
-        o2 = Outorga.objects.create(termo=t, categoria=c2, data_solicitacao=date(2008, 4, 1),
+        o2 = Outorga.objects.create(termo=t, categoria=c2, data_solicitacao=date(2008, 4, 1),  # @UnusedVariable
                                     termino=date(2008, 12, 31), data_presta_contas=date(2008, 2, 28))
 
         # Cria Natureza de gasto
@@ -1082,13 +1090,13 @@ class ModalidadeTest(UnitTestCase):
         m2 = Modalidade.objects.create(sigla='STF0', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
 
         n1 = Natureza_gasto.objects.create(modalidade=m1, termo=t, valor_concedido='1500000.00')
-        n2 = Natureza_gasto.objects.create(modalidade=m2, termo=t, valor_concedido='300000.00')
+        n2 = Natureza_gasto.objects.create(modalidade=m2, termo=t, valor_concedido='300000.00')  # @UnusedVariable
 
         # Cria Item de Outorga
         ent1 = Entidade.objects.create(sigla='SAC', nome='SAC do Brasil', cnpj='00.000.000/0000-00', fisco=True, url='')
-        endereco = Endereco.objects.create(entidade=ent1)
+        endereco = Endereco.objects.create(entidade=ent1)  # @UnusedVariable
 
-        i1 = Item.objects.create(entidade=ent1, natureza_gasto=n1, descricao='Serviço de Conexão Internacional',
+        i1 = Item.objects.create(entidade=ent1, natureza_gasto=n1, descricao='Serviço de Conexão Internacional',  # @UnusedVariable
                                  justificativa='Link Internacional', quantidade=12, valor=250000)
 
         # Cria Natureza de Gasto
@@ -1112,7 +1120,7 @@ class EstadoTest(UnitTestCase):
     def setUp(self):
         super(EstadoTest, self).setUp()
         # Cria Estado
-        e = EstadoOutorga.objects.create(nome='Vigente')
+        e = EstadoOutorga.objects.create(nome='Vigente')  # @UnusedVariable
 
     def test_unicode(self):
         e = EstadoOutorga.objects.get(pk=1)
@@ -1130,9 +1138,9 @@ class OrigemFapespTest(UnitTestCase):
         c1 = Categoria.objects.create(nome='Inicial')
         c2 = Categoria.objects.create(nome='Aditivo')
 
-        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007, 12, 1),
+        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007, 12, 1),  # @UnusedVariable
                                     termino=date(2008, 12, 31), data_presta_contas=date(2008, 2, 28))
-        o2 = Outorga.objects.create(termo=t, categoria=c2, data_solicitacao=date(2008, 4, 1),
+        o2 = Outorga.objects.create(termo=t, categoria=c2, data_solicitacao=date(2008, 4, 1),  # @UnusedVariable
                                     termino=date(2008, 12, 31), data_presta_contas=date(2008, 2, 28))
 
         # Cria Natureza de gasto
@@ -1148,7 +1156,7 @@ class OrigemFapespTest(UnitTestCase):
 
         i1 = Item.objects.create(entidade=ent1, natureza_gasto=n1, descricao='Serviço de Conexão Internacional',
                                  justificativa='Link Internacional', quantidade=12, valor=250000)
-        i2 = Item.objects.create(entidade=ent1, natureza_gasto=n2, descricao='Serviço de Conexão Internacional',
+        i2 = Item.objects.create(entidade=ent1, natureza_gasto=n2, descricao='Serviço de Conexão Internacional',  # @UnusedVariable
                                  justificativa='Ajuste na cobrança do Link Internacional', quantidade=6, valor=50000)
 
         # Cria Protocolo
@@ -1175,18 +1183,18 @@ class OrigemFapespTest(UnitTestCase):
                                       descricao='Serviço de Conexão Internacional - 10/2009', moeda_estrangeira=False)
 
         # Cria Item do Protocolo
-        ip1 = ItemProtocolo.objects.create(protocolo=p1, quantidade=1, valor_unitario=250000,
+        ip1 = ItemProtocolo.objects.create(protocolo=p1, quantidade=1, valor_unitario=250000,  # @UnusedVariable
                                            descricao='Conexão Internacional - 09/2009')
-        ip2 = ItemProtocolo.objects.create(protocolo=p1, quantidade=1, valor_unitario=50000,
+        ip2 = ItemProtocolo.objects.create(protocolo=p1, quantidade=1, valor_unitario=50000,  # @UnusedVariable
                                            descricao='Reajuste do serviço de Conexão Internacional - 09/2009')
-        ip3 = ItemProtocolo.objects.create(protocolo=p2, quantidade=1, valor_unitario=250000,
+        ip3 = ItemProtocolo.objects.create(protocolo=p2, quantidade=1, valor_unitario=250000,  # @UnusedVariable
                                            descricao='Conexão Internacional - 10/2009')
-        ip4 = ItemProtocolo.objects.create(protocolo=p2, quantidade=1, valor_unitario=50000,
+        ip4 = ItemProtocolo.objects.create(protocolo=p2, quantidade=1, valor_unitario=50000,  # @UnusedVariable
                                            descricao='Reajuste do serviço de Conexão Internacional - 10/2009')
 
         # Criar Fonte Pagadora
-        ef1 = EstadoFinanceiro.objects.create(nome='Aprovado')
-        ef2 = EstadoFinanceiro.objects.create(nome='Concluído')
+        ef1 = EstadoFinanceiro.objects.create(nome='Aprovado')  # @UnusedVariable
+        ef2 = EstadoFinanceiro.objects.create(nome='Concluído')  # @UnusedVariable
 
         ex1 = ExtratoCC.objects.create(data_extrato=date(2008, 10, 30), data_oper=date(2008, 10, 10), cod_oper=333333,
                                        valor='300000', historico='TED', despesa_caixa=False)
@@ -1199,9 +1207,9 @@ class OrigemFapespTest(UnitTestCase):
 
         of1 = OrigemFapesp.objects.create(acordo=a1, item_outorga=i1)
 
-        fp1 = Pagamento.objects.create(protocolo=p1, conta_corrente=ex1, origem_fapesp=of1, valor_fapesp='300000')
-        fp2 = Pagamento.objects.create(protocolo=p2, conta_corrente=ex2, origem_fapesp=of1, valor_fapesp='300000')
-        fp3 = Pagamento.objects.create(protocolo=p3, conta_corrente=ex3, origem_fapesp=of1, valor_fapesp='10')
+        fp1 = Pagamento.objects.create(protocolo=p1, conta_corrente=ex1, origem_fapesp=of1, valor_fapesp='300000')  # @UnusedVariable
+        fp2 = Pagamento.objects.create(protocolo=p2, conta_corrente=ex2, origem_fapesp=of1, valor_fapesp='300000')  # @UnusedVariable
+        fp3 = Pagamento.objects.create(protocolo=p3, conta_corrente=ex3, origem_fapesp=of1, valor_fapesp='10')  # @UnusedVariable
 
     def tearDown(self):
         super(OrigemFapespTest, self).tearDown()
@@ -1243,7 +1251,7 @@ class ContratoTest(UnitTestCase):
 
         # Cria um Contrato
         ent = Entidade.objects.create(sigla='SAC', nome='SAC do Brasil', cnpj='00.000.000/0000-00', fisco=True, url='')
-        ct = Contrato.objects.create(data_inicio=date(2008, 1, 1), auto_renova=True, limite_rescisao=date(2008, 1, 11),
+        ct = Contrato.objects.create(data_inicio=date(2008, 1, 1), auto_renova=True, limite_rescisao=date(2008, 1, 11),  # @UnusedVariable
                                      entidade=ent)
 
     def tearDown(self):
@@ -1295,7 +1303,7 @@ class OrdemDeServicoTest(UnitTestCase):
         # Cria uma Ordem de Serviço
         estadoOs = EstadoOS.objects.create(nome="Vigente")
         a = Acordo.objects.create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e SAC')
-        os = OrdemDeServico.objects.create(acordo=a, contrato=ct, tipo=tipo, estado=estadoOs, antes_rescisao=2,
+        os = OrdemDeServico.objects.create(acordo=a, contrato=ct, tipo=tipo, estado=estadoOs, antes_rescisao=2,  # @UnusedVariable
                                            data_inicio=date(2008, 2, 1), data_rescisao=date(2008, 11, 1), numero=66666,
                                            descricao='OS 34567 - Contratação de mais um link')
 
@@ -1372,7 +1380,7 @@ class ArquivoTest(UnitTestCase):
 
         # Cria Outorga
         c1 = Categoria.objects.create(nome='Inicial')
-        c2 = Categoria.objects.create(nome='Aditivo')
+        c2 = Categoria.objects.create(nome='Aditivo')  # @UnusedVariable
 
         o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007, 12, 1),
                                     termino=date(2008, 12, 31), data_presta_contas=date(2008, 2, 28))
@@ -1420,7 +1428,7 @@ class ArquivoOSTest(UnitTestCase):
         # Cria uma Ordem de Serviço
         estadoOs = EstadoOS.objects.create(nome="Vigente")
         a = Acordo.objects.create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e SAC')
-        os = OrdemDeServico.objects.create(acordo=a, contrato=ct, tipo=tipo, estado=estadoOs, antes_rescisao=2,
+        os = OrdemDeServico.objects.create(acordo=a, contrato=ct, tipo=tipo, estado=estadoOs, antes_rescisao=2,  # @UnusedVariable
                                            data_inicio=date(2008, 2, 1), data_rescisao=date(2008, 11, 1), numero=66666,
                                            descricao='OS 34567 - Contratação de mais um link')
 

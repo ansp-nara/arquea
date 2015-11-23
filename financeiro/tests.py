@@ -4,9 +4,9 @@ from decimal import Decimal
 
 from datetime import date, datetime
 from outorga.models import Termo, Item, OrigemFapesp, Estado as EstadoOutorga, Categoria, Outorga, Modalidade, Natureza_gasto, \
-    Acordo, Contrato
+    Acordo
 from identificacao.models import Entidade, Contato, Identificacao, Endereco
-from protocolo.models import Protocolo, ItemProtocolo, TipoDocumento, Origem, Estado as EstadoProtocolo
+from protocolo.models import Protocolo, TipoDocumento, Origem, Estado as EstadoProtocolo
 from financeiro.models import Pagamento, ExtratoCC, Estado as EstadoFinanceiro, TipoComprovante, Auditoria,\
     TipoComprovanteFinanceiro, ExtratoFinanceiro, LocalizaPatrocinio, ExtratoPatrocinio
 
@@ -20,15 +20,15 @@ class ExtratoCCTest(TestCase):
         c1 = Categoria.objects.create(nome='Inicial')
         c2 = Categoria.objects.create(nome='Aditivo')
 
-        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007, 12, 1),
+        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007, 12, 1),  # @UnusedVariable
                                     termino=date(2008, 12, 31), data_presta_contas=date(2008, 2, 28))
-        o2 = Outorga.objects.create(termo=t, categoria=c2, data_solicitacao=date(2008, 4, 1),
+        o2 = Outorga.objects.create(termo=t, categoria=c2, data_solicitacao=date(2008, 4, 1),  # @UnusedVariable
                                     termino=date(2008, 12, 31), data_presta_contas=date(2008, 2, 28))
 
         # Cria Natureza de gasto
         m1 = Modalidade.objects.create(sigla='STB1', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
         m11 = Modalidade.objects.create(sigla='STB2', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
-        m2 = Modalidade.objects.create(sigla='STE1', nome='Servicos de Terceiro no Exterior', moeda_nacional=False)
+        m2 = Modalidade.objects.create(sigla='STE1', nome='Servicos de Terceiro no Exterior', moeda_nacional=False)  # @UnusedVariable
 
         n1 = Natureza_gasto.objects.create(modalidade=m1, termo=t, valor_concedido='1500000.00')
         n2 = Natureza_gasto.objects.create(modalidade=m11, termo=t, valor_concedido='3000000.00')
@@ -79,18 +79,18 @@ class ExtratoCCTest(TestCase):
 
         a1 = Acordo.objects.create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e GTech')
         a2 = Acordo.objects.create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e SAC')
-        a3 = Acordo.objects.create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e Terremark')
+        a3 = Acordo.objects.create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e Terremark')  # @UnusedVariable
 
         of1 = OrigemFapesp.objects.create(acordo=a1, item_outorga=i1)
         of2 = OrigemFapesp.objects.create(acordo=a2, item_outorga=i2)
 
         fp1 = Pagamento.objects.create(protocolo=p1, conta_corrente=ex1, origem_fapesp=of1, valor_fapesp='2650')
-        fp2 = Pagamento.objects.create(protocolo=p2, conta_corrente=ex2, origem_fapesp=of2, valor_fapesp='250000')
+        fp2 = Pagamento.objects.create(protocolo=p2, conta_corrente=ex2, origem_fapesp=of2, valor_fapesp='250000')  # @UnusedVariable
 
         efi1 = EstadoFinanceiro.objects.create(nome="Estado financeiro 1")
         tcomprov1 = TipoComprovante.objects.create(nome="Tipo Comprovante 1")
 
-        audit1 = Auditoria.objects.create(estado=efi1, pagamento=fp1, tipo=tcomprov1, parcial=101.0, pagina=102.0,
+        audit1 = Auditoria.objects.create(estado=efi1, pagamento=fp1, tipo=tcomprov1, parcial=101.0, pagina=102.0,  # @UnusedVariable
                                           obs='observacao')
 
     def test_unicode(self):
@@ -112,7 +112,7 @@ class ExtratoCCTest(TestCase):
 
 class TipoComprovanteFinanceiroTest(TestCase):
     def setUp(self):
-        tcomprov1 = TipoComprovante.objects.create(nome="Tipo Comprovante 1")
+        tcomprov1 = TipoComprovante.objects.create(nome="Tipo Comprovante 1")  # @UnusedVariable
 
     def test_unicode(self):
         tipo = TipoComprovante.objects.get(pk=1)
@@ -127,7 +127,7 @@ class ExtratoFinanceiroTest(TestCase):
 
         tcomprov1 = TipoComprovanteFinanceiro.objects.create(nome="Tipo Comprovante Financeiro 1")
 
-        exf1 = ExtratoFinanceiro.objects.create(termo=t, data_libera='2013-08-10', cod='EFC', historico="historico",
+        exf1 = ExtratoFinanceiro.objects.create(termo=t, data_libera='2013-08-10', cod='EFC', historico="historico",  # @UnusedVariable
                                                 valor=123456, tipo_comprovante=tcomprov1, parcial=543)
 
     def test_unicode(self):
@@ -140,11 +140,11 @@ class ExtratoFinanceiroTest(TestCase):
 
     def test_despesa_caixa(self):
         tcomprov1 = TipoComprovanteFinanceiro(pk=1)
-        tcomprov1.nome = u'Despesa de caixa' 
+        tcomprov1.nome = u'Despesa de caixa'
         tcomprov1.save()
 
         exf = ExtratoFinanceiro.objects.get(pk=1)
-        exf.tipo=tcomprov1
+        exf.tipo = tcomprov1
         exf.save()
 
         self.assertTrue(exf.despesa_caixa)
@@ -160,19 +160,19 @@ class PagamentoTest(TestCase):
         c1 = Categoria.objects.create(nome='Inicial')
         c2 = Categoria.objects.create(nome='Aditivo')
 
-        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007, 12, 1),
+        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007, 12, 1),  # @UnusedVariable
                                     termino=date(2008, 12, 31), data_presta_contas=date(2008, 2, 28))
-        o2 = Outorga.objects.create(termo=t, categoria=c2, data_solicitacao=date(2008, 4, 1),
+        o2 = Outorga.objects.create(termo=t, categoria=c2, data_solicitacao=date(2008, 4, 1),  # @UnusedVariable
                                     termino=date(2008, 12, 31), data_presta_contas=date(2008, 2, 28))
         # Cria Natureza de gasto
         m1 = Modalidade.objects.create(sigla='STB1', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
         m11 = Modalidade.objects.create(sigla='STB2', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
-        m2 = Modalidade.objects.create(sigla='STE1', nome='Servicos de Terceiro no Exterior', moeda_nacional=False)
+        m2 = Modalidade.objects.create(sigla='STE1', nome='Servicos de Terceiro no Exterior', moeda_nacional=False)  # @UnusedVariable
 
         n1 = Natureza_gasto.objects.create(modalidade=m1, termo=t, valor_concedido='1500000.00')
         n2 = Natureza_gasto.objects.create(modalidade=m11, termo=t, valor_concedido='3000000.00')
 
-        #Cria Item de Outorga
+        # Cria Item de Outorga
         ent1 = Entidade.objects.create(sigla='GTECH', nome='Granero Tech', cnpj='00.000.000/0000-00', fisco=True,
                                        url='')
         ent2 = Entidade.objects.create(sigla='SAC', nome='SAC do Brasil', cnpj='00.000.000/0000-00', fisco=True,
@@ -186,7 +186,7 @@ class PagamentoTest(TestCase):
         i2 = Item.objects.create(entidade=ent2, natureza_gasto=n2, descricao='Serviço de Conexão Internacional',
                                  justificativa='Link Internacional', quantidade=12, valor=250000)
 
-        #Cria Protocolo
+        # Cria Protocolo
         ep = EstadoProtocolo.objects.create(nome='Aprovado')
         td = TipoDocumento.objects.create(nome='Nota Fiscal')
         og = Origem.objects.create(nome='Motoboy')
@@ -208,7 +208,7 @@ class PagamentoTest(TestCase):
                                       descricao='Serviço de Conexão Internacional - 09/2009', valor_total=None,
                                       moeda_estrangeira=False)
 
-        #Criar Fonte Pagadora
+        # Criar Fonte Pagadora
         ef1 = EstadoOutorga.objects.create(nome='Aprovado')
 
         ex1 = ExtratoCC.objects.create(data_extrato=date(2008, 10, 30), data_oper=date(2008, 10, 5), cod_oper=333333,
@@ -218,14 +218,13 @@ class PagamentoTest(TestCase):
 
         a1 = Acordo.objects.create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e GTech')
         a2 = Acordo.objects.create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e SAC')
-        a3 = Acordo.objects.create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e Terremark')
+        a3 = Acordo.objects.create(estado=ef1, descricao='Acordo entre Instituto UNIEMP e Terremark')  # @UnusedVariable
 
         of1 = OrigemFapesp.objects.create(acordo=a1, item_outorga=i1)
         of2 = OrigemFapesp.objects.create(acordo=a2, item_outorga=i2)
 
-        fp1 = Pagamento.objects.create(protocolo=p1, conta_corrente=ex1, origem_fapesp=of1, valor_fapesp='2650')
-        fp2 = Pagamento.objects.create(protocolo=p2, conta_corrente=ex2, origem_fapesp=of2, valor_fapesp='250000')
-
+        fp1 = Pagamento.objects.create(protocolo=p1, conta_corrente=ex1, origem_fapesp=of1, valor_fapesp='2650')  # @UnusedVariable
+        fp2 = Pagamento.objects.create(protocolo=p2, conta_corrente=ex2, origem_fapesp=of2, valor_fapesp='250000')  # @UnusedVariable
 
     def test_unicode(self):
         exf = Pagamento.objects.get(pk=1)
@@ -243,11 +242,10 @@ class PagamentoTest(TestCase):
         efi1 = EstadoFinanceiro.objects.create(nome="Estado financeiro 1")
         tcomprov1 = TipoComprovante.objects.create(nome="Tipo Comprovante 1")
 
-        audit1 = Auditoria.objects.create(estado=efi1, pagamento=exf, tipo=tcomprov1, parcial=101.0, pagina=102.0,
+        audit1 = Auditoria.objects.create(estado=efi1, pagamento=exf, tipo=tcomprov1, parcial=101.0, pagina=102.0,  # @UnusedVariable
                                           obs='observacao')
 
         self.assertEquals(exf.__unicode__(), u'8888 - 2650.00 - STB1, parcial 101, página 102    ID: 1')
-
 
     def test_unicode_para_auditoria(self):
         exf = Pagamento.objects.get(pk=1)
@@ -255,7 +253,7 @@ class PagamentoTest(TestCase):
         efi1 = EstadoFinanceiro.objects.create(nome="Estado financeiro 1")
         tcomprov1 = TipoComprovante.objects.create(nome="Tipo Comprovante 1")
 
-        audit1 = Auditoria.objects.create(estado=efi1, pagamento=exf, tipo=tcomprov1, parcial=101.0, pagina=102.0,
+        audit1 = Auditoria.objects.create(estado=efi1, pagamento=exf, tipo=tcomprov1, parcial=101.0, pagina=102.0,  # @UnusedVariable
                                           obs='observacao')
 
         self.assertEquals(exf.unicode_para_auditoria(), u'8888 - 2650.00 - STB1    ID: 1')
@@ -283,7 +281,7 @@ class PagamentoTest(TestCase):
         efi1 = EstadoFinanceiro.objects.create(nome="Estado financeiro 1")
         tcomprov1 = TipoComprovante.objects.create(nome="Tipo Comprovante 1")
 
-        audit1 = Auditoria.objects.create(estado=efi1, pagamento=exf, tipo=tcomprov1, parcial=101.0, pagina=102.0,
+        audit1 = Auditoria.objects.create(estado=efi1, pagamento=exf, tipo=tcomprov1, parcial=101.0, pagina=102.0,  # @UnusedVariable
                                           obs='observacao')
 
         self.assertEquals(exf.anexos(), u'Sim')
@@ -307,7 +305,7 @@ class PagamentoTest(TestCase):
     def test_data(self):
         exf = Pagamento.objects.get(pk=1)
 
-        self.assertEquals(exf.data(), date(2008,10,5))
+        self.assertEquals(exf.data(), date(2008, 10, 5))
 
     def test_nota(self):
         exf = Pagamento.objects.get(pk=1)
@@ -337,7 +335,7 @@ class PagamentoTest(TestCase):
         efi1 = EstadoFinanceiro.objects.create(nome="Estado financeiro 1")
         tcomprov1 = TipoComprovante.objects.create(nome="Tipo Comprovante 1")
 
-        audit1 = Auditoria.objects.create(estado=efi1, pagamento=exf, tipo=tcomprov1, parcial=101.0, pagina=102.0,
+        audit1 = Auditoria.objects.create(estado=efi1, pagamento=exf, tipo=tcomprov1, parcial=101.0, pagina=102.0,  # @UnusedVariable
                                           obs='observacao')
 
         self.assertEquals(exf.pagina(), 102)
@@ -353,7 +351,7 @@ class PagamentoTest(TestCase):
 
         efi1 = EstadoFinanceiro.objects.create(nome="Estado financeiro 1")
         tcomprov1 = TipoComprovante.objects.create(nome="Tipo Comprovante 1")
-        audit1 = Auditoria.objects.create(estado=efi1, pagamento=exf, tipo=tcomprov1, parcial=101.0, pagina=102.0,
+        audit1 = Auditoria.objects.create(estado=efi1, pagamento=exf, tipo=tcomprov1, parcial=101.0, pagina=102.0,  # @UnusedVariable
                                           obs='observacao')
 
         self.assertEquals(exf.parcial(), 101)
@@ -361,18 +359,17 @@ class PagamentoTest(TestCase):
 
 class LocalizaPatrocinioTest(TestCase):
     def setUp(self):
-        localiza = LocalizaPatrocinio.objects.create(consignado='Consignado')
+        localiza = LocalizaPatrocinio.objects.create(consignado='Consignado')  # @UnusedVariable
 
     def test_unicode(self):
         localiza = LocalizaPatrocinio.objects.get(pk=1)
         self.assertEquals(localiza.__unicode__(), u'Consignado')
 
 
-
 class ExtratoPatrocinioTest(TestCase):
     def setUp(self):
         localiza = LocalizaPatrocinio.objects.create(consignado='Consignado')
-        extrato = ExtratoPatrocinio.objects.create(localiza=localiza, data_oper=date(2013, 02, 01), cod_oper=123,
+        extrato = ExtratoPatrocinio.objects.create(localiza=localiza, data_oper=date(2013, 02, 01), cod_oper=123,  # @UnusedVariable
                                                    valor=1234.56, historico='Histórico', obs='Observação')
 
     def test_unicode(self):
@@ -382,7 +379,7 @@ class ExtratoPatrocinioTest(TestCase):
 
 class EstadoTest(TestCase):
     def setUp(self):
-        estado = EstadoFinanceiro .objects.create(nome='Estado Financeiro - nome')
+        estado = EstadoFinanceiro .objects.create(nome='Estado Financeiro - nome')  # @UnusedVariable
 
     def test_unicode(self):
         estado = EstadoFinanceiro.objects.get(pk=1)
@@ -393,24 +390,24 @@ class AuditoriaTest(TestCase):
     def setUp(self):
         e = EstadoOutorga.objects.create(nome='Vigente')
         t = Termo.objects.create(ano=2008, processo=22222, digito=2, inicio=date(2008, 1, 1), estado=e)
-        #Cria Outorga
+        # Cria Outorga
         c1 = Categoria.objects.create(nome='Inicial')
         c2 = Categoria.objects.create(nome='Aditivo')
 
-        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007, 12, 1),
+        o1 = Outorga.objects.create(termo=t, categoria=c1, data_solicitacao=date(2007, 12, 1),  # @UnusedVariable
                                     termino=date(2008, 12, 31), data_presta_contas=date(2008, 2, 28))
-        o2 = Outorga.objects.create(termo=t, categoria=c2, data_solicitacao=date(2008, 4, 1),
+        o2 = Outorga.objects.create(termo=t, categoria=c2, data_solicitacao=date(2008, 4, 1),  # @UnusedVariable
                                     termino=date(2008, 12, 31), data_presta_contas=date(2008, 2, 28))
 
-        #Cria Natureza de gasto
+        # Cria Natureza de gasto
         m1 = Modalidade.objects.create(sigla='STB1', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
         m11 = Modalidade.objects.create(sigla='STB2', nome='Servicos de Terceiro no Brasil', moeda_nacional=True)
-        m2 = Modalidade.objects.create(sigla='STE1', nome='Servicos de Terceiro no Exterior', moeda_nacional=False)
+        m2 = Modalidade.objects.create(sigla='STE1', nome='Servicos de Terceiro no Exterior', moeda_nacional=False)  # @UnusedVariable
 
         n1 = Natureza_gasto.objects.create(modalidade=m1, termo=t, valor_concedido='1500000.00')
         n2 = Natureza_gasto.objects.create(modalidade=m11, termo=t, valor_concedido='3000000.00')
 
-        #Cria Item de Outorga
+        # Cria Item de Outorga
         ent1 = Entidade.objects.create(sigla='GTECH', nome='Granero Tech', cnpj='00.000.000/0000-00', fisco=True,
                                        url='')
         ent2 = Entidade.objects.create(sigla='SAC', nome='SAC do Brasil', cnpj='00.000.000/0000-00', fisco=True,
@@ -424,7 +421,7 @@ class AuditoriaTest(TestCase):
         i2 = Item.objects.create(entidade=ent2, natureza_gasto=n2, descricao='Serviço de Conexão Internacional',
                                  justificativa='Link Internacional', quantidade=12, valor=250000)
 
-        #Cria Protocolo
+        # Cria Protocolo
         ep = EstadoProtocolo.objects.create(nome='Aprovado')
         td = TipoDocumento.objects.create(nome='Nota Fiscal')
         og = Origem.objects.create(nome='Motoboy')
@@ -446,7 +443,7 @@ class AuditoriaTest(TestCase):
                                       descricao='Serviço de Conexão Internacional - 09/2009', valor_total=None,
                                       moeda_estrangeira=False)
 
-        #Criar Fonte Pagadora
+        # Criar Fonte Pagadora
         ef1 = EstadoOutorga.objects.create(nome='Aprovado')
 
         ex1 = ExtratoCC.objects.create(data_extrato=date(2008, 10, 30), data_oper=date(2008, 10, 5), cod_oper=333333,
@@ -461,12 +458,12 @@ class AuditoriaTest(TestCase):
         of2 = OrigemFapesp.objects.create(acordo=a2, item_outorga=i2)
 
         fp1 = Pagamento.objects.create(protocolo=p1, conta_corrente=ex1, origem_fapesp=of1, valor_fapesp='2650')
-        fp2 = Pagamento.objects.create(protocolo=p2, conta_corrente=ex2, origem_fapesp=of2, valor_fapesp='250000')
+        fp2 = Pagamento.objects.create(protocolo=p2, conta_corrente=ex2, origem_fapesp=of2, valor_fapesp='250000')  # @UnusedVariable
 
         efi1 = EstadoFinanceiro.objects.create(nome="Estado financeiro 1")
         tcomprov1 = TipoComprovante.objects.create(nome="Tipo Comprovante 1")
 
-        audit1 = Auditoria.objects.create(estado=efi1, pagamento=fp1, tipo=tcomprov1, parcial=101.0, pagina=102.0,
+        audit1 = Auditoria.objects.create(estado=efi1, pagamento=fp1, tipo=tcomprov1, parcial=101.0, pagina=102.0,  # @UnusedVariable
                                           obs='observacao')
 
     def test_unicode(self):
@@ -476,7 +473,7 @@ class AuditoriaTest(TestCase):
 
 class TipoComprovanteTest(TestCase):
     def setUp(self):
-        tcomprov1 = TipoComprovante.objects.create(nome="Tipo Comprovante 1")
+        tcomprov1 = TipoComprovante.objects.create(nome="Tipo Comprovante 1")  # @UnusedVariable
 
     def test_unicode(self):
         tcomprov1 = TipoComprovante.objects.get(pk=1)
