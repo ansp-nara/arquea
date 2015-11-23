@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.core.urlresolvers import reverse
-from django.test import TestCase, client
+from django.test import TestCase
 from datetime import date
 
 from identificacao.models import Entidade
@@ -98,11 +98,11 @@ class RepositorioRelatorioTest(TestCase):
         estado = Estado.objects.create()
         responsavel = Membro.objects.create(nome='Rogerio')
 
-        repositorio3 = Repositorio.objects.create(data_ocorrencia=date(2014, 2, 13), tipo=tipo, estado=estado,
+        repositorio3 = Repositorio.objects.create(data_ocorrencia=date(2014, 2, 13), tipo=tipo, estado=estado,  # @UnusedVariable
                                                   ocorrencia=u'Ocorrência de teste número 3', responsavel=responsavel,
                                                   natureza=natureza)
 
-        repositorio4 = Repositorio.objects.create(data_ocorrencia=date(2014, 2, 11), tipo=tipo, estado=estado,
+        repositorio4 = Repositorio.objects.create(data_ocorrencia=date(2014, 2, 11), tipo=tipo, estado=estado,  # @UnusedVariable
                                                   ocorrencia=u'Ocorrência de teste número 4', responsavel=responsavel,
                                                   natureza=natureza)
 
