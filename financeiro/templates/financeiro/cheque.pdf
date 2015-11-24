@@ -1,3 +1,5 @@
+{% load proto_tags %}
+{% load static %}
 </html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -60,7 +62,7 @@
     <div id="pp-cheque" ><p>{{ pp }}</p></div>
         <div>
           &nbsp;
-          <img src="http://localhost{% if cc.imagem %}{{ cc.imagem.url }}{% else %}/files/extratocc/cheque_branco.jpg{% endif %}" style="max-width:17.5cm;">
+          <img src="media:{% if cc.imagem %}{{ cc.imagem.url }}{% else %}/files/extratocc/cheque_branco.jpg{% endif %}" style="max-width:17.5cm;">
         </div>
     <div id="cheque">
         <hr style="height:10pt;background-color:#999999;border-radius:5pt;" />
