@@ -112,16 +112,15 @@ def weasy_fetcher(url, **kwargs):
             return weasyprint.default_url_fetcher('file://' + file_path)
     elif url.startswith('media:'):
         url = url[len('media:'):]
-        
         # Normalizando a URL;
         # Removendo o sufixo de MEDIA_URL
-        url_path = os.path.normpath(url.lstrip(settings.MEDIA_URL)).split(os.sep)
-        # Normalizando o MEDIA_ROOT para path absoluto e juntando com a URL 
+        url_path = os.path.normpath(url.replace(settings.MEDIA_URL, '', 1)).split(os.sep)
+        # Normalizando o MEDIA_ROOT para path absoluto e juntando com a URL
         file_path = os.path.join(os.path.abspath(settings.MEDIA_ROOT), *url_path)
-        
+
         if isReadableFile(file_path):
             return weasyprint.default_url_fetcher('file:///' + file_path.replace(os.sep, '/'))
-    
+
     return weasyprint.default_url_fetcher(url)
     
 
