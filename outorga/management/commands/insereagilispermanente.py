@@ -14,28 +14,28 @@ import getpass
 class Command(BaseCommand):
     args = '<processo parcial usuario>'
     help = u'Envia as informações de prestação de contas para o sistema Agilis'
-    
+
     def handle(self, *args, **options):
         if len(args) < 3:
             raise CommandError(u'Parâmetros faltando')
-            
+
         try:
             parcial = int(args[1])
         except ValueError:
             raise CommandError(u'Parcial deve ser inteiro')
-            
+
         try:
             (ano, numero, digito) = re.findall(r"[\d]+", args[0])
         except ValueError:
             raise CommandError(u'Processo deve ter o fomato aa/nnnnn-d')
-            
+
         try:
             termo = Termo.objects.get(processo=numero, digito=digito)
         except Termo.DoesNotExist:
             raise CommandError(u'Processo %s não existe' % args[0])
-            
+
         password = getpass.getpass(prompt="Entre com a senha do agilis:")
-                   
+
         # Com o Cookie Jar, os cookies são recebidos e enviados a cada requisição, fazendo com que a sessão seja mantida
         cj = cookielib.CookieJar()
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
@@ -58,7 +58,7 @@ class Command(BaseCommand):
 
         eqs = {}
         patrimonios = Patrimonio.objects.filter(pagamento__protocolo__termo=termo,
-                                        pagamento__origem_fapesp__item_outorga__natureza_gasto__modalidade__sigla='MPN')
+                                                pagamento__origem_fapesp__item_outorga__natureza_gasto__modalidade__sigla='MPN')
         for e in patrimonios.filter(agilis=True):
             texto = '%s - %s - %s' % (e.equipamento.modelo, e.pagamento.id, e.equipamento.entidade_fabricante.sigla)
             if e.pagamento.auditoria_set.filter(parcial=parcial).count() == 0:
@@ -86,7 +86,8 @@ class Command(BaseCommand):
             for pt in patrimonios.filter(agilis=False, equipamento__modelo=modelo, pagamento__id=pgto,
                                          equipamento__entidade_fabricante__sigla=marca):
                 sn += ',%s' % pt.ns
-            if len(sn) > 170: sn = sn[:170]
+            if len(sn) > 170:
+                sn = sn[:170]
 
             if pg.protocolo.tipo_documento.nome.lower().find('anexo') == 0:
                 nf = '%s %s' % (pg.protocolo.tipo_documento.nome, nf)
@@ -100,8 +101,8 @@ class Command(BaseCommand):
             data = urllib.urlencode(dt+incluir)
             req = urllib2.Request(url='http://internet.aquila.fapesp.br/agilis/PconlineIncluiOuAlteraMpe.do', data=data)
             p2 = urllib2.urlopen(req)
-            txt = p2.read()	
-            
+            txt = p2.read()
+
             # pausa entre requisições para não sobrecarregar
             time.sleep(30)
             if txt.find('Erros') >= 0:

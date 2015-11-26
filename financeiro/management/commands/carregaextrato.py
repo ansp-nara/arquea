@@ -8,12 +8,12 @@ from financeiro.models import ExtratoCC
 class Command(BaseCommand):
     args = u'<arquivo_extrato cc/ct >'
     help = 'Carrega um extrato de conta corrente'
-    
+
     def handle(self, *args, **options):
         if len(args) < 2:
             self.stdout.write('Nome de arquivo faltando')
             return
-        
+
         arq = open(args[0])
         seq = 1
         codigo_anterior = 0
@@ -49,5 +49,5 @@ class Command(BaseCommand):
             sinal = '' if sinal == 'C' else '-'
             ExtratoCC.objects.create(data_oper=data, cod_oper=codigo, valor=Decimal('%s%s' % (sinal, valor)),
                                      historico=historico, despesa_caixa=False, cartao=cartao)
-            
+
         self.stdout.write('Extrato inserido')

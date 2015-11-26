@@ -25,9 +25,9 @@ class LayoutPaginaAdminForm(forms.ModelForm):
         super(LayoutPaginaAdminForm, self).__init__(*args, **kwargs)
 
         self.fields['logo_cabecalho'].label = mark_safe('<a href="#" onclick="window.open(\'/admin/configuracao/layoutlogo/\'+'
-                                                    '$(\'#id_logo_cabecalho\').val() + \'/\', \'_blank\');'
-                                                    'return true;">Logo do cabecalho</a> (185x150)')
+                                                        '$(\'#id_logo_cabecalho\').val() + \'/\', \'_blank\');'
+                                                        'return true;">Logo do cabecalho</a> (185x150)')
 
         self.fields['logo_rodape'].label = mark_safe('<a href="#" onclick="window.open(\'/admin/configuracao/layoutlogo/\'+'
-                                                    '$(\'#id_logo_rodape\').val() + \'/\', \'_blank\');'
-                                                    'return true;">Logo do rodape</a> (150x150)')
+                                                     '$(\'#id_logo_rodape\').val() + \'/\', \'_blank\');'
+                                                     'return true;">Logo do rodape</a> (150x150)')

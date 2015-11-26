@@ -8,8 +8,10 @@ from django.template.response import TemplateResponse
 from django.views.decorators.http import require_safe
 
 import json as simplejson
-from models import *
 from utils.functions import render_to_pdf_weasy
+from identificacao.models import Entidade, Endereco, EntidadeHistorico,\
+    Identificacao, Ecossistema, Acesso, NivelAcesso, Agenda, TipoEntidade
+
 
 @login_required
 @require_safe
@@ -49,7 +51,7 @@ def ajax_escolhe_entidade_filhos(request):
         filhos.append({'pk': f.id, 'valor': f.sigla})
 
     retorno = {'enderecos': enderecos, 'filhos': filhos}
-    
+
     json = simplejson.dumps(retorno)
     return HttpResponse(json, content_type="application/json")
 
@@ -78,7 +80,7 @@ def ajax_escolhe_endereco(request):
 def arquivos_entidade(request):
     """
      Relatório Técnico - Relatório de Documentos por entidade.
-    
+
     """
     return render_to_response('identificacao/arquivos_entidade.html',
                               {'entidades': [e for e in Entidade.objects.all() if e.arquivoentidade_set.count() > 0]},
@@ -91,7 +93,7 @@ def arquivos_entidade(request):
 def agenda(request, tipo=8, pdf=None):
     """
      Relatório Administrativo - Relatório de Agenda
-    
+
     """
     agenda = request.GET.get('agenda')
     if agenda:
@@ -100,12 +102,12 @@ def agenda(request, tipo=8, pdf=None):
             ativo=True, entidade__agendado__agenda__id=agenda, entidade__agendado__ativo=True).values_list(
             'tipo', flat=True).distinct().order_by('tipo'))
         for e in Entidade.objects.filter(entidadehistorico__ativo=True, entidade__isnull=True, agendado__ativo=True,
-                                         agendado__agenda__id=agenda,entidadehistorico__tipo__id=tipo).distinct():
+                                         agendado__agenda__id=agenda, entidadehistorico__tipo__id=tipo).distinct():
             areas = []
             for a in Identificacao.objects.filter(endereco__entidade=e).order_by('area').values_list('area', flat=True)\
                     .distinct():
                 area = {'area': a, 'contatos': Identificacao.objects.filter(endereco__entidade=e, area=a)
-                    .order_by('contato')}
+                        .order_by('contato')}
                 areas.append(area)
             entidades.append({'entidade': e, 'areas': areas})
             for ef in e.entidade_em.filter(entidadehistorico__ativo=True, agendado__agenda__id=agenda,
@@ -114,13 +116,13 @@ def agenda(request, tipo=8, pdf=None):
                 for a in Identificacao.objects.filter(endereco__entidade=ef).order_by('area')\
                         .values_list('area', flat=True).distinct():
                     area = {'area': a, 'contatos': Identificacao.objects.filter(endereco__entidade=ef, area=a)
-                        .order_by('contato')}
+                            .order_by('contato')}
                     areas.append(area)
                 entidades.append({'entidade': ef, 'filho': True, 'areas': areas})
 
         if pdf:
-            return render_to_pdf_weasy('identificacao/agenda.pdf', {'entidades':entidades}, request=request,
-                                       filename='agenda.pdf')
+            return render_to_pdf_weasy('identificacao/agenda.pdf', {'entidades': entidades},
+                                       request=request, filename='agenda.pdf')
         return TemplateResponse(request, 'identificacao/agenda.html',
                                 {'entidades': entidades, 'tipo': int(tipo), 'tipos': tipos, 'agenda': agenda})
     else:
@@ -134,13 +136,12 @@ def agenda(request, tipo=8, pdf=None):
 def planilha_ecossistema(request, tipo='par'):
     """
     Relatório Administrativo - Relatório de Ecossistema
-    
+
     """
     if tipo == 'par':
         return TemplateResponse(request, 'identificacao/ecossistema_par.html',
                                 {'ec': Ecossistema.objects.filter(
-                                    identificacao__endereco__entidade__entidadehistorico__tipo__nome__in=
-                                    ['Equipe', 'Participante'])})
+                                    identificacao__endereco__entidade__entidadehistorico__tipo__nome__in=['Equipe', 'Participante'])})
     elif tipo == 'tic':
         return TemplateResponse(request, 'identificacao/ecossistema_tic.html',
                                 {'ec': Ecossistema.objects.filter(
@@ -161,11 +162,11 @@ def acessos_terremark(request):
 
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="acessos.csv"'
-    
+
     writer = csv.writer(response, delimiter=';', quotechar='"')
 
     entidade = request.GET.get('entidade')
-    
+
     for acesso in Acesso.objects.filter(identificacao__endereco__entidade__id=entidade):
         fn = acesso.identificacao.contato.primeiro_nome or ''
         un = acesso.identificacao.contato.ultimo_nome or ''
@@ -185,7 +186,7 @@ def acessos_terremark(request):
             else:
                 cel = '%s %s %s' % (cel, ddd, t)
                 ddd = ''
-                
+
         writer.writerow([fn.encode('iso-8859-1'), un.encode('iso-8859-1'), fixo, cel, email] + ['']*16)
         niveis = acesso.niveis.all()
         linha = [''] * 21
@@ -196,9 +197,9 @@ def acessos_terremark(request):
 
         for na in NivelAcesso.objects.all():
             linha[6] = na.nome.encode('iso-8859-1')
-            if na in niveis: 
+            if na in niveis:
                 linha[13] = 'X'
             writer.writerow(linha)
             linha[13] = linha[7] = linha[8] = ''
-        
+
     return response

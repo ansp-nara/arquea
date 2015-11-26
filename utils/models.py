@@ -1,5 +1,6 @@
 from django.db import models
 import forms
+from django.utils import datetime_safe
 
 
 class CNPJField(models.CharField):

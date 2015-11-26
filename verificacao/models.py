@@ -12,13 +12,13 @@ logger = logging.getLogger(__name__)
 class VerificacaoEquipamento():
 
     equipamentos = []
-    
+
     def marcaVazia(self):
         """
         Verifica o equipamento com marca/fabricante/editora vazia
         """
         retorno = Equipamento.objects.filter(entidade_fabricante__isnull=True).order_by('entidade_fabricante__sigla')
-        
+
         return retorno
 
     def partNumberVSModeloDiferente(self):
@@ -30,11 +30,11 @@ class VerificacaoEquipamento():
         # busca por part_number que possuam mais que um equipamento cadastrado
         part_numbers = Equipamento.objects.exclude(part_number__exact='').values("part_number")\
             .annotate(qtd=Count("part_number")).order_by().filter(qtd__gt=1)
-        
+
         for pn_item in part_numbers:
             num_modelos = Equipamento.objects.filter(part_number=pn_item['part_number']).values("modelo")\
                 .annotate(c=Count("modelo")).order_by().count()
-            
+
             if num_modelos != 1:
                 equipamentos = Equipamento.objects.filter(part_number=pn_item['part_number']).order_by("id")
                 retorno.append(equipamentos)
@@ -49,11 +49,11 @@ class VerificacaoEquipamento():
         # busca por part_number vazio
         retorno = []
         equipamentos = Equipamento.objects.filter(part_number='').order_by("id")
-        
+
         retorno.append(equipamentos)
 
         return retorno
-    
+
     def partNumberVazioModeloVazio(self):
         """
         Verifica o equipamento pelo part_number
@@ -62,41 +62,41 @@ class VerificacaoEquipamento():
         # busca por part_number vazio
         retorno = []
         equipamentos = Equipamento.objects.filter(part_number='').filter(modelo='').order_by("id")
-        
+
         retorno.append(equipamentos)
 
         return retorno
-    
-    
+
+
 class VerificacaoPatrimonio:
 
     def procedenciaVazia(self, filtros=None):
         """
         Verifica o patrimonio com procedencia vazia
         """
-        
+
         retorno = []
         patrimonios = Patrimonio.objects.filter(entidade_procedencia__isnull=True)\
             .select_related("equipamento__entidade_fabricante").order_by("id")
-        
+
         if filtros and filtros["filtro_tipo_patrimonio"]:
             patrimonios = patrimonios.filter(tipo=filtros["filtro_tipo_patrimonio"])
-        
+
         retorno.append(patrimonios)
         return retorno
-    
+
     def equipamentoVazio(self, filtros=None):
         """
-        Verifica patrimonio sem equipamento 
+        Verifica patrimonio sem equipamento
         """
 
         # busca por part_number vazio
         retorno = []
         patrimonios = Patrimonio.objects.filter(equipamento_id__isnull=True).order_by("id")
-        
+
         if filtros and filtros["filtro_tipo_patrimonio"]:
             patrimonios = patrimonios.filter(tipo=filtros["filtro_tipo_patrimonio"])
-        
+
         retorno.append(patrimonios)
 
         return retorno
@@ -104,12 +104,12 @@ class VerificacaoPatrimonio:
     # busca de patrimonio cujos filhos estejam com historico_local diferente
     def localidadeDiferente(self, filtros=None):
         retorno = []
-        
+
         patrimonios = Patrimonio.objects.filter(patrimonio__isnull=False)
-        
+
         if filtros and filtros["filtro_tipo_patrimonio"]:
             patrimonios = patrimonios.filter(tipo=filtros["filtro_tipo_patrimonio"])
-        
+
         for p in patrimonios:
             # Busca patrimonios filhos que estão em localidade diferente deste patrimonio
             contido = self.localidadeDiferenteFilho(p, filtros)
@@ -127,20 +127,20 @@ class VerificacaoPatrimonio:
     # busca de patrimonio cujos filhos estejam com historico_local diferente
     def localidadeDiferenteFilho(self, patrimonioPai, filtros=None):
         retorno = []
-        
+
         if patrimonioPai and patrimonioPai.historico_atual:
-            
+
             patrimonios = Patrimonio.objects.filter(patrimonio=patrimonioPai)
-            
+
             if filtros and filtros["filtro_tipo_patrimonio"]:
                 patrimonios = patrimonios.filter(tipo=filtros["filtro_tipo_patrimonio"])
-            
+
             for p in patrimonios:
                 if p.historico_atual:
                     # Verifica se a localidade do historico_atual é diferente do patrimonio pai
                     if patrimonioPai.historico_atual.endereco != p.historico_atual.endereco or \
                        patrimonioPai.historico_atual.posicao != p.historico_atual.posicao:
-                    
+
                         patrimonio = {}
                         patrimonio.update({'id': p.id, 'modelo': p.modelo, 'descricao': p.descricao,
                                            'endereco': '', 'estado': '', 'posicao': '', 'data': '', 'contido': []})
@@ -150,12 +150,12 @@ class VerificacaoPatrimonio:
                         retorno.append(patrimonio)
         return retorno
 
-    
+
 class VerificacaoPatrimonioEquipamento():
     def listaFiltroTipoPatrimonio(self, patrimonios):
         pids = patrimonios.values_list('tipo_id', flat=True)
         tipos = Tipo.objects.filter(id__in=pids)
-        
+
         return tipos
 
     # busca de patrimonio e equipamento
@@ -169,7 +169,7 @@ class VerificacaoPatrimonioEquipamento():
 
         if filtros and filtros["filtro_tipo_patrimonio"]:
             patrimonios = patrimonios.filter(tipo=filtros["filtro_tipo_patrimonio"])
-        
+
         retorno.append(patrimonios)
         return retorno
 
@@ -177,14 +177,14 @@ class VerificacaoPatrimonioEquipamento():
     # com tamanho em Us diferente
     def tamanhoDiferente(self, filtros=None):
         retorno = []
-        
+
         patrimonios = Patrimonio.objects.filter(equipamento_id__isnull=False)\
             .filter(equipamento__tamanho__isnull=False).exclude(equipamento__tamanho=F('tamanho'))\
             .select_related("equipamento").order_by("id")
 
         if filtros and filtros["filtro_tipo_patrimonio"]:
             patrimonios = patrimonios.filter(tipo=filtros["filtro_tipo_patrimonio"])
-        
+
         retorno.append(patrimonios)
         return retorno
 
@@ -195,11 +195,11 @@ class VerificacaoPatrimonioEquipamento():
         patrimonio_id = id do patrimonio
         att_name = nome do atributo do objeto
         """
-        
+
         if to_object == 'patrimonio':
             patr = Patrimonio.objects.get(id=patrimonio_id)
             eq = Equipamento.objects.get(id=patr.equipamento.id)
-            
+
             if att_name == 'descricao':
                 patr.descricao = eq.descricao
                 patr.save()
@@ -216,12 +216,12 @@ class VerificacaoPatrimonioEquipamento():
                 patr.entidade_procedencia_id = eq.entidade_fabricante_id
                 patr.save()
             else:
-                raise ValueError('Valor inválido para o parametro. att_name' + str(att_name))        
-            
+                raise ValueError('Valor inválido para o parametro. att_name' + str(att_name))
+
         elif to_object == 'equipamento':
             patr = Patrimonio.objects.get(id=patrimonio_id)
             eq = Equipamento.objects.get(id=patr.equipamento.id)
-            
+
             if att_name == 'descricao':
                 eq.descricao = patr.descricao
                 eq.save()
@@ -236,6 +236,6 @@ class VerificacaoPatrimonioEquipamento():
                 eq.save()
             else:
                 raise ValueError('Valor inválido para o parametro. att_name' + str(att_name))
-            
+
         else:
-            raise ValueError('Valor inválido para o parametro. to_object=' + str(to_object))        
+            raise ValueError('Valor inválido para o parametro. to_object=' + str(to_object))

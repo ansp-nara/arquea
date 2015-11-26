@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from django.conf.urls import *
+from django.conf.urls import patterns
 
 urlpatterns = patterns('financeiro.views',
                        (r'pagamento_termo$', 'ajax_termo_escolhido'),
@@ -34,4 +34,4 @@ urlpatterns = patterns('financeiro.views',
                        (r'extrato_financeiro_parciais/(?P<pdf>\d+)$', 'financeiro_parciais'),
                        (r'ajax_get_recursos_vigentes$', 'ajax_get_recursos_vigentes'),
                        (r'ajax_insere_extrato_cc$', 'ajax_insere_extrato_cc')
-)
+                       )

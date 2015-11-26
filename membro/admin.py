@@ -3,17 +3,17 @@
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 from utils.admin import RelatedOnlyFieldListFilter
-from forms import *
-from models import *
-
-
-
-admin.site.register(TipoAssinatura)
+from membro.forms import MembroAdminForm, ControleFeriasAdminForm,\
+    ControleFeriasAdminFormSet, DispensaLegalAdminForms, ControleAdminForms
+from membro.models import Historico, Ferias, Membro, Assinatura, ControleFerias,\
+    DispensaLegal, Controle, SindicatoArquivo, TipoAssinatura, Cargo,\
+    TipoDispensa, DadoBancario
 
 
 class HistoricoInline(admin.TabularInline):
     model = Historico
     extra = 1
+
 
 class FeriasInline(admin.TabularInline):
     model = Ferias
@@ -21,8 +21,8 @@ class FeriasInline(admin.TabularInline):
     fields = ('inicio', 'inicio_ferias', 'fim_ferias', 'realizado', 'link_edit')
     readonly_fields = ('inicio_ferias', 'fim_ferias', 'link_edit')
 
-class DadoBancarioInline(admin.TabularInline):
 
+class DadoBancarioInline(admin.TabularInline):
     """
     Permite consulta por 'nome' do contato,
                          'banco', 'agencia' e 'cc' do modelo DadoBancario.
@@ -38,14 +38,12 @@ class DadoBancarioInline(admin.TabularInline):
                      'classes': ('wide',)
                  }),
     )
+    # list_display = ('membro', 'banco', 'agencia_digito', 'conta_digito')
+    # search_fields = ['membro__nome', 'banco', 'agencia', 'cc']
 
-    #list_display = ('membro', 'banco', 'agencia_digito', 'conta_digito')
-
-    #search_fields = ['membro__nome', 'banco', 'agencia', 'cc']
-    
     extra = 1
     model = DadoBancario
-    
+
 
 class SindicatoArquivosInline(admin.TabularInline):
     """
@@ -60,7 +58,7 @@ class SindicatoArquivosInline(admin.TabularInline):
 
     extra = 1
     model = SindicatoArquivo
-    
+
 
 class MembroAdmin(admin.ModelAdmin):
 
@@ -70,11 +68,11 @@ class MembroAdmin(admin.ModelAdmin):
 
     fieldsets = (
                  (None, {
-                     'fields': ('nome', ('email', 'ramal'), ('foto', 'site'), 'contato' ),
+                     'fields': ('nome', ('email', 'ramal'), ('foto', 'site'), 'contato'),
                      'classes': ('wide',)
                  }),
                  (None, {
-                     'fields': ('data_nascimento', ('rg', 'cpf'), 'url_lattes' ),
+                     'fields': ('data_nascimento', ('rg', 'cpf'), 'url_lattes'),
                      'classes': ('wide',)
                  }),
                  ('Observação', {
@@ -97,9 +95,7 @@ class MembroAdmin(admin.ModelAdmin):
 admin.site.register(Membro, MembroAdmin)
 
 
-
 class AssinaturaAdmin(admin.ModelAdmin):
-
     """
     Permite consulta por 'tipo' de assinatura e,
                          'nome' e 'cargo' do membro.
@@ -127,10 +123,10 @@ class ControleFeriasInline(admin.TabularInline):
     formset = ControleFeriasAdminFormSet
     extra = 0
 
-class FeriasAdmin(admin.ModelAdmin):
 
+class FeriasAdmin(admin.ModelAdmin):
     """
-    Permite consulta por 'nome' e 'cargo' do membro, 
+    Permite consulta por 'nome' e 'cargo' do membro,
                          'inicio' e 'termino' de férias.
     """
 
@@ -146,16 +142,14 @@ class FeriasAdmin(admin.ModelAdmin):
     )
 
     list_display = ('membro', 'inicio', 'completo', 'realizado')
-    #form = FeriasAdminForm
+    # form = FeriasAdminForm
     inlines = [ControleFeriasInline, ]
     list_per_page = 10
 
-    search_fields = ['membro__nome']#, 'membro__cargo']
+    search_fields = ['membro__nome']   # , 'membro__cargo']
 
 admin.site.register(Ferias, FeriasAdmin)
 
-admin.site.register(Cargo)
-admin.site.register(TipoDispensa)
 
 class DispensaLegalAdmin(admin.ModelAdmin):
 
@@ -192,46 +186,42 @@ class ControleMembroListFilter(admin.SimpleListFilter):
                         .order_by('membro__nome')
         return [(c['membro__id'], c['membro__nome']) for c in membros]
 
-
-
     def queryset(self, request, queryset):
         if self.value():
             return queryset.filter(membro__id__exact=self.value())
         else:
             return queryset
-            
-            
+
+
 class ControleAdmin(admin.ModelAdmin):
     list_filter = (ControleMembroListFilter, )
     form = ControleAdminForms
-    
+
     list_display = ('membro', 'format_entrada', 'format_saida', )
     list_per_page = 20
     ordering = ('-entrada', 'membro__nome')
     search_fields = ['membro__nome']
-    
+
     def format_entrada(self, obj):
         if obj.entrada:
             return obj.entrada.strftime('%d %b %Y - %H:%M')
         return '(Nenhum)'
     format_entrada.short_description = 'Entrada'
-    
+
     def format_saida(self, obj):
         if obj.saida:
             return obj.saida.strftime('%d %b %Y - %H:%M')
         return '(Nenhum)'
     format_saida.short_description = 'Saída'
 
-
     def get_queryset(self, request):
         qs = super(ControleAdmin, self).get_queryset(request)
-        if request.user.is_superuser == False: 
+        if request.user.is_superuser is False:
             qs = qs.filter(membro__email=request.user.email)
-  
+
         return qs
 
 admin.site.register(Controle, ControleAdmin)
-
 
 
 class SindicatoArquivosAdmin(admin.ModelAdmin):
@@ -254,3 +244,6 @@ class SindicatoArquivosAdmin(admin.ModelAdmin):
 
 admin.site.register(SindicatoArquivo, SindicatoArquivosAdmin)
 
+admin.site.register(TipoAssinatura)
+admin.site.register(Cargo)
+admin.site.register(TipoDispensa)

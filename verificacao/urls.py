@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from django.conf.urls import *
+from django.conf.urls import patterns
 
 urlpatterns = patterns('verificacao.views',
                        (r'versao$', 'versao'),
@@ -9,7 +9,7 @@ urlpatterns = patterns('verificacao.views',
                        (r'relatorio/equipamento_part_number_modelo_diferente$',
                         'equipamento_part_number_modelo_diferente'),
                        (r'relatorio/equipamento_marca_vazia$', 'equipamento_marca_vazia'),
-    
+
                        (r'relatorio/patrimonio_consolidado$', 'patrimonio_consolidado'),
                        (r'relatorio/patrimonio_equipamento_vazio$', 'patrimonio_equipamento_vazio'),
                        (r'relatorio/patrimonio_equipamento_descricao_diferente$',
@@ -18,7 +18,7 @@ urlpatterns = patterns('verificacao.views',
                        (r'relatorio/patrimonio_localidade_diferente', 'patrimonio_localidade_diferente'),
 
                        (r'relatorio/check_patrimonio_equipamento$', 'check_patrimonio_equipamento'),
-    
+
                        (r'relatorio/patrimonio_equipamento_marca_diferente$', 'patrimonio_equipamento_marca_diferente'),
                        (r'relatorio/patrimonio_equipamento_tamanho_diferente$',
                         'patrimonio_equipamento_tamanho_diferente'),

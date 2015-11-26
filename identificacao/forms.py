@@ -2,8 +2,10 @@
 
 from django import forms
 from django.utils.html import mark_safe
-from models import *
 import re
+
+from identificacao.models import Contato, Endereco, Entidade, EnderecoDetalhe,\
+    Identificacao, Acesso
 
 
 EMAIL_RE = re.compile(
@@ -83,8 +85,8 @@ class EnderecoDetalheAdminForm(forms.ModelForm):
         self.fields['endereco'].choices = [('', '---------')] + \
                                           [(p.id, p.__unicode__()) for p in Endereco.objects.all().select_related('entidade')]
         self.fields['detalhe'].choices = [('', '---------')] + \
-                                          [(p.id, p.__unicode__()) for p in EnderecoDetalhe.objects.all()
-                                           .select_related('detalhe__endereco__entidade__sigla', 'endereco__entidade__sigla')]
+                                         [(p.id, p.__unicode__()) for p in EnderecoDetalhe.objects.all()
+                                          .select_related('detalhe__endereco__entidade__sigla', 'endereco__entidade__sigla')]
 
     def clean(self):
         cleaned_data = self.cleaned_data

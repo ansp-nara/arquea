@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from django.conf.urls import *
+from django.conf.urls import patterns
+
 
 urlpatterns = patterns('protocolo.views',
                        (r'^(?P<prot_id>\d+)/cotacoes/$', 'cotacoes'),

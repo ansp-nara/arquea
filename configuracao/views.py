@@ -4,8 +4,6 @@ from django.contrib.auth.decorators import login_required
 from django.template.response import TemplateResponse
 from django.http import HttpResponse
 
-# Create your views here.
-
 
 @login_required
 def help_text(request, app_name, model):

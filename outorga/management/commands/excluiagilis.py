@@ -22,28 +22,28 @@ mods = ['STB', 'DET', 'MCN', 'MPN', 'REL', 'DIA']
 class Command(BaseCommand):
     args = '<processo parcial usuario>'
     help = u'Envia as informações de prestação de contas para o sistema Agilis'
-    
+
     def handle(self, *args, **options):
         if len(args) < 3:
             raise CommandError(u'Parâmetros faltando')
-            
+
         try:
             parcial = int(args[1])
         except ValueError:
             raise CommandError(u'Parcial deve ser inteiro')
-            
+
         try:
             (ano, numero, digito) = re.findall(r"[\d]+", args[0])
         except ValueError:
             raise CommandError(u'Processo deve ter o fomato aa/nnnnn-d')
-            
+
         try:
             termo = Termo.objects.get(processo=numero, digito=digito)
         except Termo.DoesNotExist:
             raise CommandError(u'Processo %s não existe' % args[0])
-            
+
         password = getpass.getpass(prompt="Entre com a senha do agilis:")
-                   
+
         # Com o Cookie Jar, os cookies são recebidos e enviados a cada requisição, fazendo com que a sessão seja mantida
         cj = cookielib.CookieJar()
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
@@ -60,7 +60,7 @@ class Command(BaseCommand):
 
         vezes = 0
         for m in mods:
-                
+
             params = [('processo', args[0]), ('parcial', parcial), ('Prosseguir', 'Prosseguir')]
             if m == 'REL':
                 params += [('tipoPrestacao', 'REL')]
@@ -74,7 +74,7 @@ class Command(BaseCommand):
             data = urllib.urlencode([('method', 'Excluir')])
             req = urllib2.Request(url='http://internet.aquila.fapesp.br/agilis/PconlineResumo.do', data=data)
             p2 = urllib2.urlopen(req)
-                
+
             txt = p2.read()
             x = txt.split('<a href="PconlineResumo.do?id=')
             for t in x[1:]:
@@ -92,6 +92,6 @@ class Command(BaseCommand):
                                           'method=Excluir&id=%s' % (tp, n))
                 p3 = urllib2.urlopen(req)
                 vezes += 1
-                if vezes % 10 == 0: 
+                if vezes % 10 == 0:
                     print ('Esperando...')
                     time.sleep(60)

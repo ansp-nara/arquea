@@ -25,22 +25,21 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **options):
-        
         patrimonios = Patrimonio.objects.filter(patrimonio__apelido__contains='Rack')
 
         if options['apenas_apelido']:
             patrimonios = patrimonios.filter(apelido__isnull=False).exclude(apelido='')
-                
+
         if options['filename']:
             f = open(options['filename'], 'w')
         else:
             f = sys.stdout
-            
+
         if patrimonios.count() > 0:
             f.write('apelido;codigo\n')
         for p in patrimonios:
             if options['filtro']:
-                
+
                 if p.historico_atual:
                     if p.historico_atual.__unicode__().find(options['filtro']) >= 0:
                         f.write('%s;%s\n' % (p.apelido, p.id))

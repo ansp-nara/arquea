@@ -1,11 +1,10 @@
 # -* coding: utf-8 -*-
-from django.contrib import admin
 from django.contrib.auth.decorators import permission_required, login_required
 from utils.decorators import login_required_or_403
 from django.db.models import Q, Max, Sum
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404
-from django.template import Context, RequestContext
+from django.template import RequestContext
 from django.template.response import TemplateResponse
 from django.views.decorators.http import require_safe, require_POST
 
@@ -14,14 +13,13 @@ import json as simplejson
 from datetime import datetime as dtime, date
 import logging
 
-from outorga.models import Modalidade, Outorga, Item, Termo, OrigemFapesp, Natureza_gasto, Acordo
+from outorga.models import Item, Termo, OrigemFapesp, Natureza_gasto, Acordo
 from protocolo.models import Protocolo
 from configuracao.models import Cheque
-from identificacao.models import Entidade, Identificacao
-from rede.models import Recurso, PlanejaAquisicaoRecurso
-from utils.functions import pega_lista, formata_moeda, render_to_pdf, render_to_pdf_weasy
+from rede.models import PlanejaAquisicaoRecurso
+from utils.functions import formata_moeda, render_to_pdf_weasy
 from operator import itemgetter
-from models import *
+from financeiro.models import ExtratoCC, Auditoria, Pagamento, ExtratoFinanceiro
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -66,7 +64,6 @@ def ajax_numero_escolhido(request):
     except (Termo.DoesNotExist, ValueError):
         t = None
 
-    retorno = {}
     if t:
         protocolos = Protocolo.objects.filter(termo=t, num_documento__icontains=numero)\
             .order_by('tipo_documento', 'num_documento', 'data_vencimento')
@@ -85,8 +82,6 @@ def ajax_numero_escolhido(request):
 @require_safe
 def ajax_codigo_escolhido(request):
     codigo = request.GET.get('codigo')
-
-    retorno = {}
 
     contas = ExtratoCC.objects.filter(cod_oper__icontains=codigo)
     ccs = []
@@ -127,18 +122,18 @@ def _estrutura_pagamentos(pagamentos):
         pp['data'] = p.conta_corrente.data_oper.strftime('%d/%m/%Y')
         pp['termo'] = p.protocolo.termo.__unicode__()
         pp['oper'] = p.conta_corrente.cod_oper
-        
+
         if p.protocolo.tipo_documento.nome.lower().find('anexo') == 0:
             pp['documento'] = '%s %s' % (p.protocolo.tipo_documento.nome, p.protocolo.num_documento)
         else:
             pp['documento'] = p.protocolo.num_documento
         pp['valor'] = formata_moeda(p.valor_fapesp, ',')
-        
+
         try:
             pp['modalidade'] = p.origem_fapesp.item_outorga.natureza_gasto.modalidade.sigla
-        except: 
+        except:
             pp['modalidade'] = ''
-        
+
         pag = 0
         ane = 0
         out = 0
@@ -209,7 +204,7 @@ def ajax_nova_pagina(request):
 def pagamentos_mensais(request, pdf=False):
     """
      Relatório Administrativo - Relatório de Pagamentos por mês.
-     
+
     """
     if request.GET.get('ano'):
         ano = int(request.GET.get('ano'))
@@ -246,7 +241,7 @@ def pagamentos_mensais(request, pdf=False):
 def pagamentos_parciais(request, pdf=False):
     """
      Relatório Administrativo - Relatório de Pagamentos por parcial.
-     
+
     """
     if request.GET.get('parcial') and request.GET.get('termo'):
         parcial = int(request.GET.get('parcial'))
@@ -284,11 +279,11 @@ def pagamentos_parciais(request, pdf=False):
 def relatorio_gerencial(request, pdf=False):
     """
      Relatório Gerencial - Relatório financeiro com visão gerencial por processo.
-    
+
      O relatório está separado em duas partes.
      - uma agregação de pagamentos por modalidade
      - detalhamento dos pagamentos por modalidade
-     
+
     """
     if request.GET.get('termo'):
         try:
@@ -296,9 +291,9 @@ def relatorio_gerencial(request, pdf=False):
             locale.setlocale(locale.LC_ALL, 'pt_BR')
         except Exception:
             print ''
-            
-        id = int(request.GET.get('termo'))
-        t = get_object_or_404(Termo, id=id)
+
+        termo_id = int(request.GET.get('termo'))
+        t = get_object_or_404(Termo, id=termo_id)
 
         try:
             rt = int(request.GET.get('rt'))
@@ -313,16 +308,16 @@ def relatorio_gerencial(request, pdf=False):
             tamanho = request.GET.get('tamanho')
         else:
             tamanho = 'a3'
-        
+
         retorno = []
         meses = []
         totalizador = []
-        
+
         inicio = request.GET.get('inicio')
         termino = request.GET.get('termino')
         ainicio, minicio = (int(x) for x in inicio.split('-'))
         afinal, mfinal = (int(x) for x in termino.split('-'))
-        
+
         ultimo = Pagamento.objects.filter(protocolo__termo=t).aggregate(ultimo=Max('conta_corrente__data_oper'))
         ultimo = ultimo['ultimo']
 
@@ -363,11 +358,11 @@ def relatorio_gerencial(request, pdf=False):
                     .filter(origem_fapesp__item_outorga__natureza_gasto__modalidade__moeda_nacional=False,
                             protocolo__data_vencimento__year=ano, protocolo__data_vencimento__month=mes)\
                     .aggregate(Sum('valor_fapesp'))
-            
+
             totalizador.append({'total_real': total_real['valor_fapesp__sum'] or Decimal('0.0'),
                                 'total_dolar': total_dolar['valor_fapesp__sum'] or Decimal('0.0'),
                                 'ord': dt.strftime('%Y%m')})
-            
+
             mes += 1
             if mes > 12:
                 mes = 1
@@ -376,7 +371,7 @@ def relatorio_gerencial(request, pdf=False):
         cr = itens.filter(natureza_gasto__modalidade__moeda_nacional=True)\
             .exclude(natureza_gasto__modalidade__sigla='REI').aggregate(Sum('valor'))
         cr = cr['valor__sum'] or Decimal('0.0')
-        
+
         cd = itens.filter(natureza_gasto__modalidade__moeda_nacional=False)\
             .exclude(natureza_gasto__modalidade__sigla='REI').aggregate(Sum('valor'))
         cd = cd['valor__sum'] or Decimal('0.0')
@@ -404,9 +399,7 @@ def relatorio_gerencial(request, pdf=False):
 
         gerais = {'concedido_real': cr, 'concedido_dolar': cd, 'gasto_real_parcial': grp, 'gasto_dolar_parcial': gdp,
                   'gasto_real': gr, 'gasto_dolar': gd, 'saldo_real': cr-gr, 'saldo_dolar': cd-gd}
-        treal = {}
-        tdolar = {}
-        
+
         for ng in Natureza_gasto.objects.filter(termo=t).exclude(modalidade__sigla='REI')\
                 .select_related('modalidade__moeda_nacional').order_by('modalidade__sigla'):
 
@@ -417,7 +410,8 @@ def relatorio_gerencial(request, pdf=False):
             elif rt == 2:
                 ng_itens = ng_itens.filter(rt=False)
                 b_rt = False
-            else: b_rt = None
+            else:
+                b_rt = None
 
             ng_concedido = ng_itens.aggregate(Sum('valor'))['valor__sum'] or Decimal('0.0')
             ng_realizado = ng.total_realizado_rt(rt=b_rt)
@@ -429,7 +423,7 @@ def relatorio_gerencial(request, pdf=False):
                 item['itens'].update({it: []})
 
             ano, mes = (int(x) for x in inicio.split('-'))
-            
+
             while ano < afinal or (ano <= afinal and mes <= mfinal):
                 total = Decimal('0.0')
 
@@ -443,7 +437,7 @@ def relatorio_gerencial(request, pdf=False):
                                                   protocolo__data_vencimento__month=mes).aggregate(Sum('valor_fapesp'))
 
                 total += sumFapesp['valor_fapesp__sum'] or Decimal('0.0')
-       
+
                 try:
                     dt = date(ano, mes+1, 1)
                 except:
@@ -504,13 +498,13 @@ def relatorio_gerencial(request, pdf=False):
 def relatorio_acordos(request, pdf=False):
     """
      Relatório Gerencial - Relatório de Acordos.
-    
+
      Deve receber um termo como parametro inicial, senão vai para uma tela para a seleção do termo.
-    
+
     """
     if request.GET.get('termo'):
-        id = int(request.GET.get('termo'))
-        t = get_object_or_404(Termo, id=id)
+        termo_id = int(request.GET.get('termo'))
+        t = get_object_or_404(Termo, id=termo_id)
         try:
             rt = int(request.GET.get('rt'))
         except TypeError:
@@ -520,7 +514,7 @@ def relatorio_acordos(request, pdf=False):
         except TypeError:
             parcial = 0
         retorno = []
-        
+
         for a in Acordo.objects.all():
             ac = {'desc': a.__unicode__()}
             totalGeralReal = Decimal('0.0')
@@ -551,8 +545,10 @@ def relatorio_acordos(request, pdf=False):
                     pg.append(pags)
 
                     if p.origem_fapesp and \
-                                    p.origem_fapesp.item_outorga.natureza_gasto.modalidade.moeda_nacional == False:
+                       p.origem_fapesp.item_outorga.natureza_gasto.modalidade.moeda_nacional is False:
+
                         totalDolar += p.valor_fapesp
+
                     else:
                         totalReal += p.valor_fapesp
 
@@ -571,12 +567,13 @@ def relatorio_acordos(request, pdf=False):
                                        request=request, filename='relatorio_de_acordos_da_outorga_%s.pdf' % t,)
         else:
             return render_to_response('financeiro/acordos.html',
-                                      {'termo': t, 'acordos' :retorno, 'rt': rt, 'parcial': parcial},
+                                      {'termo': t, 'acordos': retorno, 'rt': rt, 'parcial': parcial},
                                       context_instance=RequestContext(request))
     else:
         return render_to_response('financeiro/relatorios_termo.html',
                                   {'termos': Termo.objects.all(), 'view': 'relatorio_acordos'},
                                   context_instance=RequestContext(request))
+
 
 @login_required
 @permission_required('financeiro.rel_adm_extrato', raise_exception=True)
@@ -584,7 +581,7 @@ def relatorio_acordos(request, pdf=False):
 def extrato(request, pdf=False):
     """
      Relatório Administrativo - Relatório de Panorama da conta corrente.
-    
+
     """
     if request.GET.get('ano'):
         ano = int(request.GET.get('ano'))
@@ -615,7 +612,7 @@ def extrato(request, pdf=False):
             return render_to_response('financeiro/contacorrente.html',
                                       {'ano': ano, 'extrato': retorno}, context_instance=RequestContext(request))
     else:
-        anos = range(1990,dtime.now().year+1)
+        anos = range(1990, dtime.now().year+1)
         anos.sort(reverse=True)
         return render_to_response('financeiro/sel_contacorrente.html',
                                   {'anos': anos}, context_instance=RequestContext(request))
@@ -627,7 +624,7 @@ def extrato(request, pdf=False):
 def extrato_mes(request, pdf=False):
     """
      Relatório Administrativo - Relatório de Extrato da conta corrente por mês.
-     
+
     """
     if request.GET.get('ano'):
         ano = int(request.GET.get('ano'))
@@ -656,7 +653,7 @@ def extrato_mes(request, pdf=False):
         anos = range(1990, dtime.now().year+1)
         anos.sort(reverse=True)
         return render_to_response('financeiro/sel_contacorrente_mes.html',
-                                  {'anos':anos, 'meses':meses}, context_instance=RequestContext(request))
+                                  {'anos': anos, 'meses': meses}, context_instance=RequestContext(request))
 
 
 @login_required
@@ -665,11 +662,11 @@ def extrato_mes(request, pdf=False):
 def extrato_financeiro(request, ano=dtime.now().year, pdf=False):
     """
      Relatório Administrativo - Relatório Extrato do financeiro por mês.
-     
+
     """
     if request.GET.get('termo'):
         codigo = 'MP'
-        
+
         termo_id = int(request.GET.get('termo'))
         termo = get_object_or_404(Termo, id=termo_id)
         mes = int(request.GET.get('mes'))
@@ -700,16 +697,16 @@ def extrato_financeiro(request, ano=dtime.now().year, pdf=False):
         if pdf:
             return render_to_pdf_weasy('financeiro/financeiro.pdf',
                                        {'ano': ano, 'extrato': extrato}, request=request,
-                                       filename='financeiro_%s/%s.pdf' % (mes,ano))
+                                       filename='financeiro_%s/%s.pdf' % (mes, ano))
         else:
             return render_to_response('financeiro/financeiro.html',
                                       {'termo': termo, 'mes': mes, 'ano': ano, 'extrato': extrato},
                                       context_instance=RequestContext(request))
     else:
-        meses = range(0,13)
+        meses = range(0, 13)
         return render_to_response('financeiro/relatorios_termo.html',
                                   {'termos': Termo.objects.all(), 'meses': meses, 'view': 'extrato_financeiro',
-                                   'rt': False }, context_instance=RequestContext(request))
+                                   'rt': False}, context_instance=RequestContext(request))
 
 
 @login_required
@@ -718,7 +715,7 @@ def extrato_financeiro(request, ano=dtime.now().year, pdf=False):
 def extrato_tarifas(request):
     """
      Relatório Administrativo - Relatório de Extrato de tarifas por mês.
-     
+
     """
     if request.GET.get('ano'):
         ano = int(request.GET.get('ano'))
@@ -751,7 +748,7 @@ def extrato_tarifas(request):
 def cheque(request, cc=1):
     extrato = get_object_or_404(ExtratoCC, id=cc)
 
-    if not extrato.extrato_financeiro: 
+    if not extrato.extrato_financeiro:
         termo = None
     else:
         termo = extrato.extrato_financeiro.termo
@@ -778,20 +775,19 @@ def cheque(request, cc=1):
                                request=request, filename='capa_%s.pdf' % extrato.cod_oper)
 
 
-
 @login_required
 @permission_required('financeiro.rel_adm_extrato_financeiro_parciais', raise_exception=True)
 @require_safe
 def financeiro_parciais(request, pdf=False):
     """
      Relatório Administrativo - Relatório de Extrato do financeiro por parcial.
-     
+
     """
     if request.GET.get('termo'):
         termo_id = int(request.GET.get('termo'))
- 
+
         codigo = 'MP'
-        
+
         termo = get_object_or_404(Termo, id=termo_id)
         retorno = []
         parciais = ExtratoFinanceiro.objects.filter(termo=termo, cod__endswith=codigo).distinct('parcial')\
@@ -800,41 +796,41 @@ def financeiro_parciais(request, pdf=False):
 
         for parcial in parciais:
             extrato = []
-            
+
             liberado = Decimal('0.0')
             devolvido = Decimal('0.0')
             estornado = Decimal('0.0')
             disponibilizado = Decimal('0.0')
             pagamentos = Decimal('0.0')
-            
+
             concedido = Decimal('0.0')
             suplementado = Decimal('0.0')
             anulado = Decimal('0.0')
             cancelado = Decimal('0.0')
-            
+
             liberacoes = ExtratoFinanceiro.objects.filter(termo=termo, cod__endswith=codigo, parcial=parcial)\
                 .values('cod').annotate(Sum('valor')).order_by()
-            
+
             for t in liberacoes:
                 if t['cod'] == 'PGMP' or t['cod'] == 'PGRP':
                     liberado = t['valor__sum'] or Decimal('0.0')
                 elif t['cod'] == 'DVMP' or t['cod'] == 'DVRP':
-                    devolvido= t['valor__sum'] or Decimal('0.0')
+                    devolvido = t['valor__sum'] or Decimal('0.0')
                 elif t['cod'] == 'COMP' or t['cod'] == 'CORP':
-                    concedido= t['valor__sum'] or Decimal('0.0')
+                    concedido = t['valor__sum'] or Decimal('0.0')
                 elif t['cod'] == 'SUMP' or t['cod'] == 'SURP':
-                    suplementado= t['valor__sum'] or Decimal('0.0')
+                    suplementado = t['valor__sum'] or Decimal('0.0')
                 elif t['cod'] == 'ANMP' or t['cod'] == 'ANRP':
-                    anulado= t['valor__sum'] or Decimal('0.0')
+                    anulado = t['valor__sum'] or Decimal('0.0')
                 elif t['cod'] == 'ESMP' or t['cod'] == 'ESRP':
-                    estornado= t['valor__sum'] or Decimal('0.0')
+                    estornado = t['valor__sum'] or Decimal('0.0')
                 elif t['cod'] == 'CAMP' or t['cod'] == 'CARP':
-                    cancelado= t['valor__sum'] or Decimal('0.0')
-                
+                    cancelado = t['valor__sum'] or Decimal('0.0')
+
             disponibilizado = - liberado.copy_abs() + devolvido.copy_abs() + estornado.copy_abs()
-            
+
             concessoes = concedido.copy_abs() + suplementado.copy_abs() - anulado.copy_abs() - cancelado.copy_abs()
-            
+
             somatoria_diferenca = Decimal('0.0')
             anterior = date(1971, 1, 1)
             tdia = Decimal('0.0')
@@ -860,17 +856,17 @@ def financeiro_parciais(request, pdf=False):
                 tcheques = Decimal('0.0')
                 for c in ef.extratocc_set.all():
                     v_fapesp = Decimal('0.0')
-                    #total += c.valor
+                    # total += c.valor
                     tcheques += c.valor
                     mods = {}
                     for p in c.pagamento_set.all().prefetch_related('auditoria_set') \
                         .select_related('origem_fapesp', 'origem_fapesp__item_outorga__natureza_gasto__modalidade') \
                         .only('origem_fapesp_id', 'valor_fapesp',
                               'origem_fapesp__item_outorga__natureza_gasto__modalidade__sigla', 'conta_corrente'):
-                        
+
                         if not p.origem_fapesp_id:
                             continue
-                        
+
                         v_fapesp += p.valor_fapesp
                         modalidade = p.origem_fapesp.item_outorga.natureza_gasto.modalidade.sigla
                         if modalidade not in mods.keys():
@@ -887,11 +883,11 @@ def financeiro_parciais(request, pdf=False):
                         pags = []
                         if len(mods[modalidade].keys()) > 0:
                             for p in mods[modalidade].keys():
-                                pags= mods[modalidade][p]
+                                pags = mods[modalidade][p]
                                 pags.sort()
                         parc += '%s (%s)' % (p, ','.join([str(k) for k in pags]))
                         parc += ']       '
-                        
+
                     ch = {'id': c.id, 'valor': c.valor, 'cod': c.cod_oper, 'parciais': parc, 'obs': c.obs}
 
                     if v_fapesp != c.valor:
@@ -901,65 +897,67 @@ def financeiro_parciais(request, pdf=False):
                    ef.cod == 'PGRP' or ef.cod == 'DVRP' or ef.cod == 'ESRP':
                     ex['diferenca'] = ef.valor-total
                     somatoria_diferenca += ex['diferenca']
-                if total > ef.valor: 
+                if total > ef.valor:
                     ex['cor'] = 'red'
-                else: 
+                else:
                     ex['cor'] = 'blue'
                 if tcheques != ef.valor and ef.cod == 'PGMP':
                     ex['patrocinio'] = tcheques - ef.valor
-                    
+
                 pagamentos += total
                 extrato.append(ex)
-            if exi: 
-                exi.update({'valor_data':tdia})
+            if exi:
+                exi.update({'valor_data': tdia})
 
-            # OBS: os valores de 'liberado' e 'pagamentos' estão com o sinal negativo 
+            # OBS: os valores de 'liberado' e 'pagamentos' estão com o sinal negativo
             total_processo = - liberado.copy_abs() + devolvido.copy_abs() + estornado.copy_abs() + pagamentos.copy_abs()
-            
+
             retorno.append({'parcial': str(parcial), 'extrato': extrato, 'liberado': liberado, 'devolvido': devolvido,
                             'disponibilizado': disponibilizado, 'pagamentos': -pagamentos,
                             'somatoria_diferenca': somatoria_diferenca,  'concedido': concedido,
                             'suplementado': suplementado, 'anulado': anulado, 'cancelado': cancelado,
                             'concessoes': concessoes, 'estornado': estornado, 'total_processo': total_processo})
-            
+
             total_liberado = 0
             total_devolvido = 0
             total_estornado = 0
             total_disponibilizado = 0
             total_pagamentos = 0
             total_somatoria_diferenca = 0
-            
+
             total_concedido = 0
             total_suplementado = 0
             total_anulado = 0
             total_cancelado = 0
             total_concessoes = 0
-            
+
             for r in retorno:
                 total_liberado += r['liberado']
                 total_devolvido += r['devolvido']
                 total_estornado += r['estornado']
                 total_disponibilizado += r['disponibilizado']
                 total_pagamentos += r['pagamentos']
-                
+
                 total_somatoria_diferenca += r['somatoria_diferenca']
-                
+
                 total_concedido += r['concedido']
                 total_suplementado += r['suplementado']
                 total_anulado += r['anulado']
                 total_cancelado += r['cancelado']
                 total_concessoes += r['concessoes']
-            total_processo = - total_liberado.copy_abs() + total_devolvido.copy_abs() + \
-                             total_estornado.copy_abs() + total_pagamentos.copy_abs()
+            total_processo = - total_liberado.copy_abs() \
+                + total_devolvido.copy_abs() \
+                + total_estornado.copy_abs() \
+                + total_pagamentos.copy_abs()
 
-            totais={'total_liberado': total_liberado, 'total_devolvido': total_devolvido,
-                    'total_estornado': total_estornado, 'total_pagamentos': total_pagamentos,
-                    'total_disponibilizado': total_disponibilizado,
-                    'total_somatoria_diferenca': total_somatoria_diferenca, 'total_concedido': total_concedido,
-                    'total_suplementado': total_suplementado, 'total_anulado': total_anulado,
-                    'total_cancelado': total_cancelado, 'total_concessoes': total_concessoes,
-                    'total_processo': total_processo}
-        
+            totais = {'total_liberado': total_liberado, 'total_devolvido': total_devolvido,
+                      'total_estornado': total_estornado, 'total_pagamentos': total_pagamentos,
+                      'total_disponibilizado': total_disponibilizado,
+                      'total_somatoria_diferenca': total_somatoria_diferenca, 'total_concedido': total_concedido,
+                      'total_suplementado': total_suplementado, 'total_anulado': total_anulado,
+                      'total_cancelado': total_cancelado, 'total_concessoes': total_concessoes,
+                      'total_processo': total_processo}
+
         if pdf:
             return render_to_pdf_weasy('financeiro/financeiro_parcial.pdf',
                                        {'size': pdf, 'termo': termo, 'parciais': retorno, 'totais': totais},
@@ -1008,7 +1006,7 @@ def _parciais_or_caixa(request, caixa=False, pdf=False):
         for parcial in Auditoria.objects.filter(pagamento__protocolo__termo=termo)\
                 .values_list('parcial', flat=True).distinct():
             parcs = {'parcial': parcial}
-            ads = Auditoria.objects.filter(parcial=parcial, pagamento__protocolo__termo=termo) 
+            # ads = Auditoria.objects.filter(parcial=parcial, pagamento__protocolo__termo=termo)
 
 #                 pgs = []
 #                 for a in ads:
@@ -1023,7 +1021,7 @@ def _parciais_or_caixa(request, caixa=False, pdf=False):
             if caixa:
                 ch = ch.filter(despesa_caixa=True)
 
-    #for p in pgs:
+    # for p in pgs:
     #    if p.conta_corrente and p.conta_corrente not in ch:
 #        ch.append(p.conta_corrente)
 
@@ -1033,7 +1031,7 @@ def _parciais_or_caixa(request, caixa=False, pdf=False):
                 pagos = ecc.pagamento_set.aggregate(Sum('valor_fapesp'))
                 pago = pagos['valor_fapesp__sum'] or Decimal('0.0')
                 pagos = ecc.pagamento_set.aggregate(Sum('valor_patrocinio'))
-                #pago = pago + (pagos['valor_patrocinio__sum'] or Decimal('0.0'))
+                # pago = pago + (pagos['valor_patrocinio__sum'] or Decimal('0.0'))
                 diff = ecc.valor+pago
                 total_diff += diff
                 este = {'cheque': ecc, 'diff': -diff}
@@ -1049,7 +1047,7 @@ def _parciais_or_caixa(request, caixa=False, pdf=False):
                             break
                     pgtos.append({'pg': p, 'naparcial': ok})
                 este.update({'pgtos': pgtos})
-                
+
                 ret.append(este)
 
             parcs.update({'dados': ret, 'diff': -total_diff})
@@ -1075,7 +1073,7 @@ def ajax_escolhe_extrato(request):
         termo = Termo.objects.get(id=termo_id)
     except (Termo.DoesNotExist, ValueError):
         termo = None
-            
+
     ef = ExtratoFinanceiro.objects.filter(termo=termo)
     extratos = []
     for e in ef:
@@ -1090,8 +1088,8 @@ def ajax_escolhe_extrato(request):
 @require_safe
 def presta_contas(request, pdf=False):
     """
-     Relatório Administrativo - Relatório de Prestação de contas. 
-    
+     Relatório Administrativo - Relatório de Prestação de contas.
+
     """
     if request.GET.get('termo'):
         termo_id = request.GET.get('termo')
@@ -1113,10 +1111,10 @@ def presta_contas(request, pdf=False):
                     if a.pagamento != pag:
                         pgtos.append({'pg': a.pagamento, 'pagina': a.pagina, 'auditorias': auditorias})
                         pag = a.pagamento
-                    
+
                         for auditoria in a.pagamento.auditoria_set.all().select_related('tipo', 'estado'):
                             auditorias.append({'auditoria': auditoria})
-                    
+
                 parcs.append({'num': p, 'pgtos': pgtos})
             mod.update({'parcial': parcs})
             m.append(mod)
@@ -1136,7 +1134,7 @@ def presta_contas(request, pdf=False):
 
 @login_required
 def tipos_documentos(context):
- 
+
     protocolos = []
     for p in Protocolo.objects.filter(pagamento__isnull=False):
         ads = Auditoria.objects.filter(pagamento__protocolo=p)
@@ -1161,15 +1159,14 @@ def ajax_get_recursos_vigentes(request):
     Recebe parametro para filtra por estado (ex: Vigente) ou buscar todos os registros
     """
     estado = request.GET.get('estado')
-    retorno = []
     if estado and estado != '':
         recursos = PlanejaAquisicaoRecurso.objects.filter(os__estado__nome=estado)\
             .select_related('os', 'os__tipo', 'projeto', 'tipo', )
     else:
         recursos = PlanejaAquisicaoRecurso.objects.all().select_related('os', 'os__tipo', 'projeto', 'tipo', )
-        
+
     retorno = [{'pk': r.pk, 'valor': r.__unicode__()} for r in recursos]
-    
+
     json = simplejson.dumps(retorno)
     return HttpResponse(json, content_type="application/json")
 
@@ -1181,10 +1178,10 @@ def ajax_insere_extrato_cc(request):
     AJAX para inserir no extrato de conta corrente a liberação do financeiro para o Cartão Pesquisa BB
     Recebe o id do extrato do financeiro
     """
-    id = request.POST.get('id')
+    extrato_id = request.POST.get('id')
     retorno = 1
 
-    ef = get_object_or_404(ExtratoFinanceiro, pk=id)
+    ef = get_object_or_404(ExtratoFinanceiro, pk=extrato_id)
     if ef.extratocc_set.count() > 0:
         retorno = 2
     else:
@@ -1212,7 +1209,7 @@ def gerencial_anual(request, pdf=0):
 
     if 'ano' not in request.GET:
         from django.utils import timezone
-        return TemplateResponse(request, 'financeiro/sel_ano.html', {'anos': range(timezone.now().year, 1994,-1)})
+        return TemplateResponse(request, 'financeiro/sel_ano.html', {'anos': range(timezone.now().year, 1994, -1)})
 
     ano = request.GET.get('ano')
 

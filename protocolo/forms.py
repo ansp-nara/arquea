@@ -128,12 +128,12 @@ class CotacaoAdminForm(forms.ModelForm):
                                            [(p.id, p.__unicode__())
                                             for p in Protocolo.objects.all().prefetch_related('itemprotocolo_set')
                                                .select_related('tipo_documento').order_by('data_vencimento')]
-        
+
         self.fields['identificacao'].choices = [('', '---------')] + \
                                                [(p.id, p.__unicode__())
                                                 for p in Identificacao.objects.all()
                                                    .select_related('endereco', 'endereco__entidade', 'contato')]
-        
+
         self.fields['descricao2'].choices = [('', '---------')] + \
                                             [(p.id, p.__unicode__())
                                              for p in Descricao.objects.all().select_related('entidade',)]
@@ -208,7 +208,7 @@ class ProtocoloAdminForm(forms.ModelForm):
             if t.nome.lower() != u'contrato' and t.nome.lower() != u'ordem de serviço' and t.nome.lower() != u'cotação':
                 nomes.append(t.nome)
 
-        # Permite selecionar protocolos diferentes de 'Contrato', 'Ordem de Serviço' e 'Cotação'. 
+        # Permite selecionar protocolos diferentes de 'Contrato', 'Ordem de Serviço' e 'Cotação'.
         # pt = self.fields['protocolo']
         # pt.queryset = Protocolo.objects.filter(tipo_documento__nome__in=nomes)
 
@@ -247,7 +247,7 @@ class TipoFeriadoAdminForm(forms.ModelForm):
         movel = self.cleaned_data.get('movel')
         dia = self.cleaned_data.get('dia')
         mes = self.cleaned_data.get('mes')
-        
+
         # Verifica se um feriado fixo ocorre na data especificada do tipo de feriado
         if not movel:
             if not dia:
@@ -261,7 +261,7 @@ class TipoFeriadoAdminForm(forms.ModelForm):
 
 
 class ArquivoAdminForm(forms.ModelForm):
-    
+
     protocolo = forms.ModelChoiceField(Protocolo.objects.all().select_related('tipo_documento'))
 
     class Meta:

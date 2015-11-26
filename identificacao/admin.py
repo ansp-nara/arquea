@@ -2,7 +2,13 @@
 
 from django.contrib import admin
 from django.contrib.admin import SimpleListFilter
-from forms import *
+from identificacao.models import EntidadeHistorico, ArquivoEntidade, Agendado,\
+    ASN, TipoDetalhe, TipoEntidade, Agenda, TipoArquivoEntidade, NivelAcesso,\
+    Ecossistema, Identificacao, EnderecoDetalhe, Endereco, Contato, Entidade,\
+    Acesso
+from identificacao.forms import EnderecoDetalheInlineAdminForm,\
+    EnderecoAdminForm, ContatoAdminForm, EnderecoDetalheAdminForm,\
+    AcessoAdminForm
 
 
 class IdentificacaoInline(admin.TabularInline):

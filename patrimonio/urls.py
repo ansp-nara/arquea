@@ -1,4 +1,6 @@
-from django.conf.urls import *
+# -*- coding: utf-8 -*-
+from django.conf.urls import patterns
+
 
 urlpatterns = patterns('patrimonio.views',
                        #     (r'escolhe_termo$', 'ajax_escolhe_termo'),
@@ -11,13 +13,13 @@ urlpatterns = patterns('patrimonio.views',
                        (r'filtra_pn_estado$', 'ajax_filtra_pn_estado'),
                        #    (r'patrimonio_existente$', 'ajax_patrimonio_existente'),
                        (r'relatorio/por_estado$', 'por_estado'),
-    
+
                        (r'relatorio/por_tipo$', 'por_tipo'),
                        (r'relatorio/por_tipo/$', 'por_tipo'),
-    
+
                        (r'relatorio/por_tipo_consignado$', 'por_tipo_consignado'),
                        (r'relatorio/por_tipo_consignado/$', 'por_tipo_consignado'),
-    
+
                        (r'relatorio/por_marca$', 'por_marca'),
                        (r'relatorio/por_marca/(?P<pdf>\d)$', 'por_marca'),
                        (r'relatorio/por_local$', 'por_local'),
@@ -41,4 +43,3 @@ urlpatterns = patterns('patrimonio.views',
                        (r'ajax_get_marcas_por_termo$', 'ajax_get_marcas_por_termo'),
                        (r'planta_baixa_edit$', 'planta_baixa_edit'),
                        )
-

@@ -3,7 +3,11 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.contenttypes.models import ContentType
 
+
 class Papelaria(models.Model):
+    """
+    Classe parar configuração da imagem de fundo utilizado na geração de PDFs com papel timbrado.
+    """
     papel_timbrado_retrato_a4 = models.FileField(upload_to='papel_timbrado_retrato_a4', null=True, blank=True)
     retrato_a4_margem_superior = models.DecimalField(_(u'Margem superior em cm'), max_digits=3, decimal_places=2,
                                                      null=True, blank=True)
@@ -34,14 +38,17 @@ class Papelaria(models.Model):
         import os.path
 
         return self.papel_timbrado_retrato_a4 is not None and self.papel_timbrado_retrato_a4.name and \
-               os.path.isfile(self.papel_timbrado_retrato_a4.name) and self.papel_timbrado_paisagem_a4 is not None and \
-               self.papel_timbrado_paisagem_a4.name and os.path.isfile(self.papel_timbrado_paisagem_a4.name) and \
-               self.papel_timbrado_retrato_a3 is not None and self.papel_timbrado_retrato_a3.name and \
-               os.path.isfile(self.papel_timbrado_retrato_a3.name) and self.papel_timbrado_paisagem_a3 is not None and \
-               self.papel_timbrado_paisagem_a3.name and os.path.isfile(self.papel_timbrado_paisagem_a3.name)
+            os.path.isfile(self.papel_timbrado_retrato_a4.name) and self.papel_timbrado_paisagem_a4 is not None and \
+            self.papel_timbrado_paisagem_a4.name and os.path.isfile(self.papel_timbrado_paisagem_a4.name) and \
+            self.papel_timbrado_retrato_a3 is not None and self.papel_timbrado_retrato_a3.name and \
+            os.path.isfile(self.papel_timbrado_retrato_a3.name) and self.papel_timbrado_paisagem_a3 is not None and \
+            self.papel_timbrado_paisagem_a3.name and os.path.isfile(self.papel_timbrado_paisagem_a3.name)
 
 
 class Cheque(models.Model):
+    """
+    Objeto de configuração da imagem de fundo utilizado na geração de PDFs com papel timbrado.
+    """
     nome_assinatura = models.CharField(_(u'Assinatura'), max_length=150)
 
 
@@ -92,6 +99,7 @@ class FieldsHelp(models.Model):
         verbose_name = u'Ajuda dos campos'
         verbose_name_plural = u'Ajudas dos campos'
 
+
 class LayoutPagina(models.Model):
     logo_cabecalho = models.ForeignKey('configuracao.LayoutLogo', related_name="+")
     logo_rodape = models.ForeignKey('configuracao.LayoutLogo', related_name="+")
@@ -99,6 +107,7 @@ class LayoutPagina(models.Model):
     class Meta:
         verbose_name = u'Layout da página'
         verbose_name_plural = u'Layout das páginas'
+
 
 class LayoutLogo(models.Model):
     logo = models.ImageField(null=True, blank=True)
@@ -120,7 +129,7 @@ class LayoutLink(models.Model):
 
     def __unicode__(self):
         return '%s' % self.titulo
-    
+
     class Meta:
         ordering = ('ordem', 'titulo')
         verbose_name = u'Link do layout'

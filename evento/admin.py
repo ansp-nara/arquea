@@ -1,5 +1,6 @@
 from django.contrib import admin
-from models import *
+from evento.models import Tipo, Evento, AreaPrograma, Atribuicao, Sessao,\
+    AreaOperacional
 
 
 class EventoAdmin(admin.ModelAdmin):
@@ -8,7 +9,7 @@ class EventoAdmin(admin.ModelAdmin):
             'fields': ('acordo', ('tipo', 'local'), 'descricao', ('inicio', 'termino'), 'url', 'obs')
         }),
     )
-  
+
     list_display = ('tipo', 'local', 'descricao', 'inicio')
     search_fields = ('descricao',)
 

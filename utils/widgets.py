@@ -7,7 +7,7 @@ from django.utils.text import Truncator
 
 class ForeignKeySearchInput(forms.HiddenInput):
     """
-    A Widget for displaying ForeignKeys in an autocomplete search input 
+    A Widget for displaying ForeignKeys in an autocomplete search input
     instead in a <select> box.
     """
     class Media:

@@ -4,9 +4,9 @@ from django import forms
 from django.forms.models import BaseInlineFormSet, inlineformset_factory
 from django.forms.utils import ErrorList
 from django.utils.translation import ugettext_lazy as _
-from models import *
 import logging
 import re
+from membro.models import Membro, DadoBancario, Ferias, ControleFerias, Controle
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -20,12 +20,12 @@ EMAIL_RE = re.compile(
 # Faz a validação de um e-mmail
 def is_valid_email(value):
     return EMAIL_RE.search(value)
-        
+
 
 class MembroAdminForm(forms.ModelForm):
 
     """
-    O método '__init__'		É usado para recuperar o 'id' do membro. 
+    O método '__init__'		É usado para recuperar o 'id' do membro.
     O método 'clean_email'	Identifica cada e-mail do campo 'email' e verifica se eles são validos.
     O método 'clean_cpf'	Verifica se o CPF informado pertence a um membro cadastrado.
     A class 'Meta'		Define o modelo a ser usado.
@@ -61,7 +61,6 @@ class MembroAdminForm(forms.ModelForm):
 
     # Verifica a unicidade do CPF.
     def clean_cpf(self):
-        index = self.id
         value = self.cleaned_data['cpf']
 
         if not value:
@@ -138,7 +137,7 @@ class ControleFeriasAdminForm(forms.ModelForm):
         dias = termino - inicio
         if oficial and dias.days != 19 and dias.days != 29:
             raise forms.ValidationError(u'Férias oficiais devem durar 20 ou 30 dias')
-        
+
         # Restrição para termos um melhor controle do período de férias tirado de fato para conta no relatório de
         # controle de horas trabalhadas.
         # A marcação de oficial fica para a 'configuração' das férias, adiantamento, venda de dias e período oficial.
@@ -146,11 +145,11 @@ class ControleFeriasAdminForm(forms.ModelForm):
         if oficial and dias_uteis_fato:
             raise forms.ValidationError(u'Não marcar os "Dias úteis tirados de fato" em férias oficiais. Criar um novo '
                                         u'"Controle de Férias" para especificar o período de férias tirados de fato.')
-        
+
         dias_uteis_aberto = self.cleaned_data.get('dias_uteis_aberto')
         if not oficial and dias_uteis_aberto:
             raise forms.ValidationError(u'Marcar os "Dias úteis em aberto" somente nas férias oficiais.')
-        
+
         return self.cleaned_data
 
     class Meta:
@@ -194,13 +193,13 @@ class ControleObs(forms.ModelForm):
 
 
 class ControleAdminForms(forms.ModelForm):
-    
+
     def clean(self):
         cleaned_data = super(ControleAdminForms, self).clean()
-        
+
         entrada = cleaned_data.get("entrada")
         saida = cleaned_data.get("saida")
-        
+
         # Checar horarios de entrada e saida
         if entrada and saida and entrada > saida:
             msg = _(u"Entrada não pode ser depois que a saída.")
@@ -225,44 +224,44 @@ class ControleAdminForms(forms.ModelForm):
                 self._errors["saida"] = self.error_class([msg])
                 del cleaned_data["saida"]
 
-            # Checar se horario de almoço vai fazer as horas ficarem negativas 
+            # Checar se horario de almoço vai fazer as horas ficarem negativas
             if almoco and total_seconds <= (almoco * 60):
                 msg = _(u"Período de trabalho menor que o tempo de almoço.")
                 self._errors["almoco"] = self.error_class([msg])
                 del cleaned_data["almoco"]
-                
+
         # Always return the full collection of cleaned data.
         return cleaned_data
-        
-        
+
+
 class DispensaLegalAdminForms(forms.ModelForm):
-    
+
     def clean(self):
         cleaned_data = super(DispensaLegalAdminForms, self).clean()
-        
+
         dias_uteis = cleaned_data.get("dias_uteis")
-        if dias_uteis and dias_uteis != 0: 
+        if dias_uteis and dias_uteis != 0:
             msg = _(u"Dias úteis não é mais um campo válido. Remover o valor e atualizar o campo de dias corridos.")
             self._errors["dias_uteis"] = self.error_class([msg])
             del cleaned_data["dias_uteis"]
-        
+
         horas = cleaned_data.get("horas")
         if horas and horas >= 8:
             msg = _(u"Campo de horas deve ser menor que 8h")
             self._errors["horas"] = self.error_class([msg])
             del cleaned_data["horas"]
-        
+
         minutos = cleaned_data.get("minutos")
         if minutos and minutos >= 60:
             msg = _(u"Campo de minutos deve ser menor que 60min")
             self._errors["minutos"] = self.error_class([msg])
-            del cleaned_data["minutos"] 
-            
+            del cleaned_data["minutos"]
+
         dias_corridos = cleaned_data.get("dias_corridos")
         if (not dias_corridos or dias_corridos == 0) and (not horas or horas == 0) and (not minutos or minutos == 0):
             msg = _(u"Deve haver ao menos um lançamento de duração da dispensa.")
             self._errors["dias_corridos"] = self.error_class([msg])
             self._errors["horas"] = self.error_class([msg])
-            self._errors["minutos"] = self.error_class([msg]) 
-        
+            self._errors["minutos"] = self.error_class([msg])
+
         return cleaned_data

@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 from django.shortcuts import render_to_response, get_object_or_404
-from models import *
+from monitor.models import Link
+
 
 def grafico(request, link_id):
     link = get_object_or_404(Link, pk=link_id)
 
-    return render_to_response('monitor/grafico.html', {'link':link})
+    return render_to_response('monitor/grafico.html', {'link': link})
 
 
 def index(request):

@@ -2,7 +2,6 @@
 
 from django.db import models
 
-# Create your models here.
 
 class Instituicao(models.Model):
     nome = models.CharField(max_length=100)
@@ -15,12 +14,14 @@ class Instituicao(models.Model):
         verbose_name = u'Instituição'
         verbose_name_plural = u'Instituições'
 
+
 class Tipo(models.Model):
     nome = models.CharField(max_length=50)
     palavras_chave = models.CharField(max_length=255)
 
     def __unicode__(self):
         return self.nome
+
 
 class Mensagem(models.Model):
     assunto = models.CharField(max_length=100)

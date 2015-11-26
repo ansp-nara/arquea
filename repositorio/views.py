@@ -2,7 +2,7 @@
 from django.conf import settings
 from django.contrib.auth.decorators import permission_required, login_required
 from django.core import serializers
-from django.db.models import Q, Count 
+from django.db.models import Q, Count
 from django.http import HttpResponse, JsonResponse
 from django.template.response import TemplateResponse
 from django.views.decorators.http import require_safe
@@ -36,11 +36,11 @@ def ajax_repositorio_tipo_nomes(request):
     # .order_by('nome')
     nomes = TipoRepositorio.objects.filter(entidade_id=param_entidade_id).values('nome').annotate(dcount=Count('nome'))\
         .order_by('nome')
-            
+
     response = []
     for n in nomes:
         response.append(n['nome'])
-    
+
     return JsonResponse(response, safe=False)
 
 
@@ -50,7 +50,7 @@ def ajax_repositorio_tipo_nomes(request):
 def relatorio_repositorio(request, pdf=0):
     """
      Relatório Administrativo - Relatório de dados de Repositório
-     
+
     """
     # Parametros de filtros
     param_entidade_id = request.GET.get('entidade') or request.POST.get('entidade')
@@ -65,7 +65,7 @@ def relatorio_repositorio(request, pdf=0):
         param_entidade_id = param_entidade_id or '0'
         param_natureza_id = param_natureza_id or '0'
         param_servico_id = param_servico_id or '0'
-        
+
         repositorios = Repositorio.objects.all()
         # Filtrando os dados do repositório
         if param_entidade_id and param_entidade_id != '0':
@@ -80,10 +80,10 @@ def relatorio_repositorio(request, pdf=0):
             repositorios = repositorios.filter(data_ocorrencia__gte=param_data_de)
         if param_data_ate:
             repositorios = repositorios.filter(data_ocorrencia__lte=param_data_ate)
-        
+
         repositorios = repositorios.select_related('tipo', 'tipo__entidade', 'natureza')\
             .order_by('tipo__entidade__sigla', 'tipo__nome', 'natureza__nome', '-data_ocorrencia', 'estado__nome')
-        
+
         # Repositórios agrupados por Tipo e Natureza
         for r in repositorios:
             grupo_chave = str(r.tipo_id) + '_' + str(r.natureza_id)
@@ -93,7 +93,7 @@ def relatorio_repositorio(request, pdf=0):
                 grupo = {'entidade': r.tipo.entidade, 'nome': r.tipo.nome, 'natureza': r.natureza.nome,
                          'repositorios': []}
                 grupos.update({grupo_chave: grupo})
-            
+
             # Carregando os dados de tamanho dos arquivos dos anexos
             anexos = []
             for a in Anexo.objects.filter(repositorio=r):
@@ -106,11 +106,11 @@ def relatorio_repositorio(request, pdf=0):
                             str_size = "{:10.3f}".format(size/1000.0)
                         else:
                             str_size = "{:10.0f}".format(size/1000.0)
-                        
+
                     anexo = {'nome': a.arquivo.__unicode__(), 'tamanho': str_size, 'palavras_chave': a.palavras_chave,
                              'path': os.path.join(settings.MEDIA_URL, a.arquivo.__unicode__())}
                     anexos.append(anexo)
-                    
+
             # Guardando os dados do repositório no grupo
             grupo['repositorios'].append({'id': r.id, 'data_ocorrencia': r.data_ocorrencia.isoformat(),
                                           'estado': r.estado, 'ocorrencia': r.ocorrencia,

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-__author__ = 'antonio'
 
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
@@ -8,6 +7,8 @@ from protocolo.models import Protocolo, Feriado
 import datetime
 from django.core.mail import send_mail
 from django.conf import settings
+
+__author__ = 'antonio'
 
 
 class Command(BaseCommand):

@@ -51,7 +51,7 @@ class AutoCompleteAdmin(admin.ModelAdmin):
                 else:
                     return "%s__icontains" % field_name
 
-            model = models.get_model(app_label, model_name)
+            model = models.get_model(app_label, model_name)  # @UndefinedVariable
             qs = model._default_manager.all()
             for bit in query.split():
                 or_queries = [models.Q(**{construct_search(
@@ -71,7 +71,8 @@ class AutoCompleteAdmin(admin.ModelAdmin):
         specified in the related_search_fields class attribute.
         """
         if isinstance(db_field, models.ForeignKey) and \
-                        db_field.name in self.related_search_fields:
+                db_field.name in self.related_search_fields:
+
             kwargs['widget'] = ForeignKeySearchInput(db_field.rel,
                                                      self.related_search_fields[db_field.name])
         return super(AutoCompleteAdmin, self).formfield_for_dbfield(db_field, **kwargs)

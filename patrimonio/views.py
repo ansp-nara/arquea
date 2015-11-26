@@ -15,14 +15,17 @@ from utils.functions import render_to_pdf_weasy
 import json
 import itertools
 import datetime
+import logging
 from decimal import Decimal
 
-from patrimonio.models import *
 from configuracao.models import Variavel
 from modelsResource import RelatorioPorTipoResource
 from identificacao.models import Entidade, EnderecoDetalhe, Endereco
 from outorga.models import Termo, Natureza_gasto, Item
 from financeiro.models import Pagamento
+from patrimonio.models import Equipamento, Patrimonio, HistoricoLocal, Estado,\
+    Tipo, TipoEquipamento, PatrimonioRack, PlantaBaixaDataCenter,\
+    PlantaBaixaObjeto, PlantaBaixaPosicao
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -793,12 +796,14 @@ def por_local_termo(request, pdf=0):
                                   context_instance=RequestContext(request))
 
 
-# Usado para criar o filtro de entidades.
-# Caso o parametro seja None, busca todas as entidades de primeiro nível, seguidas pela busca de todas
-# as entidades abaixo.
-# Somente são consideradas Entidades válidas para a exibição no filtro as que possuirem EnderecoDetalhe,
-# de qualquer nível de Entidade
 def _find_entidades_filhas(entidade_id):
+    """
+    Usado para criar o filtro de entidades.
+    Caso o parametro seja None, busca todas as entidades de primeiro nível, seguidas pela busca de todas
+    as entidades abaixo.
+    Somente são consideradas Entidades válidas para a exibição no filtro as que possuirem EnderecoDetalhe,
+    de qualquer nível de Entidade
+    """
     if entidade_id:
         entidades = Entidade.objects.filter(entidade=entidade_id)
     else:
@@ -816,9 +821,11 @@ def _find_entidades_filhas(entidade_id):
     return entidades_retorno
 
 
-# Usado no disparo da view por_local_termo
-# Busca patrimonios de um endereco
 def _find_endereco(atuais, endereco_id, filtro_com_fmusp=False):
+    """
+    Usado no disparo da view por_local_termo
+    Busca patrimonios de um endereco
+    """
     endereco = get_object_or_404(Endereco, pk=endereco_id)
 
     # busca os historicos de localizacao de patrimonio baseado no endereco

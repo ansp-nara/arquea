@@ -7,8 +7,10 @@ from django.core.mail import send_mail
 from django.http import HttpResponseRedirect
 from utils.functions import clone_objects
 
-from .models import Origem, ItemProtocolo, TipoFeriado, Estado
-from forms import *
+from protocolo.models import TipoDocumento, Arquivo, Estado, Origem,\
+    ItemProtocolo, Protocolo, Cotacao, Feriado, TipoFeriado, Descricao
+from protocolo.forms import ItemAdminForm, ProtocoloAdminForm, CotacaoAdminForm,\
+    FeriadoAdminForm, TipoFeriadoAdminForm, ArquivoAdminForm
 
 admin.site.register(TipoDocumento)
 admin.site.register(Estado)
@@ -27,7 +29,7 @@ class ArquivoInline(admin.TabularInline):
     verbose_name = ''
     verbose_name_plural = 'Arquivos'
 
-    
+
 class ProtocoloAdmin(admin.ModelAdmin):
     # Filtra os dados pelos campos: 'estado' e 'data_vencimento'
 
@@ -90,7 +92,7 @@ class ProtocoloAdmin(admin.ModelAdmin):
     muda_estado = 0
 
     def action_clone(self, request, queryset):
-        objs = clone_objects(queryset)
+        clone_objects(queryset)
         total = queryset.count()
         if total == 1:
             message = _(u'1 protocolo copiado')
@@ -104,9 +106,9 @@ class ProtocoloAdmin(admin.ModelAdmin):
         try:
             antigo = Protocolo.objects.get(pk=obj.pk)
             estado_anterior = antigo.estado
-        except Protocolo.DoesNotExist: 
+        except Protocolo.DoesNotExist:
             estado_anterior = None
-            
+
         obj.save()
         if obj.estado != estado_anterior:
             self.muda_estado = 1
@@ -141,7 +143,7 @@ class ProtocoloAdmin(admin.ModelAdmin):
             self.muda_estado = 0
             if obj.estado.nome == u'Autorizada':
                 super(ProtocoloAdmin, self).response_change(request, obj)
-                e, created = Estado.objects.get_or_create(nome=u'Solicitar Liberação')
+                e, created = Estado.objects.get_or_create(nome=u'Solicitar Liberação')  # @UnusedVariable
                 url = '/admin/financeiro/fontepagadora/add/?protocolo=%s&valor=%s&estado=%s' % (obj.id, obj.valor, e.id)
                 return HttpResponseRedirect(url)
 
@@ -153,7 +155,7 @@ class ProtocoloAdmin(admin.ModelAdmin):
             self.muda_estado = 0
             if obj.estado.nome == u'Autorizada':
                 super(ProtocoloAdmin, self).response_add(request, obj)
-                e, created = Estado.objects.get_or_create(nome=u'Solicitar Liberação')
+                e, created = Estado.objects.get_or_create(nome=u'Solicitar Liberação')  # @UnusedVariable
                 url = '/admin/financeiro/fontepagadora/add/?protocolo=%s&valor=%s&estado=%s' % (obj.id, obj.valor, e.id)
                 return HttpResponseRedirect(url)
 
@@ -243,16 +245,16 @@ class CotacaoAdmin(admin.ModelAdmin):
     # Define o tipo do protocolo como 'Cotação' e envia um e-mail para o grupo 'adm' se o estado for 'Primeira opção'.
     def save_model(self, request, obj, form, change):
         if not change:
-            tp, created = TipoDocumento.objects.get_or_create(nome=u'Cotação')
+            tp, created = TipoDocumento.objects.get_or_create(nome=u'Cotação')  # @UnusedVariable
             obj.tipo_documento = tp
         try:
             antigo = Cotacao.objects.get(pk=obj.pk)
             estado_anterior = antigo.estado
         except Cotacao.DoesNotExist:
             estado_anterior = None
- 
+
         obj.save()
-    
+
         if obj.estado != estado_anterior and obj.estado.nome == u'Primeira opção':
             g = Group.objects.get(name='adm')
             if g is not None:
@@ -283,7 +285,7 @@ class CotacaoAdmin(admin.ModelAdmin):
             return HttpResponseRedirect(request.REQUEST['return_to'])
         else:
             return super(CotacaoAdmin, self).response_change(request, obj)
-        
+
 admin.site.register(Cotacao, CotacaoAdmin)
 
 
@@ -298,7 +300,7 @@ class FeriadoListFilter(admin.SimpleListFilter):
         feriados = list(set([c for c in model_admin.model.objects.extra(
             select={'year': 'extract( year from feriado )'}).values_list('year', flat=True)]))
         feriados.sort(reverse=True)
-        
+
         return [(int(c), int(c)) for c in feriados]
 
     def queryset(self, request, queryset):
@@ -306,8 +308,8 @@ class FeriadoListFilter(admin.SimpleListFilter):
             return queryset.filter(feriado__year=int(self.value()))
         else:
             return queryset
-        
-        
+
+
 class FeriadoAdmin(admin.ModelAdmin):
     """
     Filtra os dados pelo campo 'movel'.
@@ -413,7 +415,7 @@ class ArquivoAdmin(admin.ModelAdmin):
 
 #    list_display = ('protocolo', '__unicode__')
     list_display = ('mostra_termo', 'mostra_entidade', 'mostra_descricao', 'arquivo_link')
-    
+
     # list_select_related pode ser somente boolean no 1.5
     if django.VERSION[0:2] >= (1, 6):
         list_select_related = ('protocolo__termo', 'protocolo', )
@@ -431,7 +433,7 @@ class ArquivoAdmin(admin.ModelAdmin):
         return u'<a href="/files/%s">%s</a>' % (obj.arquivo, obj)
     arquivo_link.allow_tags = True
     arquivo_link.short_description = "arquivo"
-    
+
     def __init__(self, *args, **kwargs):
         super(ArquivoAdmin, self).__init__(*args, **kwargs)
         self.list_display_links = (None, )

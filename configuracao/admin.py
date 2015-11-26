@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
-from models import *
-from forms import *
-from .forms import ClassesExtraForm
+from configuracao.forms import ClassesExtraForm, LayoutPaginaAdminForm
+from configuracao.models import Papelaria, Variavel, ClassesExtra,\
+    LayoutLinkHeader, LayoutLinkFooter, LayoutPagina, LayoutLink, LayoutLogo,\
+    FieldsHelp, Cheque
 
 
 class PapelariaAdmin(admin.ModelAdmin):
@@ -67,4 +68,3 @@ admin.site.register(LayoutPagina, LayoutPaginaAdmin)
 admin.site.register(LayoutLogo)
 admin.site.register(LayoutLink)
 admin.site.register(FieldsHelp)
-

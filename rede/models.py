@@ -36,10 +36,10 @@ class BlocoIP(models.Model):
         # ip = IPv4Network(u'%s/%s' % (self.ip, self.mask), strict=False)
         ip = ipaddress.ip_network(u'%s/%s' % (self.ip, self.mask), strict=False)
         return '%s' % ip.netmask
-    
+
     def is_IPV4(self):
         return isinstance(ipaddress.ip_address(u'%s' % self.ip), IPv4Address)
-    
+
     def is_IPV6(self):
         return isinstance(ipaddress.ip_address(u'%s' % self.ip), IPv6Address)
 
@@ -74,7 +74,7 @@ class BlocoIP(models.Model):
     def leaf(self):
         if self.blocoip_set.count() == 0:
             return True
-        return False 
+        return False
 
     class Meta:
         verbose_name = u'Bloco IP'
@@ -178,9 +178,9 @@ class Enlace(models.Model):
 
     class Meta:
         ordering = ('participante',)
-        
 
-class EnlaceOperadora(models.Model):	
+
+class EnlaceOperadora(models.Model):
     enlace = models.ForeignKey('rede.Enlace')
     operadora = models.ForeignKey('rede.Operadora')
     banda = models.ForeignKey('rede.Banda')
@@ -195,8 +195,8 @@ class EnlaceOperadora(models.Model):
 
     class Meta:
         ordering = ('enlace', 'operadora',)
-        
-        
+
+
 class Segmento(models.Model):
     enlace = models.ForeignKey('rede.Enlace')
     operadora = models.ForeignKey('rede.Operadora')
@@ -354,7 +354,7 @@ class Beneficiado(models.Model):
         return u'%s' % self.entidade
 
     def porcentagem(self):
-        if not self.quantidade: 
+        if not self.quantidade:
             return 100.0
         return self.quantidade*100/self.planejamento.quantidade
 
@@ -366,13 +366,13 @@ class Recurso(models.Model):
                                                    null=True, blank=True)
     valor_imposto_mensal = models.DecimalField(u'Valor mensal com imposto', max_digits=12, decimal_places=2)
     pagamento = models.ForeignKey('financeiro.Pagamento', null=True, blank=True)
-    
+
     mes_referencia = models.DecimalField(u'Mês inicial de referência', max_digits=2, decimal_places=0,
                                          validators=[MaxValueValidator(12), MinValueValidator(1)], null=True,
                                          blank=True)
     ano_referencia = models.DecimalField(u'Ano inicial de referência', max_digits=4, decimal_places=0,
                                          validators=[MinValueValidator(1950)], null=True, blank=True)
-    
+
     obs = models.TextField(null=True, blank=True)
 
     def __unicode__(self):

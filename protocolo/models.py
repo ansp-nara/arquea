@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import datetime
-from dateutil.relativedelta import *
+from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -11,8 +11,7 @@ from django.db.models import Q
 from django.db.models.signals import post_save
 from django.templatetags.static import static
 
-from identificacao.models import Identificacao, Entidade
-from outorga.models import Termo
+from identificacao.models import Entidade
 from utils.functions import formata_moeda
 
 import logging
@@ -39,7 +38,7 @@ class TipoDocumento(models.Model):
         verbose_name_plural = _('Tipos de documento')
         ordering = ('nome', )
 
-    # Retorna o nome    
+    # Retorna o nome
     def __unicode__(self):
         return self.nome
 
@@ -101,11 +100,11 @@ class TipoFeriado(models.Model):
 
 
 class Feriado(models.Model):
-    
+
     CACHE_KEY_FERIADOS = 'model_protocolo__feriados'
 
     """
-    Uma instância desta classe diz que essa data é um feriado. Caso seja móvel, 
+    Uma instância desta classe diz que essa data é um feriado. Caso seja móvel,
     vale apenas para o ano colocado, caso não seja, essa data é feriado em todos
     os anos.
 
@@ -118,7 +117,7 @@ class Feriado(models.Model):
     tipo = models.ForeignKey('protocolo.TipoFeriado', null=True, blank=True)
     # movel = models.BooleanField(_(u'Este feriado é móvel?'))
 
-    # Retorna a data do feriado de acordo com sua classificação.    
+    # Retorna a data do feriado de acordo com sua classificação.
     def __unicode__(self):
         return self.feriado.strftime("%d/%m/%y")
 
@@ -153,7 +152,7 @@ class Feriado(models.Model):
     get_movel.short_description = 'Móvel?'
     get_movel.admin_order_field = 'tipo__movel'
     get_movel.boolean = True
-    
+
     def get_subtrai(self):
         return self.tipo.subtrai_banco_hrs
     get_subtrai.short_description = 'Subtrai horas?'
@@ -163,6 +162,7 @@ class Feriado(models.Model):
     # Define a ordenação da visualização dos dados.
     class Meta:
         ordering = ('feriado', )
+
 
 def feriado_post_save_signal(sender, instance, **kwargs):
     # Post-save signal do Feriado para limpar o cache dos Feriados
@@ -175,17 +175,17 @@ post_save.connect(feriado_post_save_signal, sender=Feriado, dispatch_uid="feriad
 class Protocolo(models.Model):
 
     """
-    Uma instância dessa classe representa um documento cadastrado no sistema como nota fiscal, 
-    fatura, cotação, contrato, entre outros. 
+    Uma instância dessa classe representa um documento cadastrado no sistema como nota fiscal,
+    fatura, cotação, contrato, entre outros.
 
-    O valor total do protocolo sera calculado através da soma de seus itens, que são instâncias da 
+    O valor total do protocolo sera calculado através da soma de seus itens, que são instâncias da
     classe ItemProtocolo e será mostrado no formato da moeda correspondente.
 
     Será feita uma consulta dos pagamentos do próximo dia útil.
 
-    O método '__unicode__' 		Retorna os campos 'termo', 'descricao', 'estado' e a data de vencimento formatada.   
+    O método '__unicode__' 		Retorna os campos 'termo', 'descricao', 'estado' e a data de vencimento formatada.
     O método 'mostra_termo'		Retorna o termo do protocolo.
-    O método 'mostra_categoria'		Retorna a categoria do protocolo. 
+    O método 'mostra_categoria'		Retorna a categoria do protocolo.
     O método 'mostra_estado'		Retorna o estado do protocolo.
     O método 'doc_num' 			Retorna o tipo e o número do documento.
     O método 'entidade' 		Retorna a entidade da identificação.
@@ -344,7 +344,7 @@ class Protocolo(models.Model):
     # Formata o atributo 'valor' conforme o campo 'moeda_estrangeira'.
     def mostra_valor(self):
         valor = self.valor
-        
+
         if valor == 0:
             return '-'
 
@@ -464,7 +464,7 @@ class ItemProtocolo(models.Model):
     def __unicode__(self):
         if self.descricao:
             return u'%s | %s' % (self.protocolo, self.descricao)
-    
+
     # Define um atributo que calcula o valor total do item.
     @property
     def valor(self):

@@ -7,8 +7,12 @@ from django.contrib.admin.util import unquote
 from django.template.response import TemplateResponse
 from rede.models import PlanejaAquisicaoRecurso
 from outorga.models import OrdemDeServico, Outorga, Modalidade, Estado, Categoria, Arquivo, ArquivoOS, TipoContrato, \
-    EstadoOS, TemplateRT
-from outorga.forms import *
+    EstadoOS, TemplateRT, Natureza_gasto, Item, OrigemFapesp, Acordo, Termo,\
+    Contrato
+from outorga.forms import ItemAdminForm, OrigemFapespInlineForm, AcordoAdminForm,\
+    EstadoAdminForm, CategoriaAdminForm, ModalidadeAdminForm, TermoAdminForm,\
+    OutorgaAdminForm, Natureza_gastoAdminForm, ArquivoAdminForm,\
+    ContratoAdminForm, OrdemDeServicoAdminForm, OrigemFapespAdminForm
 from utils.admin import RelatedOnlyFieldListFilter
 
 
@@ -350,8 +354,8 @@ class OrdemDeServicoListEntidadeFilter(admin.SimpleListFilter):
             return queryset.filter(contrato__entidade__id__exact=self.value())
         else:
             return queryset
-            
-            
+
+
 class OrdemDeServicoAdmin(admin.ModelAdmin):
     """
     """

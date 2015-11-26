@@ -2,8 +2,11 @@
 import django
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
-from forms import *
 from utils.functions import clone_objects
+from memorando.models import Estado, Assunto, Arquivo, Pergunta, Corpo,\
+    MemorandoFAPESP, MemorandoResposta, MemorandoSimples
+from memorando.forms import PerguntaAdminForm, CorpoAdminForm, CorpoFormSet,\
+    MemorandoRespostaForm, MemorandoSimplesForm
 
 
 class PerguntaInline(admin.TabularInline):
@@ -80,7 +83,7 @@ class MemorandoSimplesAdmin(admin.ModelAdmin):
     actions = ['action_clone']
 
     def action_clone(self, request, queryset):
-        objs = clone_objects(queryset)
+        clone_objects(queryset)
         total = queryset.count()
         if total == 1:
             message = u'1 memorando copiado'

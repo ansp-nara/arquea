@@ -25,8 +25,6 @@ logger = logging.getLogger(__name__)
 #
 # Funções para uso da biblioteca PisaPDF
 #
-
-
 def fetch_resources(uri, rel):
     """
     Utilizado para resolver o acesso a imagens relativas.
@@ -56,54 +54,18 @@ def fetch_resources(uri, rel):
     return path
 
 
-def render_to_pdf(template_src, context_dict, request=None, context_instance=None, filename='file.pdf', attachments=[]):
-    import ho.pisa as pisa
-    from sx.pisa3.pisa_pdf import pisaPDF
-
-    template = loader.get_template(template_src)
-
-    if request: 
-        context = RequestContext(request)
-    else: 
-        context = Context()
-    
-    context.update(context_dict)
-    html = template.render(context)
-    pdf = pisaPDF()
-    pdf_princ = pisa.pisaDocument(StringIO.StringIO(html.encode("utf-8")), link_callback=fetch_resources)
-    pdf.addDocument(pdf_princ)
-    a = 0
-    for f, d, t in attachments:
-        a += 1
-        pdf.addDocument(pisa.pisaDocument(
-            StringIO.StringIO((u'<div style="text-align:center; font-size:22px; padding-top:12cm;">'
-                               u'<strong>Anexo %s<br />%s</strong></div>' % (a, d)).encode('utf-8'))))
-        if t == 1:
-            pdf.addFromFile(open(f, "rb"))
-        elif t == 2:
-            pdf.addFromString(f)
-    if not pdf_princ.err:
-        response = HttpResponse(content_type='application/pdf')
-        response.write(pdf.getvalue())
-        response['Content-Disposition'] = 'attachment; filename=%s' % filename
-        return response
-    return HttpResponse('We had some errors<pre>%s</pre>' % cgi.escape(html))
-
-
 #
 # Funções para uso da biblioteca WeasyPrint
 #
-
-
 def weasy_fetcher(url, **kwargs):
     """
     Definição de URLs relativas;
     Para acessar imagens do MEDIA, utilizar media:
     Para os do STATIC, utilizar static:
-    
-    Ex: 
+
+    Ex:
     url('media:{{papelaria.papel_timbrado_paisagem_a4}}');
-    
+
     """
     if url.startswith('static:'):
         url = url[len('static:'):]
@@ -122,20 +84,27 @@ def weasy_fetcher(url, **kwargs):
             return weasyprint.default_url_fetcher('file:///' + file_path.replace(os.sep, '/'))
 
     return weasyprint.default_url_fetcher(url)
-    
+
 
 def render_to_pdf_weasy(template_src, context_dict, request=None, filename='file.pdf', zoom=1.0):
+    """
+    Grava o template HTML em um objeto HttpResponse em PDF
+    utilizando a biblioteca WeasyPrint.
 
+    @param template_src Template HTML a ser renderizado
+    @param context_dict Dicionário de contexto
+    @param request      Objeto Request
+    @param filename     Nome do arquivo a ser gerado no Response
+    @param zoom         Zoom para redimensionar a visualização do PDF, por exemplo, nos casos de impressão em uma página
+    """
     if list(template_src) != template_src:
         template_src = [template_src]
 
     docs = []
     if request:
         context = RequestContext(request)
-        base_url = request.build_absolute_uri()
     else:
         context = Context()
-        base_url = ''
 
     context.update(context_dict)
 
@@ -150,12 +119,11 @@ def render_to_pdf_weasy(template_src, context_dict, request=None, filename='file
         all_pages += doc.pages
 
     response = HttpResponse(content_type="application/pdf")
-    
+
     # Necessário passar o base_url para poder resolver os caminhos relativos de imagens
     docs[0].copy(all_pages).write_pdf(response, zoom=zoom)
     response['Content-Disposition'] = 'attachment; filename=%s' % filename
     return response
-
 
 
 def render_to_pdfxhtml2pdf(template_src, context_dict, request=None, context_instance=None, filename='file.pdf',
@@ -171,11 +139,11 @@ def render_to_pdfxhtml2pdf(template_src, context_dict, request=None, context_ins
 
     context.update(context_dict)
     html = template.render(context)
-    
+
     # Removendo CSS microsoft que causam erro no XHTML2PDF
     html = html.replace('-moz-use-text-color', '')
     html = html.replace('border: medium none;', 'border-width: medium 0 0 0;')
-    
+
     pdf = pisaPDF()
     pdf_princ = pisa.pisaDocument(StringIO.StringIO(html.encode("utf-8")), link_callback=fetch_resources)
     pdf.addDocument(pdf_princ)
@@ -189,7 +157,7 @@ def render_to_pdfxhtml2pdf(template_src, context_dict, request=None, context_ins
             pdf.addFromFile(f)
         elif t == 2:
             pdf.addFromString(f)
-        
+
     if not pdf_princ.err:
         response = HttpResponse(content_type='application/pdf')
         response.write(pdf.getvalue())
@@ -204,21 +172,24 @@ def formata_moeda(n, s_d):
     Ex:
         n = 10000
         s_d = ,
-        
+
         retorno: 1.000,00
-    
+
     Caso n seja vazio ou nulo, retorna 0.00 ou 0,00
+
+    @param n    Número a ser formatado
+    @param s_d  Caracter separador de decimal
     """
     if s_d == '.':
         s_i = ','
     else:
         s_i = '.'
-    
+
     if n:
         f = str(n)
     else:
         f = "0"
-    
+
     num = f.split('.')
     i = num[0]
     if len(num) > 1:
@@ -263,8 +234,8 @@ def pega_bancos():
 
 def pega_lista(request, obj, filtro):
     if request.method == 'POST':
-        id = request.POST.get('id')
-        kwargs = {filtro: id}
+        filtro_id = request.POST.get('id')
+        kwargs = {filtro: filtro_id}
         lista = obj.objects.filter(**kwargs)
         retorno = []
         for o in lista:
@@ -297,8 +268,8 @@ def clone_objects(objects):
 
     # We always have the objects in a list now
     objs = []
-    for object in objects:
-        obj = clone(object)
+    for o in objects:
+        obj = clone(o)
         obj.save()
         objs.append(obj)
 
@@ -315,6 +286,7 @@ class UTF8Recoder:
 
     def next(self):
         return self.reader.next().encode("utf-8")
+
 
 class UnicodeReader:
     """
@@ -368,12 +340,12 @@ def month_range(start_date, end_date):
     """
     Returns all months (with the same day when possible) between
     start_date and end_date (including both)
-    
+
     @param start_date   Date of the beggining
     @param end_date     Date of the ending
     """
     current_date = start_date
-    
+
     while current_date <= end_date:
         yield current_date
         carry, new_month = divmod(current_date.month, 12)
