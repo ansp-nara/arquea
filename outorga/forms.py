@@ -49,7 +49,7 @@ class ItemAdminForm(forms.ModelForm):
 
         super(ItemAdminForm, self).__init__(data, files, auto_id, prefix, initial,
                                             error_class, label_suffix, empty_permitted, instance)
-        
+
         if instance:
             # Permite selecionar as naturezas de gasto da outorga da natureza de gasto selecionada.
             n = self.fields['natureza_gasto']
@@ -134,7 +134,7 @@ class ContratoAdminForm(forms.ModelForm):
         self.fields['anterior'].choices = [('', '---------')] + \
                                           [(p.id, "%s | %s" % (p.__unicode__(), p.numero))
                                            for p in Contrato.objects.all().order_by('entidade', '-data_inicio')]
-        
+
         # mensagens de erro
         self.fields['numero'].error_messages['required'] = u'O campo NUMERO é obrigatório'
         self.fields['data_inicio'].error_messages['required'] = u'O campo INÍCIO é obrigatório'
@@ -155,10 +155,10 @@ class OrdemDeServicoAdminForm(forms.ModelForm):
                                           [(p.id, "%s | %s" % (p.__unicode__(), p.numero))
                                            for p in Contrato.objects.all().select_related('entidade')
                                               .order_by('entidade', '-data_inicio')]
-        
+
         self.fields['pergunta'].choices = [(p.id, "%s" % (p.__unicode__()))
                                            for p in Pergunta.objects.all().select_related('memorando')]
-        
+
         # mensagens de erro
         self.fields['acordo'].error_messages['required'] = u'O campo ACORDO é obrigatório'
         self.fields['tipo'].error_messages['required'] = u'O campo TIPO é obrigatório'
@@ -168,7 +168,7 @@ class OrdemDeServicoAdminForm(forms.ModelForm):
         self.fields['data_inicio'].error_messages['required'] = u'O campo INÍCIO é obrigatório'
         self.fields['contrato'].error_messages['required'] = u'O campo CONTRATO é obrigatório'
         self.fields['descricao'].error_messages['required'] = u'O campo DESCRIÇÃO é obrigatório'
-        
+
 
 class OutorgaAdminForm(forms.ModelForm):
 
@@ -197,7 +197,7 @@ class ModalidadeAdminForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super(ModalidadeAdminForm, self).clean()
-        
+
         if any(self.errors):
             return self.cleaned_data
 
@@ -225,7 +225,7 @@ class TermoAdminForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super(TermoAdminForm, self).clean()
-        
+
         if any(self.errors):
             return self.cleaned_data
 
@@ -266,7 +266,7 @@ class ArquivoAdminForm(forms.ModelForm):
         # mensagens de erro
         self.fields['outorga'].error_messages['required'] = u'O campo OUTORGA é obrigatório'
         self.fields['arquivo'].error_messages['required'] = u'O campo ARQUIVO é obrigatório'
-        
+
 
 class CategoriaAdminForm(forms.ModelForm):
 

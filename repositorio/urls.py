@@ -1,4 +1,6 @@
-from django.conf.urls import *
+# -*- coding: utf-8 -*-
+from django.conf.urls import patterns
+
 
 urlpatterns = patterns('repositorio.views',
                        (r'seleciona_patrimonios$', 'ajax_seleciona_patrimonios'),

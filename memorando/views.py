@@ -11,10 +11,11 @@ import os
 import json as simplejson
 from django.conf import settings
 
-from models import *
 from financeiro.models import Pagamento
 from outorga.models import Termo
 from utils.functions import render_to_pdf_weasy, render_to_pdfxhtml2pdf
+from memorando.models import MemorandoSimples, MemorandoFAPESP, Pergunta,\
+    MemorandoResposta
 
 
 @login_required
@@ -65,7 +66,7 @@ def ajax_escolhe_pergunta(request):
 def ajax_filtra_perguntas(request):
     memorando_id = request.GET.get('memorando')
     memorando = get_object_or_404(MemorandoFAPESP, pk=memorando_id)
-    
+
     perguntas = [{'pk': '', 'valor': '-----------'}]
     for p in memorando.pergunta_set.all():
         perguntas.append({'pk': p.id, 'valor': p.__unicode__()})
@@ -111,7 +112,7 @@ def fapesp(request, mem):
 def relatorio(request):
     """
      Relatório Administrativo - Relatório de Memorandos FAPESP.
-     
+
     """
     mem = request.GET.get('mem')
     if not mem:

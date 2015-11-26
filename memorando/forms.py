@@ -9,7 +9,8 @@ from tinymce.widgets import TinyMCE
 
 from utils import widgets
 from identificacao.models import Identificacao
-from models import *
+from memorando.models import MemorandoFAPESP, MemorandoResposta, Pergunta,\
+    MemorandoSimples, Corpo
 
 
 class MemorandoRespostaForm(forms.ModelForm):
@@ -24,8 +25,8 @@ class MemorandoRespostaForm(forms.ModelForm):
         super(MemorandoRespostaForm, self).__init__(*args, **kwargs)
 
         self.fields['identificacao'].choices = [('', '---------')] + \
-                                  [(p.id, p.__unicode__()) for p in Identificacao.objects.all()
-                                   .select_related('endereco__entidade', 'contato')]
+                                               [(p.id, p.__unicode__()) for p in Identificacao.objects.all()
+                                                .select_related('endereco__entidade', 'contato')]
 
     class Meta:
         model = MemorandoResposta
@@ -49,7 +50,7 @@ class MemorandoSimplesForm(forms.ModelForm):
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=':',
                  empty_permitted=False, instance=None):
-    
+
         super(MemorandoSimplesForm, self).__init__(data, files, auto_id, prefix, initial,
                                                    error_class, label_suffix, empty_permitted, instance)
 

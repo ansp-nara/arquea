@@ -1,4 +1,5 @@
-from django.conf.urls import *
+# -*- coding: utf-8 -*-
+from django.conf.urls import patterns
 
 urlpatterns = patterns('membro.views',
                        (r'controle$', 'controle'),
@@ -15,4 +16,3 @@ urlpatterns = patterns('membro.views',
                        (r'ajax_controle_adicionar_tempo_final$', 'ajax_controle_adicionar_tempo_final'),
                        (r'ajax_controle_adicionar_tempo_inicial$', 'ajax_controle_adicionar_tempo_inicial'),
                        )
-

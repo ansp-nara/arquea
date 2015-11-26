@@ -6,9 +6,15 @@ from django.contrib.admin import SimpleListFilter
 from utils.functions import clone_objects
 from import_export.admin import ExportMixin
 
-from modelsResource import *
-from .forms import *
 from identificacao.models import Entidade
+from rede.models import Segmento, Beneficiado, TipoConector, Operadora,\
+    EnlaceOperadora, Banda, IPBorda, Enlace, TipoServico, Projeto, Unidade, RIR,\
+    Canal, Interface, Uso, Sistema, Estado, CrossConnectionHistorico, BlocoIP,\
+    IFCConector, CrossConnection, Recurso, PlanejaAquisicaoRecurso
+from rede.modelsResource import BlocosIPResource, CrossConnectionResource
+from rede.forms import BlocoIPAdminForm, RecursoAdminForm,\
+    PlanejaAquisicaoRecursoAdminForm, IFCConectorAdminForm,\
+    CrossConnectionAdminForm
 
 
 class DesignadoFilter(SimpleListFilter):
@@ -20,9 +26,9 @@ class DesignadoFilter(SimpleListFilter):
         return [(e.id, e.sigla) for e in Entidade.objects.filter(id__in=entidade_ids)]
 
     def queryset(self, request, queryset):
-        id = self.value()
-        if id:
-            return queryset.filter(designado__id__exact=id)
+        result_id = self.value()
+        if result_id:
+            return queryset.filter(designado__id__exact=result_id)
         else:
             return queryset
 
@@ -36,9 +42,9 @@ class UsuarioFilter(SimpleListFilter):
         return [(e.id, e.sigla) for e in Entidade.objects.filter(id__in=entidade_ids)]
 
     def queryset(self, request, queryset):
-        id = self.value()
-        if id:
-            return queryset.filter(usuario__id__exact=id)
+        result_id = self.value()
+        if result_id:
+            return queryset.filter(usuario__id__exact=result_id)
         else:
             return queryset
 
@@ -59,7 +65,7 @@ class SuperblocoFilter(SimpleListFilter):
 class BlocoIPAdmin(ExportMixin, admin.ModelAdmin):
     resource_class = BlocosIPResource
     form = BlocoIPAdminForm
-    
+
     fieldsets = (
         (None, {
             'fields': (('ip', 'mask', 'net_mask', 'transito'), ('asn', 'proprietario'), ('designado', 'usuario'),
@@ -68,7 +74,7 @@ class BlocoIPAdmin(ExportMixin, admin.ModelAdmin):
             }
          ),
     )
-    
+
     list_display = ('cidr', 'asn_anunciante_numero', 'asn_anunciante_sigla',
                     'asn_proprietario_numero', 'asn_proprietario_sigla', 'usu', 'desig', 'rir', 'transito')
     search_fields = ('ip', 'asn__numero', 'asn__entidade__sigla', 'proprietario__numero',
@@ -77,7 +83,7 @@ class BlocoIPAdmin(ExportMixin, admin.ModelAdmin):
     ordering = ['ip', 'asn__entidade__sigla', 'proprietario']
     admin_order_field = ['ip', 'asn__entidade__sigla', 'proprietario__entidade__sigla', 'usuario', 'designado', 'rir',
                          'transito']
-    
+
     def get_export_queryset(self, request):
         """
         Gera o queryset utilizado na geração da exportação para Excell
@@ -167,13 +173,13 @@ class PlanejaAquisicaoRecursoAdmin(admin.ModelAdmin):
     actions = ['action_clone']
     search_fields = ('os__numero', 'referente', 'tipo__nome')
     inlines = [BeneficiadoInline]
-    
+
     def action_clone(self, request, queryset):
         for obj in queryset:
             bs = obj.beneficiado_set.all()
             obj.pk = None
             obj.save()
-            
+
             for b in bs:
                 b.pk = None
                 b.planejamento = obj
@@ -184,9 +190,9 @@ class PlanejaAquisicaoRecursoAdmin(admin.ModelAdmin):
 class TipoServicoAdmin(admin.ModelAdmin):
 
     actions = ['action_clone']
-    
+
     def action_clone(self, request, queryset):
-        objs = clone_objects(queryset)
+        clone_objects(queryset)
         total = queryset.count()
         if total == 1:
             message = _(u'1 tipo de serviço copiado')
@@ -201,7 +207,7 @@ class TipoConectorAdmin(admin.ModelAdmin):
     list_display = ('sigla', )
     search_fields = ('sigla',)
     ordering = ['sigla']
-    
+
 
 class TipoConectorFilter(SimpleListFilter):
     title = u'Tipo de conector'
@@ -212,16 +218,16 @@ class TipoConectorFilter(SimpleListFilter):
         return [(e.id, e.sigla) for e in TipoConector.objects.filter(id__in=tipoConector_ids)]
 
     def queryset(self, request, queryset):
-        id=self.value()
-        if id:
-            return queryset.filter(tipoConector__id__exact=id)
+        result_id = self.value()
+        if result_id:
+            return queryset.filter(tipoConector__id__exact=result_id)
         else:
             return queryset
-        
-        
+
+
 class IFCConectorAdmin(ExportMixin, admin.ModelAdmin):
     form = IFCConectorAdminForm
-    
+
     fieldsets = (
         (None, {
             'fields': (('rack', 'shelf', 'porta'), 'tipoConector', 'ativo', 'obs', ),
@@ -237,7 +243,7 @@ class IFCConectorAdmin(ExportMixin, admin.ModelAdmin):
 class OrigemRackFilter(SimpleListFilter):
     title = u'Rack Origem'
     parameter_name = 'origem'
-    
+
     def lookups(self, request, model_admin):
         racks = CrossConnection.objects.values_list('origem__rack', flat=True).distinct().order_by()
         return [(e, e) for e in IFCConector.objects.filter(rack__in=racks).values_list('rack', flat=True)
@@ -254,7 +260,7 @@ class OrigemRackFilter(SimpleListFilter):
 class DestinoRackFilter(SimpleListFilter):
     title = u'Rack Destino'
     parameter_name = 'destino'
-    
+
     def lookups(self, request, model_admin):
         racks = CrossConnection.objects.values_list('destino__rack', flat=True).distinct().order_by()
         return [(e, e) for e in IFCConector.objects.filter(rack__in=racks).values_list('rack', flat=True)
@@ -266,12 +272,12 @@ class DestinoRackFilter(SimpleListFilter):
             return queryset.filter(destino__rack__exact=rack)
         else:
             return queryset
-        
+
 
 class CrossConnectionAdmin(ExportMixin, admin.ModelAdmin):
     resource_class = CrossConnectionResource
     form = CrossConnectionAdminForm
-    
+
     fieldsets = (
         ('IFC', {
             'fields': ('origem', 'destino'),
@@ -281,7 +287,7 @@ class CrossConnectionAdmin(ExportMixin, admin.ModelAdmin):
             'fields': ('circuito', 'ordemDeServico', 'obs', 'ativo')
         }),
     )
-    
+
     list_display = ('origem__rack', 'origem__shelf', 'origem__porta', 'origem__tipoConector', 'destino__rack',
                     'destino__shelf', 'destino__porta', 'destino__tipoConector', 'ordemDeServico', 'circuito', )
     search_fields = ('origem__rack', 'destino__rack', 'circuito', 'ordemDeServico',)
@@ -295,7 +301,7 @@ class CrossConnectionAdmin(ExportMixin, admin.ModelAdmin):
         """
         queryset = super(CrossConnectionAdmin, self).get_export_queryset(request)
         return queryset
-    
+
     def origem__rack(self, obj):
         if obj.origem:
             return "%s" % obj.origem.rack
@@ -316,7 +322,7 @@ class CrossConnectionAdmin(ExportMixin, admin.ModelAdmin):
         return '-'
     origem__porta.short_description = 'Porta'
     origem__porta.admin_order_field = 'origem__porta'
-    
+
     def origem__tipoConector(self, obj):
         if obj.origem:
             return "%s" % obj.origem.tipoConector
@@ -344,14 +350,14 @@ class CrossConnectionAdmin(ExportMixin, admin.ModelAdmin):
         return '-'
     destino__porta.short_description = 'Porta'
     destino__porta.admin_order_field = 'destino__porta'
-    
+
     def destino__tipoConector(self, obj):
         if obj.destino:
             return "%s" % obj.destino.tipoConector
         return '-'
     destino__tipoConector.short_description = 'Conector'
     destino__tipoConector.admin_order_field = 'destino__tipoConector'
-    
+
 
 admin.site.register(BlocoIP, BlocoIPAdmin)
 admin.site.register(Operadora)
@@ -378,4 +384,3 @@ admin.site.register(TipoConector, TipoConectorAdmin)
 admin.site.register(IFCConector, IFCConectorAdmin)
 admin.site.register(CrossConnection, CrossConnectionAdmin)
 admin.site.register(CrossConnectionHistorico)
-

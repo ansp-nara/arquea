@@ -11,9 +11,9 @@ import datetime
 
 from carga.forms import UploadFileForm
 from patrimonio.models import Equipamento, Patrimonio
-from carga.models import *
 
 import logging
+from carga.models import Carga_inventario
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -109,11 +109,11 @@ def upload_planilha_patrimonio(request):
     return TemplateResponse(request, 'admin/carga/patrimonio/carga_patrimonio.html', c)
 
 
-def handle_uploaded_file(file):
-    planilha = csv.reader(file, delimiter=';', quotechar='"')
+def handle_uploaded_file(f):
+    planilha = csv.reader(f, delimiter=';', quotechar='"')
 
     cursor = connection.cursor()
-    cursor.execute('TRUNCATE TABLE "{0}"'.format(Carga_inventario._meta.db_table))
+    cursor.execute('TRUNCATE TABLE "{0}"'.format(Carga_inventario._meta.db_table))  # @UndefinedVariable
 
     count = 0
     for item in planilha:
@@ -215,7 +215,7 @@ def handle_uploaded_file(file):
 
 def buscaPatrimonioPorSN(item):
     patr = None
-    # Verificar o match pelo serial number. 
+    # Verificar o match pelo serial number.
     if item.serial_number and item.serial_number != '' and item.serial_number != ' ':
         p = Patrimonio.objects.filter(ns=item.serial_number)
 
@@ -228,7 +228,7 @@ def buscaPatrimonioPorSN(item):
 def buscaPatrimonioPorServiceTag(item):
     patr = None
 
-    # Verificar o match pelo service tag 
+    # Verificar o match pelo service tag
     if item.service_tag and item.service_tag != '' and item.service_tag != ' ':
         p = Patrimonio.objects.filter(ns=('(Serv TAG ' + item.service_tag + ')'))
 
@@ -270,7 +270,6 @@ def buscaPatrimonioSemSNPorPosicao(item):
 
 def checkPatrimonio():
     count = 0
-    retorno = []
 
     inventario = Carga_inventario.objects.all()
     for item in inventario:
@@ -307,9 +306,9 @@ def checkEquipamento(item):
 def checkPatrimonioPosicao():
     inventario = Carga_inventario.objects.filter(patrimonio_model__isnull=False)
     for item in inventario:
-        rack = item.patrimonio_model.historico_atual.posicao_rack
-        furo = item.patrimonio_model.historico_atual.posicao_furo
-        posicao = item.patrimonio_model.historico_atual.posicao_colocacao
+        # rack = item.patrimonio_model.historico_atual.posicao_rack
+        # furo = item.patrimonio_model.historico_atual.posicao_furo
+        # posicao = item.patrimonio_model.historico_atual.posicao_colocacao
 
         # chk_rack = False
         #         if rack or item.rack:

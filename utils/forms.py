@@ -4,7 +4,7 @@ from django import forms
 from django.contrib.admin.widgets import AdminDateWidget
 
 
-NARA_DATE_FORMATS=('%d-%m-%Y', '%d/%m/%Y', '%Y-%m-%d')
+NARA_DATE_FORMATS = ('%d-%m-%Y', '%d/%m/%Y', '%Y-%m-%d')
 
 
 class NARADateField(forms.DateField):

@@ -1,7 +1,8 @@
-__author__ = 'antonio'
-
+# -*- coding: utf-8 -*-
 from django.contrib.auth.decorators import user_passes_test
 from django.core.exceptions import PermissionDenied
+
+__author__ = 'antonio'
 
 
 def login_required_or_403(function=None):

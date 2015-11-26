@@ -14,28 +14,28 @@ import getpass
 class Command(BaseCommand):
     args = '<processo parcial usuario>'
     help = u'Envia as informações de prestação de contas para o sistema Agilis'
-    
+
     def handle(self, *args, **options):
         if len(args) < 3:
             raise CommandError(u'Parâmetros faltando')
-            
+
         try:
             parcial = int(args[1])
         except ValueError:
             raise CommandError(u'Parcial deve ser inteiro')
-            
+
         try:
             (ano, numero, digito) = re.findall(r"[\d]+", args[0])
         except ValueError:
             raise CommandError(u'Processo deve ter o fomato aa/nnnnn-d')
-            
+
         try:
             termo = Termo.objects.get(processo=numero, digito=digito)
         except Termo.DoesNotExist:
             raise CommandError(u'Processo %s não existe' % args[0])
-            
+
         password = getpass.getpass(prompt="Entre com a senha do agilis:")
-                   
+
         cj = cookielib.CookieJar()
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
 
@@ -48,14 +48,14 @@ class Command(BaseCommand):
         urllib2.urlopen('http://internet.aquila.fapesp.br/agilis/Pconline.do?'
                         'method=iniciar&solicitacao=49&processo=%s' % args[0])
 
-        financeiros = ExtratoFinanceiro.objects.filter(termo=termo, parcial=parcial)        
+        financeiros = ExtratoFinanceiro.objects.filter(termo=termo, parcial=parcial)
 
         data = urllib.urlencode([('processo', args[0]), ('parcial', parcial), ('tipoPrestacao', 'REL'),
                                  ('Prosseguir', 'Prosseguir')])
         req = urllib2.Request(url='http://internet.aquila.fapesp.br/agilis/PconlineSelecao.do?method=pesquisar',
                               data=data)
         resp = urllib2.urlopen(req)
-        
+
         dt = []
         for f in financeiros:
             valor = f.valor
@@ -68,7 +68,7 @@ class Command(BaseCommand):
                 dec = 0
 
             if f.cod == 'PGMP' or f.cod == 'PGRP':
-                codigo = 'L' 
+                codigo = 'L'
             else:
                 codigo = 'D'
 
@@ -77,7 +77,7 @@ class Command(BaseCommand):
 
         for k in range(0, 8):
             dt += [('dataOperacao', ''), ('operacao', ''), ('valorOperacao', '')]
-                
+
         i = 0
         while i < financeiros.count():
             data = urllib.urlencode(dt[3*i:3*i+27]+[('method', 'Incluir')])

@@ -63,4 +63,4 @@ class RepositorioAdminForm(forms.ModelForm):
                   'filtra_patrimonio', 'patrimonios', 'responsavel', 'demais', 'obs']
 
     class Media:
-        js = ('js/selects.js',)
+        js = ('js/selects.js', )

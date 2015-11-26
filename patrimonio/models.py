@@ -185,6 +185,10 @@ class Patrimonio(models.Model):
 
     @cached_property
     def historico_atual(self):
+        """
+        Objeto HistoricoLocal mais recente do Patrimonio.
+        Se ocorrer de dois históricos estarem na mesma data, retorna o objeto com ID maior.
+        """
         ht = self.historicolocal_set.order_by('-data', '-id')
         if not ht:
             return None
@@ -263,7 +267,7 @@ class Patrimonio(models.Model):
     def eixoy_em_px(self):
         eixoY = 0
 
-        # Este patrimonio precisa estar contido em um Rack para definirmos a posição 
+        # Este patrimonio precisa estar contido em um Rack para definirmos a posição
         if self.patrimonio_id is not None and self.patrimonio.equipamento_id and self.patrimonio.equipamento.tipo_id\
                 and self.patrimonio.equipamento.tipo.nome == 'Rack':
             rack = self.patrimonio
@@ -285,7 +289,7 @@ class Patrimonio(models.Model):
 
             # calculando a posição em pixels
             eixoY = int(round(((rack_altura - pos - tam) * self.U_TO_PX) / 3.0)) - 5.0
-        
+
         return eixoY
 
     def eixoy_em_pt(self):
@@ -341,7 +345,10 @@ class PatrimonioRack(Patrimonio):
     def get_patrimonios(self):
         # ordena os equipamentos do rack conforme a posição no rack
         hist = self.contido.annotate(hist=Max('historicolocal__data')).values_list('pk')
-        pts = list(self.contido.filter(pk__in=hist).select_related('equipamento', 'equipamento__tipo', 'equipamento__dimensao', 'patrimonio__equipamento', 'patrimonio__equipamento__tipo', 'patrimonio__equipamento__dimensao')
+        pts = list(self.contido.filter(pk__in=hist)
+                   .select_related('equipamento', 'equipamento__tipo', 'equipamento__dimensao',
+                                   'patrimonio__equipamento', 'patrimonio__equipamento__tipo',
+                                   'patrimonio__equipamento__dimensao')
                    .prefetch_related('historicolocal_set'))
         pts.sort(key=lambda x: x.historico_atual_prefetched.posicao_furo, reverse=True)
 
@@ -391,6 +398,12 @@ class HistoricoLocal(models.Model):
 
     @cached_property
     def posicao_rack(self):
+        """
+        Retorna o código do Rack do campo de posição.
+
+        Ex: em uma posição com valor R042.F085.TD
+            o código do Rack é o R042.
+        """
         retorno = None
         if self.posicao:
             rack_str = self.posicao.split('.')
@@ -404,6 +417,12 @@ class HistoricoLocal(models.Model):
 
     @cached_property
     def posicao_rack_letra(self):
+        """
+        Retorna a letra do Rack, a partir do campo de Posicao.
+
+        Ex: em uma posição com valor R042.F085.TD
+            a letra do Rack é o R.
+        """
         retorno = None
         if self.posicao:
             rack_str = self.posicao.split('.')
@@ -420,6 +439,12 @@ class HistoricoLocal(models.Model):
 
     @cached_property
     def posicao_rack_numero(self):
+        """
+        Retorna o número do Rack, a partir do campo de Posicao.
+
+        Ex: em uma posição com valor R042.F085.TD
+            o número do Rack é o 042.
+        """
         retorno = None
         if self.posicao:
             rack_str = self.posicao.split('.')
@@ -434,6 +459,12 @@ class HistoricoLocal(models.Model):
 
     @cached_property
     def posicao_furo(self):
+        """
+        Retorna o furo em que o equipamento está posicionado, a partir do campo de Posicao.
+
+        Ex: em uma posição com valor R042.F085.TD
+            o furo é o 085
+        """
         retorno = -1
         if self.posicao:
             # verifica se possui a posição já configurada
@@ -455,6 +486,17 @@ class HistoricoLocal(models.Model):
 
     @cached_property
     def posicao_colocacao(self):
+        """
+        Retorna o código em que o equipamento está colocado, a partir do campo de Posicao.
+        Como padrão utilizamos os códigos:
+        T - traseira
+        TD - traseira direita
+        TE - traseira esquerda
+        piso - posicionado sobre o piso
+
+        Ex: em uma posição com valor R042.F085.TD
+            o código retornado é o TD.
+        """
         retorno = None
         if self.posicao:
             # verifica se é possível recuperar a posição TD de uma string como R042.F085.TD ou R042.F085-TD

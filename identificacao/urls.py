@@ -1,4 +1,5 @@
-from django.conf.urls import *
+# -*- coding: utf-8 -*-
+from django.conf.urls import patterns
 
 urlpatterns = patterns('identificacao.views',
                        (r'escolhe_entidade$', 'ajax_escolhe_entidade'),
@@ -11,4 +12,4 @@ urlpatterns = patterns('identificacao.views',
                        (r'agenda$', 'agenda'),
                        (r'acessos/terremark$', 'acessos_terremark'),
                        (r'ecossistema/(?P<tipo>[a-z]+)$', 'planilha_ecossistema'),
-)
+                       )

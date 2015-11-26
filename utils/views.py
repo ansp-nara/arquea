@@ -7,7 +7,6 @@ import os
 import logging
 import magic
 import urllib
-import json
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -19,7 +18,7 @@ def verifica(request):
 
 @login_required
 def serve_files(request, filename):
- 
+
     # evita que o usuario tente acessar qualquer arquivo do sistema
     filename = filename.replace('..', '')
 
@@ -38,4 +37,3 @@ def serve_files(request, filename):
     response['Content-length'] = os.path.getsize(path)
 
     return response
-

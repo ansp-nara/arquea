@@ -1,7 +1,7 @@
-#-*- encoding:utf-8 -*-
+# -*- coding: utf-8 -*-
 from import_export import fields
 from import_export import resources
-from models import *
+from patrimonio.models import Patrimonio
 
 
 class PatrimonioResource(resources.ModelResource):
@@ -18,7 +18,7 @@ class PatrimonioResource(resources.ModelResource):
     numero_fmusp = fields.Field(column_name='num fmusp', attribute='numero_fmusp')
     entidade_procedencia__sigla = fields.Field(column_name='procedencia', attribute='entidade_procedencia__sigla')
     garantia_termino = fields.Field(column_name='termino de garantia', attribute='garantia_termino')
-                  
+
     class Meta:
         model = Patrimonio
         fields = ('id',
@@ -81,7 +81,7 @@ class RelatorioPorTipoResource(resources.ModelResource):
     posicao = fields.Field(column_name='Posição')
     estado = fields.Field(column_name='Estado')
     nf = fields.Field(column_name='NF')
-    
+
     class Meta:
         model = Patrimonio
         fields = ('checado',
@@ -117,7 +117,7 @@ class RelatorioPorTipoResource(resources.ModelResource):
         except AttributeError:
             return ''
 
-    def dehydrate_posicao(self, p): 
+    def dehydrate_posicao(self, p):
         try:
             return '%s' % (p.historico_atual.endereco.complemento or '')
         except AttributeError:

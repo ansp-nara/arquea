@@ -1,7 +1,8 @@
-#-*- encoding:utf-8 -*-
+# -*- encoding:utf-8 -*-
+
 from import_export import fields
 from import_export import resources
-from rede.models import *
+from rede.models import Recurso, BlocoIP, Beneficiado, CrossConnection
 
 
 class CustoTerremarkRecursoResource(resources.ModelResource):
@@ -132,7 +133,7 @@ class BlocosIPResource(resources.ModelResource):
     superbloco_mask = fields.Field(column_name='Superbloco Másc.')
     mask = fields.Field(column_name='Máscara IP')
     ipv = fields.Field(column_name='IPv4_6')
-    
+
     class Meta:
         model = BlocoIP
         fields = ('id',
@@ -170,19 +171,19 @@ class BlocosIPResource(resources.ModelResource):
 
     def dehydrate_cidr(self, bloco):
         return '%s' % bloco.cidr()
-    
+
     def dehydrate_asn(self, bloco):
         return '%s' % (bloco.asn or '')
-    
+
     def dehydrate_proprietario(self, bloco):
         return '%s' % (bloco.proprietario or '')
-    
+
     def dehydrate_designado(self, bloco):
         return '%s' % bloco.designado
-    
+
     def dehydrate_rir(self, bloco):
         return '%s' % bloco.rir
-    
+
     def dehydrate_obs(self, bloco):
         return '%s' % bloco.obs
 
@@ -202,13 +203,13 @@ class BlocosIPResource(resources.ModelResource):
             return 'IPv6'
         else:
             return ''
-        
+
 
 class BlocosIP_Rel_Lista_Inst_BlocoIP_Resource(resources.ModelResource):
     """
     Utilizado na exportação para o relatório de Lista de Blocos IP por instituição
     """
-    
+
     usuario = fields.Field(column_name='Usado por')
     cidr = fields.Field(column_name='Bloco IP')
     asn = fields.Field(column_name='AS Anunciante')
@@ -220,7 +221,7 @@ class BlocosIP_Rel_Lista_Inst_BlocoIP_Resource(resources.ModelResource):
     superbloco_mask = fields.Field(column_name='Superbloco Másc.')
     mask = fields.Field(column_name='Máscara IP')
     ipv = fields.Field(column_name='IPv4_6')
-    
+
     class Meta:
         model = BlocoIP
         fields = ('id',
@@ -258,19 +259,19 @@ class BlocosIP_Rel_Lista_Inst_BlocoIP_Resource(resources.ModelResource):
 
     def dehydrate_cidr(self, bloco):
         return '%s' % bloco.cidr()
-    
+
     def dehydrate_asn(self, bloco):
         return '%s' % (bloco.asn or '')
-    
+
     def dehydrate_proprietario(self, bloco):
         return '%s' % (bloco.proprietario or '')
-    
+
     def dehydrate_designado(self, bloco):
         return '%s' % bloco.designado
-    
+
     def dehydrate_rir(self, bloco):
         return '%s' % bloco.rir
-    
+
     def dehydrate_obs(self, bloco):
         return '%s' % bloco.obs
 
@@ -296,7 +297,7 @@ class BlocosIP_Rel_Lista_BlocoIP_Resource(resources.ModelResource):
     """
     Utilizado na exportação para o relatório de Lista de Blocos IP
     """
-    
+
     usuario = fields.Field(column_name='Usado por')
     cidr = fields.Field(column_name='Bloco IP')
     asn = fields.Field(column_name='AS Anunciante')
@@ -308,7 +309,7 @@ class BlocosIP_Rel_Lista_BlocoIP_Resource(resources.ModelResource):
     superbloco_mask = fields.Field(column_name='Superbloco Másc.')
     mask = fields.Field(column_name='Máscara IP')
     ipv = fields.Field(column_name='IPv4_6')
-    
+
     class Meta:
         model = BlocoIP
         fields = ('superbloco',
@@ -345,19 +346,19 @@ class BlocosIP_Rel_Lista_BlocoIP_Resource(resources.ModelResource):
 
     def dehydrate_asn(self, bloco):
         return '%s' % (bloco.asn or '')
-    
+
     def dehydrate_proprietario(self, bloco):
         return '%s' % (bloco.proprietario or '')
-    
+
     def dehydrate_usuario(self, bloco):
         return '%s' % (bloco.usuario or '')
-    
+
     def dehydrate_designado(self, bloco):
         return '%s' % bloco.designado
-    
+
     def dehydrate_rir(self, bloco):
         return '%s' % bloco.rir
-    
+
     def dehydrate_obs(self, bloco):
         return '%s' % bloco.obs
 
@@ -411,7 +412,7 @@ class RecursoOperacionalResource(resources.ModelResource):
         if beneficiado.planejamento.os_id and beneficiado.planejamento.os.contrato_id:
             return '%s' % beneficiado.planejamento.os.contrato.numero
         return ''
-        
+
     def dehydrate_planejamento__os(self, beneficiado):
         return '%s' % beneficiado.planejamento.os
 
@@ -449,15 +450,15 @@ class CrossConnectionResource(resources.ModelResource):
     origem__shelf = fields.Field(column_name='Shelf')
     origem__porta = fields.Field(column_name='Porta')
     origem__tipoConector__sigla = fields.Field(column_name='Conector')
-    
+
     destino__rack__complemento = fields.Field(column_name='Rack 2')
     destino__shelf = fields.Field(column_name='Shelf')
     destino__porta = fields.Field(column_name='Porta')
     destino__tipoConector__sigla = fields.Field(column_name='Conector')
-    
+
     ordemDeServico = fields.Field(column_name='OS/Projeto')
     circuito = fields.Field(column_name='Circuito')
-    
+
     obs = fields.Field(column_name='Observação')
 
     class Meta:
@@ -489,7 +490,7 @@ class CrossConnectionResource(resources.ModelResource):
 
     def dehydrate_origem__rack__complemento(self, obj):
         return obj.origem.rack.complemento
-    
+
     def dehydrate_origem__shelf(self, obj):
         return obj.origem.shelf
 
@@ -501,7 +502,7 @@ class CrossConnectionResource(resources.ModelResource):
 
     def dehydrate_destino__rack__complemento(self, obj):
         return obj.destino.rack.complemento
-    
+
     def dehydrate_destino__shelf(self, obj):
         return obj.destino.shelf
 
@@ -513,9 +514,9 @@ class CrossConnectionResource(resources.ModelResource):
 
     def dehydrate_ordemDeServico(self, obj):
         return obj.ordemDeServico
-    
+
     def dehydrate_circuito(self, obj):
         return obj.circuito
-    
+
     def dehydrate_obs(self, obj):
         return obj.obs

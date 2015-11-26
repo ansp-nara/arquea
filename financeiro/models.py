@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
+from django.db import models
 from django.db.models import Max, Sum
 from django.utils.translation import ugettext_lazy as _
 from decimal import Decimal
 
 from utils.functions import formata_moeda
 from protocolo.models import Estado as EstadoProtocolo
-from membro.models import *
+from utils.models import NARADateField
 
 CODIGO_FINANCEIRO = (
     ('COMP', 'Concessao Bens/Serv. Pais'),
@@ -43,10 +44,10 @@ class ExtratoCC(models.Model):
                                help_text=u'Somente imagem .jpeg',
                                validators=[RegexValidator(regex=".+((\.jpg)|.+(\.jpeg))$",
                                                           message="Enviar somente imagem jpeg. A proporção da "
-                                                                  "largura / altura deve ser maior que 2."),])
+                                                                  "largura / altura deve ser maior que 2."), ])
     capa = models.TextField(null=True, blank=True)
     obs = models.TextField(null=True, blank=True)
-    
+
     class Meta:
         verbose_name = _(u'Extrato de Conta corrente')
         verbose_name_plural = _(u'Extratos de Conta corrente')
@@ -74,9 +75,9 @@ class ExtratoCC(models.Model):
                 if modalidade not in mods.keys():
                     mods[modalidade] = {}
                     for a in p.auditoria_set.all():
-                        if not a.parcial in mods[modalidade].keys():
+                        if a.parcial not in mods[modalidade].keys():
                             mods[modalidade][a.parcial] = []
-                            if not a.pagina in mods[modalidade][a.parcial]:
+                            if a.pagina not in mods[modalidade][a.parcial]:
                                 mods[modalidade][a.parcial].append(a.pagina)
         parc = ''
         for modalidade in mods.keys():
@@ -95,7 +96,7 @@ class TipoComprovanteFinanceiro(models.Model):
 
     def __unicode__(self):
         return self.nome
-    
+
     class Meta:
         verbose_name = _(u'Tipo de Comprovante Financeiro')
         verbose_name_plural = _(u'Tipos de Comprovante Financeiro')
@@ -113,7 +114,7 @@ class ExtratoFinanceiro(models.Model):
     parcial = models.IntegerField(null=False, blank=False, default=0,
                                   validators=[MinValueValidator(0), MaxValueValidator(999999999)])
     taxas = models.IntegerField(default=0)
-  
+
     class Meta:
         verbose_name = _(u'Extrato do Financeiro')
         verbose_name_plural = _(u'Extratos do Financeiro')
@@ -121,14 +122,14 @@ class ExtratoFinanceiro(models.Model):
 
     def __unicode__(self):
         return u'%s - %s - %s - %s' % (self.data_libera, self.cod, self.historico, self.valor)
-    
+
     def save(self, *args, **kwargs):
         for (cod, hist) in CODIGO_FINANCEIRO:
             if self.cod == cod:
                 self.historico = hist
                 break
         super(ExtratoFinanceiro, self).save(*args, **kwargs)
-   
+
     @property
     def despesa_caixa(self):
         try:
@@ -141,7 +142,7 @@ class ExtratoFinanceiro(models.Model):
         """
         Rotina para inserir no extrato de conta corrente a liberação do financeiro para o Cartão Pesquisa BB.
         Deve receber um objeto ExtratoFinanceiro.
-        
+
         if (retorno == 1) {
             "Extrato de conta corrente inserido com sucesso."
         } else if (retorno == 2) {
@@ -151,26 +152,26 @@ class ExtratoFinanceiro(models.Model):
         }
         """
         retorno = -1
-        
+
         ef = extratoFinanceiro
 
         if ef.extratocc_set.count() > 0:
             retorno = 2
         else:
-            ecc1 = ExtratoCC.objects.create(data_oper = ef.data_libera, 
-                                            historico = u'Liberação de verba MP', 
-                                            valor = -ef.valor, 
-                                            cod_oper = ef.data_libera.strftime('%Y%m%d9'))
+            ecc1 = ExtratoCC.objects.create(data_oper=ef.data_libera,
+                                            historico=u'Liberação de verba MP',
+                                            valor=-ef.valor,
+                                            cod_oper=ef.data_libera.strftime('%Y%m%d9'))
             if ef.taxas > 0:
-                ecc2 = ExtratoCC.objects.create(data_oper = ef.data_libera, 
-                                                historico = u'Liberação de verba TX', 
-                                                valor = ef.taxas * Decimal('1.00'), 
-                                                cod_oper = ef.data_libera.strftime('%Y%m%d9'))
-                 
-                ecc3 = ExtratoCC.objects.create(data_oper = ef.data_libera, 
-                                                historico = u'Pagamento TX', 
-                                                valor = ef.taxas * Decimal('-1.00'), 
-                                                cod_oper = ef.data_libera.strftime('%Y%m%d9'))
+                ecc2 = ExtratoCC.objects.create(data_oper=ef.data_libera,
+                                                historico=u'Liberação de verba TX',
+                                                valor=ef.taxas * Decimal('1.00'),
+                                                cod_oper=ef.data_libera.strftime('%Y%m%d9'))
+
+                ecc3 = ExtratoCC.objects.create(data_oper=ef.data_libera,
+                                                historico=u'Pagamento TX',
+                                                valor=ef.taxas * Decimal('-1.00'),
+                                                cod_oper=ef.data_libera.strftime('%Y%m%d9'))
                 if not ecc2 or not ecc3:
                     retorno = -2
 
@@ -180,7 +181,7 @@ class ExtratoFinanceiro(models.Model):
                 retorno = 1
 
         return retorno
-        
+
 
 class Pagamento(models.Model):
     patrocinio = models.ForeignKey('financeiro.ExtratoPatrocinio', verbose_name=_(u'Extrato do patrocínio'),
@@ -194,7 +195,7 @@ class Pagamento(models.Model):
     membro = models.ForeignKey('membro.Membro', null=True, blank=True)
     origem_fapesp = models.ForeignKey('outorga.OrigemFapesp', null=True, blank=True)
     pergunta = models.ManyToManyField('memorando.Pergunta', null=True, blank=True)
-    
+
     def __unicode__(self):
         if self.valor_patrocinio:
             valor = self.valor_fapesp+self.valor_patrocinio
@@ -254,7 +255,7 @@ class Pagamento(models.Model):
             return u'%s' % self.origem_fapesp.item_outorga.__unicode__()
         else:
             return u'Não é Fapesp'
-    item.short_description = u'Item do orçamento'	
+    item.short_description = u'Item do orçamento'
 
     def data(self):
         return self.protocolo.data_vencimento
@@ -267,7 +268,7 @@ class Pagamento(models.Model):
 
     def formata_valor_fapesp(self):
         moeda = 'R$'
-        if self.origem_fapesp and self.origem_fapesp.item_outorga.natureza_gasto.modalidade.moeda_nacional == False:
+        if self.origem_fapesp and self.origem_fapesp.item_outorga.natureza_gasto.modalidade.moeda_nacional is False:
             moeda = 'US$'
         return u'%s %s' % (moeda, formata_moeda(self.valor_fapesp, ','))
     formata_valor_fapesp.short_description = 'Valor Fapesp'
@@ -292,7 +293,7 @@ class Pagamento(models.Model):
 
 class LocalizaPatrocinio(models.Model):
     consignado = models.CharField(max_length=50)
-    
+
     class Meta:
         verbose_name = _(u'Localização do patrocínio')
         verbose_name_plural = _(u'Localização dos patrocínios')
@@ -310,7 +311,7 @@ class ExtratoPatrocinio(models.Model):
     valor = models.DecimalField(max_digits=12, decimal_places=2)
     historico = models.CharField(max_length=30)
     obs = models.TextField()
-    
+
     class Meta:
         verbose_name = _(u'Extrato do patrocínio')
         verbose_name_plural = _(u'Extratos dos patrocínios')
@@ -321,10 +322,10 @@ class ExtratoPatrocinio(models.Model):
 
 class Estado(models.Model):
     nome = models.CharField(max_length=30)
-    
+
     def __unicode__(self):
         return self.nome
-    
+
     class Meta:
         ordering = ('nome',)
 
@@ -354,14 +355,14 @@ class Auditoria(models.Model):
     parcial = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(999999999)])
     pagina = models.IntegerField()
     obs = models.TextField(null=True, blank=True)
-    
+
     def __unicode__(self):
         return u'Parcial: %s, página: %s' % (self.parcial, self.pagina)
 
 
 class TipoComprovante(models.Model):
     nome = models.CharField(max_length=100)
-    
+
     class Meta:
         verbose_name = _(u'Tipo de comprovante')
         verbose_name_plural = _(u'Tipos de comprovante')

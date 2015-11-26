@@ -64,7 +64,7 @@ class Recurso(models.Model):
 
 class OTRS(models.Model):
     nome = models.CharField(max_length=120)
-  
+
     def __unicode__(self):
         return self.nome
 
@@ -177,5 +177,5 @@ class Permission(models.Model):
         # remover as permissões padrões, pois essa é uma classe para configurar permissões customizadas
         default_permissions = ()
         permissions = (
-            ("rel_ger_processos", "Rel. Ger. - Processos"),     #/processo/processos
+            ("rel_ger_processos", "Rel. Ger. - Processos"),     # /processo/processos
         )

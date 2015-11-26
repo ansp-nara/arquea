@@ -3,17 +3,19 @@ from django.contrib.admin.models import LogEntry
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required, login_required
-from utils.decorators import login_required_or_403
+from django.core.urlresolvers import reverse
 from django.db.models import Max, Min
 from django.http import HttpResponseRedirect, Http404, HttpResponseForbidden, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
 from django.views.decorators.http import require_safe, require_POST
-
+from utils.decorators import login_required_or_403
+from datetime import datetime, timedelta, date
 import json as simplejson
+import logging
 
-from forms import *
-from models import *
+from membro.models import Membro, Controle, Ferias
+from membro.forms import ControleObs
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -79,8 +81,8 @@ def mensal(request, ano=2012, mes=7):
         linha = [m.nome]
         controles = Controle.objects.filter(entrada__year=ano, entrada__month=mes, membro=m, saida__isnull=False)
         for dia in dias:
-            min = sum([c.segundos for c in controles.filter(entrada__day=dia)], 0)/60
-            linha.append('%02d:%02d' % (min/60, min % 60))
+            minutes = sum([c.segundos for c in controles.filter(entrada__day=dia)], 0)/60
+            linha.append('%02d:%02d' % (minutes/60, minutes % 60))
         dados.append(linha)
 
     return TemplateResponse(request, 'membro/mensal.html', {'dados': dados, 'dias': dias, 'ano': ano, 'mes': mes})
@@ -101,8 +103,8 @@ def detalhes(request):
 @require_safe
 def mensal_func(request):
     """
-     Relatório Administrativo - Relatório com o lançamento de horas dos funcionários. 
-    
+     Relatório Administrativo - Relatório com o lançamento de horas dos funcionários.
+
     """
     funcionario = request.GET.get('funcionario')
 
@@ -111,10 +113,10 @@ def mensal_func(request):
         membro = get_object_or_404(Membro, pk=funcionario)
         if request.user.is_superuser is False and request.user.email != membro.email:
             raise Http404
-        
+
         ano = request.GET.get('ano')
         mes = request.GET.get('mes')
-        
+
         try:
             c = Controle.objects.filter(membro=funcionario)[:1].get()
         except Controle.DoesNotExist:
@@ -126,7 +128,7 @@ def mensal_func(request):
         for m in total_meses:
             # soma horas extras somente dos meses que não forem o mês em andamento
             total_geral_banco_horas += m['total_banco_horas']
-              
+
         if total_geral_banco_horas >= 0:
             total_geral_banco_horas_str = '%2dh %02dmin' % (total_geral_banco_horas/3600,
                                                             total_geral_banco_horas/60 % 60)
@@ -137,7 +139,7 @@ def mensal_func(request):
         total_geral_ferias_str = '%2dh %02dmin' % (total_geral_ferias/3600, total_geral_ferias/60 % 60)
 
         meses = c.total_analitico_horas(ano, mes)
-        
+
         total_banco_horas = 0
         total_horas = 0
         total_horas_periodo = 0
@@ -146,17 +148,17 @@ def mensal_func(request):
         total_horas_ferias = 0
 
         for m in meses:
-                        
+
             # total de horas trabalhadas
             total_horas += m['total']
             total_str = '%2dh %02dmin' % (m['total']/3600, m['total']/60 % 60)
             m.update({'total': total_str})
-             
+
             # as horas totais do período são as horas do total de dias do mes menos os finais de semana, ferias e dispensas
             total_horas_periodo += m['total_horas_periodo']
             total_horas_periodo_str = '%2dh %02dmin' % (m['total_horas_periodo']/3600, m['total_horas_periodo']/60 % 60)
             m.update({'total_horas_periodo': total_horas_periodo_str})
-             
+
             total_horas_restante += m['total_horas_restante']
             if m['total_horas_restante'] >= 0:
                 total_horas_restante_str = '%02dh %02dmin' % (m['total_horas_restante']/3600.0,
@@ -165,11 +167,11 @@ def mensal_func(request):
                 total_horas_restante_str = '-%02dh %02dmin' % (-m['total_horas_restante']/3600.0,
                                                                -m['total_horas_restante']/60 % 60)
             m.update({'total_horas_restante': total_horas_restante_str})
-            
+
             total_horas_ferias += m['total_horas_ferias']
             total_horas_ferias_str = '%2dh %02dmin' % (m['total_horas_ferias']/3600, m['total_horas_ferias']/60 % 60)
             m.update({'total_horas_ferias': total_horas_ferias_str})
-            
+
             total_horas_dispensa += m['total_horas_dispensa']
             total_horas_dispensa_str = '%2dh %02dmin' % (m['total_horas_dispensa']/3600,
                                                          m['total_horas_dispensa']/60 % 60)
@@ -182,22 +184,28 @@ def mensal_func(request):
                 total_banco_horas_str = '-%2dh %02dmin' % (-m['total_banco_horas']/3600,
                                                            -m['total_banco_horas']/60 % 60)
             m.update({'total_banco_horas': total_banco_horas_str})
-        
+
+            # if m['total_horas_periodo_ate_hoje'] >= 0:
+            #     total_horas_periodo_ate_hoje_str = '%2dh %02dmin' % (m['total_horas_periodo_ate_hoje']/3600, m['total_horas_periodo_ate_hoje']/60%60)
+            # else:
+            #     total_horas_periodo_ate_hoje_str = '-%2dh %02dmin' % (-m['total_horas_periodo_ate_hoje']/3600, -m['total_horas_periodo_ate_hoje']/60%60)
+            # m.update({'total_horas_periodo_ate_hoje': total_horas_periodo_ate_hoje_str})
+
         if total_horas_restante >= 0:
             total_horas_restante_str = '%2dh %02dmin' % (total_horas_restante/3600, total_horas_restante/60 % 60)
         else:
             total_horas_restante_str = '-%2dh %02dmin' % (-total_horas_restante/3600, -total_horas_restante/60 % 60)
-             
+
         if total_banco_horas >= 0:
             total_banco_horas_str = '%2dh %02dmin' % (total_banco_horas/3600, total_banco_horas/60 % 60)
         else:
             total_banco_horas_str = '-%2dh %02dmin' % (-total_banco_horas/3600, -total_banco_horas/60 % 60)
-        
+
         total_horas_str = '%2dh %02dmin' % (total_horas/3600, total_horas/60 % 60)
         total_horas_periodo_str = '%2dh %02dmin' % (total_horas_periodo/3600, total_horas_periodo/60 % 60)
         total_horas_dispensa_str = '%2dh %02dmin' % (total_horas_dispensa/3600, total_horas_dispensa/60 % 60)
         total_horas_ferias_str = '%2dh %02dmin' % (total_horas_ferias/3600, total_horas_ferias/60 % 60)
-        
+
         return TemplateResponse(request, 'membro/detalhe.html',
                                 {'meses': meses, 'membro': membro, 'total_banco_horas': total_banco_horas_str,
                                  'total_horas': total_horas_str, 'total_horas_periodo': total_horas_periodo_str,
@@ -215,7 +223,7 @@ def mensal_func(request):
         retorno = []
         for f in funcionarios:
             entrada = Controle.objects.filter(membro=f).aggregate(Max('entrada'), Min('entrada'))
-            
+
             if entrada['entrada__min']:
                 ano_inicio = entrada['entrada__min'].year
                 mes_inicio = entrada['entrada__min'].month
@@ -229,8 +237,8 @@ def mensal_func(request):
 
 
 @login_required
-def observacao(request, id):
-    controle = get_object_or_404(Controle, pk=id)
+def observacao(request, controle_id):
+    controle = get_object_or_404(Controle, pk=controle_id)
 
     if request.user.email != controle.membro.email:
         return HttpResponseForbidden()
@@ -251,16 +259,16 @@ def observacao(request, id):
 def ajax_controle_mudar_almoco(request):
     controle_id = request.GET.get('id')
     almoco = request.GET.get('almoco')
-    
+
 #     if request.user.is_superuser == False or not controle_id:
-    if not controle_id: 
+    if not controle_id:
         raise Http404
-    
+
     controle = get_object_or_404(Controle, pk=controle_id)
     controle.almoco_devido = True
     controle.almoco = almoco
     controle.save()
-    
+
     json = simplejson.dumps('ok')
     return HttpResponse(json, content_type="application/json")
 
@@ -270,18 +278,18 @@ def ajax_controle_mudar_almoco(request):
 def ajax_controle_avancar_bloco(request):
     controle_id = request.GET.get('id')
     tempo = request.GET.get('tempo')
-    
+
 #     if request.user.is_superuser == False or not controle_id:
-    if not controle_id or not tempo: 
+    if not controle_id or not tempo:
         raise Http404
-    
+
     controle = get_object_or_404(Controle, pk=controle_id)
     controle.entrada = controle.entrada + timedelta(minutes=int(tempo))
     # Saida pode estar vazio (None) no caso do dia corrente
     if controle.saida:
         controle.saida = controle.saida + timedelta(minutes=int(tempo))
     controle.save()
-    
+
     json = simplejson.dumps('ok')
     return HttpResponse(json, content_type="application/json")
 
@@ -291,18 +299,18 @@ def ajax_controle_avancar_bloco(request):
 def ajax_controle_voltar_bloco(request):
     controle_id = request.GET.get('id')
     tempo = request.GET.get('tempo')
-    
+
 #     if request.user.is_superuser == False or not controle_id:
-    if not controle_id or not tempo: 
+    if not controle_id or not tempo:
         raise Http404
-    
+
     controle = get_object_or_404(Controle, pk=controle_id)
     controle.entrada = controle.entrada - timedelta(minutes=int(tempo))
     # Saida pode estar vazio (None) no caso do dia corrente
     if controle.saida:
         controle.saida = controle.saida - timedelta(minutes=int(tempo))
     controle.save()
-    
+
     json = simplejson.dumps('ok')
     return HttpResponse(json, content_type="application/json")
 
@@ -312,15 +320,15 @@ def ajax_controle_voltar_bloco(request):
 def ajax_controle_adicionar_tempo_final(request):
     controle_id = request.GET.get('id')
     tempo = request.GET.get('tempo')
-    
+
 #     if request.user.is_superuser == False or not controle_id:
-    if not controle_id or not tempo: 
+    if not controle_id or not tempo:
         raise Http404
-    
+
     controle = get_object_or_404(Controle, pk=controle_id)
-    controle.saida = controle.saida + timedelta(minutes=int(tempo)) 
+    controle.saida = controle.saida + timedelta(minutes=int(tempo))
     controle.save()
-    
+
     json = simplejson.dumps('ok')
     return HttpResponse(json, content_type="application/json")
 
@@ -329,15 +337,15 @@ def ajax_controle_adicionar_tempo_final(request):
 def ajax_controle_adicionar_tempo_inicial(request):
     controle_id = request.GET.get('id')
     tempo = request.GET.get('tempo')
-    
+
 #     if request.user.is_superuser == False or not controle_id:
-    if not controle_id or not tempo: 
+    if not controle_id or not tempo:
         raise Http404
-    
+
     controle = get_object_or_404(Controle, pk=controle_id)
-    controle.entrada = controle.entrada - timedelta(minutes=int(tempo)) 
+    controle.entrada = controle.entrada - timedelta(minutes=int(tempo))
     controle.save()
-    
+
     json = simplejson.dumps('ok')
     return HttpResponse(json, content_type="application/json")
 
@@ -348,10 +356,10 @@ def ajax_controle_adicionar_tempo_inicial(request):
 def uso_admin(request):
     """
      Relatório Administrativo - Relatório de registro de uso do sistema por ano.
-    
+
      Relatório de logs de uso da área administrativa do sistema.
      Exibe informação de quantidade de inclusões, alterações e exclusões feitas por cada usuário, por ano.
-    
+
     """
     if 'inicial' not in request.GET:
         return TemplateResponse(request, 'admin/logs_escolha.html', {'anos': range(2008, datetime.now().year+1)})
@@ -363,7 +371,7 @@ def uso_admin(request):
         final = int(final)
     except:
         raise Http404
-        
+
     user_ids = LogEntry.objects.filter(action_time__range=(date(inicial, 1, 1), date(final+1, 1, 1)))\
         .values_list('user', flat=True).order_by('user').distinct()
     emails = Membro.objects.values_list('email', flat=True).order_by('email').distinct()
@@ -376,9 +384,9 @@ def uso_admin(request):
         user = User.objects.get(id=u)
         if user.email in emails:
             users.append(user)
-        
+
     users.sort(key=lambda x: x.first_name)
-        
+
     returned = []
 
     sem_abuse = LogEntry.objects.exclude(content_type_id=166)
@@ -392,5 +400,5 @@ def uso_admin(request):
                           log_ano.filter(action_flag=3).count()))
         user_return['dados'] = dados
         returned.append(user_return)
-        
-    return TemplateResponse(request, 'admin/logs.html', {'users':returned})
+
+    return TemplateResponse(request, 'admin/logs.html', {'users': returned})

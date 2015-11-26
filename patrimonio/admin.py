@@ -1,18 +1,30 @@
 # -*- coding: utf-8 -*-
+import django
+from django.conf.urls import patterns, url
 from django.contrib import admin
-from django.utils.translation import ugettext_lazy as _
-from django.conf.urls import *
 from django.contrib.admin.views.decorators import staff_member_required
-from django.template.response import TemplateResponse
 from django.db.models import Prefetch
-from import_export.admin import ExportMixin
+from django.template.response import TemplateResponse
+from django.utils.safestring import mark_safe
+from django.utils.translation import ugettext_lazy as _
+import datetime
 import csv
 
-from modelsResource import *
-from forms import *
+from import_export.admin import ExportMixin
+
 from utils.admin import AdminImageWidget
 from utils.functions import clone_objects
 from utils.admin import RelatedOnlyFieldListFilter
+from patrimonio.models import Tipo, Distribuicao, DistribuicaoUnidade,\
+    UnidadeDimensao, Direcao, TipoEquipamento, Dimensao, PlantaBaixaObjeto,\
+    PlantaBaixaDataCenter, PlantaBaixaPosicao, Estado, HistoricoLocal,\
+    Patrimonio, Equipamento
+from patrimonio.modelsResource import PatrimonioResource
+from patrimonio.forms import HistoricoLocalAdminFormSet,\
+    PatrimonioHistoricoLocalAdminForm, PatrimonioAdminForm,\
+    HistoricoLocalAdminForm, EquipamentoAdminForm, PlantaBaixaObjetoForm,\
+    PlantaBaixaDataCenterForm
+
 
 admin.site.register(Estado)
 admin.site.register(Tipo)
@@ -162,7 +174,7 @@ class PatrimonioAdmin(ExportMixin, admin.ModelAdmin):
         return mark_safe("<span id='id_part_number' class='input_readonly'>"+part_number+"</span>")
 
     def action_clone(self, request, queryset):
-        objs = clone_objects(queryset)
+        clone_objects(queryset)
         total = queryset.count()
         if total == 1:
             message = u'1 patrimônio copiado'
@@ -249,7 +261,7 @@ class EquipamentoAdmin(admin.ModelAdmin):
     def formfield_for_dbfield(self, db_field, **kwargs):
         # Sobrescrevendo os campos de imagens para poder apresentar um preview na tela do admin
         if db_field.name == 'imagem' or db_field.name == 'imagem_traseira':
-            request = kwargs.pop("request", None)
+            kwargs.pop("request", None)
             kwargs['widget'] = AdminImageWidget
             return db_field.formfield(**kwargs)
         return super(EquipamentoAdmin, self).formfield_for_dbfield(db_field, **kwargs)

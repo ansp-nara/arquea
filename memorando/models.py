@@ -2,7 +2,6 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-# Create your models here.
 
 def proximo_numero():
     from datetime import datetime
@@ -41,7 +40,7 @@ class Estado(models.Model):
 
 class Assunto(models.Model):
     descricao = models.CharField(max_length=100)
-    
+
     def __unicode__(self):
         return self.descricao
 
@@ -50,7 +49,7 @@ class MemorandoFAPESP(models.Model):
     termo = models.ForeignKey('outorga.Termo')
     numero = models.CharField(_(u'Número do memorando'), max_length=15)
     arquivo = models.FileField(upload_to='memorando', null=True, blank=True)
-   
+
     def __unicode__(self):
         return self.numero
 
@@ -109,7 +108,7 @@ class MemorandoResposta(models.Model):
 
 
 class Corpo(models.Model):
-    """ 
+    """
     Cada item de um memorando da FAPESP
     """
     memorando = models.ForeignKey('memorando.MemorandoResposta')
@@ -146,7 +145,7 @@ class MemorandoSimples(models.Model):
             return u'%s/%s - %s' % (self.data.year, self.numero, self.assunto.__unicode__())
         else:
             return u'%s/%s' % (self.data.year, self.numero)
-    
+
     def num_memo(self):
         return u'%s/%s' % (self.data.year, self.numero)
     num_memo.admin_order_field = 'data'
@@ -167,7 +166,7 @@ class MemorandoSimples(models.Model):
 
     def destino(self):
         dest = self.destinatario.split('\n')
-        return '<br />'.join(dest)		
+        return '<br />'.join(dest)
 
 
 class Arquivo(models.Model):
@@ -184,5 +183,5 @@ class Permission(models.Model):
         # remover as permissões padrões, pois essa é uma classe para configurar permissões customizadas
         default_permissions = ()
         permissions = (
-            ("rel_adm_memorando", "Rel. Adm. - Memorandos FAPESP"),     #/memorando/relatorio
+            ("rel_adm_memorando", "Rel. Adm. - Memorandos FAPESP"),   # /memorando/relatorio
         )

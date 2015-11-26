@@ -28,7 +28,7 @@ def cotacoes(request, prot_id):
         raise Http404
 
     lista_cotacoes = Cotacao.objects.filter(protocolo=p)
-    return render_to_response('protocolo/cotacoes.html', 
+    return render_to_response('protocolo/cotacoes.html',
                               {'lista_cotacoes': lista_cotacoes, 'pai': p, 'user': u,
                                'return_to': '/protocolo/%s/cotacoes' % prot_id},
                               context_instance=RequestContext(request))
@@ -36,7 +36,7 @@ def cotacoes(request, prot_id):
 
 @permission_required('protocolo.protocolo')
 def escolhe_termo(request):
-    return HttpResponse(pega_lista(request, Protocolo,'termo'), content_type="application/json")
+    return HttpResponse(pega_lista(request, Protocolo, 'termo'), content_type="application/json")
 
 
 @permission_required('protocolo.protocolo')
@@ -66,7 +66,7 @@ def lista_protocolos(request, t_id):
 def protocolos_descricao(request, pdf=False):
     """
      Relatório Administrativo - Relatório de Protocolos por descrição.
-    
+
     """
     if request.GET.get('termo'):
         termo_id = request.GET.get('termo')

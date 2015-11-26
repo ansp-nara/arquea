@@ -24,7 +24,6 @@ def upload_dir_os(instance, filename):
     return 'OS/%s/%s' % (str(instance.os.id), filename)
 
 
-# Create your models here.
 class Modalidade(models.Model):
     """
     Uma instância dessa classe é uma das modalidades de gasto autorizadas pelo Departamento de Auditoria da FAPESP.
@@ -141,28 +140,27 @@ class Termo(models.Model):
             antigo = Termo.objects.get(pk=pk)
         except Termo.DoesNotExist:
             antigo = None
-        
+
         if antigo and (antigo.ano != 0 or antigo.processo != 0 or antigo.digito != 0):
             self.ano = antigo.ano
             self.processo = antigo.processo
             self.digito = antigo.digito
-            
+
         super(Termo, self).save(*args, **kwargs)
 
     # Retorna a soma das naturezas (moeda nacional) de um termo.
     @property
     def real(self):
-        total = Decimal('0.00')
-#         for ng in self.natureza_gasto_set.all():
-#             if ng.modalidade.moeda_nacional == True and ng.modalidade.sigla != 'REI':
-#                 total += ng.valor_concedido
+        #     for ng in self.natureza_gasto_set.all():
+        #         if ng.modalidade.moeda_nacional == True and ng.modalidade.sigla != 'REI':
+        #             total += ng.valor_concedido
         soma = Natureza_gasto.objects.filter(termo_id=self.id) \
                                      .filter(modalidade__moeda_nacional=True) \
                                      .filter(~Q(modalidade__sigla='REI')) \
                                      .aggregate(Sum('valor_concedido'))
-        
+
         total = soma['valor_concedido__sum'] or Decimal('0.00')
-        
+
         return total
 
     # Formata o valor do atributo real.
@@ -176,16 +174,15 @@ class Termo(models.Model):
     # Retorna a soma das naturezas (dolar) de um termo.
     @property
     def dolar(self):
-        total = Decimal('0.00')
-#         for ng in self.natureza_gasto_set.all():
-#             if ng.modalidade.moeda_nacional == False:
-#                 total += ng.valor_concedido
-                
+        # for ng in self.natureza_gasto_set.all():
+        #     if ng.modalidade.moeda_nacional == False:
+        #         total += ng.valor_concedido
+
         soma = Natureza_gasto.objects.filter(termo_id=self.id) \
                                      .filter(modalidade__moeda_nacional=False) \
                                      .aggregate(Sum('valor_concedido'))
         total = soma['valor_concedido__sum'] or Decimal('0.00')
-                
+
         return total
 
     # Formata o valor do atributo tdolar.
@@ -219,7 +216,7 @@ class Termo(models.Model):
             meses = dif.days / 30
             if dif.days % 30 >= 28:
                 meses += 1
-    
+
             if meses > 0:
                 if meses > 1:
                     return u"%s meses" % meses
@@ -548,7 +545,7 @@ class Natureza_gasto(models.Model):
                    self.formata_valor(self.valor_concedido - self.total_realizado)
         return self.formata_valor(self.valor_concedido - self.total_realizado)
     saldo.allow_tags = True
-    
+
     def valor_saldo(self):
         return self.valor_concedido - self.total_realizado
 
@@ -584,7 +581,7 @@ class Item(models.Model):
     O método 'mostra_modalidade'		Retorna a sigla da modalidade.
     O método 'mostra_solicitação'		Retorna a data de solicitação do pedido de concessão no formato dd/mm/aa.
     O método 'mostra_termino'			Retorna a data de término do pedido de concessão no formato dd/mm/aa.
-    O atributo 'valor' 				Calcula o valor total do item (quantidade * valor unitário). 
+    O atributo 'valor' 				Calcula o valor total do item (quantidade * valor unitário).
     O método 'mostra_valor'			Retorna o atributo 'valor' em formato moeda.
     O método 'mostra_valor_unit'		Retorna o campo 'valor_unit' em formato moeda.
     O método 'mostra_quantidade'		Retorna o campo 'quantidade'.
@@ -634,23 +631,22 @@ class Item(models.Model):
     # Calcula o valor total realizado de um determinado item.
     def calcula_total_despesas(self):
         from financeiro.models import Pagamento
-       
-        total = Decimal('0.00')
+
 #         if hasattr(self, 'origemfapesp_set'):
 #             for of in self.origemfapesp_set.all():
 #                 sumFapesp = of.pagamento_set.all().aggregate(Sum('valor_fapesp'))
 #                 total += sumFapesp['valor_fapesp__sum'] or Decimal('0.0')
-        
+
         sumFapesp = Pagamento.objects.filter(origem_fapesp__item_outorga_id=self.id).aggregate(Sum('valor_fapesp'))
         total = sumFapesp['valor_fapesp__sum'] or Decimal('0.0')
-        
+
         return total
     # Define um atributo com o valor total realizado
     valor_realizado_acumulado = property(calcula_total_despesas)
 
     # Valor realizado por mês
     # dt = mes/ano para o filtro inicial
-    # after = flag que especifica se o dt deve levar em conta a data cheia (dia/mes/ano) 
+    # after = flag que especifica se o dt deve levar em conta a data cheia (dia/mes/ano)
     def calcula_realizado_mes(self, dt, after=False, pagamentos=None):
         total = Decimal('0.00')
         if pagamentos:
@@ -854,10 +850,10 @@ class TipoContrato(models.Model):
 
 class EstadoOS(models.Model):
     nome = models.CharField(max_length=20)
-    
+
     def __unicode__(self):
         return '%s' % self.nome
-        
+
     class Meta:
         ordering = ('nome',)
         verbose_name = 'Estado da OS'
@@ -867,7 +863,7 @@ class EstadoOS(models.Model):
 class OrdemDeServico(models.Model):
     """
     Uma instância dessa classe representa uma ordem de serviço de um Contrato.
-    
+
     arquivos: related_name para ArquivoOS
     """
     numero = models.CharField(_(u'Número'), max_length=20)
@@ -924,7 +920,7 @@ class OrdemDeServico(models.Model):
 
 class ArquivoOS(models.Model):
     """
-    Arquivos de ordem de serviço	
+    Arquivos de ordem de serviço
     """
     arquivo = models.FileField(upload_to=upload_dir_os)
     data = models.DateField()
@@ -944,8 +940,8 @@ class Permission(models.Model):
         # remover as permissões padrões, pois essa é uma classe para configurar permissões customizadas
         default_permissions = ()
         permissions = (
-            ("rel_ger_acordo_progressivo", "Rel. Ger. - Gerencial progressivo"), # /outorga/relatorios/acordo_progressivo
+            ("rel_ger_acordo_progressivo", "Rel. Ger. - Gerencial progressivo"),    # /outorga/relatorios/acordo_progressivo
             ("rel_ger_contratos", "Rel. Ger. - Contratos"),     # /outorga/relatorios/contratos
-            ("rel_adm_item_modalidade", "Rel. Adm. - Itens do orçamento por modalidade"), # /outorga/relatorios/item_modalidade
+            ("rel_adm_item_modalidade", "Rel. Adm. - Itens do orçamento por modalidade"),    # /outorga/relatorios/item_modalidade
             ("rel_ger_lista_acordos", "Rel. Ger. - Concessões por acordo"),     # /outorga/relatorios/lista_acordos
         )
