@@ -55,6 +55,5 @@ setup(
         'pillow',
         'pypdf',
         'reportlab',
-        'django-wkhtmltopdf',
     ]
 )
