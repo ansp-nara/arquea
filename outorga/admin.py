@@ -3,7 +3,7 @@
 from django.contrib import admin
 from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
-from django.contrib.admin.util import unquote
+from django.contrib.admin.utils import unquote
 from django.template.response import TemplateResponse
 from rede.models import PlanejaAquisicaoRecurso
 from outorga.models import OrdemDeServico, Outorga, Modalidade, Estado, Categoria, Arquivo, ArquivoOS, TipoContrato, \

@@ -5,7 +5,7 @@ from functools import update_wrapper
 from django.utils.encoding import force_unicode
 from django.shortcuts import get_object_or_404
 from django.utils.safestring import mark_safe
-from django.contrib.admin.util import unquote
+from django.contrib.admin.utils import unquote
 from django.contrib.admin import helpers
 from django.utils.text import capfirst
 from django.utils.html import escape
