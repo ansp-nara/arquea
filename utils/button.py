@@ -166,7 +166,7 @@ class ButtonAdmin(admin.ModelAdmin, ButtonAdminMixin):
                     form_validated = False
                     new_object = obj
                 prefixes = {}
-                for FormSet in self.get_formsets(request, new_object):
+                for FormSet in self.get_formsets_with_inlines(request, new_object):
                     prefix = FormSet.get_default_prefix()
                     prefixes[prefix] = prefixes.get(prefix, 0) + 1
                     if prefixes[prefix] != 1:
