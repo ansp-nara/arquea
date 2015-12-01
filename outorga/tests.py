@@ -383,7 +383,7 @@ class OutorgaTest(UnitTestCase):
         o1.arquivo = 'teste.pdf'
 
         self.assertEquals(o1.existe_arquivo(), '<center><a href="/admin/outorga/arquivo/?outorga__id__exact=1">'
-                                               '<img src="/media/img/arquivo.png" /></a></center>')
+                                               '<img src="%simg/arquivo.png" /></a></center>' % settings.STATIC_URL)
 
 
 class OutorgaViewTest(UnitTestCase):
@@ -1344,7 +1344,8 @@ class OrdemDeServicoTest(UnitTestCase):
         arquivo.save()
 
         self.assertEquals(os.existe_arquivo(), u'<center><a href="/admin/outorga/arquivoos/?os__id__exact=%s">'
-                                               u'<img src="/media/img/arquivo.png" /></a></center>' % os.id)
+                                               u'<img src="%simg/arquivo.png" /></a></center>'
+                          % (os.id, settings.STATIC_URL))
 
         arquivo.arquivo.delete()
         arquivo.delete()

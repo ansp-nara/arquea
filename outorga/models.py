@@ -3,6 +3,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import cached_property
+from django.conf import settings
 from utils.functions import formata_moeda
 from utils.models import NARADateField
 from django.db.models import Sum, Q
@@ -380,7 +381,7 @@ class Outorga(models.Model):
     # Retorna um ícone se o pedido de concessão tiver arquivos.
     def existe_arquivo(self):
         a = '<center><a href="/admin/outorga/arquivo/?outorga__id__exact=%s">' \
-            '<img src="/media/img/arquivo.png" /></a></center>' % self.id
+            '<img src="%simg/arquivo.png" /></a></center>' % (self.id, settings.STATIC_URL)
         if self.arquivo:
             return a
         return ' '
@@ -829,7 +830,8 @@ class Contrato(models.Model):
     # Retorna um ícone se o contrato tiver anexo.
     def existe_arquivo(self):
         if self.arquivo and self.arquivo.name.find('/') >= 0:
-            a = '<center><a href="%s"><img src="/media/img/arquivo.png" /></a></center>' % self.arquivo.url
+            a = '<center><a href="%s"><img src="%simg/arquivo.png" /></a></center>'\
+                % (self.arquivo.url, settings.STATIC_URL)
             return a
         return ' '
     existe_arquivo.allow_tags = True
@@ -895,7 +897,7 @@ class OrdemDeServico(models.Model):
     # Retorna um ícone se a ordem de serviço tiver anexo.
     def existe_arquivo(self):
         a = '<center><a href="/admin/outorga/arquivoos/?os__id__exact=%s">' \
-            '<img src="/media/img/arquivo.png" /></a></center>' % self.id
+            '<img src="%simg/arquivo.png" /></a></center>' % (self.id, settings.STATIC_URL)
         if self.arquivos.count() > 0:
             return a
         else:
