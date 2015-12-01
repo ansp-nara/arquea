@@ -2,6 +2,7 @@
 from datetime import date, timedelta, datetime
 from decimal import Decimal
 from django.http import QueryDict
+from django.conf import settings
 from utils.UnitTestCase import UnitTestCase
 import mock
 
@@ -1279,8 +1280,9 @@ class ContratoTest(UnitTestCase):
         ct.arquivo._commited = True
         ct.save()
 
-        self.assertEquals(ct.existe_arquivo(), u'<center><a href="/media/teste/teste/test_img_file.gif">'
-                                               u'<img src="/media/img/arquivo.png" /></a></center>')
+        self.assertEquals(ct.existe_arquivo(),
+                          u'<center><a href="%steste/teste/test_img_file.gif"><img src="%simg/arquivo.png" /></a>'
+                          u'</center>' % (settings.MEDIA_URL, settings.STATIC_URL))
 
     def test_existe_arquivo__nulo(self):
         ct = Contrato.objects.get(pk=1)

@@ -3,6 +3,7 @@ from datetime import date, datetime
 from decimal import Decimal
 from django.db import IntegrityError
 from django.test import TestCase
+from django.utils import timezone
 from membro.models import Membro, Cargo, Historico
 from protocolo.models import Feriado, TipoDocumento, Origem, Protocolo, ItemProtocolo, Descricao, Cotacao,\
     Estado as ProtocoloEstado
@@ -90,7 +91,8 @@ class ProtocoloTest(TestCase):
         protocoloEstado = ProtocoloEstado.objects.create(nome='Pendente')
 
         p = Protocolo.objects.create(termo=t, tipo_documento=td, num_documento=2008, estado=protocoloEstado,
-                                     identificacao=iden, data_chegada=datetime(2008, 9, 30, 10, 10),
+                                     identificacao=iden,
+                                     data_chegada=datetime(2008, 9, 30, 10, 10, tzinfo=timezone.get_current_timezone()),
                                      data_validade=datetime(2009, 8, 25), data_vencimento=datetime(2008, 9, 30),
                                      descricao="Conta mensal", origem=og, valor_total=None, descricao2=desc,
                                      moeda_estrangeira=False)
