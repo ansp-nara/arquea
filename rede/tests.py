@@ -105,7 +105,7 @@ class ViewPermissionDeniedTest(TestCase):
     """
     Teste das permissões das views. Utilizando um usuário sem permissão de superusuário.
     """
-    fixtures = ['auth_user.yaml', 'treemenus.yaml']
+    fixtures = ['auth_user.yaml', 'initial_data.yaml']
 
     def setUp(self):
         super(ViewPermissionDeniedTest, self).setUp()
@@ -165,7 +165,7 @@ class ViewPermissionDeniedTest(TestCase):
 class ViewBlocoIPTest(TestCase):
 
     # Fixture para carregar dados de autenticação de usuário
-    fixtures = ['auth_user_superuser.yaml', 'treemenus.yaml']
+    fixtures = ['auth_user_superuser.yaml', 'initial_data.yaml']
 
     def setUp(self):
         super(ViewBlocoIPTest, self).setUp()
@@ -378,7 +378,7 @@ class ViewBlocoIPTest(TestCase):
 class ViewBlocoIPANSPTest(TestCase):
 
     # Fixture para carregar dados de autenticação de usuário
-    fixtures = ['auth_user_superuser.yaml', 'treemenus.yaml']
+    fixtures = ['auth_user_superuser.yaml', 'initial_data.yaml']
 
     def setUp(self):
         super(ViewBlocoIPANSPTest, self).setUp()
@@ -532,7 +532,7 @@ class ViewBlocoIPANSPTest(TestCase):
 class ViewBlocoIPTransitoTest(TestCase):
 
     # Fixture para carregar dados de autenticação de usuário
-    fixtures = ['auth_user_superuser.yaml', 'treemenus.yaml']
+    fixtures = ['auth_user_superuser.yaml', 'initial_data.yaml']
 
     def setUp(self):
         super(ViewBlocoIPTransitoTest, self).setUp()
@@ -723,7 +723,7 @@ class ViewBlocoIPTransitoTest(TestCase):
 class ViewBlocoIPInstTransitoTest(TestCase):
 
     # Fixture para carregar dados de autenticação de usuário
-    fixtures = ['auth_user_superuser.yaml', 'treemenus.yaml']
+    fixtures = ['auth_user_superuser.yaml', 'initial_data.yaml']
 
     def setUp(self):
         super(ViewBlocoIPInstTransitoTest, self).setUp()
@@ -913,7 +913,7 @@ class ViewBlocoIPInstTransitoTest(TestCase):
 # class ViewCrossConnectionTest(TestCase):
 #
 #     # Fixture para carregar dados de autenticação de usuário
-#     fixtures = ['auth_user_superuser.yaml', 'treemenus.yaml',]
+#     fixtures = ['auth_user_superuser.yaml', 'initial_data.yaml',]
 #
 #     def setUp(self):
 #         super(ViewCrossConnectionTest, self).setUp()

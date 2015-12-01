@@ -144,9 +144,12 @@ class MembroControleTest(TestCase):
     def test_controle_mover_bloco(self):
         membro = Membro.objects.create(id=1, nome='teste', site=True)
 
-        Controle.objects.create(id=1, membro=membro, entrada=datetime(year=2000, month=01, day=01, hour=12),
-                                saida=datetime(year=2000, month=01, day=01, hour=18, minute=30), almoco_devido=False,
-                                almoco=60)
+        Controle.objects.create(id=1, membro=membro,
+                                entrada=datetime(year=2000, month=01, day=01, hour=12,
+                                                 tzinfo=timezone.get_current_timezone()),
+                                saida=datetime(year=2000, month=01, day=01, hour=18, minute=30,
+                                               tzinfo=timezone.get_current_timezone()),
+                                almoco_devido=False, almoco=60)
         Controle.objects.get(id=1)
 
         tempo = 20
@@ -157,15 +160,11 @@ class MembroControleTest(TestCase):
         controle.save()
 
         controle = Controle.objects.get(pk=1)
-        self.assertEquals(controle.entrada.month, 1)
-        self.assertEquals(controle.entrada.day, 1)
-        self.assertEquals(controle.entrada.hour, 12)
-        self.assertEquals(controle.entrada.minute, 20)
+        entrada = datetime(year=2000, month=01, day=01, hour=12, minute=20, tzinfo=timezone.get_current_timezone())
+        self.assertEquals(controle.entrada, entrada)
 
-        self.assertEquals(controle.saida.month, 1)
-        self.assertEquals(controle.saida.day, 1)
-        self.assertEquals(controle.saida.hour, 18)
-        self.assertEquals(controle.saida.minute, 50)
+        saida = datetime(year=2000, month=01, day=01, hour=18, minute=50, tzinfo=timezone.get_current_timezone())
+        self.assertEquals(controle.saida, saida)
 
 
 class MembroControleHorarioTest(TestCase):

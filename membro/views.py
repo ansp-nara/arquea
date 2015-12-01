@@ -69,7 +69,7 @@ def controle(request):
     messages.info(request, u'Sua %s foi registrada com sucesso.' % acao)
     key = make_template_fragment_key('base-html-header', [request.user.username])
     cache.delete(key)
-    return HttpResponseRedirect(reverse('membro.views.observacao', kwargs={'id': controle.id}))
+    return HttpResponseRedirect(reverse('membro.views.observacao', kwargs={'controle_id': controle.id}))
 
 
 @login_required
