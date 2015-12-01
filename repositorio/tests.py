@@ -55,7 +55,7 @@ class RepositorioTest(TestCase):
 
 class RepositorioRelatorioTest(TestCase):
     # Fixture para carregar dados de autenticação de usuário
-    fixtures = ['auth_user_superuser.yaml', 'treemenus.yaml']
+    fixtures = ['auth_user_superuser.yaml', 'initial_data.yaml']
 
     def setUp(self):
         super(RepositorioRelatorioTest, self).setUp()
