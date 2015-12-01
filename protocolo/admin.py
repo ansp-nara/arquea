@@ -436,7 +436,7 @@ class ArquivoAdmin(admin.ModelAdmin):
 
     def __init__(self, *args, **kwargs):
         super(ArquivoAdmin, self).__init__(*args, **kwargs)
-        self.list_display_links = (None, )
+        self.list_display_links = []
 
 admin.site.register(Arquivo, ArquivoAdmin)
 
