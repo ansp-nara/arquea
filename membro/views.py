@@ -65,7 +65,7 @@ def controle(request):
         controle.saida = datetime.now()
     controle.save()
     messages.info(request, u'Sua %s foi registrada com sucesso.' % acao)
-    return HttpResponseRedirect(reverse('membro.views.observacao', kwargs={'id': controle.id}))
+    return HttpResponseRedirect(reverse('membro.views.observacao', kwargs={'controle_id': controle.id}))
 
 
 @login_required
