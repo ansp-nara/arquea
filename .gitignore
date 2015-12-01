@@ -1,0 +1,5 @@
+.idea
+arquea
+manage.py
+*.pyc
+*.sqlite3
