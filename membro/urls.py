@@ -5,7 +5,7 @@ urlpatterns = patterns('membro.views',
                        (r'controle$', 'controle'),
                        (r'mensal/(?P<ano>\d+)/(?P<mes>\d+)$', 'mensal'),
                        (r'detalhes$', 'detalhes'),
-                       (r'obs/(?P<id>\d+)$', 'observacao'),
+                       (r'obs/(?P<controle_id>\d+)$', 'observacao'),
                        (r'mensalf$', 'mensal_func'),
                        (r'logs$', 'uso_admin'),
 

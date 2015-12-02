@@ -2,6 +2,7 @@
 from datetime import date, timedelta, datetime
 from decimal import Decimal
 from django.http import QueryDict
+from django.conf import settings
 from utils.UnitTestCase import UnitTestCase
 import mock
 
@@ -382,7 +383,7 @@ class OutorgaTest(UnitTestCase):
         o1.arquivo = 'teste.pdf'
 
         self.assertEquals(o1.existe_arquivo(), '<center><a href="/admin/outorga/arquivo/?outorga__id__exact=1">'
-                                               '<img src="/media/img/arquivo.png" /></a></center>')
+                                               '<img src="%simg/arquivo.png" /></a></center>' % settings.STATIC_URL)
 
 
 class OutorgaViewTest(UnitTestCase):
@@ -1279,8 +1280,9 @@ class ContratoTest(UnitTestCase):
         ct.arquivo._commited = True
         ct.save()
 
-        self.assertEquals(ct.existe_arquivo(), u'<center><a href="/media/teste/teste/test_img_file.gif">'
-                                               u'<img src="/media/img/arquivo.png" /></a></center>')
+        self.assertEquals(ct.existe_arquivo(),
+                          u'<center><a href="%steste/teste/test_img_file.gif"><img src="%simg/arquivo.png" /></a>'
+                          u'</center>' % (settings.MEDIA_URL, settings.STATIC_URL))
 
     def test_existe_arquivo__nulo(self):
         ct = Contrato.objects.get(pk=1)
@@ -1342,7 +1344,8 @@ class OrdemDeServicoTest(UnitTestCase):
         arquivo.save()
 
         self.assertEquals(os.existe_arquivo(), u'<center><a href="/admin/outorga/arquivoos/?os__id__exact=%s">'
-                                               u'<img src="/media/img/arquivo.png" /></a></center>' % os.id)
+                                               u'<img src="%simg/arquivo.png" /></a></center>'
+                          % (os.id, settings.STATIC_URL))
 
         arquivo.arquivo.delete()
         arquivo.delete()

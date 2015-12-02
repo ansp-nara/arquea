@@ -13,6 +13,8 @@ from utils.decorators import login_required_or_403
 from datetime import datetime, timedelta, date
 import json as simplejson
 import logging
+from django.core.cache import cache
+from django.core.cache.utils import make_template_fragment_key
 
 from membro.models import Membro, Controle, Ferias
 from membro.forms import ControleObs
@@ -65,7 +67,9 @@ def controle(request):
         controle.saida = datetime.now()
     controle.save()
     messages.info(request, u'Sua %s foi registrada com sucesso.' % acao)
-    return HttpResponseRedirect(reverse('membro.views.observacao', kwargs={'id': controle.id}))
+    key = make_template_fragment_key('base-html-header', [request.user.username])
+    cache.delete(key)
+    return HttpResponseRedirect(reverse('membro.views.observacao', kwargs={'controle_id': controle.id}))
 
 
 @login_required

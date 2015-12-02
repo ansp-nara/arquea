@@ -5,6 +5,7 @@ from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.utils import timezone
 from django.core.cache import cache
 from django.contrib.auth.models import User
 from django.db.models import Q
@@ -280,7 +281,8 @@ class Protocolo(models.Model):
 
     # Retorna a data de recebimento formatada.
     def recebimento(self):
-        return self.data_chegada.strftime("%d/%m/%y %H:%M")
+        data_chegada = timezone.localtime(self.data_chegada)
+        return data_chegada.strftime("%d/%m/%y %H:%M")
     recebimento.short_description = _(u'Recebido em')
 
     # Retorna a data de validade formatada.
@@ -300,7 +302,8 @@ class Protocolo(models.Model):
 
     # Retorna a data de recebimento formatada.
     def chegada(self):
-        return self.data_chegada.strftime("%d/%m/%y")
+        data_chegada = timezone.localtime(self.data_chegada)
+        return data_chegada.strftime("%d/%m/%y")
     vencimento.short_description = _(u'Recebimento')
     vencimento.admin_order_field = 'data_chegada'
 
