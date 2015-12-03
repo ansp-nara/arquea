@@ -131,16 +131,16 @@
 	        <td>
 	            <button id="btn_voltar_20_{{d.id}}" class="btn_voltar_20"><< 20min</button>
 	            <button id="btn_add_ini_20_{{d.id}}" class="btn_add_ini_20">-20min</button>
-	            <a href="{{ model.admin_url }}/admin/membro/controle/{{ d.id }}/">{{ d.entrada|date:"d/m  H:i" }}</a></td>
+	            <a href="{% url 'admin:membro_controle_change' d.id %}">{{ d.entrada|date:"d/m  H:i" }}</a></td>
 	        <td>
 	            {% if d.almoco or d.almoco == 0 %}
-	                <a href="{{ model.admin_url }}/admin/membro/controle/{{ d.id }}/">{{ d.almoco|default_if_none:"" }}</a>
+	                <a href="{% url 'admin:membro_controle_change' d.id %}">{{ d.almoco|default_if_none:"" }}</a>
 	            {% else %}
 	                <button id="btn_al_0_{{d.id}}" class="btn_al_0">0</button><button id="btn_al_60_{{d.id}}" class="btn_al_60">60</button>
 	            {% endif %}
 	        </td>
 	        <td>
-	            <a href="{{ model.admin_url }}/admin/membro/controle/{{ d.id }}/">{{ d.saida|date:"d/m  H:i" }}</a>
+	            <a href="{% url 'admin:membro_controle_change' d.id %}">{{ d.saida|date:"d/m  H:i" }}</a>
 	            <button id="btn_add_end_20_{{d.id}}" class="btn_add_end_20"> +20min</button>
 	            <button id="btn_avancar_20_{{d.id}}" class="btn_avancar_20">>> 20min</button>
 	        </td>
@@ -152,9 +152,9 @@
 	                    style="background-color:lightyellow;"
 	                {% endif %}>
 	            
-	            <a href="{{ model.admin_url }}/admin/membro/controle/{{ d.id }}/">{{ d.permanencia }}</a>
+	            <a href="{% url 'admin:membro_controle_change' d.id %}">{{ d.permanencia }}</a>
 	        </td>
-	        <td class='td-obs'><a href="{{ model.admin_url }}/admin/membro/controle/{{ d.id }}/"><strong>{{ dia.obs }}</strong>{% if dia.obs %} - {% endif %}{{ d.obs|default_if_none:"" }}</a></td>
+	        <td class='td-obs'><a href="{% url 'admin:membro_controle_change' d.id %}"><strong>{{ dia.obs }}</strong>{% if dia.obs %} - {% endif %}{{ d.obs|default_if_none:"" }}</a></td>
 	    </tr>
 	    {% endfor %}
 	{% else %}
