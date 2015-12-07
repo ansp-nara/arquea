@@ -185,7 +185,7 @@
                         <tr>
                             <td>{{ c.inicio|date:"d/m/Y" }}</td>
                             <td>{{ c.termino|date:"d/m/Y" }}</td>
-                            <td><a href="/admin/outorga/contrato/{{ c.id }}/">{{ c.numero }}</a></td>
+                            <td><a href="{% url 'admin:outorga_contrato_change' c.id %}">{{ c.numero }}</a></td>
                             <td>{% if c.arquivo %}<a href="{{ c.arquivo.url }}"><img class="img_arquivo" title="{{ a.arquivo.name }}" src="{{ STATIC_PREFIX }}img/icon_arquivo_documento.png" ></a>{% endif %}</td>
                             <td>{% if c.auto %}Auto{% endif %}</td>
                         </tr>
@@ -208,7 +208,7 @@
                                     <tr>
                                         <td>{{ os.data_inicio|date:"d/m/Y" }}</td>
                                         <td>{{ os.data_rescisao|date:"d/m/Y" }}</td>
-                                        <td><a href="/admin/outorga/ordemdeservico/{{ os.id }}/">{{ os.tipo.nome }} - {{ os.numero }}</a></td>
+                                        <td><a href="{% url 'admin:outorga_ordemdeservico_change' os.id %}">{{ os.tipo.nome }} - {{ os.numero }}</a></td>
                                         <td width="30%">{{ os.descricao }}</td>
                                         <td>{% for a in os.arquivos.all %}<a href="{{ a.arquivo.url }}" target="_blank"><img class="img_arquivo" title="{{ a.arquivo.name }}" src="{{ STATIC_PREFIX }}img/icon_arquivo_documento.png" ></a> {% endfor %}</td>
                                         <td>{{ os.estado }}</td>
