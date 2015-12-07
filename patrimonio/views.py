@@ -1070,8 +1070,8 @@ def por_termo(request, pdf=0):
     # Se não tiver Termo selecionado, volta para a tela de seleção de filtros.
     ids_fabricantes_de_patrimonios = Patrimonio.objects.filter(
         pagamento__protocolo__termo_id=termo_id, equipamento__entidade_fabricante__isnull=False)\
-        .values_list('equipamento__entidade_fabricante__id')\
         .select_related('equipamento__entidade_fabricante')\
+        .values_list('equipamento__entidade_fabricante__id')\
         .order_by('equipamento__entidade_fabricante__sigla')
 
     filtro_marcas = Entidade.objects.filter(id__in=ids_fabricantes_de_patrimonios)
