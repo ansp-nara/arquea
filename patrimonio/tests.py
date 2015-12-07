@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from datetime import date
@@ -531,7 +530,8 @@ class ViewTest(TestCase):
         self.assertContains(response, u'<td>DELL</td>')
         self.assertContains(response, u'<td>MODEL001</td>')
         self.assertContains(response, u'<td>PN001</td>')
-        self.assertContains(response, u'<td><a href="/admin/patrimonio/patrimonio/1/"></a></td>')
+        self.assertContains(response,
+                            u'<td><a href="%s"></a></td>' % reverse('admin:patrimonio_patrimonio_change', args=(1,)))
 
     def test_view__por_estado__parametro_estado_vazio(self):
         """
@@ -651,7 +651,8 @@ class ViewTest(TestCase):
         self.assertContains(response, u'<th>Estado</th>')
         self.assertContains(response, u'<th>NF</th>')
 
-        self.assertContains(response, u'<td><a href="/admin/patrimonio/patrimonio/1/">1</a></td>')
+        self.assertContains(response, u'<td><a href="%s">1</a></td>'
+                            % reverse('admin:patrimonio_patrimonio_change', args=(1,)))
         self.assertContains(response, u'<td>PROC</td>')
         self.assertContains(response, u'<td>DELL</td>')
         self.assertContains(response, u'<td>MODEL001</td>')
@@ -896,7 +897,8 @@ class ViewTest(TestCase):
         self.assertContains(response, u'<th>Estado</th>')
 
         self.assertContains(response, u'<td><div class="level_btn"></div>'
-                                      u'<a href="/admin/patrimonio/patrimonio/1/">1</a></td>')
+                                      u'<a href="%s">1</a></td>'
+                            % reverse('admin:patrimonio_patrimonio_change', args=(1,)))
         self.assertContains(response, u'<td class="clickable">Rack</td>')
         self.assertContains(response, u'<td class="clickable">MODEL001</td>')
         self.assertContains(response, u'<td class="clickable">PN001</td>')
@@ -981,8 +983,8 @@ class ViewTest(TestCase):
         self.assertContains(response, u'<th>Posição</th>')
         self.assertContains(response, u'<th>Estado</th>')
 
-        self.assertContains(response, u'<td><div class="level_btn"></div><a href="/admin/patrimonio/patrimonio/1/">'
-                                      u'1</a></td>')
+        self.assertContains(response, u'<td><div class="level_btn"></div><a href="%s">1</a></td>'
+                            % reverse('admin:patrimonio_patrimonio_change', args=(1,)))
         self.assertContains(response, u'<td class="clickable">08/22222-2</td>')
         self.assertContains(response, u'<td class="clickable">MODEL001</td>')
         self.assertContains(response, u'<td class="clickable">PN001</td>')
@@ -1256,7 +1258,8 @@ class ViewTest(TestCase):
         self.assertContains(response, u'<td>DELL</td>')
         self.assertContains(response, u'<td>MODEL001</td>')
         self.assertContains(response, u'<td>PN001</td>')
-        self.assertContains(response, u'<td><a href="/admin/patrimonio/patrimonio/1/"></a></td>')
+        self.assertContains(response, u'<td><a href="%s"></a></td>'
+                            % reverse('admin:patrimonio_patrimonio_change', args=(1,)))
         self.assertContains(response, u'<td>Ativo</td></tr>')
 
     def test_view__por_tipo_equipamento__filtro_todos_tipos(self):
@@ -1293,7 +1296,8 @@ class ViewTest(TestCase):
         self.assertContains(response, u'<td>DELL</td>')
         self.assertContains(response, u'<td>MODEL001</td>')
         self.assertContains(response, u'<td>PN001</td>')
-        self.assertContains(response, u'<td><a href="/admin/patrimonio/patrimonio/1/"></a></td>')
+        self.assertContains(response, u'<td><a href="%s"></a></td>'
+                            % reverse('admin:patrimonio_patrimonio_change', args=(1,)))
         self.assertContains(response, u'<td>Ativo</td></tr>')
 
     def test_view__por_termo__sem_filtro(self):

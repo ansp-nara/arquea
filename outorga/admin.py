@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.contrib import admin
+from django.core import urlresolvers
 from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.admin.utils import unquote
@@ -384,7 +385,8 @@ class OrdemDeServicoAdmin(admin.ModelAdmin):
             obj = self.get_object(request, unquote(object_id))
             if obj.estado.id != int(request.POST.get('estado')) and request.POST.get('confirma') is None:
                 if request.POST.get('nconfirma'):
-                    return HttpResponseRedirect('/admin/outorga/ordemdeservico/%s' % object_id)
+                    return HttpResponseRedirect(urlresolvers.reverse('admin:outorga_ordemdeservico_change',
+                                                                     args=(object_id,)))
                 return TemplateResponse(request, 'admin/outorga/ordemdeservico/confirma_alteracao.html',
                                         {'form_url': form_url})
 

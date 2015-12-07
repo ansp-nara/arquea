@@ -5,6 +5,7 @@ from django.http import QueryDict
 from django.conf import settings
 from utils.UnitTestCase import UnitTestCase
 import mock
+from django.core.urlresolvers import reverse
 
 from outorga.models import Termo, Item, OrigemFapesp, Estado as EstadoOutorga, Categoria, Outorga, Modalidade, \
     Natureza_gasto, Acordo, Contrato, OrdemDeServico, TipoContrato, ArquivoOS, Arquivo, EstadoOS
@@ -382,8 +383,9 @@ class OutorgaTest(UnitTestCase):
         o1 = Outorga.objects.get(pk=1)
         o1.arquivo = 'teste.pdf'
 
-        self.assertEquals(o1.existe_arquivo(), '<center><a href="/admin/outorga/arquivo/?outorga__id__exact=1">'
-                                               '<img src="%simg/arquivo.png" /></a></center>' % settings.STATIC_URL)
+        self.assertEquals(o1.existe_arquivo(), '<center><a href="%s?outorga__id__exact=1">'
+                                               '<img src="%simg/arquivo.png" /></a></center>'
+                          % (reverse('admin:outorga_arquivo_changelist'), settings.STATIC_URL))
 
 
 class OutorgaViewTest(UnitTestCase):
@@ -732,7 +734,7 @@ class Natureza_gastoTest(UnitTestCase):
 
     def test_get_absolute_url(self):
         n1 = Natureza_gasto.objects.get(pk=1)
-        self.assertEquals(n1.get_absolute_url(), u'/admin/outorga/natureza_gasto/1')
+        self.assertEquals(n1.get_absolute_url(), reverse('admin:outorga_natureza_gasto_change', args=(1,)))
 
     def test_formata_valor(self):
         n1 = Natureza_gasto.objects.get(pk=1)
@@ -1021,13 +1023,14 @@ class ItemTest(UnitTestCase):
     def test_protocolos_pagina(self):
         item = Item.objects.get(pk=1)
         self.assertEquals(item.protocolos_pagina(),
-                          u'<a href="/protocolo/protocolo/?fontepagadora__origem_fapesp__item_outorga__id=1">'
-                          u'Despesas</a>')
+                          u'<a href="%s?fontepagadora__origem_fapesp__item_outorga__id=1">'
+                          u'Despesas</a>' % reverse('admin:protocolo_protocolo_changelist'))
 
     def test_pagamentos_pagina(self):
         item = Item.objects.get(pk=1)
         self.assertEquals(item.pagamentos_pagina(),
-                          u'<a href="/financeiro/pagamento/?origem_fapesp__item_outorga=1">Despesas</a>')
+                          u'<a href="%s?origem_fapesp__item_outorga=1">Despesas</a>'
+                          % reverse('admin:financeiro_pagamento_changelist'))
 
     def test_calcula_realizado_mes(self):
         item = Item.objects.get(pk=1)
@@ -1329,26 +1332,6 @@ class OrdemDeServicoTest(UnitTestCase):
         os = OrdemDeServico.objects.get(pk=1)
         os.antes_rescisao = 1
         self.assertEquals(os.mostra_prazo(), u'1 dias')
-
-    def test_existe_arquivo_vazio(self):
-        os = OrdemDeServico.objects.get(pk=1)
-        self.assertEquals(os.existe_arquivo(), u' ')
-
-    def test_existe_arquivo(self):
-        os = OrdemDeServico.objects.get(pk=1)
-        arquivo = ArquivoOS(os=os)
-        arquivo.data = "2013-01-01"
-        arquivo.arquivo = ""
-        arquivo.arquivo.name = 'test_img_file.gif'
-
-        arquivo.save()
-
-        self.assertEquals(os.existe_arquivo(), u'<center><a href="/admin/outorga/arquivoos/?os__id__exact=%s">'
-                                               u'<img src="%simg/arquivo.png" /></a></center>'
-                          % (os.id, settings.STATIC_URL))
-
-        arquivo.arquivo.delete()
-        arquivo.delete()
 
     def test_entidade(self):
         os = OrdemDeServico.objects.get(pk=1)

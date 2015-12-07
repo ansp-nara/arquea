@@ -2,6 +2,7 @@
 import django
 from django.contrib import admin
 from django.contrib.auth.models import Group
+from django.core import urlresolvers
 from django.utils.translation import ugettext_lazy as _
 from django.core.mail import send_mail
 from django.http import HttpResponseRedirect
@@ -117,7 +118,7 @@ class ProtocoloAdmin(admin.ModelAdmin):
             u = obj.responsavel
             if u and u.email:
                 mails = [u.email]
-                url = request.build_absolute_uri('/protocolo/%s/cotacoes' % obj.pk)
+                url = request.build_absolute_uri(urlresolvers.reverse('cotacoes'), args=(obj.pk,))
                 send_mail('Novo pedido requer cotações',
                           'O pedido %s requer que sejam feitas cotações.\r\nEntre em %s.' % (obj.descricao, url),
                           'Sistema administrativo <sistema@ansp.br>', mails, fail_silently=True)

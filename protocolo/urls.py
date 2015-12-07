@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-from django.conf.urls import patterns
+from django.conf.urls import url
+from . import views
 
-
-urlpatterns = patterns('protocolo.views',
-                       (r'^(?P<prot_id>\d+)/cotacoes/$', 'cotacoes'),
-                       (r'escolhe_termo$', 'escolhe_termo'),
-                       # (r'listagem/(?P<t_id>\d+)$', 'lista_protocolos'),
-                       (r'descricao$', 'protocolos_descricao'),
-                       (r'descricao/(?P<pdf>\d)$', 'protocolos_descricao'),
-                       )
+app_name = 'protocolo'
+urlpatterns = [
+    url(r'^(?P<prot_id>\d+)/cotacoes/$', views.cotacoes, name='cotacoes'),
+    url(r'escolhe_termo$', views.escolhe_termo),
+    url(r'descricao$', views.protocolos_descricao),
+    url(r'descricao/(?P<pdf>\d)$', views.protocolos_descricao),
+    ]
