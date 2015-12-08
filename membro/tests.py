@@ -19,6 +19,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+# Get current timezone
+tz = timezone.get_current_timezone()
+
+
 class TipoAssinaturaTest(TestCase):
     def test_unicode(self):
         ta = TipoAssinatura.objects.create(nome='Cheque')
@@ -148,10 +152,8 @@ class MembroControleTest(TestCase):
         membro = Membro.objects.create(id=1, nome='teste', site=True)
 
         Controle.objects.create(id=1, membro=membro,
-                                entrada=datetime(year=2000, month=01, day=01, hour=12,
-                                                 tzinfo=timezone.get_current_timezone()),
-                                saida=datetime(year=2000, month=01, day=01, hour=18, minute=30,
-                                               tzinfo=timezone.get_current_timezone()),
+                                entrada=tz.localize(datetime(year=2000, month=01, day=01, hour=12)),
+                                saida=tz.localize(datetime(year=2000, month=01, day=01, hour=18, minute=30)),
                                 almoco_devido=False, almoco=60)
         Controle.objects.get(id=1)
 
@@ -163,10 +165,10 @@ class MembroControleTest(TestCase):
         controle.save()
 
         controle = Controle.objects.get(pk=1)
-        entrada = datetime(year=2000, month=01, day=01, hour=12, minute=20, tzinfo=timezone.get_current_timezone())
+        entrada = tz.localize(datetime(year=2000, month=01, day=01, hour=12, minute=20))
         self.assertEquals(controle.entrada, entrada)
 
-        saida = datetime(year=2000, month=01, day=01, hour=18, minute=50, tzinfo=timezone.get_current_timezone())
+        saida = tz.localize(datetime(year=2000, month=01, day=01, hour=18, minute=50))
         self.assertEquals(controle.saida, saida)
 
 

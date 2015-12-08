@@ -21,6 +21,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+# Get current timezone
+tz = timezone.get_current_timezone()
+
+
 # Testes do arquivo com funções localizado em protocolo.templatetags.proto_tags que é utilizado nos templates HTML
 class PrototagTest(TestCase):
     def test_moeda_real(self):
@@ -95,8 +99,7 @@ class ProtocoloTest(TestCase):
         protocoloEstado = ProtocoloEstado.objects.create(nome='Pendente')
 
         p = Protocolo.objects.create(termo=t, tipo_documento=td, num_documento=2008, estado=protocoloEstado,
-                                     identificacao=iden,
-                                     data_chegada=datetime(2008, 9, 30, 10, 10, tzinfo=timezone.get_current_timezone()),
+                                     identificacao=iden, data_chegada=tz.localize(datetime(2008, 9, 30, 10, 10)),
                                      data_validade=datetime(2009, 8, 25), data_vencimento=datetime(2008, 9, 30),
                                      descricao="Conta mensal", origem=og, valor_total=None, descricao2=desc,
                                      moeda_estrangeira=False)
@@ -177,9 +180,9 @@ class ItemProtocoloTest(TestCase):
         desc = Descricao.objects.create(descricao='Descricao', entidade=ent)
 
         p = Protocolo.objects.create(termo=t, tipo_documento=td, num_documento=2008, estado=e, identificacao=iden,
-                                     data_chegada=datetime(2008, 9, 30, 10, 10), data_validade=date(2009, 8, 25),
-                                     data_vencimento=date(2008, 9, 30), descricao="Aditivo Uniemp", origem=og,
-                                     valor_total=None, descricao2=desc, moeda_estrangeira=False)
+                                     data_chegada=tz.localize(datetime(2008, 9, 30, 10, 10)), descricao2=desc,
+                                     data_validade=date(2009, 8, 25),data_vencimento=date(2008, 9, 30), origem=og,
+                                     valor_total=None, descricao="Aditivo Uniemp", moeda_estrangeira=False)
 
         ip = ItemProtocolo.objects.create(protocolo=p, descricao='Servico de conexao', quantidade=1,  # @UnusedVariable
                                           valor_unitario='59613.59')
@@ -266,9 +269,9 @@ class CotacaoTest(TestCase):
         iden = Identificacao.objects.create(contato=c, funcao='Tecnico', area='', ativo=True, endereco=endereco)
 
         cot = Cotacao.objects.create(termo=t, tipo_documento=td, estado=e, identificacao=iden,  # @UnusedVariable
-                                     data_chegada=datetime(2008, 12, 12, 9, 10), data_validade=date(2009, 12, 13),
-                                     descricao='Compra de Aparelhos', origem=og, parecer='custo alto', aceito=False,
-                                     entrega='confirmada', moeda_estrangeira=False)
+                                     data_chegada=tz.localize(datetime(2008, 12, 12, 9, 10)),
+                                     data_validade=date(2009, 12, 13), origem=og, parecer='custo alto', aceito=False,
+                                     descricao='Compra de Aparelhos', entrega='confirmada', moeda_estrangeira=False)
 
     def test_unicode(self):
         cot = Cotacao.objects.get(pk=1)
