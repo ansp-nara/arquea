@@ -9,7 +9,8 @@ um projeto Fapesp.
 Instalação
 ..........
 
-1. Instale os pacotes de desenvolvimento do ``python``, ``xml``, ``ffi``, ``xslt``, ``zlib`` e ``yaml``, o pacote de fontes ``liberation`` e o ``pip`` para instalar pacotes python. No caso do Ubuntu, seria::
+1. Instale os pacotes de desenvolvimento do ``python``, ``xml``, ``ffi``, ``xslt``, ``zlib`` e ``yaml``, o pacote de
+fontes ``liberation`` e o ``pip`` para instalar pacotes python. No caso do Ubuntu, seria::
 
     apt-get install libffi-dev libpython-dev libxml2-dev libxslt1-dev zlib1g-dev libyaml-dev fonts-liberation python-pip
 
@@ -26,9 +27,9 @@ Instalação
     cd <nome do ambiente>
     source bin/activate
 
-5. Instale o ``django-sistema``::
+5. Instale o ``django-arquea``::
 
-    pip install --extra-index-url http://10.0.1.65/simple/ django-sistema
+    pip install django-arquea
 
 Configuração
 ............
