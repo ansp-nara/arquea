@@ -1,3 +1,7 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 /* PAGE STRUCTURE */
 #container { position:relative; width:100%; min-width:760px; padding:0; }
 #portal-logo { background:url('../img/admin/tit_sistema.gif') no-repeat; border:0; margin:22px 0em 1em 26px; padding:0; }
