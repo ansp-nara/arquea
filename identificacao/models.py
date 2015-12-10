@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from django.db import models
 from utils.models import CNPJField
@@ -272,7 +275,7 @@ class Identificacao(models.Model):
     endereco = models.ForeignKey('identificacao.Endereco', limit_choices_to={'data_inatividade__isnull': True},
                                  verbose_name=_(u'Entidade'))
     contato = models.ForeignKey('identificacao.Contato', verbose_name=_(u'Contato'))
-    historico = models.DateTimeField(_(u'Histórico'), default=datetime.now(), editable=False)
+    historico = models.DateTimeField(_(u'Histórico'), default=datetime.now, editable=False)
     area = models.CharField(_(u'Área'), max_length=50, blank=True, help_text=_(u'ex. Administração'))
     funcao = models.CharField(_(u'Função'), max_length=50, blank=True, help_text=_(u'ex. Gerente Administrativo'))
     ativo = models.BooleanField(_(u'Ativo'), default=False)
