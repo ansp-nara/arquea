@@ -47,7 +47,7 @@ setup(
         'django-import-export',
         'django-tinymce',
         'django-ckeditor',
-        'django-treemenus',
+        'django-treemenus2',
         'django-weasyprint',
         'django-localflavor',
         'python-dateutil',

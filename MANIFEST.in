@@ -38,6 +38,8 @@ recursive-include utils/static *
 recursive-include utils/templates *
 global-exclude *.pyc
 prune questionario/*
+prune carga/*
+prune verificacao/*
 prune staticfiles/*
 prune media/*
 prune templates/*
