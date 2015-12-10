@@ -40,7 +40,7 @@ setup(
     install_requires=[
         'setuptools',
         # -*- Extra requirements: -*-
-        'django<1.9',
+        'django<1.10',
         'django-import-export',
         'django-tinymce',
         'django-ckeditor',

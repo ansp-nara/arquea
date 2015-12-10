@@ -227,7 +227,11 @@ class Ferias(models.Model):
 
     # Retorna o membro e o período de férias.
     def __unicode__(self):
-        return u'%s | Início período: %s' % (self.membro, self.inicio.strftime('%d/%m/%Y'))
+        if self.inicio:
+            inicio = self.inicio.strftime('%d/%m/%Y')
+        else:
+            inicio = ''
+        return u'%s | Início período: %s' % (self.membro, inicio)
 
     def inicio_ferias(self):
         if self.inicio is not None:
@@ -250,7 +254,7 @@ class Ferias(models.Model):
 
     @property
     def trab_termino(self):
-        return self.trab_inicio+relativedelta(days=+365)
+        return self.trab_inicio+timedelta(365)
 
     # Retorna quantos dias de férias foi solicitado.
     def qtde_dias(self):
