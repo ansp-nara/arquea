@@ -39,8 +39,8 @@ td {
     {% for pt_group in patrimonios %}
 	    {% for pt in pt_group %}
 		   <tr>
-		       <td><a href="{{ model.admin_url }}/admin/patrimonio/patrimonio/{{ pt.id }}/">{{ pt.id }}</a></td>
-		       <td><a href="{{ model.admin_url }}/admin/patrimonio/patrimonio/{{ pt.id }}/">{{ pt.descricao }}</a></td>
+		       <td><a href="{% url 'admin:patrimonio_patrimonio_change' pt.id %}">{{ pt.id }}</a></td>
+		       <td><a href="{% url 'admin:patrimonio_patrimonio_change' pt.id %}">{{ pt.descricao }}</a></td>
 		       <td>{{ pt.part_number }}</td>
 		       <td>{{ pt.modelo }}</td>
 		  </tr>

@@ -25,7 +25,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 Ninguém ainda é responsável por estas cotações.</span>
 {% endif %}
 </div>
-<ul class="object-tools"><li><a href="/admin/protocolo/cotacao/add/?protocolo={{ pai.id }}&return_to={{ return_to }}{% if is_popup %}&_popup=1{% endif %}" class="addlink">{% blocktrans %}Add{% endblocktrans %} cotação</a></li></ul>
+<ul class="object-tools"><li><a href="{% url 'admin:protocolo_cotacao_add' %}?protocolo={{ pai.id }}&return_to={{ return_to }}{% if is_popup %}&_popup=1{% endif %}" class="addlink">{% blocktrans %}Add{% endblocktrans %} cotação</a></li></ul>
 </p>
 </div>
 {% block result_list %}
@@ -49,7 +49,7 @@ Ninguém ainda é responsável por estas cotações.</span>
 <td>{{ c.identificacao.entidade }}</td>
 <td>{{ c.mostra_valor }}</td>
 <td>{{ c.estado }}</td>
-<td><a href="/admin/protocolo/cotacao/{{ c.id }}/?return_to={{ return_to }}" class="add-another">{% trans "Alterar" %}</a></td>
+<td><a href="{% url 'admin:protocolo_cotacao_change' c.id %}?return_to={{ return_to }}" class="add-another">{% trans "Alterar" %}</a></td>
 </tr>
 {% endfor %}
 <tbody>

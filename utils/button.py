@@ -9,7 +9,7 @@ from functools import update_wrapper
 from django.utils.encoding import force_unicode
 from django.shortcuts import get_object_or_404
 from django.utils.safestring import mark_safe
-from django.contrib.admin.util import unquote
+from django.contrib.admin.utils import unquote
 from django.contrib.admin import helpers
 from django.utils.text import capfirst
 from django.utils.html import escape
@@ -170,7 +170,7 @@ class ButtonAdmin(admin.ModelAdmin, ButtonAdminMixin):
                     form_validated = False
                     new_object = obj
                 prefixes = {}
-                for FormSet in self.get_formsets(request, new_object):
+                for FormSet in self.get_formsets_with_inlines(request, new_object):
                     prefix = FormSet.get_default_prefix()
                     prefixes[prefix] = prefixes.get(prefix, 0) + 1
                     if prefixes[prefix] != 1:

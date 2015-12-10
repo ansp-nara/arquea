@@ -5,7 +5,7 @@
 
 from django import forms
 from django.db.models import Q
-from django.forms.util import ErrorList
+from django.forms.utils import ErrorList
 from django.utils.html import mark_safe
 from django.utils.translation import ugettext_lazy as _
 

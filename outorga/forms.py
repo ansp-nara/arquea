@@ -5,7 +5,7 @@
 
 from django import forms
 from django.utils.translation import ugettext_lazy as _
-from django.forms.util import ErrorList
+from django.forms.utils import ErrorList
 from models import Item, OrigemFapesp, Termo, Natureza_gasto, Acordo, Contrato
 from memorando.models import Pergunta
 from utils.request_cache import get_request_cache

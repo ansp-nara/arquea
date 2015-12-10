@@ -46,8 +46,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
       </tr>
       {% for pt in patrimonios %}
 	      <tr class="tr_data_line">
-	           <td><a href="{{ model.admin_url }}/admin/patrimonio/patrimonio/{{ pt.id }}/">{{ pt.id }}</a></td>
-	           <td><a href="{{ model.admin_url }}/admin/patrimonio/patrimonio/{{ pt.id }}/">{{ pt.descricao }}</a></td>
+	           <td><a href="{% url 'admin:patrimonio_patrimonio_change' pt.id %}">{{ pt.id }}</a></td>
+	           <td><a href="{% url 'admin:patrimonio_patrimonio_change' pt.id %}">{{ pt.descricao }}</a></td>
 	           <td>{{ pt.modelo }}</td>
 	           <td>{{ pt.marca }}</td>
 	           <td>{{ pt.endereco }}</td>
@@ -70,8 +70,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 			        </tr>
 		        {% endif %}
 		        <tr>
-		           <td><a href="{{ model.admin_url }}/admin/patrimonio/patrimonio/{{ f.id }}/">{{ f.id }}</a></td>
-		           <td><a href="{{ model.admin_url }}/admin/patrimonio/patrimonio/{{ f.id }}/">{{ f.descricao }}</a></td>
+		           <td><a href="{% url 'admin:patrimonio_patrimonio_change' f.id %}">{{ f.id }}</a></td>
+		           <td><a href="{% url 'admin:patrimonio_patrimonio_change' f.id %}">{{ f.descricao }}</a></td>
 		           <td>{{ f.endereco }}</td>
 		           <td>{{ f.posicao }}</td>
 		           <td>{{ f.estado }}</td>

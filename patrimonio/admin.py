@@ -18,7 +18,6 @@ from import_export.admin import ExportMixin
 
 from utils.admin import AdminImageWidget
 from utils.functions import clone_objects
-from utils.admin import RelatedOnlyFieldListFilter
 from patrimonio.models import Tipo, Distribuicao, DistribuicaoUnidade,\
     UnidadeDimensao, Direcao, TipoEquipamento, Dimensao, PlantaBaixaObjeto,\
     PlantaBaixaDataCenter, PlantaBaixaPosicao, Estado, HistoricoLocal,\
@@ -134,7 +133,7 @@ class PatrimonioAdmin(ExportMixin, admin.ModelAdmin):
         list_select_related = ('tipo', 'equipamento', 'pagamento__protocolo__termo')
     else:
         list_select_related = True
-    list_filter = (('tipo', RelatedOnlyFieldListFilter), 'pagamento__protocolo__termo', PatrimonioEstadoListFilter)
+    list_filter = (('tipo', admin.RelatedOnlyFieldListFilter), 'pagamento__protocolo__termo', PatrimonioEstadoListFilter)
     inlines = [HistoricoLocalInline]
     search_fields = ('descricao', 'ns', 'pagamento__protocolo__num_documento', 'historicolocal__descricao',
                      'equipamento__entidade_fabricante__sigla', 'equipamento__part_number', 'equipamento__modelo',
@@ -245,7 +244,8 @@ class EquipamentoAdmin(admin.ModelAdmin):
     search_fields = ['part_number', 'descricao', 'modelo', 'entidade_fabricante__sigla']
     list_display = ('descricao', 'part_number', 'tipo')
     list_select_related = ('tipo',)
-    list_filter = (('tipo', RelatedOnlyFieldListFilter), ('entidade_fabricante', RelatedOnlyFieldListFilter),)
+    list_filter = (('tipo', admin.RelatedOnlyFieldListFilter),
+                   ('entidade_fabricante', admin.RelatedOnlyFieldListFilter),)
 
     form = EquipamentoAdminForm
 

@@ -6,7 +6,7 @@
 import django
 from django import forms
 from django.utils.translation import ugettext_lazy as _
-from django.forms.util import ErrorList
+from django.forms.utils import ErrorList
 from django.utils.html import mark_safe
 from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
 from django.db.models.fields.related import ManyToOneRel

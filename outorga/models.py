@@ -7,6 +7,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import cached_property
 from django.conf import settings
+from django.core import urlresolvers
 from utils.functions import formata_moeda
 from utils.models import NARADateField
 from django.db.models import Sum, Q
@@ -383,8 +384,9 @@ class Outorga(models.Model):
 
     # Retorna um ícone se o pedido de concessão tiver arquivos.
     def existe_arquivo(self):
-        a = '<center><a href="/admin/outorga/arquivo/?outorga__id__exact=%s">' \
-            '<img src="%simg/arquivo.png" /></a></center>' % (self.id, settings.STATIC_URL)
+        a = '<center><a href="%s?outorga__id__exact=%s">' \
+            '<img src="%simg/arquivo.png" /></a></center>' \
+            % (urlresolvers.reverse('admin:outorga_arquivo_changelist'), self.id, settings.STATIC_URL)
         if self.arquivo:
             return a
         return ' '
@@ -442,7 +444,7 @@ class Natureza_gasto(models.Model):
 
     # Retorna a URL de uma natureza de gasto.
     def get_absolute_url(self):
-        return '/admin/outorga/natureza_gasto/%s' % self.id
+        return urlresolvers.reverse('admin:outorga_natureza_gasto_change', args=(self.id,))
 
     # Formata um valor em formato moeda conforme campo 'moeda_nacional' do modelo 'Modalidade'.
     def formata_valor(self, v):
@@ -717,13 +719,14 @@ class Item(models.Model):
 
     # Pagina com todos os protocolos ligados a este item
     def protocolos_pagina(self):
-        return '<a href="/protocolo/protocolo/?fontepagadora__origem_fapesp__item_outorga__id=%s">Despesas</a>' \
-               % self.id
+        return '<a href="%s?fontepagadora__origem_fapesp__item_outorga__id=%s">Despesas</a>' \
+               % (urlresolvers.reverse('admin:protocolo_protocolo_changelist'), self.id)
     protocolos_pagina.short_description = _(u'Lista de despesas')
     protocolos_pagina.allow_tags = True
 
     def pagamentos_pagina(self):
-        return '<a href="/financeiro/pagamento/?origem_fapesp__item_outorga=%s">Despesas</a>' % self.id
+        return '<a href="%s?origem_fapesp__item_outorga=%s">Despesas</a>' \
+               % (urlresolvers.reverse('admin:financeiro_pagamento_changelist'), self.id)
     pagamentos_pagina.short_description = _(u'Lista de pagamentos')
     pagamentos_pagina.allow_tags = True
 
@@ -896,17 +899,6 @@ class OrdemDeServico(models.Model):
             return u'%s dias' % self.antes_rescisao
         return u'%s dias' % self.antes_rescisao
     mostra_prazo.short_description = _(u'Prazo p/ rescisão')
-
-    # Retorna um ícone se a ordem de serviço tiver anexo.
-    def existe_arquivo(self):
-        a = '<center><a href="/admin/outorga/arquivoos/?os__id__exact=%s">' \
-            '<img src="%simg/arquivo.png" /></a></center>' % (self.id, settings.STATIC_URL)
-        if self.arquivos.count() > 0:
-            return a
-        else:
-            return ' '
-    existe_arquivo.allow_tags = True
-    existe_arquivo.short_description = _(u'Arquivo')
 
     def entidade(self):
         return self.contrato.entidade

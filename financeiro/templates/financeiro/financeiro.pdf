@@ -41,7 +41,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
     {% for e in extrato %}
  	   <tr><td>{{ e.data|date:"d/m/Y" }}</td><td>{{ e.cod }}</td><td>{{ e.historico }}</td><td>{{ e.valor }}</td><td>{% if e.comprovante %}<a href="{{ e.comprovante.url }}">comprovante</a>{% endif %}</td>{% ifequal e.cod "PGMP" %}<td style="color:red;">{{ e.diferenca }} (Diferença)</td>{% endifequal %}</tr>
            {% for cc in e.cheques %}
-              <tr><td colspan="3"></td><td>{{ cc.valor }}</td><td><a href="http://sistema.ansp.br/financeiro/extratocc/{{ cc.id }}">{{ cc.cod }}</a></td><td>{{ cc.parciais }}</td></tr>
+              <tr><td colspan="3"></td><td>{{ cc.valor }}</td><td><a href="{{ model.admin_url }}{% url 'admin:financeiro_extratocc_change' cc.id %}">{{ cc.cod }}</a></td><td>{{ cc.parciais }}</td></tr>
            {% endfor %}
     {% endfor %}
     </table>

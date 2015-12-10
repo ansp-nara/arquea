@@ -11,7 +11,7 @@ from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
 
 from rede.models import Recurso
-from utils.admin import PrintModelAdmin, RelatedOnlyFieldListFilter
+from utils.admin import PrintModelAdmin
 from utils.button import ButtonAdmin, Button
 from financeiro.forms import RecursoInlineAdminForm, PagamentoAdminForm,\
     PagamentoAuditoriaAdminInlineForm, ExtratoCCAdminForm,\
@@ -132,7 +132,7 @@ class ExtratoFinanceiroAdmin(ButtonAdmin):
 
     list_display = ('termo', 'data_libera', 'cod', 'historico', 'valor')
     list_filter = ('termo', ExtratoFinanceiroListCodFilter,
-                   ('tipo_comprovante', RelatedOnlyFieldListFilter))
+                   ('tipo_comprovante', admin.RelatedOnlyFieldListFilter))
     search_fields = ('historico',)
     form = ExtratoFinanceiroAdminForm
 
@@ -207,8 +207,8 @@ class AuditoriaAdmin(admin.ModelAdmin):
         list_select_related = True
 
     search_fields = ('parcial', 'pagina')
-    list_filter = (('tipo', RelatedOnlyFieldListFilter),
-                   ('estado', RelatedOnlyFieldListFilter),
+    list_filter = (('tipo', admin.RelatedOnlyFieldListFilter),
+                   ('estado', admin.RelatedOnlyFieldListFilter),
                    )
     form = AuditoriaAdminForm
 

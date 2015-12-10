@@ -6,6 +6,7 @@
 import django
 from django import forms
 from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
+from django.core import urlresolvers
 from django.db.models.fields.related import ManyToOneRel
 from django.forms.utils import ErrorList
 from django.utils.html import mark_safe
@@ -49,11 +50,11 @@ class RecursoInlineAdminForm(forms.ModelForm):
                       .select_related('os', 'os__tipo', 'tipo', 'projeto', )])
         self.fields['planejamento'].choices = cache.get('rede.PlanejaAquisicaoRecurso.all')
 
-        self.fields['planejamento'].label = mark_safe('<a href="#"  onclick="window.open(\'/admin/rede/planejaaquisicao'
-                                                      'recurso/\'+$(\'#\'+$(this).parent().attr(\'for\')).val() + '
-                                                      '\'/\', \'_blank\');return true;">Planejamento:</a>'
-                                                      + ' <input type="checkbox" onclick="get_recursos($(this));"> '
-                                                        'Exibir somente os vigentes.')
+        self.fields['planejamento'].label = \
+            mark_safe('<a href="#"  onclick="window.open(\'%s\'+$(\'#\'+$(this).parent().attr(\'for\')).val() + '
+                      '\'/\', \'_blank\');return true;">Planejamento:</a> <input type="checkbox" '
+                      'onclick="get_recursos($(this));"> Exibir somente os vigentes.'
+                      % urlresolvers.reverse('admin:rede_planejaaquisicaorecurso_changelist'))
 
     class Meta:
         model = Recurso

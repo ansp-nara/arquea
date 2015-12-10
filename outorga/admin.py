@@ -5,9 +5,10 @@
 
 
 from django.contrib import admin
+from django.core import urlresolvers
 from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
-from django.contrib.admin.util import unquote
+from django.contrib.admin.utils import unquote
 from django.template.response import TemplateResponse
 from rede.models import PlanejaAquisicaoRecurso
 from outorga.models import OrdemDeServico, Outorga, Modalidade, Estado, Categoria, Arquivo, ArquivoOS, TipoContrato, \
@@ -17,7 +18,6 @@ from outorga.forms import ItemAdminForm, OrigemFapespInlineForm, AcordoAdminForm
     EstadoAdminForm, CategoriaAdminForm, ModalidadeAdminForm, TermoAdminForm,\
     OutorgaAdminForm, Natureza_gastoAdminForm, ArquivoAdminForm,\
     ContratoAdminForm, OrdemDeServicoAdminForm, OrigemFapespAdminForm
-from utils.admin import RelatedOnlyFieldListFilter
 
 
 class Natureza_gastoInline(admin.TabularInline):
@@ -198,7 +198,7 @@ class TermoAdmin(admin.ModelAdmin):
 
     list_display = ('__unicode__', 'inicio', 'duracao_meses', 'termo_real', 'formata_realizado_real',
                     'formata_saldo_real', 'termo_dolar', 'formata_realizado_dolar', 'formata_saldo_dolar', 'estado')
-    list_filter = (('estado', RelatedOnlyFieldListFilter),)
+    list_filter = (('estado', admin.RelatedOnlyFieldListFilter),)
     list_per_page = 20
     search_fields = ('ano', 'processo', 'inicio')
     inlines = (OutorgaInline, Natureza_gastoInline)
@@ -289,7 +289,7 @@ class ItemAdmin(admin.ModelAdmin):
 
     list_display = ('mostra_termo', 'mostra_modalidade', 'mostra_descricao', 'entidade', 'rt', 'mostra_quantidade',
                     'mostra_valor_realizado', 'pagamentos_pagina')
-    list_filter = ('natureza_gasto__termo', 'natureza_gasto__modalidade', ('entidade', RelatedOnlyFieldListFilter),)
+    list_filter = ('natureza_gasto__termo', 'natureza_gasto__modalidade', ('entidade', admin.RelatedOnlyFieldListFilter),)
     list_per_page = 20
     search_fields = ('natureza_gasto__modalidade__sigla', 'natureza_gasto__modalidade__nome', 'obs',
                      'natureza_gasto__termo__ano', 'natureza_gasto__termo__processo', 'descricao', 'justificativa')
@@ -331,7 +331,7 @@ class ContratoAdmin(admin.ModelAdmin):
 
     list_display = ('numero', 'data_inicio', 'limite_rescisao', 'entidade', 'auto_renova', 'existe_arquivo')
     list_display_links = ('entidade', )
-    list_filter = (('entidade', RelatedOnlyFieldListFilter),)
+    list_filter = (('entidade', admin.RelatedOnlyFieldListFilter),)
     list_per_page = 20
     search_fields = ('entidade__sigla', 'entidade__nome', 'data_inicio')
     inlines = (OrdemDeServicoInline, )
@@ -375,7 +375,7 @@ class OrdemDeServicoAdmin(admin.ModelAdmin):
 
     list_display = ('numero', 'tipo', 'entidade', 'data_inicio', 'data_rescisao', 'mostra_prazo', 'estado', 'descricao')
     list_display_links = ('descricao', )
-    list_filter = (OrdemDeServicoListEntidadeFilter,  ('estado', RelatedOnlyFieldListFilter), )
+    list_filter = (OrdemDeServicoListEntidadeFilter,  ('estado', admin.RelatedOnlyFieldListFilter), )
     list_per_page = 20
     inlines = (ArquivoOSInline, PlanejamentoInline)
     search_fields = ('numero', 'acordo__descricao', 'contrato__entidade__sigla', 'contrato__entidade__nome',
@@ -388,7 +388,8 @@ class OrdemDeServicoAdmin(admin.ModelAdmin):
             obj = self.get_object(request, unquote(object_id))
             if obj.estado.id != int(request.POST.get('estado')) and request.POST.get('confirma') is None:
                 if request.POST.get('nconfirma'):
-                    return HttpResponseRedirect('/admin/outorga/ordemdeservico/%s' % object_id)
+                    return HttpResponseRedirect(urlresolvers.reverse('admin:outorga_ordemdeservico_change',
+                                                                     args=(object_id,)))
                 return TemplateResponse(request, 'admin/outorga/ordemdeservico/confirma_alteracao.html',
                                         {'form_url': form_url})
 

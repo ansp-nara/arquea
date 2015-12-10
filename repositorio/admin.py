@@ -6,7 +6,6 @@
 from django.contrib import admin
 from repositorio.models import Repositorio, Ticket, Tipo, Estado, Natureza, Servico, Anexo
 from repositorio.forms import RepositorioAdminForm
-from utils.admin import RelatedOnlyFieldListFilter
 
 
 class TicketInline(admin.TabularInline):
@@ -37,8 +36,8 @@ class RepositorioAdmin(admin.ModelAdmin):
     readonly_fields = ('num_rep',)
     list_display = ('num_rep', 'data', 'data_ocorrencia', 'tipo', 'servicos_display', 'natureza', 'estado')
     search_fields = ('ocorrencia', 'tipo__nome', 'natureza__nome', 'servicos__nome')
-    list_filter = (('tipo', RelatedOnlyFieldListFilter),  ('natureza', RelatedOnlyFieldListFilter),
-                   ('estado', RelatedOnlyFieldListFilter),
+    list_filter = (('tipo', admin.RelatedOnlyFieldListFilter),  ('natureza', admin.RelatedOnlyFieldListFilter),
+                   ('estado', admin.RelatedOnlyFieldListFilter),
                    )
 #     def ocorrencia_trunc(self, obj):
 #         ocorrencia_truncada = (obj.ocorrencia[:40] + '...') if len(obj.ocorrencia) > 40 else obj.ocorrencia

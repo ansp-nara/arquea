@@ -4,7 +4,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from django import forms
-from django.forms.util import ErrorList
+from django.forms.utils import ErrorList
 from django.db.models import Q
 from repositorio.models import Repositorio, Tipo
 from patrimonio.models import Patrimonio

@@ -271,7 +271,8 @@ class ViewBlocoIPTest(TestCase):
         self.assertContains(response, u'<div class="obs">Obs</div>')
 
         # asssert dos dados do relatório. Verificação dos dados
-        self.assertContains(response, u'<div class="col1"><a href="/admin/rede/blocoip/1/"')
+        self.assertContains(response, u'<div class="col1"><a href="%s"'
+                            % reverse('admin:rede_blocoip_change', args=(1,)))
         self.assertContains(response, u'192.168.1.0/20')
         self.assertContains(response, u'<div class="colunas">1234 - ANSP_ASN_1</div>')
         self.assertContains(response, u'<div class="colunas">4321 - ANSP_PROP_1</div>')
@@ -281,7 +282,8 @@ class ViewBlocoIPTest(TestCase):
         self.assertContains(response, u'<div class="obs">OBS ipv4 - n1</div>')
 
         # asssert dos dados do relatório. Verificação dos dados
-        self.assertContains(response, u'<div class="col1"><a href="/admin/rede/blocoip/2/"')
+        self.assertContains(response, u'<div class="col1"><a href="%s"'
+                            % reverse('admin:rede_blocoip_change', args=(2,)))
         self.assertContains(response, u'2001:db8::7344/20')
         self.assertContains(response, u'<div class="colunas">1234 - ANSP_ASN_2</div>')
         self.assertContains(response, u'<div class="colunas">4321 - ANSP_PROP_2</div>')
@@ -472,15 +474,16 @@ class ViewBlocoIPANSPTest(TestCase):
         self._test_view__blocosip_ansp__filtros__cabecalhos(response)
 
         # asssert dos dados do relatório. Verificação dos dados
-        self.assertContains(response, u'<h4>Bloco <a href="/admin/rede/blocoip/1/" >'
-                                      u'192.168.1.0/20 - 255.255.240.0</a></h4>')
+        self.assertContains(response, u'<h4>Bloco <a href="%s" >192.168.1.0/20 - 255.255.240.0</a></h4>'
+                            % reverse('admin:rede_blocoip_change', args=(1,)))
         self.assertContains(response, u'<td class="col1 td_titulo">Prefixo</td>')
         self.assertContains(response, u'<td class="colunas td_titulo">Máscara IP</td>')
         self.assertContains(response, u'<td class="colunas td_titulo">ASN Anunciante</td>')
         self.assertContains(response, u'<td class="colunas td_titulo">Usuário</td>')
         self.assertContains(response, u'<td class="obs td_titulo">Obs</td>')
 
-        self.assertContains(response, u'<td class="col1"><a href="/admin/rede/blocoip/2/">192.168.1.1/20</a></td>')
+        self.assertContains(response, u'<td class="col1"><a href="%s">192.168.1.1/20</a></td>'
+                            % reverse('admin:rede_blocoip_change', args=(2,)))
         self.assertContains(response, u'<td class="colunas">255.255.240.0</td>')
         self.assertContains(response, u'<td class="colunas">1234</td>')
         self.assertContains(response, u'<td class="colunas">ANSP</td>')
@@ -633,40 +636,40 @@ class ViewBlocoIPTransitoTest(TestCase):
         self.assertContains(response, u'<th class="colunas">Proprietário</th>')
         self.assertContains(response, u'<th class="obs">Obs</th>')
 
-        self.assertContains(response, u'<td id="td_blocos_1_col1" class="col1">'
-                                      u'<a href="/admin/rede/blocoip/2/" >143.106.0.0/16</a></td>')
+        self.assertContains(response, u'<td id="td_blocos_1_col1" class="col1"><a href="%s" >143.106.0.0/16</a></td>'
+                            % reverse('admin:rede_blocoip_change', args=(2,)))
         self.assertContains(response, u'<td id="td_blocos_1_col2" class="colunas">255.255.0.0</td>')
         self.assertContains(response, u'<td id="td_blocos_1_col3" class="colunas">53187</td>')
         self.assertContains(response, u'<td id="td_blocos_1_col4" class="colunas">UNICAMP</td>')
         self.assertContains(response, u'<td id="td_blocos_1_col5" class="colunas">53187</td>')
         self.assertContains(response, u'<td id="td_blocos_1_col6" class="colunas">UNICAMP</td>')
 
-        self.assertContains(response, u'<td id="td_blocos_2_col1" class="col1">'
-                                      u'<a href="/admin/rede/blocoip/5/" >150.163.0.0/17</a></td>')
+        self.assertContains(response, u'<td id="td_blocos_2_col1" class="col1"><a href="%s" >150.163.0.0/17</a></td>'
+                            % reverse('admin:rede_blocoip_change', args=(5,)))
         self.assertContains(response, u'<td id="td_blocos_2_col2" class="colunas">255.255.128.0</td>')
         self.assertContains(response, u'<td id="td_blocos_2_col3" class="colunas">53166</td>')
         self.assertContains(response, u'<td id="td_blocos_2_col4" class="colunas">INPE</td>')
         self.assertContains(response, u'<td id="td_blocos_2_col5" class="colunas">53166</td>')
         self.assertContains(response, u'<td id="td_blocos_2_col6" class="colunas">INPE</td>')
 
-        self.assertContains(response, u'<td id="td_blocos_3_col1" class="col1">'
-                                      u'<a href="/admin/rede/blocoip/3/" >177.8.96.0/20</a></td>')
+        self.assertContains(response, u'<td id="td_blocos_3_col1" class="col1"><a href="%s" >177.8.96.0/20</a></td>'
+                            % reverse('admin:rede_blocoip_change', args=(3,)))
         self.assertContains(response, u'<td id="td_blocos_3_col2" class="colunas">255.255.240.0</td>')
         self.assertContains(response, u'<td id="td_blocos_3_col3" class="colunas">53187</td>')
         self.assertContains(response, u'<td id="td_blocos_3_col4" class="colunas">UNICAMP</td>')
         self.assertContains(response, u'<td id="td_blocos_3_col5" class="colunas">53187</td>')
         self.assertContains(response, u'<td id="td_blocos_3_col6" class="colunas">UNICAMP</td>')
 
-        self.assertContains(response, u'<td id="td_blocos_4_col1" class="col1">'
-                                      u'<a href="/admin/rede/blocoip/4/" >186.217.0.0/16</a></td>')
+        self.assertContains(response, u'<td id="td_blocos_4_col1" class="col1"><a href="%s" >186.217.0.0/16</a></td>'
+                            % reverse('admin:rede_blocoip_change', args=(4,)))
         self.assertContains(response, u'<td id="td_blocos_4_col2" class="colunas">255.255.0.0</td>')
         self.assertContains(response, u'<td id="td_blocos_4_col3" class="colunas">53166</td>')
         self.assertContains(response, u'<td id="td_blocos_4_col4" class="colunas">UNESP</td>')
         self.assertContains(response, u'<td id="td_blocos_4_col5" class="colunas">53166</td>')
         self.assertContains(response, u'<td id="td_blocos_4_col6" class="colunas">UNESP</td>')
 
-        self.assertContains(response, u'<td id="td_blocos_5_col1" class="col1">'
-                                      u'<a href="/admin/rede/blocoip/1/" >186.251.39.0/24</a></td>')
+        self.assertContains(response, u'<td id="td_blocos_5_col1" class="col1"><a href="%s" >186.251.39.0/24</a></td>'
+                            % reverse('admin:rede_blocoip_change', args=(1,)))
         self.assertContains(response, u'<td id="td_blocos_5_col2" class="colunas">255.255.255.0</td>')
         self.assertContains(response, u'<td id="td_blocos_5_col3" class="colunas">52914</td>')
         self.assertContains(response, u'<td id="td_blocos_5_col4" class="colunas">UNINOVE</td>')
@@ -825,40 +828,40 @@ class ViewBlocoIPInstTransitoTest(TestCase):
 
         self.assertContains(response, u'<td id="td_blocos_1_col1" class="colunas">53166</td>')
         self.assertContains(response, u'<td id="td_blocos_1_col2" class="colunas">INPE</td>')
-        self.assertContains(response, u'<td id="td_blocos_1_col3" class="col1">'
-                                      u'<a href="/admin/rede/blocoip/5/" >150.163.0.0/17</a></td>')
+        self.assertContains(response, u'<td id="td_blocos_1_col3" class="col1"><a href="%s" >150.163.0.0/17</a></td>'
+                            % reverse('admin:rede_blocoip_change', args=(5,)))
         self.assertContains(response, u'<td id="td_blocos_1_col4" class="colunas">255.255.128.0</td>')
         self.assertContains(response, u'<td id="td_blocos_1_col5" class="colunas">53166</td>')
         self.assertContains(response, u'<td id="td_blocos_1_col6" class="colunas">INPE</td>')
 
         self.assertContains(response, u'<td id="td_blocos_2_col1" class="colunas">53166</td>')
         self.assertContains(response, u'<td id="td_blocos_2_col2" class="colunas">UNESP</td>')
-        self.assertContains(response, u'<td id="td_blocos_2_col3" class="col1">'
-                                      u'<a href="/admin/rede/blocoip/4/" >186.217.0.0/16</a></td>')
+        self.assertContains(response, u'<td id="td_blocos_2_col3" class="col1"><a href="%s" >186.217.0.0/16</a></td>'
+                            % reverse('admin:rede_blocoip_change', args=(4,)))
         self.assertContains(response, u'<td id="td_blocos_2_col4" class="colunas">255.255.0.0</td>')
         self.assertContains(response, u'<td id="td_blocos_2_col5" class="colunas">53166</td>')
         self.assertContains(response, u'<td id="td_blocos_2_col6" class="colunas">UNESP</td>')
 
         self.assertContains(response, u'<td id="td_blocos_3_col1" class="colunas">53187</td>')
         self.assertContains(response, u'<td id="td_blocos_3_col2" class="colunas">UNICAMP</td>')
-        self.assertContains(response, u'<td id="td_blocos_3_col3" class="col1">'
-                                      u'<a href="/admin/rede/blocoip/2/" >143.106.0.0/16</a></td>')
+        self.assertContains(response, u'<td id="td_blocos_3_col3" class="col1"><a href="%s" >143.106.0.0/16</a></td>'
+                            % reverse('admin:rede_blocoip_change', args=(2,)))
         self.assertContains(response, u'<td id="td_blocos_3_col4" class="colunas">255.255.0.0</td>')
         self.assertContains(response, u'<td id="td_blocos_3_col5" class="colunas">53187</td>')
         self.assertContains(response, u'<td id="td_blocos_3_col6" class="colunas">UNICAMP</td>')
 
         self.assertContains(response, u'<td id="td_blocos_4_col1" class="colunas">53187</td>')
         self.assertContains(response, u'<td id="td_blocos_4_col2" class="colunas">UNICAMP</td>')
-        self.assertContains(response, u'<td id="td_blocos_4_col3" class="col1">'
-                                      u'<a href="/admin/rede/blocoip/3/" >177.8.96.0/20</a></td>')
+        self.assertContains(response, u'<td id="td_blocos_4_col3" class="col1"><a href="%s" >177.8.96.0/20</a></td>'
+                            % reverse('admin:rede_blocoip_change', args=(3,)))
         self.assertContains(response, u'<td id="td_blocos_4_col4" class="colunas">255.255.240.0</td>')
         self.assertContains(response, u'<td id="td_blocos_4_col5" class="colunas">53187</td>')
         self.assertContains(response, u'<td id="td_blocos_4_col6" class="colunas">UNICAMP</td>')
 
         self.assertContains(response, u'<td id="td_blocos_5_col1" class="colunas">52914</td>')
         self.assertContains(response, u'<td id="td_blocos_5_col2" class="colunas">UNINOVE</td>')
-        self.assertContains(response, u'<td id="td_blocos_5_col3" class="col1">'
-                                      u'<a href="/admin/rede/blocoip/1/" >186.251.39.0/24</a></td>')
+        self.assertContains(response, u'<td id="td_blocos_5_col3" class="col1"><a href="%s" >186.251.39.0/24</a></td>'
+                            % reverse('admin:rede_blocoip_change', args=(1,)))
         self.assertContains(response, u'<td id="td_blocos_5_col4" class="colunas">255.255.255.0</td>')
         self.assertContains(response, u'<td id="td_blocos_5_col5" class="colunas">52914</td>')
         self.assertContains(response, u'<td id="td_blocos_5_col6" class="colunas">UNINOVE</td>')

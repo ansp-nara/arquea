@@ -6,21 +6,21 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
     {% for pt_group in patrimonios %}
         {% for pt in pt_group %}
            <tr class="tr_data">
-               <td><a href="{{ model.admin_url }}/admin/patrimonio/patrimonio/{{ pt.id }}/">{{ pt.id }}</a></td>
+               <td><a href="{% url 'admin:patrimonio_patrimonio_change' pt.id %}">{{ pt.id }}</a></td>
            {% if atributo == 'descricao' %}
-               <td class="td_descricao"><a href="{{ model.admin_url }}/admin/patrimonio/patrimonio/{{ pt.id }}/">{{ pt.descricao }}</a></td>
+               <td class="td_descricao"><a href="{% url 'admin:patrimonio_patrimonio_change' pt.id %}">{{ pt.descricao }}</a></td>
            {% endif %}
            {% if atributo == 'part_number' %}
-               <td class="td_part_number"><a href="{{ model.admin_url }}/admin/patrimonio/patrimonio/{{ pt.id }}/">{{ pt.part_number }}</a></td>
+               <td class="td_part_number"><a href="{% url 'admin:patrimonio_patrimonio_change' pt.id %}">{{ pt.part_number }}</a></td>
            {% endif %}
            {% if atributo == 'modelo' %}
-               <td class="td_modelo"><a href="{{ model.admin_url }}/admin/patrimonio/patrimonio/{{ pt.id }}/">{{ pt.modelo }}</a></td>
+               <td class="td_modelo"><a href="{% url 'admin:patrimonio_patrimonio_change' pt.id %}">{{ pt.modelo }}</a></td>
            {% endif %}
            {% if atributo == 'marca' %}
-               <td class="td_marca"><a href="{{ model.admin_url }}/admin/patrimonio/patrimonio/{{ pt.id }}/">{{ pt.marca }}</a></td>
+               <td class="td_marca"><a href="{% url 'admin:patrimonio_patrimonio_change' pt.id %}">{{ pt.marca }}</a></td>
            {% endif %}
            {% if atributo == 'tamanho' %}
-               <td class="td_tamanho"><a href="{{ model.admin_url }}/admin/patrimonio/patrimonio/{{ pt.id }}/">{{ pt.tamanho }}</a></td>
+               <td class="td_tamanho"><a href="{% url 'admin:patrimonio_patrimonio_change' pt.id %}">{{ pt.tamanho }}</a></td>
            {% endif %}
                <td class="td_buttons">
                     <span style="white-space:nowrap">
@@ -28,21 +28,21 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
                         <button id="btn_to_eq_{{pt.id}}" type="button" title="Copiar para o equipamento" class="btn_to_eq">>></button>
                     </span>
                </td>
-               <td><a href="{{ model.admin_url }}/admin/patrimonio/equipamento/{{ pt.equipamento.id }}/">{{ pt.equipamento.id }}</a></td>
+               <td><a href="{% url 'admin:patrimonio_equipamento_change' pt.equipamento.id %}">{{ pt.equipamento.id }}</a></td>
            {% if atributo == 'descricao' %}
-               <td class="td_descricao"><a href="{{ model.admin_url }}/admin/patrimonio/equipamento/{{ pt.equipamento.id }}/">{{ pt.equipamento.descricao }}</a></td>
+               <td class="td_descricao"><a href="{% url 'admin:patrimonio_equipamento_change' pt.equipamento.id %}">{{ pt.equipamento.descricao }}</a></td>
            {% endif %}
            {% if atributo == 'part_number' %}
-               <td class="td_part_number"><a href="{{ model.admin_url }}/admin/patrimonio/equipamento/{{ pt.equipamento.id }}/">{{ pt.equipamento.part_number }}</a></td>
+               <td class="td_part_number"><a href="{% url 'admin:patrimonio_equipamento_change' pt.equipamento.id %}">{{ pt.equipamento.part_number }}</a></td>
            {% endif %}
            {% if atributo == 'modelo' %}
-               <td class="td_modelo"><a href="{{ model.admin_url }}/admin/patrimonio/equipamento/{{ pt.equipamento.id }}/">{{ pt.equipamento.modelo }}</a></td>
+               <td class="td_modelo"><a href="{% url 'admin:patrimonio_equipamento_change' pt.equipamento.id %}">{{ pt.equipamento.modelo }}</a></td>
            {% endif %}
            {% if atributo == 'marca' %}
-               <td class="td_marca"><a href="{{ model.admin_url }}/admin/patrimonio/equipamento/{{ pt.equipamento.id }}/">{{ pt.equipamento.entidade_fabricante.sigla }}</a></td>
+               <td class="td_marca"><a href="{% url 'admin:patrimonio_equipamento_change' pt.equipamento.id %}">{{ pt.equipamento.entidade_fabricante.sigla }}</a></td>
            {% endif %}
            {% if atributo == 'tamanho' %}
-               <td class="td_tamanho"><a href="{{ model.admin_url }}/admin/patrimonio/equipamento/{{ pt.equipamento.id }}/">{{ pt.equipamento.tamanho }}</a></td>
+               <td class="td_tamanho"><a href="{% url 'admin:patrimonio_equipamento_change' pt.equipamento.id %}">{{ pt.equipamento.tamanho }}</a></td>
             {% endif %}
           </tr>
         {% endfor %}
