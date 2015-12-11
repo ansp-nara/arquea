@@ -184,7 +184,16 @@ class ExtratoFinanceiroAdminForm(forms.ModelForm):
                                                          error_class, label_suffix, empty_permitted, instance)
 
         sorted_codigo = sorted(CODIGO_FINANCEIRO, key=lambda x: x[1])
+        
         self.fields['cod'].choices = [('', '---------')] + sorted_codigo
+        
+        # restringindo a seleção de extratoCC somente para o item selecionado
+        # deixa um item como 'vazio' para poder desassociar o elemento,
+        # por exemplo, se for necessário remover o item do extrato cc
+        if instance and instance.entrada_extrato_cc:
+            self.fields['entrada_extrato_cc'].choices = [('', '---------')] + [(instance.entrada_extrato_cc.id, instance.entrada_extrato_cc)]
+        else:
+            self.fields['entrada_extrato_cc'].choices = [('', '---------')]
 
         # mensagens de erro
         self.fields['termo'].error_messages['required'] = u'O campo TERMO DE OUTORGA é obrigatório'

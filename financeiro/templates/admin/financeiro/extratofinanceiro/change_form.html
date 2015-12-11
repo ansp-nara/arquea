@@ -16,4 +16,12 @@
             {% endif %}
         {% endif %}
     {% endfor %}
+    <script type="text/javascript">
+        $(function() {
+            // se tiver um item de extrato cc, remove o botão de criação de extrato
+            if ($('#id_entrada_extrato_cc option:selected').val() > 0) {
+                $('.div_more_buttons').hide();
+            }
+        });
+    </script>
 {% endblock %}
