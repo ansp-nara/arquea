@@ -107,7 +107,7 @@ class TipoComprovanteFinanceiro(models.Model):
 
 
 class ExtratoFinanceiro(models.Model):
-    entrada_extrato_cc = models.ForeignKey('financeiro.ExtratoCC', null=True, blank=True)  # referencia a uma entrada no ExtratoCC  
+    entrada_extrato_cc = models.ForeignKey('financeiro.ExtratoCC', on_delete=models.SET_NULL, null=True, blank=True)  # referencia a uma entrada no ExtratoCC  
     termo = models.ForeignKey('outorga.Termo', verbose_name=_(u'Termo de outorga'))
     data_libera = NARADateField(_(u'Data'))
     cod = models.CharField(_(u'Código'), max_length=4, choices=CODIGO_FINANCEIRO)
