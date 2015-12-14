@@ -153,6 +153,36 @@ class ExtratoFinanceiroTest(TestCase):
 
         self.assertTrue(exf.despesa_caixa)
 
+    def test_cria_entrada_extrato_cc(self):
+        exf = ExtratoFinanceiro.objects.get(pk=1)
+        self.assertIsNone(exf.entrada_extrato_cc)
+
+        retorno = ExtratoFinanceiro._insere_extrato_cc(exf)
+        self.assertEqual(retorno, 1)
+
+        self.assertIsNotNone(exf.entrada_extrato_cc)
+
+    def test_delete_cascade_entrada_extrato_cc(self):
+        exf = ExtratoFinanceiro.objects.get(pk=1)
+        self.assertIsNone(exf.entrada_extrato_cc)
+
+        # verificando se foi inserido no ExtratoCC
+        retorno = ExtratoFinanceiro._insere_extrato_cc(exf)
+        self.assertEqual(retorno, 1)
+
+        self.assertIsNotNone(exf.entrada_extrato_cc)
+
+        # removendo o objeto do BD
+        exf.entrada_extrato_cc.delete()
+
+        # verificando se o extratoCC foi removido do BD
+        extratoccs = ExtratoCC.objects.filter(pk=exf.entrada_extrato_cc_id)
+        self.assertEqual(len(extratoccs), 0)
+
+        # verificando se o ExtratoFinanceiro não foi removido do BD com CASCADE
+        extratofinanceiro = ExtratoCC.objects.filter(pk=1)
+        self.assertIsNotNone(extratofinanceiro)
+
 
 class PagamentoTest(TestCase):
     def setUp(self):
