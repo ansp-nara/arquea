@@ -107,6 +107,7 @@ class TipoComprovanteFinanceiro(models.Model):
 
 
 class ExtratoFinanceiro(models.Model):
+    entrada_extrato_cc = models.ForeignKey('financeiro.ExtratoCC', on_delete=models.SET_NULL, null=True, blank=True)  # referencia a uma entrada no ExtratoCC  
     termo = models.ForeignKey('outorga.Termo', verbose_name=_(u'Termo de outorga'))
     data_libera = NARADateField(_(u'Data'))
     cod = models.CharField(_(u'Código'), max_length=4, choices=CODIGO_FINANCEIRO)
@@ -158,13 +159,17 @@ class ExtratoFinanceiro(models.Model):
 
         ef = extratoFinanceiro
 
-        if ef.extratocc_set.count() > 0:
+        if ef.entrada_extrato_cc:
             retorno = 2
         else:
             ecc1 = ExtratoCC.objects.create(data_oper=ef.data_libera,
                                             historico=u'Liberação de verba MP',
                                             valor=-ef.valor,
                                             cod_oper=ef.data_libera.strftime('%Y%m%d9'))
+            # atribuindo a referencia de entrada no extratoCC
+            # o save() deve ser disparado por quem chamou este método
+            ef.entrada_extrato_cc = ecc1
+            
             if ef.taxas > 0:
                 ecc2 = ExtratoCC.objects.create(data_oper=ef.data_libera,
                                                 historico=u'Liberação de verba TX',

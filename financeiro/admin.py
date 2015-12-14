@@ -107,13 +107,14 @@ class ExtratoFinanceiroAdmin(ButtonAdmin):
     fieldsets = (
         (None, {
             'fields': (('termo', 'data_libera'), ('cod', 'valor'), ('comprovante', 'tipo_comprovante'), 'parcial',
-                       'taxas'),
+                       'taxas', 'entrada_extrato_cc'),
             'classes': ('wide',)
         }),
     )
     buttons = (
         Button('save_and_insert_cc', 'Salvar e inserir entrada no extrato de conta corrente', needSuperUser=False),
     )
+    
 
     def tool_save_and_insert_cc(self, request, obj, button):
         """
@@ -123,6 +124,8 @@ class ExtratoFinanceiroAdmin(ButtonAdmin):
 
         if retorno == 1:
             messages.add_message(request, messages.SUCCESS, u"Extrato de conta corrente inserido com sucesso.")
+            # como o objeto teve um extratoCC inserido, salvamos novamente o objeto.
+            obj.save()
         elif retorno == 2:
             messages.add_message(request, messages.WARNING, u"Extrato de conta corrente já existente.")
         else:

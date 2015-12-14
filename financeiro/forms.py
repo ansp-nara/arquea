@@ -184,7 +184,19 @@ class ExtratoFinanceiroAdminForm(forms.ModelForm):
                                                          error_class, label_suffix, empty_permitted, instance)
 
         sorted_codigo = sorted(CODIGO_FINANCEIRO, key=lambda x: x[1])
+        
         self.fields['cod'].choices = [('', '---------')] + sorted_codigo
+        
+        # restringindo a seleção de extratoCC
+        # Deixa uma mensagem com o link para o registro do Extrato CC, se existir
+        self.fields['entrada_extrato_cc'].widget = forms.HiddenInput()
+        if instance and instance.entrada_extrato_cc:
+            self.fields['entrada_extrato_cc'].label = mark_safe('Entrada já criada no <strong>'
+                                                            '<a href="#" onclick="window.open(\'/financeiro/extratocc'
+                                                            '/\'+$(\'#id_entrada_extrato_cc\').val() + \'/\', \'_blank\'); return true;">'
+                                                            'extrato da conta corrente</a></strong>')
+        else:
+            self.fields['entrada_extrato_cc'].label = ''
 
         # mensagens de erro
         self.fields['termo'].error_messages['required'] = u'O campo TERMO DE OUTORGA é obrigatório'
