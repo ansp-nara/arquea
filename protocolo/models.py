@@ -284,7 +284,10 @@ class Protocolo(models.Model):
 
     # Retorna a data de recebimento formatada.
     def recebimento(self):
-        data_chegada = timezone.localtime(self.data_chegada)
+        if timezone.is_aware(self.data_chegada):
+            data_chegada = timezone.localtime(self.data_chegada)
+        else:
+            data_chegada = self.data_chegada
         return data_chegada.strftime("%d/%m/%y %H:%M")
     recebimento.short_description = _(u'Recebido em')
 
@@ -305,7 +308,10 @@ class Protocolo(models.Model):
 
     # Retorna a data de recebimento formatada.
     def chegada(self):
-        data_chegada = timezone.localtime(self.data_chegada)
+        if timezone.is_aware(self.data_chegada):
+            data_chegada = timezone.localtime(self.data_chegada)
+        else:
+            data_chegada = self.data_chegada
         return data_chegada.strftime("%d/%m/%y")
     vencimento.short_description = _(u'Recebimento')
     vencimento.admin_order_field = 'data_chegada'
