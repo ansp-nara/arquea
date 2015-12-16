@@ -69,7 +69,7 @@ class ButtonAdminMixin(object):
         urls = []
         for button in self.buttons:
             urls.append(
-                url(r'^(.+)/tool_%s/$' % button.url,
+                url(r'^(\d+).*/tool_%s/$' % button.url,
                     wrap(self.button_url),
                     kwargs=dict(button=button),
                     name='%s_%s_tool_%%s' % info % button.url,
