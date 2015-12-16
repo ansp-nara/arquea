@@ -1,5 +1,7 @@
 .idea
 arquea
+dist
 manage.py
 *.pyc
-*.sqlite3
+*.sqlite3*
+*.egg-info
