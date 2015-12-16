@@ -1,7 +1,7 @@
-2.5 (unreleased)
+2.4.14 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Corrigido problema com links para apagar objeto na tela de modificação (Issue #19).
 
 
 2.4.13 (2015-12-16)
