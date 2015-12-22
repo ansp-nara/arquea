@@ -171,6 +171,16 @@ class MembroControleTest(TestCase):
         saida = tz.localize(datetime(year=2000, month=01, day=01, hour=18, minute=50))
         self.assertEquals(controle.saida, saida)
 
+    def test_controle_unicode(self):
+        membro = Membro.objects.create(id=1, nome='teste', site=True)
+
+        Controle.objects.create(id=1, membro=membro,
+                                entrada=tz.localize(datetime(year=2000, month=01, day=01, hour=12)),
+                                saida=tz.localize(datetime(year=2000, month=01, day=01, hour=18, minute=30)),
+                                almoco_devido=False, almoco=60)
+        controle = Controle.objects.get(id=1)
+
+        self.assertEqual(controle.__unicode__(), 'teste - de 2000-01-01 12:00:00-02:00 a 2000-01-01 18:30:00-02:00')
 
 class MembroControleHorarioTest(TestCase):
 
