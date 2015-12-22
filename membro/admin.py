@@ -4,6 +4,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from django.contrib import admin
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from membro.forms import MembroAdminForm, ControleFeriasAdminForm,\
     ControleFeriasAdminFormSet, DispensaLegalAdminForms, ControleAdminForms
@@ -206,13 +207,21 @@ class ControleAdmin(admin.ModelAdmin):
 
     def format_entrada(self, obj):
         if obj.entrada:
-            return obj.entrada.strftime('%d %b %Y - %H:%M')
+            if timezone.is_aware(obj.entrada):
+                entrada = timezone.localtime(obj.entrada)
+            else:
+                entrada = obj.entrada
+            return entrada.strftime('%d %b %Y - %H:%M')
         return '(Nenhum)'
     format_entrada.short_description = 'Entrada'
 
     def format_saida(self, obj):
         if obj.saida:
-            return obj.saida.strftime('%d %b %Y - %H:%M')
+            if timezone.is_aware(obj.saida):
+                saida = timezone.localtime(obj.saida)
+            else:
+                saida = obj.saida
+            return saida.strftime('%d %b %Y - %H:%M')
         return '(Nenhum)'
     format_saida.short_description = 'Saída'
 

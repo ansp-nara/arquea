@@ -4,6 +4,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from django.db import models
+from django.utils import timezone
 from utils.models import CNPJField
 from django.utils.translation import ugettext_lazy as _
 from datetime import datetime
@@ -296,6 +297,7 @@ class Identificacao(models.Model):
 
     # Retorna o histórico formatado.
     def formata_historico(self):
+        historico = timezone.localtime(self.historico) if timezone.is_aware(self.historico) else historico
         return self.historico.strftime('%d/%m/%y %H:%M')
     formata_historico.short_description = _(u'Histórico')
 

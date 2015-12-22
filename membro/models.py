@@ -6,6 +6,7 @@
 from datetime import timedelta, datetime, date
 from django.db import models
 from django.db.models import Q
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import cached_property
 from django.core.urlresolvers import reverse
@@ -562,10 +563,12 @@ class Controle(models.Model):
     almoco = models.IntegerField(_(u'Tempo de almoço em minutos'), null=True, blank=True, default=60)
 
     def __unicode__(self):
+        entrada = timezone.localtime(self.entrada) if timezone.is_aware(self.entrada) else self.entrada
         if self.saida:
-            return u'%s - de %s a %s' % (self.membro, self.entrada, self.saida)
+            saida = timezone.localtime(self.saida) if timezone.is_aware(self.saida) else self.saida
+            return u'%s - de %s a %s' % (self.membro, entrada, saida)
         else:
-            return u'%s - %s' % (self.membro, self.entrada)
+            return u'%s - %s' % (self.membro, entrada)
 
     @cached_property
     def segundos(self):

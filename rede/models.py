@@ -6,6 +6,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from decimal import Decimal
+from django.utils import timezone
 from ipaddress import IPv4Address, IPv6Address
 from django.utils.translation import ugettext_lazy as _
 
@@ -122,7 +123,7 @@ class Historico(models.Model):
     equipamento = models.ForeignKey('patrimonio.Patrimonio', null=True, blank=True)
 
     def __unicode__(self):
-        return self.horario
+        return timezone.localtime(self.horario) if timezone.is_aware(self.horario) else self.horario
 
 
 UNIDADES = (
