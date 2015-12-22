@@ -298,7 +298,7 @@ class Identificacao(models.Model):
     # Retorna o histórico formatado.
     def formata_historico(self):
         historico = timezone.localtime(self.historico) if timezone.is_aware(self.historico) else historico
-        return self.historico.strftime('%d/%m/%y %H:%M')
+        return historico.strftime('%d/%m/%y %H:%M')
     formata_historico.short_description = _(u'Histórico')
 
 
