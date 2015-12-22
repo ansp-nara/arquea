@@ -6,7 +6,7 @@
 from setuptools import setup, find_packages
 import codecs, os
 
-version = '2.5.dev0'
+version = '2.4.15'
 """
 zest.releaser available commands
 prerelease: asks you for a version number (defaults to the current version minus a 'dev' or so) with this new version

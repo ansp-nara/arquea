@@ -1,7 +1,10 @@
-2.5 (unreleased)
-----------------
+2.4.15 (2015-12-22)
+-------------------
 
-- Nothing changed yet.
+- Corrigido problema com exibição de data e hora em UTC ao invés do horário local.
+- Corrigido exibição de mensagem de timezone do cliente diferente do servidor mesmo
+  quando eram iguais.
+- Corrigido problema ao carregar imagens de calendário e relógio.
 
 
 2.4.14 (2015-12-16)
