@@ -184,7 +184,7 @@ Referências
 
 [NARA] Núcleo de Aplicações em Redes Avançadas - Equipe que operara e mantém o projeto Rede ANSP - www.ansp.br.
 
-[NEUROMAT] Neuromatemática - Centro de Pesquisa, Inovação e Difusão (CEPID) da FAPESP coordenado pelo Prof. Dr. Antonio Galves - neuromat.numec.prp.usp.br.
+[NEUROMAT] Neuromatemática - Centro de Pesquisa, Inovação e Difusão (CEPID) da FAPESP coordenado pelo Prof. Dr. Antonio Galves - www.neuromat.numec.prp.usp.br.
 
 
 
