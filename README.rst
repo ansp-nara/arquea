@@ -1,10 +1,8 @@
-﻿============
-Sistema ANSP
-============
+﻿=====
+ARQUEA
+======
 
-Sistema de gerenciamento de projetos Fapesp desenvolvido pelo NARA/ANSP.
-É um conjunto de aplicações Django para gerenciar concessões e gastos de
-um projeto Fapesp.
+Sistema de gestão de informações para projetos de pesquisa segundo regras estabelecidas pelo termo de outorga e manual de prestação de contas da FAPESP. Desenvolvido pelo NARA inicialmente para a ANSP e aperfeiçoado para o NeuroMat.
 
 Instalação
 ..........
@@ -175,4 +173,20 @@ pode ser feito de outras maneiras, como descrito em https://docs.djangoproject.c
     d. Execute, no diretório do projeto::
 
         python manage.py collectstatic
+
+
+Referências
+...........
+
+[ANSP] an Academic Network at São Paulo, Rede Acadêmica do Estado de São Paulo  - projeto especial FAPESP coordenado pelo Prof. Dr. Luis Fernandez Lopez - www.ansp.br.
+
+[FAPESP] Fundação de Amparo à Pesquisa do Estado de São Paulo - www.fapesp.br.
+
+[NARA] Núcleo de Aplicações em Redes Avançadas - Equipe que operara e mantém o projeto Rede ANSP - www.ansp.br.
+
+[NEUROMAT] Neuromatemática - Centro de Pesquisa, Inovação e Difusão (CEPID) da FAPESP coordenado pelo Prof. Dr. Antonio Galves - neuromat.numec.prp.usp.br.
+
+
+
+
 
