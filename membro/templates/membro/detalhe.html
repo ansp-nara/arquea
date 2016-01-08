@@ -134,20 +134,22 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 	        {% comment %} Junta as celulas de dias iguais {% endcomment %}
 	        <td {% if forloop.first %}{% if dia.controles|length > 1 %}rowspan="{{dia.controles|length}}" style="vertical-align:middle;"{% endif %}{% else %}style="display:none"{% endif %}>{{ d.entrada|date:"d" }}</td>
 	        <td>
+                {% comment %} 
 	            <button id="btn_voltar_20_{{d.id}}" class="btn_voltar_20"><< 20min</button>
 	            <button id="btn_add_ini_20_{{d.id}}" class="btn_add_ini_20">-20min</button>
+                {% endcomment %}
 	            <a href="{% url 'admin:membro_controle_change' d.id %}">{{ d.entrada|date:"d/m  H:i" }}</a></td>
 	        <td>
 	            {% if d.almoco or d.almoco == 0 %}
 	                <a href="{% url 'admin:membro_controle_change' d.id %}">{{ d.almoco|default_if_none:"" }}</a>
-	            {% else %}
-	                <button id="btn_al_0_{{d.id}}" class="btn_al_0">0</button><button id="btn_al_60_{{d.id}}" class="btn_al_60">60</button>
 	            {% endif %}
 	        </td>
 	        <td>
 	            <a href="{% url 'admin:membro_controle_change' d.id %}">{{ d.saida|date:"d/m  H:i" }}</a>
+                {% comment %}
 	            <button id="btn_add_end_20_{{d.id}}" class="btn_add_end_20"> +20min</button>
 	            <button id="btn_avancar_20_{{d.id}}" class="btn_avancar_20">>> 20min</button>
+                {% endcomment %}
 	        </td>
 	        <td {% if d.segundos > 72000 %}
 	                    style="background-color:red;"
@@ -184,6 +186,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
  {% endfor %}
  
  <script type="text/javascript">
+ /*
 function ajax_controle_mudar_almoco(id, almoco) {
      $.ajax({
        url: "/membro/ajax_controle_mudar_almoco",
@@ -245,7 +248,6 @@ function ajax_controle_avancar_bloco(id, tempo) {
 	        ajax_controle_mudar_almoco(id, 60);
 	    });
 	    
-	    
 	    // Adicao de tempo
         $(".btn_add_ini_20").click(function(){
             id = this.id.replace('btn_add_ini_20_', '');
@@ -263,21 +265,16 @@ function ajax_controle_avancar_bloco(id, tempo) {
             ajax_controle_voltar_bloco(id, 20);
         });
         
-        
         $(".btn_avancar_20").click(function(){
             id = this.id.replace('btn_avancar_20_', '');
             ajax_controle_avancar_bloco(id, 20);
         });
-        
 	}
-	
-	
-	
-	
-	
 	
 	$(document).ready(function() {
 	    bindButtons();
 	});
+	*/
+    
  </script>
 {% endblock %}
