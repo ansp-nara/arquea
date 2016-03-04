@@ -16,7 +16,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
     width: 900px;
  }
  #table-controle tr {
-    height: 35px;
+    height: 25px;
+ }
+ #table-controle td {
+    padding: 0 4px 0 4px;
  }
  
  .table-consolidado td,
@@ -28,6 +31,10 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
     width: 50px;
     vertical-align: middle;
  }
+ #table-controle .th-obs {
+    width: 0;
+ }
+ 
  #table-controle .td-obs {
     white-space:normal;
     width: 550px;   
@@ -123,21 +130,15 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
         <th>Almoço</th>
         <th>Saída</th>
         <th>Total</th>
-        <th>Obs</th>
+        <th class='th-obs'>Obs</th>
     </tr>
 {% for dia in m.dias %}
     {% if dia.controles %}
 	    {% for d in dia.controles %}
-	    <tr
-	       class="{% if dia.is_feriado %}tr-feriado{% elif dia.is_final_de_semana %}tr-final-de-semana{% endif %}"
-	    >
+	    <tr class="{% if dia.is_feriado %}tr-feriado{% elif dia.is_final_de_semana %}tr-final-de-semana{% endif %}" >
 	        {% comment %} Junta as celulas de dias iguais {% endcomment %}
 	        <td {% if forloop.first %}{% if dia.controles|length > 1 %}rowspan="{{dia.controles|length}}" style="vertical-align:middle;"{% endif %}{% else %}style="display:none"{% endif %}>{{ d.entrada|date:"d" }}</td>
 	        <td>
-                {% comment %} 
-	            <button id="btn_voltar_20_{{d.id}}" class="btn_voltar_20"><< 20min</button>
-	            <button id="btn_add_ini_20_{{d.id}}" class="btn_add_ini_20">-20min</button>
-                {% endcomment %}
 	            <a href="{% url 'admin:membro_controle_change' d.id %}">{{ d.entrada|date:"d/m  H:i" }}</a></td>
 	        <td>
 	            {% if d.almoco or d.almoco == 0 %}
@@ -146,10 +147,6 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 	        </td>
 	        <td>
 	            <a href="{% url 'admin:membro_controle_change' d.id %}">{{ d.saida|date:"d/m  H:i" }}</a>
-                {% comment %}
-	            <button id="btn_add_end_20_{{d.id}}" class="btn_add_end_20"> +20min</button>
-	            <button id="btn_avancar_20_{{d.id}}" class="btn_avancar_20">>> 20min</button>
-                {% endcomment %}
 	        </td>
 	        <td {% if d.segundos > 72000 %}
 	                    style="background-color:red;"
