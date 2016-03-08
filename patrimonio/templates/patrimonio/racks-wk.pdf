@@ -64,7 +64,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
     .bloco-n .u-n {
         background:#d8d8d8;
         color:#636363;
-        font:8px Verdana,Arial;
+        font:8px Arial, Verdana, Helvetica, sans-serif;
         border-top:0;
         border-right:1px;
         border-bottom:0;
@@ -147,6 +147,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
         display: table-cell;
         width:199px;
         padding-left:17px;
+        font-family: Arial, Verdana, Helvetica, sans-serif; 
         font-size:10px;
         top:-3px;
     }
@@ -313,7 +314,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
                     </div>
                     {% endcomment %}
                     <div id="rack_front_{{ rack.id }}_{{forloop.counter}}" class="bloco-n" style="position:relative; height: {{ rack.altura_pxs|unlocalize }}px;">
-                        {% for i in rack.altura_count %}
+                        {% for i in rack.altura_count reversed %}
                             <div>
                                 <div class="u-n">
                                     <div>{{ i }}</div>
