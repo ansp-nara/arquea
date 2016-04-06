@@ -96,6 +96,13 @@ class ProtocoloAdmin(admin.ModelAdmin):
                      'num_documento', 'referente']
     muda_estado = 0
 
+    # Não está aceitando o lookup mesmo definido em list_filter, então está colocado aqui.
+    # Rever assim que possível
+    def lookup_allowed(self, lookup, value):
+	if lookup == 'pagamento__origem_fapesp__item_outorga__natureza_gasto__modalidade__id__exact':
+	    return True
+	return super(ProtocoloAdmin, self).lookup_allowed(lookup,value)
+	
     def action_clone(self, request, queryset):
         clone_objects(queryset)
         total = queryset.count()
