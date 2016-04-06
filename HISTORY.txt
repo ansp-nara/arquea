@@ -1,7 +1,10 @@
 2.4.16 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Melhora na descrição do projeto.
+- Removidos botões para modificação de controle de horas.
+- Corrigida numeração dos racks no bayface em pdf.
+- Corrigido filtro inválido na exibição de protocolos.
 
 
 2.4.15 (2015-12-22)
