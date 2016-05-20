@@ -8,6 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import cached_property
 from django.conf import settings
 from django.core import urlresolvers
+from django.core.validators import RegexValidator
 from utils.functions import formata_moeda
 from utils.models import NARADateField
 from django.db.models import Sum, Q
@@ -85,6 +86,7 @@ class Estado(models.Model):
         ordering = ('nome', )
 
 
+
 class Termo(models.Model):
     """
     Uma instância dessa classe representa um Termo de Outorga.
@@ -115,7 +117,9 @@ class Termo(models.Model):
     A 'class Meta'				Define a descrição do modelo (singular e plural) e a ordenação dos dados pelo ano.
     """
     ano = models.IntegerField(_(u'Ano'), help_text=_(u'ex. 2008'), default=0)
-    processo = models.IntegerField(_(u'Processo'), help_text=_(u'ex. 52885'), default=0)
+    #processo = models.IntegerField(_(u'Processo'), help_text=_(u'ex. 52885'), default=0)
+    processo = models.CharField(_(u'Processo'), max_length=15, help_text=_(u'ex. 52885'), default='0', validators=[RegexValidator(r'^[0-9]+$', u'Somente digitos são permitidos.')])
+
     digito = models.IntegerField(_(u'Dígito'), help_text=_(u'ex. 8'), default=0)
     inicio = NARADateField(_(u'Início'), help_text=_(u'Data de início do processo'), null=True, blank=True)
     estado = models.ForeignKey('outorga.Estado', verbose_name=_(u'Estado'))
@@ -132,6 +136,8 @@ class Termo(models.Model):
     exibe_rel_ger_progressivo = models.BooleanField(_(u'Exibe o processo no Relatório Gerencial Progressivo?'),
                                                     default=True)
 #    membro = models.ForeignKey('membro.Membro', verbose_name=_(u'Outorga'))
+
+
 
     # Retorna o número completo do processo (ano, número e dígito).
     def __unicode__(self):
