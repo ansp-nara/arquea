@@ -164,6 +164,10 @@ class Membro(models.Model):
     def data_inicio(self):
         return Historico.objects.filter(membro=self).order_by('inicio').values_list('inicio')[0][0]
 
+    @property
+    def carga_horaria(self):
+        return Historico.objects.filter(membro=self).order_by('inicio').values_list('carga_horaria')[0][0]
+
     # Define a ordenação e unicidade dos dados.
     class Meta:
         ordering = ('nome', )
@@ -282,6 +286,7 @@ class Ferias(models.Model):
         total_dias_uteis_aberto = 0
 
         ferias = Ferias.objects.filter(membro=membro_id)
+        membro = Membro.objects.get(id=membro_id)
 
         for f in ferias:
             controles = ControleFerias.objects.filter(ferias=f).select_related().order_by('inicio')
@@ -293,7 +298,7 @@ class Ferias(models.Model):
                 if c.dias_uteis_fato:
                     total_dias_uteis_aberto = total_dias_uteis_aberto - c.dias_uteis_fato
 
-        return total_dias_uteis_aberto * 8 * 60 * 60
+        return total_dias_uteis_aberto * membro.carga_horaria * 60 * 60
 
     # Define a descrição do modelo, ordenação e a unicidade dos dados.
     class Meta:
@@ -398,13 +403,13 @@ class DispensaLegal(models.Model):
                 if self.termino_realizada == dia:
                     if self.horas or self.minutos:
                         if self.horas:
-                            horas_dispensa += self.horas % 8.0
+                            horas_dispensa += self.horas % self.membro.carga_horaria
                         if self.minutos:
                             horas_dispensa += (self.minutos % 60.0)/60
                     elif self.dias_corridos:
-                        horas_dispensa = 8.0
+                        horas_dispensa = self.membro.carga_horaria
                 elif dia < self.termino_realizada:
-                    horas_dispensa = 8.0
+                    horas_dispensa = self.membro.carga_horaria
                 elif dia > self.termino_realizada:
                     horas_dispensa = 0
 
@@ -521,6 +526,7 @@ class Historico(models.Model):
     obs = models.TextField(null=True, blank=True)
     cargo = models.ForeignKey('membro.Cargo')
     membro = models.ForeignKey('membro.Membro')
+    carga_horaria = models.IntegerField(verbose_name=_(u'Carga horária'), blank=True, null=True, default=8)
 
     objects = models.Manager()
     ativos = AtivoManager()
@@ -697,8 +703,8 @@ class Controle(models.Model):
                             total_horas_dispensa += horas_dispensa * 3600
                         # conta as horas de ferias
                         if d.is_ferias:
-                            # soma 8h
-                            total_horas_ferias += 28800
+                            # soma horas do dia (8h periodo completo ou 4h meio periodo)
+                            total_horas_ferias += self.membro.carga_horaria * 60 * 60
 
                 m.update({'total': total_segundos_trabalhos_mes})
                 if self.membro.data_inicio > mes_corrente_ini:
@@ -725,7 +731,6 @@ class Controle(models.Model):
 
         return meses
 
-    @classmethod
     def total_horas_uteis(self, data_ini, data_fim):
         soma_dias_de_trabalho = 0
 
@@ -749,7 +754,7 @@ class Controle(models.Model):
             d += timedelta(days=1)
 
         # as horas totais do período são as horas do total de dias do mes menos os finais de semana, ferias e dispensas
-        total_horas_periodo = (soma_dias_de_trabalho * 8 * 60 * 60)
+        total_horas_periodo = (soma_dias_de_trabalho * self.membro.carga_horaria * 60 * 60)
 
         return total_horas_periodo
 
