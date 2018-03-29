@@ -49,7 +49,7 @@ setup(
         'django-ckeditor',
         'django-treemenus2',
         'django-weasyprint',
-        'django-localflavor',
+        'django-localflavor<1.3',
         'python-dateutil',
         'python-magic',
         'xhtml2pdf',
