@@ -18,7 +18,7 @@ from financeiro.models import Pagamento
 from outorga.models import Termo
 from utils.functions import render_to_pdf_weasy, render_to_pdfxhtml2pdf
 from memorando.models import MemorandoSimples, MemorandoFAPESP, Pergunta,\
-    MemorandoResposta
+    MemorandoResposta, MemorandoPinpoint
 
 
 @login_required
@@ -29,6 +29,13 @@ def simples(request, mem):
     return render_to_pdf_weasy('memorando/simples.pdf', {'m': m, 't': Termo.termo_ativo()}, request=request,
                                filename='memorando_%s.pdf' % m.__unicode__())
 
+@login_required
+def pinpoint(request, mem):
+    m = get_object_or_404(MemorandoPinpoint, pk=mem)
+
+    # return render_to_response('memorando/simples.pdf', {'m':m, 't':Termo.termo_ativo()})
+    return render_to_pdf_weasy('memorando/pinpoint.pdf', {'m': m, 't': Termo.termo_ativo()}, request=request,
+                               filename='memorando_%s.pdf' % m.__unicode__())
 
 @login_required_or_403
 @require_safe

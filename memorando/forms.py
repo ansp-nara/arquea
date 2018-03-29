@@ -13,7 +13,7 @@ from tinymce.widgets import TinyMCE
 from utils import widgets
 from identificacao.models import Identificacao
 from memorando.models import MemorandoFAPESP, MemorandoResposta, Pergunta,\
-    MemorandoSimples, Corpo
+    MemorandoSimples, Corpo, MemorandoPinpoint
 
 
 class MemorandoRespostaForm(forms.ModelForm):
@@ -65,6 +65,15 @@ class MemorandoSimplesForm(forms.ModelForm):
         model = MemorandoSimples
         fields = ['superior', 'inferior', 'direita', 'esquerda', 'destinatario', 'assunto', 'corpo', 'equipamento',
                   'envio', 'assinatura', 'assinado', 'pai']
+
+
+class MemorandoPinpointForm(forms.ModelForm):
+    corpo = forms.CharField(widget=CKEditorWidget())
+
+    class Meta:
+        model = MemorandoPinpoint
+        fields = ['destinatario', 'assunto', 'corpo', 'envio', 'assinatura',
+                  'assinado']
 
 
 class CorpoAdminForm(forms.ModelForm):

@@ -8,6 +8,7 @@ from django.conf.urls import patterns
 
 urlpatterns = patterns('memorando.views',
                        (r'simples/(?P<mem>\d+)$', 'simples'),
+                       (r'pinpoint/(?P<mem>\d+)$', 'pinpoint'),
                        (r'fapesp/(?P<mem>\d+)$', 'fapesp'),
                        (r'relatorio/(?P<mem>\d+)$', 'relatorio'),
                        (r'relatorio$', 'relatorio'),

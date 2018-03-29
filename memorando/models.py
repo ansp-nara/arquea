@@ -11,12 +11,17 @@ def proximo_numero():
     from datetime import datetime
     from django.db.models import Max
     agora = datetime.now()
-    n1 = MemorandoSimples.objects.filter(data__year=agora.year).aggregate(Max('numero'))
-    n2 = MemorandoResposta.objects.filter(data__year=agora.year).aggregate(Max('numero'))
+    n1 = MemorandoSimples.objects.filter(data__year=agora.year).aggregate(
+        Max('numero'))
+    n2 = MemorandoResposta.objects.filter(data__year=agora.year).aggregate(
+        Max('numero'))
+    n3 = MemorandoPinpoint.objects.filter(data__year=agora.year).aggregate(
+        Max('numero'))
     n1 = n1['numero__max'] or 0
     n2 = n2['numero__max'] or 0
+    n3 = n3['numero__max'] or 0
 
-    return max(n1, n2) + 1
+    return max(n1, n2, n3) + 1
 
 
 class Estado(models.Model):
@@ -171,6 +176,49 @@ class MemorandoSimples(models.Model):
     def destino(self):
         dest = self.destinatario.split('\n')
         return '<br />'.join(dest)
+
+
+class MemorandoPinpoint(models.Model):
+    data = models.DateField(auto_now_add=True)
+    destinatario = models.TextField(u'Destinatário', default="""EQUINIX
+Av. Ceci, 1900  Conj A 1º andar
+Centro Empresarial  Tamboré
+CEP: 06460120
+Barueri - São Paulo""")
+    numero = models.IntegerField(editable=False)
+    assunto = models.ForeignKey('memorando.Assunto', null=True)
+    corpo = models.TextField()
+    equipamento = models.BooleanField('Equipamento?', default=True)
+    envio = models.BooleanField('Envio?', default=True)
+    assinatura = models.CharField(max_length=100,
+                                  help_text=u'Nome completo de quem assina')
+    assinado = models.FileField(_(u'Memorando assinado'),
+                                upload_to='memorandos', null=True, blank=True)
+
+    def __unicode__(self):
+        if self.assunto_id is not None:
+            return u'%s/%s - %s' % (self.data.year, self.numero,
+                                    self.assunto.__unicode__())
+        else:
+            return u'%s/%s' % (self.data.year, self.numero)
+
+    def num_memo(self):
+        return u'%s/%s' % (self.data.year, self.numero)
+    num_memo.admin_order_field = 'data'
+    num_memo.short_description = u'Número'
+
+    class Meta:
+        verbose_name_plural = u'Memorandos Pinpoint'
+        ordering = ('-data', '-numero')
+
+    '''
+    O método para salvar uma instância é sobrescrito para que o número sequencial
+    do memorando seja gerado automaticamente para cada ano.
+    '''
+    def save(self, *args, **kwargs):
+        if self.id is None:
+            self.numero = proximo_numero()
+        super(MemorandoPinpoint, self).save(*args, **kwargs)
 
 
 class Arquivo(models.Model):

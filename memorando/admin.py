@@ -8,9 +8,9 @@ from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 from utils.functions import clone_objects
 from memorando.models import Estado, Assunto, Arquivo, Pergunta, Corpo,\
-    MemorandoFAPESP, MemorandoResposta, MemorandoSimples
+    MemorandoFAPESP, MemorandoResposta, MemorandoSimples, MemorandoPinpoint
 from memorando.forms import PerguntaAdminForm, CorpoAdminForm, CorpoFormSet,\
-    MemorandoRespostaForm, MemorandoSimplesForm
+    MemorandoRespostaForm, MemorandoSimplesForm, MemorandoPinpointForm
 
 
 class PerguntaInline(admin.TabularInline):
@@ -98,3 +98,18 @@ class MemorandoSimplesAdmin(admin.ModelAdmin):
     action_clone.short_description = _(u"Duplicar os memorandos selecionados")
 
 admin.site.register(MemorandoSimples, MemorandoSimplesAdmin)
+
+
+class MemorandoPinpointAdmin(MemorandoSimplesAdmin):
+    form = MemorandoPinpointForm
+    inlines = []
+
+    fieldsets = (
+        (None, {
+            'fields': ('destinatario', 'assunto', 'corpo', 'envio',
+                       ('assinatura', 'assinado'))
+        }),
+    )
+
+
+admin.site.register(MemorandoPinpoint, MemorandoPinpointAdmin)
